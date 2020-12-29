@@ -1,0 +1,4 @@
+*.o
+*.out
+*.n64
+.DS_Store
