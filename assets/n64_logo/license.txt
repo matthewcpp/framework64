@@ -1,0 +1,11 @@
+Model Information:
+* title:	N64DD - N64 Logo
+* source:	https://sketchfab.com/3d-models/n64dd-n64-logo-03c95d97f95b4184ad3623d91b5e5f8b
+* author:	julianbebout75 (https://sketchfab.com/julianbebout75)
+
+Model License:
+* license type:	CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)
+* requirements:	Author must be credited. Modified versions must have the same license. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "N64DD - N64 Logo" (https://sketchfab.com/3d-models/n64dd-n64-logo-03c95d97f95b4184ad3623d91b5e5f8b) by julianbebout75 (https://sketchfab.com/julianbebout75) licensed under CC-BY-SA-4.0 (http://creativecommons.org/licenses/by-sa/4.0/)
