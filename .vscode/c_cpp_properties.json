@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "N64",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/n64",
+                "/usr/include/n64/nusys"
+            ],
+            "defines": [
+                "_LANGUAGE_C"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
