@@ -9,7 +9,7 @@ typedef struct {
     Renderer* renderer;
 } Game;
 
-Game* game_create();
+Game* game_create(Renderer* renderer);
 void game_update(Game* game, float time_delta);
 void game_draw(Game* game);
 

@@ -2,3 +2,4 @@
 *.out
 *.n64
 .DS_Store
+.devcontainer.json
