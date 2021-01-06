@@ -14,23 +14,23 @@ INC = $(ROOT)/usr/include
 
 LCDEFS =	-DNU_DEBUG -DF3DEX_GBI_2
 LDIRT  =	$(APP) $(TARGETS)
-LCINCS =	-I. -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR
+LCINCS =	-I. -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR -I/usr/include/n64/nustd
 LCOPTS =	-G 0
 LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra_d -L$(N64_LIBGCCDIR) -lgcc  -lnustd
 
 OPTIMIZER =	-g
 
-APP =		nu2.out
+APP =		sandbox.out
 
-TARGETS =	nu2.n64
+TARGETS =	sandbox.n64
 
-HFILES =	main.h graphic.h
+HFILES =	main.h assets.h renderer.h game.h
 
-CODEFILES   = 	main.c stage00.c stage01.c graphic.c gfxinit.c
+CODEFILES   = 	main.c  renderer.c game.c quad.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 
-DATAFILES   =	
+DATAFILES   =	quad.c
 
 DATAOBJECTS =	$(DATAFILES:.c=.o)
 
