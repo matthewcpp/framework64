@@ -24,9 +24,9 @@ APP =		sandbox.out
 
 TARGETS =	sandbox.n64
 
-HFILES =	main.h graphic.h assets.h renderer.h game.h
+HFILES =	main.h assets.h renderer.h game.h
 
-CODEFILES   = 	main.c graphic.c gfxinit.c  renderer.c game.c quad.c
+CODEFILES   = 	main.c  renderer.c game.c quad.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 
