@@ -5,6 +5,7 @@
 #include <malloc.h>
 
 Game* game = NULL;
+Renderer* renderer = NULL;
 
 void nusys_game_update(int pendingGfx);
 
@@ -14,7 +15,8 @@ void mainproc(void) {
   nuGfxInit();
   InitHeap(memory_heap, 1024*512*1);
   nuContInit();
-  game = game_create();
+  renderer = renderer_create(320, 240);
+  game = game_create(renderer);
   nuGfxFuncSet((NUGfxFunc)nusys_game_update);
   nuGfxDisplayOn();
 }
