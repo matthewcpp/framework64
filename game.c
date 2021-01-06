@@ -10,9 +10,10 @@ Entity entity;
 float rot = 0.0f;
 float scale_val = 1;
 
-Game* game_create(Renderer* renderer) {
+Game* game_create(Renderer* renderer, Input* input) {
     Game* game = malloc(64);
     game->camera = malloc(sizeof(Camera));
+    game->input = input;
     game->renderer = renderer;
 
     entity_init(&entity);
@@ -30,16 +31,19 @@ Game* game_create(Renderer* renderer) {
 }
 
 void game_update(Game* game, float time_delta) {
-    rot += 0.0349066f;
-    quat_set_axis_angle(&entity.rotation, 0, 0, 1, rot);
+    if (input_button_down(game->input, 0, A_BUTTON)) {
+        rot += 0.0349066f;
+        quat_set_axis_angle(&entity.rotation, 0, 0, 1, rot);
+    }
 
-    entity.scale.x += 0.03 * scale_val;
-    entity.scale.y += 0.03 * scale_val;
-    entity.scale.z += 0.03 * scale_val;
+    if (input_button_down(game->input, 0, B_BUTTON)) {
+        entity.scale.x += 0.03 * scale_val;
+        entity.scale.y += 0.03 * scale_val;
+        entity.scale.z += 0.03 * scale_val;
 
-    if (entity.scale.x >= 2.0f || entity.scale.x <= 0.5)
-        scale_val *= -1;
-
+        if (entity.scale.x >= 2.0f || entity.scale.x <= 0.5)
+            scale_val *= -1;
+    }
 }
 
 void game_draw(Game* game) {
