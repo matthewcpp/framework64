@@ -1,10 +1,11 @@
-#ifndef BOX_H
-#define BOX_H
+#ifndef CUBE_H
+#define CUBE_H
 
 #include <nusys.h>
 
-extern const Vtx box_vtx[];
-extern const int box_vtx_count;
-extern const Gfx box_display_list[];
+extern const Vtx cube_vtx[];
+extern const int cube_vtx_count;
+extern const Gfx cube_display_list[];
+extern const float cube_bounding[];
 
 #endif

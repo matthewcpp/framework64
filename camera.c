@@ -22,6 +22,7 @@ void camera_update_view_matrix(Camera* camera) {
     Vec3 forward, up, target;
     transform_forward(&camera->transform, &forward);
     transform_up(&camera->transform, &up);
+    vec3_normalize(&up);
 
     vec3_add(&target, &camera->transform.position, &forward);
 
