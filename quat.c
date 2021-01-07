@@ -54,3 +54,16 @@ void quat_transform_vec3(Vec3* out, Quat* q, Vec3* a) {
     out->y = y + uvy + uuvy;
     out->z = z + uvz + uuvz;
 }
+
+void quat_normalize(Quat* q) {
+    float len = q->x * q->x + q->y * q->y + q->z * q->z + q->w * q->w;
+
+    if (len > 0) {
+        len = 1.0f / _nsqrtf(len);
+    }
+
+    q->x *= len;
+    q->y *= len;
+    q->z *= len;
+    q->w *= len;
+}

@@ -14,4 +14,5 @@ void transform_init(Transform* transform);
 void transform_forward(Transform* transform, Vec3* out);
 void transform_up(Transform* transform, Vec3* out);
 
+void transform_look_at(Transform* transform, Vec3* target, Vec3* up);
 #endif
