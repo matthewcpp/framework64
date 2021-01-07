@@ -24,13 +24,13 @@ APP =		sandbox.out
 
 TARGETS =	sandbox.n64
 
-HFILES =	main.h assets.h renderer.h game.h
+HFILES =	main.h renderer.h game.h input.h vec3.h vec2.h quat.h matrix.h entity.h transform.h camera.h
 
-CODEFILES   = 	main.c  renderer.c input.c game.c quad.c vec3.c quat.c matrix.c entity.c transform.c camera.c
+CODEFILES   = 	main.c  renderer.c input.c game.c cube.c vec3.c quat.c matrix.c entity.c transform.c camera.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 
-DATAFILES   =	quad.c
+DATAFILES   =	cube.c
 
 DATAOBJECTS =	$(DATAFILES:.c=.o)
 

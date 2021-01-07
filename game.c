@@ -3,7 +3,7 @@
 #include <nusys.h>
 #include <malloc.h>
 
-#include "assets.h"
+#include "cube.h"
 #include "entity.h"
 
 Entity entity;
@@ -29,7 +29,7 @@ Game* game_create(Renderer* renderer, Input* input) {
 void game_update(Game* game, float time_delta) {
     if (input_button_down(game->input, 0, A_BUTTON)) {
         rot += 0.0349066f;
-        quat_set_axis_angle(&entity.transform.rotation, 0, 0, 1, rot);
+        quat_set_axis_angle(&entity.transform.rotation, 0, 1, 0, rot);
     }
 
     if (input_button_down(game->input, 0, B_BUTTON)) {
@@ -43,16 +43,23 @@ void game_update(Game* game, float time_delta) {
 
     if (input_button_down(game->input, 0, U_JPAD)) {
         game->camera->transform.position.y += 0.05;
-        camera_update_view_matrix(game->camera);
     }
     if (input_button_down(game->input, 0, D_JPAD)) {
         game->camera->transform.position.y -= 0.05;
-        camera_update_view_matrix(game->camera);
     }
+
+    Vec3 up;
+    vec3_zero(&up);
+    up.y = 1.0f;
+    Vec3 target;
+    vec3_zero(&target);
+
+    transform_look_at(&game->camera->transform, &target, &up);
+    camera_update_view_matrix(game->camera);
 }
 
 void game_draw(Game* game) {
     renderer_begin(game->renderer, game->camera);
-    renderer_draw_static(game->renderer, &entity, quad_display_list);
+    renderer_draw_static(game->renderer, &entity, box_display_list);
     renderer_end(game->renderer);
 }

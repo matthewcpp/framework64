@@ -71,9 +71,9 @@ void renderer_begin(Renderer* renderer, Camera* camera) {
 
     // set drawing mode to shaded
     gDPSetCycleType(renderer->display_list++,G_CYC_1CYCLE);
-    gDPSetRenderMode(renderer->display_list++,G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
+    gDPSetRenderMode(renderer->display_list++,G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
     gSPClearGeometryMode(renderer->display_list++,0xFFFFFFFF);
-    gSPSetGeometryMode(renderer->display_list++,G_SHADE| G_SHADING_SMOOTH);
+    gSPSetGeometryMode(renderer->display_list++,G_SHADE| G_SHADING_SMOOTH | G_ZBUFFER);
 
     gDPPipeSync(renderer->display_list++);
 }
