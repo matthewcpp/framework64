@@ -2,11 +2,20 @@
 
 #include <nusys.h>
 
+/*
 const Vtx quad_vtx[] =  {
         {        -32,  32, -5, 0, 0, 0, 0, 0xff, 0, 0xff	},
         {         32,  32, -5, 0, 0, 0, 0, 0, 0, 0xff	},
         {         32, -32, -5, 0, 0, 0, 0, 0, 0xff, 0xff	},
         {        -32, -32, -5, 0, 0, 0, 0xff, 0, 0, 0xff	},
+};
+*/
+
+const Vtx quad_vtx[] =  {
+        {        -1,  1, -5, 0, 0, 0, 0, 0xff, 0, 0xff	},
+        {         1,  1, -5, 0, 0, 0, 0, 0xff, 0, 0xff	},
+        {         1, -1, -5, 0, 0, 0, 0, 0xff, 0, 0xff	},
+        {        -1, -1, -5, 0, 0, 0, 0, 0xff, 0, 0xff	},
 };
 
 const int quad_vtx_count = 4;

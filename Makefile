@@ -26,7 +26,7 @@ TARGETS =	sandbox.n64
 
 HFILES =	main.h assets.h renderer.h game.h
 
-CODEFILES   = 	main.c  renderer.c input.c game.c quad.c vec3.c quat.c matrix.c entity.c
+CODEFILES   = 	main.c  renderer.c input.c game.c quad.c vec3.c quat.c matrix.c entity.c transform.c camera.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 

@@ -1,15 +1,12 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "quat.h"
-#include "vec3.h"
+#include "transform.h"
 
 #include <nusys.h>
 
 typedef struct {
-    Vec3 position;
-    Quat rotation;
-    Vec3 scale;
+    Transform transform;
     Mtx dl_matrix;
 } Entity;
 

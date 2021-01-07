@@ -21,11 +21,7 @@ Game* game_create(Renderer* renderer, Input* input) {
     IVec2 screen_size;
     renderer_get_screen_size(renderer, & screen_size);
 
-
-    guOrtho(&game->camera->projection,
-    -(float)screen_size.x/2.0F, (float)screen_size.x/2.0F,
-    -(float)screen_size.y/2.0F, (float)screen_size.y/2.0F,
-    1.0F, 10.0F, 1.0F);
+    camera_init(game->camera);
 
     return game;
 }
@@ -33,16 +29,25 @@ Game* game_create(Renderer* renderer, Input* input) {
 void game_update(Game* game, float time_delta) {
     if (input_button_down(game->input, 0, A_BUTTON)) {
         rot += 0.0349066f;
-        quat_set_axis_angle(&entity.rotation, 0, 0, 1, rot);
+        quat_set_axis_angle(&entity.transform.rotation, 0, 0, 1, rot);
     }
 
     if (input_button_down(game->input, 0, B_BUTTON)) {
-        entity.scale.x += 0.03 * scale_val;
-        entity.scale.y += 0.03 * scale_val;
-        entity.scale.z += 0.03 * scale_val;
+        entity.transform.scale.x += 0.03 * scale_val;
+        entity.transform.scale.y += 0.03 * scale_val;
+        entity.transform.scale.z += 0.03 * scale_val;
 
-        if (entity.scale.x >= 2.0f || entity.scale.x <= 0.5)
+        if (entity.transform.scale.x >= 2.0f || entity.transform.scale.x <= 0.5)
             scale_val *= -1;
+    }
+
+    if (input_button_down(game->input, 0, U_JPAD)) {
+        game->camera->transform.position.y += 0.05;
+        camera_update_view_matrix(game->camera);
+    }
+    if (input_button_down(game->input, 0, D_JPAD)) {
+        game->camera->transform.position.y -= 0.05;
+        camera_update_view_matrix(game->camera);
     }
 }
 
