@@ -2,6 +2,10 @@
 
 #include <math.h>
 
+#ifndef M_PI
+    #define M_PI FVAL_PI
+#endif
+
 void quat_ident(Quat* q) {
     q->x = 0.0f;
     q->y = 0.0f;
@@ -66,4 +70,24 @@ void quat_normalize(Quat* q) {
     q->y *= len;
     q->z *= len;
     q->w *= len;
+}
+
+void quat_from_euler(Quat* q, float x, float y, float z) {
+    float halfToRad = (0.5f * M_PI) / 180.0f;
+
+    x *= halfToRad;
+    y *= halfToRad;
+    z *= halfToRad;
+
+    float sx = _nsinf(x);
+    float cx = _ncosf(x);
+    float sy = _nsinf(y);
+    float cy = _ncosf(y);
+    float sz = _nsinf(z);
+    float cz = _ncosf(z);
+
+    q->x = sx * cy * cz - cx * sy * sz;
+    q->y = cx * sy * cz + sx * cy * sz;
+    q->z = cx * cy * sz - sx * sy * cz;
+    q->w = cx * cy * cz + sx * sy * sz;
 }

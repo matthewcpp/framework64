@@ -11,4 +11,6 @@ void quat_ident(Quat* q);
 void quat_set_axis_angle(Quat* q, float x, float y, float z, float rad);
 void quat_transform_vec3(Vec3* out, Quat* q, Vec3* a);
 void quat_normalize(Quat* q);
+
+void quat_from_euler(Quat* q, float x, float y, float z);
 #endif
