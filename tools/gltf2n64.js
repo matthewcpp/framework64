@@ -1,12 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 
-if (process.argv.length < 3) {
-	console.log("Usage: node gltf2n64 /path/to/model.gltf");
+if (process.argv.length < 4) {
+	console.log("Usage: node gltf2n64 /path/to/model.gltf /path/to/output/folder");
 	process.exit(1);
 }
 
 const gltfPath = process.argv[2];
+const outputFolder = process.argv[3];
 
 if (!fs.existsSync(gltfPath)) {
 	console.log(`Unable to open: ${gltfPath}`)
@@ -23,6 +24,7 @@ class N64Mesh {
 	constructor() {
 		this.vertices = [];
 		this.triangles = [];
+		this.texture = null;
 	}
 }
 
@@ -31,10 +33,32 @@ class N64Model {
 		this.name = name;
 		this.meshes = [];
 	}
+
+	mergeVertexColorMeshes() {
+		const meshList = this.meshes;
+		const mergeMesh = new N64Mesh();
+		this.meshes = [mergeMesh];
+
+		let triangleOffset = 0;
+
+		for (const mesh of meshList) {
+			if (mesh.texture != null) {
+				this.meshes.push(mesh);
+				continue;
+			}
+
+			mergeMesh.vertices.push(...mesh.vertices);
+			
+			for (const t of mesh.triangles) {
+				mergeMesh.triangles.push([ t[0] + triangleOffset, t[1] + triangleOffset, t[2] + triangleOffset]);
+			}
+
+			triangleOffset += mesh.vertices.length;
+		}
+	}
 }
 
 const modelName = path.basename(gltfPath, ".gltf");
-const modelDir = path.dirname(gltfPath);
 const model = new N64Model(modelName);
 const globalScale = 1;
 
@@ -54,15 +78,15 @@ function getBuffer(bufferIndex) {
 	return buffer;
 }
 
-function readPositions(gltfMesh, n64Mesh) {
-	const accessor = gltf.accessors[gltfMesh.primitives[0].attributes.POSITION];
+function readPositions(gltfPrimitive, n64Mesh) {
+	const accessor = gltf.accessors[gltfPrimitive.attributes.POSITION];
 	const bufferView = gltf.bufferViews[accessor.bufferView];
 	const buffer = getBuffer(bufferView.buffer);
 
 	const stride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : 4;
 	let offset = bufferView.byteOffset;
 
-	for (let i = 0; i < accessor.count; i+=3) {
+	for (let i = 0; i < accessor.count; i++) {
 		const p0 = parseInt(buffer.readFloatLE(offset) * globalScale);
 		offset += stride;
 
@@ -73,6 +97,7 @@ function readPositions(gltfMesh, n64Mesh) {
 		offset += stride;
 
 		n64Mesh.vertices.push([p0, p1, p2, 0]);
+		console.log("push vertex");
 	}
 }
 
@@ -83,25 +108,24 @@ inline fixed_point_t float_to_fixed(double input)
 }
 */
 
-function readTexCoords(gltfMesh, n64Mesh) {
+function readTexCoords(gltfPrimitive, n64Mesh) {
 	for (const vertex of n64Mesh.vertices) {
 		vertex.push(0, 0);
 	}
 }
 
-function readColors(gltfMesh, n64Mesh) {
-	for (const vertex of n64Mesh.vertices) { 
-		for (let i = 0; i < 3; i ++) {
-			vertex.push(parseInt(Math.random() * (255 - 30) + 30));
-		}
+function readMaterial(gltfPrimitive, n64Mesh) {
+	const material = gltf.materials[gltfPrimitive.material];
+	const baseColor = material.pbrMetallicRoughness.baseColorFactor;
+	const rgba = [parseInt(baseColor[0] * 255), parseInt(baseColor[1] * 255), parseInt(baseColor[2] * 255), parseInt(baseColor[3] * 255)];
 
-		vertex.push(255);
+	for (const vertex of n64Mesh.vertices) {
+		vertex.push(...rgba);
 	}
-	
 }
 
-function readIndices(gltfMesh, n64Mesh) {
-	const accessor = gltf.accessors[gltfMesh.primitives[0].indices];
+function readIndices(gltfPrimitive, n64Mesh) {
+	const accessor = gltf.accessors[gltfPrimitive.indices];
 	const bufferView = gltf.bufferViews[accessor.bufferView];
 	const buffer = getBuffer(bufferView.buffer);
 
@@ -119,23 +143,35 @@ function readIndices(gltfMesh, n64Mesh) {
 		offset += stride;
 
 		n64Mesh.triangles.push([p0, p1, p2]);
+		console.log("push triangle")
 	}
 }
 
 
 for (const gltfMesh of gltf.meshes) {
-	const n64Mesh = new N64Mesh();
-	model.meshes.push(n64Mesh);
 
-	readPositions(gltfMesh, n64Mesh);
-	readTexCoords(gltfMesh, n64Mesh);
-	readColors(gltfMesh, n64Mesh);
+	for (const gltfPrimitive of gltfMesh.primitives) {
+		// only support triangles for now
+		if (gltfPrimitive.hasOwnProperty("mode") && gltfPrimitive.mode != 4)
+			continue;
 
-	readIndices(gltfMesh, n64Mesh);
+			console.log ("process mesh");
+		const n64Mesh = new N64Mesh();
+		model.meshes.push(n64Mesh);
+	
+		readPositions(gltfPrimitive, n64Mesh);
+		readTexCoords(gltfPrimitive, n64Mesh);
+		readMaterial(gltfPrimitive, n64Mesh);
+	
+		readIndices(gltfPrimitive, n64Mesh);
+	}
 }
 
-const filePath = path.join(modelDir, `${modelName}.h`)
+model.mergeVertexColorMeshes();
+
+const filePath = path.join(outputFolder, `${model.name}.h`)
 console.log(`write: ${filePath}`);
+
 const file = fs.openSync(filePath, "w");
 fs.writeSync(file, `#ifndef MODEL_${modelName.toUpperCase()}_H\n`);
 fs.writeSync(file, `#define MODEL_${modelName.toUpperCase()}_H\n\n`);
