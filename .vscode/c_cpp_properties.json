@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/usr/include/n64",
-                "/usr/include/n64/nusys"
+                "/usr/include/n64/nusys",
+                "/usr/include/n64/nustd"
             ],
             "defines": [
                 "_LANGUAGE_C"

@@ -65,12 +65,15 @@ void renderer_begin(Renderer* renderer, Camera* camera) {
 
     // sets the projection matrix (modelling set in individual draw calls)
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPPerspNormalize(renderer->display_list++, camera->perspNorm);
+
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
 
     // set drawing mode to shaded
     gDPSetCycleType(renderer->display_list++,G_CYC_1CYCLE);
-    gDPSetRenderMode(renderer->display_list++,G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF2);
+    gDPSetRenderMode(renderer->display_list++,G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
     gSPClearGeometryMode(renderer->display_list++,0xFFFFFFFF);
-    gSPSetGeometryMode(renderer->display_list++,G_SHADE| G_SHADING_SMOOTH);
+    gSPSetGeometryMode(renderer->display_list++,G_SHADE| G_SHADING_SMOOTH | G_ZBUFFER);
 
     gDPPipeSync(renderer->display_list++);
 }
@@ -86,12 +89,13 @@ void renderer_end(Renderer* renderer) {
 float entity_matrix[4][4];
 
 void renderer_draw_static(Renderer* renderer, Entity* entity, const Gfx* static_display_list) {
-    matrix_from_trs(entity_matrix, &entity->position, &entity->rotation, &entity->scale);
+    matrix_from_trs(entity_matrix, &entity->transform.position, &entity->transform.rotation, &entity->transform.scale);
     guMtxF2L(entity_matrix, &entity->dl_matrix);
 
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(entity->dl_matrix)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(entity->dl_matrix)), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
 
     gSPDisplayList(renderer->display_list++, static_display_list);
+    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     gDPPipeSync(renderer->display_list++);
 }
 

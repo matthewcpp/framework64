@@ -32,7 +32,7 @@ void mainproc(void) {
 void nusys_game_update(int pendingGfx) {
   if (pendingGfx < 1) {
     input_update(input);
-    game_update(game, 0.0f);
+    game_update(game, 0.0333);
     game_draw(game);
   }
 }

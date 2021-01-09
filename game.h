@@ -1,11 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "arcball.h"
 #include "camera.h"
 #include "input.h"
 #include "renderer.h"
 
 typedef struct {
+    ArcballCamera* arcball;
     Camera* camera;
     Renderer* renderer;
     Input* input;
