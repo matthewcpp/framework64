@@ -14,6 +14,12 @@ void vec3_one(Vec3* v) {
     v->z = 1.0f;
 }
 
+void vec3_set(Vec3* v, float x, float y, float z) {
+    v->x = x;
+    v->y = y;
+    v->z = z;
+}
+
 void vec3_add(Vec3* out, Vec3* a, Vec3* b) {
     out->x = a->x + b->x;
     out->y = a->y + b->y;

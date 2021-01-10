@@ -5,3 +5,5 @@
 .devcontainer.json
 
 assets/build
+node_modules
+.idea

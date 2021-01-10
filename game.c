@@ -22,7 +22,7 @@ Game* game_create(Renderer* renderer, Input* input) {
 
     camera_init(game->camera);
     Box b;
-    memcpy(&b, &cube_bounding[0], sizeof(Box));
+    static_model_bounding_box(0, &b);
     arcball_set_initial(game->arcball, &b);
 
     return game;
@@ -34,6 +34,6 @@ void game_update(Game* game, float time_delta) {
 
 void game_draw(Game* game) {
     renderer_begin(game->renderer, game->camera);
-    renderer_draw_static(game->renderer, &entity, cube_display_list);
+    renderer_draw_static(game->renderer, &entity);
     renderer_end(game->renderer);
 }

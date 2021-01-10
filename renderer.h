@@ -27,7 +27,7 @@ Renderer* renderer_create(int screen_width, int screen_height);
 void renderer_begin(Renderer* renderer, Camera* camera);
 void renderer_end(Renderer* renderer);
 
-void renderer_draw_static(Renderer* renderer, Entity* entity, const Gfx* static_display_list);
+void renderer_draw_static(Renderer* renderer, Entity* entity);
 
 void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size);
 
