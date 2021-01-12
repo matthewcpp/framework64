@@ -1,6 +1,5 @@
 #include "renderer.h"
 
-#include "cube.h"
 #include "matrix.h"
 #include "static_model.h"
 
@@ -97,7 +96,7 @@ void renderer_draw_static(Renderer* renderer, Entity* entity) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(entity->dl_matrix)), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
 
     //gSPDisplayList(renderer->display_list++, cube_display_list);
-    renderer->display_list += static_model_render(0, renderer->display_list);
+    renderer->display_list += static_model_render(entity->model, renderer->display_list);
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     gDPPipeSync(renderer->display_list++);
 }

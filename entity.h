@@ -8,6 +8,7 @@
 typedef struct {
     Transform transform;
     Mtx dl_matrix;
+    int model;
 } Entity;
 
 void entity_init(Entity* entity);
