@@ -3,3 +3,7 @@
 *.n64
 .DS_Store
 .devcontainer.json
+
+assets/build
+node_modules
+.idea

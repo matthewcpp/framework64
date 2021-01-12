@@ -1,6 +1,7 @@
 #include "renderer.h"
 
 #include "matrix.h"
+#include "static_model.h"
 
 #include <malloc.h>
 
@@ -88,13 +89,14 @@ void renderer_end(Renderer* renderer) {
 
 float entity_matrix[4][4];
 
-void renderer_draw_static(Renderer* renderer, Entity* entity, const Gfx* static_display_list) {
+void renderer_draw_static(Renderer* renderer, Entity* entity) {
     matrix_from_trs(entity_matrix, &entity->transform.position, &entity->transform.rotation, &entity->transform.scale);
     guMtxF2L(entity_matrix, &entity->dl_matrix);
 
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(entity->dl_matrix)), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
 
-    gSPDisplayList(renderer->display_list++, static_display_list);
+    //gSPDisplayList(renderer->display_list++, cube_display_list);
+    renderer->display_list += static_model_render(entity->model, renderer->display_list);
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     gDPPipeSync(renderer->display_list++);
 }
