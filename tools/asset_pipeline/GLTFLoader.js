@@ -1,6 +1,8 @@
 const N64Model = require("./N64Model")
 const N64Mesh = require("./N64Mesh")
 
+const glMatrix = require("gl-matrix");
+
 const fs = require("fs");
 const path = require("path");
 
@@ -10,6 +12,8 @@ class GLTFLoader {
         this.globalScale = 1.0;
         this.gltfPath = null;
         this.gltf = null;
+        this.transform = glMatrix.mat4.create();
+        this.bakeTransform = false;
         this.model = null;
     }
 
@@ -20,7 +24,14 @@ class GLTFLoader {
         const modelName = path.basename(gltfPath, ".gltf");
         this.model = new N64Model(modelName);
 
-        for (const gltfMesh of this.gltf.meshes) {
+        const scene = this.gltf.scenes[this.gltf.scene];
+
+        for (const nodeIndex of scene.nodes) {
+            const gltfNode = this.gltf.nodes[nodeIndex];
+            this._getTransform(gltfNode);
+
+            const gltfMesh = this.gltf.meshes[gltfNode.mesh];
+
             for (const gltfPrimitive of gltfMesh.primitives) {
                 // only support triangles for now
                 if (gltfPrimitive.hasOwnProperty("mode") && gltfPrimitive.mode != 4)
@@ -40,6 +51,14 @@ class GLTFLoader {
 
     merge() {
         this.model.mergeVertexColorMeshes();
+    }
+
+    _getTransform(gltfNode) {
+        const translation = gltfNode.hasOwnProperty("translation") ? gltfNode.translation.slice() : glMatrix.vec3.fromValues(0.0, 0.0, 0.0);
+        const rotation = gltfNode.hasOwnProperty("rotation") ? gltfNode.rotation.slice() : glMatrix.quat.create();
+        const scale = gltfNode.hasOwnProperty("scale") ? gltfNode.scale.slice() : glMatrix.vec3.fromValues(1.0, 1.0, 1.0);
+
+        glMatrix.mat4.fromRotationTranslationScale(this.transform, rotation, translation, scale);
     }
 
     _getBuffer(bufferIndex) {
@@ -71,11 +90,17 @@ class GLTFLoader {
         let offset = bufferView.byteOffset;
 
         for (let i = 0; i < accessor.count; i++) {
-            const p0 = parseInt(buffer.readFloatLE(offset) * this.globalScale);
-            const p1 = parseInt(buffer.readFloatLE(offset + 4) * this.globalScale);
-            const p2 = parseInt(buffer.readFloatLE(offset + 8) * this.globalScale);
+            const position = [
+                parseInt(buffer.readFloatLE(offset) * this.globalScale),
+                parseInt(buffer.readFloatLE(offset + 4) * this.globalScale),
+                parseInt(buffer.readFloatLE(offset + 8) * this.globalScale)
+            ];
 
-            n64Mesh.vertices.push([p0, p1, p2, 0]);
+            if (this.bakeTransform) {
+                glMatrix.vec3.transformMat4(position, position, this.transform);
+            }
+
+            n64Mesh.vertices.push([...position, 0]);
             offset += byteStride;
         }
 

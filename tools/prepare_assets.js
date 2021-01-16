@@ -23,7 +23,11 @@ console.log(outputDirectory);
 for (const model of manifest.models) {
     const sourceFile = path.join(manifestDirectory, model.src);
 
-    gltfConvert(sourceFile, outputDirectory);
+    const params = {
+    	bakeTransform: model.hasOwnProperty("bakeTransform") ? model.bakeTransform : false
+    }
+
+    gltfConvert(sourceFile, outputDirectory, params);
 }
 
 for (const image of manifest.images) {

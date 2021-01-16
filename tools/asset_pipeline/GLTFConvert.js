@@ -7,7 +7,8 @@ const path = require("path");
 function gltfConvert(gltfPath, outputFolder, params) {
     let options = {
         mergeMeshes: false,
-        globalScale: 1.0
+        globalScale: 1.0,
+        bakeTransform: false
     };
 
     if (params) {
@@ -16,6 +17,7 @@ function gltfConvert(gltfPath, outputFolder, params) {
 
     const gltfLoader = new GLTFLoader();
     gltfLoader.globalScale = options.globalScale;
+    gltfLoader.bakeTransform = options.bakeTransform;
     gltfLoader.load(gltfPath);
 
     if (options.merge) {
