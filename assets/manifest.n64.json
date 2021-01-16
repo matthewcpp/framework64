@@ -1,0 +1,13 @@
+{
+    "outDir": "build_n64",
+    "images": [
+        {
+            "src": "n64_logo_sprite.png"
+        }
+    ],
+    "models": [
+        {
+            "src": "n64_logo_model/n64_logo.gltf"
+        }
+    ]
+}
