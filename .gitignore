@@ -4,6 +4,6 @@
 .DS_Store
 .devcontainer.json
 
-assets/build
+assets/build_n64
 node_modules
 .idea
