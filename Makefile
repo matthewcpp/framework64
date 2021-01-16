@@ -24,9 +24,9 @@ APP =		sandbox.out
 
 TARGETS =	sandbox.n64
 
-HFILES =	main.h renderer.h game.h input.h vec3.h vec2.h quat.h matrix.h entity.h transform.h camera.h arcball.h box.h static_model.h
+HFILES =	main.h renderer.h game.h input.h vec3.h vec2.h quat.h matrix.h entity.h transform.h camera.h arcball.h box.h static_model.h color.h rect.h
 
-CODEFILES   = 	main.c  renderer.c input.c game.c vec3.c quat.c matrix.c entity.c transform.c camera.c arcball.c box.c static_model.c
+CODEFILES   = 	main.c  renderer.c input.c game.c vec3.c quat.c matrix.c entity.c transform.c camera.c arcball.c box.c static_model.c texture.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 

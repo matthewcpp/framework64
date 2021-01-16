@@ -5,12 +5,14 @@
 #include "camera.h"
 #include "input.h"
 #include "renderer.h"
+#include "texture.h"
 
 typedef struct {
     ArcballCamera* arcball;
     Camera* camera;
     Renderer* renderer;
     Input* input;
+    Texture* texture;
 } Game;
 
 Game* game_create(Renderer* renderer, Input* input);
