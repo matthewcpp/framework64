@@ -9,6 +9,11 @@ Renderer* renderer_create(int screen_width, int screen_height) {
     Renderer* renderer = malloc(sizeof(Renderer));
     renderer->screen_size.x = screen_width;
     renderer->screen_size.y = screen_height;
+    renderer->display_list = NULL;
+
+    renderer->fill_color.r = 255;
+    renderer->fill_color.g = 255;
+    renderer->fill_color.b = 255;
 
     /*
       The viewport structure 
@@ -41,20 +46,24 @@ void renderer_init_rcp(Renderer* renderer) {
     gDPSetColorDither(renderer->display_list++, G_CD_BAYER);
 }
 
+static void renderer_clear_z_buffer(Renderer* renderer) {
+    gDPSetDepthImage(renderer->display_list++, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
+    gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
+    gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b,renderer->screen_size.x, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
+    gDPSetFillColor(renderer->display_list++,(GPACK_ZDZ(G_MAXFBZ,0) << 16 | GPACK_ZDZ(G_MAXFBZ,0)));
+    gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
+    gDPPipeSync(renderer->display_list++);
+}
+
 void renderer_clear(Renderer* renderer) {
-  /* Clear the Z-buffer  */
-  gDPSetDepthImage(renderer->display_list++, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
-  gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
-  gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b,renderer->screen_size.x, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
-  gDPSetFillColor(renderer->display_list++,(GPACK_ZDZ(G_MAXFBZ,0) << 16 | GPACK_ZDZ(G_MAXFBZ,0)));
-  gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
-  gDPPipeSync(renderer->display_list++);
-  
+    /* Clear the Z-buffer  */
+    renderer_clear_z_buffer(renderer);
+
     /* Clear the frame buffer  */
-  gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b, renderer->screen_size.x, osVirtualToPhysical(nuGfxCfb_ptr));
-  gDPSetFillColor(renderer->display_list++, (GPACK_RGBA5551(0, 0, 0, 1) << 16 | GPACK_RGBA5551(0, 0, 0, 1)));
-  gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
-  gDPPipeSync(renderer->display_list++);
+    gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b, renderer->screen_size.x, osVirtualToPhysical(nuGfxCfb_ptr));
+    gDPSetFillColor(renderer->display_list++, (GPACK_RGBA5551(0, 0, 0, 1) << 16 | GPACK_RGBA5551(0, 0, 0, 1)));
+    gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
+    gDPPipeSync(renderer->display_list++);
 }
 
 void renderer_begin(Renderer* renderer, Camera* camera) {
@@ -76,15 +85,10 @@ void renderer_begin(Renderer* renderer, Camera* camera) {
     gSPClearGeometryMode(renderer->display_list++,0xFFFFFFFF);
     gSPSetGeometryMode(renderer->display_list++,G_SHADE| G_SHADING_SMOOTH | G_ZBUFFER);
 
+    // need this for drawing 3d
+    //gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
+
     gDPPipeSync(renderer->display_list++);
-}
-
-void renderer_end(Renderer* renderer) {
-    gDPFullSync(renderer->display_list++);
-    gSPEndDisplayList(renderer->display_list++);
-
-    /* Activate the task and switch display buffers.  */
-    nuGfxTaskStart(&renderer->gfx_list[0], (s32)(renderer->display_list - renderer->gfx_list) * sizeof (Gfx), NU_GFX_UCODE_F3DEX , NU_SC_SWAPBUFFER);
 }
 
 float entity_matrix[4][4];
@@ -102,5 +106,77 @@ void renderer_draw_static(Renderer* renderer, Entity* entity) {
 }
 
 void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size) {
-  *screen_size = renderer->screen_size;
+    *screen_size = renderer->screen_size;
+}
+
+void renderer_begin_2d(Renderer* renderer) {
+    gSPClearGeometryMode(renderer->display_list++, 0xFFFFFFFF);
+    gSPTexture(renderer->display_list++, 0, 0, 0, 0, G_OFF);
+    gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
+    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, 0, 0, renderer->screen_size.x, renderer->screen_size.y);
+    gDPSetCombineKey(renderer->display_list++, G_CK_NONE);
+    gDPSetAlphaCompare(renderer->display_list++, G_AC_NONE);
+    gDPSetRenderMode(renderer->display_list++, G_RM_NOOP, G_RM_NOOP2);
+    gDPSetColorDither(renderer->display_list++, G_CD_DISABLE);
+    gDPPipeSync(renderer->display_list++);
+}
+
+void renderer_end(Renderer* renderer) {
+    gDPFullSync(renderer->display_list++);
+    gSPEndDisplayList(renderer->display_list++);
+
+    nuGfxTaskStart(&renderer->gfx_list[0], (s32)(renderer->display_list - renderer->gfx_list) * sizeof (Gfx), NU_GFX_UCODE_F3DEX , NU_SC_SWAPBUFFER);
+
+    renderer->display_list = NULL;
+}
+
+void renderer_set_fill_color(Renderer* renderer, Color* color) {
+    if (renderer->display_list) {
+        gDPSetFillColor(renderer->display_list++, (GPACK_RGBA5551(color->r, color->g, color->b, 255) << 16 | GPACK_RGBA5551(color->r, color->g, color->b, 255)));
+    }
+
+    renderer->fill_color = *color;
+}
+
+void renderer_set_fill_mode(Renderer* renderer) {
+    gDPSetFillColor(renderer->display_list++, (GPACK_RGBA5551(renderer->fill_color.r, renderer->fill_color.g, renderer->fill_color.b, 255) << 16 | GPACK_RGBA5551(renderer->fill_color.r, renderer->fill_color.g, renderer->fill_color.b, 255)));
+    gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
+    //TODO: do i need to sync pipe here?
+}
+
+void renderer_draw_filled_rect(Renderer* renderer, Rect* rect) {
+    
+    gDPFillRectangle(renderer->display_list++, rect->x, rect->y, rect->x + rect->width, rect->y + rect->height);
+    gDPPipeSync(renderer->display_list++);
+}
+
+void renderer_set_sprite_mode(Renderer* renderer){
+    gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
+    gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+    gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
+    gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
+    //TODO: do i need to sync pipe here?
+}
+
+void renderer_draw_sprite(Renderer* renderer, Texture* sprite, int x, int y) {
+    gDPLoadTextureBlock(
+        renderer->display_list++,
+        sprite->data,
+        G_IM_FMT_RGBA,
+        G_IM_SIZ_16b,
+        sprite->width, sprite->height,
+        0,
+        G_TX_WRAP, G_TX_WRAP,
+        G_TX_NOMASK, G_TX_NOMASK,
+        G_TX_NOLOD, G_TX_NOLOD 
+    );
+
+        gSPTextureRectangle(renderer->display_list++, 
+        x << 2, y << 2, 
+        (x + sprite->width)<<2, (y + sprite->height)<<2,
+        G_TX_RENDERTILE, 
+        0 << 5, 0 << 5, 
+        1 << 10, 1 << 10);
+
+    gDPPipeSync(renderer->display_list++);
 }
