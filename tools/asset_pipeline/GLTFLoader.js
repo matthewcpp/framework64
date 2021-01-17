@@ -41,6 +41,11 @@ class GLTFLoader {
                 this.model.meshes.push(n64Mesh);
 
                 this._readPositions(gltfPrimitive, n64Mesh);
+
+                if (gltfPrimitive.attributes.COLOR_0) {
+                    this._readVertexColors(gltfPrimitive, n64Mesh);
+                }
+
                 this._readTexCoords(gltfPrimitive, n64Mesh);
                 this._readMaterial(gltfPrimitive, n64Mesh);
 
@@ -91,16 +96,23 @@ class GLTFLoader {
 
         for (let i = 0; i < accessor.count; i++) {
             const position = [
-                parseInt(buffer.readFloatLE(offset) * this.globalScale),
-                parseInt(buffer.readFloatLE(offset + 4) * this.globalScale),
-                parseInt(buffer.readFloatLE(offset + 8) * this.globalScale)
+                buffer.readFloatLE(offset) * this.globalScale,
+                buffer.readFloatLE(offset + 4) * this.globalScale,
+                buffer.readFloatLE(offset + 8) * this.globalScale
             ];
 
             if (this.bakeTransform) {
                 glMatrix.vec3.transformMat4(position, position, this.transform);
             }
 
-            n64Mesh.vertices.push([...position, 0]);
+            const vertex = [
+                parseInt(position[0]), parseInt(position[1]), parseInt(position[2]),
+                0, /* unused flag*/
+                0, 0, /* texcords */
+                0, 0, 0, 0 /* color or normal */
+            ];
+
+            n64Mesh.vertices.push(vertex);
             offset += byteStride;
         }
 
@@ -108,7 +120,76 @@ class GLTFLoader {
         n64Mesh.bounding.max = accessor.max.slice();
     }
 
+    _getDefaultStride(type, componentType) {
+        let componentCount = 0;
+        let componentSize = 0;
 
+        switch (componentType) {
+            case 5120: /* byte */
+            case 5121: /* unsigned byte */
+                componentSize = 1;
+                break;
+
+            case 5122: /* short */
+            case 5123: /* unsigned short */
+                componentSize = 2;
+                break;
+
+            case 5125: /* unsigned int */
+            case 5126: /* float */
+                componentSize = 4;
+                break;
+
+            default:
+                throw new Error(`Cannot determine component size for: ${componentType}`);
+        }
+
+        switch(type) {
+            case "SCALAR":
+                componentCount = 1;
+                break;
+
+            case "VEC2":
+                componentCount = 2
+                break;
+
+            case "VEC3":
+                componentCount = 3;
+                break;
+
+            case "VEC4":
+                componentCount = 4;
+                break;
+
+            default:
+                throw new Error(`Cannot determine component count for: ${type}`);
+        }
+
+        return componentSize * componentCount;
+    }
+
+    _readVertexColors(gltfPrimitive, n64Mesh) {
+        const accessor = this.gltf.accessors[gltfPrimitive.attributes.COLOR_0];
+        const bufferView = this.gltf.bufferViews[accessor.bufferView];
+        const buffer = this._getBuffer(bufferView.buffer);
+
+        if (accessor.componentType != 5126)
+            throw new Error("Currently only support float for vertex colors");
+
+        const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
+        
+        let offset = bufferView.byteOffset;
+        for (let i = 0; i < accessor.count; i++) {
+            const vertex = n64Mesh.vertices[i];
+
+            vertex[6] = Math.round(buffer.readFloatLE(offset) * 255);
+            vertex[7] = Math.round(buffer.readFloatLE(offset + 4) * 255);
+            vertex[8] = Math.round(buffer.readFloatLE(offset + 8) * 255);
+
+            offset += byteStride;
+        }
+
+    }
 
     _readTexCoords(gltfPrimitive, n64Mesh) {
         /*
@@ -118,9 +199,11 @@ class GLTFLoader {
         }
         */
 
+        /*
         for (const vertex of n64Mesh.vertices) {
             vertex.push(0, 0);
         }
+        */
     }
 
     _readMaterial(gltfPrimitive, n64Mesh) {
