@@ -1,6 +1,41 @@
 const Bounding = require("./Bounding");
 const N64Defs = require("./N64Defs");
 
+class MeshSlice {
+    constructor() {
+        /** Maps the raw vertex index to its index within this slice */
+        this.vertexIndices = new Map();
+        this.triangles = [];
+    }
+
+    _getNeededVertices(triangle) {
+        const neededVertices = [];
+
+        for (const index of triangle) {
+            if (!this.vertexIndices.has(index))
+                neededVertices.push(index);
+        }
+
+        return neededVertices;
+    }
+
+    addTriangle(triangle) {
+        const neededVertices = this._getNeededVertices(triangle);
+
+        if (neededVertices.length <= N64Defs.vertexSliceSize - this.vertexIndices.size) {
+            for (const index of neededVertices)
+                this.vertexIndices.set(index, this.vertexIndices.size);
+
+            this.triangles.push(triangle);
+
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+}
+
 class N64Mesh {
     constructor() {
         this.vertices = [];
@@ -10,55 +45,64 @@ class N64Mesh {
         this.bounding = new Bounding();
     }
 
+    _addTriangleToSlice(triangle, slices) {
+        for (const slice of slices) {
+            if (slice.addTriangle(triangle))
+                return true;
+        }
+
+        return false;
+    }
+
+    _partitionVertices() {
+        const slices = [new MeshSlice()];
+
+        // parition all triangles and their vertices into slices
+        for (const triangle of this.triangles) {
+            if (this._addTriangleToSlice(triangle, slices))
+                continue; // triangle fit in existing slice
+
+            const slice = new MeshSlice();
+            slice.addTriangle(triangle);
+            slices.push(slice);
+        }
+
+        return slices;
+    }
+
+    _processSlices(slices) {
+        //build vertex and triangle list for each slice
+        const processed = [];
+
+        for (const slice of slices) {
+            // create vertex list for this slice by grabbing the original mesh vertex and placing it into the slice aray
+            const vertexList = new Array(slice.vertexIndices.size);
+            slice.vertexIndices.forEach((position, index)=> {
+                vertexList[position] = this.vertices[index];
+            });
+
+            // build updated triangle list by mapping the original vertex index to its index in this slice.
+            const triangleList = []
+            for (const triangle of slice.triangles) {
+                triangleList.push([
+                    slice.vertexIndices.get(triangle[0]), slice.vertexIndices.get(triangle[1]), slice.vertexIndices.get(triangle[2])
+                ])
+            }
+
+            processed.push({vertices: vertexList, triangles: triangleList})
+        }
+
+        return processed;
+    }
+
     slice() {
         // if the mesh is small, then there is only one slice
         if (this.vertices.length <= N64Defs.vertexSliceSize) {
             return [{vertices: this.vertices, triangles: this.triangles}]
         }
 
-        const slices = [];
-
-        // parition all vertices into their slices
-        for (let i = 0; i < this.vertices.length; i++) {
-            if (i % N64Defs.vertexSliceSize === 0) {
-                slices.push({vertices: [], triangles: []});
-            }
-
-            slices[slices.length - 1].vertices.push(this.vertices[i]);
-        }
-
-        const getTriangleSliceIndex = (triangle) => {
-            let index = -1;
-            for (let i = 0; i < slices.length; i++) {
-                const minIndex = i * N64Defs.vertexSliceSize;
-                const maxIndex = (i + 1) * N64Defs.vertexSliceSize;
-
-                // triangle fits in this slice?
-                if ((triangle[0] >= minIndex && triangle[0] < maxIndex) &&
-                    (triangle[1] >= minIndex && triangle[1] < maxIndex) &&
-                    (triangle[2] >= minIndex && triangle[2] < maxIndex)) {
-                        index = i;
-                        break;
-                    }
-            }
-
-            return index;
-        }
-
-        // sort all triangles into their slices
-        for (const triangle of this.triangles) {
-            const sliceIndex = getTriangleSliceIndex(triangle);
-            if (sliceIndex === -1) {
-                continue;
-            }
-            // adjust triangle indices and add to triangle list
-            slices[sliceIndex].triangles.push(
-                [triangle[0] - sliceIndex * N64Defs.vertexSliceSize, 
-                triangle[1] - sliceIndex * N64Defs.vertexSliceSize, 
-                triangle[2] - sliceIndex * N64Defs.vertexSliceSize]);
-        }
-
-        return slices;
+        const slices = this._partitionVertices();
+        return this._processSlices(slices);
     }
 }
 

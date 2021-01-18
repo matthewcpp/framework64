@@ -7,7 +7,6 @@ const path = require("path");
 function gltfConvert(gltfPath, outputFolder, params) {
     let options = {
         mergeMeshes: false,
-        globalScale: 1.0,
         bakeTransform: false
     };
 
@@ -34,7 +33,6 @@ function main() {
     program.requiredOption("-f, --file <path>", "input file");
     program.requiredOption("-o, --out-dir <dir>", "output directory");
     program.option("-m --merge", "attempt to merge meshes when possible", false);
-    program.option("-s --scale <value>", "scale value to apply to all vertices", "1.0");
 
     program.parse(process.argv);
 
@@ -42,8 +40,7 @@ function main() {
     const outputFolder = program.outDir;
 
     const options = {
-        mergeMeshes: prgram.merge ? program.merge : false,
-        globalScale: parseFloat(program.scale)
+        mergeMeshes: prgram.merge ? program.merge : false
     }
 
     if (!fs.existsSync(gltfPath)) {
