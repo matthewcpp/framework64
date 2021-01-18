@@ -2,7 +2,7 @@ const N64ImageWriter = require("./N64ImageWriter");
 
 const fs = require("fs");
 const path = require("path");
-const PNG = require("pngjs").PNG;
+const Jimp = require("jimp");
 
 function encode16bpp(png) {
     const pixelCount = png.width * png.height;
@@ -29,9 +29,9 @@ function encode16bpp(png) {
     return buffer;
 }
 
-function pngConvert(pngPath, outPath) {
-    const data = fs.readFileSync(pngPath);
-    const png = PNG.sync.read(data);
+async function pngConvert(pngPath, outPath) {
+    const data = await Jimp.read(pngPath)
+    const png = data.bitmap;
     const buffer = encode16bpp(png);
 
     const spriteInfo = {
@@ -47,7 +47,7 @@ function pngConvert(pngPath, outPath) {
 }
 
 
-function main() {
+async function main() {
     const { program } = require('commander');
 
     program.requiredOption("-f, --file <path>", "input file");
@@ -60,7 +60,7 @@ function main() {
         process.exit(1);
     }
 
-    pngConvert(program.file, program.headerFile);
+    await pngConvert(program.file, program.headerFile);
 }
 
 module.exports = pngConvert;
