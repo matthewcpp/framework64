@@ -26,6 +26,13 @@ Renderer* renderer_create(int screen_width, int screen_height) {
 
     renderer->view_port = view_port;
 
+    Lights1 default_lighting = gdSPDefLights1(
+    5, 5, 5, /* amb col */
+    0xFF, 0xE4, 0x84, /* col 1   */
+    13,   25,  30);   /* dir 1   */
+
+    renderer->lighting = default_lighting;
+
     return renderer;
 }
 
@@ -91,6 +98,12 @@ void renderer_begin(Renderer* renderer, Camera* camera) {
     gDPPipeSync(renderer->display_list++);
 }
 
+void renderer_activate_lighting(Renderer* renderer) {
+    gSPSetLights1(renderer->display_list++, renderer->lighting);
+    gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
+    gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
+}
+
 float entity_matrix[4][4];
 
 void renderer_draw_static(Renderer* renderer, Entity* entity) {
@@ -99,8 +112,7 @@ void renderer_draw_static(Renderer* renderer, Entity* entity) {
 
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(entity->dl_matrix)), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
 
-    //gSPDisplayList(renderer->display_list++, cube_display_list);
-    renderer->display_list += static_model_render(entity->model, renderer->display_list);
+    static_model_render(entity->model, renderer);
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     gDPPipeSync(renderer->display_list++);
 }
