@@ -1,7 +1,6 @@
 #include "static_model.h"
 
 #include "assets/build_n64/n64_logo.h"
-#include "assets/build_n64/normal_cube.h"
 #include "assets/build_n64/suzanne.h"
 
 #include <string.h>
@@ -13,10 +12,6 @@ void static_model_bounding_box(int handle, Box* box) {
         break;
 
         case 2:
-            memcpy(box, &normal_cube_bounding_box[0], sizeof(Box));
-        break;
-
-        case 3:
             memcpy(box, &suzanne_bounding_box[0], sizeof(Box));
         break;
     }
@@ -33,10 +28,6 @@ void static_model_render(int handle, Renderer* renderer) {
             break;
 
         case 2:
-            gSPDisplayList(renderer->display_list++, normal_cube_mesh_0_dl);
-            break;
-
-        case 3:
             gSPDisplayList(renderer->display_list++, suzanne_mesh_0_dl);
             break;
     }

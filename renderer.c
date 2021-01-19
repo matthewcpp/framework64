@@ -26,13 +26,6 @@ Renderer* renderer_create(int screen_width, int screen_height) {
 
     renderer->view_port = view_port;
 
-    Lights1 default_lighting = gdSPDefLights1(
-    5, 5, 5, /* amb col */
-    0xFF, 0xE4, 0x84, /* col 1   */
-    13,   25,  30);   /* dir 1   */
-
-    renderer->lighting = default_lighting;
-
     return renderer;
 }
 
@@ -99,7 +92,6 @@ void renderer_begin(Renderer* renderer, Camera* camera) {
 }
 
 void renderer_activate_lighting(Renderer* renderer) {
-    gSPSetLights1(renderer->display_list++, renderer->lighting);
     gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
     gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
 }

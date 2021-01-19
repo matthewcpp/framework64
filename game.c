@@ -45,7 +45,7 @@ Game* game_create(Renderer* renderer, Input* input) {
 void game_update(Game* game, float time_delta) {
     if (input_button_pressed(game->input, 0, START_BUTTON)) {
         if (entity.model == 1)
-            entity.model = 3;
+            entity.model = 2;
         else
             entity.model = 1;
 

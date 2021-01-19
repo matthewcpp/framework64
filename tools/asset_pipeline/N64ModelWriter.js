@@ -11,11 +11,20 @@ function writeHeader(model, outputFolder) {
     fs.writeSync(file, `#ifndef MODEL_${model.name.toUpperCase()}_H\n`);
     fs.writeSync(file, `#define MODEL_${model.name.toUpperCase()}_H\n\n`);
 
+    if (model.hasNormals) {
+        for (let i = 0; i < model.materials.length; i++) {
+            const material = model.materials[i];
+            fs.writeSync(file, `Lights1 ${model.name}_lights_${i} = gdSPDefLights1(${material.ambient[0]}, ${material.ambient[1]}, ${material.ambient[2]}, ${material.color[0]}, ${material.color[1]}, ${material.color[2]}, ${material.lightDirection[0]}, ${material.lightDirection[1]}, ${material.lightDirection[2]});\n\n`);
+        }
+    }
+
     fs.writeSync(file, `const float ${model.name}_bounding_box[] = { ${model.bounding.toArrayStr()} };\n\n`);
 
     for (let i = 0; i < model.meshes.length; i++) {
+        const mesh = model.meshes[i];
         //console.log(`Mesh: ${model.meshes[i].vertices.length} vertices, ${model.meshes[i].triangles.length} triangles`);
-        const slices = model.meshes[i].slice();
+
+        const slices = mesh.slice();
         const vertexArrayVar = `${model.name}_mesh_${i}`;
 
         // Write out mesh vertices for all slices in this mesh
@@ -30,6 +39,10 @@ function writeHeader(model, outputFolder) {
         // write out the mesh display list
         const displayListVar = vertexArrayVar + "_dl"
         fs.writeSync(file, `const Gfx ${displayListVar}[] = {\n`);
+
+        if (mesh.hasNormals) {
+            fs.writeSync(file, `gsSPSetLights1(${model.name}_lights_${mesh.material}),\n`);
+        }
 
         let vertexListOffset = 0;
 

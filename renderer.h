@@ -24,8 +24,6 @@ typedef struct {
 
     Vp view_port;
     IVec2 screen_size;
-
-    Lights1 lighting;
 } Renderer;
 
 

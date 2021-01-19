@@ -11,9 +11,6 @@
             "bakeTransform": true
         },
         {
-            "src": "normal_cube/normal_cube.gltf"
-        },
-        {
             "src": "suzanne/suzanne.gltf"
         }
     ]

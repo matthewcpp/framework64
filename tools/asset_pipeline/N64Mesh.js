@@ -6,6 +6,8 @@ class MeshSlice {
         /** Maps the raw vertex index to its index within this slice */
         this.vertexIndices = new Map();
         this.triangles = [];
+        this.material = null;
+        this.hasNormals = false;
     }
 
     _getNeededVertices(triangle) {

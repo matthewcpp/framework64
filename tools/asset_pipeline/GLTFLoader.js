@@ -1,5 +1,6 @@
 const N64Model = require("./N64Model")
 const N64Mesh = require("./N64Mesh")
+const N64Material = require("./N64Material")
 
 const glMatrix = require("gl-matrix");
 
@@ -22,6 +23,8 @@ class GLTFLoader {
 
         const modelName = path.basename(gltfPath, ".gltf");
         this.model = new N64Model(modelName);
+
+        this._readMaterials();
 
         const scene = this.gltf.scenes[this.gltf.scene];
 
@@ -60,7 +63,9 @@ class GLTFLoader {
             this._readTexCoords(gltfPrimitive, n64Mesh);
 
             if (gltfPrimitive.hasOwnProperty("material"))
-                this._readMaterial(gltfPrimitive, n64Mesh);
+                n64Mesh.material = gltfPrimitive.material;
+            else
+                n64Mesh.material = 0; //use default
 
             this._readIndices(gltfPrimitive, n64Mesh);
         }
@@ -240,16 +245,23 @@ class GLTFLoader {
         */
     }
 
-    _readMaterial(gltfPrimitive, n64Mesh) {
-        /*
-        const material = this.gltf.materials[gltfPrimitive.material];
-        const baseColor = material.pbrMetallicRoughness.baseColorFactor;
-        const rgba = [parseInt(baseColor[0] * 255), parseInt(baseColor[1] * 255), parseInt(baseColor[2] * 255), parseInt(baseColor[3] * 255)];
+    _readMaterials(gltfPrimitive) {
+        for (const gltfMaterial of this.gltf.materials) {
+            const material = new N64Material();
 
-        for (const vertex of n64Mesh.vertices) {
-            vertex.push(...rgba);
+            const baseColor = gltfMaterial.pbrMetallicRoughness.baseColorFactor;
+            material.color[0] = parseInt(baseColor[0] * 255);
+            material.color[1] = parseInt(baseColor[1] * 255);
+            material.color[2] = parseInt(baseColor[2] * 255);
+
+            this.model.materials.push(material)
         }
-        */
+
+        // if the file does not specify any materials use the default.
+        if (this.model.materials.length === 0) {
+            this.model.materials.push(new N64Material());
+        }
+
     }
 
     _readUShortTriangleList(buffer, byteOffset, count, mesh) {
