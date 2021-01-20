@@ -22,110 +22,51 @@
             "primitives": [
                 {
                     "attributes": {
-                        "POSITION": 0
+                        "POSITION": 0,
+                        "COLOR_0": 8
                     },
                     "indices": 1,
                     "material": 0
                 },
                 {
                     "attributes": {
-                        "POSITION": 2
+                        "POSITION": 2,
+                        "COLOR_0": 9
                     },
                     "indices": 3,
-                    "material": 1
+                    "material": 0
                 },
                 {
                     "attributes": {
-                        "POSITION": 4
+                        "POSITION": 4,
+                        "COLOR_0": 10
                     },
                     "indices": 5,
-                    "material": 2
+                    "material": 0
                 },
                 {
                     "attributes": {
-                        "POSITION": 6
+                        "POSITION": 6,
+                        "COLOR_0": 11
                     },
                     "indices": 7,
-                    "material": 3
+                    "material": 0
                 }
             ]
         }
     ],
     "materials": [
         {
-            "doubleSided" : true,
-            "emissiveFactor" : [
-                0,
-                0,
-                0
-            ],
-            "name" : "Yellow",
+            "name" : "Default",
             "pbrMetallicRoughness" : {
                 "baseColorFactor" : [
-                    0.9607843,
-                    0.6588235,
-                    0.0196078,
-                    1
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
                 ],
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
-            }
-        },
-        {
-            "doubleSided" : true,
-            "emissiveFactor" : [
-                0,
-                0,
-                0
-            ],
-            "name" : "Red",
-            "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.8784313,
-                    0.0392156,
-                    0.0784313,
-                    1
-                ],
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
-            }
-        },
-        {
-            "doubleSided" : true,
-            "emissiveFactor" : [
-                0,
-                0,
-                0
-            ],
-            "name" : "Green",
-            "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.1803921,
-                    0.5607843,
-                    0.0117647,
-                    1
-                ],
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
-            }
-        },
-        {
-            "doubleSided" : true,
-            "emissiveFactor" : [
-                0,
-                0,
-                0
-            ],
-            "name" : "Blue",
-            "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.0,
-                    0.0196078,
-                    0.5647058,
-                    1
-                ],
-                "metallicFactor" : 0,
-                "roughnessFactor" : 0.5
+                "metallicFactor" : 0.1,
+                "roughnessFactor" : 0.9
             }
         }
     ],
@@ -217,6 +158,30 @@
             "componentType" : 5123,
             "count" : 96,
             "type" : "SCALAR"
+        },
+        {
+            "bufferView": 8,
+            "componentType" : 5126,
+            "count": 48,
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 9,
+            "componentType" : 5126,
+            "count": 24,
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 10,
+            "componentType" : 5126,
+            "count": 120,
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 11,
+            "componentType" : 5126,
+            "count": 96,
+            "type": "VEC3"
         }
     ],
     "bufferViews": [
@@ -259,11 +224,31 @@
             "buffer" : 0,
             "byteLength" : 192,
             "byteOffset" : 3840
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 576,
+            "byteOffset" : 4032
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 4608
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 1440,
+            "byteOffset" : 4896
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 1152,
+            "byteOffset" : 6336
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 4032,
+            "byteLength" : 7488,
             "uri" : "n64_logo.bin"
         }
     ]

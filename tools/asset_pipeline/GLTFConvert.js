@@ -4,23 +4,11 @@ const N64ModelWriter = require("./N64ModelWriter")
 const fs = require("fs");
 const path = require("path");
 
-function gltfConvert(gltfPath, outputFolder, params) {
-    let options = {
-        mergeMeshes: false,
-        globalScale: 1.0,
-        bakeTransform: false
-    };
+async function gltfConvert(gltfPath, outputFolder, params) {
+    const gltfLoader = new GLTFLoader(params);
+    await gltfLoader.load(gltfPath);
 
-    if (params) {
-        Object.assign(options, params);
-    }
-
-    const gltfLoader = new GLTFLoader();
-    gltfLoader.globalScale = options.globalScale;
-    gltfLoader.bakeTransform = options.bakeTransform;
-    gltfLoader.load(gltfPath);
-
-    if (options.merge) {
+    if (params.hasOwnProperty("mergeMeshes") && params.mergeMeshes) {
         gltfLoader.merge();
     }
 
@@ -34,7 +22,6 @@ function main() {
     program.requiredOption("-f, --file <path>", "input file");
     program.requiredOption("-o, --out-dir <dir>", "output directory");
     program.option("-m --merge", "attempt to merge meshes when possible", false);
-    program.option("-s --scale <value>", "scale value to apply to all vertices", "1.0");
 
     program.parse(process.argv);
 
@@ -42,8 +29,7 @@ function main() {
     const outputFolder = program.outDir;
 
     const options = {
-        mergeMeshes: prgram.merge ? program.merge : false,
-        globalScale: parseFloat(program.scale)
+        mergeMeshes: prgram.merge ? program.merge : false
     }
 
     if (!fs.existsSync(gltfPath)) {

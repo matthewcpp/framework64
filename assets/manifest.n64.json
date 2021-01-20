@@ -9,6 +9,13 @@
         {
             "src": "n64_logo_model/n64_logo.gltf",
             "bakeTransform": true
+        },
+        {
+            "src": "suzanne/suzanne.gltf"
+        },
+        {
+            "src": "penguin/penguin.gltf",
+            "bakeTransform": true
         }
     ]
 }

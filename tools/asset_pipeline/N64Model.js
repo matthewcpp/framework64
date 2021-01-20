@@ -4,6 +4,8 @@ class N64Model {
     constructor(name) {
         this.name = name;
         this.meshes = [];
+        this.materials = [];
+        this.images = [];
     }
 
     get bounding() {
@@ -14,6 +16,14 @@ class N64Model {
         }
 
         return bounding;
+    }
+
+    get hasNormals() {
+        for (const mesh of this.meshes) {
+            if (mesh.hasNormals)
+                return true;
+        }
+        return false;
     }
 
     mergeVertexColorMeshes() {
