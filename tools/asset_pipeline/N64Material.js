@@ -1,7 +1,7 @@
 class N64Material {
     constructor() {
-        this.ambient = [5, 5, 5]
-        this.color = [255, 255, 255];
+        this.ambient = [100, 100, 100]
+        this.color = [125, 125, 125];
         this.lightDirection = [40, 40, 40];
         this.texture = 255;
     }

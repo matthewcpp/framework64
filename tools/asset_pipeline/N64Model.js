@@ -5,6 +5,7 @@ class N64Model {
         this.name = name;
         this.meshes = [];
         this.materials = [];
+        this.images = [];
     }
 
     get bounding() {

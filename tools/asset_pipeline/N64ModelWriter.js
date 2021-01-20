@@ -1,4 +1,4 @@
-const N64Defs = require("./N64Defs");
+const N64ImageWriter = require("./N64ImageWriter");
 
 const path  = require("path");
 const fs = require("fs")
@@ -10,6 +10,10 @@ function writeHeader(model, outputFolder) {
     const file = fs.openSync(filePath, "w");
     fs.writeSync(file, `#ifndef MODEL_${model.name.toUpperCase()}_H\n`);
     fs.writeSync(file, `#define MODEL_${model.name.toUpperCase()}_H\n\n`);
+
+    for (let i = 0; i < model.images.length; i++) {
+        N64ImageWriter.writeVariable(file, `model_${model.name}_image_${i}`, model.images[i]);
+    }
 
     if (model.hasNormals) {
         for (let i = 0; i < model.materials.length; i++) {

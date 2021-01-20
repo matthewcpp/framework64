@@ -24,11 +24,7 @@ async function main() {
     for (const model of manifest.models) {
         const sourceFile = path.join(manifestDirectory, model.src);
 
-        const params = {
-            bakeTransform: model.hasOwnProperty("bakeTransform") ? model.bakeTransform : false
-        }
-
-        gltfConvert(sourceFile, outputDirectory, params);
+        await gltfConvert(sourceFile, outputDirectory, model);
     }
 
     for (const image of manifest.images) {

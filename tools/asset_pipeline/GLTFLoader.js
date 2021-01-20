@@ -1,6 +1,7 @@
 const N64Model = require("./N64Model")
 const N64Mesh = require("./N64Mesh")
 const N64Material = require("./N64Material")
+const N64Image = require("./N64Image");
 
 const glMatrix = require("gl-matrix");
 
@@ -8,16 +9,22 @@ const fs = require("fs");
 const path = require("path");
 
 class GLTFLoader {
-    constructor() {
+    constructor(options) {
+        this.options =  {
+            bakeTransform : false,
+            resizeImages: {}
+        };
+
+        Object.assign(this.options, options);
+
         this.loadedBuffers = new Map();
         this.gltfPath = null;
         this.gltf = null;
         this.transform = glMatrix.mat4.create();
-        this.bakeTransform = false;
         this.model = null;
     }
 
-    load(gltfPath) {
+    async load(gltfPath) {
         this.gltfPath = gltfPath;
         this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
 
@@ -25,6 +32,7 @@ class GLTFLoader {
         this.model = new N64Model(modelName);
 
         this._readMaterials();
+        await this._readImages();
 
         const scene = this.gltf.scenes[this.gltf.scene];
 
@@ -60,7 +68,8 @@ class GLTFLoader {
                 this._readNormals(gltfPrimitive, n64Mesh);
             }
 
-            this._readTexCoords(gltfPrimitive, n64Mesh);
+            if (gltfPrimitive.attributes.TEXCOORD_0)
+                this._readTexCoords(gltfPrimitive, n64Mesh);
 
             if (gltfPrimitive.hasOwnProperty("material"))
                 n64Mesh.material = gltfPrimitive.material;
@@ -118,7 +127,7 @@ class GLTFLoader {
                 buffer.readFloatLE(offset + 8)
             ];
 
-            if (this.bakeTransform) {
+            if (this.options.bakeTransform) {
                 glMatrix.vec3.transformMat4(position, position, this.transform);
             }
 
@@ -130,11 +139,9 @@ class GLTFLoader {
             ];
 
             n64Mesh.vertices.push(vertex);
+            n64Mesh.bounding.encapsulatePoint(position);
             offset += byteStride;
         }
-
-        n64Mesh.bounding.min = accessor.min.slice();
-        n64Mesh.bounding.max = accessor.max.slice();
     }
 
     _getDefaultStride(type, componentType) {
@@ -230,29 +237,52 @@ class GLTFLoader {
         n64Mesh.hasNormals = true;
     }
 
-    _readTexCoords(gltfPrimitive, n64Mesh) {
-        /*
-        inline fixed_point_t float_to_fixed(double input)
-        {
-            return (fixed_point_t)(round(input * (1 << FIXED_POINT_FRACTIONAL_BITS)));
-        }
-        */
 
-        /*
-        for (const vertex of n64Mesh.vertices) {
-            vertex.push(0, 0);
+
+    _readTexCoords(gltfPrimitive, n64Mesh) {
+        const accessor = this.gltf.accessors[gltfPrimitive.attributes.TEXCOORD_0];
+        const bufferView = this.gltf.bufferViews[accessor.bufferView];
+        const buffer = this._getBuffer(bufferView.buffer);
+
+        const material = this.gltf.materials[gltfPrimitive.material];
+        const image = this.model.images[material.pbrMetallicRoughness.baseColorTexture.index];
+
+        const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
+
+        let offset = bufferView.byteOffset;
+        for (let i = 0; i < accessor.count; i++) {
+            const vertex = n64Mesh.vertices[i];
+
+            let s = buffer.readFloatLE(offset);
+            let t = buffer.readFloatLE(offset + 4);
+
+            // clamp tex coords to (0, 1)
+            s = Math.min(Math.max(s, 0.0), 1.0) * image.width * 2;
+            t = Math.min(Math.max(t, 0.0), 1.0) * image.height * 2;
+
+            vertex[4] = Math.round(s * (1 << 5));
+            vertex[5] = Math.round(t * (1 << 5));
+
+            offset += byteStride;
         }
-        */
     }
 
-    _readMaterials(gltfPrimitive) {
+    _readMaterials() {
         for (const gltfMaterial of this.gltf.materials) {
             const material = new N64Material();
 
-            const baseColor = gltfMaterial.pbrMetallicRoughness.baseColorFactor;
-            material.color[0] = parseInt(baseColor[0] * 255);
-            material.color[1] = parseInt(baseColor[1] * 255);
-            material.color[2] = parseInt(baseColor[2] * 255);
+            const pbr = gltfMaterial.pbrMetallicRoughness;
+
+            if (pbr.baseColorFactor) {
+                const baseColor = pbr.baseColorFactor;
+                material.ambient[0] = parseInt(baseColor[0] * 255);
+                material.ambient[1] = parseInt(baseColor[1] * 255);
+                material.ambient[2] = parseInt(baseColor[2] * 255);
+            }
+
+            if (pbr.baseColorTexture) {
+                material.texture = pbr.baseColorTexture.index;
+            }
 
             this.model.materials.push(material)
         }
@@ -261,7 +291,27 @@ class GLTFLoader {
         if (this.model.materials.length === 0) {
             this.model.materials.push(new N64Material());
         }
+    }
 
+    async _readImages() {
+        if (!this.gltf.images) return;
+
+        const gltfDir = path.dirname(this.gltfPath);
+
+        for (const gltfImage of this.gltf.images) {
+            const imagePath = path.join(gltfDir, gltfImage.uri);
+
+            const image = new N64Image(gltfImage.uri);
+            await image.load(imagePath);
+
+            if (this.options.resizeImages.hasOwnProperty(gltfImage.uri)) {
+                const dimensions = this.options.resizeImages[gltfImage.uri].split("x");
+                image.data.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
+                console.log(`Resize image: ${gltfImage.uri} to ${dimensions[0]}x${dimensions[1]}`);
+            }
+
+            this.model.images.push(image);
+        }
     }
 
     _readUShortTriangleList(buffer, byteOffset, count, mesh) {
