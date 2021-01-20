@@ -1,6 +1,5 @@
 #include "game.h"
 
-
 #include "entity.h"
 #include "rect.h"
 #include "static_model.h"
@@ -44,12 +43,25 @@ Game* game_create(Renderer* renderer, Input* input) {
 
 void game_update(Game* game, float time_delta) {
     if (input_button_pressed(game->input, 0, START_BUTTON)) {
-        if (entity.model == 1)
-            entity.model = 2;
-        else
-            entity.model = 1;
+        switch(entity.model) {
+            case 1:
+                entity.model = 2;
+            break;
 
-            _reset_arcball(game);
+            case 2:
+                entity.model = 3;
+            break;
+
+            case 3:
+                entity.model = 4;
+            break;
+
+            case 4:
+                entity.model = 1;
+            break;
+        }
+
+        _reset_arcball(game);
     }
     else {
         arcball_update(game->arcball, time_delta);

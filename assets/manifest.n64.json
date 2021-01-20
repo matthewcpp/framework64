@@ -12,6 +12,10 @@
         },
         {
             "src": "suzanne/suzanne.gltf"
+        },
+        {
+            "src": "penguin/penguin.gltf",
+            "bakeTransform": true
         }
     ]
 }
