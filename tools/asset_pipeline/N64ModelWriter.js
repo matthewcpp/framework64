@@ -4,7 +4,7 @@ const path  = require("path");
 const fs = require("fs")
 
 function writeHeader(model, outputFolder) {
-    const filePath = path.join(outputFolder, `${model.name}.h`)
+    const filePath = path.join(outputFolder, `${model.name}_model.h`)
     console.log(`write: ${filePath}`);
 
     const file = fs.openSync(filePath, "w");

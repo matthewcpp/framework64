@@ -16,7 +16,7 @@ typedef struct {
     Vec3 _target;
 } ArcballCamera;
 
-ArcballCamera* arcball_create(Camera* camera, Input* input);
+void arcball_init(ArcballCamera* arcball, Camera* camera, Input* input);
 void arcball_set_initial(ArcballCamera* arcball, Box* box);
 void arcball_update(ArcballCamera* arcball, float time_delta);
 

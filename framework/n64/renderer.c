@@ -1,7 +1,6 @@
 #include "ultra/renderer.h"
 
 #include "ultra/matrix.h"
-#include "ultra/static_model.h"
 
 #include <malloc.h>
 
@@ -91,20 +90,16 @@ void renderer_begin(Renderer* renderer, Camera* camera) {
     gDPPipeSync(renderer->display_list++);
 }
 
-void renderer_activate_lighting(Renderer* renderer) {
-    gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
-    gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
-}
-
 float entity_matrix[4][4];
 
-void renderer_draw_static(Renderer* renderer, Entity* entity) {
+void renderer_entity_start(Renderer* renderer, Entity* entity){
     matrix_from_trs(entity_matrix, &entity->transform.position, &entity->transform.rotation, &entity->transform.scale);
     guMtxF2L(entity_matrix, &entity->dl_matrix);
 
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(entity->dl_matrix)), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+}
 
-    static_model_render(entity->model, renderer);
+void renderer_entity_end(Renderer* renderer) {
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     gDPPipeSync(renderer->display_list++);
 }

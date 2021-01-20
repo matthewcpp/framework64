@@ -12,17 +12,13 @@ static void _arcball_reset(ArcballCamera* arcball) {
     arcball->_distance = arcball->_diagonal * 2.0f;
 }
 
-ArcballCamera* arcball_create(Camera* camera, Input* input) {
-    ArcballCamera* arcball = malloc(sizeof(ArcballCamera));
-
+void arcball_init(ArcballCamera* arcball, Camera* camera, Input* input) {
     arcball->_camera = camera;
     arcball->_input = input;
 
     arcball->_diagonal = 1.0f;
     _arcball_reset(arcball);
     vec3_zero(&arcball->_target);
-
-    return arcball;
 }
 
 void _arcball_update_camera_position(ArcballCamera* arcball) {
