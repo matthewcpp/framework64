@@ -1,11 +1,12 @@
 #include "ultra/input.h"
 
+#include <nusys.h>
+
 #include <string.h>
 #include <malloc.h>
 
-Input* input_create() {
-    Input* input = calloc(1, sizeof(Input));
-    return input;
+void input_init(Input* input) {
+    nuContInit(); // initialize nusys controller subsystem
 }
 
 void input_update(Input* input) {

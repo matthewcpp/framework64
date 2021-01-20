@@ -1,4 +1,4 @@
-#include "arcball.h"
+#include "arcball_camera.h"
 
 #include <malloc.h>
 
@@ -43,7 +43,6 @@ void _arcball_update_camera_position(ArcballCamera* arcball) {
 
     transform_look_at(&arcball->_camera->transform, &arcball->_target, &up);
     camera_update_view_matrix(arcball->_camera);
-
 }
 
 void arcball_set_initial(ArcballCamera* arcball, Box* box) {

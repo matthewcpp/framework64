@@ -2,10 +2,13 @@
 
 #include "ultra/matrix.h"
 
+#include <nusys.h>
+
 #include <malloc.h>
 
-Renderer* renderer_create(int screen_width, int screen_height) {
-    Renderer* renderer = malloc(sizeof(Renderer));
+void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
+    nuGfxInit(); // starts nusys graphics
+
     renderer->screen_size.x = screen_width;
     renderer->screen_size.y = screen_height;
     renderer->display_list = NULL;
@@ -24,8 +27,6 @@ Renderer* renderer_create(int screen_width, int screen_height) {
     };
 
     renderer->view_port = view_port;
-
-    return renderer;
 }
 
 void renderer_init_rcp(Renderer* renderer) {
@@ -93,7 +94,7 @@ void renderer_begin(Renderer* renderer, Camera* camera) {
 float entity_matrix[4][4];
 
 void renderer_entity_start(Renderer* renderer, Entity* entity){
-    matrix_from_trs(entity_matrix, &entity->transform.position, &entity->transform.rotation, &entity->transform.scale);
+    matrix_from_trs((float*)entity_matrix, &entity->transform.position, &entity->transform.rotation, &entity->transform.scale);
     guMtxF2L(entity_matrix, &entity->dl_matrix);
 
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(entity->dl_matrix)), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);

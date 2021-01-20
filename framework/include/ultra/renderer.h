@@ -27,7 +27,7 @@ typedef struct {
 } Renderer;
 
 
-Renderer* renderer_create(int screen_width, int screen_height);
+void renderer_init(Renderer* renderer, int screen_width, int screen_height);
 void renderer_begin(Renderer* renderer, Camera* camera);
 void renderer_end(Renderer* renderer);
 

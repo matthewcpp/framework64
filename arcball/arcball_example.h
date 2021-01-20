@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "arcball.h"
+#include "arcball_camera.h"
 #include "ultra/camera.h"
 #include "ultra/input.h"
 #include "ultra/renderer.h"
@@ -12,20 +12,22 @@
 #define ENTITY_COUNT 3
 
 typedef struct {
-    ArcballCamera arcball;
-    Camera camera;
     Renderer* renderer;
     Input* input;
-    Texture* texture;
+
+    Camera camera;
+    ArcballCamera arcball;
+
     Penguin penguin;
     Suzanne suzanne;
     N64Logo n64logo;
+
     Entity* entities[ENTITY_COUNT];
     int current_entity;
-} Game;
+} ArcballExample;
 
-Game* game_create(Renderer* renderer, Input* input);
-void game_update(Game* game, float time_delta);
-void game_draw(Game* game);
+void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* input);
+void arcball_example_update(ArcballExample* example, float time_delta);
+void arcball_example_draw(ArcballExample* example);
 
 #endif
