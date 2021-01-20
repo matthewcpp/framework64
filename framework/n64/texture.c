@@ -1,6 +1,6 @@
-#include "texture.h"
+#include "ultra/texture.h"
 
-#include "assets/build_n64/n64_logo_sprite.h"
+#include "n64_logo_sprite.h"
 
 #include <stddef.h>
 #include <malloc.h>

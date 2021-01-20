@@ -1,8 +1,8 @@
-#include "static_model.h"
+#include "ultra/static_model.h"
 
-#include "assets/build_n64/n64_logo.h"
-#include "assets/build_n64/suzanne.h"
-#include "assets/build_n64/penguin.h"
+#include "n64_logo.h"
+#include "suzanne.h"
+#include "penguin.h"
 
 #include <string.h>
 

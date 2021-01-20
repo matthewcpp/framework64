@@ -1,9 +1,9 @@
 #ifndef ARCBALL_H
 #define ARCBALL_H
 
-#include "camera.h"
-#include "input.h"
-#include "box.h"
+#include "ultra/camera.h"
+#include "ultra/input.h"
+#include "ultra/box.h"
 
 typedef struct {
     Camera* _camera;

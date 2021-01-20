@@ -2,10 +2,10 @@
 #define GAME_H
 
 #include "arcball.h"
-#include "camera.h"
-#include "input.h"
-#include "renderer.h"
-#include "texture.h"
+#include "ultra/camera.h"
+#include "ultra/input.h"
+#include "ultra/renderer.h"
+#include "ultra/texture.h"
 
 typedef struct {
     ArcballCamera* arcball;

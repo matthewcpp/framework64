@@ -12,9 +12,9 @@ LIB = $(ROOT)/usr/lib
 LPR = $(LIB)/PR
 INC = $(ROOT)/usr/include
 
-LCDEFS =	-DNU_DEBUG -DF3DEX_GBI_2
+LCDEFS =	-DNU_DEBUG -DF3DEX_GBI_2 -DPLATFORM_N64
 LDIRT  =	$(APP) $(TARGETS)
-LCINCS =	-I. -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR -I/usr/include/n64/nustd
+LCINCS =	-I./framework/include -I./arcball -I./assets/build_n64 -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR -I/usr/include/n64/nustd
 LCOPTS =	-G 0
 LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra_d -L$(N64_LIBGCCDIR) -lgcc  -lnustd
 
@@ -24,9 +24,9 @@ APP =		sandbox.out
 
 TARGETS =	sandbox.n64
 
-HFILES =	main.h renderer.h game.h input.h vec3.h vec2.h quat.h matrix.h entity.h transform.h camera.h arcball.h box.h static_model.h color.h rect.h
+HFILES =	$(wildcard framework/include/ulta/*.h) $(wildcard arcball/*.h)
 
-CODEFILES   = 	main.c  renderer.c input.c game.c vec3.c quat.c matrix.c entity.c transform.c camera.c arcball.c box.c static_model.c texture.c
+CODEFILES   =	$(wildcard framework/n64/*.c) $(wildcard arcball/*.c)
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 
@@ -49,3 +49,6 @@ $(CODESEGMENT):	$(CODEOBJECTS) Makefile
 $(TARGETS):	$(OBJECTS)
 		$(MAKEROM) spec -I$(NUSYSINCDIR) -r $(TARGETS) -s 10 -e $(APP)
 		makemask $(TARGETS)
+
+clean:
+	rm -f  framework/n64/*.o arcball/*.o ./*.o ./*.out *.n64

@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "ultra/matrix.h"
 
 #include <math.h>
 

@@ -1,8 +1,8 @@
 #include "game.h"
 
-#include "entity.h"
-#include "rect.h"
-#include "static_model.h"
+#include "ultra/entity.h"
+#include "ultra/rect.h"
+#include "ultra/static_model.h"
 
 #include <nusys.h>
 #include <malloc.h>

@@ -1,7 +1,7 @@
-#include "renderer.h"
+#include "ultra/renderer.h"
 
-#include "matrix.h"
-#include "static_model.h"
+#include "ultra/matrix.h"
+#include "ultra/static_model.h"
 
 #include <malloc.h>
 
