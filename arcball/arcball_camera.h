@@ -1,9 +1,9 @@
 #ifndef ARCBALL_H
 #define ARCBALL_H
 
-#include "camera.h"
-#include "input.h"
-#include "box.h"
+#include "ultra/camera.h"
+#include "ultra/input.h"
+#include "ultra/box.h"
 
 typedef struct {
     Camera* _camera;
@@ -16,7 +16,7 @@ typedef struct {
     Vec3 _target;
 } ArcballCamera;
 
-ArcballCamera* arcball_create(Camera* camera, Input* input);
+void arcball_init(ArcballCamera* arcball, Camera* camera, Input* input);
 void arcball_set_initial(ArcballCamera* arcball, Box* box);
 void arcball_update(ArcballCamera* arcball, float time_delta);
 

@@ -1,14 +1,15 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "transform.h"
+#include "ultra/transform.h"
+#include "ultra/box.h"
 
 #include <nusys.h>
 
 typedef struct {
     Transform transform;
     Mtx dl_matrix;
-    int model;
+    Box bounding;
 } Entity;
 
 void entity_init(Entity* entity);

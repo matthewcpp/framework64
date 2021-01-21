@@ -10,7 +10,7 @@ typedef struct {
     NUContData 	previous_state[NU_CONT_MAXCONTROLLERS];
 } Input;
 
-Input* input_create();
+void input_init(Input* input);
 void input_update(Input* input);
 
 int input_button_pressed(Input* input, int controller, int button);

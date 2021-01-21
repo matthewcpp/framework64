@@ -1,4 +1,4 @@
-#include "quat.h"
+#include "ultra/quat.h"
 
 #include <math.h>
 

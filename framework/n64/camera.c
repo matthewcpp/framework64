@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "ultra/camera.h"
 
 void camera_init(Camera* camera) {
     transform_init(&camera->transform);

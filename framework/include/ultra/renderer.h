@@ -27,12 +27,12 @@ typedef struct {
 } Renderer;
 
 
-Renderer* renderer_create(int screen_width, int screen_height);
+void renderer_init(Renderer* renderer, int screen_width, int screen_height);
 void renderer_begin(Renderer* renderer, Camera* camera);
 void renderer_end(Renderer* renderer);
 
-void renderer_activate_lighting(Renderer* renderer);
-void renderer_draw_static(Renderer* renderer, Entity* entity);
+void renderer_entity_start(Renderer* renderer, Entity* entity);
+void renderer_entity_end(Renderer* renderer);
 
 void renderer_begin_2d(Renderer* renderer);
 void renderer_set_fill_color(Renderer* renderer, Color* color);

@@ -1,4 +1,4 @@
-#include "vec3.h"
+#include "ultra/vec3.h"
 
 #include <math.h>
 
