@@ -1,5 +1,6 @@
 const gltfConvert = require("./asset_pipeline/GLTFConvert");
-const pngConvert = require("./asset_pipeline/PNGConvert");
+const imageConvert = require("./asset_pipeline/ImageConvert");
+
 const fs = require("fs");
 const path = require("path");
 const rimraf = require("rimraf");
@@ -18,21 +19,19 @@ async function main() {
 
     fs.mkdirSync(outputDirectory);
 
-    console.log(manifest);
-    console.log(outputDirectory);
+    if (manifest.models) {
+        for (const model of manifest.models) {
+            const sourceFile = path.join(manifestDirectory, model.src);
 
-    for (const model of manifest.models) {
-        const sourceFile = path.join(manifestDirectory, model.src);
-
-        await gltfConvert(sourceFile, outputDirectory, model);
+            await gltfConvert(sourceFile, outputDirectory, model);
+        }
     }
 
-    for (const image of manifest.images) {
-        const sourceFile = path.join(manifestDirectory, image.src);
-        const fileName = path.basename(image.src, ".png") + ".h";
-        const outputFile = path.join(outputDirectory, fileName);
-
-        await pngConvert(sourceFile, outputFile);
+    if (manifest.sprites) {
+        for (const sprite of manifest.sprites) {
+            const sourceFile = path.join(manifestDirectory, sprite.src);
+            await imageConvert.convertSprite(sourceFile, outputDirectory, sprite);
+        }
     }
 }
 
