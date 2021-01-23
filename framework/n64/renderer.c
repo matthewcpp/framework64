@@ -158,25 +158,40 @@ void renderer_set_sprite_mode(Renderer* renderer){
     //TODO: do i need to sync pipe here?
 }
 
-void renderer_draw_sprite(Renderer* renderer, Texture* sprite, int x, int y) {
-    gDPLoadTextureBlock(
-        renderer->display_list++,
-        sprite->data,
-        G_IM_FMT_RGBA,
-        G_IM_SIZ_16b,
-        sprite->width, sprite->height,
-        0,
-        G_TX_WRAP, G_TX_WRAP,
-        G_TX_NOMASK, G_TX_NOMASK,
-        G_TX_NOLOD, G_TX_NOLOD 
-    );
+void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int frame, int x, int y) {
+    int slice_width = image_sprite_get_slice_width(sprite);
+    int slice_height = image_sprite_get_slice_height(sprite);
 
-        gSPTextureRectangle(renderer->display_list++, 
-        x << 2, y << 2, 
-        (x + sprite->width)<<2, (y + sprite->height)<<2,
-        G_TX_RENDERTILE, 
-        0 << 5, 0 << 5, 
-        1 << 10, 1 << 10);
+    int top_left_x = (frame % sprite->hslices) * slice_width;
+    int top_left_y = (frame / sprite->hslices) * slice_height;
+
+    gDPLoadTextureBlock(renderer->display_list++, sprite->slices[frame], G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
+        G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+
+    gDPLoadSync(renderer->display_list++);
+
+    gSPTextureRectangle(renderer->display_list++, 
+            x << 2, y << 2, 
+            (x + slice_width) << 2, (y + slice_height) << 2,
+            G_TX_RENDERTILE, 
+            0 << 5, 0 << 5, 
+            1 << 10, 1 << 10);
 
     gDPPipeSync(renderer->display_list++);
+}
+
+void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y) {
+    int slice_width = image_sprite_get_slice_width(sprite);
+    int slice_height = image_sprite_get_slice_height(sprite);
+    int slice = 0;
+
+    for (uint8_t row = 0; row < sprite->hslices; row++ ) {
+        int draw_y = y + row * slice_height;
+        for (uint8_t col = 0; col < sprite->vslices; col++) {
+            int draw_x = x + slice_width * col;
+
+            renderer_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
+        }
+    }
+    
 }

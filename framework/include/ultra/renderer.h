@@ -7,7 +7,7 @@
 #include "color.h"
 #include "entity.h"
 #include "Rect.h"
-#include "texture.h"
+#include "sprite.h"
 #include "vec2.h"
 
 /* The maximum length of the display list of one task  */
@@ -39,7 +39,9 @@ void renderer_set_fill_color(Renderer* renderer, Color* color);
 void renderer_set_fill_mode(Renderer* renderer);
 void renderer_draw_filled_rect(Renderer* renderer, Rect* rect);
 void renderer_set_sprite_mode(Renderer* renderer);
-void renderer_draw_sprite(Renderer* renderer, Texture* sprite, int x, int y);
+
+void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y);
+void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int frame, int x, int y);
 
 void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size);
 
