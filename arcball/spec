@@ -32,6 +32,6 @@ beginseg
 endseg
 
 beginwave
-	name	"nu2"
+	name	"arcball_example"
 	include	"code"
 endwave

@@ -20,9 +20,9 @@ LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra_d -L$(N64_LIBG
 
 OPTIMIZER =	-g
 
-APP =		sandbox.out
+APP =		arcball_example.out
 
-TARGETS =	sandbox.n64
+TARGETS =	arcball_example.n64
 
 HFILES =	$(wildcard ../framework/include/ulta/*.h) $(wildcard ./*.h)
 

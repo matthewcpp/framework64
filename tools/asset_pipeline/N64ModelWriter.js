@@ -13,7 +13,11 @@ function writeHeader(model, outputFolder) {
 
     for (let i = 0; i < model.images.length; i++) {
         const image = model.images[i];
-        N64ImageWriter.writeDataArray(file, `model_${model.name}_image_${i}`, image.data, image.width, image.height);
+        const imageName = `model_${model.name}_image_${i}`;
+
+        fs.writeSync(file, `#define ${imageName}_WIDTH ${image.width}\n`);
+        fs.writeSync(file, `#define ${imageName}_HEIGHT ${image.height}\n\n`);
+        N64ImageWriter.writeDataArray(file,imageName , image.data, image.width, image.height);
     }
 
     if (model.hasNormals) {

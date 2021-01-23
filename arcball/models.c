@@ -61,14 +61,14 @@ void penguin_draw(Penguin* penguin, Renderer* renderer) {
     gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
     gDPSetTextureFilter(renderer->display_list++,G_TF_POINT);
     
-    gDPLoadTextureBlock( renderer->display_list++, model_penguin_image_0_image,
+    gDPLoadTextureBlock(renderer->display_list++, model_penguin_image_0,
     G_IM_FMT_RGBA, G_IM_SIZ_16b,  32, 32, 0,
     G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
     gSPDisplayList(renderer->display_list++, penguin_mesh_0_dl);
     gDPPipeSync(renderer->display_list++);
 
-    gDPLoadTextureBlock( renderer->display_list++, model_penguin_image_1_image,
+    gDPLoadTextureBlock( renderer->display_list++, model_penguin_image_1,
     G_IM_FMT_RGBA, G_IM_SIZ_16b,  32, 32, 0,
     G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
