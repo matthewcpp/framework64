@@ -1,8 +1,16 @@
 {
     "outDir": "build_n64",
-    "images": [
+    "sprites": [
         {
-            "src": "n64_logo_sprite.png"
+            "src": "n64_logo.png",
+            "hslices": 2,
+            "vslices": 2
+        },
+        {
+            "src": "ken.png",
+            "resize": "192x44",
+            "hslices": 6,
+            "vslices": 2
         }
     ],
     "models": [

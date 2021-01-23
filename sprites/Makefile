@@ -20,13 +20,13 @@ LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra_d -L$(N64_LIBG
 
 OPTIMIZER =	-g
 
-APP =		arcball_example.out
+APP =		sprites_example.out
 
-TARGETS =	arcball_example.n64
+TARGETS =	sprites_example.n64
 
 HFILES =	$(wildcard ../framework/include/ulta/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../framework/n64/*.c) $(wildcard ./*.c)
+CODEFILES   =	$(wildcard ../framework/n64/*.c) $(wildcard ./*.c) ../assets/build_n64/n64_logo_sprite.c ../assets/build_n64/ken_sprite.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 

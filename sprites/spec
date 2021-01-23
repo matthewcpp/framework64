@@ -32,6 +32,6 @@ beginseg
 endseg
 
 beginwave
-	name	"arcball_example"
+	name	"sprites_example"
 	include	"code"
 endwave

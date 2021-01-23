@@ -3,31 +3,33 @@ const Jimp = require("jimp");
 class N64Image {
     constructor(name) {
         this.name = name;
-        this.data = null;
-        this.hSlices = 1;
-        this.vSlices = 1;
+        this._data = null;
     }
 
     async load(path) {
-        this.data = await Jimp.read(path);
+        this._data = await Jimp.read(path);
     }
 
     get width() {
-        return this.data.bitmap.width;
+        return this._data.bitmap.width;
     }
 
     get height() {
-        return this.data.bitmap.height;
+        return this._data.bitmap.height;
     }
-    encode16bpp() {
-        const pixelCount = this.width * this.height;
+
+    get data() {
+        return this._data.bitmap.data;
+    }
+
+    static encode16bpp(data, width, height) {
+        const pixelCount = width * height;
 
         // rgba data (2 bytes per pixel)
         const bufferSize = pixelCount * 2;
 
         const buffer = Buffer.alloc(bufferSize);
         let offset = 0;
-        const data = this.data.bitmap.data;
 
         for (let i = 0; i < pixelCount; i++) {
             let index = i * 4;
@@ -43,6 +45,50 @@ class N64Image {
         }
 
         return buffer;
+    }
+
+    resize(width, height) {
+        this._data.resize(width, height);
+    }
+
+    _createSlice(originX, originY, sliceWidth, sliceHeight) {
+        const data = this._data.bitmap.data;
+        const slice = [];
+
+        for (let y = 0; y < sliceHeight; y++) {
+            for (let x = 0; x < sliceWidth; x++) {
+                const index = ((originY + y) * this.width + (originX + x)) * 4;
+                slice.push(data[index], data[index + 1], data[index+2], data[index + 3]);
+            }
+        }
+
+        return slice;
+    }
+
+    slice(horizontalSlices, verticalSlices) {
+        let slices = [];
+
+        const sliceWidth = this.width / horizontalSlices;
+        const sliceHeight = this.height / verticalSlices;
+
+        for (let sliceY = 0; sliceY < verticalSlices; sliceY++) {
+            for (let sliceX = 0; sliceX < horizontalSlices; sliceX++) {
+                const originX = sliceX * sliceWidth;
+                const originY = sliceY * sliceHeight;
+
+                const currentSliceWidth = Math.min(sliceWidth, this.width - originX);
+                const currentSliceHeight = Math.min(sliceHeight, this.height - originY);
+
+                const slice = this._createSlice(originX, originY, currentSliceWidth, currentSliceHeight);
+                slices.push(slice);
+            }
+        }
+
+        return {
+            hslices: horizontalSlices,
+            vslices: verticalSlices,
+            images: slices
+        };
     }
 }
 

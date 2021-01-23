@@ -9,6 +9,4 @@ typedef struct {
     const unsigned char* data;
 } Texture;
 
-Texture* texture_load(int index);
-void texture_destroy(Texture* texture);
 #endif
