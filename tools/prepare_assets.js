@@ -1,5 +1,6 @@
 const gltfConvert = require("./asset_pipeline/GLTFConvert");
 const imageConvert = require("./asset_pipeline/ImageConvert");
+const FontConvert = require("./asset_pipeline/FontConvert");
 
 const fs = require("fs");
 const path = require("path");
@@ -31,6 +32,13 @@ async function main() {
         for (const sprite of manifest.sprites) {
             const sourceFile = path.join(manifestDirectory, sprite.src);
             await imageConvert.convertSprite(sourceFile, outputDirectory, sprite);
+        }
+    }
+
+    if (manifest.fonts) {
+        for (const font of manifest.fonts) {
+            const sourceFile = path.join(manifestDirectory, font.src);
+            await FontConvert.convertFont(sourceFile, outputDirectory, font);
         }
     }
 }

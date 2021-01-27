@@ -25,5 +25,19 @@
             "src": "penguin/penguin.gltf",
             "bakeTransform": true
         }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "sourceString": "Matthew",
+            "name": "Consolas12"
+        },
+        {
+            "src": "basicLAZER.otf",
+            "size": 12,
+            "sourceString": "Jessica",
+            "name": "basicLAZER12"
+        }
     ]
 }
