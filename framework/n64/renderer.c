@@ -144,7 +144,7 @@ void renderer_set_fill_mode(Renderer* renderer) {
     //TODO: do i need to sync pipe here?
 }
 
-void renderer_draw_filled_rect(Renderer* renderer, Rect* rect) {
+void renderer_draw_filled_rect(Renderer* renderer, IRect* rect) {
     
     gDPFillRectangle(renderer->display_list++, rect->x, rect->y, rect->x + rect->width, rect->y + rect->height);
     gDPPipeSync(renderer->display_list++);
@@ -193,5 +193,20 @@ void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y)
             renderer_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
         }
     }
-    
+}
+
+void renderer_draw_text_sprite(Renderer* renderer, TextSprite* text_sprite, int x, int y) {
+    gDPLoadTextureBlock(renderer->display_list++, text_sprite->data, G_IM_FMT_RGBA, G_IM_SIZ_16b, text_sprite->allocated_width, text_sprite->text_height, 0, 
+        G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+
+    gDPLoadSync(renderer->display_list++);
+
+        gSPTextureRectangle(renderer->display_list++, 
+            x << 2, y << 2, 
+            (x + text_sprite->allocated_width) << 2, (y + text_sprite->text_height) << 2,
+            G_TX_RENDERTILE, 
+            0 << 5, 0 << 5, 
+            1 << 10, 1 << 10);
+
+    gDPPipeSync(renderer->display_list++);
 }

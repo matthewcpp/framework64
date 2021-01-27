@@ -4,6 +4,6 @@
 typedef struct {
     int x, y;
     int width, height;
-} Rect;
+} IRect;
 
 #endif
