@@ -7,7 +7,7 @@ const itemsPerLine = 20;
 function writeDataArray(file, name, data, width, height) {
     const buffer = N64Image.encode16bpp(data, width, height);
 
-    fs.writeSync(file, `const unsigned char ${name}[] __attribute__ ((aligned (8))) = {`);
+    fs.writeSync(file, `unsigned char ${name}[] __attribute__ ((aligned (8))) = {`);
 
     for (let i =0; i < buffer.length; i++) {
         if (i % itemsPerLine === 0) {

@@ -17,7 +17,7 @@ function writeSpriteHeader(image, slices, path) {
 
     fs.writeSync(header, `#define ${image.name}_SPRITE_SLICE_COUNT ${slices.images.length}\n\n`);
 
-    fs.writeSync(header, `extern const unsigned char* ${image.name}_sprite_slices[];\n\n`);
+    fs.writeSync(header, `extern unsigned char* ${image.name}_sprite_slices[];\n\n`);
 
     fs.writeSync(header, "#endif\n");
 
@@ -36,7 +36,7 @@ function writeSpriteSource(image, slices, path, includePath) {
 
     fs.writeSync(source, "\n\n");
 
-    fs.writeSync(source, `const unsigned char* ${image.name}_sprite_slices[] = {\n`);
+    fs.writeSync(source, `unsigned char* ${image.name}_sprite_slices[] = {\n`);
     for (let i = 0; i < slices.images.length; i++) {
         fs.writeSync(source, `${image.name}_slice_${i},\n`);
     }
