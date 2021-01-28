@@ -38,6 +38,7 @@ void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* in
     renderer_set_fill_color(example->renderer, &fill_color);
 
     init_consolas_font(&example->consolas);
+    init_buttons_sprite(&example->button_sprite);
 }
 
 void arcball_example_update(ArcballExample* example, float time_delta) {
@@ -85,7 +86,9 @@ void arcball_example_draw(ArcballExample* example) {
 
     renderer_begin_2d(example->renderer);
     renderer_set_sprite_mode(example->renderer);
-    renderer_draw_text(example->renderer, &example->consolas, 10, 200, "Switch Model");
+    renderer_draw_sprite_slice(example->renderer, &example->button_sprite, 4, 10, 200);
+    renderer_draw_sprite_slice(example->renderer, &example->button_sprite, 5, 28, 200);
+    renderer_draw_text(example->renderer, &example->consolas, 50, 200, "Switch Model");
 
     renderer_end(example->renderer);
 }

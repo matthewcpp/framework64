@@ -7,6 +7,7 @@
 #include "n64_logo_model.h"
 
 #include "Consolas12.h"
+#include "buttons_sprite.h"
 
 #include <string.h>
 
@@ -87,4 +88,13 @@ void init_consolas_font(Font* font) {
     font->spritefont_tile_width = Consolas12_SPRITEFONT_TILE_WIDTH;
     font->spritefont_tile_height = Consolas12_SPRITEFONT_TILE_HEIGHT;
     font->spritefont = &Consolas12_spritefont[0];
+}
+
+void init_buttons_sprite(ImageSprite* buttons_sprite) {
+    buttons_sprite->width = buttons_SPRITE_WIDTH;
+    buttons_sprite->height = buttons_SPRITE_HEIGHT;
+    buttons_sprite->hslices = buttons_SPRITE_HSLICES;
+    buttons_sprite->vslices = buttons_SPRITE_VSLICES;
+    buttons_sprite->slice_count = buttons_SPRITE_SLICE_COUNT;
+    buttons_sprite->slices = &buttons_sprite_slices[0];
 }

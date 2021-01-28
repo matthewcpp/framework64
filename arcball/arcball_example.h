@@ -24,6 +24,7 @@ typedef struct {
     N64Logo n64logo;
 
     Font consolas;
+    ImageSprite button_sprite;
 
     Entity* entities[ENTITY_COUNT];
     int current_entity;
