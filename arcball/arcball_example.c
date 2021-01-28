@@ -36,6 +36,8 @@ void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* in
 
     Color fill_color = {255, 0, 0};
     renderer_set_fill_color(example->renderer, &fill_color);
+
+    init_consolas_font(&example->consolas);
 }
 
 void arcball_example_update(ArcballExample* example, float time_delta) {
@@ -80,6 +82,10 @@ void arcball_example_draw(ArcballExample* example) {
             penguin_draw(&example->penguin, example->renderer);
         break;
     }
+
+    renderer_begin_2d(example->renderer);
+    renderer_set_sprite_mode(example->renderer);
+    renderer_draw_text(example->renderer, &example->consolas, 10, 200, "Switch Model");
 
     renderer_end(example->renderer);
 }

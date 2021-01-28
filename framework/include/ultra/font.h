@@ -10,30 +10,21 @@ typedef struct {
     int8_t top;
     int8_t left;
     int8_t advance;
-    uint8_t width;
-    uint8_t height;
-    uint16_t x;
-    uint16_t y;
+    int8_t height;
 } FontGlyph;
 
 typedef struct {
     FontGlyph* glyphs;
     uint16_t glyph_count;
     uint16_t size;
-    uint16_t spritefont_width;
-    uint16_t spritefont_height;
+    uint16_t spritefont_tile_width;
+    uint16_t spritefont_tile_height;
     uint8_t* spritefont;
 } Font;
 
-typedef struct {
-    uint16_t text_width;
-    uint16_t text_height;
-    uint16_t allocated_width;
-    uint8_t* data;
-} TextSprite;
 
-TextSprite* font_create_text_sprite(Font* font, char* text);
+uint16_t font_get_glyph_index(Font* font, uint16_t codepoint);
 
-void text_sprite_uninit(TextSprite* text_sprite); 
+IVec2 font_measure_text(Font* font, char* text);
 
 #endif

@@ -29,15 +29,8 @@
     "fonts": [
         {
             "src": "Consolas.ttf",
-            "size": 12,
-            "sourceString": "Matthew",
+            "size": 16,
             "name": "Consolas12"
-        },
-        {
-            "src": "basicLAZER.otf",
-            "size": 12,
-            "sourceString": "Jessica",
-            "name": "basicLAZER12"
         }
     ]
 }

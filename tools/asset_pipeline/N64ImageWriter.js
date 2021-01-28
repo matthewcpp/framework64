@@ -2,7 +2,7 @@ const N64Image = require("./N64Image");
 
 const fs = require("fs");
 
-const itemsPerLine = 20;
+const itemsPerLine = 32;
 
 function writeDataArray(file, name, data, width, height) {
     const buffer = N64Image.encode16bpp(data, width, height);

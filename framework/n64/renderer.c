@@ -5,6 +5,7 @@
 #include <nusys.h>
 
 #include <malloc.h>
+#include <string.h>
 
 void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
     nuGfxInit(); // starts nusys graphics
@@ -180,33 +181,42 @@ void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int fra
     gDPPipeSync(renderer->display_list++);
 }
 
-void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y) {
-    int slice_width = image_sprite_get_slice_width(sprite);
-    int slice_height = image_sprite_get_slice_height(sprite);
-    int slice = 0;
+void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text) {
+    if (!text || text[0] == 0) return;
+    
+    char ch = text[0];
+    uint16_t glyph_index = font_get_glyph_index(font, ch);
+    FontGlyph* glyph = font->glyphs + glyph_index;
+    uint16_t stride = font->spritefont_tile_width * font->spritefont_tile_height * 2;
 
-    for (uint8_t row = 0; row < sprite->hslices; row++ ) {
-        int draw_y = y + row * slice_height;
-        for (uint8_t col = 0; col < sprite->vslices; col++) {
-            int draw_x = x + slice_width * col;
+    int caret = x + (-glyph->left);
 
-            renderer_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
-        }
-    }
-}
+    while (ch) {
+        glyph_index = font_get_glyph_index(font, ch);
+        glyph = font->glyphs + glyph_index;
 
-void renderer_draw_text_sprite(Renderer* renderer, TextSprite* text_sprite, int x, int y) {
-    gDPLoadTextureBlock(renderer->display_list++, text_sprite->data, G_IM_FMT_RGBA, G_IM_SIZ_16b, text_sprite->allocated_width, text_sprite->text_height, 0, 
+        int draw_pos_x = caret + glyph->left;
+        int draw_pos_y = y + glyph->top;
+
+        gDPLoadTextureBlock(renderer->display_list++, font->spritefont + (stride * glyph_index), 
+        G_IM_FMT_RGBA, G_IM_SIZ_16b, 
+        font->spritefont_tile_width, font->spritefont_tile_height, 0, 
         G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
-    gDPLoadSync(renderer->display_list++);
+        gDPLoadSync(renderer->display_list++);
 
         gSPTextureRectangle(renderer->display_list++, 
-            x << 2, y << 2, 
-            (x + text_sprite->allocated_width) << 2, (y + text_sprite->text_height) << 2,
+            draw_pos_x << 2, draw_pos_y << 2, 
+            (draw_pos_x + font->spritefont_tile_width) << 2, (draw_pos_y + font->spritefont_tile_height) << 2,
             G_TX_RENDERTILE, 
             0 << 5, 0 << 5, 
             1 << 10, 1 << 10);
 
-    gDPPipeSync(renderer->display_list++);
+        gDPPipeSync(renderer->display_list++);
+
+        caret += glyph->advance;
+        text++;
+        ch = text[0];
+    }
+    
 }

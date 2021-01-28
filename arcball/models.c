@@ -6,6 +6,8 @@
 #include "suzanne_model.h"
 #include "n64_logo_model.h"
 
+#include "Consolas12.h"
+
 #include <string.h>
 
 void n64logo_init(N64Logo* n64logo) {
@@ -75,4 +77,14 @@ void penguin_draw(Penguin* penguin, Renderer* renderer) {
     gSPDisplayList(renderer->display_list++, penguin_mesh_1_dl);
 
     renderer_entity_end(renderer);
+}
+
+void init_consolas_font(Font* font) {
+    font->size = Consolas12_FONT_SIZE;
+    font->glyph_count = Consolas12_FONT_GLYPH_COUNT;
+    font->glyphs = &Consolas12_glyphs[0];
+
+    font->spritefont_tile_width = Consolas12_SPRITEFONT_TILE_WIDTH;
+    font->spritefont_tile_height = Consolas12_SPRITEFONT_TILE_HEIGHT;
+    font->spritefont = &Consolas12_spritefont[0];
 }

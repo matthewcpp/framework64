@@ -16,8 +16,8 @@ function writeFontHeader(font, path) {
     fs.writeSync(header, `#define ${font.name}_FONT_GLYPH_COUNT ${font.glyphs.length}\n`);
     fs.writeSync(header, `extern FontGlyph ${font.name}_glyphs[];\n\n`);
 
-    fs.writeSync(header, `#define ${font.name}_SPRITEFONT_WIDTH ${font.image.width}\n`);
-    fs.writeSync(header, `#define ${font.name}_SPRITEFONT_HEIGHT ${font.image.height}\n`);
+    fs.writeSync(header, `#define ${font.name}_SPRITEFONT_TILE_WIDTH ${font.tileWidth}\n`);
+    fs.writeSync(header, `#define ${font.name}_SPRITEFONT_TILE_HEIGHT ${font.tileHeight}\n`);
     fs.writeSync(header, `extern unsigned char ${font.name}_spritefont[];\n\n`);
 
     fs.writeSync(header, "#endif\n");
@@ -31,7 +31,7 @@ function writeFontSource(font, path, includePath) {
 
     fs.writeSync(source, `FontGlyph ${font.name}_glyphs[] = {\n`);
     for (const glyph of font.glyphs) {
-        fs.writeSync(source, `{${glyph.codepoint}, ${glyph.top}, ${glyph.left}, ${glyph.advance}, ${glyph.width}, ${glyph.height}, ${glyph.x}, ${glyph.y}},\n`);
+        fs.writeSync(source, `{${glyph.codepoint}, ${glyph.top}, ${glyph.left}, ${glyph.advance}, ${glyph.height}},\n`);
     }
     fs.writeSync(source, "};\n\n");
 

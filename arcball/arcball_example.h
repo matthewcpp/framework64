@@ -6,6 +6,7 @@
 #include "ultra/input.h"
 #include "ultra/renderer.h"
 #include "ultra/texture.h"
+#include "ultra/font.h"
 
 #include "models.h"
 
@@ -21,6 +22,8 @@ typedef struct {
     Penguin penguin;
     Suzanne suzanne;
     N64Logo n64logo;
+
+    Font consolas;
 
     Entity* entities[ENTITY_COUNT];
     int current_entity;

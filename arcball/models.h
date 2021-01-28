@@ -3,6 +3,7 @@
 
 #include "ultra/entity.h"
 #include "ultra/renderer.h"
+#include "ultra/font.h"
 
 typedef struct {
     Entity entity;
@@ -27,5 +28,8 @@ typedef struct {
 
 void penguin_init(Penguin* penguin);
 void penguin_draw(Penguin* penguin, Renderer* renderer);
+
+void init_consolas_font(Font* font);
+void init_basic_lazer_font(Font* font);
 
 #endif

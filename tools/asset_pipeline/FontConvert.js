@@ -5,7 +5,7 @@ const path = require("path")
 
 function _initOptions(sourceFile, params) {
     const options = {
-        sourceString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012346789!@#$%^&*()_+[];',./\\\"`~",
+        sourceString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012346789!@#$%^&*()_+[];',./\\\"`~ ",
         name: path.basename(sourceFile, path.extname(sourceFile)) + params.size.toString()
     }
 
@@ -25,7 +25,6 @@ async function convertFont(sourceFile, outputDir, params) {
     await font.load(sourceFile);
 
     const data = await font.generateSpriteFont(options.sourceString, options.size);
-    //console.log(data.glpyhData);
     N64FontWriter.writeFont(data, outputDir);
 }
 
