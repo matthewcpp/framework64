@@ -19,6 +19,10 @@ class N64Image {
         });
     }
 
+    assign(jimpData) {
+        this._data = jimpData;
+    }
+
     crop(x, y, w, h) {
         this._data.crop(x, y, w, h);
     }

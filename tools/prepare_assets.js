@@ -30,8 +30,16 @@ async function main() {
 
     if (manifest.sprites) {
         for (const sprite of manifest.sprites) {
-            const sourceFile = path.join(manifestDirectory, sprite.src);
-            await imageConvert.convertSprite(sourceFile, outputDirectory, sprite);
+            if (sprite.src) {
+                const sourceFile = path.join(manifestDirectory, sprite.src);
+                await imageConvert.convertSprite(sourceFile, outputDirectory, sprite);
+            }
+            else if (sprite.frames){
+                await imageConvert.assembleSprite(manifestDirectory, outputDirectory, sprite);
+            }
+            else {
+                throw new Error("Sprite element must specify 'src' or 'frames'");
+            }
         }
     }
 
