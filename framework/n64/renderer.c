@@ -181,6 +181,21 @@ void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int fra
     gDPPipeSync(renderer->display_list++);
 }
 
+void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y) {
+    int slice_width = image_sprite_get_slice_width(sprite);
+    int slice_height = image_sprite_get_slice_height(sprite);
+    int slice = 0;
+
+    for (uint8_t row = 0; row < sprite->hslices; row++ ) {
+        int draw_y = y + row * slice_height;
+        for (uint8_t col = 0; col < sprite->vslices; col++) {
+            int draw_x = x + slice_width * col;
+
+            renderer_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
+        }
+    }
+}
+
 void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text) {
     if (!text || text[0] == 0) return;
     

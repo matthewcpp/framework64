@@ -60,6 +60,12 @@
             "src": "Consolas.ttf",
             "size": 12,
             "name": "Consolas12"
+        },
+        {
+            "src": "basicLAZER.otf",
+            "size": 12,
+            "name": "basicLAZER",
+            "sourceString": "ELAPSED TIME:0123456789."
         }
     ]
 }
