@@ -1,8 +1,8 @@
 #ifndef SPRITES_H
 #define SPRITES_H
 
-#include "ultra/sprite.h"
 #include "ultra/renderer.h"
+#include "ultra/sprite.h"
 
 typedef struct {
     IVec2 position;
@@ -23,5 +23,15 @@ typedef struct {
 void ken_sprite_init(KenSprite* ken);
 void ken_sprite_update(KenSprite* ken, float time_delta);
 void ken_sprite_draw(KenSprite* ken, Renderer* renderer);
+
+typedef struct {
+    float total_time;
+} ElapsedTime;
+
+void elapsed_time_init(ElapsedTime* elapsed_time);
+void elapsed_time_update(ElapsedTime* elapsed_time, float time_delta);
+void elapsed_time_draw(ElapsedTime* elpased_time, Renderer* renderer, Font* font);
+
+void init_basic_lazer(Font* font);
 
 #endif

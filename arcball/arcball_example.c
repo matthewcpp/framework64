@@ -6,10 +6,15 @@
 #include <nusys.h>
 #include <malloc.h>
 #include <string.h>
+#include <stdio.h>
 
 #define ENTITY_N64_LOGO 0
 #define ENTITY_SUZANNE 1
 #define ENTITY_PENGUIN 2
+
+#define SWITCH_MODEL_TEXT "Switch Model"
+#define ORBIT_CAMERA_TEXT "Orbit"
+#define ZOOM_CAMERA_TEXT "ZOOM"
 
 void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* input) {
     example->input = input;
@@ -36,10 +41,15 @@ void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* in
 
     Color fill_color = {255, 0, 0};
     renderer_set_fill_color(example->renderer, &fill_color);
+
+    init_consolas_font(&example->consolas);
+    init_buttons_sprite(&example->button_sprite);
+
+    IVec2 text_measurement = font_measure_text(&example->consolas, SWITCH_MODEL_TEXT);
+    example->switch_model_text_width = text_measurement.x;
 }
 
 void arcball_example_update(ArcballExample* example, float time_delta) {
-    
     int previous_entity = example->current_entity;
 
     if (input_button_pressed(example->input, 0, R_CBUTTONS)) {
@@ -80,6 +90,39 @@ void arcball_example_draw(ArcballExample* example) {
             penguin_draw(&example->penguin, example->renderer);
         break;
     }
+
+    renderer_begin_2d(example->renderer);
+    renderer_set_sprite_mode(example->renderer);
+
+    IVec2 screen_size;
+    renderer_get_screen_size(example->renderer, &screen_size);
+
+    int button_width = image_sprite_get_slice_width(&example->button_sprite);
+    int draw_pos_x = 10;
+    int draw_pos_y = 200;
+
+    renderer_draw_sprite_slice(example->renderer, &example->button_sprite, 15, draw_pos_x, draw_pos_y);
+    draw_pos_x += button_width + 3;
+    renderer_draw_text(example->renderer, &example->consolas, draw_pos_x, draw_pos_y, ORBIT_CAMERA_TEXT);
+
+    draw_pos_x = screen_size.x - example->switch_model_text_width - 3;
+    renderer_draw_text(example->renderer, &example->consolas, draw_pos_x, draw_pos_y, SWITCH_MODEL_TEXT);
+
+    draw_pos_x -= button_width + 3;
+    renderer_draw_sprite_slice(example->renderer, &example->button_sprite, 5, draw_pos_x, draw_pos_y);
+
+    draw_pos_x -= button_width + 3;
+    renderer_draw_sprite_slice(example->renderer, &example->button_sprite, 4, draw_pos_x, draw_pos_y);
+
+    draw_pos_y = 220;
+    draw_pos_x = 10;
+    renderer_draw_sprite_slice(example->renderer, &example->button_sprite, 0, draw_pos_x, draw_pos_y);
+
+    draw_pos_x += button_width + 3;
+    renderer_draw_sprite_slice(example->renderer, &example->button_sprite, 1, draw_pos_x, draw_pos_y);
+
+    draw_pos_x += button_width + 3;
+    renderer_draw_text(example->renderer, &example->consolas, draw_pos_x, draw_pos_y, ZOOM_CAMERA_TEXT);
 
     renderer_end(example->renderer);
 }

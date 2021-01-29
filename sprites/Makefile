@@ -26,7 +26,7 @@ TARGETS =	sprites_example.n64
 
 HFILES =	$(wildcard ../framework/include/ulta/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../framework/n64/*.c) $(wildcard ./*.c) ../assets/build_n64/n64_logo_sprite.c ../assets/build_n64/ken_sprite.c
+CODEFILES   =	$(wildcard ../framework/n64/*.c) $(wildcard ./*.c) ../assets/build_n64/n64_logo_sprite.c ../assets/build_n64/ken_sprite.c ../assets/build_n64/basicLAZER.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 

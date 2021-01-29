@@ -6,6 +6,7 @@
 #include "ultra/input.h"
 #include "ultra/renderer.h"
 #include "ultra/texture.h"
+#include "ultra/font.h"
 
 #include "models.h"
 
@@ -22,8 +23,13 @@ typedef struct {
     Suzanne suzanne;
     N64Logo n64logo;
 
+    Font consolas;
+    ImageSprite button_sprite;
+
     Entity* entities[ENTITY_COUNT];
     int current_entity;
+
+    int switch_model_text_width;
 } ArcballExample;
 
 void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* input);

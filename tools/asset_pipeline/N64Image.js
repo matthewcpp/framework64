@@ -10,6 +10,27 @@ class N64Image {
         this._data = await Jimp.read(path);
     }
 
+    loadBuffer(buffer, width, height) {
+        return new Promise((resolve) => {
+            return new Jimp({data: buffer, width: width, height: height}, (error, image) => {
+                this._data = image;
+                resolve();
+            })
+        });
+    }
+
+    assign(jimpData) {
+        this._data = jimpData;
+    }
+
+    crop(x, y, w, h) {
+        this._data.crop(x, y, w, h);
+    }
+
+    writeToFile(path) {
+        return this._data.writeAsync(path);
+    }
+
     get width() {
         return this._data.bitmap.width;
     }
@@ -20,6 +41,10 @@ class N64Image {
 
     get data() {
         return this._data.bitmap.data;
+    }
+
+    get buffer16bpp() {
+        return N64Image.encode16bpp(this.data, this.width, this.height)
     }
 
     static encode16bpp(data, width, height) {

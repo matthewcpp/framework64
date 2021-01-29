@@ -5,6 +5,7 @@
 #include <nusys.h>
 
 #include <malloc.h>
+#include <string.h>
 
 void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
     nuGfxInit(); // starts nusys graphics
@@ -144,7 +145,7 @@ void renderer_set_fill_mode(Renderer* renderer) {
     //TODO: do i need to sync pipe here?
 }
 
-void renderer_draw_filled_rect(Renderer* renderer, Rect* rect) {
+void renderer_draw_filled_rect(Renderer* renderer, IRect* rect) {
     
     gDPFillRectangle(renderer->display_list++, rect->x, rect->y, rect->x + rect->width, rect->y + rect->height);
     gDPPipeSync(renderer->display_list++);
@@ -192,6 +193,45 @@ void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y)
 
             renderer_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
         }
+    }
+}
+
+void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text) {
+    if (!text || text[0] == 0) return;
+    
+    char ch = text[0];
+    uint16_t glyph_index = font_get_glyph_index(font, ch);
+    FontGlyph* glyph = font->glyphs + glyph_index;
+    uint16_t stride = font->spritefont_tile_width * font->spritefont_tile_height * 2;
+
+    int caret = x + glyph->left;
+
+    while (ch) {
+        glyph_index = font_get_glyph_index(font, ch);
+        glyph = font->glyphs + glyph_index;
+
+        int draw_pos_x = caret + glyph->left;
+        int draw_pos_y = y + glyph->top;
+
+        gDPLoadTextureBlock(renderer->display_list++, font->spritefont + (stride * glyph_index), 
+        G_IM_FMT_RGBA, G_IM_SIZ_16b, 
+        font->spritefont_tile_width, font->spritefont_tile_height, 0, 
+        G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+
+        gDPLoadSync(renderer->display_list++);
+
+        gSPTextureRectangle(renderer->display_list++, 
+            draw_pos_x << 2, draw_pos_y << 2, 
+            (draw_pos_x + font->spritefont_tile_width) << 2, (draw_pos_y + font->spritefont_tile_height) << 2,
+            G_TX_RENDERTILE, 
+            0 << 5, 0 << 5, 
+            1 << 10, 1 << 10);
+
+        gDPPipeSync(renderer->display_list++);
+
+        caret += glyph->advance;
+        text++;
+        ch = text[0];
     }
     
 }
