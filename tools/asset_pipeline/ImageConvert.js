@@ -61,7 +61,6 @@ async function assembleSprite(rootDir, outDir, params) {
     await image.assign(atlas);
 
     finalizeImage(image, outDir, params)
-    image.writeToFile("D:/temp/atlas.png");
 }
 
 module.exports = {

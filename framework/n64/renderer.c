@@ -189,7 +189,7 @@ void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text
     FontGlyph* glyph = font->glyphs + glyph_index;
     uint16_t stride = font->spritefont_tile_width * font->spritefont_tile_height * 2;
 
-    int caret = x + (-glyph->left);
+    int caret = x + glyph->left;
 
     while (ch) {
         glyph_index = font_get_glyph_index(font, ch);

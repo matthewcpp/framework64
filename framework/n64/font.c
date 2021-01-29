@@ -37,7 +37,6 @@ IVec2 font_measure_text(Font* font, char* str) {
     measurement.x = -glyph->left;
 
     do {
-        
         int bottom = glyph->top + glyph->height;
 
         if (bottom > measurement.y)
@@ -45,7 +44,7 @@ IVec2 font_measure_text(Font* font, char* str) {
 
         measurement.x += glyph->advance;
         
-        str += 1;
+        str ++;
         glyph = font->glyphs + font_get_glyph_index(font, str[0]);
     } while (str[0] != '\0');
 

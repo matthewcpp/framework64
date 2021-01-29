@@ -28,6 +28,8 @@ typedef struct {
 
     Entity* entities[ENTITY_COUNT];
     int current_entity;
+
+    int switch_model_text_width;
 } ArcballExample;
 
 void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* input);
