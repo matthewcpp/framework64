@@ -12,16 +12,31 @@ async function gltfConvert(gltfPath, outputFolder, params) {
         gltfLoader.merge();
     }
 
-    N64ModelWriter.writeHeader(gltfLoader.model, outputFolder);
+    if (params.createWireframe) {
+        let wireColor = null;
+
+        if (params.wireColor) {
+            const values = params.wireColor.split(',');
+            wireColor = [parseInt(values[0]), parseInt(values[1]), parseInt(values[2])];
+        }
+
+        const wireframe = gltfLoader.model.createWireframe(wireColor);
+        N64ModelWriter.writeWireframe(gltfLoader.model, wireframe, outputFolder);
+    }
+    else {
+        N64ModelWriter.writeHeader(gltfLoader.model, outputFolder);
+    }
 }
 
-function main() {
+async function main() {
     const { program } = require('commander');
 
     program.version("0.0.1");
     program.requiredOption("-f, --file <path>", "input file");
     program.requiredOption("-o, --out-dir <dir>", "output directory");
     program.option("-m --merge", "attempt to merge meshes when possible", false);
+    program.option("--wire", "create a simple wireframe representation of the model", false);
+    program.option("--wire-color <r,g,b>", "specify a override color for wireframe.  Otherwise default material color is used.")
 
     program.parse(process.argv);
 
@@ -29,13 +44,21 @@ function main() {
     const outputFolder = program.outDir;
 
     const options = {
-        mergeMeshes: prgram.merge ? program.merge : false
+        mergeMeshes: program.merge,
+        createWireframe: program.wire
     }
 
     if (!fs.existsSync(gltfPath)) {
-        console.log(`Path does not exist: ${gltfPath}`)
+        console.log(`Source file does not exist: ${gltfPath}`)
         process.exit(1)
     }
+
+    if (!fs.existsSync(outputFolder)) {
+        console.log(`Output directory does not exist: ${gltfPath}`)
+        process.exit(1)
+    }
+
+    await gltfConvert(gltfPath, outputFolder, options);
 }
 
 if (require.main === module) {
