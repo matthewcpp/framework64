@@ -4,7 +4,7 @@ void camera_init(Camera* camera) {
     transform_init(&camera->transform);
 
     camera->near = 0.1f;
-    camera->far = 100.0f;
+    camera->far = 1000.0f;
     camera->fovy = 45.0f;
     camera->aspect = 1.33f;
     camera->transform.position.z = 5.0f;

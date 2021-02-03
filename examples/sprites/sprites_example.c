@@ -6,8 +6,8 @@ void sprites_example_init(SpritesExample* example, Input* input, Renderer* rende
     example->input = input;
     example->renderer = renderer;
 
-    camera_init(&example->camera);
 
+    camera_init(&example->camera);
     n64_logo_sprite_init(&example->n64logo);
     example->n64logo.position.x = 10;
     example->n64logo.position.y = 10;
@@ -30,7 +30,8 @@ void sprites_example_update(SpritesExample* example, float time_delta){
 }
 
 void sprites_example_draw(SpritesExample* example){
-    renderer_begin(example->renderer, &example->camera);
+    renderer_begin(example->renderer, &example->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
+
     renderer_begin_2d(example->renderer);
     renderer_set_sprite_mode(example->renderer);
     n64_logo_sprite_draw(&example->n64logo, example->renderer);
@@ -39,5 +40,5 @@ void sprites_example_draw(SpritesExample* example){
 
     elapsed_time_draw(&example->elapsed_time, example->renderer, &example->basic_lazer);
 
-    renderer_end(example->renderer);
+    renderer_end(example->renderer, RENDERER_FLAG_SWAP);
 }

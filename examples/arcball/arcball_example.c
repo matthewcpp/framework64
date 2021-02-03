@@ -75,7 +75,7 @@ void arcball_example_update(ArcballExample* example, float time_delta) {
 }
 
 void arcball_example_draw(ArcballExample* example) {
-    renderer_begin(example->renderer, &example->camera);
+    renderer_begin(example->renderer, &example->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
 
     switch (example->current_entity) {
         case ENTITY_N64_LOGO:
@@ -124,5 +124,5 @@ void arcball_example_draw(ArcballExample* example) {
     draw_pos_x += button_width + 3;
     renderer_draw_text(example->renderer, &example->consolas, draw_pos_x, draw_pos_y, ZOOM_CAMERA_TEXT);
 
-    renderer_end(example->renderer);
+    renderer_end(example->renderer, RENDERER_FLAG_SWAP);
 }

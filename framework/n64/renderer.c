@@ -14,9 +14,8 @@ void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
     renderer->screen_size.y = screen_height;
     renderer->display_list = NULL;
 
-    renderer->fill_color.r = 255;
-    renderer->fill_color.g = 255;
-    renderer->fill_color.b = 255;
+    renderer->fill_color = GPACK_RGBA5551(255, 255, 255, 1);
+    renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
 
     /*
       The viewport structure 
@@ -30,66 +29,98 @@ void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
     renderer->view_port = view_port;
 }
 
-void renderer_init_rcp(Renderer* renderer) {
-    /* Setting the RSP segment register  */
-    gSPSegment(renderer->display_list++, 0, 0x0);  /* For the CPU virtual address  */
-
-    /* Setting RSP  */
-    gSPViewport(renderer->display_list++, &renderer->view_port);
-    gSPClearGeometryMode(renderer->display_list++, 0xFFFFFFFF);
-    gSPSetGeometryMode(renderer->display_list++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK);
-    gSPTexture(renderer->display_list++, 0, 0, 0, 0, G_OFF);
-
-    /* Setting RDP  */
-    gDPSetRenderMode(renderer->display_list++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
-    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, 0,0, renderer->screen_size.x,renderer->screen_size.y);
-    gDPSetColorDither(renderer->display_list++, G_CD_BAYER);
+void renderer_set_clear_color(Renderer* renderer, Color* clear_color) {
+    renderer->clear_color = GPACK_RGBA5551(clear_color->r, clear_color->g, clear_color->b, 1);
 }
 
-static void renderer_clear_z_buffer(Renderer* renderer) {
-    gDPSetDepthImage(renderer->display_list++, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
-    gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
+void renderer_init_rdp(Renderer* renderer) {
+    gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
+    gDPSetScissor(renderer->display_list++,G_SC_NON_INTERLACE, 0, 0, renderer->screen_size.x, renderer->screen_size.y);
+    gDPSetTextureLOD(renderer->display_list++,G_TL_TILE);
+    gDPSetTextureLUT(renderer->display_list++,G_TT_NONE);
+    gDPSetTextureDetail(renderer->display_list++,G_TD_CLAMP);
+    gDPSetTexturePersp(renderer->display_list++,G_TP_PERSP);
+    gDPSetTextureFilter(renderer->display_list++,G_TF_BILERP);
+    gDPSetTextureConvert(renderer->display_list++,G_TC_FILT);
+    gDPSetCombineMode(renderer->display_list++,G_CC_SHADE, G_CC_SHADE);
+    gDPSetCombineKey(renderer->display_list++,G_CK_NONE);
+    gDPSetAlphaCompare(renderer->display_list++,G_AC_NONE);
+    gDPSetRenderMode(renderer->display_list++,G_RM_OPA_SURF, G_RM_OPA_SURF2);
+    gDPSetColorDither(renderer->display_list++,G_CD_DISABLE);
+    gDPSetDepthImage(renderer->display_list++,nuGfxZBuffer);
+    gDPPipeSync(renderer->display_list++);
+}
+
+void renderer_init_rsp(Renderer* renderer) {
+    gSPViewport(renderer->display_list++, &renderer->view_port);
+    gSPClearGeometryMode(renderer->display_list++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
+    gSPTexture(renderer->display_list++, 0, 0, 0, 0, G_OFF);
+    gSPSetGeometryMode(renderer->display_list++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH);
+}
+
+void renderer_clear_z_buffer(Renderer* renderer) {
+    //gDPSetDepthImage(renderer->display_list++, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
     gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b,renderer->screen_size.x, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
+    gDPPipeSync(renderer->display_list++);
+    gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
+    
     gDPSetFillColor(renderer->display_list++,(GPACK_ZDZ(G_MAXFBZ,0) << 16 | GPACK_ZDZ(G_MAXFBZ,0)));
     gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
     gDPPipeSync(renderer->display_list++);
 }
 
-void renderer_clear(Renderer* renderer) {
-    /* Clear the Z-buffer  */
-    renderer_clear_z_buffer(renderer);
-
-    /* Clear the frame buffer  */
-    gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b, renderer->screen_size.x, osVirtualToPhysical(nuGfxCfb_ptr));
-    gDPSetFillColor(renderer->display_list++, (GPACK_RGBA5551(0, 0, 0, 1) << 16 | GPACK_RGBA5551(0, 0, 0, 1)));
+void renderer_clear_frame_buffer(Renderer* renderer) {
+    gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
+    gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b, renderer->screen_size.x, OS_K0_TO_PHYSICAL(nuGfxCfb_ptr));
+    gDPSetFillColor(renderer->display_list++, (renderer->clear_color << 16 | renderer->clear_color));
     gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
     gDPPipeSync(renderer->display_list++);
+    gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE); 
 }
 
-void renderer_begin(Renderer* renderer, Camera* camera) {
-    // set the display list pointer to the beginning
-    renderer->display_list = &renderer->gfx_list[0];
+void renderer_begin(Renderer* renderer, Camera* camera, RenderMode render_mode, RendererFlags flags) {
+    renderer->render_mode = render_mode;
 
-    renderer_init_rcp(renderer);
-    renderer_clear(renderer);
+    if (flags & RENDERER_FLAG_CLEAR) {
+        // set the display list pointer to the beginning
+        renderer->display_list = &renderer->gfx_list[0];
+    }
+    renderer->display_list = &renderer->gfx_list[0];
+    renderer->display_list_start = renderer->display_list;
+
+    gSPSegment(renderer->display_list++, 0, 0x0);
+    renderer_init_rdp(renderer);
+    renderer_init_rsp(renderer);
+
+    if (flags & RENDERER_FLAG_CLEAR) {
+        renderer_clear_z_buffer(renderer);
+        renderer_clear_frame_buffer(renderer);
+    }
+
+    if (render_mode == RENDERER_MODE_TRIANGLES) {
+        gDPSetRenderMode(renderer->display_list++, G_RM_ZB_OPA_SURF, G_RM_ZB_OPA_SURF2);
+    }
+    else{
+        gDPSetRenderMode(renderer->display_list++,  G_RM_AA_ZB_XLU_LINE,  G_RM_AA_ZB_XLU_LINE2);
+    }
 
     // sets the projection matrix (modelling set in individual draw calls)
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
     gSPPerspNormalize(renderer->display_list++, camera->perspNorm);
-
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-
-    // set drawing mode to shaded
-    gDPSetCycleType(renderer->display_list++,G_CYC_1CYCLE);
-    gDPSetRenderMode(renderer->display_list++,G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
-    gSPClearGeometryMode(renderer->display_list++,0xFFFFFFFF);
-    gSPSetGeometryMode(renderer->display_list++,G_SHADE| G_SHADING_SMOOTH | G_ZBUFFER);
-
-    // need this for drawing 3d
-    //gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
-
+    
     gDPPipeSync(renderer->display_list++);
+    
+}
+
+void renderer_end(Renderer* renderer, RendererFlags flags) {
+    gDPFullSync(renderer->display_list++);
+    gSPEndDisplayList(renderer->display_list++);
+
+    nuGfxTaskStart(renderer->display_list_start, 
+        (s32)(renderer->display_list - renderer->display_list_start) * sizeof (Gfx), 
+        (renderer->render_mode == RENDERER_MODE_TRIANGLES) ? NU_GFX_UCODE_F3DEX : NU_GFX_UCODE_L3DEX2, 
+        (flags & RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }
 
 float entity_matrix[4][4];
@@ -122,31 +153,21 @@ void renderer_begin_2d(Renderer* renderer) {
     gDPPipeSync(renderer->display_list++);
 }
 
-void renderer_end(Renderer* renderer) {
-    gDPFullSync(renderer->display_list++);
-    gSPEndDisplayList(renderer->display_list++);
-
-    nuGfxTaskStart(&renderer->gfx_list[0], (s32)(renderer->display_list - renderer->gfx_list) * sizeof (Gfx), NU_GFX_UCODE_F3DEX , NU_SC_SWAPBUFFER);
-
-    renderer->display_list = NULL;
-}
-
 void renderer_set_fill_color(Renderer* renderer, Color* color) {
-    if (renderer->display_list) {
-        gDPSetFillColor(renderer->display_list++, (GPACK_RGBA5551(color->r, color->g, color->b, 255) << 16 | GPACK_RGBA5551(color->r, color->g, color->b, 255)));
-    }
+    renderer->fill_color = GPACK_RGBA5551(color->r, color->g, color->b, 255);
 
-    renderer->fill_color = *color;
+    if (renderer->display_list) {
+        gDPSetFillColor(renderer->display_list++, (renderer->fill_color << 16 | renderer->fill_color));
+    }
 }
 
 void renderer_set_fill_mode(Renderer* renderer) {
-    gDPSetFillColor(renderer->display_list++, (GPACK_RGBA5551(renderer->fill_color.r, renderer->fill_color.g, renderer->fill_color.b, 255) << 16 | GPACK_RGBA5551(renderer->fill_color.r, renderer->fill_color.g, renderer->fill_color.b, 255)));
+    gDPSetFillColor(renderer->display_list++, (renderer->fill_color << 16 | renderer->fill_color));
     gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
     //TODO: do i need to sync pipe here?
 }
 
 void renderer_draw_filled_rect(Renderer* renderer, IRect* rect) {
-    
     gDPFillRectangle(renderer->display_list++, rect->x, rect->y, rect->x + rect->width, rect->y + rect->height);
     gDPPipeSync(renderer->display_list++);
 }
@@ -198,6 +219,12 @@ void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y)
 
 void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text) {
     if (!text || text[0] == 0) return;
+
+/*
+    TODO: Color blending? need better alpha than 5551
+    gDPSetPrimColor(renderer->display_list++, 255, 255, color->r, color->g, color->b, 255);
+    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATERGBA_PRIM , G_CC_MODULATERGBA_PRIM );
+*/
     
     char ch = text[0];
     uint16_t glyph_index = font_get_glyph_index(font, ch);
@@ -233,5 +260,4 @@ void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text
         text++;
         ch = text[0];
     }
-    
 }

@@ -24,7 +24,7 @@ APP =		sprites_example.out
 
 TARGETS =	sprites_example.n64
 
-HFILES =	$(wildcard ../../framework/include/ulta/*.h) $(wildcard ./*.h)
+HFILES =	$(wildcard ../../framework/include/ultra/*.h) $(wildcard ./*.h)
 
 CODEFILES   =	$(wildcard ../../framework/n64/*.c) $(wildcard ./*.c) ../../assets/build_n64/n64_logo_sprite.c ../../assets/build_n64/ken_sprite.c ../../assets/build_n64/basicLAZER.c
 
