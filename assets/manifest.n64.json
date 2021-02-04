@@ -53,6 +53,14 @@
         {
             "src": "penguin/penguin.gltf",
             "bakeTransform": true
+        },
+        {
+            "src": "blue_cube/blue_cube.gltf"
+        },
+        {
+            "src": "blue_cube/blue_cube.gltf",
+            "createWireframe": true,
+            "wireColor": "0,0,0"
         }
     ],
     "fonts": [

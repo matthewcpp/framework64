@@ -8,5 +8,6 @@ typedef struct {
 } Color;
 
 void color_set(Color* color, uint8_t r, uint8_t g, uint8_t b);
+void color_assign(Color* dest, Color* src);
 
 #endif

@@ -245,6 +245,11 @@ class GLTFLoader {
         const buffer = this._getBuffer(bufferView.buffer);
 
         const material = this.gltf.materials[gltfPrimitive.material];
+
+        if (!material.pbrMetallicRoughness.baseColorTexture) {
+            console.log("No image specified.  Ignoring texture coordinates.")
+            return;
+        }
         const image = this.model.images[material.pbrMetallicRoughness.baseColorTexture.index];
 
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
@@ -265,6 +270,8 @@ class GLTFLoader {
 
             offset += byteStride;
         }
+
+        n64Mesh.hasTexCoords = true;
     }
 
     _readMaterials() {

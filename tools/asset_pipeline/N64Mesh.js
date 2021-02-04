@@ -6,8 +6,6 @@ class MeshSlice {
         /** Maps the raw vertex index to its index within this slice */
         this.vertexIndices = new Map();
         this.triangles = [];
-        this.material = null;
-        this.hasNormals = false;
     }
 
     _getNeededVertices(triangle) {
@@ -39,13 +37,14 @@ class MeshSlice {
 }
 
 class N64Mesh {
-    constructor() {
-        this.vertices = [];
-        this.triangles = [];
-        this.texture = null;
+    vertices = [];
+    triangles = [];
+    texture = null;
+    material = null;
+    hasNormals = false;
+    hasTexCoords = false;
 
-        this.bounding = new Bounding();
-    }
+    bounding = new Bounding();
 
     _addTriangleToSlice(triangle, slices) {
         for (const slice of slices) {
@@ -102,9 +101,9 @@ class N64Mesh {
         if (this.vertices.length <= N64Defs.vertexSliceSize) {
             return [{vertices: this.vertices, triangles: this.triangles}]
         }
-
-        const slices = this._partitionVertices();
-        return this._processSlices(slices);
+        else {
+            return this._processSlices(this._partitionVertices());
+        }
     }
 }
 
