@@ -24,7 +24,7 @@ APP =		arcball_example.out
 
 TARGETS =	arcball_example.n64
 
-HFILES =	$(wildcard ../../framework/include/ultra/*.h) $(wildcard ./*.h)
+HFILES =	$(wildcard ../../framework/include/framework64/*.h) $(wildcard ./*.h)
 
 CODEFILES   =	$(wildcard ../../framework/n64/*.c) $(wildcard ./*.c) ../../assets/build_n64/Consolas12.c ../../assets/build_n64/buttons_sprite.c
 

@@ -1,8 +1,8 @@
 #ifndef SPRITES_H
 #define SPRITES_H
 
-#include "ultra/renderer.h"
-#include "ultra/sprite.h"
+#include "framework64/renderer.h"
+#include "framework64/sprite.h"
 
 typedef struct {
     IVec2 position;

@@ -1,4 +1,4 @@
-#include "ultra/sprite.h"
+#include "framework64/sprite.h"
 
 #include <stdlib.h>
 #include <malloc.h>

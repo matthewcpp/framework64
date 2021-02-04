@@ -1,7 +1,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "ultra/sprite.h"
+#include "framework64/sprite.h"
 
 #include <stdint.h>
 

@@ -1,6 +1,6 @@
 #include "models.h"
 
-#include "ultra/box.h"
+#include "framework64/box.h"
 
 #include "penguin_model.h"
 #include "suzanne_model.h"

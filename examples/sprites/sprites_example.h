@@ -1,9 +1,9 @@
 #ifndef SPRITES_EXAMPLE_H
 #define SPRITES_EXAMPLE_H
 
-#include "ultra/camera.h"
-#include "ultra/input.h"
-#include "ultra/renderer.h"
+#include "framework64/camera.h"
+#include "framework64/input.h"
+#include "framework64/renderer.h"
 
 #include "sprites.h"
 

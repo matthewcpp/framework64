@@ -10,7 +10,7 @@ function writeFontHeader(font, path) {
     fs.writeSync(header, `#ifndef ${font.name}_FONT_H\n`);
     fs.writeSync(header, `#define ${font.name}_FONT_H\n\n`);
 
-    fs.writeSync(header, '#include "ultra/font.h"\n\n');
+    fs.writeSync(header, '#include "framework64/font.h"\n\n');
 
     fs.writeSync(header, `#define ${font.name}_FONT_SIZE ${font.size}\n`);
     fs.writeSync(header, `#define ${font.name}_FONT_GLYPH_COUNT ${font.glyphs.length}\n`);

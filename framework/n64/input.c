@@ -1,4 +1,4 @@
-#include "ultra/input.h"
+#include "framework64/input.h"
 
 #include <nusys.h>
 

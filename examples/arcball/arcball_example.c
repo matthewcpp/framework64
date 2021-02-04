@@ -1,7 +1,7 @@
 #include "arcball_example.h"
 
-#include "ultra/entity.h"
-#include "ultra/rect.h"
+#include "framework64/entity.h"
+#include "framework64/rect.h"
 
 #include <nusys.h>
 #include <malloc.h>
