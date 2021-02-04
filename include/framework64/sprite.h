@@ -1,8 +1,8 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "ultra/texture.h"
-#include "ultra/vec2.h"
+#include "framework64/texture.h"
+#include "framework64/vec2.h"
 
 #include <stdint.h>
 

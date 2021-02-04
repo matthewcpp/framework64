@@ -2,11 +2,11 @@
 #define GAME_H
 
 #include "arcball_camera.h"
-#include "ultra/camera.h"
-#include "ultra/input.h"
-#include "ultra/renderer.h"
-#include "ultra/texture.h"
-#include "ultra/font.h"
+#include "framework64/camera.h"
+#include "framework64/input.h"
+#include "framework64/renderer.h"
+#include "framework64/texture.h"
+#include "framework64/font.h"
 
 #include "models.h"
 

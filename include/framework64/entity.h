@@ -1,8 +1,8 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "ultra/transform.h"
-#include "ultra/box.h"
+#include "framework64/transform.h"
+#include "framework64/box.h"
 
 #include <nusys.h>
 

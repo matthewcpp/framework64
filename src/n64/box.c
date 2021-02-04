@@ -1,4 +1,4 @@
-#include "ultra/box.h"
+#include "framework64/box.h"
 
 void box_center(Box* box, Vec3* out) {
     vec3_add(out, &box->min, &box->max);

@@ -1,10 +1,10 @@
 #ifndef PENGUIN_H
 #define PENGUIN_H
 
-#include "ultra/entity.h"
-#include "ultra/renderer.h"
-#include "ultra/font.h"
-#include "ultra/sprite.h"
+#include "framework64/entity.h"
+#include "framework64/renderer.h"
+#include "framework64/font.h"
+#include "framework64/sprite.h"
 
 typedef struct {
     Entity entity;

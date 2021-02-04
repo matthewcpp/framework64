@@ -1,11 +1,11 @@
 #ifndef LINES_EXAMPLE_H
 #define LINES_EXAMPLE_H
 
-#include "ultra/camera.h"
-#include "ultra/entity.h"
-#include "ultra/font.h"
-#include "ultra/input.h"
-#include "ultra/renderer.h"
+#include "framework64/camera.h"
+#include "framework64/entity.h"
+#include "framework64/font.h"
+#include "framework64/input.h"
+#include "framework64/renderer.h"
 
 #include "object.h"
 

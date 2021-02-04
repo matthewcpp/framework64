@@ -1,7 +1,7 @@
-#include "ultra/font.h"
+#include "framework64/font.h"
 
-#include "ultra/rect.h"
-#include "ultra/vec2.h"
+#include "framework64/rect.h"
+#include "framework64/vec2.h"
 
 #include <stdlib.h>
 #include <malloc.h>

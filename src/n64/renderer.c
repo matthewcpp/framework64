@@ -1,6 +1,6 @@
-#include "ultra/renderer.h"
+#include "framework64/renderer.h"
 
-#include "ultra/matrix.h"
+#include "framework64/matrix.h"
 
 #include <nusys.h>
 

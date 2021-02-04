@@ -1,9 +1,9 @@
 #include <nusys.h>
 
 #include "lines_example.h"
-#include "ultra/input.h"
-#include "ultra/renderer.h"
-#include "ultra/time.h"
+#include "framework64/input.h"
+#include "framework64/renderer.h"
+#include "framework64/time.h"
 
 #include <malloc.h>
 

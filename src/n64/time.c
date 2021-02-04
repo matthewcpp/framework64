@@ -1,4 +1,4 @@
-#include "ultra/time.h"
+#include "framework64/time.h"
 
 void time_init(Time* time){
     time->_previous_ms = 0;
