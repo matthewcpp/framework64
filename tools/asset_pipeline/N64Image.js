@@ -72,6 +72,16 @@ class N64Image {
         return buffer;
     }
 
+    static encode32bpp(data) {
+        const buffer = Buffer.alloc(data.length);
+
+        for (let i = 0; i < data.length; i++) {
+            buffer.writeUInt8(data[i], i);
+        }
+
+        return buffer;
+    }
+
     resize(width, height) {
         this._data.resize(width, height);
     }

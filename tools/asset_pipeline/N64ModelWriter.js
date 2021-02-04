@@ -1,3 +1,4 @@
+const N64Image = require("./N64Image")
 const N64ImageWriter = require("./N64ImageWriter");
 
 const path  = require("path");
@@ -17,7 +18,9 @@ function writeHeader(model, outputFolder) {
 
         fs.writeSync(file, `#define ${imageName}_WIDTH ${image.width}\n`);
         fs.writeSync(file, `#define ${imageName}_HEIGHT ${image.height}\n\n`);
-        N64ImageWriter.writeDataArray(file,imageName , image.data, image.width, image.height);
+
+        const buffer = N64Image.encode16bpp(image.data, image.width, image.height);
+        N64ImageWriter.writeDataArray(file,imageName , buffer, image.width, image.height);
     }
 
     if (model.hasNormals) {

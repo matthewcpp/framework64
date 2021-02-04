@@ -35,7 +35,9 @@ function writeFontSource(font, path, includePath) {
     }
     fs.writeSync(source, "};\n\n");
 
-    N64ImageWriter.writeDataArray(source, `${font.name}_spritefont`, font.image.data, font.image.width, font.image.height);
+    //const buffer = N64Image.encode32bpp(font.image.data);
+    const buffer = N64Image.encode16bpp(font.image.data, font.image.width, font.image.height);
+    N64ImageWriter.writeDataArray(source, `${font.name}_spritefont`, buffer, font.image.width, font.image.height);
 
     fs.closeSync(source);
 }

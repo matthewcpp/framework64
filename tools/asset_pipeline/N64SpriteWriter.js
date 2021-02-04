@@ -1,3 +1,4 @@
+const N64Image = require("./N64Image")
 const N64ImageWriter = require("./N64ImageWriter");
 
 const fs = require("fs");
@@ -31,7 +32,11 @@ function writeSpriteSource(image, slices, path, includePath) {
     for (let i = 0; i < slices.images.length; i++) {
         const slice_name = `${image.name}_slice_${i}`;
         const sliceData = slices.images[i];
-        N64ImageWriter.writeDataArray(source, slice_name, sliceData, image.width / slices.hslices, image.height / slices.vslices);
+
+        const sliceWidth = image.width / slices.hslices;
+        const sliceHeight = image.height / slices.vslices;
+        const buffer = N64Image.encode16bpp(sliceData, sliceWidth, sliceHeight);
+        N64ImageWriter.writeDataArray(source, slice_name, buffer, sliceWidth, sliceHeight);
     }
 
     fs.writeSync(source, "\n\n");

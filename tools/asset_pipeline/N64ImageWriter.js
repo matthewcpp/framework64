@@ -4,8 +4,8 @@ const fs = require("fs");
 
 const itemsPerLine = 32;
 
-function writeDataArray(file, name, data, width, height) {
-    const buffer = N64Image.encode16bpp(data, width, height);
+function writeDataArray(file, name, buffer, width, height) {
+
 
     fs.writeSync(file, `unsigned char ${name}[] __attribute__ ((aligned (8))) = {`);
 
