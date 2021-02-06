@@ -57,3 +57,9 @@ void vec3_normalize(Vec3* v) {
     v->y *= len;
     v->z *= len;
 }
+
+void vec3_negate(Vec3* v) {
+    v->x *= -1.0f;
+    v->y *= -1.0f;
+    v->z *= -1.0f;
+}

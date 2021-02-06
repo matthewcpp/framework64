@@ -12,7 +12,11 @@ typedef struct {
 
 void transform_init(Transform* transform);
 void transform_forward(Transform* transform, Vec3* out);
+void transform_back(Transform* transform, Vec3* out);
 void transform_up(Transform* transform, Vec3* out);
+void transform_down(Transform* transform, Vec3* out);
+void transform_left(Transform* transform, Vec3* out);
+void transform_right(Transform* transform, Vec3* out);
 
 void transform_look_at(Transform* transform, Vec3* target, Vec3* up);
 #endif

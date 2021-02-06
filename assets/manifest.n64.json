@@ -2,6 +2,11 @@
     "outDir": "build_n64",
     "sprites": [
         {
+            "src": "nintendo_seal.png",
+            "hslices": 1,
+            "vslices": 1
+        },
+        {
             "src": "n64_logo.png",
             "hslices": 2,
             "vslices": 2
