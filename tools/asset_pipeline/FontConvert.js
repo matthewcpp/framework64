@@ -5,7 +5,7 @@ const path = require("path")
 
 function _initOptions(sourceFile, params) {
     const options = {
-        sourceString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012346789!@#$%^&*()_+[];:',./\\\"`~ ",
+        sourceString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[];:',./\\\"`~ ",
         name: path.basename(sourceFile, path.extname(sourceFile)) + params.size.toString()
     }
 
