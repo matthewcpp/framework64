@@ -5,7 +5,7 @@ ROOT=/etc/n64
 npm install
 node tools/prepare_assets.js
 
-examples=( "arcball" "lines" "sprites")
+examples=( "arcball" "billboard" "lines" "sprites")
 
 for i in "${examples[@]}"
 do

@@ -1,6 +1,6 @@
 #include <nusys.h>
 
-#include "lines_example.h"
+#include "billboard_example.h"
 #include "framework64/input.h"
 #include "framework64/renderer.h"
 #include "framework64/time.h"

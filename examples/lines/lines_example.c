@@ -2,7 +2,7 @@
 
 #define ROTATION_SPEED 90.0f
 
-void lines_example_init(LinesExample* example, Input* input, Renderer* renderer) {
+void lines_example_init(BillboardExample* example, Input* input, Renderer* renderer) {
     example->input = input;
     example->renderer = renderer;
 
@@ -26,7 +26,7 @@ void lines_example_init(LinesExample* example, Input* input, Renderer* renderer)
     example->rotation = 0.0f;
 }
 
-void lines_example_update(LinesExample* example, float time_delta){
+void lines_example_update(BillboardExample* example, float time_delta){
     example->rotation += time_delta * ROTATION_SPEED;
 
     quat_from_euler(&example->solid_cube.transform.rotation, 0, example->rotation, 0.0f);
@@ -40,19 +40,19 @@ void lines_example_update(LinesExample* example, float time_delta){
         example->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 }
 
-static void line_example_draw_wireframe(LinesExample* example) {
+static void line_example_draw_wireframe(BillboardExample* example) {
     renderer_begin(example->renderer, &example->camera, RENDERER_MODE_LINES,  RENDERER_FLAG_CLEAR);
     wire_object_draw(&example->solid_cube, example->renderer);
     renderer_end(example->renderer, RENDERER_FLAG_SWAP);
 }
 
-static void line_example_draw_solid(LinesExample* example) {
+static void line_example_draw_solid(BillboardExample* example) {
     renderer_begin(example->renderer, &example->camera, RENDERER_MODE_TRIANGLES,  RENDERER_FLAG_CLEAR);
     solid_object_draw(&example->wire_cube, example->renderer);
     renderer_end(example->renderer, RENDERER_FLAG_SWAP);
 }
 
-static void line_example_draw_wireframe_on_shaded(LinesExample* example) {
+static void line_example_draw_wireframe_on_shaded(BillboardExample* example) {
     renderer_begin(example->renderer, &example->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
     solid_object_draw(&example->solid_cube, example->renderer);
     renderer_end(example->renderer, RENDERER_FLAG_NOSWAP);
@@ -62,7 +62,7 @@ static void line_example_draw_wireframe_on_shaded(LinesExample* example) {
     renderer_end(example->renderer, RENDERER_FLAG_SWAP);
 }
 
-void lines_example_draw(LinesExample* example) {
+void lines_example_draw(BillboardExample* example) {
     switch (example->draw_mode)
     {
     case EXAMPLE_DRAW_MODE_WIREFRAME:

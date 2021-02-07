@@ -14,5 +14,6 @@ void vec3_subtract(Vec3* out, Vec3* a, Vec3* b);
 void vec3_scale(Vec3* out, Vec3* v, float k);
 float vec3_distance(Vec3* a, Vec3* b);
 void vec3_normalize(Vec3* v);
+void vec3_negate(Vec3* v);
 
 #endif

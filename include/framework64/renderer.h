@@ -3,6 +3,7 @@
 
 #include <nusys.h>
 
+#include "billboard.h"
 #include "camera.h"
 #include "color.h"
 #include "entity.h"
@@ -37,6 +38,8 @@ typedef struct {
     // display list for drawing commands
     Gfx gfx_list[GFX_GLIST_LEN];
 
+    Camera* camera;
+
     u16 fill_color;
     u16 clear_color;
 
@@ -53,6 +56,7 @@ void renderer_end(Renderer* renderer, RendererFlags flags);
 
 void renderer_entity_start(Renderer* renderer, Entity* entity);
 void renderer_entity_end(Renderer* renderer);
+void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad);
 
 void renderer_begin_2d(Renderer* renderer);
 void renderer_set_fill_color(Renderer* renderer, Color* color);

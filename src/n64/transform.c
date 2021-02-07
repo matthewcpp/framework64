@@ -12,9 +12,29 @@ void transform_forward(Transform* transform, Vec3* out) {
     quat_transform_vec3(out, &transform->rotation, &forward);
 }
 
+void transform_back(Transform* transform, Vec3* out) {
+    transform_forward(transform, out);
+    vec3_negate(out);
+}
+
 void transform_up(Transform* transform, Vec3* out) {
     Vec3 up = {0.0f, 1.0f, 0.0f};
     quat_transform_vec3(out, &transform->rotation, &up);
+}
+
+void transform_down(Transform* transform, Vec3* out) {
+    transform_up(transform, out);
+    vec3_negate(out);
+}
+
+void transform_right(Transform* transform, Vec3* out) {
+    Vec3 right = {1.0f, 0.0f, 0.0f};
+    quat_transform_vec3(out, &transform->rotation, &right);
+}
+
+void transform_left(Transform* transform, Vec3* out) {
+    transform_right(transform, out);
+    vec3_negate(out);
 }
 
 void transform_look_at(Transform* transform, Vec3* target, Vec3* up) {
