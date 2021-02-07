@@ -267,6 +267,17 @@ void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text
     }
 }
 
+void render_billboard_frame(Renderer* renderer, BillboardQuad* quad, int frame, int index) {
+        gDPLoadTextureBlock(renderer->display_list++, 
+        quad->sprite->slices[frame],  G_IM_FMT_RGBA, G_IM_SIZ_16b,  
+        image_sprite_get_slice_width(quad->sprite), image_sprite_get_slice_height(quad->sprite), 
+        0, G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+
+        gSP2Triangles(renderer->display_list++, 
+            index + 0, index + 1, index + 2, 0, 
+            index + 0, index + 2, index + 3, 0);
+}
+
 void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad) {
     billboard_quad_look_at_camera(quad, renderer->camera);
 
@@ -278,13 +289,21 @@ void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad) {
     gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
     gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
 
-    gDPLoadTextureBlock(renderer->display_list++, 
-    quad->sprite->slices[quad->frame],  G_IM_FMT_RGBA, G_IM_SIZ_16b,  
-    image_sprite_get_slice_width(quad->sprite), image_sprite_get_slice_height(quad->sprite), 
-    0, G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        switch (quad->type) {
+        case BILLBOARD_QUAD_1X1:
+            gSPVertex(renderer->display_list++, quad->vertices, 4, 0);
+            render_billboard_frame(renderer, quad, quad->frame, 0);
+            break;
+        
+        case BILLBOARD_QUAD_2X2:
+            gSPVertex(renderer->display_list++, quad->vertices, 16, 0);
+            render_billboard_frame(renderer, quad, 0, 0);
+            render_billboard_frame(renderer, quad, 1, 4);
+            render_billboard_frame(renderer, quad, 2, 8);
+            render_billboard_frame(renderer, quad, 3, 12);
+            break;
+    }
 
-    gSPVertex(renderer->display_list++, quad->vertices, 4, 0);
-    gSP2Triangles(renderer->display_list++, 0, 1, 2, 0, 0, 2, 3, 0);
 
     renderer_pop_transform(renderer);
 }

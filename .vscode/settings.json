@@ -2,6 +2,7 @@
     "files.associations": {
         "cstdlib": "c",
         "typeinfo": "c",
-        "nintendo_seal_sprite.h": "c"
+        "nintendo_seal_sprite.h": "c",
+        "billboard.h": "c"
     }
 }

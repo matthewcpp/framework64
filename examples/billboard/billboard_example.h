@@ -16,8 +16,10 @@ typedef struct lines_example {
     Renderer* renderer;
     FpsCamera fps;
     Entity solid_cube;
-    BillboardQuad quad;
-    ImageSprite sprite;
+    BillboardQuad nintendo_seal_quad;
+    ImageSprite nintendo_seal_sprite;
+    BillboardQuad n64_logo_quad;
+    ImageSprite n64_logo_sprite;
 } BillboardExample;
 
 void lines_example_init(BillboardExample* example, Input* input, Renderer* renderer);

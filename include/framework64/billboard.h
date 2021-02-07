@@ -7,16 +7,21 @@
 
 #include <nusys.h>
 
+typedef enum {
+    BILLBOARD_QUAD_1X1,
+    BILLBOARD_QUAD_2X2
+} BillboardQuadType;
+
 typedef struct {
     Transform transform;
     Mtx dl_matrix;
-    Vtx vertices[4];
+    const Vtx* vertices;
     ImageSprite* sprite;
     int frame;
+    BillboardQuadType type;
 } BillboardQuad;
 
-void billboard_quad_init(BillboardQuad* quad, ImageSprite* sprite, int frame);
-void billboard_quad_set_sprite(BillboardQuad* quad, ImageSprite* sprite, int frame);
+void billboard_quad_init(BillboardQuad* quad, BillboardQuadType type, ImageSprite* sprite);
 void billboard_quad_look_at_camera(BillboardQuad* quad, Camera* camera);
 
 #endif
