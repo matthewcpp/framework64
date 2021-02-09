@@ -1,55 +1,40 @@
 const N64Image = require("./N64Image");
-const N64ImageWriter = require("./N64ImageWriter");
 
 const fs = require("fs");
-const path = require("path");
 
-function writeFontHeader(font, path) {
-    const header = fs.openSync(path, "w");
+const SizeOfFontHeader = 8;
+const SizeOfFontGlyph = 6;
 
-    fs.writeSync(header, `#ifndef ${font.name}_FONT_H\n`);
-    fs.writeSync(header, `#define ${font.name}_FONT_H\n\n`);
+function writeBinary(font, path) {
+    const headerBuffer = Buffer.alloc(SizeOfFontHeader);
+    let bufferOffset = 0;
 
-    fs.writeSync(header, '#include "framework64/font.h"\n\n');
+    // write the header info
+    bufferOffset = headerBuffer.writeUInt16BE(font.size, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(font.glyphs.length, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(font.tileWidth, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(font.tileHeight, bufferOffset);
 
-    fs.writeSync(header, `#define ${font.name}_FONT_SIZE ${font.size}\n`);
-    fs.writeSync(header, `#define ${font.name}_FONT_GLYPH_COUNT ${font.glyphs.length}\n`);
-    fs.writeSync(header, `extern FontGlyph ${font.name}_glyphs[];\n\n`);
+    const glyphBuffer = Buffer.alloc(SizeOfFontGlyph * font.glyphs.length);
+    bufferOffset = 0;
 
-    fs.writeSync(header, `#define ${font.name}_SPRITEFONT_TILE_WIDTH ${font.tileWidth}\n`);
-    fs.writeSync(header, `#define ${font.name}_SPRITEFONT_TILE_HEIGHT ${font.tileHeight}\n`);
-    fs.writeSync(header, `extern unsigned char ${font.name}_spritefont[];\n\n`);
-
-    fs.writeSync(header, "#endif\n");
-
-    fs.closeSync(header);
-}
-
-function writeFontSource(font, path, includePath) {
-    const source = fs.openSync(path, "w");
-    fs.writeSync(source, `#include "${includePath}"\n\n`);
-
-    fs.writeSync(source, `FontGlyph ${font.name}_glyphs[] = {\n`);
     for (const glyph of font.glyphs) {
-        fs.writeSync(source, `{${glyph.codepoint}, ${glyph.top}, ${glyph.left}, ${glyph.advance}, ${glyph.height}},\n`);
+        bufferOffset = glyphBuffer.writeUInt16BE(glyph.codepoint, bufferOffset);
+        bufferOffset = glyphBuffer.writeInt8(glyph.top, bufferOffset);
+        bufferOffset = glyphBuffer.writeInt8(glyph.left, bufferOffset);
+        bufferOffset = glyphBuffer.writeInt8(glyph.advance, bufferOffset);
+        bufferOffset = glyphBuffer.writeInt8(glyph.height, bufferOffset);
     }
-    fs.writeSync(source, "};\n\n");
 
-    //const buffer = N64Image.encode32bpp(font.image.data);
-    const buffer = N64Image.encode16bpp(font.image.data, font.image.width, font.image.height);
-    N64ImageWriter.writeDataArray(source, `${font.name}_spritefont`, buffer, font.image.width, font.image.height);
+    const spritefontBuffer = N64Image.encode16bpp(font.image.data, font.image.width, font.image.height);
 
-    fs.closeSync(source);
-}
-
-function writeFont(font, outDir) {
-    const headerFileName = `${font.name}.h`;
-    const sourceFileName = `${font.name}.c`;
-
-    writeFontHeader(font, path.join(outDir, headerFileName));
-    writeFontSource(font, path.join(outDir, sourceFileName), headerFileName);
+    const file = fs.openSync(path, "w");
+    fs.writeSync(file, headerBuffer);
+    fs.writeSync(file, spritefontBuffer);
+    fs.writeSync(file, glyphBuffer);
+    fs.closeSync(file);
 }
 
 module.exports = {
-    writeFont: writeFont
+    write: writeBinary
 }

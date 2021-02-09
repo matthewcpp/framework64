@@ -8,9 +8,11 @@ const fs = require("fs");
 const path = require("path");
 
 class N64Font {
+    name;
+    _font = null;
+
     constructor(name) {
         this.name = name;
-        this._font = null;
     }
 
     async load(path) {

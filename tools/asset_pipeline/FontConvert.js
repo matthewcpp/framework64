@@ -14,7 +14,7 @@ function _initOptions(sourceFile, params) {
     return options;
 }
 
-async function convertFont(sourceFile, outputDir, params) {
+async function convertFont(sourceFile, outputDir, params, archive) {
     if (!params.size) {
         throw new Error("Font elements must have a size specified.");
     }
@@ -25,7 +25,9 @@ async function convertFont(sourceFile, outputDir, params) {
     await font.load(sourceFile);
 
     const data = await font.generateSpriteFont(options.sourceString, options.size);
-    N64FontWriter.writeFont(data, outputDir);
+    const fontPath = path.join(outputDir, `${font.name}.font`);
+    archive.add(fontPath, "font");
+    N64FontWriter.write(data, fontPath);
 }
 
 module.exports = {
