@@ -1,6 +1,8 @@
 #include <nusys.h>
 
 #include "sprites_example.h"
+
+#include "framework64/filesystem.h"
 #include "framework64/input.h"
 #include "framework64/renderer.h"
 #include "framework64/time.h"
@@ -24,6 +26,8 @@ void mainproc(void) {
   renderer_init(&renderer, 320, 240);
   input_init(&input);
   time_init(&time);
+
+  filesystem_init();
 
   sprites_example_init(&example, &input, &renderer);
   nuGfxFuncSet((NUGfxFunc)nusys_game_update);

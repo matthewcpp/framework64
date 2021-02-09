@@ -112,15 +112,3 @@ void solid_object_draw(Entity* entity, Renderer* renderer) {
 
     renderer_entity_end(renderer);
 }
-
-#include "Consolas12.h"
-
-void init_consolas(Font* font) {
-    font->glyph_count = Consolas12_FONT_GLYPH_COUNT;
-    font->glyphs = &Consolas12_glyphs[0];
-    font->size = Consolas12_FONT_SIZE;
-
-    font->spritefont = &Consolas12_spritefont[0];
-    font->spritefont_tile_width = Consolas12_SPRITEFONT_TILE_WIDTH;
-    font->spritefont_tile_height = Consolas12_SPRITEFONT_TILE_HEIGHT;
-}

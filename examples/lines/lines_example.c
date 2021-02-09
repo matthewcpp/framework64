@@ -21,8 +21,6 @@ void lines_example_init(BillboardExample* example, Input* input, Renderer* rende
     Color clear_color = {255,255,255};
     renderer_set_clear_color(renderer, &clear_color);
 
-    init_consolas(&example->font);
-
     example->rotation = 0.0f;
 }
 

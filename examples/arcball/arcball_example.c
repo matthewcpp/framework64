@@ -1,5 +1,7 @@
 #include "arcball_example.h"
 
+#include "assets.h"
+
 #include "framework64/entity.h"
 #include "framework64/rect.h"
 
@@ -42,7 +44,7 @@ void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* in
     Color fill_color = {255, 0, 0};
     renderer_set_fill_color(example->renderer, &fill_color);
 
-    init_consolas_font(&example->consolas);
+    font_load(ASSET_font_Consolas12, &example->consolas);
     init_buttons_sprite(&example->button_sprite);
 
     IVec2 text_measurement = font_measure_text(&example->consolas, SWITCH_MODEL_TEXT);
