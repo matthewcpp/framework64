@@ -2,7 +2,6 @@
 
 #include "n64_logo_sprite.h"
 #include "ken_sprite.h"
-#include "basicLAZER.h"
 
 #include <malloc.h>
 
@@ -72,14 +71,4 @@ void elapsed_time_draw(ElapsedTime* elpased_time, Renderer* renderer, Font* font
     sprintf(elapsed_time_text, "ELAPSED TIME: %.2f", elpased_time->total_time);
 
     renderer_draw_text(renderer, font, 200, 10, elapsed_time_text);
-}
-
-void init_basic_lazer(Font* font) {
-    font->size = basicLAZER_FONT_SIZE;
-    font->glyph_count = basicLAZER_FONT_GLYPH_COUNT;
-    font->glyphs = &basicLAZER_glyphs[0];
-
-    font->spritefont_tile_width = basicLAZER_SPRITEFONT_TILE_WIDTH;
-    font->spritefont_tile_height = basicLAZER_SPRITEFONT_TILE_HEIGHT;
-    font->spritefont = &basicLAZER_spritefont[0];
 }

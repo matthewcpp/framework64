@@ -1,4 +1,5 @@
 #include "sprites_example.h"
+#include "assets.h"
 
 #include <stdio.h>
 
@@ -19,7 +20,7 @@ void sprites_example_init(SpritesExample* example, Input* input, Renderer* rende
     example->ken_sprite.position.x = 10;
     example->ken_sprite.position.y = screen_size.y - 10 - example->ken_sprite.sprite.height;
 
-    init_basic_lazer(&example->basic_lazer);
+    font_load(ASSET_font_basicLAZER, &example->basic_lazer);
 
     elapsed_time_init(&example->elapsed_time);
 }

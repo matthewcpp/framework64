@@ -80,5 +80,8 @@
             "name": "basicLAZER",
             "sourceString": "ELAPSED TIME:0123456789."
         }
+    ],
+    "raw": [
+        "sample.txt"
     ]
 }

@@ -1,6 +1,7 @@
 const gltfConvert = require("./asset_pipeline/GLTFConvert");
 const imageConvert = require("./asset_pipeline/ImageConvert");
 const FontConvert = require("./asset_pipeline/FontConvert");
+const Archive = require("./asset_pipeline/Archive");
 
 const fs = require("fs");
 const path = require("path");
@@ -17,6 +18,8 @@ async function main() {
     if (fs.existsSync(outputDirectory)) {
         rimraf.sync(outputDirectory);
     }
+
+    const archive = new Archive();
 
     fs.mkdirSync(outputDirectory);
 
@@ -46,12 +49,19 @@ async function main() {
     if (manifest.fonts) {
         for (const font of manifest.fonts) {
             const sourceFile = path.join(manifestDirectory, font.src);
-            await FontConvert.convertFont(sourceFile, outputDirectory, font);
+            const outputFile = await FontConvert.convertFont(sourceFile, outputDirectory, font, archive);
         }
     }
+
+    if (manifest.raw) {
+        for (const item of manifest.raw) {
+            const sourceFile = path.join(manifestDirectory, item);
+            archive.add(sourceFile, "raw");
+        }
+    }
+
+    archive.write(outputDirectory);
 }
-
-
 
 if (require.main === module) {
     main();

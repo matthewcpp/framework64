@@ -14,11 +14,11 @@ typedef struct {
 } FontGlyph;
 
 typedef struct {
-    FontGlyph* glyphs;
-    uint16_t glyph_count;
     uint16_t size;
+    uint16_t glyph_count;
     uint16_t spritefont_tile_width;
     uint16_t spritefont_tile_height;
+    FontGlyph* glyphs;
     uint8_t* spritefont;
 } Font;
 
@@ -26,5 +26,8 @@ typedef struct {
 uint16_t font_get_glyph_index(Font* font, uint16_t codepoint);
 
 IVec2 font_measure_text(Font* font, char* text);
+
+int font_load(int index, Font* font);
+void font_unload(Font* font);
 
 #endif

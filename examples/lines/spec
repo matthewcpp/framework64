@@ -31,7 +31,14 @@ beginseg
 	include "$(ROOT)/usr/lib/PR/gspS2DEX2.fifo.o"
 endseg
 
+beginseg
+	name "asset_data"
+	flags RAW
+	include "../../assets/build_n64/assets.dat"
+endseg
+
 beginwave
 	name	"lines_example"
 	include	"code"
+	include "asset_data"
 endwave

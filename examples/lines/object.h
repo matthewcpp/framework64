@@ -8,6 +8,4 @@
 void wire_object_draw(Entity* entity, Renderer* renderer);
 void solid_object_draw(Entity* entity, Renderer* renderer);
 
-void init_consolas(Font* font);
-
 #endif

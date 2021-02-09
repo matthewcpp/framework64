@@ -23,7 +23,6 @@ typedef struct lines_example {
     float rotation;
     Entity solid_cube;
     Entity wire_cube;
-    Font font;
 } BillboardExample;
 
 void lines_example_init(BillboardExample* example, Input* input, Renderer* renderer);

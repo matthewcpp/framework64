@@ -11,7 +11,7 @@
 
 #include "object.h"
 
-typedef struct lines_example {
+typedef struct {
     Input* input;
     Renderer* renderer;
     FpsCamera fps;
