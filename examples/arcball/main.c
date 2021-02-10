@@ -1,44 +1,23 @@
+#include "arcball_example.h"
+#include "framework64/system.h"
+
 #include <nusys.h>
 
-#include "arcball_example.h"
-
-#include "framework64/filesystem.h"
-#include "framework64/input.h"
-#include "framework64/renderer.h"
-#include "framework64/time.h"
-
-#include <malloc.h>
-
 ArcballExample example;
-Renderer renderer;
-Input input;
-Time time;
+fw64System system;
 
-void nusys_game_update(int pendingGfx);
-
-#define HEAP_SIZE 1024*512
-
-char memory_heap[HEAP_SIZE];
-
-void mainproc(void) {
-  InitHeap(memory_heap, HEAP_SIZE);
-
-  renderer_init(&renderer, 320, 240);
-  input_init(&input);
-  time_init(&time);
-
-  filesystem_init();
-
-  arcball_example_init(&example, &renderer, &input);
-  nuGfxFuncSet((NUGfxFunc)nusys_game_update);
-  nuGfxDisplayOn();
+void nusys_game_tick(int pendingGfx) {
+    if (pendingGfx < 1) {
+        fw64_sytem_update(&system);
+        arcball_example_update(&example, system.time.time_delta);
+        arcball_example_draw(&example);
+    }
 }
 
-void nusys_game_update(int pendingGfx) {
-  if (pendingGfx < 1) {
-    time_update(&time);
-    input_update(&input);
-    arcball_example_update(&example, time.time_delta);
-    arcball_example_draw(&example);
-  }
+void mainproc(void) {
+    fw64_system_init(&system);
+
+    arcball_example_init(&example, &system.renderer, &system.input);
+    nuGfxFuncSet((NUGfxFunc)nusys_game_tick);
+    nuGfxDisplayOn();
 }

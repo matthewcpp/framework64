@@ -8,8 +8,6 @@
 #include <string.h>
 
 void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
-    nuGfxInit(); // starts nusys graphics
-
     renderer->screen_size.x = screen_width;
     renderer->screen_size.y = screen_height;
     renderer->display_list = NULL;
