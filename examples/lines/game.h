@@ -1,11 +1,10 @@
-#ifndef LINES_EXAMPLE_H
-#define LINES_EXAMPLE_H
+#ifndef GAME_H
+#define GAME_H
 
 #include "framework64/camera.h"
 #include "framework64/entity.h"
 #include "framework64/font.h"
-#include "framework64/input.h"
-#include "framework64/renderer.h"
+#include "framework64/system.h"
 
 #include "object.h"
 
@@ -16,18 +15,17 @@ typedef enum {
 } DrawMode;
 
 typedef struct lines_example {
-    Input* input;
-    Renderer* renderer;
+    fw64System* system;
     Camera camera;
     DrawMode draw_mode;
     float rotation;
     Entity solid_cube;
     Entity wire_cube;
-} BillboardExample;
+} Game;
 
-void lines_example_init(BillboardExample* example, Input* input, Renderer* renderer);
-void lines_example_update(BillboardExample* example, float time_delta);
-void lines_example_draw(BillboardExample* example);
+void game_init(Game* example, fw64System* system);
+void game_update(Game* example, float time_delta);
+void game_draw(Game* example);
 
 
 #endif

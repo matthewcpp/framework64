@@ -3,18 +3,15 @@
 
 #include "arcball_camera.h"
 #include "framework64/camera.h"
-#include "framework64/input.h"
-#include "framework64/renderer.h"
-#include "framework64/texture.h"
 #include "framework64/font.h"
+#include "framework64/system.h"
 
 #include "models.h"
 
 #define ENTITY_COUNT 3
 
 typedef struct {
-    Renderer* renderer;
-    Input* input;
+    fw64System* system;
 
     Camera camera;
     ArcballCamera arcball;
@@ -30,10 +27,10 @@ typedef struct {
     int current_entity;
 
     int switch_model_text_width;
-} ArcballExample;
+} Game;
 
-void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* input);
-void arcball_example_update(ArcballExample* example, float time_delta);
-void arcball_example_draw(ArcballExample* example);
+void game_init(Game* game, fw64System* system);
+void game_update(Game* game, float time_delta);
+void game_draw(Game* game);
 
 #endif
