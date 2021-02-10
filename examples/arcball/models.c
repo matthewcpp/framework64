@@ -6,8 +6,6 @@
 #include "suzanne_model.h"
 #include "n64_logo_model.h"
 
-#include "buttons_sprite.h"
-
 #include <string.h>
 
 void n64logo_init(N64Logo* n64logo) {
@@ -77,13 +75,4 @@ void penguin_draw(Penguin* penguin, Renderer* renderer) {
     gSPDisplayList(renderer->display_list++, penguin_mesh_1_dl);
 
     renderer_entity_end(renderer);
-}
-
-void init_buttons_sprite(ImageSprite* buttons_sprite) {
-    buttons_sprite->width = buttons_SPRITE_WIDTH;
-    buttons_sprite->height = buttons_SPRITE_HEIGHT;
-    buttons_sprite->hslices = buttons_SPRITE_HSLICES;
-    buttons_sprite->vslices = buttons_SPRITE_VSLICES;
-    buttons_sprite->slice_count = buttons_SPRITE_SLICE_COUNT;
-    buttons_sprite->slices = &buttons_sprite_slices[0];
 }

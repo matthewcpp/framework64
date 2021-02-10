@@ -55,25 +55,3 @@ void solid_object_draw(Entity* entity, Renderer* renderer) {
 
     renderer_entity_end(renderer);
 }
-
-#include "nintendo_seal_sprite.h"
-
-void init_nintendo_seal_sprite(ImageSprite* sprite) {
-    sprite->width = nintendo_seal_SPRITE_WIDTH;
-    sprite->height = nintendo_seal_SPRITE_HEIGHT;
-    sprite->hslices = nintendo_seal_SPRITE_HSLICES;
-    sprite->vslices = nintendo_seal_SPRITE_VSLICES;
-    sprite->slice_count = nintendo_seal_SPRITE_SLICE_COUNT;
-    sprite->slices = &nintendo_seal_sprite_slices[0];
-}
-
-#include "n64_logo_sprite.h"
-
-void init_n64_logo_sprite(ImageSprite* sprite) {
-    sprite->width = n64_logo_SPRITE_WIDTH;
-    sprite->height = n64_logo_SPRITE_HEIGHT;
-    sprite->hslices = n64_logo_SPRITE_HSLICES;
-    sprite->vslices = n64_logo_SPRITE_VSLICES;
-    sprite->slice_count = n64_logo_SPRITE_SLICE_COUNT;
-    sprite->slices = &n64_logo_sprite_slices[0];
-}
