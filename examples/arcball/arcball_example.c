@@ -45,7 +45,7 @@ void arcball_example_init(ArcballExample* example, Renderer* renderer, Input* in
     renderer_set_fill_color(example->renderer, &fill_color);
 
     font_load(ASSET_font_Consolas12, &example->consolas);
-    init_buttons_sprite(&example->button_sprite);
+    sprite_load(ASSET_sprite_buttons, &example->button_sprite);
 
     IVec2 text_measurement = font_measure_text(&example->consolas, SWITCH_MODEL_TEXT);
     example->switch_model_text_width = text_measurement.x;

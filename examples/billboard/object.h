@@ -6,7 +6,6 @@
 
 
 void solid_object_draw(Entity* entity, Renderer* renderer);
-void init_nintendo_seal_sprite(ImageSprite* sprite);
 void init_n64_logo_sprite(ImageSprite* sprite);
 
 #endif

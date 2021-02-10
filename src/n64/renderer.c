@@ -189,10 +189,9 @@ void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int fra
     int slice_width = image_sprite_get_slice_width(sprite);
     int slice_height = image_sprite_get_slice_height(sprite);
 
-    int top_left_x = (frame % sprite->hslices) * slice_width;
-    int top_left_y = (frame / sprite->hslices) * slice_height;
+    uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
 
-    gDPLoadTextureBlock(renderer->display_list++, sprite->slices[frame], G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
+    gDPLoadTextureBlock(renderer->display_list++, sprite->data + frame_offset, G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
         G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
 
     gDPLoadSync(renderer->display_list++);
@@ -212,9 +211,9 @@ void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y)
     int slice_height = image_sprite_get_slice_height(sprite);
     int slice = 0;
 
-    for (uint8_t row = 0; row < sprite->hslices; row++ ) {
+    for (uint8_t row = 0; row < sprite->vslices; row++ ) {
         int draw_y = y + row * slice_height;
-        for (uint8_t col = 0; col < sprite->vslices; col++) {
+        for (uint8_t col = 0; col < sprite->hslices; col++) {
             int draw_x = x + slice_width * col;
 
             renderer_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
@@ -268,14 +267,19 @@ void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text
 }
 
 void render_billboard_frame(Renderer* renderer, BillboardQuad* quad, int frame, int index) {
-        gDPLoadTextureBlock(renderer->display_list++, 
-        quad->sprite->slices[frame],  G_IM_FMT_RGBA, G_IM_SIZ_16b,  
-        image_sprite_get_slice_width(quad->sprite), image_sprite_get_slice_height(quad->sprite), 
-        0, G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    int slice_width = image_sprite_get_slice_width(quad->sprite);
+    int slice_height = image_sprite_get_slice_height(quad->sprite);
 
-        gSP2Triangles(renderer->display_list++, 
-            index + 0, index + 1, index + 2, 0, 
-            index + 0, index + 2, index + 3, 0);
+    uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
+
+    gDPLoadTextureBlock(renderer->display_list++, 
+    quad->sprite->data + frame_offset,  G_IM_FMT_RGBA, G_IM_SIZ_16b,  
+    slice_width, slice_height, 
+    0, G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+
+    gSP2Triangles(renderer->display_list++, 
+        index + 0, index + 1, index + 2, 0, 
+        index + 0, index + 2, index + 3, 0);
 }
 
 void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad) {

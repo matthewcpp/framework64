@@ -26,7 +26,7 @@ TARGETS =	billboard_example.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ./*.c)  ../../assets/build_n64/nintendo_seal_sprite.c ../../assets/build_n64/n64_logo_sprite.c
+CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ./*.c)
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 

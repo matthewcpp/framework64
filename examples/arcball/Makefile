@@ -26,7 +26,7 @@ TARGETS =	arcball_example.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ./*.c) ../../assets/build_n64/buttons_sprite.c
+CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ./*.c)
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 
