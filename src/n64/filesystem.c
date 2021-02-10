@@ -107,7 +107,7 @@ int filesystem_read(void* buffer, int size, int count, int handle) {
 }
 
 int filesystem_close(int handle) {
-    if (handle < 0 || handle > FW64_FILESYSTEM_MAX_OPEN_FILES || open_files[handle].data_loc == 0)
+    if (handle < 0 || handle >= FW64_FILESYSTEM_MAX_OPEN_FILES || open_files[handle].data_loc == 0)
         return FW64_FILESYSTEM_INVALID_HANDLE;
 
     open_files[handle].data_loc = 0;

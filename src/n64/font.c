@@ -45,7 +45,7 @@ IVec2 font_measure_text(Font* font, char* str) {
 
         measurement.x += glyph->advance;
         
-        str ++;
+        str++;
         glyph = font->glyphs + font_get_glyph_index(font, str[0]);
     } while (str[0] != '\0');
 
@@ -74,5 +74,5 @@ int font_load(int index, Font* font) {
 }
 
 void font_unload(Font* font) {
-    free(font->spritefont);
+    free(font->spritefont); // note: font and glyph data were allocated in same call
 }

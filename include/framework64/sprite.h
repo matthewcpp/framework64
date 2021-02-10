@@ -11,17 +11,15 @@
 typedef struct {
     uint16_t width;
     uint16_t height;
-    uint16_t allocated_width;
-    uint16_t allocated_height;
-    uint8_t hslices;
-    uint8_t vslices;
-    uint8_t slice_count;
-    uint8_t flags;
-    uint8_t** slices;
+    uint16_t hslices;
+    uint16_t vslices;
+    uint8_t* data;
 } ImageSprite;
 
 int image_sprite_get_slice_width(ImageSprite* sprite);
 int image_sprite_get_slice_height(ImageSprite* sprite);
-void image_sprite_uninit(ImageSprite* sprite);
+
+int sprite_load(int assetIndex, ImageSprite* sprite);
+void sprite_uninit(ImageSprite* sprite);
 
 #endif

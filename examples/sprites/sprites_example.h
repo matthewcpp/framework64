@@ -12,8 +12,9 @@ typedef struct {
     Renderer* renderer;
     Camera camera;
 
-    N64LogoSprite n64logo;
     KenSprite ken_sprite;
+    N64LogoSprite n64logo;
+    
 
     ElapsedTime elapsed_time;
 

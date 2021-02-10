@@ -9,6 +9,7 @@ void sprites_example_init(SpritesExample* example, Input* input, Renderer* rende
 
 
     camera_init(&example->camera);
+
     n64_logo_sprite_init(&example->n64logo);
     example->n64logo.position.x = 10;
     example->n64logo.position.y = 10;
@@ -21,7 +22,6 @@ void sprites_example_init(SpritesExample* example, Input* input, Renderer* rende
     example->ken_sprite.position.y = screen_size.y - 10 - example->ken_sprite.sprite.height;
 
     font_load(ASSET_font_basicLAZER, &example->basic_lazer);
-
     elapsed_time_init(&example->elapsed_time);
 }
 

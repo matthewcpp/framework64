@@ -13,7 +13,7 @@
         },
         {
             "src": "ken.png",
-            "resize": "192x44",
+            "resize": "192x64",
             "hslices": 6,
             "vslices": 2
         },

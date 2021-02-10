@@ -35,10 +35,10 @@ async function main() {
         for (const sprite of manifest.sprites) {
             if (sprite.src) {
                 const sourceFile = path.join(manifestDirectory, sprite.src);
-                await imageConvert.convertSprite(sourceFile, outputDirectory, sprite);
+                await imageConvert.convertSprite(sourceFile, outputDirectory, sprite, archive);
             }
             else if (sprite.frames){
-                await imageConvert.assembleSprite(manifestDirectory, outputDirectory, sprite);
+                await imageConvert.assembleSprite(manifestDirectory, outputDirectory, sprite, archive);
             }
             else {
                 throw new Error("Sprite element must specify 'src' or 'frames'");
@@ -49,7 +49,7 @@ async function main() {
     if (manifest.fonts) {
         for (const font of manifest.fonts) {
             const sourceFile = path.join(manifestDirectory, font.src);
-            const outputFile = await FontConvert.convertFont(sourceFile, outputDirectory, font, archive);
+            await FontConvert.convertFont(sourceFile, outputDirectory, font, archive);
         }
     }
 
