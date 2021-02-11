@@ -1,5 +1,5 @@
-#ifndef BILLBOARD_H
-#define BILLBOARD_H
+#ifndef FW64_BILLBOARD_H
+#define FW64_BILLBOARD_H
 
 #include "framework64/camera.h"
 #include "framework64/sprite.h"

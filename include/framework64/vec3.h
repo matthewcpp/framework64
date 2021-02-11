@@ -1,5 +1,5 @@
-#ifndef VEC3_H
-#define VEC3_H
+#ifndef FW64_VEC3_H
+#define FW64_VEC3_H
 
 typedef struct {
     float x, y, z;

@@ -1,5 +1,5 @@
-#ifndef QUAT_H
-#define QUAT_H
+#ifndef FW64_QUAT_H
+#define FW64_QUAT_H
 
 #include "vec3.h"
 

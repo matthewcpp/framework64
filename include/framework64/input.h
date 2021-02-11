@@ -1,5 +1,5 @@
-#ifndef INPUT_H
-#define INPUT_H
+#ifndef FW64_INPUT_H
+#define FW64_INPUT_H
 
 #include "vec2.h"
 

@@ -1,5 +1,5 @@
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
+#ifndef FW64_TRANSFORM_H
+#define FW64_TRANSFORM_H
 
 #include "quat.h"
 #include "vec3.h"

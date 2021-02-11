@@ -1,5 +1,5 @@
-#ifndef RECT_H
-#define RECT_H
+#ifndef FW64_RECT_H
+#define FW64_RECT_H
 
 typedef struct {
     int x, y;

@@ -1,5 +1,5 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef FW64_CAMERA_H
+#define FW64_CAMERA_H
 
 #include "transform.h"
 

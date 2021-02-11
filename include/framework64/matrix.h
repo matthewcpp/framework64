@@ -1,5 +1,5 @@
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef FW64_MATRIX_H
+#define FW64_MATRIX_H
 
 #include "vec3.h"
 #include "quat.h"

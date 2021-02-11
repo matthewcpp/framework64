@@ -1,5 +1,5 @@
-#ifndef COLOR_H
-#define COLOR_H
+#ifndef FW64_COLOR_H
+#define FW64_COLOR_H
 
 #include <stdint.h>
 

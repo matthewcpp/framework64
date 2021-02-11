@@ -1,5 +1,5 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#ifndef FW64_TEXTURE_H
+#define FW64_TEXTURE_H
 
 #include <stdint.h>
 

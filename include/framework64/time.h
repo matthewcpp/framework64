@@ -1,5 +1,5 @@
-#ifndef TIME_H
-#define TIME_H
+#ifndef FW64_TIME_H
+#define FW64_TIME_H
 
 #include <ultra64.h>
 

@@ -1,5 +1,5 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef FW64_RENDERER_H
+#define FW64_RENDERER_H
 
 #include <nusys.h>
 

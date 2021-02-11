@@ -1,5 +1,5 @@
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef FW64_ENTITY_H
+#define FW64_ENTITY_H
 
 #include "framework64/transform.h"
 #include "framework64/box.h"

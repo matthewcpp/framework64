@@ -1,5 +1,5 @@
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
+#ifndef FW64_FILESYSTEM_H
+#define FW64_FILESYSTEM_H
 
 #include <stdint.h>
 
