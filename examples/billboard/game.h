@@ -1,5 +1,5 @@
-#ifndef LINES_EXAMPLE_H
-#define LINES_EXAMPLE_H
+#ifndef GAME_H
+#define GAME_H
 
 #include "fps_camera.h"
 
@@ -7,23 +7,22 @@
 #include "framework64/entity.h"
 #include "framework64/font.h"
 #include "framework64/input.h"
-#include "framework64/renderer.h"
+#include "framework64/system.h"
 
 #include "object.h"
 
 typedef struct {
-    Input* input;
-    Renderer* renderer;
+    fw64System* system;
     FpsCamera fps;
     Entity solid_cube;
     BillboardQuad nintendo_seal_quad;
     ImageSprite nintendo_seal_sprite;
     BillboardQuad n64_logo_quad;
     ImageSprite n64_logo_sprite;
-} BillboardExample;
+} Game;
 
-void lines_example_init(BillboardExample* example, Input* input, Renderer* renderer);
-void lines_example_update(BillboardExample* example, float time_delta);
-void lines_example_draw(BillboardExample* example);
+void game_init(Game* game, fw64System* system);
+void game_update(Game* game, float time_delta);
+void game_draw(Game* game);
 
 #endif
