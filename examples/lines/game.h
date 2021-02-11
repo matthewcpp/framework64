@@ -15,7 +15,7 @@ typedef enum {
 } DrawMode;
 
 typedef struct lines_example {
-    fw64System* system;
+    System* system;
     Camera camera;
     DrawMode draw_mode;
     float rotation;
@@ -23,7 +23,7 @@ typedef struct lines_example {
     Entity wire_cube;
 } Game;
 
-void game_init(Game* example, fw64System* system);
+void game_init(Game* example, System* system);
 void game_update(Game* example, float time_delta);
 void game_draw(Game* example);
 

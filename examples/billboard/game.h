@@ -12,7 +12,7 @@
 #include "object.h"
 
 typedef struct {
-    fw64System* system;
+    System* system;
     FpsCamera fps;
     Entity solid_cube;
     BillboardQuad nintendo_seal_quad;
@@ -21,7 +21,7 @@ typedef struct {
     ImageSprite n64_logo_sprite;
 } Game;
 
-void game_init(Game* game, fw64System* system);
+void game_init(Game* game, System* system);
 void game_update(Game* game, float time_delta);
 void game_draw(Game* game);
 

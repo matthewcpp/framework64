@@ -4,7 +4,7 @@
 #include <nusys.h>
 
 Game game;
-fw64System system;
+System system;
 
 void nusys_game_tick(int pendingGfx) {
     if (pendingGfx < 1) {

@@ -12,7 +12,7 @@ Input input;
 Renderer renderer;
 Time time;
 
-int fw64_system_init(fw64System* system) {
+int fw64_system_init(System* system) {
     system->input = &input;
     system->renderer = &renderer;
     system->time = &time;
@@ -30,7 +30,7 @@ int fw64_system_init(fw64System* system) {
     return 1;
 }
 
-int fw64_sytem_update(fw64System* system) {
+int fw64_sytem_update(System* system) {
     time_update(system->time);
     input_update(system->input);
 }

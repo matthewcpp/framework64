@@ -8,7 +8,7 @@
 
 
 
-void game_init(Game* game, fw64System* system) {
+void game_init(Game* game, System* system) {
     game->system = system;
     camera_init(&game->camera);
 

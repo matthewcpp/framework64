@@ -14,9 +14,9 @@ typedef struct {
     Input* input;
     Renderer* renderer;
     Time* time;
-} fw64System;
+} System;
 
-int fw64_system_init(fw64System* system);
-int fw64_sytem_update(fw64System* system);
+int fw64_system_init(System* system);
+int fw64_sytem_update(System* system);
 
 #endif

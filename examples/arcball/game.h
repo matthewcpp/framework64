@@ -11,7 +11,7 @@
 #define ENTITY_COUNT 3
 
 typedef struct {
-    fw64System* system;
+    System* system;
 
     Camera camera;
     ArcballCamera arcball;
@@ -29,7 +29,7 @@ typedef struct {
     int switch_model_text_width;
 } Game;
 
-void game_init(Game* game, fw64System* system);
+void game_init(Game* game, System* system);
 void game_update(Game* game, float time_delta);
 void game_draw(Game* game);
 

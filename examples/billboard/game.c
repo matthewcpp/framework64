@@ -4,7 +4,7 @@
 
 #include <math.h>
 
-void game_init(Game* example, fw64System* system) {
+void game_init(Game* example, System* system) {
     example->system = system;
 
     fps_camera_init(&example->fps, system->input);
