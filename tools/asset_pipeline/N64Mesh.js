@@ -40,7 +40,7 @@ class N64Mesh {
     vertices = [];
     triangles = [];
     texture = null;
-    material = null;
+    material = 0;
     hasNormals = false;
     hasTexCoords = false;
 

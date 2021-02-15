@@ -1,5 +1,7 @@
-const N64Image = require("./N64Image")
+const N64Image = require("./N64Image");
+const N64Material = require("./N64Material");
 const N64ImageWriter = require("./N64ImageWriter");
+const DisplayList = require("./DisplayList");
 
 const path  = require("path");
 const fs = require("fs")
@@ -153,7 +155,224 @@ function writeWireframe(model, wireframe, outputDir) {
     writeWireframeSource(model, wireframe, sourcePath);
 }
 
+const SizeOfVtx = 16; // size (in bytes) of a single vertex
+const SizeOfGfx = 8; // size (in bytes) of a single entry in a display list
+
+function createVertexBuffer(slices, hasNormals) {
+    const vertexList = [];
+    for (const slice of slices)
+        vertexList.push(...slice.vertices)
+
+    const vertexBuffer = Buffer.alloc(vertexList.length * SizeOfVtx);
+    let bufferOffset = 0;
+
+    for (const vertex of vertexList) {
+        bufferOffset =  vertexBuffer.writeInt16BE(vertex[0], bufferOffset);
+        bufferOffset =  vertexBuffer.writeInt16BE(vertex[1], bufferOffset);
+        bufferOffset =  vertexBuffer.writeInt16BE(vertex[2], bufferOffset);
+        bufferOffset =  vertexBuffer.writeInt16BE(vertex[3], bufferOffset);
+
+        bufferOffset =  vertexBuffer.writeInt16BE(vertex[4], bufferOffset);
+        bufferOffset =  vertexBuffer.writeInt16BE(vertex[5], bufferOffset);
+
+        if (hasNormals) {
+            bufferOffset =  vertexBuffer.writeInt8(vertex[6], bufferOffset);
+            bufferOffset =  vertexBuffer.writeInt8(vertex[7], bufferOffset);
+            bufferOffset =  vertexBuffer.writeInt8(vertex[8], bufferOffset);
+        }
+        else { // vertex colors
+            bufferOffset =  vertexBuffer.writeUInt8(vertex[6], bufferOffset);
+            bufferOffset =  vertexBuffer.writeUInt8(vertex[7], bufferOffset);
+            bufferOffset =  vertexBuffer.writeUInt8(vertex[8], bufferOffset);
+        }
+
+        bufferOffset =  vertexBuffer.writeUInt8(vertex[9], bufferOffset);
+    }
+
+    return vertexBuffer;
+}
+
+function createDisplayListBuffer(slices) {
+    let displayListSize = 1; // gSPEndDisplayList
+    for (const slice of slices) {
+        displayListSize += 1 + slice.triangles.length / 2 + slice.triangles.length % 2;
+    }
+
+    const gfx = Buffer.alloc(8);
+
+    const displayListBuffer = Buffer.alloc(displayListSize * SizeOfGfx);
+    let displayListIndex = 0; // holds the current index into the display list array.
+
+    const vertexPointerBuffer = Buffer.alloc(slices.length * 4); // holds indices of this primitive's display list that contain vertex cache pointers (gSPVertex)
+    let vertexPointerBufferIndex = 0;
+
+    let vertexBufferOffset = 0; // holds the offset into the vertex buffer for this primitive.  Incremented every slice
+
+    for (const slice of slices) {
+        // writes the index of the gSPVertex call of the displaylist into the list of items that need to be fixed up when loaded at runtime
+        vertexPointerBufferIndex = vertexPointerBuffer.writeInt32BE(displayListIndex, vertexPointerBufferIndex);
+
+        // writes the relative offset into the vertex buffer for this slice.  At truntime the base address of the primitive's vertex buffer will be added to this value
+        DisplayList.gSPVertex(gfx, vertexBufferOffset, slice.vertices.length, 0)
+        gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
+
+        for (let i = 0; i < slice.triangles.length - slice.triangles.length % 2; i+= 2) {
+            const t1 = slice.triangles[i];
+            const t2 = slice.triangles[i + 1];
+
+            DisplayList.gSP2Triangles(gfx, t1[0],t1[1],t1[2],0,t2[0],t2[1],t2[2],0);
+            gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
+        }
+
+        if (slice.triangles.length % 2 !== 0) {
+            const t1 = slice.triangles[slice.triangles.length - 1];
+            DisplayList.gSP1Triangle(gfx, t1[0],t1[1],t1[2],0);
+            gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
+        }
+
+        vertexBufferOffset += slice.vertices.length * SizeOfVtx;
+    }
+
+    DisplayList.gSPEndDisplayList(gfx);
+    gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
+
+    return {
+        displayList: displayListBuffer,
+        vertexPointers: vertexPointerBuffer,
+    }
+}
+
+class MeshInfo {
+    primitiveCount = 0;
+    colorCount = 0;
+    textureCount = 0;
+    vertexCount = 0;
+    displayListCount = 0;
+    vertexPointerDataSize = 0;
+
+    get buffer() {
+        const buff = Buffer.alloc(24);
+
+        buff.writeUInt32BE(this.primitiveCount, 0);
+        buff.writeUInt32BE(this.colorCount, 4);
+        buff.writeUInt32BE(this.textureCount, 8);
+        buff.writeUInt32BE(this.vertexCount, 12);
+        buff.writeUInt32BE(this.displayListCount, 16);
+        buff.writeUInt32BE(this.vertexPointerDataSize, 20);
+
+        return buff;
+    }
+}
+
+class PrimitiveInfo {
+    bounding;
+    vertices;
+    displayList;
+    materialColor;
+    materialTexture;
+    materialMode;
+
+    get buffer() {
+        const buff = Buffer.alloc(44)
+
+        let index = this.bounding.writeToBuffer(buff, 0);
+        index = buff.writeUInt32BE(this.vertices, index);
+        index = buff.writeUInt32BE(this.displayList, index);
+        index = buff.writeUInt32BE(this.materialColor, index);
+        index = buff.writeUInt32BE(this.materialTexture, index);
+        index = buff.writeUInt32BE(this.materialMode, index);
+
+        return buff;
+    }
+}
+
+const ShadingMode  = {
+    Gouraud: 3
+}
+
+function getShadingMode(primitive, model){
+    const material = model.materials[primitive.material];
+
+    if (primitive.hasNormals && material.texture === N64Material.NoTexture) {
+        return ShadingMode.Gouraud
+    }
+
+    throw new Error(`Could not determine shading mode for mesh in model: ${model.name}`);
+}
+
+function write(model, outputDir, archive) {
+    const modelPath = path.join(outputDir, `${model.name}.model`);
+    archive.add(modelPath, "mesh");
+
+    const meshInfo = new MeshInfo();
+    meshInfo.primitiveCount = model.meshes.length;
+    meshInfo.colorCount = model.materials.length;
+    meshInfo.textureCount = model.images.length;
+    meshInfo.vertexPointerDataSize = model.meshes.length * 4;
+
+    const primitiveInfos = [];
+    const vertexBuffers = [];
+    const displayListBuffers = [];
+    const vertexPointerBuffers = []
+    const vertexPointerCountBuffer = Buffer.alloc(model.meshes.length * 4); // holds number of vertex pointer indices per primitive
+
+    for (let i = 0; i <  model.meshes.length; i++) {
+        const primitive = model.meshes[i];
+
+        const primitiveInfo = new PrimitiveInfo();
+        primitiveInfo.bounding = primitive.bounding;
+        primitiveInfo.vertices = meshInfo.vertexCount;
+        primitiveInfo.displayList = meshInfo.displayListCount;
+        primitiveInfo.materialColor = primitive.material;
+        primitiveInfo.materialTexture = model.materials[primitive.material].texture;
+        primitiveInfo.materialMode = getShadingMode(primitive, model);
+
+        primitiveInfos.push(primitiveInfo);
+
+        // slice the vertices into chunks that can fit into N64 vertex cache
+        const slices = primitive.slice();
+
+        // generate the display list for rendering the primitive geometry
+        const vertexBuffer = createVertexBuffer(slices, primitive.hasNormals);
+        const {displayList, vertexPointers} = createDisplayListBuffer(slices);
+
+        // update the mesh info totals
+        meshInfo.vertexCount += vertexBuffer.length / SizeOfVtx;
+        meshInfo.displayListCount += displayList.length / SizeOfGfx;
+        meshInfo.vertexPointerDataSize += vertexPointers.length;
+        vertexPointerCountBuffer.writeUInt32BE(vertexPointers.length / 4, i * 4);
+
+        vertexBuffers.push(vertexBuffer);
+        displayListBuffers.push(displayList);
+        vertexPointerBuffers.push(vertexPointers);
+    }
+
+    const file = fs.openSync(modelPath, "w");
+    fs.writeSync(file, meshInfo.buffer);
+
+    for (const buffer of vertexBuffers)
+        fs.writeSync(file, buffer);
+
+    for (const buffer of displayListBuffers)
+        fs.writeSync(file, buffer);
+
+    for (const material of model.materials) {
+        fs.writeSync(file, material.colorBuffer);
+    }
+
+    for (const primitiveInfo of primitiveInfos) {
+        fs.writeSync(file, primitiveInfo.buffer)
+    }
+
+    fs.writeSync(file, vertexPointerCountBuffer);
+    for (const buffer of vertexPointerBuffers)
+        fs.writeSync(file, buffer);
+
+    fs.closeSync(file);
+}
+
 module.exports = {
     writeHeader: writeHeader,
-    writeWireframe: writeWireframe
+    writeWireframe: writeWireframe,
+    write: write
 };

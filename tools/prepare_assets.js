@@ -27,7 +27,7 @@ async function main() {
         for (const model of manifest.models) {
             const sourceFile = path.join(manifestDirectory, model.src);
 
-            await gltfConvert(sourceFile, outputDirectory, model);
+            await gltfConvert(sourceFile, outputDirectory, model, archive);
         }
     }
 

@@ -18,6 +18,9 @@ class Archive {
     fileName = "assets"
 
     add(path, type) {
+        if (this.entries.has(path))
+            throw new Error(`Duplicate key in archive: ${path}`);
+
         const index = this.entries.size;
         const entry = new ArchiveEntry(path, type, index);
         this.entries.set(path, entry);

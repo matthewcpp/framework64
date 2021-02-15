@@ -4,12 +4,17 @@ const N64ModelWriter = require("./N64ModelWriter")
 const fs = require("fs");
 const path = require("path");
 
-async function gltfConvert(gltfPath, outputFolder, params) {
+async function gltfConvert(gltfPath, outputFolder, params, archive) {
     const gltfLoader = new GLTFLoader(params);
     await gltfLoader.load(gltfPath);
 
     if (params.hasOwnProperty("mergeMeshes") && params.mergeMeshes) {
         gltfLoader.merge();
+    }
+
+    if (params.archive) {
+        N64ModelWriter.write(gltfLoader.model, outputFolder, archive);
+        return;
     }
 
     if (params.createWireframe) {
