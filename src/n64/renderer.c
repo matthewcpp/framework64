@@ -25,29 +25,37 @@ void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
     };
 
     renderer->view_port = view_port;
+    renderer->render_mode = RENDERER_MODE_UNSET;
+    renderer->shading_mode = SHADING_MODE_UNSET;
 }
 
 void renderer_set_clear_color(Renderer* renderer, Color* clear_color) {
     renderer->clear_color = GPACK_RGBA5551(clear_color->r, clear_color->g, clear_color->b, 1);
 }
 
+Gfx _rdp_init_static_dl[] = {
+    gsDPSetTextureLOD(G_TL_TILE),
+    gsDPSetTextureLUT(G_TT_NONE),
+    gsDPSetTextureDetail(G_TD_CLAMP),
+    gsDPSetTexturePersp(G_TP_PERSP),
+    gsDPSetTextureFilter(G_TF_BILERP),
+    gsDPSetTextureConvert(G_TC_FILT),
+    gsDPSetCombineMode(G_CC_SHADE, G_CC_SHADE),
+    gsDPSetCombineKey(G_CK_NONE),
+    gsDPSetAlphaCompare(G_AC_NONE),
+    gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
+    gsDPSetColorDither(G_CD_DISABLE),
+    gsSPEndDisplayList()
+};
+
 void renderer_init_rdp(Renderer* renderer) {
     gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
     gDPSetScissor(renderer->display_list++,G_SC_NON_INTERLACE, 0, 0, renderer->screen_size.x, renderer->screen_size.y);
-    gDPSetTextureLOD(renderer->display_list++,G_TL_TILE);
-    gDPSetTextureLUT(renderer->display_list++,G_TT_NONE);
-    gDPSetTextureDetail(renderer->display_list++,G_TD_CLAMP);
-    gDPSetTexturePersp(renderer->display_list++,G_TP_PERSP);
-    gDPSetTextureFilter(renderer->display_list++,G_TF_BILERP);
-    gDPSetTextureConvert(renderer->display_list++,G_TC_FILT);
-    gDPSetCombineMode(renderer->display_list++,G_CC_SHADE, G_CC_SHADE);
-    gDPSetCombineKey(renderer->display_list++,G_CK_NONE);
-    gDPSetAlphaCompare(renderer->display_list++,G_AC_NONE);
-    gDPSetRenderMode(renderer->display_list++,G_RM_OPA_SURF, G_RM_OPA_SURF2);
-    gDPSetColorDither(renderer->display_list++,G_CD_DISABLE);
+    gSPDisplayList(renderer->display_list++, _rdp_init_static_dl);
     gDPSetDepthImage(renderer->display_list++,nuGfxZBuffer);
     gDPPipeSync(renderer->display_list++);
 }
+
 
 void renderer_init_rsp(Renderer* renderer) {
     gSPViewport(renderer->display_list++, &renderer->view_port);
@@ -92,11 +100,18 @@ void renderer_begin(Renderer* renderer, Camera* camera, RenderMode render_mode, 
         renderer_clear_frame_buffer(renderer);
     }
 
-    if (render_mode == RENDERER_MODE_TRIANGLES) {
-        gDPSetRenderMode(renderer->display_list++, G_RM_ZB_OPA_SURF, G_RM_ZB_OPA_SURF2);
-    }
-    else{
-        gDPSetRenderMode(renderer->display_list++,  G_RM_AA_ZB_XLU_LINE,  G_RM_AA_ZB_XLU_LINE2);
+    switch (renderer->render_mode) {
+        case RENDERER_MODE_TRIANGLES:
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
+        break;
+
+        case RENDERER_MODE_LINES:
+            gDPSetRenderMode(renderer->display_list++,  G_RM_AA_ZB_XLU_LINE,  G_RM_AA_ZB_XLU_LINE2);
+        break;
+
+        case RENDERER_MODE_RECTANGLES:
+            gSPClearGeometryMode(renderer->display_list++, 0xFFFFFFFF);
+        break;
     }
 
     // sets the projection matrix (modelling set in individual draw calls)
@@ -112,10 +127,33 @@ void renderer_end(Renderer* renderer, RendererFlags flags) {
     gDPFullSync(renderer->display_list++);
     gSPEndDisplayList(renderer->display_list++);
 
+    renderer->shading_mode = SHADING_MODE_UNSET;
+
     nuGfxTaskStart(renderer->display_list_start, 
         (s32)(renderer->display_list - renderer->display_list_start) * sizeof (Gfx), 
-        (renderer->render_mode == RENDERER_MODE_TRIANGLES) ? NU_GFX_UCODE_F3DEX : NU_GFX_UCODE_L3DEX2, 
+        (renderer->render_mode == RENDERER_MODE_LINES) ? NU_GFX_UCODE_L3DEX2 : NU_GFX_UCODE_F3DEX, 
         (flags & RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
+}
+
+static void renderer_set_shading_mode(Renderer* renderer, ShadingMode shading_mode) {
+    if (shading_mode == renderer->shading_mode) return;
+
+    renderer->shading_mode = shading_mode;
+
+    switch(renderer->shading_mode) {
+        case SHADING_MODE_GOURAUD:
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
+            gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
+            break;
+        case SHADING_MODE_SPRITE:
+            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
+            gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
+            gDPPipeSync(renderer->display_list++);
+            break;
+        default:
+            break;
+    }
 }
 
 float entity_matrix[4][4];
@@ -144,18 +182,6 @@ void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size) {
     *screen_size = renderer->screen_size;
 }
 
-void renderer_begin_2d(Renderer* renderer) {
-    gSPClearGeometryMode(renderer->display_list++, 0xFFFFFFFF);
-    gSPTexture(renderer->display_list++, 0, 0, 0, 0, G_OFF);
-    gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
-    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, 0, 0, renderer->screen_size.x, renderer->screen_size.y);
-    gDPSetCombineKey(renderer->display_list++, G_CK_NONE);
-    gDPSetAlphaCompare(renderer->display_list++, G_AC_NONE);
-    gDPSetRenderMode(renderer->display_list++, G_RM_NOOP, G_RM_NOOP2);
-    gDPSetColorDither(renderer->display_list++, G_CD_DISABLE);
-    gDPPipeSync(renderer->display_list++);
-}
-
 void renderer_set_fill_color(Renderer* renderer, Color* color) {
     renderer->fill_color = GPACK_RGBA5551(color->r, color->g, color->b, 255);
 
@@ -175,15 +201,7 @@ void renderer_draw_filled_rect(Renderer* renderer, IRect* rect) {
     gDPPipeSync(renderer->display_list++);
 }
 
-void renderer_set_sprite_mode(Renderer* renderer){
-    gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
-    gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
-    gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
-    gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
-    //TODO: do i need to sync pipe here?
-}
-
-void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int frame, int x, int y) {
+static void _draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int frame, int x, int y) {
     int slice_width = image_sprite_get_slice_width(sprite);
     int slice_height = image_sprite_get_slice_height(sprite);
 
@@ -204,7 +222,14 @@ void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int fra
     gDPPipeSync(renderer->display_list++);
 }
 
+void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int frame, int x, int y) {
+    renderer_set_shading_mode(renderer, SHADING_MODE_SPRITE);
+    _draw_sprite_slice(renderer, sprite, frame, x, y);
+}
+
 void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y) {
+    renderer_set_shading_mode(renderer, SHADING_MODE_SPRITE);
+
     int slice_width = image_sprite_get_slice_width(sprite);
     int slice_height = image_sprite_get_slice_height(sprite);
     int slice = 0;
@@ -214,14 +239,14 @@ void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y)
         for (uint8_t col = 0; col < sprite->hslices; col++) {
             int draw_x = x + slice_width * col;
 
-            renderer_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
+            _draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
         }
     }
 }
 
 void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text) {
     if (!text || text[0] == 0) return;
-
+    renderer_set_shading_mode(renderer, SHADING_MODE_SPRITE);
 /*
     TODO: Color blending? need better alpha than 5551
     gDPSetPrimColor(renderer->display_list++, 255, 255, color->r, color->g, color->b, 255);
@@ -308,4 +333,16 @@ void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad) {
 
 
     renderer_pop_transform(renderer);
+}
+
+void renderer_draw_static_mesh(Renderer* renderer, Mesh* mesh) {
+    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
+        Primitive* primitive = mesh->primitives + i;
+        
+        renderer_set_shading_mode(renderer, primitive->material.mode);
+        
+        gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
+        gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
+        gDPPipeSync(renderer->display_list++);
+    }
 }

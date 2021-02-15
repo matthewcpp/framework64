@@ -1,7 +1,6 @@
 #ifndef FW64_SPRITE_H
 #define FW64_SPRITE_H
 
-#include "framework64/texture.h"
 #include "framework64/vec2.h"
 
 #include <stdint.h>
