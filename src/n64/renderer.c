@@ -145,6 +145,16 @@ static void renderer_set_shading_mode(Renderer* renderer, ShadingMode shading_mo
             gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
             gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
             break;
+
+        case SHADING_MODE_GOURAUD_TEXTURED:
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
+            gDPSetCombineMode(renderer->display_list++,G_CC_MODULATERGBA , G_CC_MODULATERGBA );
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
+            gDPSetTextureFilter(renderer->display_list++,G_TF_POINT);
+        break;
+
         case SHADING_MODE_SPRITE:
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
@@ -340,6 +350,14 @@ void renderer_draw_static_mesh(Renderer* renderer, Mesh* mesh) {
         Primitive* primitive = mesh->primitives + i;
         
         renderer_set_shading_mode(renderer, primitive->material.mode);
+
+        if (primitive->material.mode == SHADING_MODE_GOURAUD_TEXTURED) {
+            ImageSprite* texture = mesh->textures + primitive->material.texture;
+
+            gDPLoadTextureBlock(renderer->display_list++, texture->data,
+            G_IM_FMT_RGBA, G_IM_SIZ_16b,  texture->width, texture->height, 0,
+            G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+        }
         
         gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);

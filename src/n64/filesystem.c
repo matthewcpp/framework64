@@ -82,7 +82,7 @@ int filesystem_read(void* buffer, int size, int count, int handle) {
     u32 rom_location = (u32)(&_asset_dataSegmentRomStart[0]) + file_handle->data_loc + file_handle->get_pos;
 
     u8* dest_buffer = buffer;
-    int buffer_is_aligned = (u32)buffer & 7;
+    int buffer_is_aligned = ((u32)buffer & 7) == 0;
     u32 max_read_size = buffer_is_aligned ? MAX_DMA : MAX_UNALIGNED_READ;
     
     u32 data_reamining = data_total;

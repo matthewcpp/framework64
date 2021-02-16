@@ -308,7 +308,9 @@ class GLTFLoader {
         for (const gltfImage of this.gltf.images) {
             const imagePath = path.join(gltfDir, gltfImage.uri);
 
-            const image = new N64Image(gltfImage.uri);
+            //TODO: This should probably be more robust: e.g. image.something.ext will break asset macro name
+            const imageName = path.basename(gltfImage.uri, path.extname(gltfImage.uri));
+            const image = new N64Image(imageName);
             await image.load(imagePath);
 
             if (this.options.resizeImages.hasOwnProperty(gltfImage.uri)) {

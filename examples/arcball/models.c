@@ -51,7 +51,6 @@ void penguin_draw(Penguin* penguin, Renderer* renderer) {
     }
     else {
         gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
-        gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
         gDPSetCombineMode(renderer->display_list++,G_CC_MODULATERGBA , G_CC_MODULATERGBA );
     }
 

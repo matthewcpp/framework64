@@ -1,4 +1,6 @@
 class Bounding {
+    static SizeOf = 24;
+
     constructor() {
         this.min = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE];
         this.max = [Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE];

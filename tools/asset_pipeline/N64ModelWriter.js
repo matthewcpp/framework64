@@ -1,7 +1,9 @@
 const N64Image = require("./N64Image");
 const N64Material = require("./N64Material");
 const N64ImageWriter = require("./N64ImageWriter");
+const N64SpriteWriter = require("./N64SpriteWriter");
 const DisplayList = require("./DisplayList");
+const Bounding = require("./Bounding");
 
 const path  = require("path");
 const fs = require("fs")
@@ -249,9 +251,10 @@ class MeshInfo {
     vertexCount = 0;
     displayListCount = 0;
     vertexPointerDataSize = 0;
+    bounding = null;
 
     get buffer() {
-        const buff = Buffer.alloc(24);
+        const buff = Buffer.alloc(24 + Bounding.SizeOf);
 
         buff.writeUInt32BE(this.primitiveCount, 0);
         buff.writeUInt32BE(this.colorCount, 4);
@@ -259,6 +262,7 @@ class MeshInfo {
         buff.writeUInt32BE(this.vertexCount, 12);
         buff.writeUInt32BE(this.displayListCount, 16);
         buff.writeUInt32BE(this.vertexPointerDataSize, 20);
+        this.bounding.writeToBuffer(buff, 24);
 
         return buff;
     }
@@ -287,17 +291,39 @@ class PrimitiveInfo {
 }
 
 const ShadingMode  = {
-    Gouraud: 3
+    Gouraud: 3,
+    GouraudTextured: 4
 }
 
 function getShadingMode(primitive, model){
     const material = model.materials[primitive.material];
 
-    if (primitive.hasNormals && material.texture === N64Material.NoTexture) {
-        return ShadingMode.Gouraud
+    if (primitive.hasNormals) {
+        return material.texture !== N64Material.NoTexture ? ShadingMode.GouraudTextured: ShadingMode.Gouraud;
     }
 
     throw new Error(`Could not determine shading mode for mesh in model: ${model.name}`);
+}
+
+// TODO: Add support for sliced sprites?
+function prepareTextures(model, outputDir, archive) {
+    const textureAssetIndicesBuffer = Buffer.alloc(model.images.length * 4);
+    let bufferIndex = 0;
+
+    for (const image of model.images) {
+        const texturePath = path.join(outputDir, `${image.name}.sprite`);
+        let entry = archive.entries.get(texturePath);
+
+        if (!entry){
+            entry = archive.add(texturePath, "sprite");
+            N64SpriteWriter.write(image, 1, 1, texturePath);
+        }
+
+
+        bufferIndex = textureAssetIndicesBuffer.writeUInt32BE(entry.index, bufferIndex);
+    }
+
+    return textureAssetIndicesBuffer;
 }
 
 function write(model, outputDir, archive) {
@@ -309,6 +335,7 @@ function write(model, outputDir, archive) {
     meshInfo.colorCount = model.materials.length;
     meshInfo.textureCount = model.images.length;
     meshInfo.vertexPointerDataSize = model.meshes.length * 4;
+    meshInfo.bounding = model.bounding;
 
     const primitiveInfos = [];
     const vertexBuffers = [];
@@ -367,6 +394,11 @@ function write(model, outputDir, archive) {
     fs.writeSync(file, vertexPointerCountBuffer);
     for (const buffer of vertexPointerBuffers)
         fs.writeSync(file, buffer);
+
+    if (model.images.length > 0) {
+        const textureAssetIndices = prepareTextures(model, outputDir, archive);
+        fs.writeSync(file, textureAssetIndices);
+    }
 
     fs.closeSync(file);
 }

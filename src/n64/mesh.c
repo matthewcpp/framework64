@@ -5,7 +5,8 @@
 #include <malloc.h>
 #include <string.h>
 
-void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data);
+static void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data, int handle);
+static void load_textures(Mesh* mesh, uint32_t* asset_index_data, int handle);
 
 int mesh_load(int asset_index, Mesh* mesh) {
     int handle = filesystem_open(asset_index);
@@ -26,11 +27,13 @@ int mesh_load(int asset_index, Mesh* mesh) {
     mesh->primitives = malloc(sizeof(Primitive) * mesh->info.primitive_count);
     filesystem_read(mesh->primitives, sizeof(Primitive), mesh->info.primitive_count, handle);
 
-    uint32_t* vertex_pointer_data = malloc(mesh->info._vertex_pointer_data_size);
-    filesystem_read(vertex_pointer_data, 1, mesh->info._vertex_pointer_data_size, handle);
+    uint32_t scratch_data_size = mesh->info._vertex_pointer_data_size > mesh->info.texture_count * sizeof(uint32_t) ? mesh->info._vertex_pointer_data_size : mesh->info.texture_count * sizeof(uint32_t);
+    uint32_t* scratch_data = malloc(scratch_data_size);
 
-    fixup_vertex_pointers(mesh, vertex_pointer_data);
-    free(vertex_pointer_data);
+    fixup_vertex_pointers(mesh, scratch_data, handle);
+    load_textures(mesh, scratch_data, handle);
+
+    free(scratch_data);
 
     filesystem_close(handle);
 
@@ -42,9 +45,19 @@ void mesh_unload(Mesh* mesh) {
     free(mesh->display_list);
     free(mesh->colors);
     free(mesh->primitives);
+
+    if (mesh->textures) {
+        for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
+            sprite_uninit(mesh->textures + i);
+        }
+
+        free(mesh->textures);
+    }
 }
 
-void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data) {
+static void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data, int handle) {
+    filesystem_read(vertex_pointer_data, 1, mesh->info._vertex_pointer_data_size, handle);
+
     uint32_t* vertex_pointer_counts = vertex_pointer_data;
     uint32_t* vertex_pointer_offsets = vertex_pointer_data + mesh->info.primitive_count;
 
@@ -64,10 +77,16 @@ void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data) {
     }
 }
 
-void mesh_compute_bounding_box(Mesh* mesh, Box* box) {
-    box_invalidate(box);
+static void load_textures(Mesh* mesh, uint32_t* asset_index_data, int handle) {
+    if (mesh->info.texture_count > 0) {
+        filesystem_read(asset_index_data, sizeof(uint32_t), mesh->info.texture_count, handle);
+        mesh->textures = malloc(sizeof(ImageSprite) * mesh->info.texture_count);
 
-    for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
-        box_encapsulate_box(box, &mesh->primitives[i].bounding_box);
+        for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
+            sprite_load(asset_index_data[i], mesh->textures + i);
+        }
+    }
+    else {
+        mesh->textures = NULL;
     }
 }

@@ -2,15 +2,10 @@
 #define FW64_MESH_H
 
 #include "framework64/box.h"
+#include "framework64/sprite.h"
 
 #include <nusys.h>
 #include <stdint.h>
-
-typedef struct {
-    uint32_t width;
-    uint32_t height;
-    uint8_t* data;
-} Texture;
 
 typedef enum {
     SHADING_MODE_UNSET,
@@ -44,13 +39,13 @@ typedef struct {
     uint32_t vertex_count;
     uint32_t display_list_count;
     uint32_t _vertex_pointer_data_size; // only used during loading
+    Box bounding_box;
 } MeshInfo;
 
 typedef struct {
     MeshInfo info;
-
     Primitive* primitives;
-    Texture* textures;
+    ImageSprite* textures;
     Lights1* colors;
     Vtx* vertex_buffer;
     Gfx* display_list;
@@ -58,7 +53,5 @@ typedef struct {
 
 int mesh_load(int asset_index, Mesh* mesh);
 void mesh_unload(Mesh* mesh);
-
-void mesh_compute_bounding_box(Mesh* mesh, Box* box);
 
 #endif
