@@ -43,6 +43,7 @@ class N64Mesh {
     material = 0;
     hasNormals = false;
     hasTexCoords = false;
+    hasVertexColors = false;
 
     bounding = new Bounding();
 

@@ -291,6 +291,7 @@ class PrimitiveInfo {
 }
 
 const ShadingMode  = {
+    UnlitVertexColors: 1,
     Gouraud: 3,
     GouraudTextured: 4
 }
@@ -300,6 +301,9 @@ function getShadingMode(primitive, model){
 
     if (primitive.hasNormals) {
         return material.texture !== N64Material.NoTexture ? ShadingMode.GouraudTextured: ShadingMode.Gouraud;
+    }
+    else if (primitive.hasVertexColors) {
+        return ShadingMode.UnlitVertexColors;
     }
 
     throw new Error(`Could not determine shading mode for mesh in model: ${model.name}`);

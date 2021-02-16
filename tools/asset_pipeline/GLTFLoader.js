@@ -213,6 +213,8 @@ class GLTFLoader {
 
             offset += byteStride;
         }
+
+        n64Mesh.hasVertexColors = true;
     }
 
     _readNormals(gltfPrimitive, n64Mesh) {

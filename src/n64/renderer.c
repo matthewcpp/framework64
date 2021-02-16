@@ -141,6 +141,8 @@ static void renderer_set_shading_mode(Renderer* renderer, ShadingMode shading_mo
     renderer->shading_mode = shading_mode;
 
     switch(renderer->shading_mode) {
+        case SHADING_MODE_UNLIT_TEXTURED:
+            break;
         case SHADING_MODE_GOURAUD:
             gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
             gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
