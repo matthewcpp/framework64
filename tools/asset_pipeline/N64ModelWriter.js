@@ -1,5 +1,6 @@
 const N64Image = require("./N64Image");
 const N64Material = require("./N64Material");
+const N64Mesh = require("./N64Mesh");
 const N64ImageWriter = require("./N64ImageWriter");
 const N64SpriteWriter = require("./N64SpriteWriter");
 const DisplayList = require("./DisplayList");
@@ -38,7 +39,6 @@ function writeHeader(model, outputFolder) {
 
     for (let i = 0; i < model.meshes.length; i++) {
         const mesh = model.meshes[i];
-        //console.log(`Mesh: ${model.meshes[i].vertices.length} vertices, ${model.meshes[i].triangles.length} triangles`);
 
         const slices = mesh.slice();
         const vertexArrayVar = `${model.name}_mesh_${i}`;
@@ -68,7 +68,7 @@ function writeHeader(model, outputFolder) {
             fs.writeSync(file, `gsSPVertex(${vertexArrayVar} + ${vertexListOffset}, ${slice.vertices.length}, 0),\n`);
 
             // write out all the triangles
-            for (const t of slice.triangles) {
+            for (const t of slice.elements) {
                 fs.writeSync(file, `gsSP1Triangle(${t[0]}, ${t[1]}, ${t[2]}, 0),\n`)
             }
 
@@ -194,10 +194,10 @@ function createVertexBuffer(slices, hasNormals) {
     return vertexBuffer;
 }
 
-function createDisplayListBuffer(slices) {
+function createTriangleDisplayListBuffer(slices) {
     let displayListSize = 1; // gSPEndDisplayList
     for (const slice of slices) {
-        displayListSize += 1 + slice.triangles.length / 2 + slice.triangles.length % 2;
+        displayListSize += 1 + slice.elements.length / 2 + slice.elements.length % 2;
     }
 
     const gfx = Buffer.alloc(8);
@@ -218,17 +218,58 @@ function createDisplayListBuffer(slices) {
         DisplayList.gSPVertex(gfx, vertexBufferOffset, slice.vertices.length, 0)
         gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
 
-        for (let i = 0; i < slice.triangles.length - slice.triangles.length % 2; i+= 2) {
-            const t1 = slice.triangles[i];
-            const t2 = slice.triangles[i + 1];
+        for (let i = 0; i < slice.elements.length - slice.elements.length % 2; i+= 2) {
+            const t1 = slice.elements[i];
+            const t2 = slice.elements[i + 1];
 
             DisplayList.gSP2Triangles(gfx, t1[0],t1[1],t1[2],0,t2[0],t2[1],t2[2],0);
             gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
         }
 
-        if (slice.triangles.length % 2 !== 0) {
-            const t1 = slice.triangles[slice.triangles.length - 1];
+        if (slice.elements.length % 2 !== 0) {
+            const t1 = slice.elements[slice.elements.length - 1];
             DisplayList.gSP1Triangle(gfx, t1[0],t1[1],t1[2],0);
+            gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
+        }
+
+        vertexBufferOffset += slice.vertices.length * SizeOfVtx;
+    }
+
+    DisplayList.gSPEndDisplayList(gfx);
+    gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
+
+    return {
+        displayList: displayListBuffer,
+        vertexPointers: vertexPointerBuffer,
+    }
+}
+
+function createLineDisplayListBuffer(slices) {
+    let displayListSize = 1; // gSPEndDisplayList
+    for (const slice of slices) {
+        displayListSize += 1 + slice.elements.length;
+    }
+
+    const gfx = Buffer.alloc(8);
+
+    const displayListBuffer = Buffer.alloc(displayListSize * SizeOfGfx);
+    let displayListIndex = 0; // holds the current index into the display list array.
+
+    const vertexPointerBuffer = Buffer.alloc(slices.length * 4); // holds indices of this primitive's display list that contain vertex cache pointers (gSPVertex)
+    let vertexPointerBufferIndex = 0;
+
+    let vertexBufferOffset = 0; // holds the offset into the vertex buffer for this primitive.  Incremented every slice
+
+    for (const slice of slices) {
+        // writes the index of the gSPVertex call of the displaylist into the list of items that need to be fixed up when loaded at runtime
+        vertexPointerBufferIndex = vertexPointerBuffer.writeInt32BE(displayListIndex, vertexPointerBufferIndex);
+
+        // writes the relative offset into the vertex buffer for this slice.  At runtime the base address of the primitive's vertex buffer will be added to this value
+        DisplayList.gSPVertex(gfx, vertexBufferOffset, slice.vertices.length, 0)
+        gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
+
+        for (const line of slice.elements) {
+            DisplayList.gSPLine3D(gfx, line[0], line[1], 0);
             gfx.copy(displayListBuffer, displayListIndex++ * SizeOfGfx);
         }
 
@@ -365,7 +406,8 @@ function write(model, outputDir, archive) {
 
         // generate the display list for rendering the primitive geometry
         const vertexBuffer = createVertexBuffer(slices, primitive.hasNormals);
-        const {displayList, vertexPointers} = createDisplayListBuffer(slices);
+        const {displayList, vertexPointers} = primitive.elementType === N64Mesh.ElementType.Triangles ?
+            createTriangleDisplayListBuffer(slices) : createLineDisplayListBuffer(slices);
 
         // update the mesh info totals
         meshInfo.vertexCount += vertexBuffer.length / SizeOfVtx;

@@ -3,10 +3,19 @@ const fs = require("fs")
 const G_VTX = 0x01;
 const G_TRI1 = 0x05;
 const G_TRI2 = 0x06;
+const G_LINE3D = 0x08;
 const G_ENDDL = 0xdf;
 
 function _SHIFTL(v, s, w) {
     return ((((v) & ((0x01 << (w)) - 1)) << (s)));
+}
+
+function __gsSPLine3D_w1(v0, v1, wd) {
+    return (_SHIFTL((v0)*2,16,8)|_SHIFTL((v1)*2,8,8)|_SHIFTL((wd),0,8));
+}
+
+function __gsSPLine3D_w1f(v0, v1, wd, flag) {
+    return (flag === 0) ? __gsSPLine3D_w1(v0, v1, wd) : __gsSPLine3D_w1(v1, v0, wd);
 }
 
 function __gsSP1Triangle_w1(v0, v1, v2) {
@@ -32,6 +41,11 @@ function gSP1Triangle(gfx, v0, v1, v2, flag) {
 function gSP2Triangles(gfx, v00, v01, v02, flag0, v10, v11, v12, flag1) {
     gfx.writeUInt32BE(_SHIFTL(G_TRI2, 24, 8)| __gsSP1Triangle_w1f(v00, v01, v02, flag0), 0);
     gfx.writeUInt32BE(__gsSP1Triangle_w1f(v10, v11, v12, flag1), 4);
+}
+
+function gSPLine3D(gfx, v0, v1, flag) {
+    gfx.writeUInt32BE(_SHIFTL(G_LINE3D, 24, 8)|__gsSPLine3D_w1f(v0, v1, 0, flag), 0);
+    gfx.writeUInt32BE(0, 4);
 }
 
 const UlongMax = BigInt(0xFFFFFFFF);
@@ -60,5 +74,6 @@ module.exports = {
     gSPVertex: gSPVertex,
     gSP1Triangle: gSP1Triangle,
     gSP2Triangles: gSP2Triangles,
+    gSPLine3D: gSPLine3D,
     gSPEndDisplayList: gSPEndDisplayList
 };
