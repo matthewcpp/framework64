@@ -60,12 +60,26 @@
             "bakeTransform": true
         },
         {
-            "src": "blue_cube/blue_cube.gltf"
+            "src": "blue_cube/blue_cube.gltf",
+            "archive": true
         },
         {
-            "src": "blue_cube/blue_cube.gltf",
-            "createWireframe": true,
-            "wireColor": "0,0,0"
+            "src": "blue_cube/blue_cube_wire.gltf",
+            "archive": true
+        },
+        {
+            "src": "suzanne/suzanne.gltf",
+            "archive": true
+        },
+        {
+            "src": "penguin/penguin.gltf",
+            "bakeTransform": true,
+            "archive": true
+        },
+        {
+            "src": "n64_logo_model/n64_logo.gltf",
+            "bakeTransform": true,
+            "archive": true
         }
     ],
     "fonts": [
