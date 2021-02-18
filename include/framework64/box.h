@@ -13,4 +13,6 @@ void box_invalidate(Box* box);
 void box_encapsulate_point(Box* box, Vec3* pt);
 void box_encapsulate_box(Box* box, Box* to_encapsulate);
 
+void matrix_transform_box(float* matrix, Box* box, Box* out);
+
 #endif

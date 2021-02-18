@@ -183,11 +183,11 @@ static void renderer_pop_transform(Renderer* renderer) {
 }
 
 void renderer_entity_start(Renderer* renderer, Entity* entity){
-    renderer_set_transform(renderer, &entity->transform, &entity->dl_matrix);
+    //renderer_set_transform(renderer, &entity->transform, &entity->dl_matrix);
 }
 
 void renderer_entity_end(Renderer* renderer) {
-    renderer_pop_transform(renderer);
+    //renderer_pop_transform(renderer);
 }
 
 void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size) {
@@ -347,7 +347,9 @@ void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad) {
     renderer_pop_transform(renderer);
 }
 
-void renderer_draw_static_mesh(Renderer* renderer, Mesh* mesh) {
+void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* mesh) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         Primitive* primitive = mesh->primitives + i;
         
@@ -365,4 +367,6 @@ void renderer_draw_static_mesh(Renderer* renderer, Mesh* mesh) {
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
         gDPPipeSync(renderer->display_list++);
     }
+
+    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }

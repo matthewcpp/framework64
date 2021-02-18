@@ -1,6 +1,7 @@
 #include "framework64/box.h"
 
 #include <float.h>
+#include <string.h>
 
 void box_center(Box* box, Vec3* out) {
     vec3_add(out, &box->min, &box->max);
@@ -36,4 +37,32 @@ void box_encapsulate_point(Box* box, Vec3* pt) {
 void box_encapsulate_box(Box* box, Box* to_encapsulate) {
     box_encapsulate_point(box, &to_encapsulate->min);
     box_encapsulate_point(box, &to_encapsulate->max);
+}
+
+// Based on code from: https://github.com/erich666/GraphicsGems/blob/master/gems/TransBox.c
+void matrix_transform_box(float* matrix, Box* box, Box* out) {
+    float* box_min = &box->min.x;
+    float* box_max = &box->max.x;
+
+    float* out_min = &out->min.x;
+    float* out_max = &out->max.x;
+
+    /* Take care of translation by beginning at T. */
+    memcpy(&out->min, matrix + 12, 3 * sizeof(float));
+    memcpy(&out->max, matrix + 12, 3 * sizeof(float));
+    
+    /* Now find the extreme points by considering the product of the min and max with each component of M.  */
+        for(int i = 0; i < 3; i++ ) {
+            for (int j = 0; j < 3; j++) {
+                float a = (matrix[i * 4 + j] * box_min[j]);
+                float b = (matrix[i * 4 + j] * box_max[j]);
+                if (a < b) {
+                    out_min[i] += a;
+                    out_max[i] += b;
+                } else {
+                    out_min[i] += b;
+                    out_max[i] += a;
+                }
+            }
+        }
 }

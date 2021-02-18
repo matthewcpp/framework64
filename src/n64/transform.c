@@ -5,6 +5,7 @@ void transform_init(Transform* transform) {
     vec3_zero(&transform->position);
     quat_ident(&transform->rotation);
     vec3_one(&transform->scale);
+    guMtxIdent(&transform->matrix);
 }
 
 void transform_forward(Transform* transform, Vec3* out) {
@@ -43,4 +44,11 @@ void transform_look_at(Transform* transform, Vec3* target, Vec3* up) {
 
     matrix_get_rotation(matrix, &transform->rotation);
     quat_normalize( &transform->rotation);
+}
+
+void transform_update_matrix(Transform* transform) {
+    float fmatrix[16];
+    matrix_from_trs(fmatrix, &transform->position, &transform->rotation, &transform->scale);
+
+    guMtxF2L((float (*)[4])fmatrix, &transform->matrix);
 }
