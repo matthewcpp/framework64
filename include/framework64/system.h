@@ -1,6 +1,7 @@
 #ifndef FW64_SYSTEM_H
 #define FW64_SYSTEM_H
 
+#include "framework64/asset.h"
 #include "framework64/input.h"
 #include "framework64/renderer.h"
 #include "framework64/time.h"
@@ -14,6 +15,7 @@ typedef struct {
     Input* input;
     Renderer* renderer;
     Time* time;
+    Assets* assets;
 } System;
 
 int fw64_system_init(System* system);
