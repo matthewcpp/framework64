@@ -18,7 +18,7 @@ typedef struct {
     Assets* assets;
 } System;
 
-int fw64_system_init(System* system);
-void fw64_sytem_update(System* system);
+int system_init(System* system);
+void system_update(System* system);
 
 #endif
