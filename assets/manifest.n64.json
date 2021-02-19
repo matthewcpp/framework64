@@ -49,8 +49,10 @@
     ],
     "models": [
         {
-            "src": "n64_logo_model/n64_logo.gltf",
-            "bakeTransform": true
+            "src": "blue_cube/blue_cube.gltf"
+        },
+        {
+            "src": "blue_cube/blue_cube_wire.gltf"
         },
         {
             "src": "suzanne/suzanne.gltf"
@@ -60,12 +62,8 @@
             "bakeTransform": true
         },
         {
-            "src": "blue_cube/blue_cube.gltf"
-        },
-        {
-            "src": "blue_cube/blue_cube.gltf",
-            "createWireframe": true,
-            "wireColor": "0,0,0"
+            "src": "n64_logo_model/n64_logo.gltf",
+            "bakeTransform": true
         }
     ],
     "fonts": [

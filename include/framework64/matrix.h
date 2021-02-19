@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "quat.h"
 
+void matrix_set_identity(float* matrix);
 void matrix_from_trs(float* out, Vec3* t, Quat* r, Vec3* s);
 void matrix_target_to(float* out, Vec3* eye, Vec3* target, Vec3* up);
 void matrix_get_scaling(float* mat, Vec3* out);

@@ -7,7 +7,7 @@
 typedef struct {
     System* system;
     Camera camera;
-    Font consolas;
+    Font* consolas;
     char str_buff[32];
 } Game;
 

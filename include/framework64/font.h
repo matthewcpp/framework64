@@ -1,7 +1,7 @@
 #ifndef FW64_FONT_H
 #define FW64_FONT_H
 
-#include "framework64/sprite.h"
+#include "framework64/vec2.h"
 
 #include <stdint.h>
 

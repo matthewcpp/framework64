@@ -8,6 +8,15 @@ const glMatrix = require("gl-matrix");
 const fs = require("fs");
 const path = require("path");
 
+const GltfComponentType = {
+    Byte: 5120,
+    UnsignedByte: 5121,
+    Short: 5122,
+    UnsignedShort: 5123,
+    UnsignedInt: 5125,
+    Float: 5126
+}
+
 class GLTFLoader {
     constructor(options) {
         this.options =  {
@@ -50,13 +59,18 @@ class GLTFLoader {
         this._getTransform(gltfNode);
 
         const gltfMesh = this.gltf.meshes[gltfNode.mesh];
+        const supportedPrimitiveModes = new Set(Object.values(N64Mesh.ElementType));
 
         for (const gltfPrimitive of gltfMesh.primitives) {
             // only support triangles for now
-            if (gltfPrimitive.hasOwnProperty("mode") && gltfPrimitive.mode != 4)
-                continue;
+            const mode = gltfPrimitive.hasOwnProperty("mode") ? gltfPrimitive.mode : N64Mesh.ElementType.Triangles;
 
-            const n64Mesh = new N64Mesh();
+            if (!supportedPrimitiveModes.has(mode)) {
+                console.log(`Skipping primitive with mode: ${mode}`);
+                continue;
+            }
+
+            const n64Mesh = new N64Mesh(mode);
             this.model.meshes.push(n64Mesh);
 
             this._readPositions(gltfPrimitive, n64Mesh);
@@ -78,10 +92,6 @@ class GLTFLoader {
 
             this._readIndices(gltfPrimitive, n64Mesh);
         }
-    }
-
-    merge() {
-        this.model.mergeVertexColorMeshes();
     }
 
     _getTransform(gltfNode) {
@@ -149,18 +159,18 @@ class GLTFLoader {
         let componentSize = 0;
 
         switch (componentType) {
-            case 5120: /* byte */
-            case 5121: /* unsigned byte */
+            case GltfComponentType.Byte:
+            case GltfComponentType.UnsignedByte:
                 componentSize = 1;
                 break;
 
-            case 5122: /* short */
-            case 5123: /* unsigned short */
+            case GltfComponentType.Short:
+            case GltfComponentType.UnsignedShort:
                 componentSize = 2;
                 break;
 
-            case 5125: /* unsigned int */
-            case 5126: /* float */
+            case GltfComponentType.UnsignedInt: /* unsigned int */
+            case GltfComponentType.Float: /* float */
                 componentSize = 4;
                 break;
 
@@ -197,7 +207,7 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
-        if (accessor.componentType != 5126)
+        if (accessor.componentType !== 5126)
             throw new Error("Currently only support float for vertex colors");
 
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
@@ -213,6 +223,8 @@ class GLTFLoader {
 
             offset += byteStride;
         }
+
+        n64Mesh.hasVertexColors = true;
     }
 
     _readNormals(gltfPrimitive, n64Mesh) {
@@ -236,8 +248,6 @@ class GLTFLoader {
 
         n64Mesh.hasNormals = true;
     }
-
-
 
     _readTexCoords(gltfPrimitive, n64Mesh) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.TEXCOORD_0];
@@ -270,11 +280,15 @@ class GLTFLoader {
 
             offset += byteStride;
         }
-
-        n64Mesh.hasTexCoords = true;
     }
 
     _readMaterials() {
+        // if the file does not specify any materials use the default.
+        if (!this.gltf.hasOwnProperty("materials") || this.gltf.materials.length === 0) {
+            this.model.materials.push(new N64Material());
+            return;
+        }
+
         for (const gltfMaterial of this.gltf.materials) {
             const material = new N64Material();
 
@@ -293,11 +307,6 @@ class GLTFLoader {
 
             this.model.materials.push(material)
         }
-
-        // if the file does not specify any materials use the default.
-        if (this.model.materials.length === 0) {
-            this.model.materials.push(new N64Material());
-        }
     }
 
     async _readImages() {
@@ -308,7 +317,9 @@ class GLTFLoader {
         for (const gltfImage of this.gltf.images) {
             const imagePath = path.join(gltfDir, gltfImage.uri);
 
-            const image = new N64Image(gltfImage.uri);
+            //TODO: This should probably be more robust: e.g. image.something.ext will break asset macro name
+            const imageName = path.basename(gltfImage.uri, path.extname(gltfImage.uri));
+            const image = new N64Image(imageName);
             await image.load(imagePath);
 
             if (this.options.resizeImages.hasOwnProperty(gltfImage.uri)) {
@@ -321,38 +332,30 @@ class GLTFLoader {
         }
     }
 
-    _readUShortTriangleList(buffer, byteOffset, count, mesh) {
+    static _readElementList(buffer, byteOffset, count, size, componentType, mesh) {
         let offset = byteOffset;
+        let element = [];
 
-        for (let i = 0; i < count; i+=3) {
-            const p0 = buffer.readUInt16LE(offset);
-            offset += 2;
+        for (let i = 0; i < count; i++) {
+            if (i > 0 && (i % size === 0)) {
+                mesh.elements.push(element);
+                element = [];
+            }
 
-            const p1 = buffer.readUInt16LE(offset);
-            offset += 2;
+            switch (componentType) {
+                case GltfComponentType.UnsignedShort:
+                    element.push(buffer.readUInt16LE(offset));
+                    offset += 2;
+                    break;
 
-            const p2 = buffer.readUInt16LE(offset);
-            offset += 2;
-
-            mesh.triangles.push([p0, p1, p2]);
+                case GltfComponentType.UnsignedInt:
+                    element.push(buffer.readUInt32LE(offset));
+                    offset += 4;
+                    break;
+            }
         }
-    }
 
-    _readUIntTriangleList(buffer, byteOffset, count, mesh) {
-        let offset = byteOffset;
-
-        for (let i = 0; i < count; i+=3) {
-            const p0 = buffer.readUInt32LE(offset);
-            offset += 4;
-
-            const p1 = buffer.readUInt32LE(offset);
-            offset += 4;
-
-            const p2 = buffer.readUInt32LE(offset);
-            offset += 4;
-
-            mesh.triangles.push([p0, p1, p2]);
-        }
+        mesh.elements.push(element);
     }
 
     _readIndices(gltfPrimitive, n64Mesh) {
@@ -360,17 +363,9 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
-        switch (accessor.componentType) {
-            case 5123:
-                this._readUShortTriangleList(buffer, bufferView.byteOffset, accessor.count, n64Mesh);
-                break;
-            case 5125:
-                this._readUIntTriangleList(buffer, bufferView.byteOffset, accessor.count, n64Mesh);
-                break;
+        const elementSize = n64Mesh.elementType === N64Mesh.ElementType.Triangles ? 3 : 2;
 
-            default:
-                throw new Error(`Unknown Component Type: ${accessor.componentType}`);
-        }
+        GLTFLoader._readElementList(buffer, bufferView.byteOffset, accessor.count, elementSize, accessor.componentType, n64Mesh);
     }
 
 }

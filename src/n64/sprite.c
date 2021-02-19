@@ -18,7 +18,7 @@ int sprite_load(int assetIndex, ImageSprite* sprite) {
     if (handle < 0)
         return 0;
 
-
+    
     int bytes_read = filesystem_read(sprite, sizeof(uint16_t), 4, handle);
     if (bytes_read != 8) {
         filesystem_close(handle);
@@ -34,6 +34,6 @@ int sprite_load(int assetIndex, ImageSprite* sprite) {
     return bytes_read == data_size;
 }
 
-void image_sprite_uninit(ImageSprite* sprite) {
+void sprite_uninit(ImageSprite* sprite) {
     free(sprite->data);
 }

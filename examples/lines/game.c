@@ -1,4 +1,5 @@
 #include "game.h"
+#include "assets.h"
 
 #define ROTATION_SPEED 90.0f
 
@@ -14,11 +15,8 @@ void game_init(Game* game, System* system) {
 
     game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 
-    entity_init(&game->solid_cube);
-    entity_init(&game->wire_cube);
-
-    Color clear_color = {255,255,255};
-    renderer_set_clear_color(system->renderer, &clear_color);
+    entity_init(&game->solid_cube, assets_get_mesh(system->assets, ASSET_mesh_blue_cube));
+    entity_init(&game->wire_cube, assets_get_mesh(system->assets, ASSET_mesh_blue_cube_wire));
 
     game->rotation = 0.0f;
 }
@@ -27,7 +25,10 @@ void game_update(Game* game, float time_delta){
     game->rotation += time_delta * ROTATION_SPEED;
 
     quat_from_euler(&game->solid_cube.transform.rotation, 0, game->rotation, 0.0f);
+    entity_refresh(&game->solid_cube);
+
     quat_from_euler(&game->wire_cube.transform.rotation, 0, game->rotation, 0.0f);
+    entity_refresh(&game->wire_cube);
 
     if (input_button_pressed(game->system->input, 0, L_CBUTTONS))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME;
@@ -39,23 +40,23 @@ void game_update(Game* game, float time_delta){
 
 static void line_example_draw_wireframe(Game* game) {
     renderer_begin(game->system->renderer, &game->camera, RENDERER_MODE_LINES,  RENDERER_FLAG_CLEAR);
-    wire_object_draw(&game->solid_cube, game->system->renderer);
+    renderer_draw_static_mesh(game->system->renderer, &game->wire_cube.transform, game->wire_cube.mesh);
     renderer_end(game->system->renderer, RENDERER_FLAG_SWAP);
 }
 
 static void line_example_draw_solid(Game* game) {
     renderer_begin(game->system->renderer, &game->camera, RENDERER_MODE_TRIANGLES,  RENDERER_FLAG_CLEAR);
-    solid_object_draw(&game->wire_cube, game->system->renderer);
+    renderer_draw_static_mesh(game->system->renderer, &game->solid_cube.transform, game->solid_cube.mesh);
     renderer_end(game->system->renderer, RENDERER_FLAG_SWAP);
 }
 
 static void line_example_draw_wireframe_on_shaded(Game* game) {
     renderer_begin(game->system->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    solid_object_draw(&game->solid_cube, game->system->renderer);
+    renderer_draw_static_mesh(game->system->renderer, &game->solid_cube.transform, game->solid_cube.mesh);
     renderer_end(game->system->renderer, RENDERER_FLAG_NOSWAP);
 
     renderer_begin(game->system->renderer, &game->camera, RENDERER_MODE_LINES, RENDERER_FLAG_NOCLEAR);
-    wire_object_draw(&game->wire_cube, game->system->renderer);
+    renderer_draw_static_mesh(game->system->renderer, &game->wire_cube.transform, game->wire_cube.mesh);
     renderer_end(game->system->renderer, RENDERER_FLAG_SWAP);
 }
 

@@ -5,13 +5,13 @@ class MeshSlice {
     constructor() {
         /** Maps the raw vertex index to its index within this slice */
         this.vertexIndices = new Map();
-        this.triangles = [];
+        this.elements = [];
     }
 
-    _getNeededVertices(triangle) {
+    _getNeededVertices(element) {
         const neededVertices = [];
 
-        for (const index of triangle) {
+        for (const index of element) {
             if (!this.vertexIndices.has(index))
                 neededVertices.push(index);
         }
@@ -19,14 +19,14 @@ class MeshSlice {
         return neededVertices;
     }
 
-    addTriangle(triangle) {
-        const neededVertices = this._getNeededVertices(triangle);
+    addElement(element) {
+        const neededVertices = this._getNeededVertices(element);
 
         if (neededVertices.length <= N64Defs.vertexSliceSize - this.vertexIndices.size) {
             for (const index of neededVertices)
                 this.vertexIndices.set(index, this.vertexIndices.size);
 
-            this.triangles.push(triangle);
+            this.elements.push(element);
 
             return true;
         }
@@ -37,18 +37,28 @@ class MeshSlice {
 }
 
 class N64Mesh {
+    static ElementType = {
+        Lines: 1,
+        Triangles: 4
+    };
+
     vertices = [];
-    triangles = [];
+    elements = [];
+    elementType;
     texture = null;
-    material = null;
+    material = 0;
     hasNormals = false;
-    hasTexCoords = false;
+    hasVertexColors = false;
 
     bounding = new Bounding();
 
+    constructor(elementType) {
+        this.elementType = elementType;
+    }
+
     _addTriangleToSlice(triangle, slices) {
         for (const slice of slices) {
-            if (slice.addTriangle(triangle))
+            if (slice.addElement(triangle))
                 return true;
         }
 
@@ -59,12 +69,12 @@ class N64Mesh {
         const slices = [new MeshSlice()];
 
         // parition all triangles and their vertices into slices
-        for (const triangle of this.triangles) {
-            if (this._addTriangleToSlice(triangle, slices))
+        for (const element of this.elements) {
+            if (this._addTriangleToSlice(element, slices))
                 continue; // triangle fit in existing slice
 
             const slice = new MeshSlice();
-            slice.addTriangle(triangle);
+            slice.addElement(element);
             slices.push(slice);
         }
 
@@ -83,14 +93,12 @@ class N64Mesh {
             });
 
             // build updated triangle list by mapping the original vertex index to its index in this slice.
-            const triangleList = []
-            for (const triangle of slice.triangles) {
-                triangleList.push([
-                    slice.vertexIndices.get(triangle[0]), slice.vertexIndices.get(triangle[1]), slice.vertexIndices.get(triangle[2])
-                ])
+            const elementList = []
+            for (const triangle of slice.elements) {
+                elementList.push(triangle.map((val) => slice.vertexIndices.get(val)));
             }
 
-            processed.push({vertices: vertexList, triangles: triangleList})
+            processed.push({vertices: vertexList, elements: elementList})
         }
 
         return processed;
@@ -99,7 +107,7 @@ class N64Mesh {
     slice() {
         // if the mesh is small, then there is only one slice
         if (this.vertices.length <= N64Defs.vertexSliceSize) {
-            return [{vertices: this.vertices, triangles: this.triangles}]
+            return [{vertices: this.vertices, elements: this.elements}]
         }
         else {
             return this._processSlices(this._partitionVertices());

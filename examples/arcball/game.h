@@ -3,10 +3,8 @@
 
 #include "arcball_camera.h"
 #include "framework64/camera.h"
-#include "framework64/font.h"
+#include "framework64/entity.h"
 #include "framework64/system.h"
-
-#include "models.h"
 
 #define ENTITY_COUNT 3
 
@@ -16,15 +14,12 @@ typedef struct {
     Camera camera;
     ArcballCamera arcball;
 
-    Penguin penguin;
-    Suzanne suzanne;
-    N64Logo n64logo;
+    Font* consolas;
+    ImageSprite* button_sprite;
 
-    Font consolas;
-    ImageSprite button_sprite;
-
-    Entity* entities[ENTITY_COUNT];
+    Entity entity;
     int current_entity;
+    uint32_t mesh_assets[ENTITY_COUNT];
 
     int switch_model_text_width;
 } Game;
