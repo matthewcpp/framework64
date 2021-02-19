@@ -4,7 +4,7 @@
 
 #include <malloc.h>
 
-int n64_logo_sprite_init(N64LogoSprite* logo_sprite, ImageSprite* image) {
+void n64_logo_sprite_init(N64LogoSprite* logo_sprite, ImageSprite* image) {
     logo_sprite->sprite = image;
     logo_sprite->position.x = 0;
     logo_sprite->position.y = 0;
@@ -16,7 +16,7 @@ void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, Renderer* renderer){
 
 #define FRAME_DUR 1.0f / 10.0f
 
-int ken_sprite_init(KenSprite* ken, ImageSprite* image) {
+void ken_sprite_init(KenSprite* ken, ImageSprite* image) {
     ken->sprite = image;
     ken->position.x = 0;
     ken->position.y = 0;

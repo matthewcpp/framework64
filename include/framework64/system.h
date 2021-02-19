@@ -19,6 +19,6 @@ typedef struct {
 } System;
 
 int fw64_system_init(System* system);
-int fw64_sytem_update(System* system);
+void fw64_sytem_update(System* system);
 
 #endif

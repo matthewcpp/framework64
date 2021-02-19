@@ -9,7 +9,7 @@ typedef struct {
     IVec2 position;
 } N64LogoSprite;
 
-int n64_logo_sprite_init(N64LogoSprite* logo_sprite, ImageSprite* image);
+void n64_logo_sprite_init(N64LogoSprite* logo_sprite, ImageSprite* image);
 void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, Renderer* renderer);
 
 typedef struct {
@@ -20,7 +20,7 @@ typedef struct {
     float frame_speed;
 } KenSprite;
 
-int ken_sprite_init(KenSprite* ken, ImageSprite* image);
+void ken_sprite_init(KenSprite* ken, ImageSprite* image);
 void ken_sprite_update(KenSprite* ken, float time_delta);
 void ken_sprite_draw(KenSprite* ken, Renderer* renderer);
 

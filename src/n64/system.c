@@ -33,7 +33,7 @@ int fw64_system_init(System* system) {
     return 1;
 }
 
-int fw64_sytem_update(System* system) {
+void fw64_sytem_update(System* system) {
     time_update(system->time);
     input_update(system->input);
 }

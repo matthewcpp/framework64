@@ -19,12 +19,16 @@ void renderer_init(Renderer* renderer, int screen_width, int screen_height) {
       The viewport structure 
       The conversion from (-1,-1,-1)-(1,1,1).  The decimal part of 2-bit.
     */
-    Vp view_port = {
-      screen_width*2, screen_height*2, G_MAXZ/2, 0,	/* The scale factor  */
-      screen_width*2, screen_height*2, G_MAXZ/2, 0,	/* Move  */
-    };
+    renderer->view_port.vp.vscale[0] = screen_width * 2;
+    renderer->view_port.vp.vscale[1] = screen_height * 2;
+    renderer->view_port.vp.vscale[2] = G_MAXZ / 2;
+    renderer->view_port.vp.vscale[3] = 0;
 
-    renderer->view_port = view_port;
+    renderer->view_port.vp.vtrans[0] = screen_width * 2;
+    renderer->view_port.vp.vtrans[1] = screen_height * 2;
+    renderer->view_port.vp.vtrans[2] = G_MAXZ / 2;
+    renderer->view_port.vp.vtrans[3] = 0;
+
     renderer->render_mode = RENDERER_MODE_UNSET;
     renderer->shading_mode = SHADING_MODE_UNSET;
 }
@@ -101,6 +105,8 @@ void renderer_begin(Renderer* renderer, Camera* camera, RenderMode render_mode, 
     }
 
     switch (renderer->render_mode) {
+        case RENDERER_MODE_UNSET:
+            break;
         case RENDERER_MODE_TRIANGLES:
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
         break;
