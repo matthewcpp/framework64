@@ -5,22 +5,22 @@
 #include "framework64/sprite.h"
 
 typedef struct {
-    ImageSprite sprite;
+    ImageSprite* sprite;
     IVec2 position;
 } N64LogoSprite;
 
-int n64_logo_sprite_init(N64LogoSprite* logo_sprite);
+int n64_logo_sprite_init(N64LogoSprite* logo_sprite, ImageSprite* image);
 void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, Renderer* renderer);
 
 typedef struct {
-    ImageSprite sprite;
+    ImageSprite* sprite;
     IVec2 position;
     int frame_index;
     float frame_time;
     float frame_speed;
 } KenSprite;
 
-int ken_sprite_init(KenSprite* ken);
+int ken_sprite_init(KenSprite* ken, ImageSprite* image);
 void ken_sprite_update(KenSprite* ken, float time_delta);
 void ken_sprite_draw(KenSprite* ken, Renderer* renderer);
 

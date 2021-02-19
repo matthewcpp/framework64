@@ -3,7 +3,6 @@
 
 #include "framework64/camera.h"
 #include "framework64/entity.h"
-#include "framework64/font.h"
 #include "framework64/system.h"
 
 #include "object.h"
