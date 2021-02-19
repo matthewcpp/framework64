@@ -8,10 +8,7 @@ async function gltfConvert(gltfPath, outputFolder, params, archive) {
     const gltfLoader = new GLTFLoader(params);
     await gltfLoader.load(gltfPath);
 
-    if (params.archive)
-        N64ModelWriter.write(gltfLoader.model, outputFolder, archive);
-    else
-        N64ModelWriter.writeHeader(gltfLoader.model, outputFolder);
+    N64ModelWriter.write(gltfLoader.model, outputFolder, archive);
 }
 
 async function main() {
