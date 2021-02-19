@@ -6,16 +6,34 @@ const Archive = require("./asset_pipeline/Archive");
 const fs = require("fs");
 const path = require("path");
 const rimraf = require("rimraf");
+const { program } = require('commander');
 
 async function main() {
-    const manifestFile = path.resolve(__dirname, "..", "assets", "manifest.n64.json");
+    program.version("0.1.0");
+    program.requiredOption("-m, --manifest <path>", "asset manifest file");
+    program.requiredOption("-o, --out-dir <dir>", "output directory");
+    program.option("-f, --force", "force asset creation in existing directory")
+
+    program.parse(process.argv);
+
+    const manifestFile = program.manifest;
     const manifestDirectory = path.dirname(manifestFile);
+
+    if (!fs.existsSync(manifestFile)) {
+        console.log(`manifest file: ${manifestFile} does not exist.`);
+        process.exit(1);
+    }
 
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
 
-    const outputDirectory = path.resolve(path.dirname(manifestFile), manifest.outDir);
+    const outputDirectory = program.outDir;
 
     if (fs.existsSync(outputDirectory)) {
+        if (!program.force) {
+            console.log(`specify -f or --force to build assets into existing directory.`);
+            process.exit(1);
+        }
+
         rimraf.sync(outputDirectory);
     }
 

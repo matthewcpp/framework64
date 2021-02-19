@@ -14,7 +14,7 @@ async function gltfConvert(gltfPath, outputFolder, params, archive) {
 async function main() {
     const { program } = require('commander');
 
-    program.version("0.0.1");
+    program.version("0.1.0");
     program.requiredOption("-f, --file <path>", "input file");
     program.requiredOption("-o, --out-dir <dir>", "output directory");
 

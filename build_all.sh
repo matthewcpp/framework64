@@ -2,9 +2,6 @@
 
 ROOT=/etc/n64
 
-npm install
-node tools/prepare_assets.js
-
 examples=( "arcball" "billboard" "data" "lines" "minimal" "sprites")
 
 for i in "${examples[@]}"
