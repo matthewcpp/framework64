@@ -1,6 +1,7 @@
 const gltfConvert = require("./asset_pipeline/GLTFConvert");
 const imageConvert = require("./asset_pipeline/ImageConvert");
 const FontConvert = require("./asset_pipeline/FontConvert");
+const AudioConvert = require("./asset_pipeline/AudioConvert");
 const Archive = require("./asset_pipeline/Archive");
 
 const fs = require("fs");
@@ -68,6 +69,18 @@ async function main() {
         for (const font of manifest.fonts) {
             const sourceFile = path.join(manifestDirectory, font.src);
             await FontConvert.convertFont(sourceFile, outputDirectory, font, archive);
+        }
+    }
+
+    if (manifest.soundBanks) {
+        for (const soundBank of manifest.soundBanks) {
+            if (!soundBank.hasOwnProperty("name")) {
+                console.log("Sound bank element must have a `name` property");
+                process.exit(1);
+            }
+
+            const paths = soundBank.files.map((file) => path.join(manifestDirectory, file));
+            await AudioConvert.convertSoundBank(paths, soundBank.name, outputDirectory, archive);
         }
     }
 
