@@ -16,7 +16,7 @@ LCDEFS =	-DNU_DEBUG -DF3DEX_GBI_2 -DPLATFORM_N64
 LDIRT  =	$(APP) $(TARGETS)
 LCINCS =	-I../../include -I. -I../../assets/build_n64 -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR -I/usr/include/n64/nustd
 LCOPTS =	-G 0 -Werror -Wall
-LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnusys_d -lultra_d -L$(N64_LIBGCCDIR) -lgcc  -lnustd
+LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n -ln_audio -lnusys_d -lultra_d -L$(N64_LIBGCCDIR) -lgcc  -lnustd
 
 OPTIMIZER =	-g
 

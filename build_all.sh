@@ -2,7 +2,7 @@
 
 ROOT=/etc/n64
 
-examples=( "arcball" "billboard" "data" "lines" "minimal" "sprites")
+examples=( "arcball" "audio" "billboard" "data" "lines" "minimal" "sprites")
 
 for i in "${examples[@]}"
 do
