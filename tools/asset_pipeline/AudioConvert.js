@@ -9,8 +9,21 @@ async function convertSoundBank(files, name, outputDir, archive) {
     soundBank.load(files);
     await N64AudioWriter.writeSoundBank(soundBank);
 
-    fs.copyFileSync(soundBank.tblFilePath, path.join(outputDir, soundBank.tblFileName));
-    fs.copyFileSync(soundBank.ctlFilePath, path.join(outputDir, soundBank.ctlFileName));
+    const ctrlFileStats = fs.statSync(soundBank.ctlFilePath);
+
+    const soundBankBuffer = Buffer.alloc(8);
+    soundBankBuffer.writeUInt32BE(soundBank.fileCount, 0);
+    soundBankBuffer.writeUInt32BE(ctrlFileStats.size, 4);
+
+    const soundBankPath = path.join(outputDir, `${soundBank.name}.soundbank`);
+
+    const soundBankFile = fs.openSync(soundBankPath, "w");
+    fs.writeSync(soundBankFile, soundBankBuffer);
+    fs.writeSync(soundBankFile, fs.readFileSync(soundBank.ctlFilePath));
+    fs.writeSync(soundBankFile, fs.readFileSync(soundBank.tblFilePath));
+    fs.closeSync(soundBankFile);
+
+    archive.add(soundBankPath, "soundbank");
 
     soundBank.cleanup();
 }

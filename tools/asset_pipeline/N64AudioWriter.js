@@ -75,9 +75,12 @@ function writeInstrumentFile(soundBank) {
 }
 
 async function runDocker(soundBank) {
-    const { stdout } = await exec(`docker run --rm -v ${soundBank.directory}:/workspace -u $(id -u):$(id -g) ${DockerContainer} sh /make_sound_effect_bank.sh`);
-    console.log(stdout);
+    const dockerCommand = process.platform === "win32" ?
+        `docker run --rm -v ${soundBank.directory}:/workspace ${DockerContainer} sh /make_sound_effect_bank.sh` :
+        `docker run --rm -v ${soundBank.directory}:/workspace -u $(id -u):$(id -g) ${DockerContainer} sh /make_sound_effect_bank.sh`;
 
+    const { stdout, stderr } = await exec(dockerCommand);
+    //console.log(stderr);
 }
 
 async function writeSoundBank(soundBank) {
