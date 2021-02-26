@@ -114,3 +114,7 @@ int filesystem_close(int handle) {
 
     return 1;
 }
+
+uint32_t n64_filesystem_get_rom_address(int asset_index) {
+    return (u32)(&_asset_dataSegmentRomStart[0]) + asset_offsets[asset_index] + ASSET_HEADER_SIZE;
+}

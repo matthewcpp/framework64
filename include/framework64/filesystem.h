@@ -11,5 +11,6 @@ int filesystem_open(int index);
 int filesystem_size(int handle);
 int filesystem_read(void* buffer, int size, int count, int handle);
 int filesystem_close(int handle);
+uint32_t n64_filesystem_get_rom_address(int index);
 
 #endif

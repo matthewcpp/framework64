@@ -2,6 +2,7 @@
 #define FW64_SYSTEM_H
 
 #include "framework64/asset.h"
+#include "framework64/audio.h"
 #include "framework64/input.h"
 #include "framework64/renderer.h"
 #include "framework64/time.h"
@@ -12,6 +13,7 @@
 #define FW64_N64_HEAP_SIZE 1024*512
 
 typedef struct {
+    Audio* audio;
     Input* input;
     Renderer* renderer;
     Time* time;

@@ -20,9 +20,9 @@ LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n -ln_audio -lnusys_d 
 
 OPTIMIZER =	-g
 
-APP =		arcball_example.out
+APP =		audio_example.out
 
-TARGETS =	arcball_example.n64
+TARGETS =	audio_example.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ./*.h)
 
