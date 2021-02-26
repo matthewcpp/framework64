@@ -8,7 +8,7 @@
 #include "color.h"
 #include "entity.h"
 #include "mesh.h"
-#include "Rect.h"
+#include "rect.h"
 #include "sprite.h"
 #include "vec2.h"
 #include "font.h"
