@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "fps_camera.h"
+#include "framework64/util/fps_camera.h"
 
 #include "framework64/billboard.h"
 #include "framework64/entity.h"

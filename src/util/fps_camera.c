@@ -1,4 +1,4 @@
-#include "fps_camera.h"
+#include "framework64/util/fps_camera.h"
 
 void fps_camera_init(FpsCamera* fps, Input* input){
     fps->input = input;
