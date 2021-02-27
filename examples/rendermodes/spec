@@ -40,7 +40,7 @@ beginseg
 endseg
 
 beginwave
-	name	"arcball_example"
+	name	"rendermodes_example"
 	include	"code"
 	include "asset_data"
 endwave
