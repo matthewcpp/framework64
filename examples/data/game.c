@@ -6,8 +6,6 @@
 
 #include <string.h>
 
-
-
 void game_init(Game* game, System* system) {
     game->system = system;
     camera_init(&game->camera);

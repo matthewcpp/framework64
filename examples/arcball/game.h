@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "arcball_camera.h"
+#include "framework64/util/arcball_camera.h"
 #include "framework64/camera.h"
 #include "framework64/entity.h"
 #include "framework64/system.h"
@@ -10,8 +10,6 @@
 
 typedef struct {
     System* system;
-
-    Camera camera;
     ArcballCamera arcball;
 
     Font* consolas;

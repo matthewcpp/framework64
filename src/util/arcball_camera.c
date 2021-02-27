@@ -1,4 +1,4 @@
-#include "arcball_camera.h"
+#include "framework64/util/arcball_camera.h"
 
 #include <malloc.h>
 
@@ -12,9 +12,10 @@ static void _arcball_reset(ArcballCamera* arcball) {
     arcball->_distance = arcball->_diagonal * 2.0f;
 }
 
-void arcball_init(ArcballCamera* arcball, Camera* camera, Input* input) {
-    arcball->_camera = camera;
+void arcball_init(ArcballCamera* arcball, Input* input) {
     arcball->_input = input;
+
+    camera_init(&arcball->camera);
 
     arcball->_diagonal = 1.0f;
     _arcball_reset(arcball);
@@ -39,10 +40,10 @@ void _arcball_update_camera_position(ArcballCamera* arcball) {
     vec3_normalize(&orbit_pos);
     vec3_scale(&orbit_pos, &orbit_pos, arcball->_distance);
 
-    vec3_add(&arcball->_camera->transform.position, &arcball->_target, &orbit_pos);
+    vec3_add(&arcball->camera.transform.position, &arcball->_target, &orbit_pos);
 
-    transform_look_at(&arcball->_camera->transform, &arcball->_target, &up);
-    camera_update_view_matrix(arcball->_camera);
+    transform_look_at(&arcball->camera.transform, &arcball->_target, &up);
+    camera_update_view_matrix(&arcball->camera);
 }
 
 void arcball_set_initial(ArcballCamera* arcball, Box* box) {

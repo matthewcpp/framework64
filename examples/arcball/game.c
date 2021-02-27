@@ -20,8 +20,7 @@
 void game_init(Game* game, System* system) {
     game->system = system;
 
-    camera_init(&game->camera);
-    arcball_init(&game->arcball, &game->camera, system->input);
+    arcball_init(&game->arcball, system->input);
 
     game->current_entity = 0;
     game->mesh_assets[0] = ASSET_mesh_n64_logo;
@@ -31,9 +30,9 @@ void game_init(Game* game, System* system) {
     entity_init(&game->entity, assets_get_mesh(system->assets, game->mesh_assets[game->current_entity]));
     arcball_set_initial(&game->arcball, &game->entity.bounding);
 
-    game->camera.near = 4.0f;
-    game->camera.far = 1000.0f;
-    camera_update_projection_matrix(&game->camera);
+    game->arcball.camera.near = 4.0f;
+    game->arcball.camera.far = 1000.0f;
+    camera_update_projection_matrix(&game->arcball.camera);
 
     Color fill_color = {255, 0, 0};
     renderer_set_fill_color(system->renderer, &fill_color);
@@ -70,7 +69,7 @@ void game_update(Game* game, float time_delta) {
 
 void game_draw(Game* game) {
     Renderer* renderer = game->system->renderer;
-    renderer_begin(renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
+    renderer_begin(renderer, &game->arcball.camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
     renderer_draw_static_mesh(renderer, &game->entity.transform, game->entity.mesh);
 
     IVec2 screen_size;
