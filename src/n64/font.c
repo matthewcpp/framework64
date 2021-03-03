@@ -32,7 +32,7 @@ uint16_t font_get_glyph_index(Font* font, uint16_t codepoint) {
     return find_font_glyph_rec(font->glyphs, 0, font->glyph_count - 1, codepoint);
 }
 
-IVec2 font_measure_text(Font* font, char* str) {
+IVec2 font_measure_text(Font* font, const char* str) {
     IVec2 measurement = {0, 0};
     FontGlyph* glyph = font->glyphs + font_get_glyph_index(font, str[0]);
     measurement.x = -glyph->left;

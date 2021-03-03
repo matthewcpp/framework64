@@ -20,13 +20,13 @@ LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n -ln_audio -lnusys_d 
 
 OPTIMIZER =	-g
 
-APP =		billboard_example.out
+APP =		texparams_example.out
 
-TARGETS =	billboard_example.n64
+TARGETS =	texparams_example.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ./*.c) ../../src/util/fps_camera.c ../../src/util/quad.c
+CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ./*.c) ../../src/util/quad.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 

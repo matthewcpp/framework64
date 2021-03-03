@@ -17,18 +17,20 @@ typedef enum {
     SHADING_MODE_FILL
 } ShadingMode;
 
-#define MATERIAL_NO_TEXTURE UINT32_MAX
+#define MATERIAL_NO_TEXTURE UINT16_MAX
+#define MATERIAL_NO_COLOR UINT32_MAX
 
 typedef struct {
     uint32_t color;
-    uint32_t texture;
+    uint16_t texture;
+    uint16_t texture_frame;
     uint32_t mode;
 } Material;
 
 typedef struct {
     Box bounding_box;
-    uint32_t vertices;
-    uint32_t display_list;
+    uint32_t vertices; // offset into mesh vertex array
+    uint32_t display_list; // offset into mesh display_list array
     Material material;
 } Primitive;
 
@@ -51,7 +53,25 @@ typedef struct {
     Gfx* display_list;
 } Mesh;
 
+/**
+Loads a mesh and all dependant assets from the asset bundle.
+@param asset_index the mesh asset index.  Refer to the generated assets.h file.
+*/
 int mesh_load(int asset_index, Mesh* mesh);
+
+/**
+Unloads a mesh that was loaded with \ref mesh_load
+*/
 void mesh_unload(Mesh* mesh);
+
+/**
+Initializes a mesh for manual construction.
+*/
+void mesh_init(Mesh* mesh);
+
+/**
+Cleans up a mesh that was manually constructed after calling \ref mesh_init
+*/
+void mesh_uninit(Mesh* mesh);
 
 #endif

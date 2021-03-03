@@ -1,5 +1,5 @@
 class N64Material {
-    static NoTexture = 0xFFFFFFFF;
+    static NoTexture = 0xFFFF;
 
     constructor() {
         this.ambient = [100, 100, 100]

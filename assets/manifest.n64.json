@@ -7,6 +7,11 @@
             "vslices": 1
         },
         {
+            "src": "pyoro64.png",
+            "hslices": 1,
+            "vslices": 1
+        },
+        {
             "src": "n64_logo.png",
             "hslices": 2,
             "vslices": 2

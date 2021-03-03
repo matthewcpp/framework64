@@ -12,6 +12,10 @@ typedef struct {
     uint16_t height;
     uint16_t hslices;
     uint16_t vslices;
+    uint32_t wrap_s;
+    uint32_t wrap_t;
+    uint32_t mask_s;
+    uint32_t mask_t;
     uint8_t* data;
 } ImageSprite;
 

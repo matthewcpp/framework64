@@ -167,6 +167,7 @@ class PrimitiveInfo {
     displayList;
     materialColor;
     materialTexture;
+    materialTextureFrame;
     materialMode;
 
     get buffer() {
@@ -176,7 +177,8 @@ class PrimitiveInfo {
         index = buff.writeUInt32BE(this.vertices, index);
         index = buff.writeUInt32BE(this.displayList, index);
         index = buff.writeUInt32BE(this.materialColor, index);
-        index = buff.writeUInt32BE(this.materialTexture, index);
+        index = buff.writeUInt16BE(this.materialTexture, index);
+        index = buff.writeUInt16BE(this.materialTextureFrame, index);
         index = buff.writeUInt32BE(this.materialMode, index);
 
         return buff;
@@ -249,6 +251,7 @@ function write(model, outputDir, archive) {
         primitiveInfo.displayList = meshInfo.displayListCount;
         primitiveInfo.materialColor = primitive.material;
         primitiveInfo.materialTexture = model.materials[primitive.material].texture;
+        primitiveInfo.materialTextureFrame = 0;
         primitiveInfo.materialMode = getShadingMode(primitive, model);
 
         primitiveInfos.push(primitiveInfo);

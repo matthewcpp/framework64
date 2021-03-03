@@ -2,8 +2,8 @@
 #define GAME_H
 
 #include "framework64/util/fps_camera.h"
+#include "framework64/util/quad.h"
 
-#include "framework64/billboard.h"
 #include "framework64/entity.h"
 #include "framework64/system.h"
 
@@ -11,8 +11,8 @@ typedef struct {
     System* system;
     FpsCamera fps;
     Entity blue_cube;
-    BillboardQuad nintendo_seal_quad;
-    BillboardQuad n64_logo_quad;
+    Entity nintendo_seal;
+    Entity n64_logo;
 } Game;
 
 void game_init(Game* game, System* system);
