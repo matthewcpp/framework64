@@ -11,16 +11,17 @@ npm install
 
 Build the assets:
 ```
-node tools/prepare_assets.js --manifest assets/manifest.n64.json -out-dir assets/build_n64 -f
+node tools/prepare_assets.js --manifest assets/manifest.n64.json --out-dir assets/build_n64 -f
 ```
 
 Build the example ROM files:
 ```
-docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) matthewcpp/n64-modern-sdk /bin/bash -c "cd /src; ./build_all.sh"
+docker run --rm -v $(pwd):/workspace -u $(id -u):$(id -g) matthewcpp/n64-modern-sdk /bin/bash -c "cd /workspace; ./build_all.sh"
 ```
 
 ### Developing with Visual Studio Code
 - Ensure that you have the remote containers extension installed.
 - Copy `tools/.devcontainer.n64.json` to `.devcontainer.json`
 - Open the repo root folder in VS Code.
+- Install the C/C++ development extension into the container via the extensions panel.
 - In the terminal override the `ROOT` environment variable: `ROOT=/etc/n64`
