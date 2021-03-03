@@ -180,14 +180,6 @@ static void renderer_set_shading_mode(Renderer* renderer, ShadingMode shading_mo
     }
 }
 
-void renderer_entity_start(Renderer* renderer, Entity* entity){
-    //renderer_set_transform(renderer, &entity->transform, &entity->dl_matrix);
-}
-
-void renderer_entity_end(Renderer* renderer) {
-    //renderer_pop_transform(renderer);
-}
-
 void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size) {
     *screen_size = renderer->screen_size;
 }

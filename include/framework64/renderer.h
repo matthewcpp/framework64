@@ -56,8 +56,6 @@ void renderer_begin(Renderer* renderer, Camera* camera, RenderMode render_mode, 
 void renderer_set_clear_color(Renderer* renderer, Color* color);
 void renderer_end(Renderer* renderer, RendererFlags flags);
 
-void renderer_entity_start(Renderer* renderer, Entity* entity);
-void renderer_entity_end(Renderer* renderer);
 void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* mesh);
 
 void renderer_set_fill_color(Renderer* renderer, Color* color);

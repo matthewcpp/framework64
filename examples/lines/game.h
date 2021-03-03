@@ -5,8 +5,6 @@
 #include "framework64/entity.h"
 #include "framework64/system.h"
 
-#include "object.h"
-
 typedef enum {
     EXAMPLE_DRAW_MODE_SHADED,
     EXAMPLE_DRAW_MODE_WIREFRAME,
