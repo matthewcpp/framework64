@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "cstdlib": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "assets.h": "c"
     }
 }

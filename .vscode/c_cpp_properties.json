@@ -9,7 +9,8 @@
                 "/usr/include/n64/nustd"
             ],
             "defines": [
-                "_LANGUAGE_C"
+                "_LANGUAGE_C",
+                "PLATFORM_N64"
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
