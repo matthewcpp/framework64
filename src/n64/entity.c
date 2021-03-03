@@ -32,3 +32,12 @@ void entity_set_mesh(Entity* entity, Mesh* mesh) {
         entity->bounding.max = entity->transform.position;
     }
 }
+
+void entity_billboard(Entity* entity, Camera* camera) {
+    Vec3 camera_forward, camera_up, target;
+    transform_forward(&camera->transform, &camera_forward);
+    transform_up(&camera->transform, &camera_up);
+
+    vec3_add(&target, &entity->transform.position, &camera_forward);
+    transform_look_at(&entity->transform, &target, &camera_up);
+}
