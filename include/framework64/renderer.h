@@ -1,9 +1,6 @@
 #ifndef FW64_RENDERER_H
 #define FW64_RENDERER_H
 
-#include <nusys.h>
-
-#include "billboard.h"
 #include "camera.h"
 #include "color.h"
 #include "entity.h"
@@ -12,6 +9,8 @@
 #include "sprite.h"
 #include "vec2.h"
 #include "font.h"
+
+#include <nusys.h>
 
 /* The maximum length of the display list of one task  */
 #define GFX_GLIST_LEN     2048
@@ -59,7 +58,6 @@ void renderer_end(Renderer* renderer, RendererFlags flags);
 
 void renderer_entity_start(Renderer* renderer, Entity* entity);
 void renderer_entity_end(Renderer* renderer);
-void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad);
 void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* mesh);
 
 void renderer_set_fill_color(Renderer* renderer, Color* color);

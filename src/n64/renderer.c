@@ -180,20 +180,6 @@ static void renderer_set_shading_mode(Renderer* renderer, ShadingMode shading_mo
     }
 }
 
-float entity_matrix[4][4];
-
-static void renderer_set_transform(Renderer* renderer, Transform* transform, Mtx* dl_matrix) {
-    matrix_from_trs((float*)entity_matrix, &transform->position, &transform->rotation, &transform->scale);
-    guMtxF2L(entity_matrix, dl_matrix);
-
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(dl_matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
-}
-
-static void renderer_pop_transform(Renderer* renderer) {
-    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
-    gDPPipeSync(renderer->display_list++);
-}
-
 void renderer_entity_start(Renderer* renderer, Entity* entity){
     //renderer_set_transform(renderer, &entity->transform, &entity->dl_matrix);
 }
@@ -312,47 +298,6 @@ void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, const char
         text++;
         ch = text[0];
     }
-}
-
-void render_billboard_frame(Renderer* renderer, BillboardQuad* quad, int frame, int index) {
-    int slice_width = image_sprite_get_slice_width(quad->sprite);
-    int slice_height = image_sprite_get_slice_height(quad->sprite);
-
-    uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
-
-    gDPLoadTextureBlock(renderer->display_list++, 
-    quad->sprite->data + frame_offset,  G_IM_FMT_RGBA, G_IM_SIZ_16b,  
-    slice_width, slice_height, 
-    0, quad->sprite->wrap_s, quad->sprite->wrap_t, quad->sprite->mask_s, quad->sprite->mask_t, G_TX_NOLOD, G_TX_NOLOD);
-
-    gSP2Triangles(renderer->display_list++, 
-        index + 0, index + 1, index + 2, 0, 
-        index + 0, index + 2, index + 3, 0);
-}
-
-void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad) {
-    billboard_quad_look_at_camera(quad, renderer->camera);
-
-    renderer_set_transform(renderer, &quad->transform, &quad->dl_matrix);
-    renderer_set_shading_mode(renderer, SHADING_MODE_UNLIT_TEXTURED);
-
-        switch (quad->type) {
-        case BILLBOARD_QUAD_1X1:
-            gSPVertex(renderer->display_list++, quad->vertices, 4, 0);
-            render_billboard_frame(renderer, quad, quad->frame, 0);
-            break;
-        
-        case BILLBOARD_QUAD_2X2:
-            gSPVertex(renderer->display_list++, quad->vertices, 16, 0);
-            render_billboard_frame(renderer, quad, 0, 0);
-            render_billboard_frame(renderer, quad, 1, 4);
-            render_billboard_frame(renderer, quad, 2, 8);
-            render_billboard_frame(renderer, quad, 3, 12);
-            break;
-    }
-
-
-    renderer_pop_transform(renderer);
 }
 
 void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* mesh) {
