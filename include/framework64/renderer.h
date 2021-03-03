@@ -32,8 +32,6 @@ typedef enum {
     RENDERER_FLAG_SWAP = 2,
 } RendererFlags;
 
-
-
 typedef struct {
     // holds the current command insertion point of the display list
     Gfx* display_list;
@@ -70,7 +68,7 @@ void renderer_draw_filled_rect(Renderer* renderer, IRect* rect);
 
 void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y);
 void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int frame, int x, int y);
-void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text);
+void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, const char* text);
 
 void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size);
 

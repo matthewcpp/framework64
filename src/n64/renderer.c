@@ -148,7 +148,13 @@ static void renderer_set_shading_mode(Renderer* renderer, ShadingMode shading_mo
 
     switch(renderer->shading_mode) {
         case SHADING_MODE_UNLIT_TEXTURED:
+            gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+            gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
             break;
+
         case SHADING_MODE_GOURAUD:
             gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
             gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
@@ -225,8 +231,9 @@ static void _draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int fram
 
     uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
 
-    gDPLoadTextureBlock(renderer->display_list++, sprite->data + frame_offset, G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
-        G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    gDPLoadTextureBlock(renderer->display_list++, sprite->data + frame_offset, 
+        G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
+        sprite->wrap_s, sprite->wrap_t, sprite->mask_s, sprite->mask_t, G_TX_NOLOD, G_TX_NOLOD);
 
     gDPLoadSync(renderer->display_list++);
 
@@ -262,7 +269,7 @@ void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y)
     }
 }
 
-void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, char* text) {
+void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, const char* text) {
     if (!text || text[0] == 0) return;
     renderer_set_shading_mode(renderer, SHADING_MODE_SPRITE);
 /*
@@ -316,7 +323,7 @@ void render_billboard_frame(Renderer* renderer, BillboardQuad* quad, int frame, 
     gDPLoadTextureBlock(renderer->display_list++, 
     quad->sprite->data + frame_offset,  G_IM_FMT_RGBA, G_IM_SIZ_16b,  
     slice_width, slice_height, 
-    0, G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+    0, quad->sprite->wrap_s, quad->sprite->wrap_t, quad->sprite->mask_s, quad->sprite->mask_t, G_TX_NOLOD, G_TX_NOLOD);
 
     gSP2Triangles(renderer->display_list++, 
         index + 0, index + 1, index + 2, 0, 
@@ -327,12 +334,7 @@ void renderer_draw_billboard_quad(Renderer* renderer, BillboardQuad* quad) {
     billboard_quad_look_at_camera(quad, renderer->camera);
 
     renderer_set_transform(renderer, &quad->transform, &quad->dl_matrix);
-
-    gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
-    gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
-    gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
-    gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
-    gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
+    renderer_set_shading_mode(renderer, SHADING_MODE_UNLIT_TEXTURED);
 
         switch (quad->type) {
         case BILLBOARD_QUAD_1X1:
@@ -361,15 +363,24 @@ void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* m
         
         renderer_set_shading_mode(renderer, primitive->material.mode);
 
-        if (primitive->material.mode == SHADING_MODE_GOURAUD_TEXTURED) {
+
+        if (primitive->material.mode == SHADING_MODE_GOURAUD_TEXTURED || 
+            primitive->material.mode == SHADING_MODE_UNLIT_TEXTURED ) {
             ImageSprite* texture = mesh->textures + primitive->material.texture;
 
-            gDPLoadTextureBlock(renderer->display_list++, texture->data,
-            G_IM_FMT_RGBA, G_IM_SIZ_16b,  texture->width, texture->height, 0,
-            G_TX_WRAP, G_TX_WRAP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
+            int slice_width = image_sprite_get_slice_width(texture);
+            int slice_height = image_sprite_get_slice_height(texture);
+            int frame_offset = slice_width * slice_height * 2 * primitive->material.texture_frame;
+
+            gDPLoadTextureBlock(renderer->display_list++, texture->data + frame_offset,
+                G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
+                texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
         }
         
-        gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
+        
+        if (primitive->material.color != MATERIAL_NO_COLOR)
+            gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
+
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
         gDPPipeSync(renderer->display_list++);
     }

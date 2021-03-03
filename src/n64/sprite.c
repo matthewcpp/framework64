@@ -2,6 +2,8 @@
 
 #include "framework64/filesystem.h"
 
+#include <nusys.h>
+
 #include <stdlib.h>
 #include <malloc.h>
 
@@ -28,6 +30,11 @@ int sprite_load(int assetIndex, ImageSprite* sprite) {
     int data_size = sprite->width * sprite->height * 2;
     sprite->data = memalign(8, data_size);
     bytes_read = filesystem_read(sprite->data, 1, data_size, handle);
+
+    sprite->wrap_s = G_TX_CLAMP;
+    sprite->wrap_t = G_TX_CLAMP;
+    sprite->mask_s = G_TX_NOMASK;
+    sprite->mask_t = G_TX_NOMASK;
 
     filesystem_close(handle);
  
