@@ -238,6 +238,7 @@ class GLTFLoader {
         for (let i = 0; i < accessor.count; i++) {
             const vertex = n64Mesh.vertices[i];
 
+            // the normals are treated as 8-bit signed values (-128 to 127).
             vertex[6] = Math.min(Math.round(buffer.readFloatLE(offset) * 128), 127);
             vertex[7] = Math.min(Math.round(buffer.readFloatLE(offset + 4) * 128), 127);
             vertex[8] = Math.min(Math.round(buffer.readFloatLE(offset + 8) * 128), 127);
@@ -275,6 +276,7 @@ class GLTFLoader {
             s = Math.min(Math.max(s, 0.0), 1.0) * image.width * 2;
             t = Math.min(Math.max(t, 0.0), 1.0) * image.height * 2;
 
+            // Note that the texture coordinates (s,t) are encoded in S10.5 format.
             vertex[4] = Math.round(s * (1 << 5));
             vertex[5] = Math.round(t * (1 << 5));
 

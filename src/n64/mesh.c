@@ -41,10 +41,17 @@ int mesh_load(int asset_index, Mesh* mesh) {
 }
 
 void mesh_unload(Mesh* mesh) {
-    free(mesh->vertex_buffer);
-    free(mesh->display_list);
-    free(mesh->colors);
-    free(mesh->primitives);
+    if (mesh->vertex_buffer)
+        free(mesh->vertex_buffer);
+
+    if (mesh->display_list)
+        free(mesh->display_list);
+    
+    if (mesh->colors)
+        free(mesh->colors);
+
+    if (mesh->primitives)
+        free(mesh->primitives);
 
     if (mesh->textures) {
         for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
@@ -89,4 +96,12 @@ static void load_textures(Mesh* mesh, uint32_t* asset_index_data, int handle) {
     else {
         mesh->textures = NULL;
     }
+}
+
+void mesh_init(Mesh* mesh) {
+    memset(mesh, 0, sizeof(Mesh));
+}
+
+void mesh_uninit(Mesh* mesh) {
+    mesh_unload(mesh);
 }
