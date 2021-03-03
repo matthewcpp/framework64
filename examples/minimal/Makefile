@@ -20,9 +20,9 @@ LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n -ln_audio -lnusys_d 
 
 OPTIMIZER =	-g
 
-APP =		minimal_example.out
+APP =		minimal.out
 
-TARGETS =	minimal_example.n64
+TARGETS =	minimal.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ./*.h)
 

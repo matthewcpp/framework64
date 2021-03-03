@@ -40,7 +40,7 @@ beginseg
 endseg
 
 beginwave
-	name	"minimal_example"
+	name	"minimal"
 	include	"code"
 	include "asset_data"
 endwave

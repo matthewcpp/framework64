@@ -20,9 +20,9 @@ LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n -ln_audio -lnusys_d 
 
 OPTIMIZER =	-g
 
-APP =		rendermodes_example.out
+APP =		rendermodes.out
 
-TARGETS =	rendermodes_example.n64
+TARGETS =	rendermodes.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ./*.h)
 

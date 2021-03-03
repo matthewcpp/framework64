@@ -40,7 +40,7 @@ beginseg
 endseg
 
 beginwave
-	name	"texparams_example"
+	name	"texparams"
 	include	"code"
 	include "asset_data"
 endwave

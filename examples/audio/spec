@@ -40,7 +40,7 @@ beginseg
 endseg
 
 beginwave
-	name	"audio_example"
+	name	"audio"
 	include	"code"
 	include "asset_data"
 endwave

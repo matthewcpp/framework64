@@ -40,7 +40,7 @@ beginseg
 endseg
 
 beginwave
-	name	"billboard_example"
+	name	"billboard"
 	include	"code"
 	include "asset_data"
 endwave

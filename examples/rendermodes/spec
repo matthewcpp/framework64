@@ -40,7 +40,7 @@ beginseg
 endseg
 
 beginwave
-	name	"rendermodes_example"
+	name	"rendermodes"
 	include	"code"
 	include "asset_data"
 endwave

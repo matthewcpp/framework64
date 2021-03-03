@@ -40,7 +40,7 @@ beginseg
 endseg
 
 beginwave
-	name	"sprites_example"
+	name	"sprites"
 	include	"code"
 	include "asset_data"
 endwave

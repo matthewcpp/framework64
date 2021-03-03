@@ -6,6 +6,7 @@ examples=( "audio" "billboard" "data" "lines" "minimal" "rendermodes" "sprites" 
 
 for i in "${examples[@]}"
 do
-    cd examples/$i && make
-    cd ..
+    pushd examples/$i
+    make clean && make
+    popd
 done
