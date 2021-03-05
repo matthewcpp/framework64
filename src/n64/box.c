@@ -1,10 +1,22 @@
 #include "framework64/box.h"
 
-#include <float.h>
+#include <math.h>
 #include <string.h>
+
 
 void box_center(Box* box, Vec3* out) {
     vec3_add(out, &box->min, &box->max);
+    vec3_scale(out, out, 0.5f);
+}
+
+void box_size(Box* box, Vec3* out) {
+    out->x = fabsf(box->max.x - box->min.x);
+    out->y = fabsf(box->max.y - box->min.y);
+    out->z = fabsf(box->max.z - box->min.z);
+}
+
+void box_extents(Box* box, Vec3* out) {
+    box_size(box, out);
     vec3_scale(out, out, 0.5f);
 }
 
@@ -65,4 +77,12 @@ void matrix_transform_box(float* matrix, Box* box, Box* out) {
                 }
             }
         }
+}
+
+int box_intersection(Box* a, Box* b) {
+    if (a->max.x < b->min.x || a->min.x > b->max.x) return 0;
+    if (a->max.y < b->min.y || a->min.y > b->max.y) return 0;
+    if (a->max.z < b->min.z || a->min.z > b->max.z) return 0;
+
+    return 1;
 }
