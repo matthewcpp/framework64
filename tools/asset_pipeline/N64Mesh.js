@@ -42,6 +42,8 @@ class N64Mesh {
         Triangles: 4
     };
 
+    static NoMaterial = 0xFFFF;
+
     vertices = [];
     elements = [];
     elementType;

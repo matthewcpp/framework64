@@ -20,6 +20,12 @@ void vec3_set(Vec3* v, float x, float y, float z) {
     v->z = z;
 }
 
+void vec3_set_all(Vec3* v, float val) {
+    v->x = val;
+    v->y = val;
+    v->z = val;
+}
+
 void vec3_add(Vec3* out, Vec3* a, Vec3* b) {
     out->x = a->x + b->x;
     out->y = a->y + b->y;

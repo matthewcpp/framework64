@@ -178,3 +178,20 @@ void matrix_get_rotation(float* mat, Quat* out) {
         out->z = 0.25f * S;
     }
 }
+
+void mat2_set_rotation(float* mat, float rad) {
+    float s = _nsinf(rad);
+    float c = _ncosf(rad);
+
+    mat[0] = c;
+    mat[1] = s;
+    mat[2] = -s;
+    mat[3] = c;
+}
+
+void mat2_transform_vec2(const float* mat, Vec2* vec) {
+    Vec2 in = * vec;
+
+    vec->x = in.x * mat[0] + in.y * mat[2];
+    vec->y = in.x * mat[1] + in.y * mat[3];
+}

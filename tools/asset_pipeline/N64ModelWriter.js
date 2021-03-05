@@ -249,10 +249,19 @@ function write(model, outputDir, archive) {
         primitiveInfo.bounding = primitive.bounding;
         primitiveInfo.vertices = meshInfo.vertexCount;
         primitiveInfo.displayList = meshInfo.displayListCount;
-        primitiveInfo.materialColor = primitive.material;
-        primitiveInfo.materialTexture = model.materials[primitive.material].texture;
-        primitiveInfo.materialTextureFrame = 0;
-        primitiveInfo.materialMode = getShadingMode(primitive, model);
+
+        if (primitive.elementType === N64Mesh.ElementType.Lines) {
+            primitiveInfo.materialMode = ShadingMode.UnlitVertexColors;
+            primitiveInfo.materialColor = N64Mesh.NoMaterial;
+            primitiveInfo.materialTexture = N64Material.NoTexture;
+            primitiveInfo.materialTextureFrame = 0;
+        }
+        else {
+            primitiveInfo.materialMode = getShadingMode(primitive, model);
+            primitiveInfo.materialColor = primitive.material;
+            primitiveInfo.materialTexture = model.materials[primitive.material].texture;
+            primitiveInfo.materialTextureFrame = 0;
+        }
 
         primitiveInfos.push(primitiveInfo);
 
