@@ -2,6 +2,13 @@
     "files.associations": {
         "cstdlib": "c",
         "typeinfo": "c",
-        "assets.h": "c"
+        "assets.h": "c",
+        "functional": "c",
+        "math.h": "c",
+        "input.h": "c",
+        "matrix.h": "c",
+        "vec2.h": "c",
+        "vec3.h": "c",
+        "quat.h": "c"
     }
 }
