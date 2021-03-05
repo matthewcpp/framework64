@@ -1,6 +1,6 @@
 {
     "asset" : {
-        "generator" : "Khronos glTF Blender I/O v1.2.75",
+        "generator" : "Khronos glTF Blender I/O v1.4.40",
         "version" : "2.0"
     },
     "scene" : 0,
@@ -10,11 +10,56 @@
             "nodes" : [
                 0,
                 1,
-                2
+                2,
+                3,
+                4
             ]
         }
     ],
     "nodes" : [
+        {
+            "name" : "Light.001",
+            "rotation" : [
+                0.16907575726509094,
+                0.7558803558349609,
+                -0.27217137813568115,
+                0.570947527885437
+            ],
+            "translation" : [
+                4.076245307922363,
+                5.903861999511719,
+                -1.0054539442062378
+            ]
+        },
+        {
+            "name" : "Camera.001",
+            "rotation" : [
+                0.483536034822464,
+                0.33687159419059753,
+                -0.20870360732078552,
+                0.7804827094078064
+            ],
+            "translation" : [
+                7.358891487121582,
+                4.958309173583984,
+                6.925790786743164
+            ]
+        },
+        {
+            "mesh" : 0,
+            "name" : "Penguin",
+            "rotation" : [
+                0.5,
+                -0.5,
+                0.5,
+                0.4999999701976776
+            ],
+            "scale" : [
+                100,
+                100,
+                100
+            ]
+        },
         {
             "name" : "Light",
             "rotation" : [
@@ -42,27 +87,11 @@
                 4.958309173583984,
                 6.925790786743164
             ]
-        },
-        {
-            "mesh" : 0,
-            "name" : "Penguin",
-            "rotation" : [
-                0.7071068286895752,
-                0,
-                0,
-                0.7071067094802856
-            ],
-            "scale": [100.0, 100.0, 100.0]
         }
     ],
     "materials" : [
         {
             "doubleSided" : true,
-            "emissiveFactor" : [
-                0,
-                0,
-                0
-            ],
             "name" : "mat_0-penguin_eye_0.jpg",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
@@ -75,11 +104,6 @@
         },
         {
             "doubleSided" : true,
-            "emissiveFactor" : [
-                0,
-                0,
-                0
-            ],
             "name" : "mat_1-penguin_cmp4.jpg",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
@@ -118,9 +142,11 @@
     ],
     "textures" : [
         {
+            "sampler" : 0,
             "source" : 0
         },
         {
+            "sampler" : 0,
             "source" : 1
         }
     ],
@@ -174,7 +200,7 @@
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 715,
+            "count" : 721,
             "max" : [
                 1.0730630159378052,
                 0.9857050180435181,
@@ -190,13 +216,13 @@
         {
             "bufferView" : 5,
             "componentType" : 5126,
-            "count" : 715,
+            "count" : 721,
             "type" : "VEC3"
         },
         {
             "bufferView" : 6,
             "componentType" : 5126,
-            "count" : 715,
+            "count" : 721,
             "type" : "VEC2"
         },
         {
@@ -229,28 +255,34 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 8580,
+            "byteLength" : 8652,
             "byteOffset" : 612
         },
         {
             "buffer" : 0,
-            "byteLength" : 8580,
-            "byteOffset" : 9192
+            "byteLength" : 8652,
+            "byteOffset" : 9264
         },
         {
             "buffer" : 0,
-            "byteLength" : 5720,
-            "byteOffset" : 17772
+            "byteLength" : 5768,
+            "byteOffset" : 17916
         },
         {
             "buffer" : 0,
             "byteLength" : 1464,
-            "byteOffset" : 23492
+            "byteOffset" : 23684
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9986
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 24956,
+            "byteLength" : 25148,
             "uri" : "penguin.bin"
         }
     ]

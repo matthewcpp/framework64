@@ -300,7 +300,6 @@ void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* m
         
         renderer_set_shading_mode(renderer, primitive->material.mode);
 
-
         if (primitive->material.mode == SHADING_MODE_GOURAUD_TEXTURED || 
             primitive->material.mode == SHADING_MODE_UNLIT_TEXTURED ) {
             ImageSprite* texture = mesh->textures + primitive->material.texture;
@@ -313,8 +312,7 @@ void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* m
                 G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
                 texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
         }
-        
-        
+
         if (primitive->material.color != MATERIAL_NO_COLOR)
             gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
 
