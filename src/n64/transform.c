@@ -11,6 +11,7 @@ void transform_init(Transform* transform) {
 void transform_forward(Transform* transform, Vec3* out) {
     Vec3 forward = {0.0f, 0.0f, -1.0f};
     quat_transform_vec3(out, &transform->rotation, &forward);
+    vec3_normalize(out);
 }
 
 void transform_back(Transform* transform, Vec3* out) {
@@ -21,6 +22,7 @@ void transform_back(Transform* transform, Vec3* out) {
 void transform_up(Transform* transform, Vec3* out) {
     Vec3 up = {0.0f, 1.0f, 0.0f};
     quat_transform_vec3(out, &transform->rotation, &up);
+    vec3_normalize(out);
 }
 
 void transform_down(Transform* transform, Vec3* out) {
@@ -31,6 +33,7 @@ void transform_down(Transform* transform, Vec3* out) {
 void transform_right(Transform* transform, Vec3* out) {
     Vec3 right = {1.0f, 0.0f, 0.0f};
     quat_transform_vec3(out, &transform->rotation, &right);
+    vec3_normalize(out);
 }
 
 void transform_left(Transform* transform, Vec3* out) {
