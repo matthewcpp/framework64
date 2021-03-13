@@ -50,8 +50,8 @@ for (const file of files) {
     if (path.extname(file.name) !== ".sfz")
         continue;
 
-    if (file.name === percussionFile)
-        continue;
+    //if (file.name === percussionFile)
+    //    continue;
 
     const programNumber = parseInt(file.name.substr(0, file.name.indexOf('_'))) + 1;
 
