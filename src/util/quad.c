@@ -89,8 +89,6 @@ void textured_quad_create(Mesh* mesh, ImageSprite* texture) {
             vertex_set_p_tc(vtx_base + 2, tl_x + size, tl_y - size, 0, 1.0, 1.0, texture);
             vertex_set_p_tc(vtx_base + 3, tl_x, tl_y - size, 0, 0.0f, 1.0, texture);
 
-            //_set_quad_vertices(mesh->vertex_buffer + primitive_index * 4, tl_x, tl_y, size, 1.0f, 1.0f, texture);
-
             gSPVertex(mesh->display_list + primitive_index * 3, mesh->vertex_buffer + primitive_index * 4, 4, 0);
             gSP2Triangles(mesh->display_list + primitive_index * 3 + 1, 
             0, 1, 2, 0, 
