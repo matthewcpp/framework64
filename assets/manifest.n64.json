@@ -87,23 +87,21 @@
     "soundBanks": [
         {
             "name": "bank1",
-            "files": [
-                "sound_effects/load.ogg",
-                "sound_effects/misc_menu.ogg",
-                "sound_effects/misc_menu_2.ogg",
-                "sound_effects/misc_menu_3.ogg",
-                "sound_effects/misc_menu_4.ogg"
-            ]
+            "dir": "sound_effects/bank1"
         },
         {
             "name": "bank2",
-            "files": [
-                "sound_effects/misc_sound.ogg",
-                "sound_effects/negative.ogg",
-                "sound_effects/negative_2.ogg",
-                "sound_effects/save.ogg",
-                "sound_effects/sharp_echo.ogg"
-            ]
+            "dir": "sound_effects/bank2"
+        }
+    ],
+    "musicBanks": [
+        {
+            "name": "bank1",
+            "dir": "music/bank1"
+        },
+        {
+            "name": "bank2",
+            "dir": "music/bank2"
         }
     ],
     "raw": [
