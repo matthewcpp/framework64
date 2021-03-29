@@ -13,12 +13,13 @@ typedef struct {
     int current_music_bank;
 } Audio;
 
-typedef enum {
-    SOUND_STATE_STOPPED,
-    SOUND_STATE_PLAYING
-} SoundStatus;
-
 #define FW64_NO_AUDIO_BANK_LOADED INT_MAX
+
+typedef enum {
+    FW64_AUDIO_STOPPED = 0, //AL_STOPPED
+    FW64_AUDIO_PLAYING = 1, // AL_PLAYING,
+    FW64_AUDIO_STOPPING = 2 // AL_STOPPING
+} fw64AudioStatus;
 
 void audio_init(Audio* audio);
 
@@ -30,7 +31,7 @@ int audio_load_soundbank(Audio* audio, int asset_id);
 
 int audio_play_sound(Audio* audio, uint32_t sound_num);
 int audio_stop_sound(Audio* audio, int handle);
-SoundStatus audio_get_sound_status(Audio* audio, int handle);
+fw64AudioStatus audio_get_sound_status(Audio* audio, int handle);
 
 /**
  * Loads a music (sequence) bank.  The number of tracks (sequences) contained in the bank will be placed in audio->music_track_count.
@@ -40,4 +41,5 @@ int audio_load_music(Audio* audio, int asset_id);
 int audio_play_music(Audio* audio, uint32_t track_num);
 int audio_stop_music(Audio* audio);
 void audio_set_music_volume(Audio* audio, float volume);
+fw64AudioStatus audio_get_music_status(Audio* audio);
 #endif

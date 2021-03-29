@@ -88,15 +88,10 @@ int audio_stop_sound(Audio* audio, int handle) {
     return 1;
 }
 
-SoundStatus audio_get_sound_status(Audio* audio, int handle) {
+fw64AudioStatus audio_get_sound_status(Audio* audio, int handle) {
     (void)audio;
     nuAuSndPlayerSetSound(handle);
-    s32 status = nuAuSndPlayerGetState();
-
-    if (status == AL_PLAYING)
-        return SOUND_STATE_PLAYING;
-    else
-        return SOUND_STATE_STOPPED;
+    return (fw64AudioStatus)nuAuSndPlayerGetState();
 }
 
 int audio_load_music(Audio* audio, int asset_id) {
@@ -146,4 +141,9 @@ int audio_stop_music(Audio* audio){
 void audio_set_music_volume(Audio* audio, float volume) {
     audio->music_volume = volume;
     nuAuSeqPlayerSetVol(0, (s16)(volume * MAX_VOL));
+}
+
+fw64AudioStatus audio_get_music_status(Audio* audio) {
+    (void)audio;
+    return (fw64AudioStatus)nuAuSeqPlayerGetState(0);
 }
