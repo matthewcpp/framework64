@@ -45,7 +45,7 @@ int filesystem_open(int asset_index) {
     }
 
     if (file_handle == FW64_FILESYSTEM_INVALID_HANDLE) {
-        return FW64_FILESYSTEM_INVALID_HANDLE;
+        return FW64_FILESYSTEM_MAX_FILES_OPEN;
     }
 
     fw64FileHandle* handle = &open_files[file_handle];
@@ -117,4 +117,17 @@ int filesystem_close(int handle) {
 
 uint32_t n64_filesystem_get_rom_address(int asset_index) {
     return (u32)(&_asset_dataSegmentRomStart[0]) + asset_offsets[asset_index] + ASSET_HEADER_SIZE;
+}
+
+int filesystem_get_open_handle_count() {
+    int count = 0;
+
+    for (int i = 0; i < FW64_FILESYSTEM_MAX_OPEN_FILES; i++) {
+        if (open_files[i].data_loc == 0) {
+            count += 1;
+            break;
+        }
+    }
+
+    return 0;
 }

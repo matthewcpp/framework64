@@ -10,8 +10,13 @@ typedef struct {
     Font* font;
     int sound_bank;
     int sound_num;
-
     int sound_id;
+
+    int music_bank;
+    int music_track;
+
+    Entity n64_logo;
+    float rotation;
 } Game;
 
 void game_init(Game* game, System* system);
