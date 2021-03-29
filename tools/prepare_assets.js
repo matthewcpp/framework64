@@ -4,20 +4,22 @@ const FontConvert = require("./asset_pipeline/FontConvert");
 const AudioConvert = require("./asset_pipeline/AudioConvert");
 const Archive = require("./asset_pipeline/Archive");
 
+const { program } = require('commander');
+const rimraf = require("rimraf");
+
+
 const fs = require("fs");
 const path = require("path");
-const rimraf = require("rimraf");
-const { program } = require('commander');
 
 async function main() {
     program.version("0.1.0");
     program.requiredOption("-m, --manifest <path>", "asset manifest file");
     program.requiredOption("-o, --out-dir <dir>", "output directory");
-    program.option("-f, --force", "force asset creation in existing directory")
+    program.option("-f, --force", "force asset creation in existing directory");
 
     program.parse(process.argv);
 
-    const manifestFile = program.manifest;
+    const manifestFile = path.resolve(program.manifest);
     const manifestDirectory = path.dirname(manifestFile);
 
     if (!fs.existsSync(manifestFile)) {
@@ -74,24 +76,37 @@ async function main() {
 
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
-            if (!soundBank.hasOwnProperty("name")) {
-                console.log("Sound bank element must have a `name` property");
-                process.exit(1);
+            checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
+
+            const sourceDir = path.join(manifestDirectory, soundBank.dir);
+            await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, archive);
+        }
+    }
+
+    if (manifest.musicBanks) {
+        for (const musicBank of manifest.musicBanks) {
+            checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
+
+            const sourceDir = path.join(manifestDirectory, musicBank.dir);
+            await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
+        }
+    }
+
+        if (manifest.raw) {
+            for (const item of manifest.raw) {
+                const sourceFile = path.join(manifestDirectory, item);
+                archive.add(sourceFile, "raw");
             }
-
-            const paths = soundBank.files.map((file) => path.join(manifestDirectory, file));
-            await AudioConvert.convertSoundBank(paths, soundBank.name, outputDirectory, archive);
         }
-    }
-
-    if (manifest.raw) {
-        for (const item of manifest.raw) {
-            const sourceFile = path.join(manifestDirectory, item);
-            archive.add(sourceFile, "raw");
-        }
-    }
 
     archive.write(outputDirectory);
+}
+
+function checkRequiredFields(type, obj, fields) {
+    for (const field of fields) {
+        if (!obj.hasOwnProperty(field))
+            throw new Error(`${type} object must have the following properties: `+ fields.join(' '));
+    }
 }
 
 if (require.main === module) {
