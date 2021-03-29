@@ -5,24 +5,24 @@
 #include <malloc.h>
 #include <math.h>
 
-void game_init(Game* example, System* system) {
-    example->system = system;
+void game_init(Game* game, System* system) {
+    game->system = system;
 
-    fps_camera_init(&example->fps, system->input);
-    vec3_set(&example->fps.camera.transform.position, 0.0f, 4.0f, 20.0f);
+    fps_camera_init(&game->fps, system->input);
+    vec3_set(&game->fps.camera.transform.position, 0.0f, 4.0f, 20.0f);
 
     Mesh* nintendo_seal_mesh = malloc(sizeof(Mesh));
     textured_quad_create(nintendo_seal_mesh, assets_get_image(system->assets, ASSET_sprite_nintendo_seal));
-    entity_init(&example->nintendo_seal, nintendo_seal_mesh);
-    vec3_set(&example->nintendo_seal.transform.position, -3.0f, 5.0f, 0.0f);
+    entity_init(&game->nintendo_seal, nintendo_seal_mesh);
+    vec3_set(&game->nintendo_seal.transform.position, -3.0f, 5.0f, 0.0f);
 
     Mesh* n64_logo_mesh = malloc(sizeof(Mesh));
     textured_quad_create(n64_logo_mesh, assets_get_image(system->assets, ASSET_sprite_n64_logo));
-    entity_init(&example->n64_logo, n64_logo_mesh);
-    vec3_set(&example->n64_logo.transform.position, 3.0f, 5.0f, 0.0f);
+    entity_init(&game->n64_logo, n64_logo_mesh);
+    vec3_set(&game->n64_logo.transform.position, 3.0f, 5.0f, 0.0f);
 
 
-    entity_init(&example->blue_cube, assets_get_mesh(system->assets, ASSET_mesh_blue_cube));
+    entity_init(&game->blue_cube, assets_get_mesh(system->assets, ASSET_mesh_blue_cube));
 }
 
 void game_update(Game* game, float time_delta){
