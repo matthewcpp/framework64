@@ -7,18 +7,16 @@
     "url": "git+https://github.com/matthewcpp/n64-sandbox.git"
   },
   "keywords": [
-    "n64"
+    "n64",
+    "libultra"
   ],
+  "scripts": {
+    "prepare-assets": "npx prepare-fw64-assets -f assets/manifest.n64.json assets/build_n64"
+  },
   "author": "Matthew LaRocca",
   "license": "MIT",
   "homepage": "https://github.com/matthewcpp/n64-sandbox#readme",
   "dependencies": {
-    "canvas": "^2.6.1",
-    "commander": "^6.2.1",
-    "gl-matrix": "^3.3.0",
-    "jimp": "^0.16.1",
-    "opentype.js": "^1.3.3",
-    "rimraf": "^3.0.2",
-    "tmp": "^0.2.1"
+    "@matthewcpp/framework64-pipeline": "^0.1.0"
   }
 }
