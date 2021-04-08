@@ -38,14 +38,14 @@ static void fps_cam_left(FpsCamera* fps, Vec3* out) {
 }
 
 static void move_camera(FpsCamera* fps, float time_delta, Vec2* stick) {
-    if (input_button_down(fps->input, 0, R_CBUTTONS)) {
+    if (input_button_down(fps->input, 0, CONTROLLER_BUTTON_C_RIGHT)) {
         Vec3 move;
         fps_cam_right(fps, &move);
         vec3_scale(&move, &move, MOVEMENT_SPEED * time_delta);
         vec3_add(&fps->camera.transform.position, &fps->camera.transform.position, &move);
     }
 
-    if (input_button_down(fps->input, 0, L_CBUTTONS)) {
+    if (input_button_down(fps->input, 0, CONTROLLER_BUTTON_C_LEFT)) {
         Vec3 move;
         fps_cam_left(fps, &move);
         vec3_scale(&move, &move, MOVEMENT_SPEED * time_delta);
@@ -76,14 +76,14 @@ static void tilt_camera(FpsCamera* fps, float time_delta, Vec2* stick) {
         fps->rotation.y += ROTATION_SPEED * time_delta;
     }
 
-    if (input_button_down(fps->input, 0, U_CBUTTONS)) {
+    if (input_button_down(fps->input, 0, CONTROLLER_BUTTON_C_UP)) {
         fps->rotation.x += ROTATION_SPEED * time_delta;
 
         if (fps->rotation.x > 90.0f)
             fps->rotation.x = 90.0f;
     }
 
-    if (input_button_down(fps->input, 0, D_CBUTTONS)) {
+    if (input_button_down(fps->input, 0, CONTROLLER_BUTTON_C_DOWN)) {
         fps->rotation.x -= ROTATION_SPEED * time_delta;
 
         if (fps->rotation.x < -90.0f)

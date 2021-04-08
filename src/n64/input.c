@@ -15,11 +15,11 @@ void input_update(Input* input) {
     nuContDataGetExAll(input->current_state);
 }
 
-int input_button_pressed(Input* input, int controller, int button) {
+int input_button_pressed(Input* input, int controller, ControllerButton button) {
     return input->current_state[controller].trigger & button;
 }
 
-int input_button_down(Input* input, int controller, int button) {
+int input_button_down(Input* input, int controller, ControllerButton button) {
     return input->current_state[controller].button & button;
 }
 

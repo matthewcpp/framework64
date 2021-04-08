@@ -46,40 +46,40 @@ void game_init(Game* game, System* system) {
 }
 
 void game_update(Game* game, float time_delta){
-    if (input_button_pressed(game->system->input, 0, A_BUTTON))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_A))
         game->sound_id = audio_play_sound(game->system->audio, game->sound_num);
 
-    if (input_button_pressed(game->system->input, 0, B_BUTTON))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_B))
         audio_stop_sound(game->system->audio, game->sound_id);
 
-    if (input_button_pressed(game->system->input, 0, R_CBUTTONS))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_RIGHT))
         change_sound(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, L_CBUTTONS))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_LEFT))
         change_sound(game, -1);
 
-    if (input_button_pressed(game->system->input, 0, U_CBUTTONS))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_UP))
         change_sound_bank(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, D_CBUTTONS))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_DOWN))
         change_sound_bank(game, -1);
 
-    if (input_button_pressed(game->system->input, 0, START_BUTTON))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_START))
         audio_play_music(game->system->audio, game->music_track);
 
-    if (input_button_pressed(game->system->input, 0, Z_TRIG))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_Z))
         audio_stop_music(game->system->audio);
 
-    if (input_button_pressed(game->system->input, 0, R_JPAD))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_RIGHT))
         change_music_track(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, L_JPAD))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_LEFT))
         change_music_track(game, -1);
 
-    if (input_button_pressed(game->system->input, 0, U_JPAD))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_UP))
         change_music_bank(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, D_JPAD))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_DOWN))
         change_music_bank(game, -1);
 
     game->rotation += ROTATION_SPEED * time_delta;

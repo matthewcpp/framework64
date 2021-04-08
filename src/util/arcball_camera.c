@@ -72,14 +72,14 @@ void arcball_update(ArcballCamera* arcball, float time_delta) {
         arcball->_rot_x -= ARCBALL_ORBIT_SPEED * time_delta;
     }
 
-    if (input_button_down(arcball->_input, 0, L_TRIG)) {
+    if (input_button_down(arcball->_input, 0, CONTROLLER_BUTTON_L)) {
         arcball->_distance += arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     }
-    else if (input_button_down(arcball->_input, 0, R_TRIG)) {
+    else if (input_button_down(arcball->_input, 0, CONTROLLER_BUTTON_R)) {
         arcball->_distance -= arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     } 
 
-    if (input_button_pressed(arcball->_input, 0, START_BUTTON)) {
+    if (input_button_pressed(arcball->_input, 0, CONTROLLER_BUTTON_START)) {
         _arcball_reset(arcball);
     }
 

@@ -30,11 +30,11 @@ void game_update(Game* game, float time_delta){
     quat_from_euler(&game->wire_cube.transform.rotation, 0, game->rotation, 0.0f);
     entity_refresh(&game->wire_cube);
 
-    if (input_button_pressed(game->system->input, 0, L_CBUTTONS))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_LEFT))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME;
-    if (input_button_pressed(game->system->input, 0, U_CBUTTONS))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_UP))
         game->draw_mode = EXAMPLE_DRAW_MODE_SHADED;
-    if (input_button_pressed(game->system->input, 0, R_CBUTTONS))
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_RIGHT))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 }
 

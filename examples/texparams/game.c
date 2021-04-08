@@ -27,10 +27,10 @@ void game_init(Game* game, System* system) {
 }
 
 void game_update(Game* game, float time_delta){
-    if (input_button_pressed(game->system->input, 0, L_CBUTTONS) && game->mode > MODE_DEFAULT)
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_LEFT) && game->mode > MODE_DEFAULT)
         set_texture_mode(game, game->mode - 1);
 
-    if (input_button_pressed(game->system->input, 0, R_CBUTTONS) && game->mode < MODE_MIRROR)
+    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_RIGHT) && game->mode < MODE_MIRROR)
         set_texture_mode(game, game->mode + 1);
 }
 
