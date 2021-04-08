@@ -14,7 +14,7 @@ INC = $(ROOT)/usr/include
 
 LCDEFS =	-DNU_DEBUG -DF3DEX_GBI_2 -DPLATFORM_N64
 LDIRT  =	$(APP) $(TARGETS)
-LCINCS =	-I../../include -I. -I../../assets/build_n64 -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR -I/usr/include/n64/nustd
+LCINCS =	-I../../include -I../common -I. -I../../assets/build_n64 -I$(NUSYSINCDIR) -I$(ROOT)/usr/include/PR -I/usr/include/n64/nustd
 LCOPTS =	-G 0 -Werror -Wall
 LDFLAGS = $(MKDEPOPT) -L$(LIB) -L$(NUSYSLIBDIR) -lnualsgi_n -ln_audio -lnusys_d -lultra_d -L$(N64_LIBGCCDIR) -lgcc  -lnustd
 
@@ -24,9 +24,9 @@ APP =		rendermodes.out
 
 TARGETS =	rendermodes.n64
 
-HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ./*.h)
+HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ../common/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ./*.c) ../../src/util/arcball_camera.c
+CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ../common/*.c) $(wildcard ./*.c) ../../src/util/arcball_camera.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 
@@ -51,4 +51,4 @@ $(TARGETS):	$(OBJECTS)
 		makemask $(TARGETS)
 
 clean:
-	rm -f  ../../src/n64/*.o ./*.o ./*.out *.n64
+	rm -f  ../../src/n64/*.o ../common/*.o ./*.o ./*.out *.n64
