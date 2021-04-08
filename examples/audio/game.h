@@ -1,10 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "framework64/system.h"
+#include "framework64/engine.h"
 
 typedef struct {
-    System* system;
+    fw64Engine* engine;
     Camera camera;
     ImageSprite* buttons;
     Font* font;
@@ -19,7 +19,7 @@ typedef struct {
     float rotation;
 } Game;
 
-void game_init(Game* game, System* system);
+void game_init(Game* game, fw64Engine* engine);
 void game_update(Game* game, float time_delta);
 void game_draw(Game* game);
 

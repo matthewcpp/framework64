@@ -23,8 +23,8 @@ void change_music_track(Game* game, int delta);
 
 #define ROTATION_SPEED -M_PI / 4.0f
 
-void game_init(Game* game, System* system) {
-    game->system = system;
+void game_init(Game* game, fw64Engine* engine) {
+    game->engine = engine;
     camera_init(&game->camera);
 
     game->sound_bank = -1;
@@ -33,53 +33,53 @@ void game_init(Game* game, System* system) {
     game->music_bank = -1;
     change_music_bank(game, 1);
 
-    game->font = assets_get_font(system->assets, ASSET_font_Consolas12);
-    game->buttons = assets_get_image(system->assets, ASSET_sprite_buttons);
+    game->font = assets_get_font(engine->assets, ASSET_font_Consolas12);
+    game->buttons = assets_get_image(engine->assets, ASSET_sprite_buttons);
 
     game->sound_id = 0;
 
     Mesh* mesh = malloc(sizeof(Mesh));
-    textured_quad_create(mesh, assets_get_image(system->assets, ASSET_sprite_n64_logo));
+    textured_quad_create(mesh, assets_get_image(engine->assets, ASSET_sprite_n64_logo));
     entity_init(&game->n64_logo, mesh);
 
     game->rotation = 0.0f;
 }
 
 void game_update(Game* game, float time_delta){
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_A))
-        game->sound_id = audio_play_sound(game->system->audio, game->sound_num);
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_A))
+        game->sound_id = audio_play_sound(game->engine->audio, game->sound_num);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_B))
-        audio_stop_sound(game->system->audio, game->sound_id);
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_B))
+        audio_stop_sound(game->engine->audio, game->sound_id);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_RIGHT))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_RIGHT))
         change_sound(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_LEFT))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_LEFT))
         change_sound(game, -1);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_UP))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_UP))
         change_sound_bank(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_C_DOWN))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_DOWN))
         change_sound_bank(game, -1);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_START))
-        audio_play_music(game->system->audio, game->music_track);
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_START))
+        audio_play_music(game->engine->audio, game->music_track);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_Z))
-        audio_stop_music(game->system->audio);
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_Z))
+        audio_stop_music(game->engine->audio);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_RIGHT))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_DPAD_RIGHT))
         change_music_track(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_LEFT))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_DPAD_LEFT))
         change_music_track(game, -1);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_UP))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_DPAD_UP))
         change_music_bank(game, 1);
 
-    if (input_button_pressed(game->system->input, 0, CONTROLLER_BUTTON_DPAD_DOWN))
+    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_DPAD_DOWN))
         change_music_bank(game, -1);
 
     game->rotation += ROTATION_SPEED * time_delta;
@@ -88,7 +88,7 @@ void game_update(Game* game, float time_delta){
 }
 
 static void draw_sound_controls(Game* game) {
-    Renderer* renderer = game->system->renderer;
+    Renderer* renderer = game->engine->renderer;
     char buffer[32];
 
     renderer_draw_text(renderer, game->font, 10, 10, "Sounds");
@@ -113,7 +113,7 @@ static void draw_sound_controls(Game* game) {
 }
 
 static void draw_music_controls(Game* game) {
-    Renderer* renderer = game->system->renderer;
+    Renderer* renderer = game->engine->renderer;
     char buffer[32];
 
     int offset = 200;
@@ -140,7 +140,7 @@ static void draw_music_controls(Game* game) {
 }
 
 void game_draw(Game* game) {
-    Renderer* renderer = game->system->renderer;
+    Renderer* renderer = game->engine->renderer;
 
     renderer_begin(renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
 
@@ -149,7 +149,7 @@ void game_draw(Game* game) {
     draw_sound_controls(game);
     draw_music_controls(game);
 
-    renderer_end(game->system->renderer, RENDERER_FLAG_SWAP);
+    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
 }
 
 void change_sound_bank(Game* game, int delta) {
@@ -161,7 +161,7 @@ void change_sound_bank(Game* game, int delta) {
     if (game->sound_bank >= SOUND_BANK_COUNT)
         game->sound_bank = SOUND_BANK_COUNT - 1;
     
-    audio_load_soundbank(game->system->audio, sound_banks[game->sound_bank]);
+    audio_load_soundbank(game->engine->audio, sound_banks[game->sound_bank]);
 
     game->sound_num = 0;
 }
@@ -172,8 +172,8 @@ void change_sound(Game* game, int delta) {
     if (game->sound_num < 0) 
         game->sound_num = 0;
     
-    if (game->sound_num >= game->system->audio->sound_count)
-        game->sound_num = game->system->audio->sound_count - 1;
+    if (game->sound_num >= game->engine->audio->sound_count)
+        game->sound_num = game->engine->audio->sound_count - 1;
 }
 
 void change_music_bank(Game* game, int delta) {
@@ -185,7 +185,7 @@ void change_music_bank(Game* game, int delta) {
     if (game->music_bank >= MUSIC_BANK_COUNT) 
         game->music_bank = MUSIC_BANK_COUNT - 1;
 
-    audio_load_music(game->system->audio, music_banks[game->music_bank]);
+    audio_load_music(game->engine->audio, music_banks[game->music_bank]);
 
     game->music_track = 0;
 }
@@ -196,6 +196,6 @@ void change_music_track(Game* game, int delta) {
     if (game->music_track < 0)
         game->music_track = 0;
 
-    if (game->music_track >= game->system->audio->music_track_count)
-        game->music_track = game->system->audio->music_track_count - 1;
+    if (game->music_track >= game->engine->audio->music_track_count)
+        game->music_track = game->engine->audio->music_track_count - 1;
 }

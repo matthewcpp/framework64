@@ -1,22 +1,22 @@
 #include "game.h"
-#include "framework64/system.h"
+#include "framework64/engine.h"
 
 #include <nusys.h>
 
-Game example;
-System system;
+Game game;
+fw64Engine engine;
 
 void nusys_game_tick(int pendingGfx) {
     if (pendingGfx < 1) {
-        system_update(&system);
-        game_update(&example, system.time->time_delta);
-        game_draw(&example);
+        fw64_engine_update(&engine);
+        game_update(&game, engine.time->time_delta);
+        game_draw(&game);
     }
 }
 
 void mainproc(void) {
-    system_init(&system);
-    game_init(&example, &system);
+    fw64_engine_init(&engine);
+    game_init(&game, &engine);
     nuGfxFuncSet((NUGfxFunc)nusys_game_tick);
     nuGfxDisplayOn();
 }

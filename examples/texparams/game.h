@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include "framework64/font.h"
-#include "framework64/system.h"
+#include "framework64/engine.h"
 
 typedef enum {
     MODE_DEFAULT,
@@ -12,7 +12,7 @@ typedef enum {
 } Mode;
 
 typedef struct {
-    System* system;
+    fw64Engine* engine;
     Camera camera;
     Entity quad_entity;
     Mode mode;
@@ -21,7 +21,7 @@ typedef struct {
     Font* font;
 } Game;
 
-void game_init(Game* game, System* system);
+void game_init(Game* game, fw64Engine* engine);
 void game_update(Game* game, float time_delta);
 void game_draw(Game* game);
 

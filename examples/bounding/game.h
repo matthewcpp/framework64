@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "framework64/system.h"
+#include "framework64/engine.h"
 
 typedef enum {
     CUBE_TOP_LEFT,
@@ -13,7 +13,7 @@ typedef enum {
 } CubeId;
 
 typedef struct {
-    System* system;
+    fw64Engine* engine;
     Camera camera;
     Entity penguin;
     Entity penguin_box;
@@ -22,7 +22,7 @@ typedef struct {
     Font* font;
 } Game;
 
-void game_init(Game* game, System* system);
+void game_init(Game* game, fw64Engine* engine);
 void game_update(Game* game, float time_delta);
 void game_draw(Game* game);
 

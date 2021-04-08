@@ -18,9 +18,9 @@ typedef struct {
     Renderer* renderer;
     Time* time;
     Assets* assets;
-} System;
+} fw64Engine;
 
-int system_init(System* system);
-void system_update(System* system);
+int fw64_engine_init(fw64Engine* system);
+void fw64_engine_update(fw64Engine* system);
 
 #endif

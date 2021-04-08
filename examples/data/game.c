@@ -6,11 +6,11 @@
 
 #include <string.h>
 
-void game_init(Game* game, System* system) {
-    game->system = system;
+void game_init(Game* game, fw64Engine* engine) {
+    game->engine = engine;
     camera_init(&game->camera);
 
-    game->consolas = assets_get_font(system->assets, ASSET_font_Consolas12);
+    game->consolas = assets_get_font(engine->assets, ASSET_font_Consolas12);
 
     memset(game->str_buff, 0, 32);
     int handle = filesystem_open(ASSET_raw_sample);
@@ -23,7 +23,7 @@ void game_update(Game* game, float time_delta){
 }
 
 void game_draw(Game* game) {
-    renderer_begin(game->system->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_text(game->system->renderer, game->consolas, 10, 10, game->str_buff);
-    renderer_end(game->system->renderer, RENDERER_FLAG_SWAP);
+    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
+    renderer_draw_text(game->engine->renderer, game->consolas, 10, 10, game->str_buff);
+    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
 }

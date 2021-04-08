@@ -3,7 +3,7 @@
 
 #include "framework64/camera.h"
 #include "framework64/entity.h"
-#include "framework64/system.h"
+#include "framework64/engine.h"
 
 typedef enum {
     EXAMPLE_DRAW_MODE_SHADED,
@@ -12,7 +12,7 @@ typedef enum {
 } DrawMode;
 
 typedef struct lines_example {
-    System* system;
+    fw64Engine* engine;
     Camera camera;
     DrawMode draw_mode;
     float rotation;
@@ -20,7 +20,7 @@ typedef struct lines_example {
     Entity wire_cube;
 } Game;
 
-void game_init(Game* example, System* system);
+void game_init(Game* example, fw64Engine* engine);
 void game_update(Game* example, float time_delta);
 void game_draw(Game* example);
 

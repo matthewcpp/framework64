@@ -1,4 +1,4 @@
-#include "framework64/system.h"
+#include "framework64/engine.h"
 
 #include "framework64/filesystem.h"
 
@@ -18,7 +18,7 @@ Input input;
 Renderer renderer;
 Time time;
 
-int system_init(System* system) {
+int fw64_engine_init(fw64Engine* system) {
     system->audio = &audio;
     system->assets = &assets;
     system->input = &input;
@@ -41,7 +41,7 @@ int system_init(System* system) {
     return 1;
 }
 
-void system_update(System* system) {
+void fw64_engine_update(fw64Engine* system) {
     time_update(system->time);
     input_update(system->input);
 }

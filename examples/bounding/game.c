@@ -16,12 +16,12 @@ static const char* intersection_text(CubeId cube);
 
 float stick_adjust[4];
 
-void game_init(Game* game, System* system) {
-    game->system = system;
+void game_init(Game* game, fw64Engine* engine) {
+    game->engine = engine;
     
-    entity_init(&game->penguin, assets_get_mesh(system->assets, ASSET_mesh_penguin));
-    entity_init(&game->penguin_box, assets_get_mesh(system->assets, ASSET_mesh_blue_cube_wire));
-    game->font = assets_get_font(system->assets, ASSET_font_Consolas12);
+    entity_init(&game->penguin, assets_get_mesh(engine->assets, ASSET_mesh_penguin));
+    entity_init(&game->penguin_box, assets_get_mesh(engine->assets, ASSET_mesh_blue_cube_wire));
+    game->font = assets_get_font(engine->assets, ASSET_font_Consolas12);
     game->intersection = CUBE_NONE;
 
     vec3_set(&game->penguin.transform.scale, 0.5, 0.5, 0.5);
@@ -36,7 +36,7 @@ void game_init(Game* game, System* system) {
 void game_update(Game* game, float time_delta){
     
     Vec2 stick;
-    input_stick(game->system->input, 0, &stick);
+    input_stick(game->engine->input, 0, &stick);
     
     if (stick.x >= STICK_THRESHOLD || stick.x <= -STICK_THRESHOLD  || stick.y >= STICK_THRESHOLD || stick.y <= -STICK_THRESHOLD) {
         mat2_transform_vec2(stick_adjust, & stick);
@@ -51,11 +51,11 @@ void game_update(Game* game, float time_delta){
 
     Vec3 scale_delta;
     vec3_set_all(&scale_delta, time_delta * SCALE_SPEED);
-    if (input_button_down(game->system->input, 0, CONTROLLER_BUTTON_C_UP)) {
+    if (input_button_down(game->engine->input, 0, CONTROLLER_BUTTON_C_UP)) {
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }
 
-    if (input_button_down(game->system->input, 0, CONTROLLER_BUTTON_C_DOWN)) {
+    if (input_button_down(game->engine->input, 0, CONTROLLER_BUTTON_C_DOWN)) {
         vec3_negate(&scale_delta);
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }
@@ -73,24 +73,24 @@ void game_update(Game* game, float time_delta){
 void game_draw(Game* game) {
 
 
-    renderer_begin(game->system->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->system->renderer, &game->penguin.transform, game->penguin.mesh);
+    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
+    renderer_draw_static_mesh(game->engine->renderer, &game->penguin.transform, game->penguin.mesh);
 
     for (int i = 0; i < CUBE_COUNT; i++)
-        renderer_draw_static_mesh(game->system->renderer, &game->cubes[i].transform, game->cubes[i].mesh);
+        renderer_draw_static_mesh(game->engine->renderer, &game->cubes[i].transform, game->cubes[i].mesh);
     
     char text_buffer[32];
     sprintf(text_buffer, "Intersection: %s", intersection_text(game->intersection));
-    renderer_draw_text(game->system->renderer, game->font, 10, 10, text_buffer);
+    renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
 
     // This seems to lock up CEN64
     // Uncomment following lines if running on hardware to see preview bounding box.
 
-    //renderer_end(game->system->renderer, RENDERER_FLAG_NOSWAP);
+    //renderer_end(game->engine->renderer, RENDERER_FLAG_NOSWAP);
 
-    //renderer_begin(game->system->renderer, &game->camera, RENDERER_MODE_LINES, RENDERER_FLAG_NOCLEAR);
-    //renderer_draw_static_mesh(game->system->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
-    renderer_end(game->system->renderer, RENDERER_FLAG_SWAP);
+    //renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_LINES, RENDERER_FLAG_NOCLEAR);
+    //renderer_draw_static_mesh(game->engine->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
+    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
 }
 
 void setup_camera(Game* game) {
@@ -120,7 +120,7 @@ Vec3 cube_positions[CUBE_COUNT] = {
 
 void init_cubes(Game* game) {
     
-    Mesh* cube_mesh = assets_get_mesh(game->system->assets, ASSET_mesh_blue_cube);
+    Mesh* cube_mesh = assets_get_mesh(game->engine->assets, ASSET_mesh_blue_cube);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
         Entity* cube = &game->cubes[i];

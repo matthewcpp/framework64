@@ -4,12 +4,12 @@
 #include "framework64/util/arcball_camera.h"
 #include "framework64/camera.h"
 #include "framework64/entity.h"
-#include "framework64/system.h"
+#include "framework64/engine.h"
 
 #define ENTITY_COUNT 3
 
 typedef struct {
-    System* system;
+    fw64Engine* engine;
     ArcballCamera arcball;
 
     Font* consolas;
@@ -22,7 +22,7 @@ typedef struct {
     int switch_model_text_width;
 } Game;
 
-void game_init(Game* game, System* system);
+void game_init(Game* game, fw64Engine* engine);
 void game_update(Game* game, float time_delta);
 void game_draw(Game* game);
 
