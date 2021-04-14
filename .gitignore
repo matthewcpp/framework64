@@ -7,3 +7,6 @@
 assets/build_n64
 node_modules
 .idea
+
+/build
+/cmake-build-debug
