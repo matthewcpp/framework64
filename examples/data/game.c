@@ -10,7 +10,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     camera_init(&game->camera);
 
-    game->consolas = assets_get_font(engine->assets, ASSET_font_Consolas12);
+    game->consolas = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
 
     memset(game->str_buff, 0, 32);
     int handle = filesystem_open(ASSET_raw_sample);

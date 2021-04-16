@@ -33,13 +33,13 @@ void game_init(Game* game, fw64Engine* engine) {
     game->music_bank = -1;
     change_music_bank(game, 1);
 
-    game->font = assets_get_font(engine->assets, ASSET_font_Consolas12);
-    game->buttons = assets_get_image(engine->assets, ASSET_sprite_buttons);
+    game->font = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
+    game->buttons = fw64_assets_get_image(engine->assets, ASSET_sprite_buttons);
 
     game->sound_id = 0;
 
     Mesh* mesh = malloc(sizeof(Mesh));
-    textured_quad_create(mesh, assets_get_image(engine->assets, ASSET_sprite_n64_logo));
+    textured_quad_create(mesh, fw64_assets_get_image(engine->assets, ASSET_sprite_n64_logo));
     entity_init(&game->n64_logo, mesh);
 
     game->rotation = 0.0f;

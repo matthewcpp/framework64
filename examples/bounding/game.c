@@ -19,9 +19,9 @@ float stick_adjust[4];
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     
-    entity_init(&game->penguin, assets_get_mesh(engine->assets, ASSET_mesh_penguin));
-    entity_init(&game->penguin_box, assets_get_mesh(engine->assets, ASSET_mesh_blue_cube_wire));
-    game->font = assets_get_font(engine->assets, ASSET_font_Consolas12);
+    entity_init(&game->penguin, fw64_assets_get_mesh(engine->assets, ASSET_mesh_penguin));
+    entity_init(&game->penguin_box, fw64_assets_get_mesh(engine->assets, ASSET_mesh_blue_cube_wire));
+    game->font = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
     game->intersection = CUBE_NONE;
 
     vec3_set(&game->penguin.transform.scale, 0.5, 0.5, 0.5);

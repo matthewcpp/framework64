@@ -17,11 +17,11 @@ void game_init(Game* game, fw64Engine* engine) {
     game->mode = MODE_DEFAULT;
 
     Mesh* mesh = malloc(sizeof(Mesh));
-    textured_quad_create(mesh, assets_get_image(engine->assets, ASSET_sprite_pyoro64));
+    textured_quad_create(mesh, fw64_assets_get_image(engine->assets, ASSET_sprite_pyoro64));
     entity_init(&game->quad_entity, mesh);
 
-    game->font = assets_get_font(engine->assets, ASSET_font_Consolas12);
-    game->buttons = assets_get_image(engine->assets, ASSET_sprite_buttons);
+    game->font = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
+    game->buttons = fw64_assets_get_image(engine->assets, ASSET_sprite_buttons);
 
     set_texture_mode(game, MODE_DEFAULT);
 }

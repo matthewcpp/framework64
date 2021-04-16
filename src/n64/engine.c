@@ -13,7 +13,7 @@
 char memory_heap[FW64_N64_HEAP_SIZE];
 
 Audio audio;
-Assets assets;
+fw64Assets assets;
 Input input;
 Renderer renderer;
 Time time;
@@ -33,7 +33,7 @@ int fw64_engine_init(fw64Engine* system) {
     renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     input_init(system->input);
     time_init(system->time);
-    assets_init(system->assets);
+    fw64_assets_init(system->assets);
     audio_init(system->audio);
 
     filesystem_init();

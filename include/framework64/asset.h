@@ -10,24 +10,24 @@ typedef union {
     Font* font;
     ImageSprite* image;
     Mesh* mesh;
-} AssetPtr;
+} fw64AssetPtr;
 
 typedef struct {
-    AssetPtr ptr;
+    fw64AssetPtr ptr;
     uint32_t index;
-} Asset;
+} fw64Asset;
 
 typedef struct {
-    Asset* _assets;
+    fw64Asset* _assets;
     uint32_t _asset_count;
     uint32_t _asset_capacity;
-} Assets;
+} fw64Assets;
 
-void assets_init(Assets* assets);
+void fw64_assets_init(fw64Assets* assets);
 
-int assets_is_loaded(Assets* assets, uint32_t index);
-Mesh* assets_get_mesh(Assets* assets, uint32_t index);
-Font* assets_get_font(Assets* assets, uint32_t index);
-ImageSprite* assets_get_image(Assets* assets, uint32_t index);
+int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index);
+Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index);
+Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index);
+ImageSprite* fw64_assets_get_image(fw64Assets* assets, uint32_t index);
 
 #endif

@@ -9,6 +9,7 @@
         "matrix.h": "c",
         "vec2.h": "c",
         "vec3.h": "c",
-        "quat.h": "c"
+        "quat.h": "c",
+        "sparse_set.h": "c"
     }
 }
