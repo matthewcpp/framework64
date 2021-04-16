@@ -47,10 +47,10 @@ void game_init(Game* game, fw64Engine* engine) {
 
 void game_update(Game* game, float time_delta){
     if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_A))
-        game->sound_id = audio_play_sound(game->engine->audio, game->sound_num);
+        game->sound_id = fw64_audio_play_sound(game->engine->audio, game->sound_num);
 
     if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_B))
-        audio_stop_sound(game->engine->audio, game->sound_id);
+        fw64_audio_stop_sound(game->engine->audio, game->sound_id);
 
     if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_RIGHT))
         change_sound(game, 1);
@@ -65,10 +65,10 @@ void game_update(Game* game, float time_delta){
         change_sound_bank(game, -1);
 
     if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_START))
-        audio_play_music(game->engine->audio, game->music_track);
+        fw64_audio_play_music(game->engine->audio, game->music_track);
 
     if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_Z))
-        audio_stop_music(game->engine->audio);
+        fw64_audio_stop_music(game->engine->audio);
 
     if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_DPAD_RIGHT))
         change_music_track(game, 1);
@@ -161,7 +161,7 @@ void change_sound_bank(Game* game, int delta) {
     if (game->sound_bank >= SOUND_BANK_COUNT)
         game->sound_bank = SOUND_BANK_COUNT - 1;
     
-    audio_load_soundbank(game->engine->audio, sound_banks[game->sound_bank]);
+    fw64_audio_load_soundbank(game->engine->audio, sound_banks[game->sound_bank]);
 
     game->sound_num = 0;
 }
@@ -185,7 +185,7 @@ void change_music_bank(Game* game, int delta) {
     if (game->music_bank >= MUSIC_BANK_COUNT) 
         game->music_bank = MUSIC_BANK_COUNT - 1;
 
-    audio_load_music(game->engine->audio, music_banks[game->music_bank]);
+    fw64_audio_load_music(game->engine->audio, music_banks[game->music_bank]);
 
     game->music_track = 0;
 }
