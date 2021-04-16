@@ -39,25 +39,25 @@ void game_update(Game* game, float time_delta){
 }
 
 static void line_example_draw_wireframe(Game* game) {
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_LINES,  RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->wire_cube.transform, game->wire_cube.mesh);
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_LINES,  FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->wire_cube.transform, game->wire_cube.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 static void line_example_draw_solid(Game* game) {
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES,  RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->solid_cube.transform, game->solid_cube.mesh);
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES,  FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->solid_cube.transform, game->solid_cube.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 static void line_example_draw_wireframe_on_shaded(Game* game) {
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->solid_cube.transform, game->solid_cube.mesh);
-    renderer_end(game->engine->renderer, RENDERER_FLAG_NOSWAP);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->solid_cube.transform, game->solid_cube.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_LINES, RENDERER_FLAG_NOCLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->wire_cube.transform, game->wire_cube.mesh);
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_LINES, FW64_RENDERER_FLAG_NOCLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->wire_cube.transform, game->wire_cube.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void game_draw(Game* game) {

@@ -13,7 +13,7 @@ void game_init(Game* game, fw64Engine* engine) {
     camera_init(&game->camera);
 
     Color c = {39, 58, 93};
-    renderer_set_clear_color(engine->renderer, &c);
+    fw64_renderer_set_clear_color(engine->renderer, &c);
     game->mode = MODE_DEFAULT;
 
     Mesh* mesh = malloc(sizeof(Mesh));
@@ -36,22 +36,22 @@ void game_update(Game* game, float time_delta){
 
 void game_draw(Game* game) {
     IVec2 screen_size;
-    renderer_get_screen_size(game->engine->renderer, &screen_size);
+    fw64_renderer_get_screen_size(game->engine->renderer, &screen_size);
     IVec2 measurement = font_measure_text(game->font, game->mode_name);
     int slice_width = image_sprite_get_slice_width(game->buttons);
 
     int x_pos = screen_size.x / 2 - measurement.x / 2;
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->quad_entity.transform, game->quad_entity.mesh);
-    renderer_draw_text(game->engine->renderer, game->font, x_pos, 10, game->mode_name);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->quad_entity.transform, game->quad_entity.mesh);
+    fw64_renderer_draw_text(game->engine->renderer, game->font, x_pos, 10, game->mode_name);
 
     if (game->mode > MODE_DEFAULT)
-        renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 4, x_pos - slice_width - 5, 10);
+        fw64_renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 4, x_pos - slice_width - 5, 10);
 
     if (game->mode < MODE_MIRROR)
-        renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 5, x_pos + measurement.x + 5, 10);
+        fw64_renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 5, x_pos + measurement.x + 5, 10);
 
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void set_texture_mode(Game* game, Mode mode) {

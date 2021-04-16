@@ -30,16 +30,16 @@ void game_update(Game* game, float time_delta){
 }
 
 void game_draw(Game* game) {
-    renderer_begin(game->engine->renderer, &game->fps.camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->blue_cube.transform, game->blue_cube.mesh);
+    fw64_renderer_begin(game->engine->renderer, &game->fps.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->blue_cube.transform, game->blue_cube.mesh);
     
     entity_billboard(&game->nintendo_seal, &game->fps.camera);
     entity_refresh(&game->nintendo_seal);
-    renderer_draw_static_mesh(game->engine->renderer, &game->nintendo_seal.transform, game->nintendo_seal.mesh);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->nintendo_seal.transform, game->nintendo_seal.mesh);
 
     entity_billboard(&game->n64_logo, &game->fps.camera);
     entity_refresh(&game->n64_logo);
-    renderer_draw_static_mesh(game->engine->renderer, &game->n64_logo.transform, game->n64_logo.mesh);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->n64_logo.transform, game->n64_logo.mesh);
 
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

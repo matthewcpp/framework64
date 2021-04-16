@@ -10,7 +10,7 @@ typedef struct {
 } N64LogoSprite;
 
 void n64_logo_sprite_init(N64LogoSprite* logo_sprite, ImageSprite* image);
-void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, Renderer* renderer);
+void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, fw64Renderer* renderer);
 
 typedef struct {
     ImageSprite* sprite;
@@ -22,7 +22,7 @@ typedef struct {
 
 void ken_sprite_init(KenSprite* ken, ImageSprite* image);
 void ken_sprite_update(KenSprite* ken, float time_delta);
-void ken_sprite_draw(KenSprite* ken, Renderer* renderer);
+void ken_sprite_draw(KenSprite* ken, fw64Renderer* renderer);
 
 typedef struct {
     float total_time;
@@ -30,7 +30,7 @@ typedef struct {
 
 void elapsed_time_init(ElapsedTime* elapsed_time);
 void elapsed_time_update(ElapsedTime* elapsed_time, float time_delta);
-void elapsed_time_draw(ElapsedTime* elpased_time, Renderer* renderer, Font* font);
+void elapsed_time_draw(ElapsedTime* elpased_time, fw64Renderer* renderer, Font* font);
 
 void init_basic_lazer(Font* font);
 

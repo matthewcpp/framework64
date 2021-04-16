@@ -35,7 +35,7 @@ void game_init(Game* game, fw64Engine* engine) {
     camera_update_projection_matrix(&game->arcball.camera);
 
     Color fill_color = {255, 0, 0};
-    renderer_set_fill_color(engine->renderer, &fill_color);
+    fw64_renderer_set_fill_color(engine->renderer, &fill_color);
 
     game->consolas = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
     game->button_sprite = fw64_assets_get_image(engine->assets, ASSET_sprite_buttons);
@@ -68,39 +68,39 @@ void game_update(Game* game, float time_delta) {
 }
 
 void game_draw(Game* game) {
-    Renderer* renderer = game->engine->renderer;
-    renderer_begin(renderer, &game->arcball.camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(renderer, &game->entity.transform, game->entity.mesh);
+    fw64Renderer* renderer = game->engine->renderer;
+    fw64_renderer_begin(renderer, &game->arcball.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(renderer, &game->entity.transform, game->entity.mesh);
 
     IVec2 screen_size;
-    renderer_get_screen_size(renderer, &screen_size);
+    fw64_renderer_get_screen_size(renderer, &screen_size);
 
     int button_width = image_sprite_get_slice_width(game->button_sprite);
     int draw_pos_x = 10;
     int draw_pos_y = 200;
 
-    renderer_draw_sprite_slice(renderer, game->button_sprite, 15, draw_pos_x, draw_pos_y);
+    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 15, draw_pos_x, draw_pos_y);
     draw_pos_x += button_width + 3;
-    renderer_draw_text(renderer, game->consolas, draw_pos_x, draw_pos_y, ORBIT_CAMERA_TEXT);
+    fw64_renderer_draw_text(renderer, game->consolas, draw_pos_x, draw_pos_y, ORBIT_CAMERA_TEXT);
 
     draw_pos_x = screen_size.x - game->switch_model_text_width - 3;
-    renderer_draw_text(renderer, game->consolas, draw_pos_x, draw_pos_y, SWITCH_MODEL_TEXT);
+    fw64_renderer_draw_text(renderer, game->consolas, draw_pos_x, draw_pos_y, SWITCH_MODEL_TEXT);
 
     draw_pos_x -= button_width + 3;
-    renderer_draw_sprite_slice(renderer, game->button_sprite, 5, draw_pos_x, draw_pos_y);
+    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 5, draw_pos_x, draw_pos_y);
 
     draw_pos_x -= button_width + 3;
-    renderer_draw_sprite_slice(renderer, game->button_sprite, 4, draw_pos_x, draw_pos_y);
+    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 4, draw_pos_x, draw_pos_y);
 
     draw_pos_y = 220;
     draw_pos_x = 10;
-    renderer_draw_sprite_slice(renderer, game->button_sprite, 0, draw_pos_x, draw_pos_y);
+    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 0, draw_pos_x, draw_pos_y);
 
     draw_pos_x += button_width + 3;
-    renderer_draw_sprite_slice(renderer, game->button_sprite, 1, draw_pos_x, draw_pos_y);
+    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 1, draw_pos_x, draw_pos_y);
 
     draw_pos_x += button_width + 3;
-    renderer_draw_text(renderer, game->consolas, draw_pos_x, draw_pos_y, ZOOM_CAMERA_TEXT);
+    fw64_renderer_draw_text(renderer, game->consolas, draw_pos_x, draw_pos_y, ZOOM_CAMERA_TEXT);
 
-    renderer_end(renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }

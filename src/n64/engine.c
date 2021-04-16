@@ -15,7 +15,7 @@ char memory_heap[FW64_N64_HEAP_SIZE];
 fw64Audio audio;
 fw64Assets assets;
 Input input;
-Renderer renderer;
+fw64Renderer renderer;
 Time time;
 
 int fw64_engine_init(fw64Engine* system) {
@@ -30,7 +30,7 @@ int fw64_engine_init(fw64Engine* system) {
     nuGfxInit(); // starts nusys graphics
     nuAuInit(); //starts the SGI tools audio manager
 
-    renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
+    fw64_renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     input_init(system->input);
     time_init(system->time);
     fw64_assets_init(system->assets);

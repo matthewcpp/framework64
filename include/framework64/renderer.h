@@ -16,20 +16,20 @@
 #define GFX_GLIST_LEN     2048
 
 typedef enum {
-    RENDERER_MODE_UNSET,
-    RENDERER_MODE_TRIANGLES,
-    RENDERER_MODE_LINES,
-    RENDERER_MODE_RECTANGLES
-} RenderMode;
+    FW64_RENDERER_MODE_UNSET,
+    FW64_RENDERER_MODE_TRIANGLES,
+    FW64_RENDERER_MODE_LINES,
+    FW64_RENDERER_MODE_RECTANGLES
+} fw64RenderMode;
 
 typedef enum {
-    RENDERER_FLAG_NONE,
-    RENDERER_FLAG_NOCLEAR = 0,
-    RENDERER_FLAG_CLEAR = 1,
+    FW64_RENDERER_FLAG_NONE,
+    FW64_RENDERER_FLAG_NOCLEAR = 0,
+    FW64_RENDERER_FLAG_CLEAR = 1,
 
-    RENDERER_FLAG_NOSWAP = 0,
-    RENDERER_FLAG_SWAP = 2,
-} RendererFlags;
+    FW64_RENDERER_FLAG_NOSWAP = 0,
+    FW64_RENDERER_FLAG_SWAP = 2,
+} fw64RendererFlags;
 
 typedef struct {
     // holds the current command insertion point of the display list
@@ -46,26 +46,26 @@ typedef struct {
 
     Vp view_port;
     IVec2 screen_size;
-    RenderMode render_mode;
+    fw64RenderMode render_mode;
     ShadingMode shading_mode;
-} Renderer;
+} fw64Renderer;
 
 
-void renderer_init(Renderer* renderer, int screen_width, int screen_height);
-void renderer_begin(Renderer* renderer, Camera* camera, RenderMode render_mode, RendererFlags flags);
-void renderer_set_clear_color(Renderer* renderer, Color* color);
-void renderer_end(Renderer* renderer, RendererFlags flags);
+void fw64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
+void fw64_renderer_begin(fw64Renderer* renderer, Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags);
+void fw64_renderer_set_clear_color(fw64Renderer* renderer, Color* color);
+void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
 
-void renderer_draw_static_mesh(Renderer* renderer, Transform* transform, Mesh* mesh);
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform, Mesh* mesh);
 
-void renderer_set_fill_color(Renderer* renderer, Color* color);
-void renderer_set_fill_mode(Renderer* renderer);
-void renderer_draw_filled_rect(Renderer* renderer, IRect* rect);
+void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color);
+void fw64_renderer_set_fill_mode(fw64Renderer* renderer);
+void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect);
 
-void renderer_draw_sprite(Renderer* renderer, ImageSprite* sprite, int x, int y);
-void renderer_draw_sprite_slice(Renderer* renderer, ImageSprite* sprite, int frame, int x, int y);
-void renderer_draw_text(Renderer* renderer, Font* font, int x, int y, const char* text);
+void fw64_renderer_draw_sprite(fw64Renderer* renderer, ImageSprite* sprite, int x, int y);
+void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, ImageSprite* sprite, int frame, int x, int y);
+void fw64_renderer_draw_text(fw64Renderer* renderer, Font* font, int x, int y, const char* text);
 
-void renderer_get_screen_size(Renderer* renderer, IVec2* screen_size);
+void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
 
 #endif

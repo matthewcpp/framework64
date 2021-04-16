@@ -15,7 +15,7 @@
 typedef struct {
     fw64Audio* audio;
     Input* input;
-    Renderer* renderer;
+    fw64Renderer* renderer;
     Time* time;
     fw64Assets* assets;
 } fw64Engine;

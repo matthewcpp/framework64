@@ -23,7 +23,7 @@ void game_update(Game* game, float time_delta){
 }
 
 void game_draw(Game* game) {
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_text(game->engine->renderer, game->consolas, 10, 10, game->str_buff);
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_text(game->engine->renderer, game->consolas, 10, 10, game->str_buff);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

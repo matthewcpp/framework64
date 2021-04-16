@@ -88,68 +88,68 @@ void game_update(Game* game, float time_delta){
 }
 
 static void draw_sound_controls(Game* game) {
-    Renderer* renderer = game->engine->renderer;
+    fw64Renderer* renderer = game->engine->renderer;
     char buffer[32];
 
-    renderer_draw_text(renderer, game->font, 10, 10, "Sounds");
-    renderer_draw_text(renderer, game->font, 10, 25, "Bank:");
+    fw64_renderer_draw_text(renderer, game->font, 10, 10, "Sounds");
+    fw64_renderer_draw_text(renderer, game->font, 10, 25, "Bank:");
     sprintf(buffer, "%d", game->sound_bank);
-    renderer_draw_text(renderer, game->font, 70, 25, buffer);
+    fw64_renderer_draw_text(renderer, game->font, 70, 25, buffer);
 
-    renderer_draw_text(renderer, game->font, 10, 40, "Sound:");
+    fw64_renderer_draw_text(renderer, game->font, 10, 40, "Sound:");
     sprintf(buffer, "%d", game->sound_num);
-    renderer_draw_text(renderer, game->font, 70, 40, buffer);
+    fw64_renderer_draw_text(renderer, game->font, 70, 40, buffer);
 
-    renderer_draw_text(renderer, game->font, 30, 55, "Play");
-    renderer_draw_text(renderer, game->font, 30, 70, "Stop");
+    fw64_renderer_draw_text(renderer, game->font, 30, 55, "Play");
+    fw64_renderer_draw_text(renderer, game->font, 30, 70, "Stop");
 
-    renderer_draw_sprite_slice(renderer, game->buttons, 3, 53, 25);
-    renderer_draw_sprite_slice(renderer, game->buttons, 2, 80, 25);
-    renderer_draw_sprite_slice(renderer, game->buttons, 4, 53, 40);
-    renderer_draw_sprite_slice(renderer, game->buttons, 5, 80, 40);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 3, 53, 25);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 2, 80, 25);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 4, 53, 40);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 5, 80, 40);
 
-    renderer_draw_sprite_slice(renderer, game->buttons, 0, 10, 55);
-    renderer_draw_sprite_slice(renderer, game->buttons, 1, 10, 70);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 0, 10, 55);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 1, 10, 70);
 }
 
 static void draw_music_controls(Game* game) {
-    Renderer* renderer = game->engine->renderer;
+    fw64Renderer* renderer = game->engine->renderer;
     char buffer[32];
 
     int offset = 200;
 
-    renderer_draw_text(renderer, game->font, offset + 10, 10, "Music");
-    renderer_draw_text(renderer, game->font, offset + 10, 25, "Bank:");
+    fw64_renderer_draw_text(renderer, game->font, offset + 10, 10, "Music");
+    fw64_renderer_draw_text(renderer, game->font, offset + 10, 25, "Bank:");
     sprintf(buffer, "%d", game->music_bank);
-    renderer_draw_text(renderer, game->font, offset + 70, 25, buffer);
+    fw64_renderer_draw_text(renderer, game->font, offset + 70, 25, buffer);
 
-    renderer_draw_text(renderer, game->font, offset + 10, 40, "Track:");
+    fw64_renderer_draw_text(renderer, game->font, offset + 10, 40, "Track:");
     sprintf(buffer, "%d", game->music_track);
-    renderer_draw_text(renderer, game->font, offset + 70, 40, buffer);
+    fw64_renderer_draw_text(renderer, game->font, offset + 70, 40, buffer);
 
-    renderer_draw_text(renderer, game->font, offset + 30, 55, "Play");
-    renderer_draw_text(renderer, game->font, offset + 30, 70, "Stop");
+    fw64_renderer_draw_text(renderer, game->font, offset + 30, 55, "Play");
+    fw64_renderer_draw_text(renderer, game->font, offset + 30, 70, "Stop");
 
-    renderer_draw_sprite_slice(renderer, game->buttons, 8, offset + 53, 25);
-    renderer_draw_sprite_slice(renderer, game->buttons, 9, offset + 80, 25);
-    renderer_draw_sprite_slice(renderer, game->buttons, 10, offset + 53, 40);
-    renderer_draw_sprite_slice(renderer, game->buttons, 11, offset + 80, 40);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 8, offset + 53, 25);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 9, offset + 80, 25);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 10, offset + 53, 40);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 11, offset + 80, 40);
 
-    renderer_draw_sprite_slice(renderer, game->buttons, 12, offset + 10, 55);
-    renderer_draw_sprite_slice(renderer, game->buttons, 13, offset + 10, 70);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 12, offset + 10, 55);
+    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 13, offset + 10, 70);
 }
 
 void game_draw(Game* game) {
-    Renderer* renderer = game->engine->renderer;
+    fw64Renderer* renderer = game->engine->renderer;
 
-    renderer_begin(renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
 
-    renderer_draw_static_mesh(renderer, &game->n64_logo.transform, game->n64_logo.mesh);
+    fw64_renderer_draw_static_mesh(renderer, &game->n64_logo.transform, game->n64_logo.mesh);
 
     draw_sound_controls(game);
     draw_music_controls(game);
 
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void change_sound_bank(Game* game, int delta) {

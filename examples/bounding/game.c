@@ -71,26 +71,24 @@ void game_update(Game* game, float time_delta){
 }
 
 void game_draw(Game* game) {
-
-
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->penguin.transform, game->penguin.mesh);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin.transform, game->penguin.mesh);
 
     for (int i = 0; i < CUBE_COUNT; i++)
-        renderer_draw_static_mesh(game->engine->renderer, &game->cubes[i].transform, game->cubes[i].mesh);
+        fw64_renderer_draw_static_mesh(game->engine->renderer, &game->cubes[i].transform, game->cubes[i].mesh);
     
     char text_buffer[32];
     sprintf(text_buffer, "Intersection: %s", intersection_text(game->intersection));
-    renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
+    fw64_renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
 
     // This seems to lock up CEN64
     // Uncomment following lines if running on hardware to see preview bounding box.
 
-    //renderer_end(game->engine->renderer, RENDERER_FLAG_NOSWAP);
+    //fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
-    //renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_LINES, RENDERER_FLAG_NOCLEAR);
-    //renderer_draw_static_mesh(game->engine->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    //fw64_renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_LINES, RENDERER_FLAG_NOCLEAR);
+    //fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void setup_camera(Game* game) {
@@ -120,7 +118,7 @@ Vec3 cube_positions[CUBE_COUNT] = {
 
 void init_cubes(Game* game) {
     
-    Mesh* cube_mesh = assets_get_mesh(game->engine->assets, ASSET_mesh_blue_cube);
+    Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, ASSET_mesh_blue_cube);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
         Entity* cube = &game->cubes[i];
