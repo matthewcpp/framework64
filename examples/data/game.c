@@ -13,10 +13,10 @@ void game_init(Game* game, fw64Engine* engine) {
     game->consolas = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
 
     memset(game->str_buff, 0, 32);
-    int handle = filesystem_open(ASSET_raw_sample);
-    int size= filesystem_size(handle);
-    filesystem_read(game->str_buff, 1, size, handle);
-    filesystem_close(handle);
+    int handle = fw64_filesystem_open(ASSET_raw_sample);
+    int size= fw64_filesystem_size(handle);
+    fw64_filesystem_read(game->str_buff, 1, size, handle);
+    fw64_filesystem_close(handle);
 }
 
 void game_update(Game* game, float time_delta){

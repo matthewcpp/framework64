@@ -16,7 +16,7 @@ fw64Audio audio;
 fw64Assets assets;
 fw64Input input;
 fw64Renderer renderer;
-Time time;
+fw64Time time;
 
 int fw64_engine_init(fw64Engine* system) {
     system->audio = &audio;
@@ -32,16 +32,16 @@ int fw64_engine_init(fw64Engine* system) {
 
     fw64_renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_input_init(system->input);
-    time_init(system->time);
+    fw64_time_init(system->time);
     fw64_assets_init(system->assets);
     fw64_audio_init(system->audio);
 
-    filesystem_init();
+    fw64_filesystem_init();
 
     return 1;
 }
 
 void fw64_engine_update(fw64Engine* system) {
-    time_update(system->time);
+    fw64_time_update(system->time);
     fw64_input_update(system->input);
 }

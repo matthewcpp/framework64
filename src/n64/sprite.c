@@ -16,27 +16,27 @@ int image_sprite_get_slice_height(ImageSprite* sprite) {
 }
 
 int sprite_load(int assetIndex, ImageSprite* sprite) {
-    int handle = filesystem_open(assetIndex);
+    int handle = fw64_filesystem_open(assetIndex);
     if (handle < 0)
         return 0;
 
     
-    int bytes_read = filesystem_read(sprite, sizeof(uint16_t), 4, handle);
+    int bytes_read = fw64_filesystem_read(sprite, sizeof(uint16_t), 4, handle);
     if (bytes_read != 8) {
-        filesystem_close(handle);
+        fw64_filesystem_close(handle);
         return 0;
     }
 
     int data_size = sprite->width * sprite->height * 2;
     sprite->data = memalign(8, data_size);
-    bytes_read = filesystem_read(sprite->data, 1, data_size, handle);
+    bytes_read = fw64_filesystem_read(sprite->data, 1, data_size, handle);
 
     sprite->wrap_s = G_TX_CLAMP;
     sprite->wrap_t = G_TX_CLAMP;
     sprite->mask_s = G_TX_NOMASK;
     sprite->mask_t = G_TX_NOMASK;
 
-    filesystem_close(handle);
+    fw64_filesystem_close(handle);
  
     return bytes_read == data_size;
 }

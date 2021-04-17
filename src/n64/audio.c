@@ -34,14 +34,14 @@ typedef enum {
 } fw64BankType;
 
 static int fw64_audio_load_bank(fw64Audio* audio, fw64BankType bank_type, int asset_id) {
-    int handle = filesystem_open(asset_id);
+    int handle = fw64_filesystem_open(asset_id);
 
     if (handle < 0)
         return handle;
 
     fw64SoundbankHeader header;
-    filesystem_read(&header, sizeof(fw64SoundbankHeader), 1, handle);
-    filesystem_close(handle);
+    fw64_filesystem_read(&header, sizeof(fw64SoundbankHeader), 1, handle);
+    fw64_filesystem_close(handle);
 
     uint32_t rom_address = n64_filesystem_get_rom_address(asset_id);
     uint32_t ctrl_file_address = rom_address + sizeof(fw64SoundbankHeader);
@@ -100,14 +100,14 @@ int fw64_audio_load_music(fw64Audio* audio, int asset_id) {
 
     fw64_audio_stop_music(audio);
 
-    int handle = filesystem_open(asset_id);
+    int handle = fw64_filesystem_open(asset_id);
 
     if (handle < 0)
         return handle;
 
     fw64MusicHeader header;
-    filesystem_read(&header, sizeof(fw64MusicHeader), 1, handle);
-    filesystem_close(asset_id);
+    fw64_filesystem_read(&header, sizeof(fw64MusicHeader), 1, handle);
+    fw64_filesystem_close(asset_id);
 
     int result = fw64_audio_load_bank(audio, BANK_TYPE_SEQUENCE, header.bank_asset_id);
     if (result != 1)

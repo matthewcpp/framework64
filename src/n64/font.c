@@ -53,19 +53,19 @@ IVec2 font_measure_text(Font* font, const char* str) {
 }
 
 int font_load(int index, Font* font) {
-    int handle = filesystem_open(index);
+    int handle = fw64_filesystem_open(index);
 
     if (handle == FW64_FILESYSTEM_INVALID_HANDLE)
         return 0;
 
-    filesystem_read(font, sizeof(uint16_t), 4, handle);
+    fw64_filesystem_read(font, sizeof(uint16_t), 4, handle);
 
     uint32_t spritefont_data_size = (font->spritefont_tile_width * font->spritefont_tile_height * 2) * font->glyph_count;
     uint32_t glyph_data_size = sizeof(FontGlyph) * font->glyph_count;
 
     uint8_t* payload = memalign(8, spritefont_data_size + glyph_data_size);
-    filesystem_read(payload, 1, spritefont_data_size + glyph_data_size, handle);
-    filesystem_close(handle);
+    fw64_filesystem_read(payload, 1, spritefont_data_size + glyph_data_size, handle);
+    fw64_filesystem_close(handle);
     
     font->spritefont = payload;
     font->glyphs = (FontGlyph*)(payload + spritefont_data_size);
