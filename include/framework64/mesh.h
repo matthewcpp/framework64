@@ -8,31 +8,31 @@
 #include <stdint.h>
 
 typedef enum {
-    SHADING_MODE_UNSET,
-    SHADING_MODE_UNLIT_VERTEX_COLORS,
-    SHADING_MODE_UNLIT_TEXTURED,
-    SHADING_MODE_GOURAUD,
-    SHADING_MODE_GOURAUD_TEXTURED,
-    SHADING_MODE_SPRITE,
-    SHADING_MODE_FILL
-} ShadingMode;
+    FW64_SHADING_MODE_UNSET,
+    FW64_SHADING_MODE_UNLIT_VERTEX_COLORS,
+    FW64_SHADING_MODE_UNLIT_TEXTURED,
+    FW64_SHADING_MODE_GOURAUD,
+    FW64_SHADING_MODE_GOURAUD_TEXTURED,
+    FW64_SHADING_MODE_SPRITE,
+    FW64_SHADING_MODE_FILL
+} fw64ShadingMode;
 
-#define MATERIAL_NO_TEXTURE UINT16_MAX
-#define MATERIAL_NO_COLOR UINT32_MAX
+#define FW64_MATERIAL_NO_TEXTURE UINT16_MAX
+#define FW64_MATERIAL_NO_COLOR UINT32_MAX
 
 typedef struct {
     uint32_t color;
     uint16_t texture;
     uint16_t texture_frame;
     uint32_t mode;
-} Material;
+} fw64Material;
 
 typedef struct {
     Box bounding_box;
     uint32_t vertices; // offset into mesh vertex array
     uint32_t display_list; // offset into mesh display_list array
-    Material material;
-} Primitive;
+    fw64Material material;
+} fw64Primitive;
 
 typedef struct {
     uint32_t primitive_count;
@@ -42,36 +42,36 @@ typedef struct {
     uint32_t display_list_count;
     uint32_t _vertex_pointer_data_size; // only used during loading
     Box bounding_box;
-} MeshInfo;
+} fw64MeshInfo;
 
 typedef struct {
-    MeshInfo info;
-    Primitive* primitives;
+    fw64MeshInfo info;
+    fw64Primitive* primitives;
     ImageSprite* textures;
     Lights1* colors;
     Vtx* vertex_buffer;
     Gfx* display_list;
-} Mesh;
+} fw64Mesh;
 
 /**
 Loads a mesh and all dependant assets from the asset bundle.
 @param asset_index the mesh asset index.  Refer to the generated assets.h file.
 */
-int mesh_load(int asset_index, Mesh* mesh);
+int fw64_mesh_load(int asset_index, fw64Mesh* mesh);
 
 /**
 Unloads a mesh that was loaded with \ref mesh_load
 */
-void mesh_unload(Mesh* mesh);
+void fw64_mesh_unload(fw64Mesh* mesh);
 
 /**
 Initializes a mesh for manual construction.
 */
-void mesh_init(Mesh* mesh);
+void fw64_mesh_init(fw64Mesh* mesh);
 
 /**
 Cleans up a mesh that was manually constructed after calling \ref mesh_init
 */
-void mesh_uninit(Mesh* mesh);
+void fw64_mesh_uninit(fw64Mesh* mesh);
 
 #endif

@@ -38,7 +38,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->sound_id = 0;
 
-    Mesh* mesh = malloc(sizeof(Mesh));
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     textured_quad_create(mesh, fw64_assets_get_image(engine->assets, ASSET_sprite_n64_logo));
     entity_init(&game->n64_logo, mesh);
 

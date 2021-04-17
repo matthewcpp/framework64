@@ -4,7 +4,7 @@
 
 #include <nusys.h>
 
-void entity_init(Entity* entity, Mesh* mesh) {
+void entity_init(Entity* entity, fw64Mesh* mesh) {
     transform_init(&entity->transform);
     entity->mesh = mesh;
 
@@ -21,7 +21,7 @@ void entity_refresh(Entity* entity) {
         matrix_transform_box(fmatrix, &entity->mesh->info.bounding_box, &entity->bounding);
 }
 
-void entity_set_mesh(Entity* entity, Mesh* mesh) {
+void entity_set_mesh(Entity* entity, fw64Mesh* mesh) {
     entity->mesh = mesh;
 
     if (mesh) {

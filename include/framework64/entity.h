@@ -9,11 +9,11 @@
 typedef struct {
     Transform transform;
     Box bounding;
-    Mesh* mesh;
+    fw64Mesh* mesh;
 } Entity;
 
-void entity_init(Entity* entity, Mesh* mesh);
-void entity_set_mesh(Entity* entity, Mesh* mesh);
+void entity_init(Entity* entity, fw64Mesh* mesh);
+void entity_set_mesh(Entity* entity, fw64Mesh* mesh);
 void entity_refresh(Entity* entity);
 void entity_billboard(Entity* entity, Camera* camera);
 

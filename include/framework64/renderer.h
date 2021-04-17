@@ -47,7 +47,7 @@ typedef struct {
     Vp view_port;
     IVec2 screen_size;
     fw64RenderMode render_mode;
-    ShadingMode shading_mode;
+    fw64ShadingMode shading_mode;
 } fw64Renderer;
 
 
@@ -56,7 +56,7 @@ void fw64_renderer_begin(fw64Renderer* renderer, Camera* camera, fw64RenderMode 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, Color* color);
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
 
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform, Mesh* mesh);
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform, fw64Mesh* mesh);
 
 void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color);
 void fw64_renderer_set_fill_mode(fw64Renderer* renderer);
@@ -64,7 +64,7 @@ void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect);
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, ImageSprite* sprite, int x, int y);
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, ImageSprite* sprite, int frame, int x, int y);
-void fw64_renderer_draw_text(fw64Renderer* renderer, Font* font, int x, int y, const char* text);
+void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
 

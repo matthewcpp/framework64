@@ -5,15 +5,15 @@
 #include <malloc.h>
 #include <string.h>
 
-static void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data, int handle);
-static void load_textures(Mesh* mesh, uint32_t* asset_index_data, int handle);
+static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle);
+static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle);
 
-int mesh_load(int asset_index, Mesh* mesh) {
+int fw64_mesh_load(int asset_index, fw64Mesh* mesh) {
     int handle = fw64_filesystem_open(asset_index);
     if (handle < 0)
         return 0;
 
-    fw64_filesystem_read(&mesh->info, sizeof(MeshInfo), 1, handle);
+    fw64_filesystem_read(&mesh->info, sizeof(fw64MeshInfo), 1, handle);
 
     mesh->vertex_buffer = memalign(8, sizeof(Vtx) * mesh->info.vertex_count );
     fw64_filesystem_read(mesh->vertex_buffer, sizeof(Vtx),  mesh->info.vertex_count, handle);
@@ -24,8 +24,8 @@ int mesh_load(int asset_index, Mesh* mesh) {
     mesh->colors = memalign(8, sizeof(Lights1) * mesh->info.color_count);
     fw64_filesystem_read(mesh->colors, sizeof(Lights1), mesh->info.color_count, handle);
 
-    mesh->primitives = malloc(sizeof(Primitive) * mesh->info.primitive_count);
-    fw64_filesystem_read(mesh->primitives, sizeof(Primitive), mesh->info.primitive_count, handle);
+    mesh->primitives = malloc(sizeof(fw64Primitive) * mesh->info.primitive_count);
+    fw64_filesystem_read(mesh->primitives, sizeof(fw64Primitive), mesh->info.primitive_count, handle);
 
     uint32_t scratch_data_size = mesh->info._vertex_pointer_data_size > mesh->info.texture_count * sizeof(uint32_t) ? mesh->info._vertex_pointer_data_size : mesh->info.texture_count * sizeof(uint32_t);
     uint32_t* scratch_data = malloc(scratch_data_size);
@@ -40,7 +40,7 @@ int mesh_load(int asset_index, Mesh* mesh) {
     return 1;
 }
 
-void mesh_unload(Mesh* mesh) {
+void fw64_mesh_unload(fw64Mesh* mesh) {
     if (mesh->vertex_buffer)
         free(mesh->vertex_buffer);
 
@@ -62,7 +62,7 @@ void mesh_unload(Mesh* mesh) {
     }
 }
 
-static void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data, int handle) {
+static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle) {
     fw64_filesystem_read(vertex_pointer_data, 1, mesh->info._vertex_pointer_data_size, handle);
 
     uint32_t* vertex_pointer_counts = vertex_pointer_data;
@@ -71,7 +71,7 @@ static void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data, int
     uint32_t offset_index = 0;
 
     for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
-        Primitive* primitive = mesh->primitives + i;
+        fw64Primitive* primitive = mesh->primitives + i;
 
         Vtx* vertex_buffer = mesh->vertex_buffer + primitive->vertices;
         Gfx* display_list = mesh->display_list + primitive->display_list;
@@ -84,7 +84,7 @@ static void fixup_vertex_pointers(Mesh* mesh, uint32_t* vertex_pointer_data, int
     }
 }
 
-static void load_textures(Mesh* mesh, uint32_t* asset_index_data, int handle) {
+static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle) {
     if (mesh->info.texture_count > 0) {
         fw64_filesystem_read(asset_index_data, sizeof(uint32_t), mesh->info.texture_count, handle);
         mesh->textures = malloc(sizeof(ImageSprite) * mesh->info.texture_count);
@@ -98,10 +98,10 @@ static void load_textures(Mesh* mesh, uint32_t* asset_index_data, int handle) {
     }
 }
 
-void mesh_init(Mesh* mesh) {
-    memset(mesh, 0, sizeof(Mesh));
+void fw64_mesh_init(fw64Mesh* mesh) {
+    memset(mesh, 0, sizeof(fw64Mesh));
 }
 
-void mesh_uninit(Mesh* mesh) {
-    mesh_unload(mesh);
+void fw64_mesh_uninit(fw64Mesh* mesh) {
+    fw64_mesh_unload(mesh);
 }

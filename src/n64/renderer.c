@@ -30,7 +30,7 @@ void fw64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_hei
     renderer->view_port.vp.vtrans[3] = 0;
 
     renderer->render_mode = FW64_RENDERER_MODE_UNSET;
-    renderer->shading_mode = SHADING_MODE_UNSET;
+    renderer->shading_mode = FW64_SHADING_MODE_UNSET;
 }
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, Color* clear_color) {
@@ -133,7 +133,7 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
     gDPFullSync(renderer->display_list++);
     gSPEndDisplayList(renderer->display_list++);
 
-    renderer->shading_mode = SHADING_MODE_UNSET;
+    renderer->shading_mode = FW64_SHADING_MODE_UNSET;
 
     nuGfxTaskStart(renderer->display_list_start, 
         (s32)(renderer->display_list - renderer->display_list_start) * sizeof (Gfx), 
@@ -141,13 +141,13 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
         (flags & FW64_RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }
 
-static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, ShadingMode shading_mode) {
+static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMode shading_mode) {
     if (shading_mode == renderer->shading_mode) return;
 
     renderer->shading_mode = shading_mode;
 
     switch(renderer->shading_mode) {
-        case SHADING_MODE_UNLIT_TEXTURED:
+        case FW64_SHADING_MODE_UNLIT_TEXTURED:
             gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
@@ -155,12 +155,12 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, ShadingMode s
             gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
             break;
 
-        case SHADING_MODE_GOURAUD:
+        case FW64_SHADING_MODE_GOURAUD:
             gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
             gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
             break;
 
-        case SHADING_MODE_GOURAUD_TEXTURED:
+        case FW64_SHADING_MODE_GOURAUD_TEXTURED:
             gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
             gDPSetCombineMode(renderer->display_list++,G_CC_MODULATERGBA , G_CC_MODULATERGBA );
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
@@ -169,7 +169,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, ShadingMode s
             gDPSetTextureFilter(renderer->display_list++,G_TF_POINT);
         break;
 
-        case SHADING_MODE_SPRITE:
+        case FW64_SHADING_MODE_SPRITE:
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
@@ -226,12 +226,12 @@ static void _fw64_draw_sprite_slice(fw64Renderer* renderer, ImageSprite* sprite,
 }
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, ImageSprite* sprite, int frame, int x, int y) {
-    fw64_renderer_set_shading_mode(renderer, SHADING_MODE_SPRITE);
+    fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
     _fw64_draw_sprite_slice(renderer, sprite, frame, x, y);
 }
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, ImageSprite* sprite, int x, int y) {
-    fw64_renderer_set_shading_mode(renderer, SHADING_MODE_SPRITE);
+    fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
 
     int slice_width = image_sprite_get_slice_width(sprite);
     int slice_height = image_sprite_get_slice_height(sprite);
@@ -247,9 +247,9 @@ void fw64_renderer_draw_sprite(fw64Renderer* renderer, ImageSprite* sprite, int 
     }
 }
 
-void fw64_renderer_draw_text(fw64Renderer* renderer, Font* font, int x, int y, const char* text) {
+void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
     if (!text || text[0] == 0) return;
-    fw64_renderer_set_shading_mode(renderer, SHADING_MODE_SPRITE);
+    fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
 /*
     TODO: Color blending? need better alpha than 5551
     gDPSetPrimColor(renderer->display_list++, 255, 255, color->r, color->g, color->b, 255);
@@ -257,14 +257,14 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, Font* font, int x, int y, c
 */
     
     char ch = text[0];
-    uint16_t glyph_index = font_get_glyph_index(font, ch);
-    FontGlyph* glyph = font->glyphs + glyph_index;
+    uint16_t glyph_index = fw64_font_get_glyph_index(font, ch);
+    fw64FontGlyph* glyph = font->glyphs + glyph_index;
     uint16_t stride = font->spritefont_tile_width * font->spritefont_tile_height * 2;
 
     int caret = x + glyph->left;
 
     while (ch) {
-        glyph_index = font_get_glyph_index(font, ch);
+        glyph_index = fw64_font_get_glyph_index(font, ch);
         glyph = font->glyphs + glyph_index;
 
         int draw_pos_x = caret + glyph->left;
@@ -292,16 +292,16 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, Font* font, int x, int y, c
     }
 }
 
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform, Mesh* mesh) {
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform, fw64Mesh* mesh) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
-        Primitive* primitive = mesh->primitives + i;
+        fw64Primitive* primitive = mesh->primitives + i;
         
         fw64_renderer_set_shading_mode(renderer, primitive->material.mode);
 
-        if (primitive->material.mode == SHADING_MODE_GOURAUD_TEXTURED || 
-            primitive->material.mode == SHADING_MODE_UNLIT_TEXTURED ) {
+        if (primitive->material.mode == FW64_SHADING_MODE_GOURAUD_TEXTURED || 
+            primitive->material.mode == FW64_SHADING_MODE_UNLIT_TEXTURED ) {
             ImageSprite* texture = mesh->textures + primitive->material.texture;
 
             int slice_width = image_sprite_get_slice_width(texture);
@@ -313,7 +313,7 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform
                 texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
         }
 
-        if (primitive->material.color != MATERIAL_NO_COLOR)
+        if (primitive->material.color != FW64_MATERIAL_NO_COLOR)
             gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
 
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);

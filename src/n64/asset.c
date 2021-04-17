@@ -39,13 +39,13 @@ int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index) {
     return fw64_find_asset(assets, index) != NULL;
 }
 
-Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
-    Mesh* mesh = fw64_find_asset(assets, index);
+fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
+    fw64Mesh* mesh = fw64_find_asset(assets, index);
 
     if (!mesh) {
-        mesh = malloc(sizeof(Mesh));
+        mesh = malloc(sizeof(fw64Mesh));
 
-        if (mesh_load(index, mesh)) {
+        if (fw64_mesh_load(index, mesh)) {
             fw64_insert_asset(assets, mesh, index);
         }
         else {
