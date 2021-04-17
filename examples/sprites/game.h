@@ -12,7 +12,7 @@ typedef struct {
     KenSprite ken_sprite;
     N64LogoSprite n64logo;
     ElapsedTime elapsed_time;
-    Font basic_lazer;
+    fw64Font basic_lazer;
 } Game;
 
 void game_init(Game* game, fw64Engine* engine);

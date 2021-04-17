@@ -18,7 +18,7 @@ typedef struct {
     Mode mode;
     const char* mode_name;
     ImageSprite* buttons;
-    Font* font;
+    fw64Font* font;
 } Game;
 
 void game_init(Game* game, fw64Engine* engine);

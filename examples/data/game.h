@@ -7,7 +7,7 @@
 typedef struct {
     fw64Engine* engine;
     Camera camera;
-    Font* consolas;
+    fw64Font* consolas;
     char str_buff[32];
 } Game;
 

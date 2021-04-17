@@ -19,7 +19,7 @@ typedef struct {
     Entity penguin_box;
     Entity cubes[CUBE_COUNT];
     CubeId intersection;
-    Font* font;
+    fw64Font* font;
 } Game;
 
 void game_init(Game* game, fw64Engine* engine);

@@ -57,13 +57,13 @@ Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
     return mesh;
 }
 
-Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
-    Font* font = fw64_find_asset(assets, index);
+fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
+    fw64Font* font = fw64_find_asset(assets, index);
 
     if (!font) {
-        font = malloc(sizeof(Font));
+        font = malloc(sizeof(fw64Font));
 
-        if (font_load(index, font)) {
+        if (fw64_font_load(index, font)) {
             fw64_insert_asset(assets, font, index);
         }
         else{

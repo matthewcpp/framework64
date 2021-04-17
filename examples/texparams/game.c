@@ -37,7 +37,7 @@ void game_update(Game* game, float time_delta){
 void game_draw(Game* game) {
     IVec2 screen_size;
     fw64_renderer_get_screen_size(game->engine->renderer, &screen_size);
-    IVec2 measurement = font_measure_text(game->font, game->mode_name);
+    IVec2 measurement = fw64_font_measure_text(game->font, game->mode_name);
     int slice_width = image_sprite_get_slice_width(game->buttons);
 
     int x_pos = screen_size.x / 2 - measurement.x / 2;

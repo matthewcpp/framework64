@@ -7,7 +7,7 @@
 
 typedef union {
     void* any;
-    Font* font;
+    fw64Font* font;
     ImageSprite* image;
     Mesh* mesh;
 } fw64AssetPtr;
@@ -27,7 +27,7 @@ void fw64_assets_init(fw64Assets* assets);
 
 int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index);
 Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index);
-Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index);
+fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index);
 ImageSprite* fw64_assets_get_image(fw64Assets* assets, uint32_t index);
 
 #endif
