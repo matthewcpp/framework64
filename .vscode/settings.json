@@ -10,6 +10,7 @@
         "vec2.h": "c",
         "vec3.h": "c",
         "quat.h": "c",
-        "sparse_set.h": "c"
+        "sparse_set.h": "c",
+        "arcball_camera.h": "c"
     }
 }

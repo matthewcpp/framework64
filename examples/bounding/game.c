@@ -36,7 +36,7 @@ void game_init(Game* game, fw64Engine* engine) {
 void game_update(Game* game, float time_delta){
     
     Vec2 stick;
-    input_stick(game->engine->input, 0, &stick);
+    fw64_input_stick(game->engine->input, 0, &stick);
     
     if (stick.x >= STICK_THRESHOLD || stick.x <= -STICK_THRESHOLD  || stick.y >= STICK_THRESHOLD || stick.y <= -STICK_THRESHOLD) {
         mat2_transform_vec2(stick_adjust, & stick);
@@ -51,11 +51,11 @@ void game_update(Game* game, float time_delta){
 
     Vec3 scale_delta;
     vec3_set_all(&scale_delta, time_delta * SCALE_SPEED);
-    if (input_button_down(game->engine->input, 0, CONTROLLER_BUTTON_C_UP)) {
+    if (fw64_input_button_down(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_UP)) {
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }
 
-    if (input_button_down(game->engine->input, 0, CONTROLLER_BUTTON_C_DOWN)) {
+    if (fw64_input_button_down(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_DOWN)) {
         vec3_negate(&scale_delta);
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }

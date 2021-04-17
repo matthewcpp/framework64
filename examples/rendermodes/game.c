@@ -47,13 +47,13 @@ void game_init(Game* game, fw64Engine* engine) {
 void game_update(Game* game, float time_delta) {
     int previous_entity = game->current_entity;
 
-    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_RIGHT)) {
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_RIGHT)) {
         game->current_entity += 1;
         if (game->current_entity >= ENTITY_COUNT)
             game->current_entity = 0;
     }
 
-        if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_LEFT)) {
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_LEFT)) {
         game->current_entity -= 1;
         if (game->current_entity < 0)
             game->current_entity = ENTITY_COUNT - 1;

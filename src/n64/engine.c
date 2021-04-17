@@ -14,7 +14,7 @@ char memory_heap[FW64_N64_HEAP_SIZE];
 
 fw64Audio audio;
 fw64Assets assets;
-Input input;
+fw64Input input;
 fw64Renderer renderer;
 Time time;
 
@@ -31,7 +31,7 @@ int fw64_engine_init(fw64Engine* system) {
     nuAuInit(); //starts the SGI tools audio manager
 
     fw64_renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
-    input_init(system->input);
+    fw64_input_init(system->input);
     time_init(system->time);
     fw64_assets_init(system->assets);
     fw64_audio_init(system->audio);
@@ -43,5 +43,5 @@ int fw64_engine_init(fw64Engine* system) {
 
 void fw64_engine_update(fw64Engine* system) {
     time_update(system->time);
-    input_update(system->input);
+    fw64_input_update(system->input);
 }
