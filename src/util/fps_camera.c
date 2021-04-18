@@ -3,7 +3,7 @@
 void fps_camera_init(FpsCamera* fps, fw64Input* input){
     fps->input = input;
 
-    camera_init(&fps->camera);
+    fw64_camera_init(&fps->camera);
     vec2_set(&fps->rotation, 0.0f, 0.0f);
 }
 
@@ -109,5 +109,5 @@ void fps_camera_update(FpsCamera* fps, float time_delta) {
     Vec3 up = {0.0f, 1.0f, 0.0f};
 
     transform_look_at(&fps->camera.transform, &tar, &up);
-    camera_update_view_matrix(&fps->camera);
+    fw64_camera_update_view_matrix(&fps->camera);
 }

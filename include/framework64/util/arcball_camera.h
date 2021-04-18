@@ -7,7 +7,7 @@
 
 typedef struct {
     fw64Input* _input;
-    Camera camera;
+    fw64Camera camera;
 
     float _distance;
     float _diagonal;

@@ -33,7 +33,7 @@ void entity_set_mesh(Entity* entity, fw64Mesh* mesh) {
     }
 }
 
-void entity_billboard(Entity* entity, Camera* camera) {
+void entity_billboard(Entity* entity, fw64Camera* camera) {
     Vec3 camera_forward, camera_up, target;
     transform_forward(&camera->transform, &camera_forward);
     transform_up(&camera->transform, &camera_up);

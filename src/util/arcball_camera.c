@@ -15,7 +15,7 @@ static void _arcball_reset(ArcballCamera* arcball) {
 void arcball_init(ArcballCamera* arcball, fw64Input* input) {
     arcball->_input = input;
 
-    camera_init(&arcball->camera);
+    fw64_camera_init(&arcball->camera);
 
     arcball->_diagonal = 1.0f;
     _arcball_reset(arcball);
@@ -43,7 +43,7 @@ void _arcball_update_camera_position(ArcballCamera* arcball) {
     vec3_add(&arcball->camera.transform.position, &arcball->_target, &orbit_pos);
 
     transform_look_at(&arcball->camera.transform, &arcball->_target, &up);
-    camera_update_view_matrix(&arcball->camera);
+    fw64_camera_update_view_matrix(&arcball->camera);
 }
 
 void arcball_set_initial(ArcballCamera* arcball, Box* box) {

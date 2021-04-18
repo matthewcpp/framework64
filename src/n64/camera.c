@@ -1,6 +1,6 @@
 #include "framework64/camera.h"
 
-void camera_init(Camera* camera) {
+void fw64_camera_init(fw64Camera* camera) {
     transform_init(&camera->transform);
 
     camera->near = 0.1f;
@@ -9,16 +9,16 @@ void camera_init(Camera* camera) {
     camera->aspect = 1.33f;
     camera->transform.position.z = 5.0f;
 
-    camera_update_projection_matrix(camera);
-    camera_update_view_matrix(camera);
+    fw64_camera_update_projection_matrix(camera);
+    fw64_camera_update_view_matrix(camera);
 }
 
-void camera_update_projection_matrix(Camera* camera) {
+void fw64_camera_update_projection_matrix(fw64Camera* camera) {
     guPerspective(&camera->projection, &camera->perspNorm, 
     camera->fovy, camera->aspect, camera->near, camera->far, 1.0f);
 }
 
-void camera_update_view_matrix(Camera* camera) {
+void fw64_camera_update_view_matrix(fw64Camera* camera) {
     Vec3 forward, up, target;
     transform_forward(&camera->transform, &forward);
     transform_up(&camera->transform, &up);

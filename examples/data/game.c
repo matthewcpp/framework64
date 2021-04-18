@@ -8,7 +8,7 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
 
     game->consolas = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
 

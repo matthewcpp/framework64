@@ -39,7 +39,7 @@ typedef struct {
     // display list for drawing commands
     Gfx gfx_list[GFX_DLIST_LEN];
 
-    Camera* camera;
+    fw64Camera* camera;
 
     u16 fill_color;
     u16 clear_color;
@@ -52,7 +52,7 @@ typedef struct {
 
 
 void fw64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
-void fw64_renderer_begin(fw64Renderer* renderer, Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags);
+void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags);
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, Color* color);
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
 

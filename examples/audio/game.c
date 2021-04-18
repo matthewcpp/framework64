@@ -25,7 +25,7 @@ void change_music_track(Game* game, int delta);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
 
     game->sound_bank = -1;
     change_sound_bank(game, 1);

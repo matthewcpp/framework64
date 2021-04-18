@@ -32,7 +32,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->arcball.camera.near = 4.0f;
     game->arcball.camera.far = 1000.0f;
-    camera_update_projection_matrix(&game->arcball.camera);
+    fw64_camera_update_projection_matrix(&game->arcball.camera);
 
     Color fill_color = {255, 0, 0};
     fw64_renderer_set_fill_color(engine->renderer, &fill_color);

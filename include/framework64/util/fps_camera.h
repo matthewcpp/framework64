@@ -6,7 +6,7 @@
 #include "framework64/vec2.h"
 
 typedef struct {
-    Camera camera;
+    fw64Camera camera;
     fw64Input* input;
     Vec2 rotation;
 } FpsCamera;

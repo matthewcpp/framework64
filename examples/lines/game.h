@@ -13,7 +13,7 @@ typedef enum {
 
 typedef struct lines_example {
     fw64Engine* engine;
-    Camera camera;
+    fw64Camera camera;
     DrawMode draw_mode;
     float rotation;
     Entity solid_cube;

@@ -10,7 +10,7 @@ static void set_texture_mode(Game* game, Mode mode);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
 
     Color c = {39, 58, 93};
     fw64_renderer_set_clear_color(engine->renderer, &c);

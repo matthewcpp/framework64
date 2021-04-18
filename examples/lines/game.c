@@ -6,12 +6,12 @@
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
     vec3_set(&game->camera.transform.position, 0.0f, 0.0f, 5.0f);
     Vec3 target = {0.0f, 0.0f, 0.0f};
     Vec3 up = {0.0f, 1.0f, 0.0f};
     transform_look_at(&game->camera.transform, &target, &up);
-    camera_update_view_matrix(&game->camera);
+    fw64_camera_update_view_matrix(&game->camera);
 
     game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 

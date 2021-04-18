@@ -6,7 +6,7 @@
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
 
     n64_logo_sprite_init(&game->n64logo, fw64_assets_get_image(game->engine->assets, ASSET_sprite_n64_logo));
     game->n64logo.position.x = 10;

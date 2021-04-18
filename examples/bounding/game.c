@@ -92,11 +92,11 @@ void game_draw(Game* game) {
 }
 
 void setup_camera(Game* game) {
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
 
     game->camera.near = 25.0f;
     game->camera.far = 1000;
-    camera_update_projection_matrix(&game->camera);
+    fw64_camera_update_projection_matrix(&game->camera);
 
     Vec3 center, size, up = {0.0f, 1.0f, 0.0f};
 
@@ -106,7 +106,7 @@ void setup_camera(Game* game) {
     vec3_set(&game->camera.transform.position, center.x, center.y + size.y * 2, center.z - size.z* 2);
     transform_look_at(&game->camera.transform, &center, &up);
 
-    camera_update_view_matrix(&game->camera);
+    fw64_camera_update_view_matrix(&game->camera);
 }
 
 Vec3 cube_positions[CUBE_COUNT] = {

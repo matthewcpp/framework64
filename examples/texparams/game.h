@@ -13,7 +13,7 @@ typedef enum {
 
 typedef struct {
     fw64Engine* engine;
-    Camera camera;
+    fw64Camera camera;
     Entity quad_entity;
     Mode mode;
     const char* mode_name;

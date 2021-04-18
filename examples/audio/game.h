@@ -5,7 +5,7 @@
 
 typedef struct {
     fw64Engine* engine;
-    Camera camera;
+    fw64Camera camera;
     fw64Texture* buttons;
     fw64Font* font;
     int sound_bank;

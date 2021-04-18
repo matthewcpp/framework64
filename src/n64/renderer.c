@@ -88,7 +88,7 @@ void fw64_renderer_clear_frame_buffer(fw64Renderer* renderer) {
     gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE); 
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags) {
+void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags) {
     renderer->render_mode = render_mode;
     renderer->camera = camera;
 

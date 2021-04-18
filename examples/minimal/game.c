@@ -3,7 +3,7 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
 }
 
 void game_update(Game* game, float time_delta){
