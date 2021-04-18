@@ -13,7 +13,7 @@
 #include <nusys.h>
 
 /* The maximum length of the display list of one task  */
-#define GFX_GLIST_LEN     2048
+#define GFX_DLIST_LEN     2048
 
 typedef enum {
     FW64_RENDERER_MODE_UNSET,
@@ -37,7 +37,7 @@ typedef struct {
     Gfx* display_list_start;
 
     // display list for drawing commands
-    Gfx gfx_list[GFX_GLIST_LEN];
+    Gfx gfx_list[GFX_DLIST_LEN];
 
     Camera* camera;
 
