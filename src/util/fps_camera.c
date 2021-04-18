@@ -108,6 +108,6 @@ void fps_camera_update(FpsCamera* fps, float time_delta) {
 
     Vec3 up = {0.0f, 1.0f, 0.0f};
 
-    transform_look_at(&fps->camera.transform, &tar, &up);
+    fw64_transform_look_at(&fps->camera.transform, &tar, &up);
     fw64_camera_update_view_matrix(&fps->camera);
 }

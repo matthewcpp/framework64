@@ -7,7 +7,7 @@
 
 
 typedef struct {
-    Transform transform;
+    fw64Transform transform;
     Mtx projection;
     Mtx view;
     float near, far;

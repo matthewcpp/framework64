@@ -1,7 +1,7 @@
 #include "framework64/camera.h"
 
 void fw64_camera_init(fw64Camera* camera) {
-    transform_init(&camera->transform);
+    fw64_transform_init(&camera->transform);
 
     camera->near = 0.1f;
     camera->far = 1000.0f;
@@ -20,8 +20,8 @@ void fw64_camera_update_projection_matrix(fw64Camera* camera) {
 
 void fw64_camera_update_view_matrix(fw64Camera* camera) {
     Vec3 forward, up, target;
-    transform_forward(&camera->transform, &forward);
-    transform_up(&camera->transform, &up);
+    fw64_transform_forward(&camera->transform, &forward);
+    fw64_transform_up(&camera->transform, &up);
     vec3_normalize(&up);
 
     vec3_add(&target, &camera->transform.position, &forward);

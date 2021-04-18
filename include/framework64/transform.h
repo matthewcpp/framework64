@@ -11,16 +11,16 @@ typedef struct {
     Quat rotation;
     Vec3 scale;
     Mtx matrix;
-} Transform;
+} fw64Transform;
 
-void transform_init(Transform* transform);
-void transform_forward(Transform* transform, Vec3* out);
-void transform_back(Transform* transform, Vec3* out);
-void transform_up(Transform* transform, Vec3* out);
-void transform_down(Transform* transform, Vec3* out);
-void transform_left(Transform* transform, Vec3* out);
-void transform_right(Transform* transform, Vec3* out);
+void fw64_transform_init(fw64Transform* transform);
+void fw64_transform_forward(fw64Transform* transform, Vec3* out);
+void fw64_transform_back(fw64Transform* transform, Vec3* out);
+void fw64_transform_up(fw64Transform* transform, Vec3* out);
+void fw64_transform_down(fw64Transform* transform, Vec3* out);
+void fw64_transform_left(fw64Transform* transform, Vec3* out);
+void fw64_transform_right(fw64Transform* transform, Vec3* out);
 
-void transform_look_at(Transform* transform, Vec3* target, Vec3* up);
-void transform_update_matrix(Transform* transform);
+void fw64_transform_look_at(fw64Transform* transform, Vec3* target, Vec3* up);
+void fw64_transform_update_matrix(fw64Transform* transform);
 #endif

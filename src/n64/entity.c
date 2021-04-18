@@ -5,7 +5,7 @@
 #include <nusys.h>
 
 void entity_init(Entity* entity, fw64Mesh* mesh) {
-    transform_init(&entity->transform);
+    fw64_transform_init(&entity->transform);
     entity->mesh = mesh;
 
     entity_refresh(entity);
@@ -35,9 +35,9 @@ void entity_set_mesh(Entity* entity, fw64Mesh* mesh) {
 
 void entity_billboard(Entity* entity, fw64Camera* camera) {
     Vec3 camera_forward, camera_up, target;
-    transform_forward(&camera->transform, &camera_forward);
-    transform_up(&camera->transform, &camera_up);
+    fw64_transform_forward(&camera->transform, &camera_forward);
+    fw64_transform_up(&camera->transform, &camera_up);
 
     vec3_add(&target, &entity->transform.position, &camera_forward);
-    transform_look_at(&entity->transform, &target, &camera_up);
+    fw64_transform_look_at(&entity->transform, &target, &camera_up);
 }

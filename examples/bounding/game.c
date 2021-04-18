@@ -44,7 +44,7 @@ void game_update(Game* game, float time_delta){
         quat_set_axis_angle(&game->penguin.transform.rotation, 0, 1, 0, orientation);
 
         Vec3 forward;
-        transform_forward(&game->penguin.transform, &forward);
+        fw64_transform_forward(&game->penguin.transform, &forward);
         vec3_scale(&forward, &forward, MOVE_SPEED * time_delta);
         vec3_add(&game->penguin.transform.position, &game->penguin.transform.position, &forward);
     }
@@ -104,7 +104,7 @@ void setup_camera(Game* game) {
     box_size(&game->penguin.bounding, &size);
 
     vec3_set(&game->camera.transform.position, center.x, center.y + size.y * 2, center.z - size.z* 2);
-    transform_look_at(&game->camera.transform, &center, &up);
+    fw64_transform_look_at(&game->camera.transform, &center, &up);
 
     fw64_camera_update_view_matrix(&game->camera);
 }

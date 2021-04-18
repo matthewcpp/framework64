@@ -292,7 +292,7 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
     }
 }
 
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform, fw64Mesh* mesh) {
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {

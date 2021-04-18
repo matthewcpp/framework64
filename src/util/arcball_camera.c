@@ -42,7 +42,7 @@ void _arcball_update_camera_position(ArcballCamera* arcball) {
 
     vec3_add(&arcball->camera.transform.position, &arcball->_target, &orbit_pos);
 
-    transform_look_at(&arcball->camera.transform, &arcball->_target, &up);
+    fw64_transform_look_at(&arcball->camera.transform, &arcball->_target, &up);
     fw64_camera_update_view_matrix(&arcball->camera);
 }
 

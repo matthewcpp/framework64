@@ -7,7 +7,7 @@
 #include "framework64/transform.h"
 
 typedef struct {
-    Transform transform;
+    fw64Transform transform;
     Box bounding;
     fw64Mesh* mesh;
 } Entity;
