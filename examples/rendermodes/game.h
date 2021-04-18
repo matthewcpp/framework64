@@ -13,7 +13,7 @@ typedef struct {
     ArcballCamera arcball;
 
     fw64Font* consolas;
-    ImageSprite* button_sprite;
+    fw64Texture* button_sprite;
 
     Entity entity;
     int current_entity;

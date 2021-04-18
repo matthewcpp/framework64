@@ -16,7 +16,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderer_set_clear_color(engine->renderer, &c);
     game->mode = MODE_DEFAULT;
 
-    Mesh* mesh = malloc(sizeof(Mesh));
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     textured_quad_create(mesh, fw64_assets_get_image(engine->assets, ASSET_sprite_pyoro64));
     entity_init(&game->quad_entity, mesh);
 
@@ -38,7 +38,7 @@ void game_draw(Game* game) {
     IVec2 screen_size;
     fw64_renderer_get_screen_size(game->engine->renderer, &screen_size);
     IVec2 measurement = fw64_font_measure_text(game->font, game->mode_name);
-    int slice_width = image_sprite_get_slice_width(game->buttons);
+    int slice_width = fw64_texture_get_slice_width(game->buttons);
 
     int x_pos = screen_size.x / 2 - measurement.x / 2;
     fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
@@ -55,7 +55,7 @@ void game_draw(Game* game) {
 }
 
 void set_texture_mode(Game* game, Mode mode) {
-    ImageSprite* texture = game->quad_entity.mesh->textures;
+    fw64Texture* texture = game->quad_entity.mesh->textures;
     game->mode = mode;
 
     switch (game->mode)

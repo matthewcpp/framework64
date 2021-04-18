@@ -2,7 +2,7 @@
 #define FW64_MESH_H
 
 #include "framework64/box.h"
-#include "framework64/sprite.h"
+#include "framework64/texture.h"
 
 #include <nusys.h>
 #include <stdint.h>
@@ -47,7 +47,7 @@ typedef struct {
 typedef struct {
     fw64MeshInfo info;
     fw64Primitive* primitives;
-    ImageSprite* textures;
+    fw64Texture* textures;
     Lights1* colors;
     Vtx* vertex_buffer;
     Gfx* display_list;

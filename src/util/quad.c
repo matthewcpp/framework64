@@ -5,9 +5,9 @@
 #include <malloc.h>
 #include <string.h>
 
-static void vertex_set_tc(Vtx* vertex, float s, float t, ImageSprite* texture) {
-    s *= (float)image_sprite_get_slice_width(texture) * 2.0f;
-    t *= (float)image_sprite_get_slice_height(texture) * 2.0f;
+static void vertex_set_tc(Vtx* vertex, float s, float t, fw64Texture* texture) {
+    s *= (float)fw64_texture_get_slice_width(texture) * 2.0f;
+    t *= (float)fw64_texture_get_slice_height(texture) * 2.0f;
 
     // Note that the texture coordinates (s,t) are encoded in S10.5 format.
     short ss = (short)s;
@@ -16,7 +16,7 @@ static void vertex_set_tc(Vtx* vertex, float s, float t, ImageSprite* texture) {
     vertex->n.tc[1] = st << 5;
 }
 
-static void vertex_set_p_tc(Vtx* vertex, short x, short y, short z, float s, float t, ImageSprite* texture) {
+static void vertex_set_p_tc(Vtx* vertex, short x, short y, short z, float s, float t, fw64Texture* texture) {
     vertex->n.ob[0] = x;
     vertex->n.ob[1] = y;
     vertex->n.ob[2] = z;
@@ -41,7 +41,7 @@ void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t) {
     vertex_set_tc(mesh->vertex_buffer + index + 3, 0.0f, t, mesh->textures);
 }
 
-static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, short tl_y, short size, ImageSprite* texture) {
+static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, short tl_y, short size, fw64Texture* texture) {
     fw64Primitive* primitive = mesh->primitives + primitive_index;
 
     Vtx* vtx_base = mesh->vertex_buffer + primitive_index * 4;
@@ -64,7 +64,7 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-void textured_quad_create(fw64Mesh* mesh, ImageSprite* texture) {
+void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
     fw64_mesh_init(mesh);
 
     mesh->info.texture_count = 1;

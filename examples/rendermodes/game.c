@@ -75,7 +75,7 @@ void game_draw(Game* game) {
     IVec2 screen_size;
     fw64_renderer_get_screen_size(renderer, &screen_size);
 
-    int button_width = image_sprite_get_slice_width(game->button_sprite);
+    int button_width = fw64_texture_get_slice_width(game->button_sprite);
     int draw_pos_x = 10;
     int draw_pos_y = 200;
 

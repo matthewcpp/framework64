@@ -17,12 +17,12 @@ typedef struct {
     uint32_t mask_s;
     uint32_t mask_t;
     uint8_t* data;
-} ImageSprite;
+} fw64Texture;
 
-int image_sprite_get_slice_width(ImageSprite* sprite);
-int image_sprite_get_slice_height(ImageSprite* sprite);
+int fw64_texture_get_slice_width(fw64Texture* sprite);
+int fw64_texture_get_slice_height(fw64Texture* sprite);
 
-int sprite_load(int assetIndex, ImageSprite* sprite);
-void sprite_uninit(ImageSprite* sprite);
+int fw64_texture_load(int assetIndex, fw64Texture* sprite);
+void fw64_texture_uninit(fw64Texture* sprite);
 
 #endif

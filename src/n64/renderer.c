@@ -203,9 +203,9 @@ void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect) {
     gDPPipeSync(renderer->display_list++);
 }
 
-static void _fw64_draw_sprite_slice(fw64Renderer* renderer, ImageSprite* sprite, int frame, int x, int y) {
-    int slice_width = image_sprite_get_slice_width(sprite);
-    int slice_height = image_sprite_get_slice_height(sprite);
+static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y) {
+    int slice_width = fw64_texture_get_slice_width(sprite);
+    int slice_height = fw64_texture_get_slice_height(sprite);
 
     uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
 
@@ -225,16 +225,16 @@ static void _fw64_draw_sprite_slice(fw64Renderer* renderer, ImageSprite* sprite,
     gDPPipeSync(renderer->display_list++);
 }
 
-void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, ImageSprite* sprite, int frame, int x, int y) {
+void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y) {
     fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
     _fw64_draw_sprite_slice(renderer, sprite, frame, x, y);
 }
 
-void fw64_renderer_draw_sprite(fw64Renderer* renderer, ImageSprite* sprite, int x, int y) {
+void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* sprite, int x, int y) {
     fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
 
-    int slice_width = image_sprite_get_slice_width(sprite);
-    int slice_height = image_sprite_get_slice_height(sprite);
+    int slice_width = fw64_texture_get_slice_width(sprite);
+    int slice_height = fw64_texture_get_slice_height(sprite);
     int slice = 0;
 
     for (uint8_t row = 0; row < sprite->vslices; row++ ) {
@@ -302,10 +302,10 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, Transform* transform
 
         if (primitive->material.mode == FW64_SHADING_MODE_GOURAUD_TEXTURED || 
             primitive->material.mode == FW64_SHADING_MODE_UNLIT_TEXTURED ) {
-            ImageSprite* texture = mesh->textures + primitive->material.texture;
+            fw64Texture* texture = mesh->textures + primitive->material.texture;
 
-            int slice_width = image_sprite_get_slice_width(texture);
-            int slice_height = image_sprite_get_slice_height(texture);
+            int slice_width = fw64_texture_get_slice_width(texture);
+            int slice_height = fw64_texture_get_slice_height(texture);
             int frame_offset = slice_width * slice_height * 2 * primitive->material.texture_frame;
 
             gDPLoadTextureBlock(renderer->display_list++, texture->data + frame_offset,

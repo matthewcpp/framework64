@@ -75,13 +75,13 @@ fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
     return font;
 }
 
-ImageSprite* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
-    ImageSprite* image = fw64_find_asset(assets, index);
+fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
+    fw64Texture* image = fw64_find_asset(assets, index);
 
     if (!image) {
-        image = malloc(sizeof(ImageSprite));
+        image = malloc(sizeof(fw64Texture));
 
-        if (sprite_load(index, image)) {
+        if (fw64_texture_load(index, image)) {
             fw64_insert_asset(assets, image, index);
         }
         else {

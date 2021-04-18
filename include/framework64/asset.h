@@ -3,12 +3,12 @@
 
 #include "framework64/font.h"
 #include "framework64/mesh.h"
-#include "framework64/sprite.h"
+#include "framework64/texture.h"
 
 typedef union {
     void* any;
     fw64Font* font;
-    ImageSprite* image;
+    fw64Texture* image;
     fw64Mesh* mesh;
 } fw64AssetPtr;
 
@@ -28,6 +28,6 @@ void fw64_assets_init(fw64Assets* assets);
 int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index);
 fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index);
 fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index);
-ImageSprite* fw64_assets_get_image(fw64Assets* assets, uint32_t index);
+fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index);
 
 #endif

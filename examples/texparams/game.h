@@ -17,7 +17,7 @@ typedef struct {
     Entity quad_entity;
     Mode mode;
     const char* mode_name;
-    ImageSprite* buttons;
+    fw64Texture* buttons;
     fw64Font* font;
 } Game;
 

@@ -55,7 +55,7 @@ void fw64_mesh_unload(fw64Mesh* mesh) {
 
     if (mesh->textures) {
         for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
-            sprite_uninit(mesh->textures + i);
+            fw64_texture_uninit(mesh->textures + i);
         }
 
         free(mesh->textures);
@@ -87,10 +87,10 @@ static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data,
 static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle) {
     if (mesh->info.texture_count > 0) {
         fw64_filesystem_read(asset_index_data, sizeof(uint32_t), mesh->info.texture_count, handle);
-        mesh->textures = malloc(sizeof(ImageSprite) * mesh->info.texture_count);
+        mesh->textures = malloc(sizeof(fw64Texture) * mesh->info.texture_count);
 
         for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
-            sprite_load(asset_index_data[i], mesh->textures + i);
+            fw64_texture_load(asset_index_data[i], mesh->textures + i);
         }
     }
     else {

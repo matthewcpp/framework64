@@ -118,7 +118,7 @@ Vec3 cube_positions[CUBE_COUNT] = {
 
 void init_cubes(Game* game) {
     
-    Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, ASSET_mesh_blue_cube);
+    fw64Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, ASSET_mesh_blue_cube);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
         Entity* cube = &game->cubes[i];

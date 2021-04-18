@@ -1,4 +1,4 @@
-#include "framework64/sprite.h"
+#include "framework64/texture.h"
 
 #include "framework64/filesystem.h"
 
@@ -7,15 +7,15 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-int image_sprite_get_slice_width(ImageSprite* sprite) {
+int fw64_texture_get_slice_width(fw64Texture* sprite) {
     return sprite->width / sprite->hslices;
 }
 
-int image_sprite_get_slice_height(ImageSprite* sprite) {
+int fw64_texture_get_slice_height(fw64Texture* sprite) {
     return sprite->height / sprite->vslices;
 }
 
-int sprite_load(int assetIndex, ImageSprite* sprite) {
+int fw64_texture_load(int assetIndex, fw64Texture* sprite) {
     int handle = fw64_filesystem_open(assetIndex);
     if (handle < 0)
         return 0;
@@ -41,6 +41,6 @@ int sprite_load(int assetIndex, ImageSprite* sprite) {
     return bytes_read == data_size;
 }
 
-void sprite_uninit(ImageSprite* sprite) {
+void fw64_texture_uninit(fw64Texture* sprite) {
     free(sprite->data);
 }
