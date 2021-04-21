@@ -1,4 +1,4 @@
-#include "framework64/entity.h"
+#include "entity.h"
 
 #include "framework64/matrix.h"
 

@@ -1,8 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "entity.h"
+
 #include "framework64/camera.h"
-#include "framework64/entity.h"
 #include "framework64/engine.h"
 
 typedef enum {

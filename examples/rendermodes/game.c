@@ -1,8 +1,9 @@
 #include "game.h"
 
+#include "entity.h"
+
 #include "assets.h"
 
-#include "framework64/entity.h"
 #include "framework64/rect.h"
 
 #include <malloc.h>
