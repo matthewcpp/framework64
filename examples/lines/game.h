@@ -1,8 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "entity.h"
+
 #include "framework64/camera.h"
-#include "framework64/entity.h"
 #include "framework64/engine.h"
 
 typedef enum {
@@ -13,7 +14,7 @@ typedef enum {
 
 typedef struct lines_example {
     fw64Engine* engine;
-    Camera camera;
+    fw64Camera camera;
     DrawMode draw_mode;
     float rotation;
     Entity solid_cube;

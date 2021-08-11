@@ -4,19 +4,19 @@
 
 #include <malloc.h>
 
-void n64_logo_sprite_init(N64LogoSprite* logo_sprite, ImageSprite* image) {
+void n64_logo_sprite_init(N64LogoSprite* logo_sprite, fw64Texture* image) {
     logo_sprite->sprite = image;
     logo_sprite->position.x = 0;
     logo_sprite->position.y = 0;
 }
 
-void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, Renderer* renderer){
-    renderer_draw_sprite(renderer, logo_sprite->sprite, logo_sprite->position.x, logo_sprite->position.y);
+void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, fw64Renderer* renderer){
+    fw64_renderer_draw_sprite(renderer, logo_sprite->sprite, logo_sprite->position.x, logo_sprite->position.y);
 }
 
 #define FRAME_DUR 1.0f / 10.0f
 
-void ken_sprite_init(KenSprite* ken, ImageSprite* image) {
+void ken_sprite_init(KenSprite* ken, fw64Texture* image) {
     ken->sprite = image;
     ken->position.x = 0;
     ken->position.y = 0;
@@ -38,24 +38,25 @@ void ken_sprite_update(KenSprite* ken, float time_delta) {
 
 }
 
-void ken_sprite_draw(KenSprite* ken, Renderer* renderer) {
-    int slice_height = image_sprite_get_slice_height(ken->sprite);
+void ken_sprite_draw(KenSprite* ken, fw64Renderer* renderer) {
+    int slice_height = fw64_texture_get_slice_height(ken->sprite);
 
-    renderer_draw_sprite_slice(renderer, ken->sprite, ken->frame_index, ken->position.x, ken->position.y);
-    renderer_draw_sprite_slice(renderer, ken->sprite, ken->frame_index + ken->sprite->hslices, ken->position.x, ken->position.y + slice_height);
+    fw64_renderer_draw_sprite_slice(renderer, ken->sprite, ken->frame_index, ken->position.x, ken->position.y);
+    fw64_renderer_draw_sprite_slice(renderer, ken->sprite, ken->frame_index + ken->sprite->hslices, ken->position.x, ken->position.y + slice_height);
 }
 
-void elapsed_time_init(ElapsedTime* elapsed_time) {
+void elapsed_time_init(ElapsedTime* elapsed_time, fw64Font* font) {
     elapsed_time->total_time = 0.0f;
+    elapsed_time->font = font;
 }
 
 void elapsed_time_update(ElapsedTime* elapsed_time, float time_delta) {
     elapsed_time->total_time += time_delta;
 }
 
-void elapsed_time_draw(ElapsedTime* elpased_time, Renderer* renderer, Font* font) {
+void elapsed_time_draw(ElapsedTime* elapsed_time, fw64Renderer* renderer) {
     char elapsed_time_text[24];
-    sprintf(elapsed_time_text, "ELAPSED TIME: %.2f", elpased_time->total_time);
+    sprintf(elapsed_time_text, "ELAPSED TIME: %.2f", elapsed_time->total_time);
 
-    renderer_draw_text(renderer, font, 200, 10, elapsed_time_text);
+    fw64_renderer_draw_text(renderer, elapsed_time->font, 200, 10, elapsed_time_text);
 }

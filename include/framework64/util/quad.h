@@ -3,11 +3,11 @@
 
 #include "framework64/color.h"
 #include "framework64/mesh.h"
-#include "framework64/sprite.h"
+#include "framework64/texture.h"
 
-void textured_quad_create(Mesh* mesh, ImageSprite* texture);
-void textured_quad_set_tex_coords(Mesh* mesh, int frame, float s, float t);
+void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture);
+void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t);
 
-void quad_create(Mesh* mesh, s16 size, Color* color);
+void quad_create(fw64Mesh* mesh, s16 size, Color* color);
 
 #endif

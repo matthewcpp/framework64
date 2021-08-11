@@ -25,14 +25,14 @@ fw64FileHandle open_files[FW64_FILESYSTEM_MAX_OPEN_FILES];
 uint32_t asset_offsets[ASSET_COUNT] __attribute__ ((aligned (8)));
 uint8_t read_cache[MAX_UNALIGNED_READ] __attribute__ ((aligned (8)));
 
-int filesystem_init() {
+int fw64_filesystem_init() {
     memset(&open_files[0], 0, sizeof(fw64FileHandle) * FW64_FILESYSTEM_MAX_OPEN_FILES);
     nuPiReadRom((u32)(&_asset_dataSegmentRomStart[0] + 4), &asset_offsets[0], ARCHIVE_HEADER_SIZE);
 
     return 1;
 }
 
-int filesystem_open(int asset_index) {
+int fw64_filesystem_open(int asset_index) {
     if (asset_index < 0 || asset_index >= ASSET_COUNT)
         return FW64_FILESYSTEM_INVALID_HANDLE;
 
@@ -60,14 +60,14 @@ int filesystem_open(int asset_index) {
     return file_handle;
 }
 
-int filesystem_size(int handle) {
+int fw64_filesystem_size(int handle) {
     if (handle < 0 || handle > FW64_FILESYSTEM_MAX_OPEN_FILES || open_files[handle].data_loc == 0)
         return FW64_FILESYSTEM_INVALID_HANDLE;
 
     return open_files[handle].size;
 }
 
-int filesystem_read(void* buffer, int size, int count, int handle) {
+int fw64_filesystem_read(void* buffer, int size, int count, int handle) {
     if (handle < 0 || handle > FW64_FILESYSTEM_MAX_OPEN_FILES || open_files[handle].data_loc == 0)
         return FW64_FILESYSTEM_INVALID_HANDLE;
 
@@ -106,7 +106,7 @@ int filesystem_read(void* buffer, int size, int count, int handle) {
     return data_total;
 }
 
-int filesystem_close(int handle) {
+int fw64_filesystem_close(int handle) {
     if (handle < 0 || handle >= FW64_FILESYSTEM_MAX_OPEN_FILES || open_files[handle].data_loc == 0)
         return FW64_FILESYSTEM_INVALID_HANDLE;
 
@@ -119,7 +119,7 @@ uint32_t n64_filesystem_get_rom_address(int asset_index) {
     return (u32)(&_asset_dataSegmentRomStart[0]) + asset_offsets[asset_index] + ASSET_HEADER_SIZE;
 }
 
-int filesystem_get_open_handle_count() {
+int fw64_filesystem_get_open_handle_count() {
     int count = 0;
 
     for (int i = 0; i < FW64_FILESYSTEM_MAX_OPEN_FILES; i++) {

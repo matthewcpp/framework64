@@ -5,7 +5,7 @@
 
 typedef struct {
     fw64Engine* engine;
-    Camera camera;
+    fw64Camera camera;
 } Game;
 
 void game_init(Game* game, fw64Engine* engine);

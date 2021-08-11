@@ -1,11 +1,11 @@
 #include "framework64/time.h"
 
-void time_init(Time* time){
+void fw64_time_init(fw64Time* time){
     time->_previous_ms = 0;
     time->time_delta = 0.0f;
 }
 
-void time_update(Time* time) {
+void fw64_time_update(fw64Time* time) {
     u64 current_ms = OS_CYCLES_TO_USEC(osGetTime()) / 1000;
 
     if (current_ms < time->_previous_ms)

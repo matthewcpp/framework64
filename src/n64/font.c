@@ -8,11 +8,11 @@
 #include <malloc.h>
 #include <string.h>
 
-uint16_t find_font_glyph_rec(FontGlyph* glyphs, int min_index, int max_index, uint16_t codepoint) {
+uint16_t find_font_glyph_rec(fw64FontGlyph* glyphs, int min_index, int max_index, uint16_t codepoint) {
     uint32_t center_index = min_index + (max_index - min_index) / 2;
     if (min_index > max_index) return UINT16_MAX;
 
-    FontGlyph* center_glyph = glyphs + center_index;
+    fw64FontGlyph* center_glyph = glyphs + center_index;
 
     if (center_glyph->codepoint == codepoint) {
         return center_index;
@@ -28,13 +28,13 @@ uint16_t find_font_glyph_rec(FontGlyph* glyphs, int min_index, int max_index, ui
     }
 }
 
-uint16_t font_get_glyph_index(Font* font, uint16_t codepoint) {
+uint16_t fw64_font_get_glyph_index(fw64Font* font, uint16_t codepoint) {
     return find_font_glyph_rec(font->glyphs, 0, font->glyph_count - 1, codepoint);
 }
 
-IVec2 font_measure_text(Font* font, const char* str) {
+IVec2 fw64_font_measure_text(fw64Font* font, const char* str) {
     IVec2 measurement = {0, 0};
-    FontGlyph* glyph = font->glyphs + font_get_glyph_index(font, str[0]);
+    fw64FontGlyph* glyph = font->glyphs + fw64_font_get_glyph_index(font, str[0]);
     measurement.x = -glyph->left;
 
     do {
@@ -46,33 +46,33 @@ IVec2 font_measure_text(Font* font, const char* str) {
         measurement.x += glyph->advance;
         
         str++;
-        glyph = font->glyphs + font_get_glyph_index(font, str[0]);
+        glyph = font->glyphs + fw64_font_get_glyph_index(font, str[0]);
     } while (str[0] != '\0');
 
     return measurement;
 }
 
-int font_load(int index, Font* font) {
-    int handle = filesystem_open(index);
+int fw64_font_load(int index, fw64Font* font) {
+    int handle = fw64_filesystem_open(index);
 
     if (handle == FW64_FILESYSTEM_INVALID_HANDLE)
         return 0;
 
-    filesystem_read(font, sizeof(uint16_t), 4, handle);
+    fw64_filesystem_read(font, sizeof(uint16_t), 4, handle);
 
     uint32_t spritefont_data_size = (font->spritefont_tile_width * font->spritefont_tile_height * 2) * font->glyph_count;
-    uint32_t glyph_data_size = sizeof(FontGlyph) * font->glyph_count;
+    uint32_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
 
     uint8_t* payload = memalign(8, spritefont_data_size + glyph_data_size);
-    filesystem_read(payload, 1, spritefont_data_size + glyph_data_size, handle);
-    filesystem_close(handle);
+    fw64_filesystem_read(payload, 1, spritefont_data_size + glyph_data_size, handle);
+    fw64_filesystem_close(handle);
     
     font->spritefont = payload;
-    font->glyphs = (FontGlyph*)(payload + spritefont_data_size);
+    font->glyphs = (fw64FontGlyph*)(payload + spritefont_data_size);
 
     return 1;
 }
 
-void font_unload(Font* font) {
+void fw64_font_unload(fw64Font* font) {
     free(font->spritefont); // note: font and glyph data were allocated in same call
 }

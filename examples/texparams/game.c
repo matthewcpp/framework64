@@ -10,52 +10,52 @@ static void set_texture_mode(Game* game, Mode mode);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    camera_init(&game->camera);
+    fw64_camera_init(&game->camera);
 
     Color c = {39, 58, 93};
-    renderer_set_clear_color(engine->renderer, &c);
+    fw64_renderer_set_clear_color(engine->renderer, &c);
     game->mode = MODE_DEFAULT;
 
-    Mesh* mesh = malloc(sizeof(Mesh));
-    textured_quad_create(mesh, assets_get_image(engine->assets, ASSET_sprite_pyoro64));
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
+    textured_quad_create(mesh, fw64_assets_get_image(engine->assets, ASSET_sprite_pyoro64));
     entity_init(&game->quad_entity, mesh);
 
-    game->font = assets_get_font(engine->assets, ASSET_font_Consolas12);
-    game->buttons = assets_get_image(engine->assets, ASSET_sprite_buttons);
+    game->font = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
+    game->buttons = fw64_assets_get_image(engine->assets, ASSET_sprite_buttons);
 
     set_texture_mode(game, MODE_DEFAULT);
 }
 
 void game_update(Game* game, float time_delta){
-    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_LEFT) && game->mode > MODE_DEFAULT)
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_LEFT) && game->mode > MODE_DEFAULT)
         set_texture_mode(game, game->mode - 1);
 
-    if (input_button_pressed(game->engine->input, 0, CONTROLLER_BUTTON_C_RIGHT) && game->mode < MODE_MIRROR)
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_RIGHT) && game->mode < MODE_MIRROR)
         set_texture_mode(game, game->mode + 1);
 }
 
 void game_draw(Game* game) {
     IVec2 screen_size;
-    renderer_get_screen_size(game->engine->renderer, &screen_size);
-    IVec2 measurement = font_measure_text(game->font, game->mode_name);
-    int slice_width = image_sprite_get_slice_width(game->buttons);
+    fw64_renderer_get_screen_size(game->engine->renderer, &screen_size);
+    IVec2 measurement = fw64_font_measure_text(game->font, game->mode_name);
+    int slice_width = fw64_texture_get_slice_width(game->buttons);
 
     int x_pos = screen_size.x / 2 - measurement.x / 2;
-    renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_TRIANGLES, RENDERER_FLAG_CLEAR);
-    renderer_draw_static_mesh(game->engine->renderer, &game->quad_entity.transform, game->quad_entity.mesh);
-    renderer_draw_text(game->engine->renderer, game->font, x_pos, 10, game->mode_name);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->quad_entity.transform, game->quad_entity.mesh);
+    fw64_renderer_draw_text(game->engine->renderer, game->font, x_pos, 10, game->mode_name);
 
     if (game->mode > MODE_DEFAULT)
-        renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 4, x_pos - slice_width - 5, 10);
+        fw64_renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 4, x_pos - slice_width - 5, 10);
 
     if (game->mode < MODE_MIRROR)
-        renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 5, x_pos + measurement.x + 5, 10);
+        fw64_renderer_draw_sprite_slice(game->engine->renderer, game->buttons, 5, x_pos + measurement.x + 5, 10);
 
-    renderer_end(game->engine->renderer, RENDERER_FLAG_SWAP);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void set_texture_mode(Game* game, Mode mode) {
-    ImageSprite* texture = game->quad_entity.mesh->textures;
+    fw64Texture* texture = game->quad_entity.mesh->textures;
     game->mode = mode;
 
     switch (game->mode)

@@ -6,9 +6,9 @@
 typedef struct {
     u64 _previous_ms;
     float time_delta;
-} Time;
+} fw64Time;
 
-void time_init(Time* time);
-void time_update(Time* time);
+void fw64_time_init(fw64Time* time);
+void fw64_time_update(fw64Time* time);
 
 #endif

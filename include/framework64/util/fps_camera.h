@@ -6,12 +6,12 @@
 #include "framework64/vec2.h"
 
 typedef struct {
-    Camera camera;
-    Input* input;
+    fw64Camera camera;
+    fw64Input* input;
     Vec2 rotation;
 } FpsCamera;
 
-void fps_camera_init(FpsCamera* fps, Input* input);
+void fps_camera_init(FpsCamera* fps, fw64Input* input);
 void fps_camera_update(FpsCamera* fps, float time_delta);
 
 #endif

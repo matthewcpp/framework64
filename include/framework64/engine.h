@@ -13,11 +13,11 @@
 #define FW64_N64_HEAP_SIZE 1024*512
 
 typedef struct {
-    Audio* audio;
-    Input* input;
-    Renderer* renderer;
-    Time* time;
-    Assets* assets;
+    fw64Audio* audio;
+    fw64Input* input;
+    fw64Renderer* renderer;
+    fw64Time* time;
+    fw64Assets* assets;
 } fw64Engine;
 
 int fw64_engine_init(fw64Engine* system);

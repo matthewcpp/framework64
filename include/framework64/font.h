@@ -11,23 +11,23 @@ typedef struct {
     int8_t left;
     int8_t advance;
     int8_t height;
-} FontGlyph;
+} fw64FontGlyph;
 
 typedef struct {
     uint16_t size;
     uint16_t glyph_count;
     uint16_t spritefont_tile_width;
     uint16_t spritefont_tile_height;
-    FontGlyph* glyphs;
+    fw64FontGlyph* glyphs;
     uint8_t* spritefont;
-} Font;
+} fw64Font;
 
 
-uint16_t font_get_glyph_index(Font* font, uint16_t codepoint);
+uint16_t fw64_font_get_glyph_index(fw64Font* font, uint16_t codepoint);
 
-IVec2 font_measure_text(Font* font, const char* text);
+IVec2 fw64_font_measure_text(fw64Font* font, const char* text);
 
-int font_load(int index, Font* font);
-void font_unload(Font* font);
+int fw64_font_load(int index, fw64Font* font);
+void fw64_font_unload(fw64Font* font);
 
 #endif

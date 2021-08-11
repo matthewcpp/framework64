@@ -12,10 +12,10 @@ static void _arcball_reset(ArcballCamera* arcball) {
     arcball->_distance = arcball->_diagonal * 2.0f;
 }
 
-void arcball_init(ArcballCamera* arcball, Input* input) {
+void arcball_init(ArcballCamera* arcball, fw64Input* input) {
     arcball->_input = input;
 
-    camera_init(&arcball->camera);
+    fw64_camera_init(&arcball->camera);
 
     arcball->_diagonal = 1.0f;
     _arcball_reset(arcball);
@@ -42,8 +42,8 @@ void _arcball_update_camera_position(ArcballCamera* arcball) {
 
     vec3_add(&arcball->camera.transform.position, &arcball->_target, &orbit_pos);
 
-    transform_look_at(&arcball->camera.transform, &arcball->_target, &up);
-    camera_update_view_matrix(&arcball->camera);
+    fw64_transform_look_at(&arcball->camera.transform, &arcball->_target, &up);
+    fw64_camera_update_view_matrix(&arcball->camera);
 }
 
 void arcball_set_initial(ArcballCamera* arcball, Box* box) {
@@ -56,7 +56,7 @@ void arcball_set_initial(ArcballCamera* arcball, Box* box) {
 
 void arcball_update(ArcballCamera* arcball, float time_delta) {
     Vec2 stick;
-    input_stick(arcball->_input, 0, &stick);
+    fw64_input_stick(arcball->_input, 0, &stick);
 
     if (stick.x > ARCBALL_DEAD_ZONE) {
         arcball->_rot_y -= ARCBALL_ORBIT_SPEED * time_delta;
@@ -72,14 +72,14 @@ void arcball_update(ArcballCamera* arcball, float time_delta) {
         arcball->_rot_x -= ARCBALL_ORBIT_SPEED * time_delta;
     }
 
-    if (input_button_down(arcball->_input, 0, CONTROLLER_BUTTON_L)) {
+    if (fw64_input_button_down(arcball->_input, 0, FW64_CONTROLLER_BUTTON_L)) {
         arcball->_distance += arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     }
-    else if (input_button_down(arcball->_input, 0, CONTROLLER_BUTTON_R)) {
+    else if (fw64_input_button_down(arcball->_input, 0, FW64_CONTROLLER_BUTTON_R)) {
         arcball->_distance -= arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     } 
 
-    if (input_button_pressed(arcball->_input, 0, CONTROLLER_BUTTON_START)) {
+    if (fw64_input_button_pressed(arcball->_input, 0, FW64_CONTROLLER_BUTTON_START)) {
         _arcball_reset(arcball);
     }
 

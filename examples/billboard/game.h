@@ -1,10 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "entity.h"
+
 #include "framework64/util/fps_camera.h"
 #include "framework64/util/quad.h"
 
-#include "framework64/entity.h"
 #include "framework64/engine.h"
 
 typedef struct {

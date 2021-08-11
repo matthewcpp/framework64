@@ -6,8 +6,8 @@
 #include "framework64/box.h"
 
 typedef struct {
-    Input* _input;
-    Camera camera;
+    fw64Input* _input;
+    fw64Camera camera;
 
     float _distance;
     float _diagonal;
@@ -16,7 +16,7 @@ typedef struct {
     Vec3 _target;
 } ArcballCamera;
 
-void arcball_init(ArcballCamera* arcball, Input* input);
+void arcball_init(ArcballCamera* arcball, fw64Input* input);
 void arcball_set_initial(ArcballCamera* arcball, Box* box);
 void arcball_update(ArcballCamera* arcball, float time_delta);
 

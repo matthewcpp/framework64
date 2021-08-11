@@ -7,17 +7,17 @@
 
 
 typedef struct {
-    Transform transform;
+    fw64Transform transform;
     Mtx projection;
     Mtx view;
     float near, far;
     float fovy;
     float aspect;
     u16 perspNorm;
-} Camera;
+} fw64Camera;
 
-void camera_init(Camera* camera);
-void camera_update_projection_matrix(Camera* camera);
-void camera_update_view_matrix(Camera* camera);
+void fw64_camera_init(fw64Camera* camera);
+void fw64_camera_update_projection_matrix(fw64Camera* camera);
+void fw64_camera_update_view_matrix(fw64Camera* camera);
 
 #endif
