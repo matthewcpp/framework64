@@ -4,7 +4,11 @@
 #include "framework64/box.h"
 #include "framework64/texture.h"
 
+
+#ifdef PLATFORM_N64
 #include <nusys.h>
+#endif
+
 #include <stdint.h>
 
 typedef enum {
@@ -48,9 +52,11 @@ typedef struct {
     fw64MeshInfo info;
     fw64Primitive* primitives;
     fw64Texture* textures;
+#ifdef PLATFORM_N64
     Lights1* colors;
     Vtx* vertex_buffer;
     Gfx* display_list;
+#endif
 } fw64Mesh;
 
 /**

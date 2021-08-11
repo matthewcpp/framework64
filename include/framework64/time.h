@@ -1,10 +1,10 @@
 #ifndef FW64_TIME_H
 #define FW64_TIME_H
 
-#include <ultra64.h>
+#include <stdint.h>
 
 typedef struct {
-    u64 _previous_ms;
+    uint64_t _previous_ms;
     float time_delta;
 } fw64Time;
 

@@ -1,6 +1,6 @@
 #include "framework64/vec3.h"
 
-#include <math.h>
+#include "framework64/types.h"
 
 void vec3_zero(Vec3* v) {
     v->x = 0.0f;
@@ -49,14 +49,14 @@ float vec3_distance(Vec3* a, Vec3* b) {
     float y = b->y - a->y;
     float z = b->z - a->z;
 
-    return _nsqrtf(x * x + y * y + z * z);
+    return fw64_sqrtf(x * x + y * y + z * z);
 }
 
 void vec3_normalize(Vec3* v) {
     float len = v->x * v->x + v->y * v->y + v->z * v->z;
 
     if (len > 0) {
-        len = 1.0f / _nsqrtf(len);
+        len = 1.0f / fw64_sqrtf(len);
     }
 
     v->x *= len;
