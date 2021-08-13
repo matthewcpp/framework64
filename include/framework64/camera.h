@@ -1,6 +1,7 @@
 #ifndef FW64_CAMERA_H
 #define FW64_CAMERA_H
 
+#include "framework64/frustum.h"
 #include "framework64/transform.h"
 #include "framework64/types.h"
 
@@ -23,6 +24,8 @@ typedef struct {
 void fw64_camera_init(fw64Camera* camera);
 void fw64_camera_update_projection_matrix(fw64Camera* camera);
 void fw64_camera_update_view_matrix(fw64Camera* camera);
+
+void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* planes);
 
 #ifdef __cplusplus
 }

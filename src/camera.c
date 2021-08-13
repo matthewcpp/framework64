@@ -39,3 +39,13 @@ void fw64_camera_update_view_matrix(fw64Camera* camera) {
     matrix_camera_look_at(&camera->view.m[0], &camera->transform.position, &target, &up);
 #endif
 }
+
+void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* frustum) {
+    float cameraWorldMatrixInverse[16];
+    matrix_invert(&cameraWorldMatrixInverse[0], &camera->transform.matrix.m[0]);
+
+    float projScreenMatrix[16];
+    matrix_multiply(&projScreenMatrix[0], &camera->projection.m[0], &cameraWorldMatrixInverse[0]);
+
+    fw64_frustum_set_from_matrix(frustum, &projScreenMatrix[0]);
+}
