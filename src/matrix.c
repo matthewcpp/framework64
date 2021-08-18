@@ -370,6 +370,8 @@ int matrix_invert(float* out, float* a) {
     out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
     out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
     out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+
+    return 1;
 }
 
 void mat2_set_rotation(float* mat, float rad) {
