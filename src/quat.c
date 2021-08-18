@@ -1,10 +1,6 @@
 #include "framework64/quat.h"
 
-#include <math.h>
-
-#ifndef M_PI
-    #define M_PI FVAL_PI
-#endif
+#include "framework64/types.h"
 
 void quat_ident(Quat* q) {
     q->x = 0.0f;
@@ -13,13 +9,20 @@ void quat_ident(Quat* q) {
     q->w = 1.0f;
 }
 
+void quat_set(Quat* q, float x, float y, float z, float w) {
+    q->x = x;
+    q->y = y;
+    q->z = z;
+    q->w = w;
+}
+
 void quat_set_axis_angle(Quat* out, float x, float y, float z, float rad) {
     rad = rad * 0.5;
-    float s = _nsinf(rad);
+    float s = fw64_sinf(rad);
     out->x = s * x;
     out->y = s * y;
     out->z = s * z;
-    out->w = _ncosf(rad);
+    out->w = fw64_cosf(rad);
 }
 
 void quat_transform_vec3(Vec3* out, Quat* q, Vec3* a) {
@@ -63,7 +66,7 @@ void quat_normalize(Quat* q) {
     float len = q->x * q->x + q->y * q->y + q->z * q->z + q->w * q->w;
 
     if (len > 0) {
-        len = 1.0f / _nsqrtf(len);
+        len = 1.0f / fw64_sqrtf(len);
     }
 
     q->x *= len;
@@ -79,12 +82,12 @@ void quat_from_euler(Quat* q, float x, float y, float z) {
     y *= halfToRad;
     z *= halfToRad;
 
-    float sx = _nsinf(x);
-    float cx = _ncosf(x);
-    float sy = _nsinf(y);
-    float cy = _ncosf(y);
-    float sz = _nsinf(z);
-    float cz = _ncosf(z);
+    float sx = fw64_sinf(x);
+    float cx = fw64_cosf(x);
+    float sy = fw64_sinf(y);
+    float cy = fw64_cosf(y);
+    float sz = fw64_sinf(z);
+    float cz = fw64_cosf(z);
 
     q->x = sx * cy * cz - cx * sy * sz;
     q->y = cx * sy * cz + sx * cy * sz;

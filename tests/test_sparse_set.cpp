@@ -60,15 +60,15 @@ TEST_F(SparseSetTest, FreeList) {
     fw64_sparse_set_delete(&sparse_set, handles[2]);
 
     fw64SparseSetHandle actual_handle;
-    fw64SparseSetHandle expected_handle = {.lookup_index = 2, .generation = 1};
+    fw64SparseSetHandle expected_handle = {2, 1};
     fw64_sparse_set_alloc(&sparse_set, &actual_handle);
     ASSERT_EQ(actual_handle, expected_handle);
 
-    expected_handle = {.lookup_index = 1, .generation = 1};
+    expected_handle = {1, 1};
     fw64_sparse_set_alloc(&sparse_set, &actual_handle);
     ASSERT_EQ(actual_handle, expected_handle);
 
-    expected_handle = {.lookup_index = 4, .generation = 0};
+    expected_handle = {4, 0};
     fw64_sparse_set_alloc(&sparse_set, &actual_handle);
     ASSERT_EQ(actual_handle, expected_handle);
 }

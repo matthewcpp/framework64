@@ -5,6 +5,10 @@ void fw64_time_init(fw64Time* time){
     time->time_delta = 0.0f;
 }
 
+#ifdef PLATFORM_N64
+
+#include <ultra64.h>
+
 void fw64_time_update(fw64Time* time) {
     u64 current_ms = OS_CYCLES_TO_USEC(osGetTime()) / 1000;
 
@@ -16,3 +20,10 @@ void fw64_time_update(fw64Time* time) {
 
     time->_previous_ms = current_ms;
 }
+#else
+
+void fw64_time_update(fw64Time* time) {
+
+}
+
+#endif
