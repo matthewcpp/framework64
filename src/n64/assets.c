@@ -1,4 +1,5 @@
-#include "framework64/asset.h"
+#include "framework64/assets.h"
+#include "framework64/n64/assets.h"
 
 #include <malloc.h>
 #include <stddef.h>

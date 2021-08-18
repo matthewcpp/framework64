@@ -1,4 +1,5 @@
 #include "framework64/util/arcball_camera.h"
+#include "framework64/n64/controller_button.h"
 
 #include <malloc.h>
 

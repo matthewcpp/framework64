@@ -5,6 +5,7 @@
 #include "assets.h"
 
 #include "framework64/rect.h"
+#include "framework64/n64/controller_button.h"
 
 #include <malloc.h>
 #include <string.h>

@@ -1,4 +1,5 @@
 #include "framework64/renderer.h"
+#include "framework64/n64/renderer.h"
 
 #include "framework64/matrix.h"
 
@@ -6,6 +7,8 @@
 
 #include <malloc.h>
 #include <string.h>
+
+
 
 void fw64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
     renderer->screen_size.x = screen_width;

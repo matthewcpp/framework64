@@ -1,5 +1,10 @@
 #include "framework64/engine.h"
 
+#include "framework64/n64/audio.h"
+#include "framework64/n64/assets.h"
+#include "framework64/n64/input.h"
+#include "framework64/n64/renderer.h"
+
 #include "framework64/filesystem.h"
 
 #include <nusys.h>
@@ -9,6 +14,11 @@
 #pragma GCC diagnostic pop
 
 #include <malloc.h>
+
+#define FW64_N64_SCREEN_WIDTH 320
+#define FW64_N64_SCREEN_HEIGHT 240
+
+#define FW64_N64_HEAP_SIZE 1024*512
 
 char memory_heap[FW64_N64_HEAP_SIZE];
 

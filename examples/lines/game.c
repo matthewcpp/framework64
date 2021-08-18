@@ -1,6 +1,8 @@
 #include "game.h"
 #include "assets.h"
 
+#include "framework64/n64/controller_button.h"
+
 #define ROTATION_SPEED 90.0f
 
 void game_init(Game* game, fw64Engine* engine) {

@@ -1,6 +1,7 @@
 #include "game.h"
-#include "framework64/asset.h"
+#include "assets.h"
 #include "framework64/util/quad.h"
+#include "framework64/n64/controller_button.h"
 
 #include "assets.h"
 

@@ -1,14 +1,12 @@
 #include "game.h"
 #include "assets.h"
 
-#include <nusys.h>
-
+#include "framework64/filesystem.h"
 #include "framework64/util/quad.h"
+#include "framework64/n64/controller_button.h"
 
 #include <malloc.h>
 #include <math.h>
-
-#include "framework64/filesystem.h"
 
 #define SOUND_BANK_COUNT 2
 #define MUSIC_BANK_COUNT 2
@@ -167,13 +165,14 @@ void change_sound_bank(Game* game, int delta) {
 }
 
 void change_sound(Game* game, int delta) {
+    int sound_count = fw64_audio_sound_count(game->engine->audio);
     game->sound_num += delta;
 
     if (game->sound_num < 0) 
         game->sound_num = 0;
     
-    if (game->sound_num >= game->engine->audio->sound_count)
-        game->sound_num = game->engine->audio->sound_count - 1;
+    if (game->sound_num >= sound_count)
+        game->sound_num = sound_count - 1;
 }
 
 void change_music_bank(Game* game, int delta) {
@@ -191,11 +190,12 @@ void change_music_bank(Game* game, int delta) {
 }
 
 void change_music_track(Game* game, int delta) {
+    int music_track_count = fw64_audio_music_track_count(game->engine->audio);
     game->music_track += delta;
 
     if (game->music_track < 0)
         game->music_track = 0;
 
-    if (game->music_track >= game->engine->audio->music_track_count)
-        game->music_track = game->engine->audio->music_track_count - 1;
+    if (game->music_track >= music_track_count)
+        game->music_track = music_track_count - 1;
 }

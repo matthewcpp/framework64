@@ -1,4 +1,5 @@
 #include "framework64/util/fps_camera.h"
+#include "framework64/n64/controller_button.h"
 
 void fps_camera_init(FpsCamera* fps, fw64Input* input){
     fps->input = input;

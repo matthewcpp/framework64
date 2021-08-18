@@ -1,4 +1,5 @@
 #include "framework64/input.h"
+#include "framework64/n64/input.h"
 
 #include <nusys.h>
 
@@ -15,11 +16,11 @@ void fw64_input_update(fw64Input* input) {
     nuContDataGetExAll(input->current_state);
 }
 
-int fw64_input_button_pressed(fw64Input* input, int controller, fw64ControllerButton button) {
+int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
     return input->current_state[controller].trigger & button;
 }
 
-int fw64_input_button_down(fw64Input* input, int controller, fw64ControllerButton button) {
+int fw64_input_button_down(fw64Input* input, int controller, int button) {
     return input->current_state[controller].button & button;
 }
 

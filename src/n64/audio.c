@@ -1,4 +1,5 @@
 #include "framework64/audio.h"
+#include "framework64/n64/audio.h"
 
 #include "framework64/filesystem.h"
 
@@ -94,6 +95,10 @@ fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle) {
     return (fw64AudioStatus)nuAuSndPlayerGetState();
 }
 
+int fw64_audio_sound_count(fw64Audio* audio) {
+    return audio->sound_count;
+}
+
 int fw64_audio_load_music(fw64Audio* audio, int asset_id) {
     if (asset_id == audio->current_music_bank)
         return 0;
@@ -146,4 +151,8 @@ void fw64_audio_set_music_volume(fw64Audio* audio, float volume) {
 fw64AudioStatus fw64_audio_get_music_status(fw64Audio* audio) {
     (void)audio;
     return (fw64AudioStatus)nuAuSeqPlayerGetState(0);
+}
+
+int fw64_audio_music_track_count(fw64Audio* audio) {
+    return audio->music_track_count;
 }
