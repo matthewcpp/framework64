@@ -11,7 +11,8 @@
     "libultra"
   ],
   "scripts": {
-    "prepare-assets": "npx prepare-fw64-assets -f assets/manifest.n64.json assets/build_n64"
+    "prepare-assets": "npx prepare-fw64-assets -f assets/manifest.n64.json assets/build_n64",
+    "install-deps": "node tools/install-deps.js"
   },
   "author": "Matthew LaRocca",
   "license": "MIT",
