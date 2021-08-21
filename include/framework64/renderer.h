@@ -3,7 +3,6 @@
 
 #include "camera.h"
 #include "color.h"
-#include "entity.h"
 #include "mesh.h"
 #include "rect.h"
 #include "texture.h"
@@ -28,8 +27,10 @@ typedef enum {
 
 typedef struct fw64Renderer fw64Renderer;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void fw64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
 void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags);
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, Color* color);
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
@@ -45,5 +46,9 @@ void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -8,4 +8,6 @@ struct fw64Input{
     NUContData previous_state[NU_CONT_MAXCONTROLLERS];
 };
 
+void fw64_n64_input_init(fw64Input* input);
+
 #endif

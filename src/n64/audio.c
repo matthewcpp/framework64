@@ -1,7 +1,7 @@
 #include "framework64/audio.h"
 #include "framework64/n64/audio.h"
 
-#include "framework64/filesystem.h"
+#include "framework64/n64/filesystem.h"
 
 #include <nusys.h>
 
@@ -22,7 +22,7 @@ typedef struct {
     uint32_t sequence_bank_size;
 } fw64MusicHeader;
 
-void fw64_audio_init(fw64Audio* audio) {
+void fw64_n64_audio_init(fw64Audio* audio) {
     memset(audio, 0, sizeof(audio));
     audio->music_volume = 1.0f;
     audio->current_sound_bank = FW64_NO_AUDIO_BANK_LOADED;
@@ -44,7 +44,7 @@ static int fw64_audio_load_bank(fw64Audio* audio, fw64BankType bank_type, int as
     fw64_filesystem_read(&header, sizeof(fw64SoundbankHeader), 1, handle);
     fw64_filesystem_close(handle);
 
-    uint32_t rom_address = n64_filesystem_get_rom_address(asset_id);
+    uint32_t rom_address = fw64_n64_filesystem_get_rom_address(asset_id);
     uint32_t ctrl_file_address = rom_address + sizeof(fw64SoundbankHeader);
     uint32_t tbl_file_address = ctrl_file_address + header.ctrl_file_size;
 
@@ -120,7 +120,7 @@ int fw64_audio_load_music(fw64Audio* audio, int asset_id) {
 
     audio->music_track_count = header.track_count;
 
-    uint32_t rom_address = n64_filesystem_get_rom_address(asset_id);
+    uint32_t rom_address = fw64_n64_filesystem_get_rom_address(asset_id);
     uint32_t seq_file_address = rom_address + sizeof(fw64MusicHeader);
     nuAuSeqPlayerSeqSet((u8*)seq_file_address);
 

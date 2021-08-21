@@ -19,7 +19,16 @@ const depsJsonPath = path.join(scriptDir, "vcpkg.json");
 async function main() {
     if (!fs.existsSync(executablePath)) {
         console.log("Bootstrapping vcpkg");
-        await  execFile("cmd.exe", ["/c", bootstrapScriptPath]);
+        switch (process.platform) {
+            case "win32":
+                await execFile("cmd.exe", ["/c", bootstrapScriptPath]);
+                break;
+
+            case "darwin":
+                await execFile("zsh", [bootstrapScriptPath]);
+                break;
+        }
+
     }
 
     const args = ["install", ...JSON.parse(fs.readFileSync(depsJsonPath, {encoding: "utf8"}))];

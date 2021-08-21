@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "framework64/engine.h"
+#include "entity.h"
 
 typedef struct {
     fw64Engine* engine;

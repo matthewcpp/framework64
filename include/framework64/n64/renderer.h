@@ -25,4 +25,6 @@ struct fw64Renderer{
     fw64ShadingMode shading_mode;
 };
 
+void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
+
 #endif

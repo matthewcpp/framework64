@@ -5,7 +5,7 @@
 #include "framework64/n64/input.h"
 #include "framework64/n64/renderer.h"
 
-#include "framework64/filesystem.h"
+#include "framework64/n64/filesystem.h"
 
 #include <nusys.h>
 
@@ -40,13 +40,13 @@ int fw64_engine_init(fw64Engine* system) {
     nuGfxInit(); // starts nusys graphics
     nuAuInit(); //starts the SGI tools audio manager
 
-    fw64_renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
-    fw64_input_init(system->input);
+    fw64_n64_renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
+    fw64_n64_input_init(system->input);
     fw64_time_init(system->time);
-    fw64_assets_init(system->assets);
-    fw64_audio_init(system->audio);
+    fw64_n64_assets_init(system->assets);
+    fw64_n64_audio_init(system->audio);
 
-    fw64_filesystem_init();
+    fw64_n64_filesystem_init();
 
     return 1;
 }

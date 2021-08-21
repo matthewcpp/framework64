@@ -7,8 +7,6 @@
 
 typedef struct fw64Assets fw64Assets;
 
-void fw64_assets_init(fw64Assets* assets);
-
 int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index);
 fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index);
 fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index);

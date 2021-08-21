@@ -12,4 +12,6 @@ struct fw64Audio {
     int current_music_bank;
 };
 
+void fw64_n64_audio_init(fw64Audio* audio);
+
 #endif

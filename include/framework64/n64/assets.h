@@ -23,4 +23,6 @@ struct fw64Assets{
     uint32_t _asset_capacity;
 };
 
+void fw64_n64_assets_init(fw64Assets* assets);
+
 #endif

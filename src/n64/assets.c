@@ -7,7 +7,7 @@
 #define FW64_ASSET_INITIAL_CAPACITY 8
 #define FW64_ASSET_GROW_AMOUNT 8
 
-void fw64_assets_init(fw64Assets* assets) {
+void fw64_n64_assets_init(fw64Assets* assets) {
     assets->_asset_capacity = FW64_ASSET_INITIAL_CAPACITY;
     assets->_assets = calloc(FW64_ASSET_INITIAL_CAPACITY, sizeof(fw64Asset));
     assets->_asset_count = 0;

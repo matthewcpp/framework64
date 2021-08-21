@@ -14,8 +14,6 @@ typedef enum {
     FW64_AUDIO_STOPPING = 2 // AL_STOPPING
 } fw64AudioStatus;
 
-void fw64_audio_init(fw64Audio* audio);
-
 /**
  * Loads a sound effect bank.  The number of sounds contained in the bank will be placed in audio->sound_count.
  * \return nonzero value if the bank was successfully loaded, otherwise zero if an error occurred.

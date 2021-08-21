@@ -5,7 +5,6 @@
 
 typedef struct fw64Input fw64Input;
 
-void fw64_input_init(fw64Input* input);
 void fw64_input_update(fw64Input* input);
 
 int fw64_input_button_pressed(fw64Input* input, int controller, int button);

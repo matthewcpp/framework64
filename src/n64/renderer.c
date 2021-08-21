@@ -10,7 +10,7 @@
 
 
 
-void fw64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
+void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
     renderer->screen_size.x = screen_width;
     renderer->screen_size.y = screen_height;
     renderer->display_list = NULL;

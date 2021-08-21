@@ -6,7 +6,7 @@
 #include <string.h>
 #include <malloc.h>
 
-void fw64_input_init(fw64Input* input) {
+void fw64_n64_input_init(fw64Input* input) {
     nuContInit(); // initialize nusys controller subsystem
 }
 
