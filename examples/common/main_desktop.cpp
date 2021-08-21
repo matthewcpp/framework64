@@ -4,7 +4,8 @@
 
 int main(int argc, char** argv) {
     fw64Engine engine;
-    fw64_engine_init(&engine);
+    if (!fw64_engine_init(&engine))
+        return 1;
 
     Game game;
     game_init(&game, &engine);

@@ -16,7 +16,8 @@ int fw64_engine_init(fw64Engine* engine) {
     engine->renderer = new fw64Renderer();
     engine->time = new fw64Time();
 
-    fw64_desktop_renderer_init(engine->renderer, 320, 240);
+    const std::string base_dir = "/Users/matthew/development/repos/n64-sandbox/src/desktop/";
+    fw64_desktop_renderer_init(engine->renderer, 320, 240, base_dir);
     fw64_desktop_filesystem_init();
 
     return 1;
