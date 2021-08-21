@@ -1,7 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const util = require("util");
-const execFile = util.promisify(require('child_process').execFile);
+const {spawn} = require('child_process');
 
 const scriptDir = __dirname;
 const vcpkgDir = path.resolve(scriptDir, "..", "lib", "vcpkg");
@@ -16,16 +15,35 @@ const triplets = {"win32": "x64-windows", "linux": "x64-linux", "darwin": "x64-o
 
 const depsJsonPath = path.join(scriptDir, "vcpkg.json");
 
+function spawnPromise(command, args) {
+    return new Promise((resolve, reject) => {
+        const spawnedProcess = spawn(command, args);
+
+        spawnedProcess.stdout.on("data", (data) => {
+           console.log(`${data}`);
+        });
+        spawnedProcess.stderr.on("data", (data) => {
+            console.log(`${data}`);
+        });
+        spawnedProcess.on("close", (code) => {
+            if (code === 0)
+                resolve(code);
+            else
+                reject(code);
+        })
+    })
+}
+
 async function main() {
     if (!fs.existsSync(executablePath)) {
         console.log("Bootstrapping vcpkg");
         switch (process.platform) {
             case "win32":
-                await execFile("cmd.exe", ["/c", bootstrapScriptPath]);
+                await spawnPromise("cmd.exe", ["/c", bootstrapScriptPath]);
                 break;
 
             case "darwin":
-                await execFile("zsh", [bootstrapScriptPath]);
+                await spawnPromise("zsh", [bootstrapScriptPath]);
                 break;
         }
 
@@ -43,7 +61,7 @@ async function main() {
 
     console.log(args);
     console.log("Installing vcpkg packages");
-    await execFile(executablePath, args);
+    await spawnPromise(executablePath, args);
 }
 
 if (require.main === module) {
