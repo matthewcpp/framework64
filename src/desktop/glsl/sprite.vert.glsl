@@ -10,6 +10,7 @@ uniform mat4 matrix;
 out vec2 tex_coords;
 
 void main() {
+    // image loaded by SDL_image has origin at top left
     tex_coords = vec2(fw64_tex_coords.x, 1.0 - fw64_tex_coords.y);
     gl_Position = matrix * fw64_position;
 }

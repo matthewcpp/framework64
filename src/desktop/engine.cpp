@@ -17,7 +17,7 @@ int fw64_engine_init(fw64Engine* engine) {
 
     // const std::string base_dir = "/Users/matthew/development/repos/n64-sandbox/src/desktop/";
     const std::string base_dir = "D:/development/repos/n64-sandbox/src/desktop/";
-    fw64_desktop_renderer_init(engine->renderer, 320, 240, base_dir);
+    engine->renderer->init(320, 240, base_dir);
     engine->assets->init();
     fw64_desktop_filesystem_init();
 

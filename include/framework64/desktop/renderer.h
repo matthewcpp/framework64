@@ -13,17 +13,23 @@
 #include <vector>
 
 struct fw64Renderer {
-    SDL_Window* window;
-    SDL_GLContext gl_context;
+public:
+    fw64Renderer() = default;
+    bool init(int screen_width, int screen_height, std::string const& base_path);
+
+    void setClearColor(float r, float g, float b, float a);
+    void begin(fw64Camera* camera, fw64RenderMode new_render_mode, fw64RendererFlags flags);
+    void end(fw64RendererFlags flags);
+    void setScreenSize(int width, int height);
+
+public:
+    framework64::SpriteRenderer sprite_renderer;
+    fw64RenderMode render_mode;
     int screen_width;
     int screen_height;
-    std::array<float, 4> clear_color = {0.10f, 0.0f, 0.65f, 1.0f};
+    std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
 
-    fw64RenderMode render_mode;
-    framework64::SpriteRenderer sprite_renderer;
+private:
+    SDL_Window* window;
+    SDL_GLContext gl_context;
 };
-
-bool fw64_desktop_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height, std::string const& base_path);
-
-uint32_t fw64_desktop_load_shader(std::string const& vertex_path, std::string const& frag_path);
-uint32_t fw64_desktop_renderer_compile_shader(std::string const& vertex, std::string const& fragment);
