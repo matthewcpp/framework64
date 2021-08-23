@@ -13,7 +13,8 @@ typedef enum {
     FW64_RENDERER_MODE_UNSET,
     FW64_RENDERER_MODE_TRIANGLES,
     FW64_RENDERER_MODE_LINES,
-    FW64_RENDERER_MODE_RECTANGLES
+    FW64_RENDERER_MODE_RECTANGLES,
+    FW64_RENDERER_MODE_SPRITES
 } fw64RenderMode;
 
 typedef enum {
@@ -41,8 +42,8 @@ void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color);
 void fw64_renderer_set_fill_mode(fw64Renderer* renderer);
 void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect);
 
-void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* sprite, int x, int y);
-void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y);
+void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y);
+void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y);
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);

@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <malloc.h>
+#include "framework64/n64/texture.h"
 
 int fw64_texture_get_slice_width(fw64Texture* sprite) {
     return sprite->width / sprite->hslices;

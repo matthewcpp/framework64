@@ -148,6 +148,29 @@ void matrix_perspective(float* out, float fov_degrees, float aspect, float near,
     out[15] = 0;
 }
 
+void matrix_ortho(float* out, float left, float right, float bottom, float top, float near, float far) {
+    float lr = 1.0f / (left - right);
+    float bt = 1.0f / (bottom - top);
+    float nf = 1.0f / (near - far);
+
+    out[0] = -2 * lr;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = -2 * bt;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[10] = 2 * nf;
+    out[11] = 0;
+    out[12] = (left + right) * lr;
+    out[13] = (top + bottom) * bt;
+    out[14] = (far + near) * nf;
+    out[15] = 1;
+}
+
 static float hypot3(float a, float b, float c) {
     return fw64_sqrtf(a * a + b* b + c * c);
 }
