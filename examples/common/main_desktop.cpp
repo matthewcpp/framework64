@@ -1,11 +1,16 @@
 #include "game.h"
+#include "framework64/desktop/engine.h"
 
 #include <SDL2/SDL.h>
 
+#include <iostream>
+
 int main(int argc, char** argv) {
-    fw64Engine engine;
-    if (!fw64_engine_init(&engine))
+    framework64::Engine engine;
+    if (!engine.init(320, 240)) {
+        std::cout << "Failed to initialize engine." << std::endl;
         return 1;
+    }
 
     Game game;
     game_init(&game, &engine);
@@ -33,8 +38,8 @@ int main(int argc, char** argv) {
         time_delta = now - last_update;
 
         if (time_delta >= 32) {
-            fw64_engine_update(&engine);
-            game_update(&game, engine.time->time_delta);
+            engine.update(static_cast<float>(time_delta) / 1000.0f);
+            game_update(&game);
             game_draw(&game);
 
             last_update = now;

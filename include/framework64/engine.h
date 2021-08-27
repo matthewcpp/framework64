@@ -15,7 +15,4 @@ typedef struct {
     fw64Time* time;
 } fw64Engine;
 
-int fw64_engine_init(fw64Engine* engine);
-void fw64_engine_update(fw64Engine* engine);
-
 #endif

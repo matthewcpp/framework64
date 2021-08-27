@@ -1,5 +1,7 @@
 #pragma once
 
+#include "framework64/texture.h"
+
 #include <string>
 #include <cstdint>
 

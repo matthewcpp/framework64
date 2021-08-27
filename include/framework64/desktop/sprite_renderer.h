@@ -25,6 +25,7 @@ public:
     void drawSpriteFrame(fw64Texture* texture, int frame, int x, int y);
 
 private:
+    void setCurrentTexture(fw64Texture* texture);
     void submitCurrentBatch();
 
 private:

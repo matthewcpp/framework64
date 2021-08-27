@@ -1,10 +1,5 @@
 #include "framework64/time.h"
 
-void fw64_time_init(fw64Time* time){
-    time->_previous_ms = 0;
-    time->time_delta = 0.0f;
-}
-
 #ifdef PLATFORM_N64
 
 #include <ultra64.h>

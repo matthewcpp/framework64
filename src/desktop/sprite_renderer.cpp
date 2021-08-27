@@ -80,13 +80,17 @@ namespace framework64 {
         vertex_buffer.clear();
     }
 
-    void SpriteRenderer::drawSprite(fw64Texture* texture, int x, int y) {
+    void SpriteRenderer::setCurrentTexture(fw64Texture* texture) {
         if (texture != current_texture) {
             if (current_texture != nullptr)
                 submitCurrentBatch();
 
             current_texture = texture;
         }
+    }
+
+    void SpriteRenderer::drawSprite(fw64Texture* texture, int x, int y) {
+        setCurrentTexture(texture);
 
         auto xf = static_cast<float>(x);
         auto yf = static_cast<float>(y);
@@ -108,7 +112,22 @@ namespace framework64 {
     }
 
     void SpriteRenderer::drawSpriteFrame(fw64Texture* texture, int frame, int x, int y) {
+        setCurrentTexture(texture);
 
+        auto xf = static_cast<float>(x);
+        auto yf = static_cast<float>(y);
+        auto wf = static_cast<float>(fw64_texture_get_slice_width(texture));
+        auto hf = static_cast<float>(fw64_texture_get_slice_height(texture));
+
+        float tc_width = wf / texture->width;
+        float tc_height = hf / texture->height;
+        float tc_x = static_cast<float>(frame % texture->hslices) * tc_width;
+        float tc_y = static_cast<float>(frame / texture->hslices) * tc_height;
+
+        SpriteVertex a = {xf, yf, 0.0f, 0.0, 1.0};
+        SpriteVertex b = {xf + wf, yf, 0.0f, 1.0f, 1.0f};
+        SpriteVertex c = {xf + wf, yf + hf, 0.0f, 1.0f, 0.0f};
+        SpriteVertex d = {xf, yf + hf, 0.0f, 0.0f, 0.0f};
     }
 
     void SpriteRenderer::setScreenSize(int width, int height) {

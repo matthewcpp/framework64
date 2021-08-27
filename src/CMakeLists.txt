@@ -25,7 +25,7 @@ set(source_files
 set(desktop_files
         ${include_dir}/assets.h ${include_dir}/desktop/assets.h desktop/assets.cpp
         ${include_dir}/audio.h ${include_dir}/desktop/audio.h desktop/audio.cpp
-        ${include_dir}/engine.h desktop/engine.cpp
+        ${include_dir}/engine.h ${include_dir}/desktop/engine.h desktop/engine.cpp
         ${include_dir}/filesystem.h ${include_dir}/desktop/filesystem.h desktop/filesystem.cpp
         ${include_dir}/input.h ${include_dir}/desktop/input.h desktop/input.cpp
         ${include_dir}/renderer.h ${include_dir}/desktop/renderer.h desktop/renderer.cpp
