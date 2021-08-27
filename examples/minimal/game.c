@@ -18,7 +18,9 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
+    int slice_height = fw64_texture_get_slice_height(tex);
     fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_SPRITES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_renderer_draw_sprite(game->engine->renderer, tex, 10, 10);
+    fw64_renderer_draw_sprite_slice(game->engine->renderer, tex, 1, 10, 10);
+    fw64_renderer_draw_sprite_slice(game->engine->renderer, tex, 7, 10, 10 + slice_height);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

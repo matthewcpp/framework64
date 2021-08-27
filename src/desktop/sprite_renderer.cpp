@@ -119,15 +119,24 @@ namespace framework64 {
         auto wf = static_cast<float>(fw64_texture_get_slice_width(texture));
         auto hf = static_cast<float>(fw64_texture_get_slice_height(texture));
 
+        // calculate the texcore coordinate window
         float tc_width = wf / texture->width;
         float tc_height = hf / texture->height;
         float tc_x = static_cast<float>(frame % texture->hslices) * tc_width;
-        float tc_y = static_cast<float>(frame / texture->hslices) * tc_height;
+        float tc_y = 1.0f - static_cast<float>(frame / texture->hslices) * tc_height;
 
-        SpriteVertex a = {xf, yf, 0.0f, 0.0, 1.0};
-        SpriteVertex b = {xf + wf, yf, 0.0f, 1.0f, 1.0f};
-        SpriteVertex c = {xf + wf, yf + hf, 0.0f, 1.0f, 0.0f};
-        SpriteVertex d = {xf, yf + hf, 0.0f, 0.0f, 0.0f};
+        SpriteVertex a = {xf, yf, 0.0f, tc_x, tc_y};
+        SpriteVertex b = {xf + wf, yf, 0.0f, tc_x + tc_width, tc_y};
+        SpriteVertex c = {xf + wf, yf + hf, 0.0f, tc_x + tc_width, tc_y - tc_height};
+        SpriteVertex d = {xf, yf + hf, 0.0f, tc_x, tc_y - tc_height};
+
+        vertex_buffer.push_back(a);
+        vertex_buffer.push_back(b);
+        vertex_buffer.push_back(c);
+
+        vertex_buffer.push_back(a);
+        vertex_buffer.push_back(c);
+        vertex_buffer.push_back(d);
     }
 
     void SpriteRenderer::setScreenSize(int width, int height) {
