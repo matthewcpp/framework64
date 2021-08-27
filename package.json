@@ -1,6 +1,6 @@
 {
   "name": "n64-sandbox",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "N64 development framework",
   "repository": {
     "type": "git",
@@ -11,7 +11,8 @@
     "libultra"
   ],
   "scripts": {
-    "prepare-assets": "npx prepare-fw64-assets -f assets/manifest.n64.json assets/build_n64",
+    "prepare-n64-assets": "npx prepare-fw64-assets -f assets/manifest.n64.json assets/build_n64",
+    "prepare-desktop-assets": "npx prepare-fw64-assets -f assets/manifest.desktop.json assets/build_desktop",
     "install-deps": "node tools/install-deps.js"
   },
   "author": "Matthew LaRocca",

@@ -4,7 +4,7 @@
 #include <cassert>
 #include <iostream>
 
-bool fw64Renderer::init(int screen_width, int screen_height, const std::string &base_path) {
+bool fw64Renderer::init(int screen_width, int screen_height, const std::string & shader_dir_path) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
@@ -24,9 +24,7 @@ bool fw64Renderer::init(int screen_width, int screen_height, const std::string &
 
     glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
 
-    std::string shader_dir = base_path + "glsl/";
-
-    if (!sprite_renderer.init(shader_dir)) return false;
+    if (!sprite_renderer.init(shader_dir_path)) return false;
     setScreenSize(screen_width, screen_height);
 
     return true;
@@ -49,6 +47,9 @@ void fw64Renderer::begin(fw64Camera *camera, fw64RenderMode new_render_mode, fw6
         case FW64_RENDERER_MODE_SPRITES:
             sprite_renderer.begin(camera);
             break;
+
+        default:
+            break;
     }
 }
 
@@ -56,6 +57,9 @@ void fw64Renderer::end(fw64RendererFlags flags) {
     switch(render_mode) {
         case FW64_RENDERER_MODE_SPRITES:
             sprite_renderer.end();
+            break;
+
+        default:
             break;
     }
 

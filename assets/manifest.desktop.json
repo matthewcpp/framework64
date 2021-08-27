@@ -1,0 +1,26 @@
+{
+    "platform": "desktop",
+    "sprites": [
+        {
+            "src": "nintendo_seal.png",
+            "hslices": 1,
+            "vslices": 1
+        },
+        {
+            "src": "pyoro64.png",
+            "hslices": 1,
+            "vslices": 1
+        },
+        {
+            "src": "n64_logo.png",
+            "hslices": 2,
+            "vslices": 2
+        },
+        {
+            "src": "ken.png",
+            "resize": "192x64",
+            "hslices": 6,
+            "vslices": 2
+        }
+    ]
+}

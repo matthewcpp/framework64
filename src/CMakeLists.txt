@@ -5,6 +5,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-mixer CONFIG REQUIRED)
 find_package(sdl2-image CONFIG REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 set(source_files
         ${include_dir}/box.h box.c
@@ -35,11 +36,9 @@ set(desktop_files
 
 add_library(framework64 STATIC ${source_files} ${desktop_files})
 
-target_include_directories(framework64 PUBLIC ../include ../assets/build_n64)
-
-#TODO: should be in the build_desktop folder
-target_include_directories(framework64 PUBLIC ../assets/build_n64)
+target_include_directories(framework64 PUBLIC ../include ../assets/build_desktop)
 
 target_link_libraries(framework64 PRIVATE GLEW::GLEW)
 target_link_libraries(framework64 INTERFACE SDL2::SDL2 SDL2::SDL2main)
 target_link_libraries(framework64 PRIVATE SDL2::SDL2_image)
+target_link_libraries(framework64 PRIVATE unofficial::sqlite3::sqlite3)

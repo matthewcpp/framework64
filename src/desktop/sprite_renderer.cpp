@@ -44,7 +44,6 @@ namespace framework64 {
         glUseProgram(shader);
         glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, matrix.data());
         current_texture = nullptr;
-
     }
 
     void SpriteRenderer::end() {

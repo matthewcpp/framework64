@@ -9,7 +9,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     fw64_camera_init(&game->camera);
 
-    tex = fw64_assets_get_image(engine->assets, 1);
+    tex = fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_ken);
+    tex = fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_ken);
 }
 
 void game_update(Game* game, float time_delta){

@@ -1,5 +1,5 @@
 {
-    "outDir": "build_n64",
+    "platform": "n64",
     "sprites": [
         {
             "src": "nintendo_seal.png",

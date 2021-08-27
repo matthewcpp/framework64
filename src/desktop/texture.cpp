@@ -18,7 +18,7 @@ fw64Texture* fw64Texture::loadImageFile(std::string const& path) {
     texture->hslices = 1;
     texture->vslices = 1;
 
-    GLenum image_data_type = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+    GLenum image_data_type = surface->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
 
     glGenTextures(1, &texture->gl_handle);
     glBindTexture(GL_TEXTURE_2D, texture->gl_handle);
@@ -29,12 +29,6 @@ fw64Texture* fw64Texture::loadImageFile(std::string const& path) {
     SDL_FreeSurface(surface);
 
     return texture;
-}
-
-fw64Texture* fw64Texture::loadTexture(std::string const& path) {
-    //todo: parse json info created by pipeline
-    std::string image_path = path + ".png";
-    return loadImageFile(image_path);
 }
 
 int fw64_texture_get_slice_width(fw64Texture* texture) {
