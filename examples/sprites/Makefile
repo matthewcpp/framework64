@@ -26,7 +26,7 @@ TARGETS =	sprites.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ../common/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ../common/*.c) $(wildcard ./*.c)
+CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ../../src/*.c) $(wildcard ../common/*.c) $(wildcard ./*.c)
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 

@@ -2,6 +2,8 @@
 
 #include "framework64/matrix.h"
 
+#include "framework64/n64/mesh.h"
+
 #include <nusys.h>
 
 void entity_init(Entity* entity, fw64Mesh* mesh) {

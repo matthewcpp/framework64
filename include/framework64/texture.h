@@ -7,8 +7,12 @@ typedef struct fw64Texture fw64Texture;
 extern "C" {
 #endif
 
-int fw64_texture_get_slice_width(fw64Texture *sprite);
-int fw64_texture_get_slice_height(fw64Texture *sprite);
+int fw64_texture_width(fw64Texture* texture);
+int fw64_texture_height(fw64Texture* texture);
+int fw64_texture_hslices(fw64Texture* texture);
+int fw64_texture_vslices(fw64Texture* texture);
+int fw64_texture_slice_width(fw64Texture* texture);
+int fw64_texture_slice_height(fw64Texture* texture);
 
 #ifdef __cplusplus
 }

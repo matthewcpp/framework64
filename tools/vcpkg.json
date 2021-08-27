@@ -1,6 +1,5 @@
 [
     "glew",
-    "nlohmann-json",
     "sdl2",
     "sdl2-mixer[dynamic-load,libvorbis,nativemidi]",
     "sdl2-image",

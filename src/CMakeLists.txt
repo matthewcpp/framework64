@@ -18,7 +18,7 @@ set(source_files
         ${include_dir}/sparse_set.h sparse_set.c
         ${include_dir}/transform.h transform.c
         ${include_dir}/types.h
-        ${include_dir}/time.h time.c
+        ${include_dir}/time.h
         ${include_dir}/vec2.h vec2.c
         ${include_dir}/vec3.h vec3.c)
 

@@ -32,17 +32,17 @@ void ken_sprite_update(KenSprite* ken, float time_delta) {
         ken->frame_time -= FRAME_DUR;
 
         ken->frame_index += 1;
-        if (ken->frame_index >= ken->sprite->hslices)
+        if (ken->frame_index >= fw64_texture_hslices(ken->sprite))
             ken->frame_index = 0;
     }
 
 }
 
 void ken_sprite_draw(KenSprite* ken, fw64Renderer* renderer) {
-    int slice_height = fw64_texture_get_slice_height(ken->sprite);
+    int slice_height = fw64_texture_slice_height(ken->sprite);
 
     fw64_renderer_draw_sprite_slice(renderer, ken->sprite, ken->frame_index, ken->position.x, ken->position.y);
-    fw64_renderer_draw_sprite_slice(renderer, ken->sprite, ken->frame_index + ken->sprite->hslices, ken->position.x, ken->position.y + slice_height);
+    fw64_renderer_draw_sprite_slice(renderer, ken->sprite, ken->frame_index + fw64_texture_hslices(ken->sprite), ken->position.x, ken->position.y + slice_height);
 }
 
 void elapsed_time_init(ElapsedTime* elapsed_time, fw64Font* font) {

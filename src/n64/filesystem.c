@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <string.h>
 
-#define ARCHIVE_HEADER_SIZE ((ASSET_COUNT * sizeof(uint32_t)))
+#define ARCHIVE_HEADER_SIZE ((FW64_ASSET_COUNT * sizeof(uint32_t)))
 #define ASSET_HEADER_SIZE 4
 #define MAX_DMA 16384
 #define MAX_UNALIGNED_READ 256
@@ -22,7 +22,7 @@ typedef struct {
 
 fw64FileHandle open_files[FW64_FILESYSTEM_MAX_OPEN_FILES];
 
-uint32_t asset_offsets[ASSET_COUNT] __attribute__ ((aligned (8)));
+uint32_t asset_offsets[FW64_ASSET_COUNT] __attribute__ ((aligned (8)));
 uint8_t read_cache[MAX_UNALIGNED_READ] __attribute__ ((aligned (8)));
 
 int fw64_n64_filesystem_init() {
@@ -33,7 +33,7 @@ int fw64_n64_filesystem_init() {
 }
 
 int fw64_filesystem_open(int asset_index) {
-    if (asset_index < 0 || asset_index >= ASSET_COUNT)
+    if (asset_index < 0 || asset_index >= FW64_ASSET_COUNT)
         return FW64_FILESYSTEM_INVALID_HANDLE;
 
     int file_handle = FW64_FILESYSTEM_INVALID_HANDLE;

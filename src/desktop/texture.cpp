@@ -38,3 +38,19 @@ int fw64_texture_get_slice_width(fw64Texture* texture) {
 int fw64_texture_get_slice_height(fw64Texture* texture) {
     return texture->height / texture->vslices;
 }
+
+int fw64_texture_width(fw64Texture* texture) {
+    return texture->width;
+}
+
+int fw64_texture_height(fw64Texture* texture) {
+    return texture->height;
+}
+
+int fw64_texture_hslices(fw64Texture* texture) {
+    return texture->hslices;
+}
+
+int fw64_texture_vslices(fw64Texture* texture) {
+    return texture->vslices;
+}

@@ -1,4 +1,4 @@
-#include "framework64/mesh.h"
+#include "framework64/n64/mesh.h"
 
 #include "framework64/filesystem.h"
 
@@ -8,7 +8,7 @@
 static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle);
 static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle);
 
-int fw64_mesh_load(int asset_index, fw64Mesh* mesh) {
+int fw64_n64_mesh_load(int asset_index, fw64Mesh* mesh) {
     int handle = fw64_filesystem_open(asset_index);
     if (handle < 0)
         return 0;
@@ -40,7 +40,7 @@ int fw64_mesh_load(int asset_index, fw64Mesh* mesh) {
     return 1;
 }
 
-void fw64_mesh_unload(fw64Mesh* mesh) {
+void fw64_n64_mesh_unload(fw64Mesh* mesh) {
     if (mesh->vertex_buffer)
         free(mesh->vertex_buffer);
 
@@ -55,7 +55,7 @@ void fw64_mesh_unload(fw64Mesh* mesh) {
 
     if (mesh->textures) {
         for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
-            fw64_texture_uninit(mesh->textures + i);
+            fw64_n64_texture_uninit(mesh->textures + i);
         }
 
         free(mesh->textures);
@@ -90,7 +90,7 @@ static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle
         mesh->textures = malloc(sizeof(fw64Texture) * mesh->info.texture_count);
 
         for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
-            fw64_texture_load(asset_index_data[i], mesh->textures + i);
+            fw64_n64_texture_load(asset_index_data[i], mesh->textures + i);
         }
     }
     else {
@@ -103,5 +103,5 @@ void fw64_mesh_init(fw64Mesh* mesh) {
 }
 
 void fw64_mesh_uninit(fw64Mesh* mesh) {
-    fw64_mesh_unload(mesh);
+    fw64_n64_mesh_unload(mesh);
 }
