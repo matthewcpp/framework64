@@ -24,6 +24,9 @@ bool fw64Renderer::init(int screen_width, int screen_height, const std::string &
 
     glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     if (!sprite_renderer.init(shader_dir_path)) return false;
     setScreenSize(screen_width, screen_height);
 
@@ -77,8 +80,8 @@ void fw64Renderer::setScreenSize(int width, int height) {
 
 // Public C interface
 
-void fw64_renderer_set_clear_color(fw64Renderer* renderer, Color* color) {
-    renderer->setClearColor( color->r / 255.0f, color->g / 255.0f, color->b /255.0f, 1.0f);
+void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
+    renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
 }
 
 void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags) {
@@ -107,17 +110,20 @@ void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect) {
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {
     assert(renderer->render_mode == FW64_RENDERER_MODE_SPRITES);
-    renderer->sprite_renderer.drawSprite(texture, x, y);
+    renderer->sprite_renderer.drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y) {
     assert(renderer->render_mode == FW64_RENDERER_MODE_SPRITES);
-    renderer->sprite_renderer.drawSpriteFrame(texture, frame, x, y);
+    renderer->sprite_renderer.drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
+    assert(renderer->render_mode == FW64_RENDERER_MODE_SPRITES);
+    renderer->sprite_renderer.drawText(font, static_cast<float>(x), static_cast<float>(y), text);
 }
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {
-    renderer->setScreenSize(screen_size->x, screen_size->y);
+    screen_size->x = renderer->screen_width;
+    screen_size->y = renderer->screen_height;
 }

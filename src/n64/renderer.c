@@ -2,6 +2,7 @@
 
 #include "framework64/matrix.h"
 
+#include "framework64/n64/font.h"
 #include "framework64/n64/mesh.h"
 #include "framework64/n64/renderer.h"
 #include "framework64/n64/texture.h"
@@ -10,8 +11,6 @@
 
 #include <malloc.h>
 #include <string.h>
-
-
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
     renderer->screen_size.x = screen_width;
@@ -39,8 +38,8 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
 }
 
-void fw64_renderer_set_clear_color(fw64Renderer* renderer, Color* clear_color) {
-    renderer->clear_color = GPACK_RGBA5551(clear_color->r, clear_color->g, clear_color->b, 1);
+void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
+    renderer->clear_color = GPACK_RGBA5551(r, g, b, 1);
 }
 
 Gfx _rdp_init_static_dl[] = {

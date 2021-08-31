@@ -22,5 +22,18 @@
             "hslices": 6,
             "vslices": 2
         }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12"
+        },
+        {
+            "src": "basicLAZER.otf",
+            "size": 12,
+            "name": "basicLAZER",
+            "sourceString": "ELAPSED TIME:0123456789."
+        }
     ]
 }

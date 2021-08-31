@@ -1,12 +1,11 @@
 #include "game.h"
 #include "assets.h"
 
-#include "framework64/n64/controller_button.h"
-
 #include <stdio.h>
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
+    fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 255);
 
     fw64_camera_init(&game->camera);
 
@@ -30,7 +29,7 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game){
-    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_SPRITES, FW64_RENDERER_FLAG_CLEAR);
     n64_logo_sprite_draw(&game->n64logo, game->engine->renderer);
     ken_sprite_draw(&game->ken_sprite, game->engine->renderer);
     elapsed_time_draw(&game->elapsed_time, game->engine->renderer);

@@ -38,7 +38,7 @@ namespace framework64 {
         return true;
     }
 
-    void SpriteRenderer::begin(fw64Camera* camera) {
+    void SpriteRenderer::begin(fw64Camera const * camera) {
         (void)camera;
 
         glUseProgram(shader);
@@ -80,7 +80,7 @@ namespace framework64 {
         vertex_buffer.clear();
     }
 
-    void SpriteRenderer::setCurrentTexture(fw64Texture* texture) {
+    void SpriteRenderer::setCurrentTexture(fw64Texture const* texture) {
         if (texture != current_texture) {
             if (current_texture != nullptr)
                 submitCurrentBatch();
@@ -89,7 +89,7 @@ namespace framework64 {
         }
     }
 
-    void SpriteRenderer::drawSprite(fw64Texture* texture, int x, int y) {
+    void SpriteRenderer::drawSprite(fw64Texture const * texture, float x, float y) {
         setCurrentTexture(texture);
 
         auto xf = static_cast<float>(x);
@@ -102,24 +102,18 @@ namespace framework64 {
         SpriteVertex c = {xf + wf, yf + hf, 0.0f, 1.0f, 0.0f};
         SpriteVertex d = {xf, yf + hf, 0.0f, 0.0f, 0.0f};
 
-        vertex_buffer.push_back(a);
-        vertex_buffer.push_back(b);
-        vertex_buffer.push_back(c);
-
-        vertex_buffer.push_back(a);
-        vertex_buffer.push_back(c);
-        vertex_buffer.push_back(d);
+        addQuad(a, b, c, d);
     }
 
-    void SpriteRenderer::drawSpriteFrame(fw64Texture* texture, int frame, int x, int y) {
+    void SpriteRenderer::drawSpriteFrame(fw64Texture const * texture, int frame, float x, float y) {
         setCurrentTexture(texture);
 
         auto xf = static_cast<float>(x);
         auto yf = static_cast<float>(y);
-        auto wf = static_cast<float>(fw64_texture_get_slice_width(texture));
-        auto hf = static_cast<float>(fw64_texture_get_slice_height(texture));
+        auto wf = static_cast<float>(texture->slice_width());
+        auto hf = static_cast<float>(texture->slice_height());
 
-        // calculate the texcore coordinate window
+        // calculate the texcord coordinate window
         float tc_width = wf / texture->width;
         float tc_height = hf / texture->height;
         float tc_x = static_cast<float>(frame % texture->hslices) * tc_width;
@@ -130,6 +124,36 @@ namespace framework64 {
         SpriteVertex c = {xf + wf, yf + hf, 0.0f, tc_x + tc_width, tc_y - tc_height};
         SpriteVertex d = {xf, yf + hf, 0.0f, tc_x, tc_y - tc_height};
 
+        addQuad(a, b, c, d);
+    }
+
+
+
+    void SpriteRenderer::drawText(fw64Font const * font, float x, float y, const char* text){
+        if (!text || text[0] == 0) return;
+
+        uint32_t glyph_index;
+        text = font->getNextGlyphIndex(text, glyph_index);
+        auto const & first_glyph = font->glyphs[glyph_index];
+        x += -first_glyph.left;
+
+        for (;;) {
+            auto const & glyph = font->glyphs[glyph_index];
+            drawSpriteFrame(font->texture, glyph_index, x + glyph.left, glyph.top);
+            x += glyph.advance;
+
+            if (text[0] == 0)
+                break;
+
+            text = font->getNextGlyphIndex(text, glyph_index);
+        }
+    }
+
+    void SpriteRenderer::setScreenSize(int width, int height) {
+        matrix_ortho(matrix.data(), 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
+    }
+
+    void SpriteRenderer::addQuad(SpriteVertex const & a, SpriteVertex const & b, SpriteVertex const & c, SpriteVertex const & d) {
         vertex_buffer.push_back(a);
         vertex_buffer.push_back(b);
         vertex_buffer.push_back(c);
@@ -137,9 +161,5 @@ namespace framework64 {
         vertex_buffer.push_back(a);
         vertex_buffer.push_back(c);
         vertex_buffer.push_back(d);
-    }
-
-    void SpriteRenderer::setScreenSize(int width, int height) {
-        matrix_ortho(matrix.data(), 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
     }
 }

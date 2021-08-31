@@ -1,8 +1,10 @@
 #include "framework64/assets.h"
 #include "framework64/n64/assets.h"
 
-#include "framework64/n64/texture.h"
+#include "framework64/n64/font.h"
 #include "framework64/n64/mesh.h"
+#include "framework64/n64/texture.h"
+
 
 #include <malloc.h>
 #include <stddef.h>

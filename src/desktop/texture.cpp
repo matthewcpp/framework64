@@ -18,11 +18,17 @@ fw64Texture* fw64Texture::loadImageFile(std::string const& path) {
     texture->hslices = 1;
     texture->vslices = 1;
 
-    GLenum image_data_type = surface->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
+    GLenum textureFormat;
+    if ((surface->format->Rmask & 0xFF) == 0xFF) { // RGB
+        textureFormat = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+    }
+    else {
+        textureFormat = surface->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
+    }
 
     glGenTextures(1, &texture->gl_handle);
     glBindTexture(GL_TEXTURE_2D, texture->gl_handle);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, image_data_type, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, textureFormat, GL_UNSIGNED_BYTE, surface->pixels);
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -31,12 +37,12 @@ fw64Texture* fw64Texture::loadImageFile(std::string const& path) {
     return texture;
 }
 
-int fw64_texture_get_slice_width(fw64Texture* texture) {
-    return texture->width / texture->hslices;
+int fw64_texture_slice_width(fw64Texture* texture) {
+    return texture->slice_width();
 }
 
-int fw64_texture_get_slice_height(fw64Texture* texture) {
-    return texture->height / texture->vslices;
+int fw64_texture_slice_height(fw64Texture* texture) {
+    return texture->slice_height();
 }
 
 int fw64_texture_width(fw64Texture* texture) {

@@ -2,7 +2,7 @@
 
 #include "assets.h"
 
-#include <malloc.h>
+#include <stdio.h>
 
 void n64_logo_sprite_init(N64LogoSprite* logo_sprite, fw64Texture* image) {
     logo_sprite->sprite = image;

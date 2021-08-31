@@ -2,6 +2,7 @@
 
 #include "framework64/camera.h"
 
+#include "framework64/desktop/font.h"
 #include "framework64/desktop/texture.h"
 
 #include <gl/glew.h>
@@ -18,15 +19,12 @@ public:
 
     bool init(std::string const & shader_dir);
     void setScreenSize(int width, int height);
-    void begin(fw64Camera* camera);
+    void begin(fw64Camera const * camera);
     void end();
 
-    void drawSprite(fw64Texture* texture, int x, int y);
-    void drawSpriteFrame(fw64Texture* texture, int frame, int x, int y);
-
-private:
-    void setCurrentTexture(fw64Texture* texture);
-    void submitCurrentBatch();
+    void drawSprite(fw64Texture const * texture, float x, float y);
+    void drawSpriteFrame(fw64Texture const * texture, int frame, float x, float y);
+    void drawText(fw64Font const* font, float x, float y, const char* text);
 
 private:
     struct SpriteVertex {
@@ -35,11 +33,16 @@ private:
     };
 
 private:
+    void setCurrentTexture(fw64Texture const * texture);
+    void submitCurrentBatch();
+    void addQuad(SpriteVertex const & a, SpriteVertex const & b, SpriteVertex const & c, SpriteVertex const & d);
+
+private:
     GLuint shader;
     GLint uniform_matrix;
     GLint uniform_sampler;
 
-    fw64Texture* current_texture;
+    fw64Texture const * current_texture;
 
     GLuint gl_vertex_array_object;
     GLuint gl_vertex_buffer;
