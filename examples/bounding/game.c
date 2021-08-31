@@ -1,6 +1,7 @@
 #include "game.h"
 #include "assets.h"
 
+#include "framework64/assets.h"
 #include "framework64/matrix.h"
 #include "framework64/n64/controller_button.h"
 
@@ -20,9 +21,9 @@ float stick_adjust[4];
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     
-    entity_init(&game->penguin, fw64_assets_get_mesh(engine->assets, ASSET_mesh_penguin));
-    entity_init(&game->penguin_box, fw64_assets_get_mesh(engine->assets, ASSET_mesh_blue_cube_wire));
-    game->font = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
+    entity_init(&game->penguin, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_penguin));
+    entity_init(&game->penguin_box, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
+    game->font = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
     game->intersection = CUBE_NONE;
 
     vec3_set(&game->penguin.transform.scale, 0.5, 0.5, 0.5);
@@ -34,7 +35,7 @@ void game_init(Game* game, fw64Engine* engine) {
     init_cubes(game);
 }
 
-void game_update(Game* game, float time_delta){
+void game_update(Game* game){
     
     Vec2 stick;
     fw64_input_stick(game->engine->input, 0, &stick);
@@ -46,12 +47,12 @@ void game_update(Game* game, float time_delta){
 
         Vec3 forward;
         fw64_transform_forward(&game->penguin.transform, &forward);
-        vec3_scale(&forward, &forward, MOVE_SPEED * time_delta);
+        vec3_scale(&forward, &forward, MOVE_SPEED * game->engine->time->time_delta);
         vec3_add(&game->penguin.transform.position, &game->penguin.transform.position, &forward);
     }
 
     Vec3 scale_delta;
-    vec3_set_all(&scale_delta, time_delta * SCALE_SPEED);
+    vec3_set_all(&scale_delta, game->engine->time->time_delta * SCALE_SPEED);
     if (fw64_input_button_down(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_UP)) {
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }
@@ -119,7 +120,7 @@ Vec3 cube_positions[CUBE_COUNT] = {
 
 void init_cubes(Game* game) {
     
-    fw64Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, ASSET_mesh_blue_cube);
+    fw64Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, FW64_ASSET_mesh_blue_cube);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
         Entity* cube = &game->cubes[i];
