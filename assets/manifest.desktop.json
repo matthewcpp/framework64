@@ -35,5 +35,13 @@
             "name": "basicLAZER",
             "sourceString": "ELAPSED TIME:0123456789."
         }
+    ],
+    "meshes": [
+        {
+            "src": "blue_cube/blue_cube.gltf"
+        },
+        {
+            "src": "blue_cube/blue_cube_wire.gltf"
+        }
     ]
 }

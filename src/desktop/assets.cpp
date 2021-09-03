@@ -1,14 +1,14 @@
 #include "framework64/assets.h"
 
-
 #include "framework64/desktop/assets.h"
 #include "framework64/desktop/font.h"
-#include "framework64/desktop/texture.h"
+#include "framework64/desktop/glb_parser.h"
 
 #include <SDL_image.h>
 
 
-fw64Assets::fw64Assets(std::string asset_dir_path) {
+fw64Assets::fw64Assets(std::string asset_dir_path, framework64::MeshRenderer& mr)
+    : mesh_renderer(mr) {
     asset_dir = std::move(asset_dir_path);
     database = nullptr;
     select_texture_statement = nullptr;
@@ -34,6 +34,11 @@ bool fw64Assets::init() {
     }
 
     result = sqlite3_prepare_v2(database, "SELECT path, size, tileWidth, tileHeight, glyphCount, glyphData FROM fonts WHERE assetId = ?;", -1, &select_font_statement, nullptr);
+    if (result) {
+        return false;
+    }
+
+    result = sqlite3_prepare_v2(database, "SELECT path, bakeTransform FROM meshes WHERE assetId = ?;", -1, &select_mesh_statement, nullptr);
     if (result) {
         return false;
     }
@@ -103,16 +108,48 @@ fw64Font* fw64Assets::getFont(int handle) {
     return font;
 }
 
-bool fw64Assets::isLoaded(int handle) {
-    return textures.count(handle) || fonts.count(handle);
+fw64Mesh* fw64Assets::getMesh(int handle) {
+    auto const result = meshes.find(handle);
+
+    if (result != meshes.end())
+        return result->second.get();
+
+    sqlite3_reset(select_mesh_statement);
+    sqlite3_bind_int(select_mesh_statement, 1, handle);
+
+    if(sqlite3_step(select_mesh_statement) != SQLITE_ROW)
+        return nullptr;
+
+    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(select_mesh_statement, 0));
+    const std::string mesh_path = asset_dir + asset_path;
+
+    fw64Mesh::LoadOptions options;
+    options.bakeTransform = sqlite3_column_int(select_mesh_statement, 1) != 0;
+
+    framework64::GlbParser glb;
+    auto * mesh = glb.parseStaticMesh(mesh_path);
+
+    if (!mesh)
+        return nullptr;
+
+    mesh_renderer.setupMesh(mesh);
+    meshes[handle] = std::unique_ptr<fw64Mesh>(mesh);
+
+    return mesh;
 }
+
+bool fw64Assets::isLoaded(int handle) {
+    return textures.count(handle) || fonts.count(handle) || meshes.count(handle);
+}
+
+// C Interface
 
 int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index) {
     return assets->isLoaded(index);
 }
 
 fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
-    return nullptr;
+    return assets->getMesh(index);
 }
 
 fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {

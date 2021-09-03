@@ -14,14 +14,17 @@ bool Engine::init(int screen_width, int screen_height) {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
 
-    assets = new fw64Assets(asset_dir_path);
+    renderer = new fw64Renderer();
+    assets = new fw64Assets(asset_dir_path, renderer->mesh_renderer);
     audio = new fw64Audio();
     input = new fw64Input();
-    renderer = new fw64Renderer();
+
     time = new fw64Time();
     memset(time, 0, sizeof(fw64Time));
 
-    renderer->init(screen_width, screen_height, shader_dir_path);
+    if (!renderer->init(screen_width, screen_height, shader_dir_path))
+        return false;
+
     assets->init();
     fw64_desktop_filesystem_init();
 

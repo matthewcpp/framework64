@@ -2,6 +2,7 @@
 
 #include "framework64/renderer.h"
 #include "framework64/desktop/sprite_renderer.h"
+#include "framework64/desktop/mesh_renderer.h"
 
 #include <SDL2/SDL.h>
 
@@ -24,6 +25,7 @@ public:
 
 public:
     framework64::SpriteRenderer sprite_renderer;
+    framework64::MeshRenderer mesh_renderer;
     fw64RenderMode render_mode;
     int screen_width;
     int screen_height;

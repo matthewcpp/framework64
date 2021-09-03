@@ -18,7 +18,9 @@ typedef enum {
 
 
 typedef struct fw64Mesh fw64Mesh;
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
 Initializes a mesh for manual construction.
@@ -29,5 +31,11 @@ void fw64_mesh_init(fw64Mesh* mesh);
 Cleans up a mesh that was manually constructed after calling \ref mesh_init
 */
 void fw64_mesh_uninit(fw64Mesh* mesh);
+
+void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

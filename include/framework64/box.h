@@ -8,6 +8,10 @@ typedef struct {
     Vec3 max;
 } Box;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void box_center(Box* box, Vec3* out);
 void box_size(Box* box, Vec3* out);
 void box_extents(Box* box, Vec3* out);
@@ -17,5 +21,9 @@ void box_encapsulate_box(Box* box, Box* to_encapsulate);
 int box_intersection(Box* a, Box* b);
 
 void matrix_transform_box(float* matrix, Box* box, Box* out);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

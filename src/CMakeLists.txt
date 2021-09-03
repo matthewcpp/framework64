@@ -28,7 +28,10 @@ set(desktop_files
         ${include_dir}/engine.h ${include_dir}/desktop/engine.h desktop/engine.cpp
         ${include_dir}/filesystem.h ${include_dir}/desktop/filesystem.h desktop/filesystem.cpp
         ${include_dir}/font.h ${include_dir}/desktop/font.h desktop/font.cpp
+        ${include_dir}/desktop/glb_parser.h desktop/glb_parser.cpp
         ${include_dir}/input.h ${include_dir}/desktop/input.h desktop/input.cpp
+        ${include_dir}/mesh.h ${include_dir}/desktop/mesh.h desktop/mesh.cpp
+        ${include_dir}/mesh.h ${include_dir}/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
         ${include_dir}/renderer.h ${include_dir}/desktop/renderer.h desktop/renderer.cpp
         ${include_dir}/desktop/shader.h desktop/shader.cpp
         ${include_dir}/desktop/sprite_renderer.h desktop/sprite_renderer.cpp

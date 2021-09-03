@@ -98,6 +98,10 @@ static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle
     }
 }
 
+void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box) {
+    *box = mesh->info.bounding_box;
+}
+
 void fw64_mesh_init(fw64Mesh* mesh) {
     memset(mesh, 0, sizeof(fw64Mesh));
 }

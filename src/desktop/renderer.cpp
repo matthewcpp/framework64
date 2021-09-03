@@ -1,4 +1,3 @@
-#include "framework64/renderer.h"
 #include "framework64/desktop/renderer.h"
 
 #include <cassert>
@@ -28,6 +27,7 @@ bool fw64Renderer::init(int screen_width, int screen_height, const std::string &
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (!sprite_renderer.init(shader_dir_path)) return false;
+    if (!mesh_renderer.init(shader_dir_path)) return false;
     setScreenSize(screen_width, screen_height);
 
     return true;
@@ -51,6 +51,10 @@ void fw64Renderer::begin(fw64Camera *camera, fw64RenderMode new_render_mode, fw6
             sprite_renderer.begin(camera);
             break;
 
+        case FW64_RENDERER_MODE_TRIANGLES:
+            mesh_renderer.begin(camera);
+            break;
+
         default:
             break;
     }
@@ -60,6 +64,10 @@ void fw64Renderer::end(fw64RendererFlags flags) {
     switch(render_mode) {
         case FW64_RENDERER_MODE_SPRITES:
             sprite_renderer.end();
+            break;
+
+        case FW64_RENDERER_MODE_TRIANGLES:
+            mesh_renderer.end();
             break;
 
         default:
@@ -93,7 +101,8 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-
+    assert(renderer->render_mode == FW64_RENDERER_MODE_TRIANGLES);
+    renderer->mesh_renderer.drawStaticMesh(transform, mesh);
 }
 
 void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color) {
