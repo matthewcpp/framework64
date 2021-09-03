@@ -10,7 +10,7 @@ void fw64_n64_input_init(fw64Input* input) {
     nuContInit(); // initialize nusys controller subsystem
 }
 
-void fw64_input_update(fw64Input* input) {
+void fw64_n64_input_update(fw64Input* input) {
     memcpy(&input->previous_state[0], &input->current_state[0], sizeof(NUContData) * NU_CONT_MAXCONTROLLERS);
 
     nuContDataGetExAll(input->current_state);

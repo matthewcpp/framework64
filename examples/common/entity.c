@@ -2,7 +2,7 @@
 
 #include "framework64/matrix.h"
 
-static _entity_update_bounding_box_with_matrix(Entity* entity, float* matrix) {
+static void _entity_update_bounding_box_with_matrix(Entity* entity, float* matrix) {
     if (entity->mesh) {
         Box mesh_bounding_box;
         fw64_mesh_get_bounding_box(entity->mesh, &mesh_bounding_box);
@@ -29,9 +29,6 @@ void entity_refresh(Entity* entity) {
     fw64_transform_update_matrix(&entity->transform);
     _entity_update_bounding_box_with_matrix(entity, &entity->transform.matrix.m[0]);
 #endif
-
-
-
 }
 
 void entity_set_mesh(Entity* entity, fw64Mesh* mesh) {

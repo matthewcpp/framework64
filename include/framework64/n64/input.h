@@ -9,5 +9,6 @@ struct fw64Input{
 };
 
 void fw64_n64_input_init(fw64Input* input);
+void fw64_n64_input_update(fw64Input* input);
 
 #endif
