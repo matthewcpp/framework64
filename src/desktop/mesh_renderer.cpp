@@ -21,6 +21,7 @@ void MeshRenderer::begin(fw64Camera * cam) {
 
 void MeshRenderer::end(){
     active_shader = nullptr;
+    render_mode = fw64Mesh::Primitive::Mode::Unknown;
 }
 
 void MeshRenderer::updateMeshTransformBlock(fw64Transform* transform) {
@@ -38,11 +39,14 @@ void MeshRenderer::drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh) {
     updateMeshTransformBlock(transform);
 
     for (auto const & primitive : mesh->primitives) {
+        if (primitive.mode != render_mode)
+            continue;
+
         setActiveShader(primitive.material.shader);
         active_shader->shader->setUniforms(primitive.material);
         glBindVertexArray(primitive.gl_vertex_array_object);
 
-        glDrawElements(GL_TRIANGLES, primitive.element_count, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(primitive.mode, primitive.element_count, primitive.element_type, 0);
     }
 }
 

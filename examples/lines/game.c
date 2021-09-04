@@ -15,11 +15,10 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_transform_look_at(&game->camera.transform, &target, &up);
     fw64_camera_update_view_matrix(&game->camera);
 
-    //game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
-    game->draw_mode = EXAMPLE_DRAW_MODE_SHADED;
+    game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 
     entity_init(&game->solid_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube));
-    //entity_init(&game->wire_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
+    entity_init(&game->wire_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
 
     game->rotation = 0.0f;
 }
@@ -30,8 +29,8 @@ void game_update(Game* game){
     quat_from_euler(&game->solid_cube.transform.rotation, 0, game->rotation, 0.0f);
     entity_refresh(&game->solid_cube);
 
-    //quat_from_euler(&game->wire_cube.transform.rotation, 0, game->rotation, 0.0f);
-    //entity_refresh(&game->wire_cube);
+    quat_from_euler(&game->wire_cube.transform.rotation, 0, game->rotation, 0.0f);
+    entity_refresh(&game->wire_cube);
 
     if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME;

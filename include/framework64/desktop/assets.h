@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/assets.h"
-#include "framework64/desktop/shader_cache.h."
+#include "framework64/desktop/shader_cache.h"
 
 #include <sqlite3.h>
 

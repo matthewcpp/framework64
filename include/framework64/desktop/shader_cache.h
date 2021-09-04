@@ -1,5 +1,7 @@
 #pragma once
+
 #include "framework64/desktop/gouraud_shader.h"
+#include "framework64/desktop/line_shader.h"
 #include "framework64/desktop/mesh.h"
 
 #include <memory>
@@ -21,6 +23,7 @@ private:
 
 private:
     GouraudShader gouraud_shader;
+    LineShader line_shader;
 
     std::unordered_multimap<Shader*, std::unique_ptr<ShaderProgram>> shader_programs;
 

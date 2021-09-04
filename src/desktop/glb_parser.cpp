@@ -6,6 +6,11 @@ constexpr uint32_t HeaderMagicNumber = 0x46546C67;
 constexpr uint32_t JsonChunkMagicNumber = 0x4E4F534A;
 constexpr uint32_t BinaryChunkMagicNumber = 0x004E4942;
 
+enum GltfComponentType {
+    UnsignedShort = 5123,
+    UnsignedInt = 5125
+};
+
 fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     glb_file.open(path, std::ios::binary);
 
@@ -98,7 +103,9 @@ void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
         auto & primitive = mesh->primitives.emplace_back();
 
         primitive.mode = primitive_mode;
-        parseMaterial(primitive.material, primitive_node["material"].get<size_t>());
+
+        if (primitive_node.contains("material"))
+            parseMaterial(primitive.material, primitive_node["material"].get<size_t>());
 
         auto const & attributes_node = primitive_node["attributes"];
 
@@ -143,13 +150,7 @@ void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
             primitive.attributes |= fw64Mesh::Primitive::Attributes::TexCoords;
         }
 
-        auto const & element_accessor_node = json_doc["accessors"][primitive_node["indices"].get<size_t>()];
-        std::vector<uint16_t> elements = readBufferViewData<uint16_t>(element_accessor_node["bufferView"].get<size_t>());
-
-        glGenBuffers(1, &primitive.gl_array_buffer_object);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, primitive.gl_array_buffer_object);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(uint16_t), elements.data(), GL_STATIC_DRAW);
-        primitive.element_count = elements.size();
+        parseIndices(primitive, primitive_node);
 
         glBindVertexArray(0);
 
@@ -165,6 +166,27 @@ void GlbParser::parseMaterial(Material& material, size_t material_index) {
     for (size_t i = 0; i < 4; i++) {
         material.color[i] = base_color_factor[i].get<float>();
     }
+}
+
+void GlbParser::parseIndices(fw64Mesh::Primitive& primitive, nlohmann::json const & primitive_node) {
+    auto const & element_accessor_node = json_doc["accessors"][primitive_node["indices"].get<size_t>()];
+    auto componentType = element_accessor_node["componentType"].get<uint32_t>();
+    auto bufferViewIndex = element_accessor_node["bufferView"].get<size_t>();
+
+    if (componentType == GltfComponentType::UnsignedShort) {
+        primitive.gl_array_buffer_object = readIndicesIntoGlBuffer<uint16_t >(bufferViewIndex);
+        primitive.element_type = GL_UNSIGNED_SHORT;
+    }
+
+    else if (componentType == GltfComponentType::UnsignedInt) {
+        primitive.gl_array_buffer_object = readIndicesIntoGlBuffer<uint32_t >(bufferViewIndex);
+        primitive.element_type = GL_UNSIGNED_INT;
+    }
+    else {
+        return; // error?
+    }
+
+    primitive.element_count = element_accessor_node["count"].get<GLsizei>();
 }
 
 void GlbParser::seekInBinaryChunk(size_t pos) {

@@ -12,7 +12,7 @@ struct Material {
     };
 
     std::array<float, 4> color = {1.0f, 1.0f, 1.0f, 1.0f};
-    ShaderProgram* shader;
+    ShaderProgram* shader = nullptr;
 
     uint32_t featureMask() const { return Features::None; }
 };

@@ -52,6 +52,12 @@ void fw64Renderer::begin(fw64Camera *camera, fw64RenderMode new_render_mode, fw6
             break;
 
         case FW64_RENDERER_MODE_TRIANGLES:
+            mesh_renderer.render_mode = fw64Mesh::Primitive::Mode::Triangles;
+            mesh_renderer.begin(camera);
+            break;
+
+        case FW64_RENDERER_MODE_LINES:
+            mesh_renderer.render_mode = fw64Mesh::Primitive::Mode::Lines;
             mesh_renderer.begin(camera);
             break;
 
@@ -67,6 +73,7 @@ void fw64Renderer::end(fw64RendererFlags flags) {
             break;
 
         case FW64_RENDERER_MODE_TRIANGLES:
+        case FW64_RENDERER_MODE_LINES:
             mesh_renderer.end();
             break;
 
@@ -101,7 +108,7 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    assert(renderer->render_mode == FW64_RENDERER_MODE_TRIANGLES);
+    assert(renderer->render_mode == FW64_RENDERER_MODE_TRIANGLES || renderer->render_mode == FW64_RENDERER_MODE_LINES);
     renderer->mesh_renderer.drawStaticMesh(transform, mesh);
 }
 

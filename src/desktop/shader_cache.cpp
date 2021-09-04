@@ -31,6 +31,8 @@ uint64_t ShaderCache::programHash(fw64Mesh::Primitive const & primitive) const {
 Shader* ShaderCache::getShader(fw64Mesh::Primitive const & primitive) {
     if (primitive.mode == fw64Mesh::Primitive::Mode::Triangles)
         return &gouraud_shader;
+    else if (primitive.mode == fw64Mesh::Primitive::Mode::Lines)
+        return &line_shader;
 
     return nullptr;
 }

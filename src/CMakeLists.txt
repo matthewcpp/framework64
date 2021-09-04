@@ -31,8 +31,9 @@ set(desktop_files
         ${include_dir}/desktop/glb_parser.h desktop/glb_parser.cpp
         ${include_dir}/desktop/gouraud_shader.h desktop/gouraud_shader.cpp
         ${include_dir}/input.h ${include_dir}/desktop/input.h desktop/input.cpp
+        ${include_dir}/desktop/line_shader.h desktop/line_shader.cpp
         ${include_dir}/mesh.h ${include_dir}/desktop/mesh.h desktop/mesh.cpp
-        ${include_dir}/mesh.h ${include_dir}/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
+        ${include_dir}/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
         ${include_dir}/renderer.h ${include_dir}/desktop/renderer.h desktop/renderer.cpp
         ${include_dir}/desktop/shader.h desktop/shader.cpp
         ${include_dir}/desktop/shader_cache.h desktop/shader_cache.cpp

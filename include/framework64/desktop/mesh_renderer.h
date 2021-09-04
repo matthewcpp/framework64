@@ -19,6 +19,9 @@ public:
 
     void drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh);
 
+public:
+    fw64Mesh::Primitive::Mode render_mode = fw64Mesh::Primitive::Mode::Unknown;
+
 private:
     void updateMeshTransformBlock(fw64Transform* transform);
     void setActiveShader(ShaderProgram* shader);
