@@ -6,14 +6,6 @@
 
 #include <SDL_image.h>
 
-
-fw64Assets::fw64Assets(std::string asset_dir_path, framework64::MeshRenderer& mr)
-    : mesh_renderer(mr) {
-    asset_dir = std::move(asset_dir_path);
-    database = nullptr;
-    select_texture_statement = nullptr;
-}
-
 bool fw64Assets::init() {
     int result = IMG_Init(IMG_INIT_PNG);
 
@@ -126,13 +118,12 @@ fw64Mesh* fw64Assets::getMesh(int handle) {
     fw64Mesh::LoadOptions options;
     options.bakeTransform = sqlite3_column_int(select_mesh_statement, 1) != 0;
 
-    framework64::GlbParser glb;
+    framework64::GlbParser glb(shader_cache);
     auto * mesh = glb.parseStaticMesh(mesh_path);
 
     if (!mesh)
         return nullptr;
 
-    mesh_renderer.setupMesh(mesh);
     meshes[handle] = std::unique_ptr<fw64Mesh>(mesh);
 
     return mesh;

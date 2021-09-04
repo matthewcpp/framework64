@@ -25,10 +25,8 @@ out vec4 calculated_color;
 uniform vec4 diffuse_color;
 
 void main() {
-    calculated_color = vec4(fw64_ambient_light_color, 1.0f);
-
     vec3 normal = normalize(mat3(fw64_normal_matrix) * vertex_normal);
-    vec3 light_dir = normalize(-fw64_light_direction); // note that direction is specified from source, but our calculations following assume light dir is to the source.
+    vec3 light_dir = normalize(fw64_light_direction);
     float diff = max(dot(normal, light_dir), 0.0f);
 
     calculated_color = vec4(fw64_ambient_light_color, 1.0) * fw64_ambient_light_intensity;

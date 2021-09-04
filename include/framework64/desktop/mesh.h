@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/mesh.h"
+#include "framework64/desktop/material.h"
 
 #include <array>
 #include <string>
@@ -11,16 +12,11 @@ struct fw64Mesh {
         bool bakeTransform = false;
     };
 
-    struct Material {
-        std::array<float, 4> color = {1.0f, 1.0f, 1.0f, 1.0f};
-        uint32_t shader_program = 0;
-    };
-
     struct Primitive {
-        enum Mode { Triangles, Lines };
+        enum Mode { Triangles, Lines, Unknown };
         enum Attributes { Positions = 1, Normals = 2, TexCoords = 4 };
 
-        Material material;
+        framework64::Material material;
         Mode mode;
         uint32_t attributes;
         Box bounding_box;

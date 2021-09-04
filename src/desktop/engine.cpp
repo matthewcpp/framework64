@@ -14,8 +14,9 @@ bool Engine::init(int screen_width, int screen_height) {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
 
+    shader_cache = new ShaderCache(shader_dir_path);
     renderer = new fw64Renderer();
-    assets = new fw64Assets(asset_dir_path, renderer->mesh_renderer);
+    assets = new fw64Assets(asset_dir_path, *shader_cache);
     audio = new fw64Audio();
     input = new fw64Input();
 

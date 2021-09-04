@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/desktop/mesh.h"
+#include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 
 #include <gl/glew.h>
@@ -11,6 +12,8 @@
 namespace framework64 {
 
 class GlbParser {
+public:
+    GlbParser(ShaderCache& sc) : shader_cache(sc) {};
 public:
     struct Options {
         bool bakeTransform = false;
@@ -25,7 +28,7 @@ private:
     bool parseBinaryChunk();
 
     void parseMeshPrimitives(fw64Mesh* mesh);
-    void parseMaterial(fw64Mesh::Material& material, size_t material_index);
+    void parseMaterial(Material& material, size_t material_index);
 
     template <typename T>
     std::vector<T> readBufferViewData(size_t bufferViewIndex);
@@ -55,6 +58,7 @@ private:
     std::ifstream glb_file;
     nlohmann::json json_doc;
     Options parse_options;
+    ShaderCache& shader_cache;
 };
 
     template <typename T>

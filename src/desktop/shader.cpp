@@ -7,9 +7,9 @@
 #include <sstream>
 #include <vector>
 
-namespace framework64::Shader {
+namespace framework64 {
 
-uint32_t createFromPaths(std::string const & vertex_path, std::string const & frag_path) {
+GLuint Shader::createFromPaths(std::string const & vertex_path, std::string const & frag_path) {
     std::ifstream vertex_file(vertex_path);
     std::ifstream fragment_file(frag_path);
 
@@ -56,7 +56,7 @@ static GLuint create_shader(std::string const & str, GLenum shader_type){
     return shader;
 }
 
-uint32_t compile(std::string const& vertex, std::string const& fragment) {
+GLuint Shader::compile(std::string const& vertex, std::string const& fragment) {
     GLuint vertex_shader = create_shader(vertex, GL_VERTEX_SHADER);
     if (!vertex_shader) {
         return 0;

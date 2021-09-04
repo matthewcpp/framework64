@@ -2,6 +2,7 @@
 
 #include "framework64/camera.h"
 #include "framework64/desktop/mesh.h"
+#include "framework64/desktop/shader_cache.h"
 
 #include <gl/glew.h>
 
@@ -17,11 +18,10 @@ public:
     void end();
 
     void drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh);
-    void setupMesh(fw64Mesh* mesh);
 
 private:
     void updateMeshTransformBlock(fw64Transform* transform);
-    void setActiveProgram(GLuint program);
+    void setActiveShader(ShaderProgram* shader);
 
 private:
 
@@ -49,27 +49,14 @@ private:
         void update();
     };
 
-
-    struct GouraudShader {
-        GLuint program;
-        GLuint lighting_data_uniform_block_index;
-        GLuint mesh_transform_uniform_block_index;
-
-        GLint diffuse_color_location;
-
-        bool create(std::string const& shader_dir);
-        void setUniforms(fw64Mesh::Material const & material);
-    };
-
 private:
     UniformBlock<LightingData> lighting_data_uniform_block;
     UniformBlock<MeshTransformData> mesh_transform_uniform_block;
 
     std::array<float, 16> view_projection_matrix;
 
-    GouraudShader gouraud_shader;
     fw64Camera* camera = nullptr;
-    GLuint active_program = 0;
+    ShaderProgram* active_shader = nullptr;
 };
 
 template<typename T>

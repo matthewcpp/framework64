@@ -1,8 +1,10 @@
 #pragma once
 
 #include "framework64/renderer.h"
-#include "framework64/desktop/sprite_renderer.h"
 #include "framework64/desktop/mesh_renderer.h"
+#include "framework64/desktop/shader_cache.h"
+#include "framework64/desktop/sprite_renderer.h"
+
 
 #include <SDL2/SDL.h>
 
@@ -15,7 +17,6 @@
 
 struct fw64Renderer {
 public:
-    fw64Renderer() = default;
     bool init(int screen_width, int screen_height, std::string const & shader_dir_path);
 
     void setClearColor(float r, float g, float b, float a);

@@ -70,14 +70,34 @@ Box GlbParser::getBoxFromAccessor(size_t accessor_index) const {
     return box;
 }
 
+static fw64Mesh::Primitive::Mode getPrimitiveMode(nlohmann::json const & primitive_node) {
+    if (!primitive_node.contains("mode"))
+        return fw64Mesh::Primitive::Mode::Triangles;
+    
+    int mode = primitive_node["mode"].get<int>();
+
+    switch (mode) {
+        case 1:
+            return fw64Mesh::Primitive::Mode::Lines;
+        case 4:
+            return fw64Mesh::Primitive::Mode::Triangles;
+        default:
+            return fw64Mesh::Primitive::Mode::Unknown;
+    }
+}
 
 void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
     auto const & mesh_node = json_doc["meshes"][0];
 
     for (auto const & primitive_node : mesh_node["primitives"]) {
+        auto const primitive_mode = getPrimitiveMode(primitive_node);
+
+        if (primitive_mode == fw64Mesh::Primitive::Mode::Unknown)
+            continue;
+
         auto & primitive = mesh->primitives.emplace_back();
 
-        primitive.mode = fw64Mesh::Primitive::Mode::Triangles;
+        primitive.mode = primitive_mode;
         parseMaterial(primitive.material, primitive_node["material"].get<size_t>());
 
         auto const & attributes_node = primitive_node["attributes"];
@@ -132,10 +152,12 @@ void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
         primitive.element_count = elements.size();
 
         glBindVertexArray(0);
+
+        primitive.material.shader = shader_cache.getShaderProgram(primitive);
     }
 }
 
-void GlbParser::parseMaterial(fw64Mesh::Material& material, size_t material_index) {
+void GlbParser::parseMaterial(Material& material, size_t material_index) {
     auto const & material_node = json_doc["materials"][material_index];
     auto const & pbr = material_node["pbrMetallicRoughness"];
     auto const & base_color_factor = pbr["baseColorFactor"];
