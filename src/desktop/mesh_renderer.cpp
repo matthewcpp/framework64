@@ -15,6 +15,8 @@ void MeshRenderer::begin(fw64Camera * cam) {
     camera = cam;
 
     matrix_multiply(view_projection_matrix.data(), &camera->projection.m[0], &camera->view.m[0]);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void MeshRenderer::end(){

@@ -26,10 +26,12 @@ private:
 private:
 
     struct LightingData {
-        std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 0.1f};
-        std::array<float, 4> light_color = {1.0f, 1.0f, 1.0f, 1.0f};
-        std::array<float, 3> light_direction = {0.0f, -1.0f, 0.0f};
-        float align = 0.0f;
+        std::array<float, 3> ambient_light_color = {1.0f, 1.0f, 1.0f};
+        float ambient_light_intensity = 0.1;
+        std::array<float, 3> light_color = {1.0f, 1.0f, 1.0f};
+        float align1 = 0.0f;
+        std::array<float, 3> light_direction = {0.57735f, 0.57735f, 0.57735f};
+        float align2 = 0.0f;
     };
 
     struct MeshTransformData {

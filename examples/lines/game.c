@@ -19,7 +19,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->draw_mode = EXAMPLE_DRAW_MODE_SHADED;
 
     entity_init(&game->solid_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube));
-    entity_init(&game->wire_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
+    //entity_init(&game->wire_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
 
     game->rotation = 0.0f;
 }

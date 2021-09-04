@@ -41,6 +41,8 @@ namespace framework64 {
     void SpriteRenderer::begin(fw64Camera const * camera) {
         (void)camera;
 
+        glDisable(GL_DEPTH_TEST);
+
         glUseProgram(shader);
         glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, matrix.data());
         current_texture = nullptr;
