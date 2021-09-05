@@ -141,7 +141,7 @@ namespace framework64 {
 
         for (;;) {
             auto const & glyph = font->glyphs[glyph_index];
-            drawSpriteFrame(font->texture, glyph_index, x + glyph.left, glyph.top);
+            drawSpriteFrame(font->texture, glyph_index, x + glyph.left, y + glyph.top);
             x += glyph.advance;
 
             if (text[0] == 0)

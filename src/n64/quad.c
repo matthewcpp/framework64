@@ -6,8 +6,8 @@
 #include <string.h>
 
 static void vertex_set_tc(Vtx* vertex, float s, float t, fw64Texture* texture) {
-    s *= (float)fw64_texture_get_slice_width(texture) * 2.0f;
-    t *= (float)fw64_texture_get_slice_height(texture) * 2.0f;
+    s *= (float)fw64_texture_slice_width(texture) * 2.0f;
+    t *= (float)fw64_texture_slice_height(texture) * 2.0f;
 
     // Note that the texture coordinates (s,t) are encoded in S10.5 format.
     short ss = (short)s;
@@ -121,7 +121,7 @@ void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
     }
 }
 
-void quad_create(fw64Mesh* mesh, s16 size, Color* color) {
+void quad_create(fw64Mesh* mesh, int16_t size, Color* color) {
     fw64_mesh_init(mesh);
 
     mesh->info.color_count = 1;

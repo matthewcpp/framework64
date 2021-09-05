@@ -16,7 +16,7 @@ struct fw64Mesh {
 
     struct Primitive {
         enum Mode { Triangles = GL_TRIANGLES, Lines = GL_LINES, Unknown = 0};
-        enum Attributes { Positions = 1, Normals = 2, TexCoords = 4 };
+        enum Attributes { Positions = 1, Normals = 2, TexCoords = 4, VertexColors = 8 };
 
         framework64::Material material;
         Mode mode;

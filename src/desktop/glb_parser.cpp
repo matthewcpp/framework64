@@ -1,5 +1,9 @@
 #include "framework64/desktop/glb_parser.h"
 
+#include "framework64/matrix.h"
+
+#include <limits>
+
 namespace framework64 {
 
 constexpr uint32_t HeaderMagicNumber = 0x46546C67;
@@ -11,6 +15,7 @@ enum GltfComponentType {
     UnsignedInt = 5125
 };
 
+// note this function assumes scene 0 is the "active scene"
 fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     glb_file.open(path, std::ios::binary);
 
@@ -20,16 +25,7 @@ fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     if (!parseHeader() || !parseJsonChunk() || !parseBinaryChunk() )
         return nullptr;
 
-    auto static_mesh = std::make_unique<fw64Mesh>();
-
-    parseMeshPrimitives(static_mesh.get());
-
-    return static_mesh.release();
-}
-
-fw64Mesh* GlbParser::parseStaticMesh(std::string const & path, Options options) {
-    parse_options = options;
-    return parseStaticMesh(path);
+    return createStaticMesh(json_doc["meshes"][0]);
 }
 
 bool GlbParser::parseHeader() {
@@ -91,8 +87,60 @@ static fw64Mesh::Primitive::Mode getPrimitiveMode(nlohmann::json const & primiti
     }
 }
 
-void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
-    auto const & mesh_node = json_doc["meshes"][0];
+// note this assumes there is only one mesh at the top level
+// it will need to be modified in the future
+static std::array<float, 16> extractMatrixFromNode(nlohmann::json const & node) {
+    std::array<float, 16> transform;
+    matrix_set_identity(transform.data());
+
+    Vec3 translation = {0.0f, 0.0f, 0.0f};
+    Quat rotation;
+    quat_ident(&rotation);
+    Vec3 scale = {1.0f, 1.0f, 1.0f};
+
+    bool set_trs = true;
+
+    if (node.contains("translation")) {
+        auto const & translation_node = node["translation"];
+        translation.x = translation_node[0].get<float>();
+        translation.y = translation_node[1].get<float>();
+        translation.z = translation_node[2].get<float>();
+    }
+
+    if (node.contains("rotation")) {
+        auto const & rotation_node = node["rotation"];
+        rotation.x = rotation_node[0].get<float>();
+        rotation.y = rotation_node[1].get<float>();
+        rotation.z = rotation_node[2].get<float>();
+        rotation.w = rotation_node[3].get<float>();
+    }
+
+    if (node.contains("scale")) {
+        auto const & scale_node = node["scale"];
+        scale.x = scale_node[0].get<float>();
+        scale.y = scale_node[1].get<float>();
+        scale.z = scale_node[2].get<float>();
+    }
+
+    if (node.contains("matrix")) {
+        auto const &matrix_node = node["matrix"];
+
+        for (size_t i = 0; i < 16; i++) {
+            transform[i] = matrix_node[i].get<float>();
+        }
+
+        set_trs = false;
+    }
+
+    if (set_trs) {
+        matrix_from_trs(transform.data(), &translation, &rotation, &scale);
+    }
+
+    return transform;
+}
+
+fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
+    auto mesh = new fw64Mesh();
 
     for (auto const & primitive_node : mesh_node["primitives"]) {
         auto const primitive_mode = getPrimitiveMode(primitive_node);
@@ -112,8 +160,9 @@ void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
         std::vector<float> positions = readPrimitiveAttributeBuffer<float>(attributes_node, "POSITION");
         std::vector<float> normals = readPrimitiveAttributeBuffer<float>(attributes_node, "NORMAL");
         std::vector<float> tex_coords = readPrimitiveAttributeBuffer<float>(attributes_node, "TEXCOORD_0");
+        std::vector<float> colors = readPrimitiveAttributeBuffer<float>(attributes_node, "COLOR_0");
 
-        GLuint array_buffer_size = (positions.size() + normals.size() + tex_coords.size()) * sizeof(float);
+        GLuint array_buffer_size = (positions.size() + normals.size() + tex_coords.size() + colors.size()) * sizeof(float);
         glGenVertexArrays(1, &primitive.gl_vertex_array_object);
         glBindVertexArray(primitive.gl_vertex_array_object);
 
@@ -144,10 +193,22 @@ void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
         }
 
         if (!tex_coords.empty()) {
-            glBufferSubData(GL_ARRAY_BUFFER, buffer_offset, tex_coords.size() * sizeof(float), tex_coords.data());
+            GLsizeiptr data_size = tex_coords.size() * sizeof(float);
+            glBufferSubData(GL_ARRAY_BUFFER, buffer_offset, data_size, tex_coords.data());
             glEnableVertexAttribArray(2);
             glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
+            buffer_offset += data_size;
             primitive.attributes |= fw64Mesh::Primitive::Attributes::TexCoords;
+        }
+
+        // note that we are assuming vertex colors are encoded as RGB floats (seems to be default blender export)
+        if (!colors.empty()) {
+            GLsizeiptr data_size = colors.size() * sizeof(float);
+            glBufferSubData(GL_ARRAY_BUFFER, buffer_offset, data_size, colors.data());
+            glEnableVertexAttribArray(3);
+            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
+            buffer_offset += data_size;
+            primitive.attributes |= fw64Mesh::Primitive::Attributes::VertexColors;
         }
 
         parseIndices(primitive, primitive_node);
@@ -156,6 +217,8 @@ void GlbParser::parseMeshPrimitives(fw64Mesh* mesh) {
 
         primitive.material.shader = shader_cache.getShaderProgram(primitive);
     }
+
+    return mesh;
 }
 
 void GlbParser::parseMaterial(Material& material, size_t material_index) {

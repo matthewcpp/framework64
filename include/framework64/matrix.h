@@ -17,6 +17,7 @@ void matrix_get_rotation(float* mat, Quat* out);
 void matrix_multiply(float* out, float* a, float* b);
 void matrix_transpose(float* matrix);
 int matrix_invert(float* out, float* matrix);
+void matrix_transform_vec3(float* matrix, Vec3* vec);
 
 void matrix_perspective(float* out, float fov_degrees, float aspect, float near, float far);
 void matrix_ortho(float* out, float left, float right, float bottom, float top, float near, float far);

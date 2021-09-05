@@ -397,6 +397,20 @@ int matrix_invert(float* out, float* a) {
     return 1;
 }
 
+void matrix_transform_vec3(float* m, Vec3* vec) {
+    float x = vec->x;
+    float y = vec->y;
+    float z = vec->z;
+
+    float w = m[3] * x + m[7] * y + m[11] * z + m[15];
+    if (w == 0.0f)
+        w = 1.0f;
+
+    vec->x = (m[0] * x + m[4] * y + m[8] * z + m[12]) / w;
+    vec->y = (m[1] * x + m[5] * y + m[9] * z + m[13]) / w;
+    vec->z = (m[2] * x + m[6] * y + m[10] * z + m[14]) / w;
+}
+
 void mat2_set_rotation(float* mat, float rad) {
     float s = fw64_sinf(rad);
     float c = fw64_cosf(rad);

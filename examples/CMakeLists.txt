@@ -1,3 +1,4 @@
 add_subdirectory(lines)
 add_subdirectory(minimal)
+add_subdirectory(rendermodes)
 add_subdirectory(sprites)

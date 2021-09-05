@@ -14,5 +14,6 @@ int fw64_input_button_down(fw64Input* input, int controller, int button) {
 }
 
 void fw64_input_stick(fw64Input* input, int controller, Vec2* current) {
-
+    current->x = 0.0f;
+    current->y = 0.0f;
 }

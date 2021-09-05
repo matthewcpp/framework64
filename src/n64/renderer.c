@@ -173,7 +173,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
             gDPSetTextureFilter(renderer->display_list++,G_TF_POINT);
-        break;
+            break;
 
         case FW64_SHADING_MODE_SPRITE:
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
@@ -181,6 +181,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             gDPPipeSync(renderer->display_list++);
             break;
+
         default:
             break;
     }

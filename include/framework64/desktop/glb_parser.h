@@ -7,6 +7,7 @@
 #include <gl/glew.h>
 #include <nlohmann/json.hpp>
 
+#include <array>
 #include <fstream>
 
 namespace framework64 {
@@ -14,20 +15,17 @@ namespace framework64 {
 class GlbParser {
 public:
     GlbParser(ShaderCache& sc) : shader_cache(sc) {};
+
 public:
-    struct Options {
-        bool bakeTransform = false;
-    };
-public:
+    /** Extracts a single, static mesh from the GLB file. */
     fw64Mesh* parseStaticMesh(std::string const & path);
-    fw64Mesh* parseStaticMesh(std::string const & path, Options options);
 
 private:
     bool parseHeader();
     bool parseJsonChunk();
     bool parseBinaryChunk();
 
-    void parseMeshPrimitives(fw64Mesh* mesh);
+    fw64Mesh* createStaticMesh(nlohmann::json const & node);
     void parseMaterial(Material& material, size_t material_index);
     void parseIndices(fw64Mesh::Primitive& primitive, nlohmann::json const & primitive_node);
 
@@ -61,7 +59,6 @@ private:
 
     std::ifstream glb_file;
     nlohmann::json json_doc;
-    Options parse_options;
     ShaderCache& shader_cache;
 };
 

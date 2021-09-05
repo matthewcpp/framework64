@@ -18,6 +18,7 @@ ShaderProgram* ShaderCache::getShaderProgram(fw64Mesh::Primitive const & primiti
     }
 
     auto * program = shader->create(primitive.attributes, primitive.material.featureMask(), shader_dir);
+    program->hash = program_hash;
     shader_programs.insert(std::make_pair(shader, program));
 
     return program;
@@ -29,8 +30,13 @@ uint64_t ShaderCache::programHash(fw64Mesh::Primitive const & primitive) const {
 
 // TODO: This will get more involved
 Shader* ShaderCache::getShader(fw64Mesh::Primitive const & primitive) {
-    if (primitive.mode == fw64Mesh::Primitive::Mode::Triangles)
-        return &gouraud_shader;
+    if (primitive.mode == fw64Mesh::Primitive::Mode::Triangles) {
+        if (primitive.attributes & fw64Mesh::Primitive::Attributes::VertexColors)
+            return &vertex_color_shader;
+        else
+            return &gouraud_shader;
+
+    }
     else if (primitive.mode == fw64Mesh::Primitive::Mode::Lines)
         return &line_shader;
 

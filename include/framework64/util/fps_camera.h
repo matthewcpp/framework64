@@ -11,7 +11,15 @@ typedef struct {
     Vec2 rotation;
 } FpsCamera;
 
-void fps_camera_init(FpsCamera* fps, fw64Input* input);
-void fps_camera_update(FpsCamera* fps, float time_delta);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void fps_camera_init(FpsCamera *fps, fw64Input *input);
+void fps_camera_update(FpsCamera *fps, float time_delta);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

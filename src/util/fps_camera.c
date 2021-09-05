@@ -39,14 +39,14 @@ static void fps_cam_left(FpsCamera* fps, Vec3* out) {
 }
 
 static void move_camera(FpsCamera* fps, float time_delta, Vec2* stick) {
-    if (fw64_input_button_down(fps->input, 0, FW64_CONTROLLER_BUTTON_C_RIGHT)) {
+    if (fw64_input_button_down(fps->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         Vec3 move;
         fps_cam_right(fps, &move);
         vec3_scale(&move, &move, MOVEMENT_SPEED * time_delta);
         vec3_add(&fps->camera.transform.position, &fps->camera.transform.position, &move);
     }
 
-    if (fw64_input_button_down(fps->input, 0, FW64_CONTROLLER_BUTTON_C_LEFT)) {
+    if (fw64_input_button_down(fps->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
         Vec3 move;
         fps_cam_left(fps, &move);
         vec3_scale(&move, &move, MOVEMENT_SPEED * time_delta);
@@ -77,14 +77,14 @@ static void tilt_camera(FpsCamera* fps, float time_delta, Vec2* stick) {
         fps->rotation.y += ROTATION_SPEED * time_delta;
     }
 
-    if (fw64_input_button_down(fps->input, 0, FW64_CONTROLLER_BUTTON_C_UP)) {
+    if (fw64_input_button_down(fps->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
         fps->rotation.x += ROTATION_SPEED * time_delta;
 
         if (fps->rotation.x > 90.0f)
             fps->rotation.x = 90.0f;
     }
 
-    if (fw64_input_button_down(fps->input, 0, FW64_CONTROLLER_BUTTON_C_DOWN)) {
+    if (fw64_input_button_down(fps->input, 0, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
         fps->rotation.x -= ROTATION_SPEED * time_delta;
 
         if (fps->rotation.x < -90.0f)

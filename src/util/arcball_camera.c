@@ -73,14 +73,14 @@ void arcball_update(ArcballCamera* arcball, float time_delta) {
         arcball->_rot_x -= ARCBALL_ORBIT_SPEED * time_delta;
     }
 
-    if (fw64_input_button_down(arcball->_input, 0, FW64_CONTROLLER_BUTTON_L)) {
+    if (fw64_input_button_down(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_L)) {
         arcball->_distance += arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     }
-    else if (fw64_input_button_down(arcball->_input, 0, FW64_CONTROLLER_BUTTON_R)) {
+    else if (fw64_input_button_down(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_R)) {
         arcball->_distance -= arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     } 
 
-    if (fw64_input_button_pressed(arcball->_input, 0, FW64_CONTROLLER_BUTTON_START)) {
+    if (fw64_input_button_pressed(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
         _arcball_reset(arcball);
     }
 

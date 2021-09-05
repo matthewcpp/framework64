@@ -23,8 +23,16 @@ typedef struct {
     int switch_model_text_width;
 } Game;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void game_init(Game* game, fw64Engine* engine);
-void game_update(Game* game, float time_delta);
+void game_update(Game* game);
 void game_draw(Game* game);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

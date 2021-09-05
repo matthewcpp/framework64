@@ -20,7 +20,11 @@ set(source_files
         ${include_dir}/types.h
         ${include_dir}/time.h
         ${include_dir}/vec2.h vec2.c
-        ${include_dir}/vec3.h vec3.c)
+        ${include_dir}/vec3.h vec3.c
+
+        ${include_dir}/util/arcball_camera.h util/arcball_camera.c
+        ${include_dir}/util/fps_camera.h util/fps_camera.c
+        ${include_dir}/util/quad.h)
 
 set(desktop_files
         ${include_dir}/assets.h ${include_dir}/desktop/assets.h desktop/assets.cpp
@@ -33,12 +37,14 @@ set(desktop_files
         ${include_dir}/input.h ${include_dir}/desktop/input.h desktop/input.cpp
         ${include_dir}/desktop/line_shader.h desktop/line_shader.cpp
         ${include_dir}/mesh.h ${include_dir}/desktop/mesh.h desktop/mesh.cpp
+        desktop/quad.cpp
         ${include_dir}/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
         ${include_dir}/renderer.h ${include_dir}/desktop/renderer.h desktop/renderer.cpp
         ${include_dir}/desktop/shader.h desktop/shader.cpp
         ${include_dir}/desktop/shader_cache.h desktop/shader_cache.cpp
         ${include_dir}/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
         ${include_dir}/texture.h ${include_dir}/desktop/texture.h desktop/texture.cpp
+        ${include_dir}/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp
         )
 
 add_library(framework64 STATIC ${source_files} ${desktop_files})
