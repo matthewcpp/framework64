@@ -81,7 +81,7 @@ void game_draw(Game* game) {
     int draw_pos_x = 10;
     int draw_pos_y = 200;
 
-    fw64_renderer_begin(renderer, &game->arcball.camera, FW64_RENDERER_MODE_SPRITES, FW64_RENDERER_FLAG_NOCLEAR);
+    fw64_renderer_begin(renderer, &game->arcball.camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
 
     fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 15, draw_pos_x, draw_pos_y);
     draw_pos_x += button_width + 3;

@@ -97,7 +97,10 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderM
     renderer->render_mode = render_mode;
     renderer->camera = camera;
 
-    renderer->display_list = &renderer->gfx_list[0];
+    if (flags & FW64_RENDERER_FLAG_CLEAR) {
+        renderer->display_list = &renderer->gfx_list[0];
+    }
+    
     renderer->display_list_start = renderer->display_list;
 
     gSPSegment(renderer->display_list++, 0, 0x0);
@@ -113,7 +116,7 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderM
         case FW64_RENDERER_MODE_UNSET:
             break;
         case FW64_RENDERER_MODE_TRIANGLES:
-        case FW64_RENDERER_MODE_SPRITES:
+        case FW64_RENDERER_MODE_ORTHO2D:
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
         break;
 
@@ -132,7 +135,6 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderM
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     gDPPipeSync(renderer->display_list++);
-    
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
@@ -148,7 +150,7 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
 }
 
 static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMode shading_mode) {
-    if (shading_mode == renderer->shading_mode) return;
+    if (renderer->shading_mode == shading_mode) return;
 
     renderer->shading_mode = shading_mode;
 
@@ -180,12 +182,13 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
-            gDPPipeSync(renderer->display_list++);
             break;
 
         default:
             break;
     }
+
+    gDPPipeSync(renderer->display_list++);
 }
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {

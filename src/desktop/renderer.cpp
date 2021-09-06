@@ -47,7 +47,7 @@ void fw64Renderer::begin(fw64Camera *camera, fw64RenderMode new_render_mode, fw6
     render_mode = new_render_mode;
 
     switch(render_mode) {
-        case FW64_RENDERER_MODE_SPRITES:
+        case FW64_RENDERER_MODE_ORTHO2D:
             sprite_renderer.begin(camera);
             break;
 
@@ -68,7 +68,7 @@ void fw64Renderer::begin(fw64Camera *camera, fw64RenderMode new_render_mode, fw6
 
 void fw64Renderer::end(fw64RendererFlags flags) {
     switch(render_mode) {
-        case FW64_RENDERER_MODE_SPRITES:
+        case FW64_RENDERER_MODE_ORTHO2D:
             sprite_renderer.end();
             break;
 
@@ -125,17 +125,17 @@ void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect) {
 }
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {
-    assert(renderer->render_mode == FW64_RENDERER_MODE_SPRITES);
+    assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
     renderer->sprite_renderer.drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y) {
-    assert(renderer->render_mode == FW64_RENDERER_MODE_SPRITES);
+    assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
     renderer->sprite_renderer.drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
-    assert(renderer->render_mode == FW64_RENDERER_MODE_SPRITES);
+    assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
     renderer->sprite_renderer.drawText(font, static_cast<float>(x), static_cast<float>(y), text);
 }
 

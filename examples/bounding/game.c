@@ -77,18 +77,24 @@ void game_draw(Game* game) {
     sprintf(text_buffer, "Intersection: %s", intersection_text(game->intersection));
 
     fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    
     fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin.transform, game->penguin.mesh);
 
-    for (int i = 0; i < CUBE_COUNT; i++)
+    for (int i = 0; i < CUBE_COUNT; i++){
         fw64_renderer_draw_static_mesh(game->engine->renderer, &game->cubes[i].transform, game->cubes[i].mesh);
-
-    fw64_renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
+    }
 
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
     fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_LINES, FW64_RENDERER_FLAG_NOCLEAR);
     fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
+
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
+    fw64_renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
+
+
 }
 
 void setup_camera(Game* game) {
