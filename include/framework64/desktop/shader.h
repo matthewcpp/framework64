@@ -16,7 +16,7 @@ public:
     virtual ShaderProgram* create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) = 0;
 
 public:
-    static GLuint createFromPaths(std::string const & vertex_path, std::string const & frag_path);
+    static GLuint createFromPaths(std::string const & vertex_path, std::string const & frag_path, std::vector<std::string> const & preprocessor_statements);
     static GLuint compile(std::string const& vertex, std::string const& fragment);
 };
 

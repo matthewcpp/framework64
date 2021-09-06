@@ -1,8 +1,6 @@
 #include "framework64/util/arcball_camera.h"
 #include "framework64/n64/controller_button.h"
 
-#include <malloc.h>
-
 #define ARCBALL_ORBIT_SPEED 180.0f
 #define ARCBALL_ZOOM_SPEED 1.0f
 #define ARCBALL_DEAD_ZONE 0.2f

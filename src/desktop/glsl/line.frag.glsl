@@ -1,5 +1,3 @@
-#version 410
-
 uniform vec4 diffuse_color;
 out vec4 final_color;
 

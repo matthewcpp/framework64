@@ -10,7 +10,7 @@ ShaderProgram* VertexColorShader::create(uint32_t primitive_attributes, uint32_t
     std::string vertex_path = shader_dir + "unlit.vert.glsl";
     std::string frag_path = shader_dir + "unlit.frag.glsl";
 
-    GLuint handle = Shader::createFromPaths(vertex_path, frag_path);
+    GLuint handle = Shader::createFromPaths(vertex_path, frag_path, {});
 
     if (!handle)
         return nullptr;

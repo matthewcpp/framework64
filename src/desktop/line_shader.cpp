@@ -8,7 +8,7 @@ ShaderProgram* LineShader::create(uint32_t primitive_attributes, uint32_t materi
     std::string const vertex_path = shader_dir + "line.vert.glsl";
     std::string const frag_path = shader_dir + "line.frag.glsl";
 
-    GLuint handle = Shader::createFromPaths(vertex_path, frag_path);
+    GLuint handle = Shader::createFromPaths(vertex_path, frag_path, {});
 
     if (!handle)
         return nullptr;

@@ -6,6 +6,7 @@
 #include "framework64/n64/controller_button.h"
 
 #include <math.h>
+#include <stdio.h>
 
 #define PENGUIN_SIZE_CHANGE_SPEED 0.25f
 #define PENGUIN_MOVE_SPEED 350.0f

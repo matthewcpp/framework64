@@ -30,7 +30,7 @@ bool fw64Assets::init() {
         return false;
     }
 
-    result = sqlite3_prepare_v2(database, "SELECT path, bakeTransform FROM meshes WHERE assetId = ?;", -1, &select_mesh_statement, nullptr);
+    result = sqlite3_prepare_v2(database, "SELECT path FROM meshes WHERE assetId = ?;", -1, &select_mesh_statement, nullptr);
     if (result) {
         return false;
     }
@@ -114,9 +114,6 @@ fw64Mesh* fw64Assets::getMesh(int handle) {
 
     std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(select_mesh_statement, 0));
     const std::string mesh_path = asset_dir + asset_path;
-
-    fw64Mesh::LoadOptions options;
-    options.bakeTransform = sqlite3_column_int(select_mesh_statement, 1) != 0;
 
     framework64::GlbParser glb(shader_cache);
     auto * mesh = glb.parseStaticMesh(mesh_path);

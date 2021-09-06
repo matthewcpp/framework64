@@ -233,6 +233,23 @@ void GlbParser::parseMaterial(Material& material, size_t material_index) {
             material.color[i] = base_color_factor[i].get<float>();
         }
     }
+
+    if (pbr.contains("baseColorTexture")) {
+        auto texture_index = pbr["baseColorTexture"]["index"].get<size_t>();
+        material.texture = parseTexture(texture_index);
+    }
+}
+
+fw64Texture* GlbParser::parseTexture(size_t texture_index) {
+    auto source_index = json_doc["textures"][texture_index]["source"].get<size_t>();
+    auto image_node = json_doc["images"][source_index];
+
+    std::string image_name = image_node["name"].get<std::string>();
+
+    auto buffer_view_index = image_node["bufferView"].get<size_t>();
+    auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
+
+    return fw64Texture::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size());
 }
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {

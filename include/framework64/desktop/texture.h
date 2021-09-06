@@ -17,4 +17,5 @@ struct fw64Texture {
 
     /** Load image file into OpenGL */
     static fw64Texture* loadImageFile(std::string const& path);
+    static fw64Texture* loadImageBuffer(void* data, size_t size);
 };

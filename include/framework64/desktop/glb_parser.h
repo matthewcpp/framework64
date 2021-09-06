@@ -27,6 +27,7 @@ private:
 
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
     void parseMaterial(Material& material, size_t material_index);
+    fw64Texture* parseTexture(size_t texture_index);
     void parseIndices(fw64Mesh::Primitive& primitive, nlohmann::json const & primitive_node);
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
 

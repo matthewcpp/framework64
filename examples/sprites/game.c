@@ -29,7 +29,7 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game){
-    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_SPRITES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_CLEAR);
     n64_logo_sprite_draw(&game->n64logo, game->engine->renderer);
     ken_sprite_draw(&game->ken_sprite, game->engine->renderer);
     elapsed_time_draw(&game->elapsed_time, game->engine->renderer);

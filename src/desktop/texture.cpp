@@ -4,13 +4,7 @@
 #include <gl/glew.h>
 #include <SDL_image.h>
 
-fw64Texture* fw64Texture::loadImageFile(std::string const& path) {
-    SDL_Surface* surface = IMG_Load(path.c_str());
-
-    if (!surface) {
-        return nullptr;
-    }
-
+static fw64Texture* createTextureFromSurface(SDL_Surface* surface) {
     auto* texture = new fw64Texture();
 
     texture->width = surface->w;
@@ -32,6 +26,31 @@ fw64Texture* fw64Texture::loadImageFile(std::string const& path) {
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
+    return texture;
+}
+
+fw64Texture* fw64Texture::loadImageFile(std::string const& path) {
+    auto* surface = IMG_Load(path.c_str());
+
+    if (!surface) {
+        return nullptr;
+    }
+
+    auto* texture = createTextureFromSurface(surface);
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+fw64Texture* fw64Texture::loadImageBuffer(void* data, size_t size) {
+    auto* data_stream = SDL_RWFromMem(data, static_cast<int>(size));
+    auto* surface = IMG_Load_RW(data_stream, 1);
+
+    if (!surface) {
+        return nullptr;
+    }
+
+    auto* texture = createTextureFromSurface(surface);
     SDL_FreeSurface(surface);
 
     return texture;

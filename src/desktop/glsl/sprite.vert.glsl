@@ -1,5 +1,3 @@
-#version 410
-
 precision mediump float;
 
 layout(location = 0) in vec4 fw64_position;

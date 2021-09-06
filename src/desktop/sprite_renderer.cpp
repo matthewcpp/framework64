@@ -10,7 +10,7 @@ namespace framework64 {
         const std::string vertex_path = shader_dir + "sprite.vert.glsl";
         const std::string frag_path = shader_dir + "sprite.frag.glsl";
 
-        shader = Shader::createFromPaths(vertex_path, frag_path);
+        shader = Shader::createFromPaths(vertex_path, frag_path, {});
 
         if (!shader) {
             return false;

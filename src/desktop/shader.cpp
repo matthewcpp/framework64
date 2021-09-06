@@ -8,22 +8,28 @@
 #include <vector>
 
 namespace framework64 {
+std::string const glsl_version_str = "#version 410";
 
-GLuint Shader::createFromPaths(std::string const & vertex_path, std::string const & frag_path) {
+GLuint Shader::createFromPaths(std::string const & vertex_path, std::string const & frag_path, std::vector<std::string> const & preprocessor_statements) {
     std::ifstream vertex_file(vertex_path);
     std::ifstream fragment_file(frag_path);
 
     if (!vertex_file || !fragment_file)
         return 0;
 
-    auto read_file = [](std::ifstream& file)->std::string{
+    auto read_file = [](std::string const& version_str, std::vector<std::string> const & preprocessor_statements, std::ifstream& file)->std::string{
         std::ostringstream str;
+        str << version_str << '\n';
+
+        for (auto const & preprocessor_statement : preprocessor_statements)
+            str << preprocessor_statement << '\n';
+
         str << file.rdbuf();
         return str.str();
     };
 
-    auto const vertex_shader = read_file(vertex_file);
-    auto const fragment_shader = read_file(fragment_file);
+    auto const vertex_shader = read_file(glsl_version_str, preprocessor_statements, vertex_file);
+    auto const fragment_shader = read_file(glsl_version_str, preprocessor_statements, fragment_file);
 
     return compile(vertex_shader, fragment_shader);
 }

@@ -2,18 +2,16 @@
 
 #include "framework64/mesh.h"
 #include "framework64/desktop/material.h"
+#include "framework64/desktop/texture.h"
 
 #include <gl/glew.h>
 
 #include <array>
+#include <memory>
 #include <string>
 #include <vector>
 
 struct fw64Mesh {
-    struct LoadOptions {
-        bool bakeTransform = false;
-    };
-
     struct Primitive {
         enum Mode { Triangles = GL_TRIANGLES, Lines = GL_LINES, Unknown = 0};
         enum Attributes { Positions = 1, Normals = 2, TexCoords = 4, VertexColors = 8 };
@@ -35,4 +33,5 @@ struct fw64Mesh {
     Box bounding_box;
 
     std::vector<Primitive> primitives;
+    std::vector<std::unique_ptr<fw64Texture>> textures;
 };

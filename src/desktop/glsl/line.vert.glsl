@@ -1,5 +1,3 @@
-#version 410
-
 layout(std140) uniform fw64MeshTransformData {
     mat4 fw64_mvp_matrix;
     mat4 fw64_normal_matrix;
