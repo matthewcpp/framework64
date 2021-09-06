@@ -1,4 +1,6 @@
 #include "framework64/util/quad.h"
+#include "framework64/n64/texture.h"
+#include "framework64/n64/mesh.h"
 
 #include <nusys.h>
 

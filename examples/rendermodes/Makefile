@@ -26,7 +26,7 @@ TARGETS =	rendermodes.n64
 
 HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ../common/*.h) $(wildcard ./*.h)
 
-CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ../common/*.c) $(wildcard ./*.c) ../../src/util/arcball_camera.c
+CODEFILES   =	$(wildcard ../../src/*.c) $(wildcard ../../src/n64/*.c) $(wildcard ../common/*.c) $(wildcard ./*.c) ../../src/util/arcball_camera.c
 
 CODEOBJECTS =	$(CODEFILES:.c=.o)  $(NUSYSLIBDIR)/nusys.o
 
@@ -51,4 +51,4 @@ $(TARGETS):	$(OBJECTS)
 		makemask $(TARGETS)
 
 clean:
-	rm -f  ../../src/n64/*.o ../common/*.o ./*.o ./*.out *.n64
+	rm -f  ../../src/*.o ../../src/n64/*.o ../common/*.o ./*.o ./*.out *.n64

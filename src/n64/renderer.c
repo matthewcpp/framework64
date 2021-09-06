@@ -178,6 +178,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
         case FW64_SHADING_MODE_SPRITE:
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             gDPPipeSync(renderer->display_list++);
             break;
@@ -300,6 +301,7 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
+    
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {

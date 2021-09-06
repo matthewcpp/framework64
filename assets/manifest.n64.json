@@ -63,12 +63,10 @@
             "src": "suzanne/suzanne.gltf"
         },
         {
-            "src": "penguin/penguin.gltf",
-            "bakeTransform": true
+            "src": "penguin/penguin.gltf"
         },
         {
-            "src": "n64_logo_model/n64_logo.gltf",
-            "bakeTransform": true
+            "src": "n64_logo_model/n64_logo.gltf"
         }
     ],
     "fonts": [

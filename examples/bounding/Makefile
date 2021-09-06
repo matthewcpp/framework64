@@ -51,4 +51,4 @@ $(TARGETS):	$(OBJECTS)
 		makemask $(TARGETS)
 
 clean:
-	rm -f  ../../src/n64/*.o ../common/*.o ./*.o ./*.out *.n64
+	rm -f  ../../src/*.o ../../src/n64/*.o ../common/*.o ./*.o ./*.out *.n64

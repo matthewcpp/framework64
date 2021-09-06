@@ -12,7 +12,8 @@ constexpr uint32_t BinaryChunkMagicNumber = 0x004E4942;
 
 enum GltfComponentType {
     UnsignedShort = 5123,
-    UnsignedInt = 5125
+    UnsignedInt = 5125,
+    Float = 5126
 };
 
 // note this function assumes scene 0 is the "active scene"
@@ -160,7 +161,7 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
         std::vector<float> positions = readPrimitiveAttributeBuffer<float>(attributes_node, "POSITION");
         std::vector<float> normals = readPrimitiveAttributeBuffer<float>(attributes_node, "NORMAL");
         std::vector<float> tex_coords = readPrimitiveAttributeBuffer<float>(attributes_node, "TEXCOORD_0");
-        std::vector<float> colors = readPrimitiveAttributeBuffer<float>(attributes_node, "COLOR_0");
+        std::vector<float> colors = parseVertexColors(primitive_node);
 
         GLuint array_buffer_size = (positions.size() + normals.size() + tex_coords.size() + colors.size()) * sizeof(float);
         glGenVertexArrays(1, &primitive.gl_vertex_array_object);
@@ -206,7 +207,7 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
             GLsizeiptr data_size = colors.size() * sizeof(float);
             glBufferSubData(GL_ARRAY_BUFFER, buffer_offset, data_size, colors.data());
             glEnableVertexAttribArray(3);
-            glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
+            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
             buffer_offset += data_size;
             primitive.attributes |= fw64Mesh::Primitive::Attributes::VertexColors;
         }
@@ -224,11 +225,45 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
 void GlbParser::parseMaterial(Material& material, size_t material_index) {
     auto const & material_node = json_doc["materials"][material_index];
     auto const & pbr = material_node["pbrMetallicRoughness"];
-    auto const & base_color_factor = pbr["baseColorFactor"];
 
-    for (size_t i = 0; i < 4; i++) {
-        material.color[i] = base_color_factor[i].get<float>();
+    if (pbr.contains("baseColorFactor")) {
+        auto const & base_color_factor = pbr["baseColorFactor"];
+
+        for (size_t i = 0; i < 4; i++) {
+            material.color[i] = base_color_factor[i].get<float>();
+        }
     }
+}
+
+std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {
+    std::vector<float> vertex_colors;
+
+    auto const & attributes_node = primitive_node["attributes"];
+
+    if (!attributes_node.contains("COLOR_0"))
+        return vertex_colors;
+
+    auto const & accessor_node = json_doc["accessors"][attributes_node["COLOR_0"].get<size_t>()];
+    auto componentType = accessor_node["componentType"].get<uint32_t>();
+    auto type = accessor_node["type"].get<std::string>();
+
+
+    if (componentType == GltfComponentType::Float) {
+        vertex_colors = readPrimitiveAttributeBuffer<float>(attributes_node, "COLOR_0");
+    }
+    else if (componentType == GltfComponentType::UnsignedShort){ // in this case values should be normalized
+        auto vertex_colors_uint16 = readPrimitiveAttributeBuffer<uint16_t>(attributes_node, "COLOR_0");
+        vertex_colors.resize(vertex_colors_uint16.size());
+        std::transform(vertex_colors_uint16.begin(), vertex_colors_uint16.end(), vertex_colors.begin(), [](uint16_t u16) {
+           return static_cast<float>(u16) / 65535.0f;
+        });
+    }
+
+    if (!vertex_colors.empty() && type == "VEC3") {
+        vertex_colors = vec3ToVec4Array<float>(vertex_colors, 1.0f);
+    }
+
+    return vertex_colors;
 }
 
 void GlbParser::parseIndices(fw64Mesh::Primitive& primitive, nlohmann::json const & primitive_node) {

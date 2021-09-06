@@ -28,6 +28,7 @@ private:
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
     void parseMaterial(Material& material, size_t material_index);
     void parseIndices(fw64Mesh::Primitive& primitive, nlohmann::json const & primitive_node);
+    std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
 
     template <typename T>
     std::vector<T> readBufferViewData(size_t bufferViewIndex);
@@ -37,6 +38,9 @@ private:
 
     template <typename T>
     GLuint readIndicesIntoGlBuffer(size_t bufferViewIndex);
+
+    template <typename T>
+    static std::vector<T> vec3ToVec4Array(std::vector<T> const & vec3_arr, T fill_val);
 
     Box getBoxFromAccessor(size_t accessor_index) const;
     void seekInBinaryChunk(size_t pos);
@@ -99,6 +103,24 @@ private:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(T), elements.data(), GL_STATIC_DRAW);
 
         return gl_buffer;
+    }
+
+    template <typename T>
+    std::vector<T> GlbParser::vec3ToVec4Array(std::vector<T> const & vec3_arr, T fill_val) {
+        size_t item_count = vec3_arr.size() / 3;
+        std::vector<T> vec4_arr(vec3_arr.size() + item_count);
+
+        for (size_t i = 0; i < item_count; i++) {
+            size_t src_index = i * 3;
+            size_t dest_index = i * 4;
+
+            vec4_arr[dest_index] = vec3_arr[src_index];
+            vec4_arr[dest_index + 1] = vec3_arr[src_index + 1];
+            vec4_arr[dest_index + 2] = vec3_arr[src_index + 2];
+            vec4_arr[dest_index + 3] = fill_val;
+        }
+
+        return vec4_arr;
     }
 }
 
