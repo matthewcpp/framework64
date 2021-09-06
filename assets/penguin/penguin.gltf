@@ -21,7 +21,7 @@
     "materials" : [
         {
             "doubleSided" : true,
-            "name" : "mat_0-penguin_eye_0.jpg",
+            "name" : "mat_0-penguin_eye_0.png",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0
@@ -32,7 +32,7 @@
         },
         {
             "doubleSided" : true,
-            "name" : "mat_1-penguin_cmp4.jpg",
+            "name" : "mat_1-penguin_cmp4.png",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 1
@@ -79,14 +79,14 @@
     ],
     "images" : [
         {
-            "mimeType" : "image/jpeg",
+            "mimeType" : "image/png",
             "name" : "penguin_eye_0",
-            "uri" : "penguin_eye_0.jpg"
+            "uri" : "penguin_eye_0.png"
         },
         {
-            "mimeType" : "image/jpeg",
+            "mimeType" : "image/png",
             "name" : "penguin_cmp4",
-            "uri" : "penguin_cmp4.jpg"
+            "uri" : "penguin_cmp4.png"
         }
     ],
     "accessors" : [
