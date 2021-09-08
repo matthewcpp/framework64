@@ -14,7 +14,9 @@ bool Engine::init(int screen_width, int screen_height) {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
 
-    shader_cache = new ShaderCache(shader_dir_path);
+    n64_input_interface = std::make_unique<N64InputInterface>();
+    shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
+
     renderer = new fw64Renderer();
     assets = new fw64Assets(asset_dir_path, *shader_cache);
     audio = new fw64Audio();
@@ -26,6 +28,7 @@ bool Engine::init(int screen_width, int screen_height) {
     if (!renderer->init(screen_width, screen_height, shader_dir_path))
         return false;
 
+    input->init(*n64_input_interface);
     assets->init();
     fw64_desktop_filesystem_init();
 
@@ -33,6 +36,7 @@ bool Engine::init(int screen_width, int screen_height) {
 }
 
 void Engine::update(float time_delta) {
+    input->update();
     time->time_delta = time_delta;
     time->total_time += time_delta;
 }

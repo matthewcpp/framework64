@@ -22,8 +22,10 @@ typedef enum {
     FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT = R_JPAD
 } fw64N64ControllerButton;
 
-#else
+#define FW64_N64_STICK_INDEX 0
 
+#else
+// https://www.reddit.com/r/RetroArch/comments/etwgqz/mapping_a_xbox_one_controller_to_n64/
 typedef enum {
     FW64_N64_CONTROLLER_BUTTON_A,
     FW64_N64_CONTROLLER_BUTTON_B,
@@ -40,6 +42,8 @@ typedef enum {
     FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT,
     FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT
 } fw64N64ControllerButton;
+
+#define FW64_N64_STICK_INDEX 0
 
 #endif
 

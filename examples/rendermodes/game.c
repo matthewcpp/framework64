@@ -98,10 +98,10 @@ void game_draw(Game* game) {
 
     draw_pos_y = 220;
     draw_pos_x = 10;
-    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 0, draw_pos_x, draw_pos_y);
+    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 6, draw_pos_x, draw_pos_y);
 
     draw_pos_x += button_width + 3;
-    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 1, draw_pos_x, draw_pos_y);
+    fw64_renderer_draw_sprite_slice(renderer, game->button_sprite, 7, draw_pos_x, draw_pos_y);
 
     draw_pos_x += button_width + 3;
     fw64_renderer_draw_text(renderer, game->consolas, draw_pos_x, draw_pos_y, ZOOM_CAMERA_TEXT);

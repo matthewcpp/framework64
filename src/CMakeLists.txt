@@ -35,16 +35,19 @@ set(desktop_files
         ${include_dir}/desktop/glb_parser.h desktop/glb_parser.cpp
         ${include_dir}/desktop/gouraud_shader.h desktop/gouraud_shader.cpp
         ${include_dir}/input.h ${include_dir}/desktop/input.h desktop/input.cpp
+        ${include_dir}/desktop/input_interface.h
         ${include_dir}/desktop/line_shader.h desktop/line_shader.cpp
         ${include_dir}/mesh.h ${include_dir}/desktop/mesh.h desktop/mesh.cpp
         desktop/quad.cpp
         ${include_dir}/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
+        ${include_dir}/desktop/n64_input_interface.h desktop/n64_input_interface.cpp
         ${include_dir}/renderer.h ${include_dir}/desktop/renderer.h desktop/renderer.cpp
         ${include_dir}/desktop/shader.h desktop/shader.cpp
         ${include_dir}/desktop/shader_cache.h desktop/shader_cache.cpp
         ${include_dir}/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
         ${include_dir}/texture.h ${include_dir}/desktop/texture.h desktop/texture.cpp
         ${include_dir}/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp
+        ${include_dir}/n64/controller_button.h
         )
 
 add_library(framework64 STATIC ${source_files} ${desktop_files})

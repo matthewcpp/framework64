@@ -37,7 +37,6 @@ void game_init(Game* game, fw64Engine* engine) {
 }
 
 void game_update(Game* game){
-    
     Vec2 stick;
     fw64_input_stick(game->engine->input, 0, &stick);
     
