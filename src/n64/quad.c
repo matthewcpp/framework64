@@ -66,7 +66,8 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
+fw64Mesh* textured_quad_create(fw64Texture* texture) {
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_mesh_init(mesh);
 
     mesh->info.texture_count = 1;
@@ -121,9 +122,12 @@ void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
         tl_y -= size;
         tl_x = start_x;
     }
+
+    return mesh;
 }
 
-void quad_create(fw64Mesh* mesh, int16_t size, Color* color) {
+fw64Mesh* quad_create(int16_t size, Color* color) {
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_mesh_init(mesh);
 
     mesh->info.color_count = 1;
@@ -155,4 +159,6 @@ void quad_create(fw64Mesh* mesh, int16_t size, Color* color) {
     primitive->material.texture = FW64_MATERIAL_NO_TEXTURE;
     primitive->material.texture_frame = FW64_MATERIAL_NO_TEXTURE;
     primitive->material.mode = FW64_SHADING_MODE_GOURAUD;
+
+    return mesh;
 }

@@ -29,6 +29,7 @@ set(source_files
 set(desktop_files
         ${include_dir}/assets.h ${include_dir}/desktop/assets.h desktop/assets.cpp
         ${include_dir}/audio.h ${include_dir}/desktop/audio.h desktop/audio.cpp
+        ${include_dir}/audio_bank.h ${include_dir}/desktop/audio_bank.h desktop/audio_bank.cpp
         ${include_dir}/engine.h ${include_dir}/desktop/engine.h desktop/engine.cpp
         ${include_dir}/filesystem.h ${include_dir}/desktop/filesystem.h desktop/filesystem.cpp
         ${include_dir}/font.h ${include_dir}/desktop/font.h desktop/font.cpp
@@ -55,6 +56,5 @@ add_library(framework64 STATIC ${source_files} ${desktop_files})
 target_include_directories(framework64 PUBLIC ../include ../assets/build_desktop)
 
 target_link_libraries(framework64 PRIVATE GLEW::GLEW)
-target_link_libraries(framework64 INTERFACE SDL2::SDL2 SDL2::SDL2main)
-target_link_libraries(framework64 PRIVATE SDL2::SDL2_image)
+target_link_libraries(framework64 INTERFACE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_mixer)
 target_link_libraries(framework64 PRIVATE unofficial::sqlite3::sqlite3)

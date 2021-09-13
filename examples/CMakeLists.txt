@@ -1,3 +1,4 @@
+add_subdirectory(audio)
 add_subdirectory(bounding)
 add_subdirectory(lines)
 add_subdirectory(minimal)

@@ -1,20 +1,13 @@
 #include "framework64/assets.h"
 
 #include "framework64/desktop/assets.h"
+#include "framework64/desktop/audio_bank.h"
 #include "framework64/desktop/font.h"
 #include "framework64/desktop/glb_parser.h"
 
-#include <SDL_image.h>
-
 bool fw64Assets::init() {
-    int result = IMG_Init(IMG_INIT_PNG);
-
-    if ((result & IMG_INIT_PNG) != IMG_INIT_PNG) {
-        return false;
-    }
-
     std::string database_path = asset_dir + "assets.db";
-    result = sqlite3_open_v2(database_path.c_str(), &database, SQLITE_OPEN_READONLY, nullptr);
+    int result = sqlite3_open_v2(database_path.c_str(), &database, SQLITE_OPEN_READONLY, nullptr);
 
     if (result) {
         return false;
@@ -31,6 +24,11 @@ bool fw64Assets::init() {
     }
 
     result = sqlite3_prepare_v2(database, "SELECT path FROM meshes WHERE assetId = ?;", -1, &select_mesh_statement, nullptr);
+    if (result) {
+        return false;
+    }
+
+    result = sqlite3_prepare_v2(database, "SELECT path, count FROM soundBanks WHERE assetId = ?;", -1, &select_sound_bank_statement, nullptr);
     if (result) {
         return false;
     }
@@ -116,7 +114,7 @@ fw64Mesh* fw64Assets::getMesh(int handle) {
     const std::string mesh_path = asset_dir + asset_path;
 
     framework64::GlbParser glb(shader_cache);
-    auto * mesh = glb.parseStaticMesh(mesh_path);
+    auto* mesh = glb.parseStaticMesh(mesh_path);
 
     if (!mesh)
         return nullptr;
@@ -126,15 +124,32 @@ fw64Mesh* fw64Assets::getMesh(int handle) {
     return mesh;
 }
 
-bool fw64Assets::isLoaded(int handle) {
-    return textures.count(handle) || fonts.count(handle) || meshes.count(handle);
+fw64SoundBank* fw64Assets::getSoundBank(int handle) {
+    auto result = sound_banks.find(handle);
+
+    if (result != sound_banks.end())
+        return result->second.get();
+
+    sqlite3_reset(select_sound_bank_statement);
+    sqlite3_bind_int(select_sound_bank_statement, 1, handle);
+
+    if(sqlite3_step(select_sound_bank_statement) != SQLITE_ROW)
+        return nullptr;
+
+    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(select_sound_bank_statement, 0));
+    const std::string sound_bank_path = asset_dir + asset_path + "/";
+    auto sound_bank_count = static_cast<uint32_t>(sqlite3_column_int(select_sound_bank_statement, 1));
+
+    auto sound_bank = std::make_unique<fw64SoundBank>();
+    if (!sound_bank->load(sound_bank_path, sound_bank_count))
+        return nullptr;
+
+    sound_banks[handle] = std::move(sound_bank);
+
+    return sound_banks[handle].get();
 }
 
 // C Interface
-
-int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index) {
-    return assets->isLoaded(index);
-}
 
 fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
     return assets->getMesh(index);
@@ -146,4 +161,8 @@ fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
 
 fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
     return assets->getTexture(index);
+}
+
+fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {
+    return assets->getSoundBank(index);
 }

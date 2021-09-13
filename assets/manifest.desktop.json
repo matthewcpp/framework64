@@ -81,5 +81,25 @@
         {
             "src": "n64_logo_model/n64_logo.gltf"
         }
+    ],
+    "soundBanks": [
+        {
+            "name": "soundbank1",
+            "dir": "sound_effects/bank1"
+        },
+        {
+            "name": "soundbank2",
+            "dir": "sound_effects/bank2"
+        }
+    ],
+    "musicBanks": [
+        {
+            "name": "musicbank1",
+            "dir": "music/bank1"
+        },
+        {
+            "name": "musicbank2",
+            "dir": "music/bank2"
+        }
     ]
 }

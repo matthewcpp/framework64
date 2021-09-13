@@ -5,13 +5,13 @@
 #include "framework64/util/quad.h"
 #include "framework64/n64/controller_button.h"
 
-#include <malloc.h>
 #include <math.h>
+#include <stdio.h>
 
 #define SOUND_BANK_COUNT 2
 #define MUSIC_BANK_COUNT 2
-static int sound_banks[SOUND_BANK_COUNT] = { ASSET_soundbank_bank1, ASSET_soundbank_bank2 };
-static int music_banks[MUSIC_BANK_COUNT] = { ASSET_musicbank_bank1, ASSET_musicbank_bank2 };
+static int sound_banks[SOUND_BANK_COUNT] = { FW64_ASSET_soundbank_soundbank1, FW64_ASSET_soundbank_soundbank2 };
+static int music_banks[MUSIC_BANK_COUNT] = { FW64_ASSET_musicbank_musicbank1, FW64_ASSET_musicbank_musicbank2 };
 
 void change_sound_bank(Game* game, int delta);
 void change_sound(Game* game, int delta);
@@ -31,56 +31,55 @@ void game_init(Game* game, fw64Engine* engine) {
     game->music_bank = -1;
     change_music_bank(game, 1);
 
-    game->font = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
-    game->buttons = fw64_assets_get_image(engine->assets, ASSET_sprite_buttons);
+    game->font = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
+    game->buttons = fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_buttons);
 
     game->sound_id = 0;
 
-    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
-    textured_quad_create(mesh, fw64_assets_get_image(engine->assets, ASSET_sprite_n64_logo));
+    fw64Mesh* mesh = textured_quad_create(fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_n64_logo));
     entity_init(&game->n64_logo, mesh);
 
     game->rotation = 0.0f;
 }
 
-void game_update(Game* game, float time_delta){
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_A))
+void game_update(Game* game){
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_A))
         game->sound_id = fw64_audio_play_sound(game->engine->audio, game->sound_num);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_B))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_B))
         fw64_audio_stop_sound(game->engine->audio, game->sound_id);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_RIGHT))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT))
         change_sound(game, 1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_LEFT))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT))
         change_sound(game, -1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_UP))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP))
         change_sound_bank(game, 1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_DOWN))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_DOWN))
         change_sound_bank(game, -1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_START))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START))
         fw64_audio_play_music(game->engine->audio, game->music_track);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_Z))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z))
         fw64_audio_stop_music(game->engine->audio);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_DPAD_RIGHT))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT))
         change_music_track(game, 1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_DPAD_LEFT))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT))
         change_music_track(game, -1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_DPAD_UP))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_UP))
         change_music_bank(game, 1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_DPAD_DOWN))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN))
         change_music_bank(game, -1);
 
-    game->rotation += ROTATION_SPEED * time_delta;
+    game->rotation += ROTATION_SPEED * game->engine->time->time_delta;
     quat_set_axis_angle(&game->n64_logo.transform.rotation, 0.0f, 0.0f, 1.0f, game->rotation);
     entity_refresh(&game->n64_logo);
 }
@@ -158,8 +157,9 @@ void change_sound_bank(Game* game, int delta) {
 
     if (game->sound_bank >= SOUND_BANK_COUNT)
         game->sound_bank = SOUND_BANK_COUNT - 1;
-    
-    fw64_audio_load_soundbank(game->engine->audio, sound_banks[game->sound_bank]);
+
+    fw64SoundBank* sound_bank = fw64_assets_get_sound_bank(game->engine->assets, sound_banks[game->sound_bank]);
+    fw64_audio_set_soundbank(game->engine->audio, sound_bank);
 
     game->sound_num = 0;
 }

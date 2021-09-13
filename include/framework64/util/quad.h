@@ -11,10 +11,10 @@
 extern "C" {
 #endif
 
-void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture);
+fw64Mesh* textured_quad_create(fw64Texture* texture);
 void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t);
 
-void quad_create(fw64Mesh* mesh, int16_t size, Color* color);
+fw64Mesh* quad_create(int16_t size, Color* color);
 
 #ifdef __cplusplus
 }

@@ -41,10 +41,6 @@ static void* fw64_find_asset(fw64Assets* assets, uint32_t index) {
     return NULL;
 }
 
-int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index) {
-    return fw64_find_asset(assets, index) != NULL;
-}
-
 fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
     fw64Mesh* mesh = fw64_find_asset(assets, index);
 

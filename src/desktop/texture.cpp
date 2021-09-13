@@ -2,7 +2,7 @@
 #include "framework64/desktop/texture.h"
 
 #include <gl/glew.h>
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 
 static fw64Texture* createTextureFromSurface(SDL_Surface* surface) {
     auto* texture = new fw64Texture();
