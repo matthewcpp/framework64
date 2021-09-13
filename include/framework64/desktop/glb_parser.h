@@ -28,7 +28,6 @@ private:
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
     void parseMaterial(Material& material, size_t material_index);
     fw64Texture* parseTexture(size_t texture_index);
-    void parseIndices(fw64Mesh::Primitive& primitive, nlohmann::json const & primitive_node);
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
 
     template <typename T>
@@ -36,9 +35,6 @@ private:
 
     template <typename T>
     std::vector<T> readPrimitiveAttributeBuffer(nlohmann::json const & primitive_node, const char* key);
-
-    template <typename T>
-    GLuint readIndicesIntoGlBuffer(size_t bufferViewIndex);
 
     template <typename T>
     static std::vector<T> vec3ToVec4Array(std::vector<T> const & vec3_arr, T fill_val);
@@ -92,18 +88,6 @@ private:
         }
 
         return attribute_data;
-    }
-
-    template <typename T>
-    GLuint GlbParser::readIndicesIntoGlBuffer(size_t bufferViewIndex) {
-        std::vector<T> elements = readBufferViewData<T>(bufferViewIndex);
-
-        GLuint gl_buffer;
-        glGenBuffers(1, &gl_buffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(T), elements.data(), GL_STATIC_DRAW);
-
-        return gl_buffer;
     }
 
     template <typename T>

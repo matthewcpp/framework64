@@ -39,6 +39,7 @@ set(desktop_files
         ${include_dir}/desktop/input_interface.h
         ${include_dir}/desktop/line_shader.h desktop/line_shader.cpp
         ${include_dir}/mesh.h ${include_dir}/desktop/mesh.h desktop/mesh.cpp
+        ${include_dir}/desktop/mesh_data.h desktop/mesh_data.cpp
         desktop/quad.cpp
         ${include_dir}/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
         ${include_dir}/desktop/n64_input_interface.h desktop/n64_input_interface.cpp

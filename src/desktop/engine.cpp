@@ -23,15 +23,15 @@ bool Engine::init(int screen_width, int screen_height) {
         return false;
     }
 
+    result = Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024);
+    if (result)
+        return false;
+
     result = Mix_Init(MIX_INIT_OGG);
 
     if ((result & MIX_INIT_OGG) != MIX_INIT_OGG) {
         return false;
     }
-
-    result = Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024);
-    if (result)
-        return false;
 
     n64_input_interface = std::make_unique<N64InputInterface>();
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
