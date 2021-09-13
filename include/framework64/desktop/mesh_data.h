@@ -16,6 +16,7 @@ struct GLMeshInfo {
 
     uint32_t attributes = 0;
     GLenum element_type = 0;
+    uint32_t element_count = 0;
 
     void setPrimitiveValues(fw64Mesh::Primitive& primitive);
 };

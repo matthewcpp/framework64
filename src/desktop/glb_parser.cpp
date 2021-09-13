@@ -188,9 +188,7 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
 
         GLMeshInfo gl_info = mesh_data.createMesh();
         gl_info.setPrimitiveValues(primitive);
-
-        primitive.element_count = element_accessor_node["count"].get<GLsizei>();
-        primitive.material.shader = shader_cache.getShaderProgram(primitive);
+        shader_cache.setShaderProgram(primitive);
     }
 
     return mesh;

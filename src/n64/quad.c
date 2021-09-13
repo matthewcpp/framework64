@@ -66,7 +66,8 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-fw64Mesh* textured_quad_create(fw64Texture* texture) {
+fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
+    (void)engine;
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_mesh_init(mesh);
 

@@ -2,11 +2,13 @@
 
 namespace framework64 {
 
-ShaderProgram* ShaderCache::getShaderProgram(fw64Mesh::Primitive const & primitive) {
+void ShaderCache::setShaderProgram(fw64Mesh::Primitive & primitive) {
     Shader* shader = getShader(primitive);
 
-    if (!shader)
-        return nullptr;
+    if (!shader) {
+        primitive.material.shader = nullptr;
+        return;
+    }
 
     // check for existing shader
     auto program_hash = programHash(primitive);
@@ -14,14 +16,14 @@ ShaderProgram* ShaderCache::getShaderProgram(fw64Mesh::Primitive const & primiti
 
     for (auto it = result.first; it != result.second; ++it) {
         if (it->second->hash == program_hash)
-            return it->second.get();
+            primitive.material.shader = it->second.get();
     }
 
     auto * program = shader->create(primitive.attributes, primitive.material.featureMask(), shader_dir);
     program->hash = program_hash;
     shader_programs.insert(std::make_pair(shader, program));
 
-    return program;
+    primitive.material.shader = program;
 }
 
 uint64_t ShaderCache::programHash(fw64Mesh::Primitive const & primitive) const {

@@ -36,7 +36,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->sound_id = 0;
 
-    fw64Mesh* mesh = textured_quad_create(fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_n64_logo));
+    fw64Mesh* mesh = textured_quad_create(game->engine, fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_n64_logo));
     entity_init(&game->n64_logo, mesh);
 
     game->rotation = 0.0f;
@@ -140,12 +140,12 @@ void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
     fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-
     fw64_renderer_draw_static_mesh(renderer, &game->n64_logo.transform, game->n64_logo.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
+    fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
     draw_sound_controls(game);
     draw_music_controls(game);
-
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 

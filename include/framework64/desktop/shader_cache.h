@@ -16,7 +16,7 @@ public:
     ShaderCache(std::string shader_dir_path): shader_dir(shader_dir_path) {}
 
 public:
-    ShaderProgram* getShaderProgram(fw64Mesh::Primitive const & primitive);
+    void setShaderProgram(fw64Mesh::Primitive & primitive);
 
 private:
     uint64_t programHash(fw64Mesh::Primitive const & primitive) const;
