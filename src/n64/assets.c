@@ -1,6 +1,7 @@
 #include "framework64/assets.h"
 #include "framework64/n64/assets.h"
 
+#include "framework64/n64/audio_bank.h"
 #include "framework64/n64/font.h"
 #include "framework64/n64/mesh.h"
 #include "framework64/n64/texture.h"
@@ -93,4 +94,18 @@ fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
     }
 
     return image;
+}
+
+fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {
+    fw64SoundBank* sound_bank = fw64_find_asset(assets, index);
+
+    if (sound_bank) 
+        return sound_bank;
+
+    sound_bank = fw64_n64_sound_bank_load(index);
+
+    if (sound_bank)
+        fw64_insert_asset(assets, sound_bank, index);
+
+    return sound_bank;
 }

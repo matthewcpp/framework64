@@ -1,7 +1,6 @@
-#include "framework64/audio.h"
 #include "framework64/n64/audio.h"
-
 #include "framework64/n64/filesystem.h"
+#include "framework64/n64/audio_bank.h"
 
 #include <nusys.h>
 
@@ -59,7 +58,7 @@ static int fw64_audio_load_bank(fw64Audio* audio, fw64BankType bank_type, int as
     return 1;
 }
 
-int fw64_audio_load_soundbank(fw64Audio* audio, int asset_id) {
+static int fw64_audio_load_soundbank(fw64Audio* audio, int asset_id) {
     if (asset_id == audio->current_sound_bank)
         return 0;
 
@@ -69,6 +68,10 @@ int fw64_audio_load_soundbank(fw64Audio* audio, int asset_id) {
         audio->current_sound_bank = asset_id;
 
     return result;
+}
+
+int fw64_audio_set_soundbank(fw64Audio* audio, fw64SoundBank* sound_bank) {
+    return fw64_audio_load_soundbank(audio, (int)sound_bank->index);
 }
 
 int fw64_audio_play_sound(fw64Audio* audio, uint32_t sound_num) {
@@ -81,12 +84,10 @@ int fw64_audio_play_sound(fw64Audio* audio, uint32_t sound_num) {
     }
 }
 
-int fw64_audio_stop_sound(fw64Audio* audio, int handle) {
+void fw64_audio_stop_sound(fw64Audio* audio, int handle) {
     (void)audio;
     nuAuSndPlayerSetSound(handle);
     nuAuSndPlayerStop();
-
-    return 1;
 }
 
 fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle) {

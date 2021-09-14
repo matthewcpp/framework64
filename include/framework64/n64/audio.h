@@ -1,6 +1,8 @@
 #ifndef FW64_N64_AUDIO_H
 #define FW64_N64_AUDIO_H
 
+#include "framework64/audio.h"
+
 #include <stdint.h>
 
 struct fw64Audio {

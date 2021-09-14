@@ -1,6 +1,7 @@
 #ifndef FW64_N64_ASSETS_H
 #define FW64_N64_ASSETS_H
 
+#include "framework64/audio_bank.h"
 #include "framework64/font.h"
 #include "framework64/mesh.h"
 #include "framework64/texture.h"
@@ -10,6 +11,7 @@ typedef union {
     fw64Font* font;
     fw64Texture* image;
     fw64Mesh* mesh;
+    fw64SoundBank* fw64SoundBank;
 } fw64AssetPtr;
 
 typedef struct {
