@@ -33,6 +33,11 @@ bool fw64Assets::init() {
         return false;
     }
 
+    result = sqlite3_prepare_v2(database, "SELECT path, count FROM musicBanks WHERE assetId = ?;", -1, &select_music_bank_statement, nullptr);
+    if (result) {
+        return false;
+    }
+
     return true;
 }
 
@@ -149,6 +154,31 @@ fw64SoundBank* fw64Assets::getSoundBank(int handle) {
     return sound_banks[handle].get();
 }
 
+fw64MusicBank* fw64Assets::getMusicBank(int handle) {
+    auto result = music_banks.find(handle);
+
+    if (result != music_banks.end())
+        return result->second.get();
+
+    sqlite3_reset(select_music_bank_statement);
+    sqlite3_bind_int(select_music_bank_statement, 1, handle);
+
+    if(sqlite3_step(select_music_bank_statement) != SQLITE_ROW)
+        return nullptr;
+
+    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(select_music_bank_statement, 0));
+    const std::string music_bank_path = asset_dir + asset_path + "/";
+    auto music_bank_count = static_cast<uint32_t>(sqlite3_column_int(select_music_bank_statement, 1));
+
+    auto music_bank = std::make_unique<fw64MusicBank>();
+    if (!music_bank->load(music_bank_path, music_bank_count))
+        return nullptr;
+
+    music_banks[handle] = std::move(music_bank);
+
+    return music_banks[handle].get();
+}
+
 // C Interface
 
 fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
@@ -165,4 +195,8 @@ fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
 
 fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {
     return assets->getSoundBank(index);
+}
+
+fw64MusicBank* fw64_assets_get_music_bank(fw64Assets* assets, uint32_t index) {
+    return assets->getMusicBank(index);
 }

@@ -158,8 +158,7 @@ void change_sound_bank(Game* game, int delta) {
     if (game->sound_bank >= SOUND_BANK_COUNT)
         game->sound_bank = SOUND_BANK_COUNT - 1;
 
-    fw64SoundBank* sound_bank = fw64_assets_get_sound_bank(game->engine->assets, sound_banks[game->sound_bank]);
-    fw64_audio_set_soundbank(game->engine->audio, sound_bank);
+    fw64_audio_set_sound_bank(game->engine->audio, fw64_assets_get_sound_bank(game->engine->assets, sound_banks[game->sound_bank]));
 
     game->sound_num = 0;
 }
@@ -184,7 +183,7 @@ void change_music_bank(Game* game, int delta) {
     if (game->music_bank >= MUSIC_BANK_COUNT) 
         game->music_bank = MUSIC_BANK_COUNT - 1;
 
-    fw64_audio_load_music(game->engine->audio, music_banks[game->music_bank]);
+    fw64_audio_set_music_bank(game->engine->audio,  fw64_assets_get_music_bank(game->engine->assets, music_banks[game->music_bank]));
 
     game->music_track = 0;
 }

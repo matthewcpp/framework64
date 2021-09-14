@@ -109,3 +109,17 @@ fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {
 
     return sound_bank;
 }
+
+fw64MusicBank* fw64_assets_get_music_bank(fw64Assets* assets, uint32_t index) {
+    fw64MusicBank* music_bank = fw64_find_asset(assets, index);
+
+    if (music_bank)
+        return music_bank;
+
+    music_bank = fw64_n64_music_bank_load(index);
+
+    if (music_bank)
+        fw64_insert_asset(assets, music_bank, index);
+
+    return music_bank;
+}

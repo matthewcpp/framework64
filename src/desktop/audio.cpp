@@ -34,10 +34,8 @@ fw64AudioStatus fw64Audio::getChannelStatus(uint32_t channel_num) {
 
 // C Interface
 
-int fw64_audio_set_soundbank(fw64Audio* audio, fw64SoundBank* sound_bank) {
+void fw64_audio_set_sound_bank(fw64Audio* audio, fw64SoundBank* sound_bank) {
     audio->setSoundBank(sound_bank);
-
-    return 1;
 }
 
 int fw64_audio_sound_count(fw64Audio* audio) {
@@ -56,16 +54,16 @@ fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle) {
     return audio->getChannelStatus(handle);
 }
 
-int fw64_audio_load_music(fw64Audio* audio, int asset_id) {
-    return 0;
+void fw64_audio_set_music_bank(fw64Audio* audio, fw64MusicBank* music_bank) {
+
 }
 
 int fw64_audio_play_music(fw64Audio* audio, uint32_t track_num) {
     return 0;
 }
 
-int fw64_audio_stop_music(fw64Audio* audio) {
-    return 0;
+void fw64_audio_stop_music(fw64Audio* audio) {
+
 }
 
 void fw64_audio_set_music_volume(fw64Audio* audio, float volume) {

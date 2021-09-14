@@ -15,4 +15,5 @@ public:
 
 private:
     fw64SoundBank* sound_bank = nullptr;
+    fw64MusicBank* music_bank = nullptr;
 };

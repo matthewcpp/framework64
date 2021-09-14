@@ -27,3 +27,11 @@ void fw64SoundBank::unload() {
 
     sounds.resize(0);
 }
+
+bool fw64MusicBank::load(std::string base_path, uint32_t count){
+    return true;
+}
+
+void fw64MusicBank::unload() {
+
+}

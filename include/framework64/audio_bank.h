@@ -3,5 +3,6 @@
 
 typedef struct fw64Audio fw64Audio;
 typedef struct fw64SoundBank fw64SoundBank;
+typedef struct fw64MusicBank fw64MusicBank;
 
 #endif

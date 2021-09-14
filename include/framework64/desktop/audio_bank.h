@@ -11,3 +11,8 @@ struct fw64SoundBank {
     void unload();
     bool load(std::string base_path, uint32_t count);
 };
+
+struct fw64MusicBank {
+    bool load(std::string base_path, uint32_t count);
+    void unload();
+};

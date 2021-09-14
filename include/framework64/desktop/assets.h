@@ -18,6 +18,7 @@ public:
     fw64Font* getFont(int handle);
     fw64Mesh* getMesh(int handle);
     fw64SoundBank* getSoundBank(int handle);
+    fw64MusicBank* getMusicBank(int handle);
 
 private:
     std::string asset_dir;
@@ -27,11 +28,13 @@ private:
     std::unordered_map<int, std::unique_ptr<fw64Font>> fonts;
     std::unordered_map<int, std::unique_ptr<fw64Mesh>> meshes;
     std::unordered_map<int, std::unique_ptr<fw64SoundBank>> sound_banks;
+    std::unordered_map<int, std::unique_ptr<fw64MusicBank>> music_banks;
 
     sqlite3* database = nullptr;
     sqlite3_stmt* select_texture_statement = nullptr;
     sqlite3_stmt* select_font_statement = nullptr;
     sqlite3_stmt* select_mesh_statement = nullptr;
     sqlite3_stmt* select_sound_bank_statement = nullptr;
+    sqlite3_stmt* select_music_bank_statement = nullptr;
 };
 
