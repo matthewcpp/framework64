@@ -13,7 +13,6 @@
   "scripts": {
     "prepare-n64-assets": "npx prepare-fw64-assets -f assets/manifest.n64.json assets/build_n64",
     "prepare-desktop-assets": "npx prepare-fw64-assets -f assets/manifest.desktop.json assets/build_desktop",
-    "install-deps": "node tools/install-deps.js"
   },
   "author": "Matthew LaRocca",
   "license": "MIT",
