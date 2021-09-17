@@ -41,6 +41,8 @@ bool Engine::init(int screen_width, int screen_height) {
     if (!database->init(database_path))
         return false;
 
+    Filesystem::init(asset_dir_path, *database);
+
     renderer = new fw64Renderer();
     assets = new fw64Assets(asset_dir_path, *database, *shader_cache);
     audio = new fw64Audio();
@@ -53,8 +55,6 @@ bool Engine::init(int screen_width, int screen_height) {
         return false;
 
     input->init(*n64_input_interface);
-
-    fw64_desktop_filesystem_init();
 
     return true;
 }

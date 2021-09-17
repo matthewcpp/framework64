@@ -15,6 +15,7 @@ struct Database {
     sqlite3_stmt* select_mesh_statement = nullptr;
     sqlite3_stmt* select_sound_bank_statement = nullptr;
     sqlite3_stmt* select_music_bank_statement = nullptr;
+    sqlite3_stmt* select_raw_file_statement = nullptr;
 };
 
 }
