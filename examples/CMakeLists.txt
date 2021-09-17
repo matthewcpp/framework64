@@ -1,6 +1,7 @@
 add_subdirectory(audio)
 add_subdirectory(billboard)
 add_subdirectory(bounding)
+add_subdirectory(data)
 add_subdirectory(lines)
 add_subdirectory(minimal)
 add_subdirectory(rendermodes)

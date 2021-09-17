@@ -101,5 +101,8 @@
             "name": "musicbank2",
             "dir": "music/bank2"
         }
+    ],
+    "raw": [
+        "sample.txt"
     ]
 }
