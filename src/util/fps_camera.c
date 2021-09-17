@@ -9,7 +9,7 @@ void fps_camera_init(FpsCamera* fps, fw64Input* input){
 }
 
 #define MOVEMENT_SPEED 8.0f
-#define ROTATION_SPEED 180.0f
+#define ROTATION_SPEED 90.0f
 #define STICK_THRESHOLD 0.15
 
 static void fps_cam_forward(FpsCamera* fps, Vec3* out) {

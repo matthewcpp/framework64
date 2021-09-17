@@ -15,7 +15,7 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
     auto* mesh = new fw64Mesh();
 
     Vec3 min_pt = {-1.0f, -1.0f, 0.0f};
-    Vec3 max_pt = {1.0f, -.0f, 0.0f};
+    Vec3 max_pt = {1.0f, 1.0f, 0.0f};
 
     if(slice_count > 1) {
         min_pt = {-texture->hslices / 2.0f, -texture->vslices / 2.0f, 0.0f};
