@@ -4,6 +4,7 @@
 
 TEST(Camera, PerspectiveMatrix) {
     fw64Camera camera;
+    fw64_camera_init(&camera);
 
     camera.aspect = 1.3333f;
     camera.fovy = 60.0f;
@@ -21,6 +22,7 @@ TEST(Camera, PerspectiveMatrix) {
 
 TEST(Camera, ViewMatrix) {
     fw64Camera camera;
+    fw64_camera_init(&camera);
 
     vec3_set(&camera.transform.position, 0.0f, 0.0f, 10.0f);
     Vec3 target = {0.0f, 0.0f, 0.0f};
