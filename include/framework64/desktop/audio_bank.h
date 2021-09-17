@@ -6,13 +6,15 @@
 #include <vector>
 
 struct fw64SoundBank {
-    std::vector<Mix_Chunk *> sounds;
-
-    void unload();
     bool load(std::string base_path, uint32_t count);
+
+    uint32_t sound_count;
+    std::string base_path;
 };
 
 struct fw64MusicBank {
-    bool load(std::string base_path, uint32_t count);
-    void unload();
+    bool load(std::string path, uint32_t count);
+
+    uint32_t track_count = 0;
+    std::string base_path;
 };

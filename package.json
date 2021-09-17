@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "prepare-n64-assets": "npx prepare-fw64-assets -f assets/manifest.n64.json assets/build_n64",
-    "prepare-desktop-assets": "npx prepare-fw64-assets -f assets/manifest.desktop.json assets/build_desktop",
+    "prepare-desktop-assets": "npx prepare-fw64-assets -f assets/manifest.desktop.json assets/build_desktop"
   },
   "author": "Matthew LaRocca",
   "license": "MIT",
