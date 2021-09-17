@@ -13,6 +13,7 @@ namespace framework64 {
 bool Engine::init(int screen_width, int screen_height) {
     const std::string base_path = SDL_GetBasePath();
     const std::string asset_dir_path = base_path + "assets/";
+    const std::string database_path = asset_dir_path + "assets.db";
     const std::string shader_dir_path = base_path + "glsl/";
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
@@ -35,9 +36,13 @@ bool Engine::init(int screen_width, int screen_height) {
 
     n64_input_interface = std::make_unique<N64InputInterface>();
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
+    database = std::make_unique<Database>();
+
+    if (!database->init(database_path))
+        return false;
 
     renderer = new fw64Renderer();
-    assets = new fw64Assets(asset_dir_path, *shader_cache);
+    assets = new fw64Assets(asset_dir_path, *database, *shader_cache);
     audio = new fw64Audio();
     input = new fw64Input();
 
@@ -48,9 +53,6 @@ bool Engine::init(int screen_width, int screen_height) {
         return false;
 
     input->init(*n64_input_interface);
-
-    if (!assets->init())
-        return false;
 
     fw64_desktop_filesystem_init();
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/engine.h"
+#include "framework64/desktop/database.h"
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/n64_input_interface.h"
 
@@ -15,6 +16,7 @@ public:
     void update(float time_delta);
 
 public:
+    std::unique_ptr<Database> database;
     std::unique_ptr<ShaderCache> shader_cache;
     std::unique_ptr<N64InputInterface> n64_input_interface;
 };

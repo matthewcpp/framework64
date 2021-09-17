@@ -1,9 +1,8 @@
 #pragma once
 
 #include "framework64/assets.h"
+#include "framework64/desktop/database.h"
 #include "framework64/desktop/shader_cache.h"
-
-#include <sqlite3.h>
 
 #include <string>
 #include <unordered_map>
@@ -11,8 +10,8 @@
 
 class fw64Assets {
 public:
-    fw64Assets(std::string asset_dir_path, framework64::ShaderCache& sc) : asset_dir(asset_dir_path), shader_cache(sc) {}
-    bool init();
+    fw64Assets(std::string const & dir, framework64::Database& db, framework64::ShaderCache& sc)
+        : asset_dir(dir), database(db), shader_cache(sc) {}
 
     fw64Texture* getTexture(int handle);
     fw64Font* getFont(int handle);
@@ -23,18 +22,12 @@ public:
 private:
     std::string asset_dir;
     framework64::ShaderCache& shader_cache;
+    framework64::Database& database;
 
     std::unordered_map<int, std::unique_ptr<fw64Texture>> textures;
     std::unordered_map<int, std::unique_ptr<fw64Font>> fonts;
     std::unordered_map<int, std::unique_ptr<fw64Mesh>> meshes;
     std::unordered_map<int, std::unique_ptr<fw64SoundBank>> sound_banks;
     std::unordered_map<int, std::unique_ptr<fw64MusicBank>> music_banks;
-
-    sqlite3* database = nullptr;
-    sqlite3_stmt* select_texture_statement = nullptr;
-    sqlite3_stmt* select_font_statement = nullptr;
-    sqlite3_stmt* select_mesh_statement = nullptr;
-    sqlite3_stmt* select_sound_bank_statement = nullptr;
-    sqlite3_stmt* select_music_bank_statement = nullptr;
 };
 
