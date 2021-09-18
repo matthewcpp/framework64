@@ -11,7 +11,7 @@ typedef struct {
 
 void vec3_zero(Vec3* v);
 void vec3_one(Vec3* v);
-void vec3_set(Vec3* v, float x, float y, float z);;
+void vec3_set(Vec3* v, float x, float y, float z);
 void vec3_set_all(Vec3* v, float val);
 void vec3_copy(Vec3* dest, Vec3* src);
 

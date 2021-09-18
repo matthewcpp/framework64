@@ -1,254 +1,98 @@
 {
-    "asset": {
-        "version": "2.0"
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.5.17",
+        "version" : "2.0"
     },
-    "scenes": [
+    "scene" : 0,
+    "scenes" : [
         {
-            "name": "N64 Logo",
-            "nodes": [0]
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
         }
     ],
-    "scene": 0,
-    "nodes": [
+    "nodes" : [
         {
-            "name": "N64 Logo",
-            "mesh": 0,
-            "rotation": [ 0.7071067690849304, 0, 0, 0.7071067690849304 ]
+            "mesh" : 0,
+            "name" : "N64 Logo"
         }
     ],
-    "meshes": [
+    "materials" : [
         {
-            "name": "N64 Logo",
-            "primitives": [
+            "name" : "Default",
+            "pbrMetallicRoughness" : {
+                "metallicFactor" : 0.10000000149011612,
+                "roughnessFactor" : 0.8999999761581421
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "N64 Logo",
+            "primitives" : [
                 {
-                    "attributes": {
-                        "POSITION": 0,
-                        "COLOR_0": 8
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "COLOR_0" : 1
                     },
-                    "indices": 1,
-                    "material": 0
-                },
-                {
-                    "attributes": {
-                        "POSITION": 2,
-                        "COLOR_0": 9
-                    },
-                    "indices": 3,
-                    "material": 0
-                },
-                {
-                    "attributes": {
-                        "POSITION": 4,
-                        "COLOR_0": 10
-                    },
-                    "indices": 5,
-                    "material": 0
-                },
-                {
-                    "attributes": {
-                        "POSITION": 6,
-                        "COLOR_0": 11
-                    },
-                    "indices": 7,
-                    "material": 0
+                    "indices" : 2,
+                    "material" : 0
                 }
             ]
         }
     ],
-    "materials": [
-        {
-            "name" : "Default",
-            "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "metallicFactor" : 0.1,
-                "roughnessFactor" : 0.9
-            }
-        }
-    ],
-    "accessors": [
+    "accessors" : [
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 48,
+            "count" : 288,
             "max" : [
                 48,
-                43,
-                42
+                42.0000114440918,
+                43.00000762939453
             ],
             "min" : [
                 -44,
-                -43,
-                -42
+                -42.0000114440918,
+                -43.00000762939453
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5123,
-            "count" : 48,
-            "type" : "SCALAR"
+            "count" : 288,
+            "normalized" : true,
+            "type" : "VEC4"
         },
         {
             "bufferView" : 2,
-            "componentType" : 5126,
-            "count" : 24,
-            "max" : [
-                48,
-                43,
-                42
-            ],
-            "min" : [
-                -44,
-                -43,
-                -42
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 24,
+            "count" : 288,
             "type" : "SCALAR"
-        },
-        {
-            "bufferView" : 4,
-            "componentType" : 5126,
-            "count" : 120,
-            "max" : [
-                48,
-                43,
-                42
-            ],
-            "min" : [
-                -44,
-                -43,
-                -42
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 5,
-            "componentType" : 5123,
-            "count" : 120,
-            "type" : "SCALAR"
-        },
-        {
-            "bufferView" : 6,
-            "componentType" : 5126,
-            "count" : 96,
-            "max" : [
-                48,
-                43,
-                42
-            ],
-            "min" : [
-                -44,
-                -43,
-                -42
-            ],
-            "type" : "VEC3"
-        },
-        {
-            "bufferView" : 7,
-            "componentType" : 5123,
-            "count" : 96,
-            "type" : "SCALAR"
-        },
-        {
-            "bufferView": 8,
-            "componentType" : 5126,
-            "count": 48,
-            "type": "VEC3"
-        },
-        {
-            "bufferView": 9,
-            "componentType" : 5126,
-            "count": 24,
-            "type": "VEC3"
-        },
-        {
-            "bufferView": 10,
-            "componentType" : 5126,
-            "count": 120,
-            "type": "VEC3"
-        },
-        {
-            "bufferView": 11,
-            "componentType" : 5126,
-            "count": 96,
-            "type": "VEC3"
         }
     ],
-    "bufferViews": [
+    "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 576,
+            "byteLength" : 3456,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 96,
-            "byteOffset" : 576
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 288,
-            "byteOffset" : 672
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 48,
-            "byteOffset" : 960
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 1440,
-            "byteOffset" : 1008
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 240,
-            "byteOffset" : 2448
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 1152,
-            "byteOffset" : 2688
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 192,
-            "byteOffset" : 3840
+            "byteLength" : 2304,
+            "byteOffset" : 3456
         },
         {
             "buffer" : 0,
             "byteLength" : 576,
-            "byteOffset" : 4032
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 288,
-            "byteOffset" : 4608
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 1440,
-            "byteOffset" : 4896
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 1152,
-            "byteOffset" : 6336
+            "byteOffset" : 5760
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 7488,
+            "byteLength" : 6336,
             "uri" : "n64_logo.bin"
         }
     ]

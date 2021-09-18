@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "framework64/engine.h"
+#include "entity.h"
 
 typedef struct {
     fw64Engine* engine;
@@ -19,8 +20,16 @@ typedef struct {
     float rotation;
 } Game;
 
-void game_init(Game* game, fw64Engine* engine);
-void game_update(Game* game, float time_delta);
-void game_draw(Game* game);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void game_init(Game *game, fw64Engine *engine);
+void game_update(Game *game);
+void game_draw(Game *game);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

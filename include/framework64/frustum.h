@@ -1,12 +1,7 @@
-#ifndef FW64_FRUSTUM_H
-#define FW64_FRUSTUM_H
+#pragma once
 
 #include "framework64/box.h"
 #include "framework64/plane.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef enum {
     FW64_FRUSTUM_PLANE_LEFT,
@@ -27,6 +22,10 @@ typedef struct {
     fw64Plane planes[6];
 } fw64Frustum;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void fw64_frustum_set_from_matrix(fw64Frustum* frustum, float* matrix);
 fw64FrustumTestResult fw64_frustum_test_point(fw64Frustum* frustum, Vec3* point);
 fw64FrustumTestResult fw64_frustum_test_sphere(fw64Frustum* frustum, Vec3* center, float radius);
@@ -35,6 +34,4 @@ int fw64_frustum_intersects_box(fw64Frustum* frustum, Box* box);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

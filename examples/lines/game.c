@@ -1,6 +1,8 @@
 #include "game.h"
 #include "assets.h"
 
+#include "framework64/n64/controller_button.h"
+
 #define ROTATION_SPEED 90.0f
 
 void game_init(Game* game, fw64Engine* engine) {
@@ -15,14 +17,14 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 
-    entity_init(&game->solid_cube, fw64_assets_get_mesh(engine->assets, ASSET_mesh_blue_cube));
-    entity_init(&game->wire_cube, fw64_assets_get_mesh(engine->assets, ASSET_mesh_blue_cube_wire));
+    entity_init(&game->solid_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube));
+    entity_init(&game->wire_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
 
     game->rotation = 0.0f;
 }
 
-void game_update(Game* game, float time_delta){
-    game->rotation += time_delta * ROTATION_SPEED;
+void game_update(Game* game){
+    game->rotation += game->engine->time->time_delta * ROTATION_SPEED;
 
     quat_from_euler(&game->solid_cube.transform.rotation, 0, game->rotation, 0.0f);
     entity_refresh(&game->solid_cube);
@@ -30,11 +32,11 @@ void game_update(Game* game, float time_delta){
     quat_from_euler(&game->wire_cube.transform.rotation, 0, game->rotation, 0.0f);
     entity_refresh(&game->wire_cube);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_LEFT))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME;
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_UP))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP))
         game->draw_mode = EXAMPLE_DRAW_MODE_SHADED;
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_RIGHT))
+    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 }
 

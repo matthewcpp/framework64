@@ -4,11 +4,8 @@
 #include <stdint.h>
 
 typedef struct {
-    uint64_t _previous_ms;
     float time_delta;
+    float total_time;
 } fw64Time;
-
-void fw64_time_init(fw64Time* time);
-void fw64_time_update(fw64Time* time);
 
 #endif

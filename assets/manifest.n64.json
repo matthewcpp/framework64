@@ -1,5 +1,5 @@
 {
-    "outDir": "build_n64",
+    "platform": "n64",
     "sprites": [
         {
             "src": "nintendo_seal.png",
@@ -63,12 +63,10 @@
             "src": "suzanne/suzanne.gltf"
         },
         {
-            "src": "penguin/penguin.gltf",
-            "bakeTransform": true
+            "src": "penguin/penguin.gltf"
         },
         {
-            "src": "n64_logo_model/n64_logo.gltf",
-            "bakeTransform": true
+            "src": "n64_logo_model/n64_logo.gltf"
         }
     ],
     "fonts": [
@@ -86,21 +84,21 @@
     ],
     "soundBanks": [
         {
-            "name": "bank1",
+            "name": "soundbank1",
             "dir": "sound_effects/bank1"
         },
         {
-            "name": "bank2",
+            "name": "soundbank2",
             "dir": "sound_effects/bank2"
         }
     ],
     "musicBanks": [
         {
-            "name": "bank1",
+            "name": "musicbank1",
             "dir": "music/bank1"
         },
         {
-            "name": "bank2",
+            "name": "musicbank2",
             "dir": "music/bank2"
         }
     ],

@@ -16,8 +16,16 @@ typedef struct {
     Vec3 _target;
 } ArcballCamera;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void arcball_init(ArcballCamera* arcball, fw64Input* input);
 void arcball_set_initial(ArcballCamera* arcball, Box* box);
 void arcball_update(ArcballCamera* arcball, float time_delta);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

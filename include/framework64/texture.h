@@ -1,28 +1,44 @@
-#ifndef FW64_SPRITE_H
-#define FW64_SPRITE_H
+#pragma once
 
-#include "framework64/vec2.h"
+#include "framework64/image.h"
 
-#include <stdint.h>
+typedef struct fw64Texture fw64Texture;
 
-#define SPRITE_FLAG_DYNAMIC 1
+#ifdef PLATFORM_N64
+#include <nusys.h>
 
-typedef struct {
-    uint16_t width;
-    uint16_t height;
-    uint16_t hslices;
-    uint16_t vslices;
-    uint32_t wrap_s;
-    uint32_t wrap_t;
-    uint32_t mask_s;
-    uint32_t mask_t;
-    uint8_t* data;
-} fw64Texture;
+typedef enum {
+    FW64_TEXTURE_WRAP_CLAMP = G_TX_CLAMP,
+    FW64_TEXTURE_WRAP_REPEAT = G_TX_WRAP,
+    FW64_TEXTURE_WRAP_MIRROR = G_TX_MIRROR
+} fw64TextureWrapMode;
+#else
+#include <gl/glew.h>
 
-int fw64_texture_get_slice_width(fw64Texture* sprite);
-int fw64_texture_get_slice_height(fw64Texture* sprite);
-
-int fw64_texture_load(int assetIndex, fw64Texture* sprite);
-void fw64_texture_uninit(fw64Texture* sprite);
-
+typedef enum {
+    FW64_TEXTURE_WRAP_CLAMP = GL_CLAMP_TO_EDGE,
+    FW64_TEXTURE_WRAP_REPEAT = GL_REPEAT,
+    FW64_TEXTURE_WRAP_MIRROR =  GL_MIRRORED_REPEAT
+} fw64TextureWrapMode;
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+fw64Texture* fw64_texture_create_from_image(fw64Image* image);
+void fw64_texture_delete(fw64Texture* texture);
+
+int fw64_texture_width(fw64Texture* texture);
+int fw64_texture_height(fw64Texture* texture);
+int fw64_texture_hslices(fw64Texture* texture);
+int fw64_texture_vslices(fw64Texture* texture);
+int fw64_texture_slice_width(fw64Texture* texture);
+int fw64_texture_slice_height(fw64Texture* texture);
+
+void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s, fw64TextureWrapMode wrap_t);
+
+#ifdef __cplusplus
+}
+#endif
+

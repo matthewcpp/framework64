@@ -14,7 +14,7 @@ typedef Mtx fw64Matrix;
 
 #define fw64_sinf _nsinf
 #define fw64_cosf _ncosf
-#define fw64_tanf _ntanf
+#define fw64_tanf tanf
 #define fw64_sqrtf _nsqrtf
 
 #else

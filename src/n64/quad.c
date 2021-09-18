@@ -1,4 +1,7 @@
 #include "framework64/util/quad.h"
+#include "framework64/n64/image.h"
+#include "framework64/n64/texture.h"
+#include "framework64/n64/mesh.h"
 
 #include <nusys.h>
 
@@ -6,8 +9,8 @@
 #include <string.h>
 
 static void vertex_set_tc(Vtx* vertex, float s, float t, fw64Texture* texture) {
-    s *= (float)fw64_texture_get_slice_width(texture) * 2.0f;
-    t *= (float)fw64_texture_get_slice_height(texture) * 2.0f;
+    s *= (float)fw64_texture_slice_width(texture) * 2.0f;
+    t *= (float)fw64_texture_slice_height(texture) * 2.0f;
 
     // Note that the texture coordinates (s,t) are encoded in S10.5 format.
     short ss = (short)s;
@@ -64,13 +67,17 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
-    fw64_mesh_init(mesh);
+fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
+    fw64Texture* texture = fw64_texture_create_from_image(image);
+
+    (void)engine;
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
+    fw64_n64_mesh_init(mesh);
 
     mesh->info.texture_count = 1;
     mesh->textures = texture;
 
-    uint32_t slice_count = texture->hslices * texture->vslices;
+    uint32_t slice_count = texture->image->info.hslices * texture->image->info.vslices;
 
     mesh->info.primitive_count = slice_count;
     mesh->primitives = malloc(mesh->info.primitive_count * sizeof(fw64Primitive));
@@ -89,8 +96,8 @@ void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
         size = 2;
     }
     else {
-        start_x = -texture->hslices / 2;
-        start_y = texture->vslices / 2;
+        start_x = -texture->image->info.hslices / 2;
+        start_y = texture->image->info.vslices / 2;
         size = 1;
     }
 
@@ -101,14 +108,14 @@ void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
 
     box_invalidate(&mesh->info.bounding_box);
     
-    for (int y = 0; y < texture->vslices; y++) {
-        for (int x = 0; x < texture->hslices; x++) {
+    for (int y = 0; y < texture->image->info.vslices; y++) {
+        for (int x = 0; x < texture->image->info.hslices; x++) {
             create_quad_slice(mesh, primitive_index, tl_x, tl_y, size, texture);
 
             fw64Primitive* primitive = mesh->primitives + primitive_index;
 
             primitive->material.color = FW64_MATERIAL_NO_COLOR;
-            primitive->material.texture = 0;
+            primitive->material.texture = texture;
             primitive->material.texture_frame = primitive_index;
             primitive->material.mode = FW64_SHADING_MODE_UNLIT_TEXTURED;
 
@@ -119,10 +126,21 @@ void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture) {
         tl_y -= size;
         tl_x = start_x;
     }
+
+    return mesh;
 }
 
-void quad_create(fw64Mesh* mesh, s16 size, Color* color) {
-    fw64_mesh_init(mesh);
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Image* image, float max_s, float max_t){
+    fw64Mesh* mesh = textured_quad_create(engine, image);
+    textured_quad_set_tex_coords(mesh, 0, max_s, max_t);
+
+    return mesh;
+}
+
+/*
+fw64Mesh* quad_create(int16_t size, Color* color) {
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
+    fw64_n64_mesh_init(mesh);
 
     mesh->info.color_count = 1;
     mesh->colors = memalign(8, sizeof(Lights1) * 4);
@@ -150,7 +168,10 @@ void quad_create(fw64Mesh* mesh, s16 size, Color* color) {
     fw64Primitive* primitive = mesh->primitives;
 
     primitive->material.color = 0;
-    primitive->material.texture = FW64_MATERIAL_NO_TEXTURE;
+    primitive->material.texture = NULL;
     primitive->material.texture_frame = FW64_MATERIAL_NO_TEXTURE;
     primitive->material.mode = FW64_SHADING_MODE_GOURAUD;
+
+    return mesh;
 }
+*/

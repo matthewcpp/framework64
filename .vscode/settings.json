@@ -11,6 +11,11 @@
         "vec3.h": "c",
         "quat.h": "c",
         "sparse_set.h": "c",
-        "arcball_camera.h": "c"
+        "arcball_camera.h": "c",
+        "renderer.h": "c",
+        "mesh.h": "c",
+        "controller_button.h": "c",
+        "variant": "c",
+        "texture.h": "c"
     }
 }

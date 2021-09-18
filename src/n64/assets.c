@@ -1,4 +1,12 @@
-#include "framework64/asset.h"
+#include "framework64/assets.h"
+#include "framework64/n64/assets.h"
+
+#include "framework64/n64/audio_bank.h"
+#include "framework64/n64/font.h"
+#include "framework64/n64/image.h"
+#include "framework64/n64/mesh.h"
+#include "framework64/n64/texture.h"
+
 
 #include <malloc.h>
 #include <stddef.h>
@@ -6,7 +14,7 @@
 #define FW64_ASSET_INITIAL_CAPACITY 8
 #define FW64_ASSET_GROW_AMOUNT 8
 
-void fw64_assets_init(fw64Assets* assets) {
+void fw64_n64_assets_init(fw64Assets* assets) {
     assets->_asset_capacity = FW64_ASSET_INITIAL_CAPACITY;
     assets->_assets = calloc(FW64_ASSET_INITIAL_CAPACITY, sizeof(fw64Asset));
     assets->_asset_count = 0;
@@ -35,17 +43,13 @@ static void* fw64_find_asset(fw64Assets* assets, uint32_t index) {
     return NULL;
 }
 
-int fw64_assets_is_loaded(fw64Assets* assets, uint32_t index) {
-    return fw64_find_asset(assets, index) != NULL;
-}
-
 fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
     fw64Mesh* mesh = fw64_find_asset(assets, index);
 
     if (!mesh) {
         mesh = malloc(sizeof(fw64Mesh));
 
-        if (fw64_mesh_load(index, mesh)) {
+        if (fw64_n64_mesh_load(index, mesh)) {
             fw64_insert_asset(assets, mesh, index);
         }
         else {
@@ -75,20 +79,35 @@ fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
     return font;
 }
 
-fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
-    fw64Texture* image = fw64_find_asset(assets, index);
+fw64Image* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
+    (void)assets;
+    return fw64_n64_image_load(index);
+}
 
-    if (!image) {
-        image = malloc(sizeof(fw64Texture));
+fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {
+    fw64SoundBank* sound_bank = fw64_find_asset(assets, index);
 
-        if (fw64_texture_load(index, image)) {
-            fw64_insert_asset(assets, image, index);
-        }
-        else {
-            free(image);
-            image = NULL;
-        }
-    }
+    if (sound_bank) 
+        return sound_bank;
 
-    return image;
+    sound_bank = fw64_n64_sound_bank_load(index);
+
+    if (sound_bank)
+        fw64_insert_asset(assets, sound_bank, index);
+
+    return sound_bank;
+}
+
+fw64MusicBank* fw64_assets_get_music_bank(fw64Assets* assets, uint32_t index) {
+    fw64MusicBank* music_bank = fw64_find_asset(assets, index);
+
+    if (music_bank)
+        return music_bank;
+
+    music_bank = fw64_n64_music_bank_load(index);
+
+    if (music_bank)
+        fw64_insert_asset(assets, music_bank, index);
+
+    return music_bank;
 }

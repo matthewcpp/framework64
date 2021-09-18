@@ -9,6 +9,18 @@ Begin by installing the dependencies:
 npm install
 ```
 
+### Building For desktop
+
+#### OSX
+- Run `brew install pkg-config`
+
+#### Build with CMAKE
+- Create build directory: `mkdir build`
+- Configure the project: `cmake -S . -B build .. -DCMAKE_TOOLCHAIN_FILE=lib/vcpkg/scripts/buildsystems/vcpkg.cmake`
+- Build the project: `cmake --build build`
+
+# Building for N64
+
 Build the assets:
 ```
 node tools/prepare_assets.js --manifest assets/manifest.n64.json --out-dir assets/build_n64 -f
@@ -19,7 +31,7 @@ Build the example ROM files:
 docker run --rm -v $(pwd):/workspace -u $(id -u):$(id -g) matthewcpp/n64-modern-sdk /bin/bash -c "cd /workspace; ./build_all.sh"
 ```
 
-### Developing with Visual Studio Code
+### Visual Studio Code Development
 - Ensure that you have the remote containers extension installed.
 - Copy `tools/.devcontainer.n64.json` to `.devcontainer.json`
 - Open the repo root folder in VS Code.

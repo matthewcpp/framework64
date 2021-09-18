@@ -5,6 +5,7 @@
 .devcontainer.json
 
 assets/build_n64
+assets/build_desktop
 node_modules
 .idea
 

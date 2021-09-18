@@ -1,0 +1,73 @@
+#include "framework64/desktop/image.h"
+
+#include <SDL2/SDL_image.h>
+
+static fw64Image* createTextureFromSurface(SDL_Surface* surface) {
+    auto* texture = new fw64Image();
+
+    texture->width = surface->w;
+    texture->height = surface->h;
+    texture->hslices = 1;
+    texture->vslices = 1;
+
+    GLenum textureFormat;
+    if ((surface->format->Rmask & 0xFF) == 0xFF) { // RGB
+        textureFormat = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+    }
+    else {
+        textureFormat = surface->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
+    }
+
+    glGenTextures(1, &texture->gl_handle);
+    glBindTexture(GL_TEXTURE_2D, texture->gl_handle);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, textureFormat, GL_UNSIGNED_BYTE, surface->pixels);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    return texture;
+}
+
+fw64Image* fw64Image::loadImageFile(std::string const& path) {
+    auto* surface = IMG_Load(path.c_str());
+
+    if (!surface) {
+        return nullptr;
+    }
+
+    auto* texture = createTextureFromSurface(surface);
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+fw64Image* fw64Image::loadImageBuffer(void* data, size_t size) {
+    auto* data_stream = SDL_RWFromMem(data, static_cast<int>(size));
+    auto* surface = IMG_Load_RW(data_stream, 1);
+
+    if (!surface) {
+        return nullptr;
+    }
+
+    auto* texture = createTextureFromSurface(surface);
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+void fw64Image::freeGlResources() {
+    glDeleteTextures(1, &gl_handle);
+}
+
+void fw64_image_reference_add(fw64Image* image) {
+    image->ref_count += 1;
+}
+
+void fw64_image_reference_remove(fw64Image* image) {
+    image->ref_count -= 1;
+
+    if (image->ref_count <= 0) {
+        image->freeGlResources();
+        delete(image);
+    }
+
+}

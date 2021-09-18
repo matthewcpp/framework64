@@ -21,9 +21,17 @@ typedef struct lines_example {
     Entity wire_cube;
 } Game;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void game_init(Game* example, fw64Engine* engine);
-void game_update(Game* example, float time_delta);
+void game_update(Game* example);
 void game_draw(Game* example);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

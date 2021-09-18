@@ -1,0 +1,16 @@
+{
+  "name": "framework64",
+  "version": "0.5.0",
+  "dependencies": [
+    "glew",
+    "gtest",
+    "nlohmann-json",
+    "sdl2",
+    {
+      "name": "sdl2-mixer",
+      "features": ["dynamic-load", "libvorbis"]
+    },
+    "sdl2-image",
+    "sqlite3"
+  ]
+}

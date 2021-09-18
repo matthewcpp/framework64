@@ -148,6 +148,29 @@ void matrix_perspective(float* out, float fov_degrees, float aspect, float near,
     out[15] = 0;
 }
 
+void matrix_ortho(float* out, float left, float right, float bottom, float top, float near, float far) {
+    float lr = 1.0f / (left - right);
+    float bt = 1.0f / (bottom - top);
+    float nf = 1.0f / (near - far);
+
+    out[0] = -2 * lr;
+    out[1] = 0;
+    out[2] = 0;
+    out[3] = 0;
+    out[4] = 0;
+    out[5] = -2 * bt;
+    out[6] = 0;
+    out[7] = 0;
+    out[8] = 0;
+    out[9] = 0;
+    out[10] = 2 * nf;
+    out[11] = 0;
+    out[12] = (left + right) * lr;
+    out[13] = (top + bottom) * bt;
+    out[14] = (far + near) * nf;
+    out[15] = 1;
+}
+
 static float hypot3(float a, float b, float c) {
     return fw64_sqrtf(a * a + b* b + c * c);
 }
@@ -370,6 +393,22 @@ int matrix_invert(float* out, float* a) {
     out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
     out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
     out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+
+    return 1;
+}
+
+void matrix_transform_vec3(float* m, Vec3* vec) {
+    float x = vec->x;
+    float y = vec->y;
+    float z = vec->z;
+
+    float w = m[3] * x + m[7] * y + m[11] * z + m[15];
+    if (w == 0.0f)
+        w = 1.0f;
+
+    vec->x = (m[0] * x + m[4] * y + m[8] * z + m[12]) / w;
+    vec->y = (m[1] * x + m[5] * y + m[9] * z + m[13]) / w;
+    vec->z = (m[2] * x + m[6] * y + m[10] * z + m[14]) / w;
 }
 
 void mat2_set_rotation(float* mat, float rad) {

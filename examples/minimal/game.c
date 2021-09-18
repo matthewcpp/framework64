@@ -1,13 +1,15 @@
 #include "game.h"
 #include "assets.h"
 
+#include <stddef.h>
+
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     fw64_camera_init(&game->camera);
 }
 
-void game_update(Game* game, float time_delta){
-
+void game_update(Game* game){
+    (void)game;
 }
 
 void game_draw(Game* game) {

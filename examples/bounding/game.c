@@ -1,13 +1,16 @@
 #include "game.h"
 #include "assets.h"
 
+#include "framework64/assets.h"
 #include "framework64/matrix.h"
+#include "framework64/n64/controller_button.h"
 
 #include <math.h>
+#include <stdio.h>
 
-#define SCALE_SPEED 0.25f
+#define PENGUIN_SIZE_CHANGE_SPEED 0.25f
+#define PENGUIN_MOVE_SPEED 350.0f
 #define STICK_THRESHOLD 0.15f
-#define MOVE_SPEED 175.0f
 
 static void setup_camera(Game* game);
 static void init_cubes(Game* game);
@@ -19,9 +22,9 @@ float stick_adjust[4];
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     
-    entity_init(&game->penguin, fw64_assets_get_mesh(engine->assets, ASSET_mesh_penguin));
-    entity_init(&game->penguin_box, fw64_assets_get_mesh(engine->assets, ASSET_mesh_blue_cube_wire));
-    game->font = fw64_assets_get_font(engine->assets, ASSET_font_Consolas12);
+    entity_init(&game->penguin, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_penguin));
+    entity_init(&game->penguin_box, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
+    game->font = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
     game->intersection = CUBE_NONE;
 
     vec3_set(&game->penguin.transform.scale, 0.5, 0.5, 0.5);
@@ -33,8 +36,7 @@ void game_init(Game* game, fw64Engine* engine) {
     init_cubes(game);
 }
 
-void game_update(Game* game, float time_delta){
-    
+void game_update(Game* game){
     Vec2 stick;
     fw64_input_stick(game->engine->input, 0, &stick);
     
@@ -45,17 +47,17 @@ void game_update(Game* game, float time_delta){
 
         Vec3 forward;
         fw64_transform_forward(&game->penguin.transform, &forward);
-        vec3_scale(&forward, &forward, MOVE_SPEED * time_delta);
+        vec3_scale(&forward, &forward, PENGUIN_MOVE_SPEED * game->engine->time->time_delta);
         vec3_add(&game->penguin.transform.position, &game->penguin.transform.position, &forward);
     }
 
     Vec3 scale_delta;
-    vec3_set_all(&scale_delta, time_delta * SCALE_SPEED);
-    if (fw64_input_button_down(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_UP)) {
+    vec3_set_all(&scale_delta, game->engine->time->time_delta * PENGUIN_SIZE_CHANGE_SPEED);
+    if (fw64_input_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }
 
-    if (fw64_input_button_down(game->engine->input, 0, FW64_CONTROLLER_BUTTON_C_DOWN)) {
+    if (fw64_input_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
         vec3_negate(&scale_delta);
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }
@@ -71,30 +73,32 @@ void game_update(Game* game, float time_delta){
 }
 
 void game_draw(Game* game) {
+    char text_buffer[64];
+    sprintf(text_buffer, "Intersection: %s", intersection_text(game->intersection));
+
     fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    
     fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin.transform, game->penguin.mesh);
 
-    for (int i = 0; i < CUBE_COUNT; i++)
+    for (int i = 0; i < CUBE_COUNT; i++){
         fw64_renderer_draw_static_mesh(game->engine->renderer, &game->cubes[i].transform, game->cubes[i].mesh);
-    
-    char text_buffer[32];
-    sprintf(text_buffer, "Intersection: %s", intersection_text(game->intersection));
+    }
+
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
+
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_LINES, FW64_RENDERER_FLAG_NOCLEAR);
+    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
+
+    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
     fw64_renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
-
-    // This seems to lock up CEN64
-    // Uncomment following lines if running on hardware to see preview bounding box.
-
-    //fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
-
-    //fw64_renderer_begin(game->engine->renderer, &game->camera, RENDERER_MODE_LINES, RENDERER_FLAG_NOCLEAR);
-    //fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void setup_camera(Game* game) {
     fw64_camera_init(&game->camera);
 
-    game->camera.near = 25.0f;
+    game->camera.near = 250.0f;
     game->camera.far = 1000;
     fw64_camera_update_projection_matrix(&game->camera);
 
@@ -118,7 +122,7 @@ Vec3 cube_positions[CUBE_COUNT] = {
 
 void init_cubes(Game* game) {
     
-    fw64Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, ASSET_mesh_blue_cube);
+    fw64Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, FW64_ASSET_mesh_blue_cube);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
         Entity* cube = &game->cubes[i];

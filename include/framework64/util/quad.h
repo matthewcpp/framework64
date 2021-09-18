@@ -1,13 +1,19 @@
-#ifndef FW64_QUAD_H
-#define FW64_QUAD_H
+#pragma once
 
 #include "framework64/color.h"
+#include "framework64/engine.h"
 #include "framework64/mesh.h"
-#include "framework64/texture.h"
+#include "framework64/image.h"
 
-void textured_quad_create(fw64Mesh* mesh, fw64Texture* texture);
-void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t);
+#include <stdint.h>
 
-void quad_create(fw64Mesh* mesh, s16 size, Color* color);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image);
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Image* image, float max_s, float max_t);
+
+#ifdef __cplusplus
+}
 #endif

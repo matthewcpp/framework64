@@ -42,5 +42,5 @@ fw64FrustumTestResult fw64_frustum_test_sphere(fw64Frustum* frustum, Vec3* cente
 }
 
 int fw64_frustum_intersects_box(fw64Frustum* frustum, Box* box) {
-
+    return 0;
 }
