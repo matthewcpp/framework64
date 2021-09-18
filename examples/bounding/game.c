@@ -93,8 +93,6 @@ void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
     fw64_renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
-
-
 }
 
 void setup_camera(Game* game) {

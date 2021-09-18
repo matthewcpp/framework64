@@ -69,7 +69,7 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
 fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
     (void)engine;
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
-    fw64_mesh_init(mesh);
+    fw64_n64_mesh_init(mesh);
 
     mesh->info.texture_count = 1;
     mesh->textures = texture;
@@ -112,7 +112,7 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
             fw64Primitive* primitive = mesh->primitives + primitive_index;
 
             primitive->material.color = FW64_MATERIAL_NO_COLOR;
-            primitive->material.texture = 0;
+            primitive->material.texture = texture;
             primitive->material.texture_frame = primitive_index;
             primitive->material.mode = FW64_SHADING_MODE_UNLIT_TEXTURED;
 
@@ -129,7 +129,7 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
 
 fw64Mesh* quad_create(int16_t size, Color* color) {
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
-    fw64_mesh_init(mesh);
+    fw64_n64_mesh_init(mesh);
 
     mesh->info.color_count = 1;
     mesh->colors = memalign(8, sizeof(Lights1) * 4);
@@ -157,7 +157,7 @@ fw64Mesh* quad_create(int16_t size, Color* color) {
     fw64Primitive* primitive = mesh->primitives;
 
     primitive->material.color = 0;
-    primitive->material.texture = FW64_MATERIAL_NO_TEXTURE;
+    primitive->material.texture = NULL;
     primitive->material.texture_frame = FW64_MATERIAL_NO_TEXTURE;
     primitive->material.mode = FW64_SHADING_MODE_GOURAUD;
 

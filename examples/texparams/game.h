@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "../common/entity.h"
+
 #include "framework64/font.h"
 #include "framework64/engine.h"
 
@@ -22,7 +24,7 @@ typedef struct {
 } Game;
 
 void game_init(Game* game, fw64Engine* engine);
-void game_update(Game* game, float time_delta);
+void game_update(Game* game);
 void game_draw(Game* game);
 
 #endif

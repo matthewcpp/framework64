@@ -24,7 +24,7 @@ APP =		bounding.out
 
 TARGETS =	bounding.n64
 
-HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ../common/*.h) $(wildcard ./*.h)
+HFILES =	$(wildcard ../../include/*.h) $(wildcard ../../include/framework64/*.h) $(wildcard ../common/*.h) $(wildcard ./*.h)
 
 CODEFILES   =	$(wildcard ../../src/*.c) $(wildcard ../../src/n64/*.c) $(wildcard ../common/*.c) $(wildcard ./*.c)
 

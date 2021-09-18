@@ -57,6 +57,13 @@ int fw64_n64_texture_load(int assetIndex, fw64Texture* texture) {
     return bytes_read == data_size;
 }
 
+void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s, fw64TextureWrapMode wrap_t) {
+    texture->wrap_s = wrap_s;
+    texture->mask_s = wrap_s != FW64_TEXTURE_WRAP_CLAMP ? 4 : 0;
+    texture->wrap_t = wrap_t;
+    texture->mask_t = wrap_t != FW64_TEXTURE_WRAP_CLAMP ? 4 : 0;
+}
+
 void fw64_n64_texture_uninit(fw64Texture* texture) {
     free(texture->data);
 }

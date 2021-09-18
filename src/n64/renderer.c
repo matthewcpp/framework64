@@ -314,7 +314,7 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
 
         if (primitive->material.mode == FW64_SHADING_MODE_GOURAUD_TEXTURED || 
             primitive->material.mode == FW64_SHADING_MODE_UNLIT_TEXTURED ) {
-            fw64Texture* texture = mesh->textures + primitive->material.texture;
+            fw64Texture* texture = primitive->material.texture;
 
             int slice_width = fw64_texture_slice_width(texture);
             int slice_height = fw64_texture_slice_height(texture);

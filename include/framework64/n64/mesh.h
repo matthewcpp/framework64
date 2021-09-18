@@ -10,22 +10,22 @@
 
 #include <stdint.h>
 
-#define FW64_MATERIAL_NO_TEXTURE UINT16_MAX
+#define FW64_MATERIAL_NO_TEXTURE UINT32_MAX
 #define FW64_MATERIAL_NO_COLOR UINT32_MAX
 
-typedef struct {
+struct fw64Material {
     uint32_t color;
-    uint16_t texture;
-    uint16_t texture_frame;
+    fw64Texture* texture;
+    uint32_t texture_frame;
     uint32_t mode;
-} fw64Material;
+};
 
-typedef struct {
+struct fw64Primitive{
     Box bounding_box;
     uint32_t vertices; // offset into mesh vertex array
     uint32_t display_list; // offset into mesh display_list array
     fw64Material material;
-} fw64Primitive;
+} ;
 
 typedef struct {
     uint32_t primitive_count;
@@ -45,6 +45,8 @@ struct fw64Mesh {
     Vtx* vertex_buffer;
     Gfx* display_list;
 };
+
+void fw64_n64_mesh_init(fw64Mesh* mesh);
 
 /**
 Loads a mesh and all dependant assets from the asset bundle.
