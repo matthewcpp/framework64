@@ -3,6 +3,7 @@
 #include "framework64/matrix.h"
 
 #include "framework64/n64/font.h"
+#include "framework64/n64/image.h"
 #include "framework64/n64/mesh.h"
 #include "framework64/n64/renderer.h"
 #include "framework64/n64/texture.h"
@@ -220,7 +221,7 @@ static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite,
 
     uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
 
-    gDPLoadTextureBlock(renderer->display_list++, sprite->data + frame_offset, 
+    gDPLoadTextureBlock(renderer->display_list++, sprite->image->data + frame_offset, 
         G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
         sprite->wrap_s, sprite->wrap_t, sprite->mask_s, sprite->mask_t, G_TX_NOLOD, G_TX_NOLOD);
 
@@ -248,9 +249,9 @@ void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* sprite, int 
     int slice_height = fw64_texture_slice_height(sprite);
     int slice = 0;
 
-    for (uint8_t row = 0; row < sprite->vslices; row++ ) {
+    for (uint8_t row = 0; row < sprite->image->info.vslices; row++ ) {
         int draw_y = y + row * slice_height;
-        for (uint8_t col = 0; col < sprite->hslices; col++) {
+        for (uint8_t col = 0; col < sprite->image->info.hslices; col++) {
             int draw_x = x + slice_width * col;
 
             _fw64_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
@@ -320,7 +321,7 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
             int slice_height = fw64_texture_slice_height(texture);
             int frame_offset = slice_width * slice_height * 2 * primitive->material.texture_frame;
 
-            gDPLoadTextureBlock(renderer->display_list++, texture->data + frame_offset,
+            gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
                 G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
                 texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
         }

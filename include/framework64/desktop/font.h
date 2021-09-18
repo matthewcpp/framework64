@@ -5,6 +5,7 @@
 #include "framework64/desktop/texture.h"
 
 #include <limits>
+#include <memory>
 #include <vector>
 
 struct fw64FontGlyph {
@@ -18,7 +19,7 @@ struct fw64FontGlyph {
 };
 
 struct fw64Font {
-    fw64Texture* texture;
+    std::unique_ptr<fw64Texture> texture;
     std::vector<fw64FontGlyph> glyphs;
     int size;
 

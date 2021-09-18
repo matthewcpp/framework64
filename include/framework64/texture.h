@@ -1,5 +1,6 @@
-#ifndef FW64_SPRITE_H
-#define FW64_SPRITE_H
+#pragma once
+
+#include "framework64/image.h"
 
 typedef struct fw64Texture fw64Texture;
 
@@ -25,6 +26,9 @@ typedef enum {
 extern "C" {
 #endif
 
+fw64Texture* fw64_texture_create_from_image(fw64Image* image);
+void fw64_texture_delete(fw64Texture* texture);
+
 int fw64_texture_width(fw64Texture* texture);
 int fw64_texture_height(fw64Texture* texture);
 int fw64_texture_hslices(fw64Texture* texture);
@@ -38,4 +42,3 @@ void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s
 }
 #endif
 
-#endif

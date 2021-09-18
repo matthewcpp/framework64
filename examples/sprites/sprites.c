@@ -4,8 +4,8 @@
 
 #include <stdio.h>
 
-void n64_logo_sprite_init(N64LogoSprite* logo_sprite, fw64Texture* image) {
-    logo_sprite->sprite = image;
+void n64_logo_sprite_init(N64LogoSprite* logo_sprite, fw64Image* image) {
+    logo_sprite->sprite = fw64_texture_create_from_image(image);
     logo_sprite->position.x = 0;
     logo_sprite->position.y = 0;
 }
@@ -16,8 +16,8 @@ void n64_logo_sprite_draw(N64LogoSprite* logo_sprite, fw64Renderer* renderer){
 
 #define FRAME_DUR 1.0f / 10.0f
 
-void ken_sprite_init(KenSprite* ken, fw64Texture* image) {
-    ken->sprite = image;
+void ken_sprite_init(KenSprite* ken, fw64Image* image) {
+    ken->sprite = fw64_texture_create_from_image(image);
     ken->position.x = 0;
     ken->position.y = 0;
     ken->frame_time = 0.0f;

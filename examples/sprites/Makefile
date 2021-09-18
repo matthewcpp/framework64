@@ -24,7 +24,7 @@ APP =		sprites.out
 
 TARGETS =	sprites.n64
 
-HFILES =	$(wildcard ../../include/framework64/*.h) $(wildcard ../common/*.h) $(wildcard ./*.h)
+HFILES =	$(wildcard ../../include/framework64/n64/*.h) $(wildcard ../../include/framework64/*.h) $(wildcard ../common/*.h) $(wildcard ./*.h)
 
 CODEFILES   =	$(wildcard ../../src/n64/*.c) $(wildcard ../../src/*.c) $(wildcard ../common/*.c) $(wildcard ./*.c)
 
@@ -51,4 +51,4 @@ $(TARGETS):	$(OBJECTS)
 		makemask $(TARGETS)
 
 clean:
-	rm -f  ../../src/n64/*.o ../common/*.o ./*.o ./*.out *.n64
+	rm -f  ../../src/n64/*.o ../../src/*.o ../common/*.o ./*.o ./*.out *.n64

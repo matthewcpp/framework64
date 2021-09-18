@@ -1,25 +1,23 @@
 #include "framework64/util/quad.h"
 
 #include "framework64/desktop/engine.h"
-#include "framework64/desktop/texture.h"
-#include "framework64/vec3.h"
-#include "framework64/desktop/mesh.h"
 #include "framework64/desktop/mesh_data.h"
 
 #include <vector>
 
-fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Texture* texture, float max_s, float max_t) {
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Image* image, float max_s, float max_t) {
     auto* f64_engine = reinterpret_cast<framework64::Engine*>(engine);
-    uint32_t slice_count = texture->hslices * texture->vslices;
+    uint32_t slice_count = image->hslices * image->vslices;
 
     auto* mesh = new fw64Mesh();
+    mesh->textures.emplace_back(new fw64Texture(image));
 
     Vec3 min_pt = {-1.0f, -1.0f, 0.0f};
     Vec3 max_pt = {1.0f, 1.0f, 0.0f};
 
     if(slice_count > 1) {
-        min_pt = {-texture->hslices / 2.0f, -texture->vslices / 2.0f, 0.0f};
-        max_pt = {texture->hslices / 2.0f, texture->vslices / 2.0f, 0.0f};
+        min_pt = {-image->hslices / 2.0f, -image->vslices / 2.0f, 0.0f};
+        max_pt = {image->hslices / 2.0f, image->vslices / 2.0f, 0.0f};
     }
 
     framework64::MeshData mesh_data;
@@ -54,11 +52,11 @@ fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Texture* text
     auto mesh_info = mesh_data.createMesh();
     mesh_info.setPrimitiveValues(primitive);
     primitive.mode = fw64Primitive::Mode::Triangles;
-    primitive.material.texture = texture;
+    primitive.material.texture = mesh->textures[0].get();
     f64_engine->shader_cache->setShaderProgram(primitive);
     return mesh;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
-    return textured_quad_create_with_params(engine, texture, 1.0f, 1.0f);
+fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
+    return textured_quad_create_with_params(engine, image, 1.0f, 1.0f);
 }

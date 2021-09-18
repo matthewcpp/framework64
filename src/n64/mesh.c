@@ -1,6 +1,8 @@
 #include "framework64/n64/mesh.h"
 
 #include "framework64/filesystem.h"
+#include "framework64/n64/image.h"
+#include "framework64/n64/texture.h"
 
 #include <malloc.h>
 #include <string.h>
@@ -70,13 +72,12 @@ static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle
         return;
     }
 
-    if (mesh->info.texture_count > 0) {
-        fw64_filesystem_read(asset_index_data, sizeof(uint32_t), mesh->info.texture_count, handle);
-        mesh->textures = malloc(sizeof(fw64Texture) * mesh->info.texture_count);
+    fw64_filesystem_read(asset_index_data, sizeof(uint32_t), mesh->info.texture_count, handle);
+    mesh->textures = malloc(sizeof(fw64Texture) * mesh->info.texture_count);
 
-        for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
-            fw64_n64_texture_load(asset_index_data[i], mesh->textures + i);
-        }
+    for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
+        fw64Image* image = fw64_n64_image_load(asset_index_data[i]);
+        fw64_n64_texture_init_with_image(mesh->textures + i, image);
     }
 }
 
@@ -118,7 +119,7 @@ void fw64_mesh_delete(fw64Mesh* mesh) {
     if (mesh->primitives)
         free(mesh->primitives);
 
-    if (mesh->textures) {
+    if ( mesh->info.texture_count > 0) {
         for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
             fw64_n64_texture_uninit(mesh->textures + i);
         }
@@ -140,4 +141,15 @@ fw64Material* fw64_mesh_primitive_get_material(fw64Primitive* primitive) {
 
 fw64Texture* fw64_material_get_texture(fw64Material* material) {
     return material->texture;
+}
+
+int fw64_mesh_get_texture_count(fw64Mesh* mesh) {
+    return mesh->info.texture_count;
+}
+
+fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index) {
+    if (index >= mesh->info.texture_count)
+        return NULL;
+    else 
+        return mesh->textures + index;
 }

@@ -3,6 +3,7 @@
 
 #include "framework64/n64/audio_bank.h"
 #include "framework64/n64/font.h"
+#include "framework64/n64/image.h"
 #include "framework64/n64/mesh.h"
 #include "framework64/n64/texture.h"
 
@@ -78,22 +79,9 @@ fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
     return font;
 }
 
-fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
-    fw64Texture* image = fw64_find_asset(assets, index);
-
-    if (!image) {
-        image = malloc(sizeof(fw64Texture));
-
-        if (fw64_n64_texture_load(index, image)) {
-            fw64_insert_asset(assets, image, index);
-        }
-        else {
-            free(image);
-            image = NULL;
-        }
-    }
-
-    return image;
+fw64Image* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
+    (void)assets;
+    return fw64_n64_image_load(index);
 }
 
 fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {

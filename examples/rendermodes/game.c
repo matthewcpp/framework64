@@ -39,7 +39,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderer_set_fill_color(engine->renderer, &fill_color);
 
     game->consolas = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
-    game->button_sprite = fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_buttons);
+    game->button_sprite = fw64_texture_create_from_image(fw64_assets_get_image(engine->assets, FW64_ASSET_image_buttons));
 
     IVec2 text_measurement = fw64_font_measure_text(game->consolas, SWITCH_MODEL_TEXT);
     game->switch_model_text_width = text_measurement.x;

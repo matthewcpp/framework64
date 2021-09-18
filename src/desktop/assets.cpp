@@ -3,28 +3,29 @@
 #include "framework64/desktop/assets.h"
 #include "framework64/desktop/audio_bank.h"
 #include "framework64/desktop/font.h"
+#include "framework64/desktop/image.h"
 #include "framework64/desktop/glb_parser.h"
 
-fw64Texture* fw64Assets::getTexture(int handle) {
-    auto existing_texture = textures.find(handle);
+fw64Image* fw64Assets::getImage(int handle) {
+    auto existing_texture = images.find(handle);
 
-    if (existing_texture != textures.end())
+    if (existing_texture != images.end())
         return existing_texture->second.get();
 
-    sqlite3_reset(database.select_texture_statement);
-    sqlite3_bind_int(database.select_texture_statement, 1, handle);
+    sqlite3_reset(database.select_image_statement);
+    sqlite3_bind_int(database.select_image_statement, 1, handle);
 
-    if(sqlite3_step(database.select_texture_statement) != SQLITE_ROW)
+    if(sqlite3_step(database.select_image_statement) != SQLITE_ROW)
         return nullptr;
 
-    std::string sprite_path = reinterpret_cast<const char *>(sqlite3_column_text(database.select_texture_statement, 0));
-    const std::string asset_path = asset_dir + sprite_path;
-    auto texture =  fw64Texture::loadImageFile(asset_path);
+    std::string image_path = reinterpret_cast<const char *>(sqlite3_column_text(database.select_image_statement, 0));
+    const std::string asset_path = asset_dir + image_path;
+    auto texture =  fw64Image::loadImageFile(asset_path);
 
-    texture->hslices = sqlite3_column_int(database.select_texture_statement, 1);
-    texture->vslices = sqlite3_column_int(database.select_texture_statement, 2);
+    texture->hslices = sqlite3_column_int(database.select_image_statement, 1);
+    texture->vslices = sqlite3_column_int(database.select_image_statement, 2);
 
-    textures[handle] = std::unique_ptr<fw64Texture>(texture);
+    images[handle] = std::unique_ptr<fw64Image>(texture);
 
     return texture;
 }
@@ -43,20 +44,20 @@ fw64Font* fw64Assets::getFont(int handle) {
 
     std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database.select_font_statement, 0));
     const std::string texture_path = asset_dir + asset_path;
-    auto texture =  fw64Texture::loadImageFile(texture_path);
+    auto image =  fw64Image::loadImageFile(texture_path);
 
-    if (!texture)
+    if (!image)
         return nullptr;
 
     auto font = new fw64Font();
-    font->texture = texture;
+    font->texture = std::make_unique<fw64Texture>(image);
     font->size = sqlite3_column_int(database.select_font_statement, 1);
 
     int tile_width = sqlite3_column_int(database.select_font_statement, 2);
     int tile_height = sqlite3_column_int(database.select_font_statement, 3);
 
-    font->texture->hslices = font->texture->width / tile_width;
-    font->texture->vslices = font->texture->height / tile_height;
+    font->texture->image->hslices = font->texture->image->width / tile_width;
+    font->texture->image->vslices = font->texture->image->height / tile_height;
 
     int glyphCount = sqlite3_column_int(database.select_font_statement, 4);
     font->glyphs.resize(glyphCount);
@@ -153,8 +154,8 @@ fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
     return assets->getFont(index);
 }
 
-fw64Texture* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
-    return assets->getTexture(index);
+fw64Image* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
+    return assets->getImage(index);
 }
 
 fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {

@@ -1,5 +1,4 @@
-#ifndef FW64_N64_RENDERER_H
-#define FW64_N64_RENDERER_H
+#pragma once
 
 #include <nusys.h>
 
@@ -26,5 +25,3 @@ struct fw64Renderer{
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
-
-#endif

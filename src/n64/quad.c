@@ -1,4 +1,5 @@
 #include "framework64/util/quad.h"
+#include "framework64/n64/image.h"
 #include "framework64/n64/texture.h"
 #include "framework64/n64/mesh.h"
 
@@ -66,7 +67,9 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
+fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
+    fw64Texture* texture = fw64_texture_create_from_image(image);
+
     (void)engine;
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);
@@ -74,7 +77,7 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
     mesh->info.texture_count = 1;
     mesh->textures = texture;
 
-    uint32_t slice_count = texture->hslices * texture->vslices;
+    uint32_t slice_count = texture->image->info.hslices * texture->image->info.vslices;
 
     mesh->info.primitive_count = slice_count;
     mesh->primitives = malloc(mesh->info.primitive_count * sizeof(fw64Primitive));
@@ -93,8 +96,8 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
         size = 2;
     }
     else {
-        start_x = -texture->hslices / 2;
-        start_y = texture->vslices / 2;
+        start_x = -texture->image->info.hslices / 2;
+        start_y = texture->image->info.vslices / 2;
         size = 1;
     }
 
@@ -105,8 +108,8 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
 
     box_invalidate(&mesh->info.bounding_box);
     
-    for (int y = 0; y < texture->vslices; y++) {
-        for (int x = 0; x < texture->hslices; x++) {
+    for (int y = 0; y < texture->image->info.vslices; y++) {
+        for (int x = 0; x < texture->image->info.hslices; x++) {
             create_quad_slice(mesh, primitive_index, tl_x, tl_y, size, texture);
 
             fw64Primitive* primitive = mesh->primitives + primitive_index;
@@ -127,13 +130,14 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
     return mesh;
 }
 
-fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Texture* texture, float max_s, float max_t){
-    fw64Mesh* mesh = textured_quad_create(engine, texture);
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Image* image, float max_s, float max_t){
+    fw64Mesh* mesh = textured_quad_create(engine, image);
     textured_quad_set_tex_coords(mesh, 0, max_s, max_t);
 
     return mesh;
 }
 
+/*
 fw64Mesh* quad_create(int16_t size, Color* color) {
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);
@@ -170,3 +174,4 @@ fw64Mesh* quad_create(int16_t size, Color* color) {
 
     return mesh;
 }
+*/

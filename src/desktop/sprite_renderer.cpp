@@ -72,7 +72,7 @@ namespace framework64 {
 
         // set the current texture
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, current_texture->gl_handle);
+        glBindTexture(GL_TEXTURE_2D, current_texture->image->gl_handle);
         glUniform1i(uniform_sampler, 0);
 
         glBindVertexArray(gl_vertex_array_object);
@@ -96,8 +96,8 @@ namespace framework64 {
 
         auto xf = static_cast<float>(x);
         auto yf = static_cast<float>(y);
-        auto wf = static_cast<float>(texture->width);
-        auto hf = static_cast<float>(texture->height);
+        auto wf = static_cast<float>(texture->image->width);
+        auto hf = static_cast<float>(texture->image->height);
 
         SpriteVertex a = {xf, yf, 0.0f, 0.0, 1.0};
         SpriteVertex b = {xf + wf, yf, 0.0f, 1.0f, 1.0f};
@@ -116,10 +116,10 @@ namespace framework64 {
         auto hf = static_cast<float>(texture->slice_height());
 
         // calculate the texcord coordinate window
-        float tc_width = wf / texture->width;
-        float tc_height = hf / texture->height;
-        float tc_x = static_cast<float>(frame % texture->hslices) * tc_width;
-        float tc_y = 1.0f - static_cast<float>(frame / texture->hslices) * tc_height;
+        float tc_width = wf / texture->image->width;
+        float tc_height = hf / texture->image->height;
+        float tc_x = static_cast<float>(frame % texture->image->hslices) * tc_width;
+        float tc_y = 1.0f - static_cast<float>(frame / texture->image->hslices) * tc_height;
 
         SpriteVertex a = {xf, yf, 0.0f, tc_x, tc_y};
         SpriteVertex b = {xf + wf, yf, 0.0f, tc_x + tc_width, tc_y};
@@ -141,7 +141,7 @@ namespace framework64 {
 
         for (;;) {
             auto const & glyph = font->glyphs[glyph_index];
-            drawSpriteFrame(font->texture, glyph_index, x + glyph.left, y + glyph.top);
+            drawSpriteFrame(font->texture.get(), glyph_index, x + glyph.left, y + glyph.top);
             x += glyph.advance;
 
             if (text[0] == 0)

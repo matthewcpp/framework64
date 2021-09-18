@@ -20,7 +20,7 @@ typedef struct {
     Mode mode;
     const char* mode_name;
     fw64Texture* buttons;
-    fw64Texture* texture;
+    fw64Image* image;
     fw64Font* font;
 } Game;
 

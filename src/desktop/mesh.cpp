@@ -34,3 +34,12 @@ void fw64_mesh_delete(fw64Mesh* mesh) {
     mesh->freeGlResources();
     delete mesh;
 }
+
+int fw64_mesh_get_texture_count(fw64Mesh* mesh) {
+    return static_cast<int>(mesh->textures.size());
+}
+
+fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index) {
+    assert(index >= 0 && index < mesh->textures.size());
+    return mesh->textures[index].get();
+}

@@ -221,7 +221,8 @@ fw64Texture* GlbParser::parseTexture(size_t texture_index) {
     auto buffer_view_index = image_node["bufferView"].get<size_t>();
     auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
 
-    return fw64Texture::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size());
+    auto* image = fw64Image::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size());
+    return new fw64Texture(image);
 }
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {

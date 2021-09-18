@@ -9,7 +9,7 @@ bool Database::init(std::string const & database_path) {
         return false;
     }
 
-    result = sqlite3_prepare_v2(database, "SELECT path, hslices, vslices FROM sprites WHERE assetId = ?;", -1, &select_texture_statement, nullptr);
+    result = sqlite3_prepare_v2(database, "SELECT path, hslices, vslices FROM images WHERE assetId = ?;", -1, &select_image_statement, nullptr);
     if (result) {
         return false;
     }

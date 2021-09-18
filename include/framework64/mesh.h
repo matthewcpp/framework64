@@ -1,5 +1,4 @@
-#ifndef FW64_MESH_H
-#define FW64_MESH_H
+#pragma once
 
 #include "framework64/box.h"
 #include "framework64/material.h"
@@ -33,11 +32,12 @@ void fw64_mesh_delete(fw64Mesh* mesh);
 void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box);
 int fw64_mesh_get_primitive_count(fw64Mesh* mesh);
 
+int fw64_mesh_get_texture_count(fw64Mesh* mesh);
+fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index);
+
 fw64Primitive* fw64_mesh_get_primitive(fw64Mesh* mesh, int index);
 fw64Material* fw64_mesh_primitive_get_material(fw64Primitive* primitive);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

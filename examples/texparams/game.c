@@ -17,8 +17,9 @@ void game_init(Game* game, fw64Engine* engine) {
     game->mode = MODE_DEFAULT;
 
     game->font = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
-    game->buttons = fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_buttons);
-    game->texture = fw64_assets_get_image(engine->assets, FW64_ASSET_sprite_pyoro64);
+    game->buttons = fw64_texture_create_from_image(fw64_assets_get_image(engine->assets, FW64_ASSET_image_buttons));
+    game->image = fw64_assets_get_image(engine->assets, FW64_ASSET_image_pyoro64);
+    fw64_image_reference_add(game->image);
 
     entity_init(&game->quad_entity, NULL);
     set_texture_mode(game, MODE_DEFAULT);
@@ -65,35 +66,35 @@ void set_texture_mode(Game* game, Mode mode) {
 
     switch (game->mode)
     {
-    case MODE_DEFAULT:
-        game->mode_name = "Default";
-        vec2_set(&coords_max, 1.0f, 1.0f);
-        wrap_mode = FW64_TEXTURE_WRAP_CLAMP;
-        break;
+        case MODE_DEFAULT:
+            game->mode_name = "Default";
+            vec2_set(&coords_max, 1.0f, 1.0f);
+            wrap_mode = FW64_TEXTURE_WRAP_CLAMP;
+            break;
 
-    case MODE_CLAMP:
-        game->mode_name = "Clamp";
-        vec2_set(&coords_max, 2.0f, 2.0f);
-        wrap_mode = FW64_TEXTURE_WRAP_CLAMP;
+        case MODE_CLAMP:
+            game->mode_name = "Clamp";
+            vec2_set(&coords_max, 2.0f, 2.0f);
+            wrap_mode = FW64_TEXTURE_WRAP_CLAMP;
 
-        break;
+            break;
 
-    case MODE_WRAP:
-        game->mode_name = "Repeat";
-        vec2_set(&coords_max, 2.0f, 2.0f);
-        wrap_mode = FW64_TEXTURE_WRAP_REPEAT;
-        break;
+        case MODE_WRAP:
+            game->mode_name = "Repeat";
+            vec2_set(&coords_max, 2.0f, 2.0f);
+            wrap_mode = FW64_TEXTURE_WRAP_REPEAT;
+            break;
 
-    case MODE_MIRROR:
-        game->mode_name = "Mirror";
-        vec2_set(&coords_max, 2.0f, 2.0f);
-        wrap_mode = FW64_TEXTURE_WRAP_MIRROR;
-        break;
+        case MODE_MIRROR:
+            game->mode_name = "Mirror";
+            vec2_set(&coords_max, 2.0f, 2.0f);
+            wrap_mode = FW64_TEXTURE_WRAP_MIRROR;
+            break;
     }
 
     if (game->quad_entity.mesh)
         fw64_mesh_delete(game->quad_entity.mesh);
 
-    entity_init(&game->quad_entity, textured_quad_create_with_params(game->engine, game->texture, coords_max.x, coords_max.y));
-    fw64_texture_set_wrap_mode(game->texture, wrap_mode, wrap_mode);
+    entity_init(&game->quad_entity, textured_quad_create_with_params(game->engine, game->image, coords_max.x, coords_max.y));
+    fw64_texture_set_wrap_mode(fw64_mesh_get_texture(game->quad_entity.mesh, 0), wrap_mode, wrap_mode);
 }
