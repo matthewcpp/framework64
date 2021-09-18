@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/material.h"
 #include "framework64/texture.h"
 
 #include <array>

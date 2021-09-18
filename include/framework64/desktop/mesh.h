@@ -16,15 +16,15 @@ struct fw64Primitive {
     enum Attributes { Positions = 1, Normals = 2, TexCoords = 4, VertexColors = 8 };
 
     fw64Material material;
-    Mode mode;
-    uint32_t attributes;
+    Mode mode = Mode::Unknown;
+    uint32_t attributes = 0;
     Box bounding_box;
 
-    uint32_t gl_vertex_array_object;
-    uint32_t gl_array_buffer_object;
-    uint32_t gl_element_buffer_object;
-    GLsizei element_count;
-    GLenum element_type;
+    GLuint  gl_vertex_array_object = 0;
+    GLuint  gl_array_buffer_object = 0;
+    GLuint  gl_element_buffer_object = 0;
+    GLsizei element_count = 0;
+    GLenum element_type = 0;
 };
 
 struct fw64Mesh {
@@ -34,4 +34,6 @@ struct fw64Mesh {
 
     std::vector<fw64Primitive> primitives;
     std::vector<std::unique_ptr<fw64Texture>> textures;
+
+    void freeGlResources();
 };

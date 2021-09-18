@@ -127,6 +127,13 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
     return mesh;
 }
 
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Texture* texture, float max_s, float max_t){
+    fw64Mesh* mesh = textured_quad_create(engine, texture);
+    textured_quad_set_tex_coords(mesh, 0, max_s, max_t);
+
+    return mesh;
+}
+
 fw64Mesh* quad_create(int16_t size, Color* color) {
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);

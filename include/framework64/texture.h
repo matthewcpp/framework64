@@ -12,10 +12,12 @@ typedef enum {
     FW64_TEXTURE_WRAP_MIRROR = G_TX_MIRROR
 } fw64TextureWrapMode;
 #else
+#include <gl/glew.h>
+
 typedef enum {
-    FW64_TEXTURE_WRAP_CLAMP,
-    FW64_TEXTURE_WRAP_REPEAT,
-    FW64_TEXTURE_WRAP_MIRROR
+    FW64_TEXTURE_WRAP_CLAMP = GL_CLAMP_TO_EDGE,
+    FW64_TEXTURE_WRAP_REPEAT = GL_REPEAT,
+    FW64_TEXTURE_WRAP_MIRROR =  GL_MIRRORED_REPEAT
 } fw64TextureWrapMode;
 #endif
 

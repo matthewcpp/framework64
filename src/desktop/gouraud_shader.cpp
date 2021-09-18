@@ -45,6 +45,8 @@ void GouraudShader::setUniforms(fw64Material const & material) {
     if (material.texture) {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.texture->gl_handle);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, material.texture->wrap_s);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, material.texture->wrap_t);
         glUniform1i(material.shader->diffuse_texture_location, 0);
     }
 }

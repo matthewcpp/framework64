@@ -12,9 +12,7 @@ static void _entity_update_bounding_box_with_matrix(Entity* entity, float* matri
 
 void entity_init(Entity* entity, fw64Mesh* mesh) {
     fw64_transform_init(&entity->transform);
-    entity->mesh = mesh;
-
-    entity_refresh(entity);
+    entity_set_mesh(entity, mesh);
 }
 
 void entity_refresh(Entity* entity) {

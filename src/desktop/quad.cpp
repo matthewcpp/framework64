@@ -8,7 +8,7 @@
 
 #include <vector>
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Texture* texture, float max_s, float max_t) {
     auto* f64_engine = reinterpret_cast<framework64::Engine*>(engine);
     uint32_t slice_count = texture->hslices * texture->vslices;
 
@@ -40,9 +40,9 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
 
     mesh_data.tex_coords = {
         0.0f, 0.0f,
-        1.0f, 0.0f,
-        1.0f, 1.0f,
-        0.0f, 1.0f
+        max_s, 0.0f,
+        max_s, max_t,
+        0.0f, max_t
     };
 
     mesh_data.indices_array_uint16 = {
@@ -59,10 +59,6 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
     return mesh;
 }
 
-void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t) {
-
-}
-
-fw64Mesh* quad_create(int16_t size, Color* color) {
-    return nullptr;
+fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
+    return textured_quad_create_with_params(engine, texture, 1.0f, 1.0f);
 }

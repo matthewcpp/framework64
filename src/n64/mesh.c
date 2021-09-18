@@ -42,28 +42,6 @@ int fw64_n64_mesh_load(int asset_index, fw64Mesh* mesh) {
     return 1;
 }
 
-void fw64_n64_mesh_unload(fw64Mesh* mesh) {
-    if (mesh->vertex_buffer)
-        free(mesh->vertex_buffer);
-
-    if (mesh->display_list)
-        free(mesh->display_list);
-    
-    if (mesh->colors)
-        free(mesh->colors);
-
-    if (mesh->primitives)
-        free(mesh->primitives);
-
-    if (mesh->textures) {
-        for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
-            fw64_n64_texture_uninit(mesh->textures + i);
-        }
-
-        free(mesh->textures);
-    }
-}
-
 static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle) {
     fw64_filesystem_read(vertex_pointer_data, 1, mesh->info._vertex_pointer_data_size, handle);
 
@@ -127,8 +105,26 @@ void fw64_n64_mesh_init(fw64Mesh* mesh) {
     memset(mesh, 0, sizeof(fw64Mesh));
 }
 
-void fw64_mesh_uninit(fw64Mesh* mesh) {
-    fw64_n64_mesh_unload(mesh);
+void fw64_mesh_delete(fw64Mesh* mesh) {
+    if (mesh->vertex_buffer)
+        free(mesh->vertex_buffer);
+
+    if (mesh->display_list)
+        free(mesh->display_list);
+    
+    if (mesh->colors)
+        free(mesh->colors);
+
+    if (mesh->primitives)
+        free(mesh->primitives);
+
+    if (mesh->textures) {
+        for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
+            fw64_n64_texture_uninit(mesh->textures + i);
+        }
+
+        free(mesh->textures);
+    }
 }
 
 fw64Primitive* fw64_mesh_get_primitive(fw64Mesh* mesh, int index) {

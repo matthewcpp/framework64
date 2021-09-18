@@ -11,6 +11,9 @@ struct fw64Texture {
     int hslices;
     int vslices;
     uint32_t gl_handle;
+
+    fw64TextureWrapMode wrap_s = FW64_TEXTURE_WRAP_CLAMP;
+    fw64TextureWrapMode wrap_t = FW64_TEXTURE_WRAP_CLAMP;
     
     inline int slice_width() const { return width / hslices; }
     inline int slice_height() const { return height / vslices; }
