@@ -52,12 +52,12 @@ void fw64Renderer::begin(fw64Camera *camera, fw64RenderMode new_render_mode, fw6
             break;
 
         case FW64_RENDERER_MODE_TRIANGLES:
-            mesh_renderer.render_mode = fw64Mesh::Primitive::Mode::Triangles;
+            mesh_renderer.render_mode = fw64Primitive::Mode::Triangles;
             mesh_renderer.begin(camera);
             break;
 
         case FW64_RENDERER_MODE_LINES:
-            mesh_renderer.render_mode = fw64Mesh::Primitive::Mode::Lines;
+            mesh_renderer.render_mode = fw64Primitive::Mode::Lines;
             mesh_renderer.begin(camera);
             break;
 

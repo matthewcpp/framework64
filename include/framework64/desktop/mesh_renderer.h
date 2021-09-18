@@ -20,7 +20,7 @@ public:
     void drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh);
 
 public:
-    fw64Mesh::Primitive::Mode render_mode = fw64Mesh::Primitive::Mode::Unknown;
+    fw64Primitive::Mode render_mode = fw64Primitive::Mode::Unknown;
 
 private:
     void updateMeshTransformBlock(fw64Transform* transform);

@@ -26,7 +26,7 @@ private:
     bool parseBinaryChunk();
 
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
-    void parseMaterial(Material& material, size_t material_index);
+    void parseMaterial(fw64Material& material, size_t material_index);
     fw64Texture* parseTexture(size_t texture_index);
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
 

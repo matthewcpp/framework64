@@ -2,7 +2,7 @@
 
 namespace framework64 {
 
-void ShaderCache::setShaderProgram(fw64Mesh::Primitive & primitive) {
+void ShaderCache::setShaderProgram(fw64Primitive & primitive) {
     Shader* shader = getShader(primitive);
 
     if (!shader) {
@@ -26,20 +26,20 @@ void ShaderCache::setShaderProgram(fw64Mesh::Primitive & primitive) {
     primitive.material.shader = program;
 }
 
-uint64_t ShaderCache::programHash(fw64Mesh::Primitive const & primitive) const {
+uint64_t ShaderCache::programHash(fw64Primitive const & primitive) const {
     return ( static_cast<uint64_t>(primitive.attributes) << 32) | static_cast<uint64_t>(primitive.material.featureMask());
 }
 
 // TODO: This will get more involved
-Shader* ShaderCache::getShader(fw64Mesh::Primitive const & primitive) {
-    if (primitive.mode == fw64Mesh::Primitive::Mode::Triangles) {
-        if (primitive.attributes & fw64Mesh::Primitive::Attributes::VertexColors)
+Shader* ShaderCache::getShader(fw64Primitive const & primitive) {
+    if (primitive.mode == fw64Primitive::Mode::Triangles) {
+        if (primitive.attributes & fw64Primitive::Attributes::VertexColors)
             return &vertex_color_shader;
         else
             return &gouraud_shader;
 
     }
-    else if (primitive.mode == fw64Mesh::Primitive::Mode::Lines)
+    else if (primitive.mode == fw64Primitive::Mode::Lines)
         return &line_shader;
 
     return nullptr;

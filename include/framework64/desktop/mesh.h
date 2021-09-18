@@ -11,27 +11,27 @@
 #include <string>
 #include <vector>
 
+struct fw64Primitive {
+    enum Mode { Triangles = GL_TRIANGLES, Lines = GL_LINES, Unknown = 0};
+    enum Attributes { Positions = 1, Normals = 2, TexCoords = 4, VertexColors = 8 };
+
+    fw64Material material;
+    Mode mode;
+    uint32_t attributes;
+    Box bounding_box;
+
+    uint32_t gl_vertex_array_object;
+    uint32_t gl_array_buffer_object;
+    uint32_t gl_element_buffer_object;
+    GLsizei element_count;
+    GLenum element_type;
+};
+
 struct fw64Mesh {
-    struct Primitive {
-        enum Mode { Triangles = GL_TRIANGLES, Lines = GL_LINES, Unknown = 0};
-        enum Attributes { Positions = 1, Normals = 2, TexCoords = 4, VertexColors = 8 };
-
-        framework64::Material material;
-        Mode mode;
-        uint32_t attributes;
-        Box bounding_box;
-
-        uint32_t gl_vertex_array_object;
-        uint32_t gl_array_buffer_object;
-        uint32_t gl_element_buffer_object;
-        GLsizei element_count;
-        GLenum element_type;
-    };
-
     fw64Mesh();
 
     Box bounding_box;
 
-    std::vector<Primitive> primitives;
+    std::vector<fw64Primitive> primitives;
     std::vector<std::unique_ptr<fw64Texture>> textures;
 };

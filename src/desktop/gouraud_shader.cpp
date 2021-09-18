@@ -1,4 +1,5 @@
 #include "framework64/desktop/gouraud_shader.h"
+#include "framework64/desktop/texture.h"
 
 #include <memory>
 
@@ -10,7 +11,7 @@ ShaderProgram* GouraudShader::create(uint32_t primitive_attributes, uint32_t mat
 
     std::vector<std::string> preprocessor_statements;
 
-    bool has_diffuse_texture = material_features & framework64::Material::Features::DiffuseTexture;
+    bool has_diffuse_texture = material_features & fw64Material::Features::DiffuseTexture;
     if (has_diffuse_texture)
         preprocessor_statements.emplace_back("#define FW64_DIFFUSE_TEXTURE");
 
@@ -38,7 +39,7 @@ ShaderProgram* GouraudShader::create(uint32_t primitive_attributes, uint32_t mat
     return program.release();
 }
 
-void GouraudShader::setUniforms(Material const & material) {
+void GouraudShader::setUniforms(fw64Material const & material) {
     glUniform4fv(material.shader->diffuse_color_location, 1, material.color.data());
 
     if (material.texture) {

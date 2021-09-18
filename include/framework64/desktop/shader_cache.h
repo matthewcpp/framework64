@@ -16,11 +16,11 @@ public:
     ShaderCache(std::string shader_dir_path): shader_dir(shader_dir_path) {}
 
 public:
-    void setShaderProgram(fw64Mesh::Primitive & primitive);
+    void setShaderProgram(fw64Primitive & primitive);
 
 private:
-    uint64_t programHash(fw64Mesh::Primitive const & primitive) const;
-    Shader* getShader(fw64Mesh::Primitive const & primitive);
+    uint64_t programHash(fw64Primitive const & primitive) const;
+    Shader* getShader(fw64Primitive const & primitive);
 
 private:
     GouraudShader gouraud_shader;

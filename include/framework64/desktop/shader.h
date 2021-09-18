@@ -1,10 +1,11 @@
 #pragma once
 
-#include "framework64/desktop/mesh.h"
+#include "framework64/desktop/material.h"
 
 #include <gl/glew.h>
 
 #include <string>
+#include <vector>
 
 namespace framework64 {
 
@@ -12,7 +13,7 @@ class ShaderProgram;
 
 class Shader {
 public:
-    virtual void setUniforms(Material const & material) = 0;
+    virtual void setUniforms(fw64Material const & material) = 0;
     virtual ShaderProgram* create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) = 0;
 
 public:

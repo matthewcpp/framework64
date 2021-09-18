@@ -20,7 +20,7 @@ GLMeshInfo MeshData::createMesh() {
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
         buffer_offset += data_size;
-        mesh_info.attributes |= fw64Mesh::Primitive::Attributes::Positions;
+        mesh_info.attributes |= fw64Primitive::Attributes::Positions;
     }
 
     if (!normals.empty()) {
@@ -29,7 +29,7 @@ GLMeshInfo MeshData::createMesh() {
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
         buffer_offset += data_size;
-        mesh_info.attributes |= fw64Mesh::Primitive::Attributes::Normals;
+        mesh_info.attributes |= fw64Primitive::Attributes::Normals;
     }
 
     if (!tex_coords.empty()) {
@@ -38,7 +38,7 @@ GLMeshInfo MeshData::createMesh() {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
         buffer_offset += data_size;
-        mesh_info.attributes |= fw64Mesh::Primitive::Attributes::TexCoords;
+        mesh_info.attributes |= fw64Primitive::Attributes::TexCoords;
     }
 
     // note that we are assuming vertex colors are encoded as RGB floats (seems to be default blender export)
@@ -49,7 +49,7 @@ GLMeshInfo MeshData::createMesh() {
         glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, (void*)buffer_offset);
         buffer_offset += data_size;
 
-        mesh_info.attributes |= fw64Mesh::Primitive::Attributes::VertexColors;
+        mesh_info.attributes |= fw64Primitive::Attributes::VertexColors;
     }
 
     if (!indices_array_uint16.empty()) {
@@ -73,7 +73,7 @@ GLMeshInfo MeshData::createMesh() {
     return mesh_info;
 }
 
-void GLMeshInfo::setPrimitiveValues(fw64Mesh::Primitive& primitive) {
+void GLMeshInfo::setPrimitiveValues(fw64Primitive& primitive) {
     primitive.gl_array_buffer_object = gl_array_buffer_object;
     primitive.gl_vertex_array_object = gl_vertex_array_object;
     primitive.gl_element_buffer_object = gl_element_buffer_object;

@@ -4,7 +4,7 @@
 
 namespace framework64 {
 
-void VertexColorShader::setUniforms(Material const & material) {}
+void VertexColorShader::setUniforms(fw64Material const & material) {}
 
 ShaderProgram* VertexColorShader::create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) {
     std::string vertex_path = shader_dir + "unlit.vert.glsl";

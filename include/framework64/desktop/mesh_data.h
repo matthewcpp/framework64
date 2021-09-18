@@ -18,7 +18,7 @@ struct GLMeshInfo {
     GLenum element_type = 0;
     uint32_t element_count = 0;
 
-    void setPrimitiveValues(fw64Mesh::Primitive& primitive);
+    void setPrimitiveValues(fw64Primitive& primitive);
 };
 
 struct MeshData {

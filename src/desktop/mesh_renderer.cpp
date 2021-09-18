@@ -21,7 +21,7 @@ void MeshRenderer::begin(fw64Camera * cam) {
 
 void MeshRenderer::end(){
     active_shader = nullptr;
-    render_mode = fw64Mesh::Primitive::Mode::Unknown;
+    render_mode = fw64Primitive::Mode::Unknown;
 }
 
 void MeshRenderer::updateMeshTransformBlock(fw64Transform* transform) {

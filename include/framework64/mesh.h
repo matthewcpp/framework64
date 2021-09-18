@@ -19,6 +19,7 @@ typedef enum {
 typedef struct fw64Material fw64Material;
 typedef struct fw64Primitive fw64Primitive;
 typedef struct fw64Mesh fw64Mesh;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

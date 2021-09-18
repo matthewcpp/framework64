@@ -53,7 +53,7 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Texture* texture) {
     auto& primitive = mesh->primitives.emplace_back();
     auto mesh_info = mesh_data.createMesh();
     mesh_info.setPrimitiveValues(primitive);
-    primitive.mode = fw64Mesh::Primitive::Mode::Triangles;
+    primitive.mode = fw64Primitive::Mode::Triangles;
     primitive.material.texture = texture;
     f64_engine->shader_cache->setShaderProgram(primitive);
     return mesh;

@@ -73,19 +73,19 @@ Box GlbParser::getBoxFromAccessor(size_t accessor_index) const {
     return box;
 }
 
-static fw64Mesh::Primitive::Mode getPrimitiveMode(nlohmann::json const & primitive_node) {
+static fw64Primitive::Mode getPrimitiveMode(nlohmann::json const & primitive_node) {
     if (!primitive_node.contains("mode"))
-        return fw64Mesh::Primitive::Mode::Triangles;
+        return fw64Primitive::Mode::Triangles;
     
     int mode = primitive_node["mode"].get<int>();
 
     switch (mode) {
         case 1:
-            return fw64Mesh::Primitive::Mode::Lines;
+            return fw64Primitive::Mode::Lines;
         case 4:
-            return fw64Mesh::Primitive::Mode::Triangles;
+            return fw64Primitive::Mode::Triangles;
         default:
-            return fw64Mesh::Primitive::Mode::Unknown;
+            return fw64Primitive::Mode::Unknown;
     }
 }
 
@@ -147,7 +147,7 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
     for (auto const & primitive_node : mesh_node["primitives"]) {
         auto const primitive_mode = getPrimitiveMode(primitive_node);
 
-        if (primitive_mode == fw64Mesh::Primitive::Mode::Unknown)
+        if (primitive_mode == fw64Primitive::Mode::Unknown)
             continue;
 
         auto & primitive = mesh->primitives.emplace_back();
@@ -194,7 +194,7 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
     return mesh;
 }
 
-void GlbParser::parseMaterial(Material& material, size_t material_index) {
+void GlbParser::parseMaterial(fw64Material& material, size_t material_index) {
     auto const & material_node = json_doc["materials"][material_index];
     auto const & pbr = material_node["pbrMetallicRoughness"];
 
