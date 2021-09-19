@@ -1,4 +1,5 @@
 #include "framework64/engine.h"
+#include "assets.h"
 
 #include "framework64/n64/audio.h"
 #include "framework64/n64/assets.h"
@@ -61,7 +62,7 @@ int fw64_n64_engine_init(fw64Engine* system) {
     fw64_n64_assets_init(system->assets);
     fw64_n64_audio_init(system->audio);
 
-    fw64_n64_filesystem_init();
+    fw64_n64_filesystem_init(FW64_ASSET_COUNT);
 
     return 1;
 }
