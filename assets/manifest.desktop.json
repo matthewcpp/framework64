@@ -1,6 +1,6 @@
 {
     "platform": "desktop",
-    "sprites": [
+    "images": [
         {
             "src": "nintendo_seal.png",
             "hslices": 1,
