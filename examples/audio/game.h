@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "framework64/engine.h"
 #include "entity.h"
@@ -30,6 +29,4 @@ void game_draw(Game *game);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

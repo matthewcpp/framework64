@@ -1,6 +1,8 @@
 #include "game.h"
 #include "framework64/n64/engine.h"
 
+#include "assets.h"
+
 #include <nusys.h>
 
 Game game;
@@ -15,7 +17,7 @@ void nusys_game_tick(int pendingGfx) {
 }
 
 void mainproc(void) {
-    fw64_n64_engine_init(&engine);
+    fw64_n64_engine_init(&engine, FW64_ASSET_COUNT);
     game_init(&game, &engine);
     nuGfxFuncSet((NUGfxFunc)nusys_game_tick);
     nuGfxDisplayOn();

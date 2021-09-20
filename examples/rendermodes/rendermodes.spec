@@ -21,7 +21,7 @@ beginseg
 	entry 	nuBoot
 	address NU_SPEC_BOOT_ADDR
         stack   NU_SPEC_BOOT_STACK
-	include "codesegment.o"
+	include "rendermodes.o"
 	include "$(ROOT)/usr/lib/PR/rspboot.o"
 	include "/usr/lib/n64/PR/aspMain.o"
 	include "/usr/lib/n64/PR/n_aspMain.o"
@@ -36,11 +36,11 @@ endseg
 beginseg
 	name "asset_data"
 	flags RAW
-	include "../../assets/build_n64/assets.dat"
+	include "assets/assets.dat"
 endseg
 
 beginwave
-	name	"sprites"
+	name	"rendermodes"
 	include	"code"
 	include "asset_data"
 endwave

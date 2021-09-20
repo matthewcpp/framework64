@@ -1,5 +1,4 @@
-#ifndef FW64_MATRIX_H
-#define FW64_MATRIX_H
+#pragma once
 
 #include "framework64/vec2.h"
 #include "framework64/vec3.h"
@@ -31,6 +30,4 @@ void mat2_transform_vec2(const float* mat, Vec2* vec);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

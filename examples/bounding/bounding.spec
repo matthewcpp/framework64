@@ -20,27 +20,27 @@ beginseg
 	flags	BOOT OBJECT
 	entry 	nuBoot
 	address NU_SPEC_BOOT_ADDR
-        stack   NU_SPEC_BOOT_STACK
-	include "codesegment.o"
+	stack   NU_SPEC_BOOT_STACK
+	include "bounding.o"
 	include "$(ROOT)/usr/lib/PR/rspboot.o"
 	include "/usr/lib/n64/PR/aspMain.o"
 	include "/usr/lib/n64/PR/n_aspMain.o"
 	include "$(ROOT)/usr/lib/PR/gspF3DEX2.fifo.o"
 	include "$(ROOT)/usr/lib/PR/gspL3DEX2.fifo.o"
 	include "$(ROOT)/usr/lib/PR/gspF3DEX2.Rej.fifo.o"
-        include "$(ROOT)/usr/lib/PR/gspF3DEX2.NoN.fifo.o"
-        include "$(ROOT)/usr/lib/PR/gspF3DLX2.Rej.fifo.o"
+	include "$(ROOT)/usr/lib/PR/gspF3DEX2.NoN.fifo.o"
+	include "$(ROOT)/usr/lib/PR/gspF3DLX2.Rej.fifo.o"
 	include "$(ROOT)/usr/lib/PR/gspS2DEX2.fifo.o"
 endseg
 
 beginseg
 	name "asset_data"
 	flags RAW
-	include "../../assets/build_n64/assets.dat"
+	include "assets/assets.dat"
 endseg
 
 beginwave
-	name	"data"
+	name	"bounding"
 	include	"code"
 	include "asset_data"
 endwave

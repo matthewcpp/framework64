@@ -1,9 +1,16 @@
 set(src_files
-        ../common/main_desktop.cpp
-        ../common/entity.h ../common/entity.c
-        game.h game.c)
+    ../common/${platform_main_file}
+    ../common/entity.h ../common/entity.c
+    game.h game.c)
 
 add_executable(texparams ${src_files})
 
 target_link_libraries(texparams framework64)
-target_include_directories(texparams PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(texparams
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../common
+    PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets)
+
+if (FW64_PLATFORM_N64)
+    create_n64_rom(TARGET texparams)
+endif()

@@ -10,4 +10,6 @@ node_modules
 .idea
 
 /build
+/build_n64
+/build_desktop
 /cmake-build-debug

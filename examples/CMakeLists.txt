@@ -1,3 +1,9 @@
+if (FW64_PLATFORM_N64)
+    set(platform_main_file main_n64.c)
+else()
+    set(platform_main_file main_desktop.cpp)
+endif()
+
 add_subdirectory(audio)
 add_subdirectory(billboard)
 add_subdirectory(bounding)

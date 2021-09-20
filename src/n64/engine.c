@@ -1,5 +1,4 @@
 #include "framework64/engine.h"
-#include "assets.h"
 
 #include "framework64/n64/audio.h"
 #include "framework64/n64/assets.h"
@@ -44,25 +43,25 @@ static void fw64_n64_engine_update_time(fw64Engine* engine) {
     _previous_update_time = current_ms;
 }
 
-int fw64_n64_engine_init(fw64Engine* system) {
-    system->audio = &audio;
-    system->assets = &assets;
-    system->input = &input;
-    system->renderer = &renderer;
-    system->time = &time;
+int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
+    engine->audio = &audio;
+    engine->assets = &assets;
+    engine->input = &input;
+    engine->renderer = &renderer;
+    engine->time = &time;
 
     InitHeap(memory_heap, FW64_N64_HEAP_SIZE);
 
     nuGfxInit(); // starts nusys graphics
     nuAuInit(); //starts the SGI tools audio manager
 
-    fw64_n64_renderer_init(system->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
-    fw64_n64_input_init(system->input);
-    memset(system->time, 0, sizeof(fw64Time));
-    fw64_n64_assets_init(system->assets);
-    fw64_n64_audio_init(system->audio);
+    fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
+    fw64_n64_input_init(engine->input);
+    memset(engine->time, 0, sizeof(fw64Time));
+    fw64_n64_assets_init(engine->assets);
+    fw64_n64_audio_init(engine->audio);
 
-    fw64_n64_filesystem_init(FW64_ASSET_COUNT);
+    fw64_n64_filesystem_init(asset_count);
 
     return 1;
 }

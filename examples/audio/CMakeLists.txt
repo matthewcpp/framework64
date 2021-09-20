@@ -1,9 +1,16 @@
 set(src_files
-        ../common/main_desktop.cpp
-        ../common/entity.h ../common/entity.c
-        game.h game.c)
+    ../common/${platform_main_file}
+    ../common/entity.h ../common/entity.c
+    game.h game.c)
 
 add_executable(audio ${src_files})
 
 target_link_libraries(audio framework64)
-target_include_directories(audio PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../common)
+target_include_directories(audio
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../common
+    PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets)
+
+if (FW64_PLATFORM_N64)
+    create_n64_rom(TARGET audio)
+endif()
