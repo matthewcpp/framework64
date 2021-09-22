@@ -1,6 +1,6 @@
-set(CMAKE_C_COMPILER mips64-elf-gcc)
-set(CMAKE_LINKER mips64-elf-ld)
-set(CMAKE_C_LINK_EXECUTABLE "mips64-elf-ld --no-check-sections -o <TARGET>.o -r <OBJECTS>  /usr/lib/n64/nusys/nusys.o <LINK_LIBRARIES>")
+set(CMAKE_C_COMPILER mips-n64-gcc)
+set(CMAKE_LINKER mips-n64-ld)
+set(CMAKE_C_LINK_EXECUTABLE "mips-n64-ld --no-check-sections -o <TARGET>.o -r <OBJECTS>  /usr/lib/n64/nusys/nusys.o <LINK_LIBRARIES>")
 
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR mips64)
@@ -22,9 +22,9 @@ link_directories(
 link_libraries (
 	-lnualsgi_n 
 	-ln_audio 
-	-lnusys_d 
-	-lultra_d
-	/usr/local/n64chain/lib/gcc/mips64-elf/10.2.0/libgcc.a
+	-lnusys
+	-lultra_rom
+	/opt/crashsdk/lib/gcc/mips64-elf/11.2.0/libgcc.a
 	-lnustd
 )
 
@@ -54,7 +54,7 @@ function(create_n64_rom)
 	# build the rom with spicy
 	add_custom_command(TARGET ${target_name} POST_BUILD
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-	    COMMAND spicy ${specfile_dest} -I/usr/include/n64/nusys -r ${target_name}.n64 -s 10 -e ${target_name}.out
+	    COMMAND spicy ${specfile_dest} -I/usr/include/n64/nusys -r ${target_name}.n64 -s 10 -e ${target_name}.out --cpp_command mips-n64-gcc --as_command mips-n64-as --ld_command mips-n64-ld --objcopy_command mips-n64-objcopy
 	)
 
 	# mask the rom
