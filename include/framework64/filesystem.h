@@ -1,5 +1,4 @@
-#ifndef FW64_FILESYSTEM_H
-#define FW64_FILESYSTEM_H
+#pragma once
 
 #include <stdint.h>
 
@@ -25,6 +24,4 @@ int fw64_filesystem_get_open_handle_count();
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

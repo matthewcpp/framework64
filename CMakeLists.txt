@@ -1,13 +1,21 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(framework64)
-
-set(CMAKE_CXX_STANDARD 17)
+if (FW64_PLATFORM_N64)
+    message("Configuring for Platform: Nintendo64")
+    set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMake/framework64.modernsdk.cmake)
+    project(framework64 C)
+else()
+    message("Configuring for Platform: Desktop")
+    project(framework64)
+    set(CMAKE_CXX_STANDARD 17)
+    set(FW64_PLATFORM_DESKTOP ON)
+endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(src)
 add_subdirectory(examples)
-add_subdirectory(tests)
+if (FW64_PLATFORM_DESKTOP)
+    add_subdirectory(tests)
+endif()
