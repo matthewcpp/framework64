@@ -42,31 +42,3 @@ static void* fw64_find_asset(fw64AssetDatabase* assets, uint32_t index) {
 
     return NULL;
 }
-
-fw64SoundBank* fw64_assets_get_sound_bank(fw64AssetDatabase* assets, uint32_t index) {
-    fw64SoundBank* sound_bank = fw64_find_asset(assets, index);
-
-    if (sound_bank) 
-        return sound_bank;
-
-    sound_bank = fw64_n64_sound_bank_load(index);
-
-    if (sound_bank)
-        fw64_insert_asset(assets, sound_bank, index);
-
-    return sound_bank;
-}
-
-fw64MusicBank* fw64_assets_get_music_bank(fw64AssetDatabase* assets, uint32_t index) {
-    fw64MusicBank* music_bank = fw64_find_asset(assets, index);
-
-    if (music_bank)
-        return music_bank;
-
-    music_bank = fw64_n64_music_bank_load(index);
-
-    if (music_bank)
-        fw64_insert_asset(assets, music_bank, index);
-
-    return music_bank;
-}

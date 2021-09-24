@@ -16,9 +16,6 @@ public:
     fw64AssetDatabase(std::string const & dir, framework64::Database& db, framework64::ShaderCache& sc)
         : asset_dir(dir), database(db), shader_cache(sc) {}
 
-    fw64SoundBank* getSoundBank(int handle);
-    fw64MusicBank* getMusicBank(int handle);
-
     std::string asset_dir;
     framework64::ShaderCache& shader_cache;
     framework64::Database& database;
