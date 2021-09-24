@@ -40,7 +40,7 @@ set(common_source_files
 
 if (FW64_PLATFORM_N64)
     set(platform_source_files
-            ../include/framework64/n64/asset_database.h n64/assets.c
+            ../include/framework64/n64/asset_database.h
             ../include/framework64/n64/audio.h n64/audio.c
             ../include/framework64/n64/audio_bank.h n64/audio_bank.c
             ../include/framework64/n64/controller_button.h
@@ -59,7 +59,6 @@ else()
             ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
         ../include/framework64/desktop/audio.h desktop/audio.cpp
         ../include/framework64/desktop/audio_bank.h desktop/audio_bank.cpp
-        ../include/framework64/desktop/database.h desktop/database.cpp
         ../include/framework64/desktop/engine.h desktop/engine.cpp
         ../include/framework64/desktop/filesystem.h desktop/filesystem.cpp
         ../include/framework64/desktop/font.h desktop/font.cpp

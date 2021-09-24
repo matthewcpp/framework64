@@ -5,18 +5,18 @@
 #include <SDL2/SDL_image.h>
 
 fw64Image* fw64Image::loadFromDatabase(fw64AssetDatabase* database, uint32_t index) {
-    sqlite3_reset(database->database.select_image_statement);
-    sqlite3_bind_int(database->database.select_image_statement, 1, index);
+    sqlite3_reset(database->select_image_statement);
+    sqlite3_bind_int(database->select_image_statement, 1, index);
 
-    if(sqlite3_step(database->database.select_image_statement) != SQLITE_ROW)
+    if(sqlite3_step(database->select_image_statement) != SQLITE_ROW)
         return nullptr;
 
-    std::string image_path = reinterpret_cast<const char *>(sqlite3_column_text(database->database.select_image_statement, 0));
+    std::string image_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_image_statement, 0));
     const std::string asset_path = database->asset_dir + image_path;
     auto image = fw64Image::loadImageFile(asset_path);
 
-    image->hslices = sqlite3_column_int(database->database.select_image_statement, 1);
-    image->vslices = sqlite3_column_int(database->database.select_image_statement, 2);
+    image->hslices = sqlite3_column_int(database->select_image_statement, 1);
+    image->vslices = sqlite3_column_int(database->select_image_statement, 2);
 
     return image;
 }

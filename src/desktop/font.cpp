@@ -6,13 +6,13 @@
 #include <cmath>
 
 fw64Font* fw64Font::loadFromDatabase(fw64AssetDatabase* database, uint32_t index) {
-    sqlite3_reset(database->database.select_font_statement);
-    sqlite3_bind_int(database->database.select_font_statement, 1, index);
+    sqlite3_reset(database->select_font_statement);
+    sqlite3_bind_int(database->select_font_statement, 1, index);
 
-    if(sqlite3_step(database->database.select_font_statement) != SQLITE_ROW)
+    if(sqlite3_step(database->select_font_statement) != SQLITE_ROW)
         return nullptr;
 
-    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->database.select_font_statement, 0));
+    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_font_statement, 0));
     const std::string texture_path = database->asset_dir + asset_path;
     auto image =  fw64Image::loadImageFile(texture_path);
 
@@ -21,17 +21,17 @@ fw64Font* fw64Font::loadFromDatabase(fw64AssetDatabase* database, uint32_t index
 
     auto font = new fw64Font();
     font->texture = std::make_unique<fw64Texture>(image);
-    font->size = sqlite3_column_int(database->database.select_font_statement, 1);
+    font->size = sqlite3_column_int(database->select_font_statement, 1);
 
-    int tile_width = sqlite3_column_int(database->database.select_font_statement, 2);
-    int tile_height = sqlite3_column_int(database->database.select_font_statement, 3);
+    int tile_width = sqlite3_column_int(database->select_font_statement, 2);
+    int tile_height = sqlite3_column_int(database->select_font_statement, 3);
 
     font->texture->image->hslices = font->texture->image->width / tile_width;
     font->texture->image->vslices = font->texture->image->height / tile_height;
 
-    int glyphCount = sqlite3_column_int(database->database.select_font_statement, 4);
+    int glyphCount = sqlite3_column_int(database->select_font_statement, 4);
     font->glyphs.resize(glyphCount);
-    memcpy(font->glyphs.data(), sqlite3_column_blob(database->database.select_font_statement, 5), glyphCount * sizeof(fw64FontGlyph));
+    memcpy(font->glyphs.data(), sqlite3_column_blob(database->select_font_statement, 5), glyphCount * sizeof(fw64FontGlyph));
 
     return font;
 }

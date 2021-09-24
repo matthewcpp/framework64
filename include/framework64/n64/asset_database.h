@@ -1,27 +1,6 @@
 #pragma once
 
-#include "framework64/audio_bank.h"
-#include "framework64/font.h"
-#include "framework64/mesh.h"
-#include "framework64/texture.h"
-
-typedef union {
-    void* any;
-    fw64Font* font;
-    fw64Texture* image;
-    fw64Mesh* mesh;
-    fw64SoundBank* fw64SoundBank;
-} fw64AssetPtr;
-
-typedef struct {
-    fw64AssetPtr ptr;
-    uint32_t index;
-} fw64Asset;
-
 struct fw64AssetDatabase{
-    fw64Asset* _assets;
-    uint32_t _asset_count;
-    uint32_t _asset_capacity;
+    int unused;
 };
 
-void fw64_n64_assets_init(fw64AssetDatabase* assets);

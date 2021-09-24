@@ -10,13 +10,13 @@ fw64Mesh::fw64Mesh() {
 }
 
 fw64Mesh* fw64Mesh::loadFromDatabase(fw64AssetDatabase* database, uint32_t index) {
-    sqlite3_reset(database->database.select_mesh_statement);
-    sqlite3_bind_int(database->database.select_mesh_statement, 1, index);
+    sqlite3_reset(database->select_mesh_statement);
+    sqlite3_bind_int(database->select_mesh_statement, 1, index);
 
-    if(sqlite3_step(database->database.select_mesh_statement) != SQLITE_ROW)
+    if(sqlite3_step(database->select_mesh_statement) != SQLITE_ROW)
         return nullptr;
 
-    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->database.select_mesh_statement, 0));
+    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_mesh_statement, 0));
     const std::string mesh_path = database->asset_dir + asset_path;
 
     framework64::GlbParser glb(database->shader_cache);

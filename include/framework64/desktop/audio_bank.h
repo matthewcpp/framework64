@@ -8,19 +8,17 @@
 #include <vector>
 
 struct fw64SoundBank {
-    bool load(std::string base_path, uint32_t count);
+    fw64SoundBank(std::string path, uint32_t count) : base_path(path), sound_count(count) {}
+    static fw64SoundBank* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 
     uint32_t sound_count;
     std::string base_path;
-
-    static fw64SoundBank* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 };
 
 struct fw64MusicBank {
-    bool load(std::string path, uint32_t count);
+    fw64MusicBank(std::string path, uint32_t count) : base_path(path), track_count(count) {}
+    static fw64MusicBank* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 
     uint32_t track_count = 0;
     std::string base_path;
-
-    static fw64MusicBank* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 };
