@@ -1,6 +1,25 @@
 #include "framework64/desktop/image.h"
 
+#include "framework64/desktop/asset_database.h"
+
 #include <SDL2/SDL_image.h>
+
+fw64Image* fw64Image::loadFromDatabase(fw64AssetDatabase* database, uint32_t index) {
+    sqlite3_reset(database->database.select_image_statement);
+    sqlite3_bind_int(database->database.select_image_statement, 1, index);
+
+    if(sqlite3_step(database->database.select_image_statement) != SQLITE_ROW)
+        return nullptr;
+
+    std::string image_path = reinterpret_cast<const char *>(sqlite3_column_text(database->database.select_image_statement, 0));
+    const std::string asset_path = database->asset_dir + image_path;
+    auto image = fw64Image::loadImageFile(asset_path);
+
+    image->hslices = sqlite3_column_int(database->database.select_image_statement, 1);
+    image->vslices = sqlite3_column_int(database->database.select_image_statement, 2);
+
+    return image;
+}
 
 static fw64Image* createTextureFromSurface(SDL_Surface* surface) {
     auto* texture = new fw64Image();
@@ -70,4 +89,9 @@ void fw64_image_reference_remove(fw64Image* image) {
         delete(image);
     }
 
+}
+
+// C API
+fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t index) {
+    return fw64Image::loadFromDatabase(asset_database, index);
 }

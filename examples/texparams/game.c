@@ -16,9 +16,9 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderer_set_clear_color(engine->renderer, 39, 58, 93);
     game->mode = MODE_DEFAULT;
 
-    game->font = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
-    game->buttons = fw64_texture_create_from_image(fw64_assets_get_image(engine->assets, FW64_ASSET_image_buttons));
-    game->image = fw64_assets_get_image(engine->assets, FW64_ASSET_image_pyoro64);
+    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
+    game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons));
+    game->image = fw64_image_load(engine->assets, FW64_ASSET_image_pyoro64);
     fw64_image_reference_add(game->image);
 
     entity_init(&game->quad_entity, NULL);

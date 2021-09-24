@@ -43,47 +43,6 @@ static void* fw64_find_asset(fw64AssetDatabase* assets, uint32_t index) {
     return NULL;
 }
 
-fw64Mesh* fw64_assets_get_mesh(fw64AssetDatabase* assets, uint32_t index) {
-    fw64Mesh* mesh = fw64_find_asset(assets, index);
-
-    if (!mesh) {
-        mesh = malloc(sizeof(fw64Mesh));
-
-        if (fw64_n64_mesh_load(index, mesh)) {
-            fw64_insert_asset(assets, mesh, index);
-        }
-        else {
-            free(mesh);
-            mesh = NULL;
-        }
-    }
-
-    return mesh;
-}
-
-fw64Font* fw64_assets_get_font(fw64AssetDatabase* assets, uint32_t index) {
-    fw64Font* font = fw64_find_asset(assets, index);
-
-    if (!font) {
-        font = malloc(sizeof(fw64Font));
-
-        if (fw64_font_load(index, font)) {
-            fw64_insert_asset(assets, font, index);
-        }
-        else{
-            free(font);
-            font = NULL;
-        }
-    }
-
-    return font;
-}
-
-fw64Image* fw64_assets_get_image(fw64AssetDatabase* assets, uint32_t index) {
-    (void)assets;
-    return fw64_n64_image_load(index);
-}
-
 fw64SoundBank* fw64_assets_get_sound_bank(fw64AssetDatabase* assets, uint32_t index) {
     fw64SoundBank* sound_bank = fw64_find_asset(assets, index);
 

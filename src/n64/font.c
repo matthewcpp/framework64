@@ -1,4 +1,3 @@
-#include "framework64/font.h"
 #include "framework64/n64/font.h"
 
 #include "framework64/filesystem.h"
@@ -8,6 +7,34 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
+
+fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index) {
+    (void)database;
+    int handle = fw64_filesystem_open(index);
+
+    if (handle == FW64_FILESYSTEM_INVALID_HANDLE)
+        return 0;
+
+    fw64Font* font = malloc(sizeof(fw64Font));
+
+    fw64_filesystem_read(font, sizeof(uint16_t), 4, handle);
+
+    uint32_t spritefont_data_size = (font->spritefont_tile_width * font->spritefont_tile_height * 2) * font->glyph_count;
+    uint32_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
+
+    uint8_t* payload = memalign(8, spritefont_data_size + glyph_data_size);
+    fw64_filesystem_read(payload, 1, spritefont_data_size + glyph_data_size, handle);
+    fw64_filesystem_close(handle);
+    
+    font->spritefont = payload;
+    font->glyphs = (fw64FontGlyph*)(payload + spritefont_data_size);
+
+    return font;
+}
+
+void fw64_font_unload(fw64Font* font) {
+    free(font->spritefont); // note: font and glyph data were allocated in same call
+}
 
 uint16_t find_font_glyph_rec(fw64FontGlyph* glyphs, int min_index, int max_index, uint16_t codepoint) {
     uint32_t center_index = min_index + (max_index - min_index) / 2;
@@ -51,29 +78,4 @@ IVec2 fw64_font_measure_text(fw64Font* font, const char* str) {
     } while (str[0] != '\0');
 
     return measurement;
-}
-
-int fw64_font_load(int index, fw64Font* font) {
-    int handle = fw64_filesystem_open(index);
-
-    if (handle == FW64_FILESYSTEM_INVALID_HANDLE)
-        return 0;
-
-    fw64_filesystem_read(font, sizeof(uint16_t), 4, handle);
-
-    uint32_t spritefont_data_size = (font->spritefont_tile_width * font->spritefont_tile_height * 2) * font->glyph_count;
-    uint32_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
-
-    uint8_t* payload = memalign(8, spritefont_data_size + glyph_data_size);
-    fw64_filesystem_read(payload, 1, spritefont_data_size + glyph_data_size, handle);
-    fw64_filesystem_close(handle);
-    
-    font->spritefont = payload;
-    font->glyphs = (fw64FontGlyph*)(payload + spritefont_data_size);
-
-    return 1;
-}
-
-void fw64_font_unload(fw64Font* font) {
-    free(font->spritefont); // note: font and glyph data were allocated in same call
 }

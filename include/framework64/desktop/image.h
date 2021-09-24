@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/asset_database.h"
 #include "framework64/image.h"
 
 #include <gl/glew.h>
@@ -15,6 +16,8 @@ struct fw64Image {
     GLuint gl_handle = 0;
 
     void freeGlResources();
+
+    static fw64Image* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 
     /** Load image file into OpenGL */
     static fw64Image* loadImageFile(std::string const& path);

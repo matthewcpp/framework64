@@ -56,7 +56,7 @@ if (FW64_PLATFORM_N64)
         )
 else()
     set(platform_source_files
-            ../include/framework64/desktop/asset_database.h desktop/assets.cpp
+            ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
         ../include/framework64/desktop/audio.h desktop/audio.cpp
         ../include/framework64/desktop/audio_bank.h desktop/audio_bank.cpp
         ../include/framework64/desktop/database.h desktop/database.cpp

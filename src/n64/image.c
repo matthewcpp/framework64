@@ -6,7 +6,9 @@
 #include <malloc.h>
 #include <stddef.h>
 
-fw64Image* fw64_n64_image_load(int assetIndex) {
+fw64Image* fw64_image_load(fw64AssetDatabase* database, uint32_t assetIndex) {
+    (void)database;
+    
     int handle = fw64_filesystem_open(assetIndex);
     if (handle < 0)
         return NULL;
