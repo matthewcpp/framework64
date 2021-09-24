@@ -1,12 +1,12 @@
-#include "framework64/assets.h"
+#include "framework64/asset_database.h"
 
-#include "framework64/desktop/assets.h"
+#include "framework64/desktop/asset_database.h"
 #include "framework64/desktop/audio_bank.h"
 #include "framework64/desktop/font.h"
 #include "framework64/desktop/image.h"
 #include "framework64/desktop/glb_parser.h"
 
-fw64Image* fw64Assets::getImage(int handle) {
+fw64Image* fw64AssetDatabase::getImage(int handle) {
     auto existing_texture = images.find(handle);
 
     if (existing_texture != images.end())
@@ -30,7 +30,7 @@ fw64Image* fw64Assets::getImage(int handle) {
     return texture;
 }
 
-fw64Font* fw64Assets::getFont(int handle) {
+fw64Font* fw64AssetDatabase::getFont(int handle) {
     auto existing_font = fonts.find(handle);
 
     if (existing_font != fonts.end())
@@ -68,7 +68,7 @@ fw64Font* fw64Assets::getFont(int handle) {
     return font;
 }
 
-fw64Mesh* fw64Assets::getMesh(int handle) {
+fw64Mesh* fw64AssetDatabase::getMesh(int handle) {
     auto const result = meshes.find(handle);
 
     if (result != meshes.end())
@@ -94,7 +94,7 @@ fw64Mesh* fw64Assets::getMesh(int handle) {
     return mesh;
 }
 
-fw64SoundBank* fw64Assets::getSoundBank(int handle) {
+fw64SoundBank* fw64AssetDatabase::getSoundBank(int handle) {
     auto result = sound_banks.find(handle);
 
     if (result != sound_banks.end())
@@ -119,7 +119,7 @@ fw64SoundBank* fw64Assets::getSoundBank(int handle) {
     return sound_banks[handle].get();
 }
 
-fw64MusicBank* fw64Assets::getMusicBank(int handle) {
+fw64MusicBank* fw64AssetDatabase::getMusicBank(int handle) {
     auto result = music_banks.find(handle);
 
     if (result != music_banks.end())
@@ -146,22 +146,22 @@ fw64MusicBank* fw64Assets::getMusicBank(int handle) {
 
 // C Interface
 
-fw64Mesh* fw64_assets_get_mesh(fw64Assets* assets, uint32_t index) {
+fw64Mesh* fw64_assets_get_mesh(fw64AssetDatabase* assets, uint32_t index) {
     return assets->getMesh(index);
 }
 
-fw64Font* fw64_assets_get_font(fw64Assets* assets, uint32_t index) {
+fw64Font* fw64_assets_get_font(fw64AssetDatabase* assets, uint32_t index) {
     return assets->getFont(index);
 }
 
-fw64Image* fw64_assets_get_image(fw64Assets* assets, uint32_t index) {
+fw64Image* fw64_assets_get_image(fw64AssetDatabase* assets, uint32_t index) {
     return assets->getImage(index);
 }
 
-fw64SoundBank* fw64_assets_get_sound_bank(fw64Assets* assets, uint32_t index) {
+fw64SoundBank* fw64_assets_get_sound_bank(fw64AssetDatabase* assets, uint32_t index) {
     return assets->getSoundBank(index);
 }
 
-fw64MusicBank* fw64_assets_get_music_bank(fw64Assets* assets, uint32_t index) {
+fw64MusicBank* fw64_assets_get_music_bank(fw64AssetDatabase* assets, uint32_t index) {
     return assets->getMusicBank(index);
 }

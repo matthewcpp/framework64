@@ -1,7 +1,7 @@
 #include "game.h"
 #include "assets.h"
 
-#include "framework64/assets.h"
+#include "framework64/asset_database.h"
 #include "framework64/matrix.h"
 #include "framework64/n64/controller_button.h"
 

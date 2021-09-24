@@ -1,6 +1,6 @@
 #include "framework64/desktop/engine.h"
 
-#include "framework64/desktop/assets.h"
+#include "framework64/desktop/asset_database.h"
 #include "framework64/desktop/audio.h"
 #include "framework64/desktop/filesystem.h"
 #include "framework64/desktop/input.h"
@@ -44,7 +44,7 @@ bool Engine::init(int screen_width, int screen_height) {
     Filesystem::init(asset_dir_path, *database);
 
     renderer = new fw64Renderer();
-    assets = new fw64Assets(asset_dir_path, *database, *shader_cache);
+    assets = new fw64AssetDatabase(asset_dir_path, *database, *shader_cache);
     audio = new fw64Audio();
     input = new fw64Input();
 

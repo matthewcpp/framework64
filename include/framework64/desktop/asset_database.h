@@ -1,6 +1,6 @@
 #pragma once
 
-#include "framework64/assets.h"
+#include "framework64/asset_database.h"
 #include "framework64/desktop/database.h"
 #include "framework64/desktop/shader_cache.h"
 
@@ -8,9 +8,9 @@
 #include <unordered_map>
 #include <memory>
 
-class fw64Assets {
+class fw64AssetDatabase {
 public:
-    fw64Assets(std::string const & dir, framework64::Database& db, framework64::ShaderCache& sc)
+    fw64AssetDatabase(std::string const & dir, framework64::Database& db, framework64::ShaderCache& sc)
         : asset_dir(dir), database(db), shader_cache(sc) {}
 
     fw64Image* getImage(int handle);

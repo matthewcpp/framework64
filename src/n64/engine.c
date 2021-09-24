@@ -1,7 +1,7 @@
 #include "framework64/engine.h"
 
 #include "framework64/n64/audio.h"
-#include "framework64/n64/assets.h"
+#include "framework64/n64/asset_database.h"
 #include "framework64/n64/input.h"
 #include "framework64/n64/renderer.h"
 
@@ -25,7 +25,7 @@
 char memory_heap[FW64_N64_HEAP_SIZE];
 
 fw64Audio audio;
-fw64Assets assets;
+fw64AssetDatabase assets;
 fw64Input input;
 fw64Renderer renderer;
 fw64Time time;

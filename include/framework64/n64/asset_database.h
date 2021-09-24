@@ -1,5 +1,4 @@
-#ifndef FW64_N64_ASSETS_H
-#define FW64_N64_ASSETS_H
+#pragma once
 
 #include "framework64/audio_bank.h"
 #include "framework64/font.h"
@@ -19,12 +18,10 @@ typedef struct {
     uint32_t index;
 } fw64Asset;
 
-struct fw64Assets{
+struct fw64AssetDatabase{
     fw64Asset* _assets;
     uint32_t _asset_count;
     uint32_t _asset_capacity;
 };
 
-void fw64_n64_assets_init(fw64Assets* assets);
-
-#endif
+void fw64_n64_assets_init(fw64AssetDatabase* assets);
