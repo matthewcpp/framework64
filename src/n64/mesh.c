@@ -11,10 +11,14 @@ static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data,
 static void fixup_material_texture_pointers(fw64Mesh* mesh);
 static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle);
 
-int fw64_n64_mesh_load(int asset_index, fw64Mesh* mesh) {
+fw64Mesh* fw64_mesh_load(fw64AssetDatabase* database, uint32_t asset_index) {
+    (void)database;
+
     int handle = fw64_filesystem_open(asset_index);
     if (handle < 0)
         return 0;
+
+    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
 
     fw64_filesystem_read(&mesh->info, sizeof(fw64MeshInfo), 1, handle);
 
@@ -41,7 +45,7 @@ int fw64_n64_mesh_load(int asset_index, fw64Mesh* mesh) {
 
     fw64_filesystem_close(handle);
 
-    return 1;
+    return mesh;
 }
 
 static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle) {
@@ -76,7 +80,7 @@ static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle
     mesh->textures = malloc(sizeof(fw64Texture) * mesh->info.texture_count);
 
     for (uint32_t i = 0; i < mesh->info.texture_count; i++) {
-        fw64Image* image = fw64_n64_image_load(asset_index_data[i]);
+        fw64Image* image = fw64_image_load(NULL, asset_index_data[i]);
         fw64_n64_texture_init_with_image(mesh->textures + i, image);
     }
 }

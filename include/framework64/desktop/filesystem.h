@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/filesystem.h"
-#include "framework64/desktop/database.h"
+#include "framework64/desktop/asset_database.h"
 
 #include <array>
 #include <fstream>
@@ -12,7 +12,7 @@ namespace framework64 {
 
 class Filesystem {
 public:
-    Filesystem(std::string const & path, framework64::Database& db) : base_path(path), database(db){}
+    Filesystem(std::string const & path, fw64AssetDatabase& db) : base_path(path), database(db){}
 
     int open(int asset_index);
     int close(int file_handle);
@@ -21,7 +21,7 @@ public:
     int openHandleCount();
 
 public:
-    static void init(std::string const & path, framework64::Database& database);
+    static void init(std::string const & path, fw64AssetDatabase& db);
     static inline Filesystem* get() { return instance.get(); }
 
 private:
@@ -29,7 +29,7 @@ private:
 
 private:
     std::string base_path;
-    Database& database;
+    fw64AssetDatabase& database;
     std::array<std::ifstream, FW64_FILESYSTEM_MAX_OPEN_FILES> file_handles;
     std::array<int, FW64_FILESYSTEM_MAX_OPEN_FILES> file_sizes;
 

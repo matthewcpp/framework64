@@ -9,7 +9,8 @@ typedef struct {
     uint32_t ctrl_file_size;
 } fw64SoundbankHeader;
 
-fw64SoundBank* fw64_n64_sound_bank_load(uint32_t asset_id) {
+fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t asset_id) {
+    (void)assets;
     int handle = fw64_filesystem_open(asset_id);
 
     if (handle < 0)
@@ -39,7 +40,9 @@ typedef struct {
     uint32_t sequence_bank_size; // this is currently unused
 } fw64MusicHeader;
 
-fw64MusicBank* fw64_n64_music_bank_load(uint32_t asset_id) {
+fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t asset_id) {
+    (void)assets;
+
     // load the music bank header which contains sequence info and also the asset ID of the sound bank
     int handle = fw64_filesystem_open(asset_id);
 

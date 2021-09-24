@@ -1,7 +1,7 @@
 #include "framework64/engine.h"
 
 #include "framework64/n64/audio.h"
-#include "framework64/n64/assets.h"
+#include "framework64/n64/asset_database.h"
 #include "framework64/n64/input.h"
 #include "framework64/n64/renderer.h"
 
@@ -25,7 +25,7 @@
 char memory_heap[FW64_N64_HEAP_SIZE];
 
 fw64Audio audio;
-fw64Assets assets;
+fw64AssetDatabase assets;
 fw64Input input;
 fw64Renderer renderer;
 fw64Time time;
@@ -58,7 +58,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_n64_input_init(engine->input);
     memset(engine->time, 0, sizeof(fw64Time));
-    fw64_n64_assets_init(engine->assets);
+    memset(engine->assets, 0, sizeof(fw64AssetDatabase));
     fw64_n64_audio_init(engine->audio);
 
     fw64_n64_filesystem_init(asset_count);

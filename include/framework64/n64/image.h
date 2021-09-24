@@ -15,5 +15,4 @@ struct fw64Image {
     uint8_t* data;
 };
 
-fw64Image* fw64_n64_image_load(int assetIndex);
 void fw64_n64_image_delete(fw64Image* image);

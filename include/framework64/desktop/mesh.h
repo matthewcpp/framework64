@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/asset_database.h"
 #include "framework64/mesh.h"
 #include "framework64/desktop/material.h"
 #include "framework64/desktop/texture.h"
@@ -34,6 +35,8 @@ struct fw64Mesh {
 
     std::vector<fw64Primitive> primitives;
     std::vector<std::unique_ptr<fw64Texture>> textures;
+
+    static fw64Mesh* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 
     void freeGlResources();
 };

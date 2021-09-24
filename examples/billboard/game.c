@@ -12,16 +12,16 @@ void game_init(Game* game, fw64Engine* engine) {
     fps_camera_init(&game->fps, engine->input);
     vec3_set(&game->fps.camera.transform.position, 0.0f, 4.0f, 20.0f);
 
-    fw64Mesh* nintendo_seal_mesh = textured_quad_create(game->engine, fw64_assets_get_image(engine->assets, FW64_ASSET_image_nintendo_seal));
+    fw64Mesh* nintendo_seal_mesh = textured_quad_create(game->engine, fw64_image_load(engine->assets, FW64_ASSET_image_nintendo_seal));
     entity_init(&game->nintendo_seal, nintendo_seal_mesh);
     vec3_set(&game->nintendo_seal.transform.position, -3.0f, 5.0f, 0.0f);
 
-    fw64Mesh* n64_logo_mesh = textured_quad_create(game->engine, fw64_assets_get_image(engine->assets, FW64_ASSET_image_n64_logo));
+    fw64Mesh* n64_logo_mesh = textured_quad_create(game->engine, fw64_image_load(engine->assets, FW64_ASSET_image_n64_logo));
     entity_init(&game->n64_logo, n64_logo_mesh);
     vec3_set(&game->n64_logo.transform.position, 3.0f, 5.0f, 0.0f);
 
 
-    entity_init(&game->blue_cube, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube));
+    entity_init(&game->blue_cube, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube));
 }
 
 void game_update(Game* game){

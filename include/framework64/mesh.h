@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/asset_database.h"
 #include "framework64/box.h"
 #include "framework64/material.h"
 #include "framework64/texture.h"
@@ -23,6 +24,12 @@ typedef struct fw64Mesh fw64Mesh;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+Loads a mesh and all dependant assets from the asset bundle.
+@param asset_index the mesh asset index.  Refer to the generated assets.h file.
+*/
+fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index);
 
 /**
 Cleans up a mesh that was manually constructed after calling \ref mesh_init

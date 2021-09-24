@@ -7,7 +7,7 @@ namespace framework64 {
 
 std::unique_ptr<Filesystem> Filesystem::instance;
 
-void Filesystem::init(std::string const & path, framework64::Database& database) {
+void Filesystem::init(std::string const & path, fw64AssetDatabase& database) {
     instance = std::make_unique<Filesystem>(path, database);
 }
 

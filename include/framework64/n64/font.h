@@ -1,5 +1,6 @@
-#ifndef FW64_N64_FONT_H
-#define FW64_N64_FONT_H
+#pragma once
+
+#include "framework64/font.h"
 
 typedef struct {
     uint16_t codepoint;
@@ -20,7 +21,4 @@ struct fw64Font {
 
 uint16_t fw64_font_get_glyph_index(fw64Font* font, uint16_t codepoint);
 
-int fw64_font_load(int index, fw64Font* font);
 void fw64_font_unload(fw64Font* font);
-
-#endif

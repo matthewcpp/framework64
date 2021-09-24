@@ -1,5 +1,4 @@
-#ifndef FW64_N64_MESH_H
-#define FW64_N64_MESH_H
+#pragma once
 
 #include "framework64/mesh.h"
 
@@ -49,14 +48,6 @@ struct fw64Mesh {
 void fw64_n64_mesh_init(fw64Mesh* mesh);
 
 /**
-Loads a mesh and all dependant assets from the asset bundle.
-@param asset_index the mesh asset index.  Refer to the generated assets.h file.
-*/
-int fw64_n64_mesh_load(int asset_index, fw64Mesh* mesh);
-
-/**
 Unloads a mesh that was loaded with \ref mesh_load
 */
 void fw64_n64_mesh_unload(fw64Mesh* mesh);
-
-#endif

@@ -1,8 +1,6 @@
-#include "framework64/desktop/database.h"
+#include "framework64/desktop/asset_database.h"
 
-namespace framework64 {
-
-bool Database::init(std::string const & database_path) {
+bool fw64AssetDatabase::init(std::string const & database_path) {
     int result = sqlite3_open_v2(database_path.c_str(), &database, SQLITE_OPEN_READONLY, nullptr);
 
     if (result) {
@@ -40,6 +38,4 @@ bool Database::init(std::string const & database_path) {
     }
 
     return true;
-}
-
 }

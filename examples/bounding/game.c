@@ -1,7 +1,7 @@
 #include "game.h"
 #include "assets.h"
 
-#include "framework64/assets.h"
+#include "framework64/asset_database.h"
 #include "framework64/matrix.h"
 #include "framework64/n64/controller_button.h"
 
@@ -22,9 +22,9 @@ float stick_adjust[4];
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     
-    entity_init(&game->penguin, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_penguin));
-    entity_init(&game->penguin_box, fw64_assets_get_mesh(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
-    game->font = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
+    entity_init(&game->penguin, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin));
+    entity_init(&game->penguin_box, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
+    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
     game->intersection = CUBE_NONE;
 
     vec3_set(&game->penguin.transform.scale, 0.5, 0.5, 0.5);
@@ -122,7 +122,7 @@ Vec3 cube_positions[CUBE_COUNT] = {
 
 void init_cubes(Game* game) {
     
-    fw64Mesh* cube_mesh = fw64_assets_get_mesh(game->engine->assets, FW64_ASSET_mesh_blue_cube);
+    fw64Mesh* cube_mesh = fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_blue_cube);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
         Entity* cube = &game->cubes[i];

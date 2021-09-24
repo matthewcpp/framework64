@@ -1,11 +1,9 @@
 #include "game.h"
 #include "assets.h"
 
-#include "framework64/filesystem.h"
 #include "framework64/util/quad.h"
 #include "framework64/n64/controller_button.h"
 
-#include <math.h>
 #include <stdio.h>
 
 #define SOUND_BANK_COUNT 2
@@ -31,12 +29,12 @@ void game_init(Game* game, fw64Engine* engine) {
     game->music_bank = -1;
     change_music_bank(game, 1);
 
-    game->font = fw64_assets_get_font(engine->assets, FW64_ASSET_font_Consolas12);
-    game->buttons = fw64_texture_create_from_image(fw64_assets_get_image(engine->assets, FW64_ASSET_image_buttons));
+    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
+    game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons));
 
     game->sound_id = 0;
 
-    fw64Mesh* mesh = textured_quad_create(game->engine, fw64_assets_get_image(engine->assets, FW64_ASSET_image_n64_logo));
+    fw64Mesh* mesh = textured_quad_create(game->engine, fw64_image_load(engine->assets, FW64_ASSET_image_n64_logo));
     entity_init(&game->n64_logo, mesh);
 
     game->rotation = 0.0f;
@@ -158,7 +156,7 @@ void change_sound_bank(Game* game, int delta) {
     if (game->sound_bank >= SOUND_BANK_COUNT)
         game->sound_bank = SOUND_BANK_COUNT - 1;
 
-    fw64_audio_set_sound_bank(game->engine->audio, fw64_assets_get_sound_bank(game->engine->assets, sound_banks[game->sound_bank]));
+    fw64_audio_set_sound_bank(game->engine->audio, fw64_sound_bank_load(game->engine->assets, sound_banks[game->sound_bank]));
 
     game->sound_num = 0;
 }
@@ -183,7 +181,7 @@ void change_music_bank(Game* game, int delta) {
     if (game->music_bank >= MUSIC_BANK_COUNT) 
         game->music_bank = MUSIC_BANK_COUNT - 1;
 
-    fw64_audio_set_music_bank(game->engine->audio,  fw64_assets_get_music_bank(game->engine->assets, music_banks[game->music_bank]));
+    fw64_audio_set_music_bank(game->engine->audio,  fw64_music_bank_load(game->engine->assets, music_banks[game->music_bank]));
 
     game->music_track = 0;
 }
