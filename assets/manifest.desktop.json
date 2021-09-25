@@ -104,5 +104,12 @@
     ],
     "raw": [
         "sample.txt"
+    ],
+    "terrains": [
+        {
+            "src": "fogworld/fogworld.gltf",
+            "dimensionX": 32,
+            "dimensionZ": 32
+        }
     ]
 }

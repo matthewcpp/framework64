@@ -47,6 +47,7 @@ void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* textur
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
+fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);
 
 #ifdef __cplusplus
 }

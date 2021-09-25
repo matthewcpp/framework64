@@ -36,6 +36,7 @@ set(common_source_files
         ../include/framework64/util/arcball_camera.h util/arcball_camera.c
         ../include/framework64/util/fps_camera.h util/fps_camera.c
         ../include/framework64/util/quad.h
+        ../include/framework64/util/terrain.h util/terrain.c
         )
 
 if (FW64_PLATFORM_N64)
@@ -78,6 +79,7 @@ else()
         ../include/framework64/desktop/shader.h desktop/shader.cpp
         ../include/framework64/desktop/shader_cache.h desktop/shader_cache.cpp
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
+        desktop/terrain.cpp
         ../include/framework64/desktop/texture.h desktop/texture.cpp
         ../include/framework64/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp
         ../include/framework64/n64/controller_button.h

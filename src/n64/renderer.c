@@ -196,6 +196,10 @@ void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {
     *screen_size = renderer->screen_size;
 }
 
+fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {
+    return renderer->camera;
+}
+
 void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color) {
     renderer->fill_color = GPACK_RGBA5551(color->r, color->g, color->b, 255);
 

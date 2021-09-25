@@ -9,6 +9,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
+#include <iostream>
+
 namespace framework64 {
 bool Engine::init(int screen_width, int screen_height) {
     const std::string base_path = SDL_GetBasePath();
@@ -21,16 +23,21 @@ bool Engine::init(int screen_width, int screen_height) {
     int result = IMG_Init(IMG_INIT_PNG);
 
     if ((result & IMG_INIT_PNG) != IMG_INIT_PNG) {
+        std::cout << "Failed to initialize SDL_Image" << std::endl;
         return false;
     }
 
     result = Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024);
-    if (result)
+    if (result) {
+        std::cout << "Failed to initialize audio output" << std::endl;
         return false;
+    }
+
 
     result = Mix_Init(MIX_INIT_OGG);
 
     if ((result & MIX_INIT_OGG) != MIX_INIT_OGG) {
+        std::cout << "SDL_Mixer: Failed to initialize OGG Library" << std::endl;
         return false;
     }
 
@@ -45,11 +52,15 @@ bool Engine::init(int screen_width, int screen_height) {
     time = new fw64Time();
     memset(time, 0, sizeof(fw64Time));
 
-    if (!assets->init(database_path))
+    if (!assets->init(database_path)) {
+        std::cout << "Failed to initialize Asset Database" << std::endl;
         return false;
+    }
 
-    if (!renderer->init(screen_width, screen_height, shader_dir_path))
+    if (!renderer->init(screen_width, screen_height, shader_dir_path)) {
+        std::cout << "Failed to initialize renderer" << std::endl;
         return false;
+    }
 
     input->init(*n64_input_interface);
 

@@ -5,8 +5,6 @@
 
 #include "assets.h"
 
-#include <malloc.h>
-
 static void set_texture_mode(Game* game, Mode mode);
 
 void game_init(Game* game, fw64Engine* engine) {

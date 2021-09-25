@@ -38,7 +38,9 @@ void fw64Renderer::setClearColor(float r, float g, float b, float a) {
     glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
 }
 
-void fw64Renderer::begin(fw64Camera *camera, fw64RenderMode new_render_mode, fw64RendererFlags flags) {
+void fw64Renderer::begin(fw64Camera* cam, fw64RenderMode new_render_mode, fw64RendererFlags flags) {
+    camera = cam;
+
     if ((flags & FW64_RENDERER_FLAG_CLEAR) == FW64_RENDERER_FLAG_CLEAR) {
         glViewport(0,0, screen_width, screen_height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -84,6 +86,8 @@ void fw64Renderer::end(fw64RendererFlags flags) {
     if ((flags & FW64_RENDERER_FLAG_SWAP) == FW64_RENDERER_FLAG_SWAP){
         SDL_GL_SwapWindow(window);
     }
+
+    camera = nullptr;
 }
 
 void fw64Renderer::setScreenSize(int width, int height) {
@@ -142,4 +146,8 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {
     screen_size->x = renderer->screen_width;
     screen_size->y = renderer->screen_height;
+}
+
+fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {
+    return renderer->camera;
 }

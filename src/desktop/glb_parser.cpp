@@ -3,6 +3,7 @@
 #include "framework64/desktop/mesh_data.h"
 #include "framework64/matrix.h"
 
+#include <cassert>
 #include <limits>
 
 namespace framework64 {
@@ -19,15 +20,41 @@ enum GltfComponentType {
 
 // note this function assumes scene 0 is the "active scene"
 fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
-    glb_file.open(path, std::ios::binary);
-
-    if (!glb_file)
-        return nullptr;
-
-    if (!parseHeader() || !parseJsonChunk() || !parseBinaryChunk() )
+    if (!openFile(path))
         return nullptr;
 
     return createStaticMesh(json_doc["meshes"][0]);
+}
+
+std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {
+    std::vector<fw64Mesh*> meshes;
+
+    if (!openFile(path))
+        return meshes;
+
+    for (auto const & mesh : json_doc["meshes"] ) {
+        meshes.push_back(createStaticMesh(mesh));
+    }
+
+    return meshes;
+}
+
+bool GlbParser::openFile(std::string const& path) {
+    loaded_textures.clear();
+
+    glb_file.open(path, std::ios::binary);
+
+    if (!glb_file)
+        return false;
+
+    if (!parseHeader() || !parseJsonChunk() || !parseBinaryChunk() )
+        return false;
+
+    if (json_doc.contains("textures")) {
+        loaded_textures.resize(json_doc["textures"].size(), nullptr);
+    }
+
+    return true;
 }
 
 bool GlbParser::parseHeader() {
@@ -208,11 +235,23 @@ void GlbParser::parseMaterial(fw64Material& material, size_t material_index) {
 
     if (pbr.contains("baseColorTexture")) {
         auto texture_index = pbr["baseColorTexture"]["index"].get<size_t>();
-        material.texture = parseTexture(texture_index);
+        material.texture = getTexture(texture_index);
     }
 }
 
+fw64Texture* GlbParser::getTexture(size_t texture_index) {
+    if (loaded_textures[texture_index])
+        return loaded_textures[texture_index];
+
+    auto* texture = parseTexture(texture_index);
+    loaded_textures[texture_index] = texture;
+
+    return texture;
+}
+
 fw64Texture* GlbParser::parseTexture(size_t texture_index) {
+    assert(loaded_textures[texture_index] == nullptr);
+
     auto source_index = json_doc["textures"][texture_index]["source"].get<size_t>();
     auto image_node = json_doc["images"][source_index];
 
