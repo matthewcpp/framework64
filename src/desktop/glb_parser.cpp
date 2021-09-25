@@ -249,6 +249,7 @@ fw64Texture* GlbParser::getTexture(size_t texture_index) {
     return texture;
 }
 
+//TODO: read sampler parameters and apply to texture object
 fw64Texture* GlbParser::parseTexture(size_t texture_index) {
     assert(loaded_textures[texture_index] == nullptr);
 
@@ -261,7 +262,13 @@ fw64Texture* GlbParser::parseTexture(size_t texture_index) {
     auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
 
     auto* image = fw64Image::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size());
-    return new fw64Texture(image);
+    auto* texture =  new fw64Texture(image);
+
+    // Note: default wrap mode for GLTF is repeat
+    texture->wrap_t = FW64_TEXTURE_WRAP_REPEAT;
+    texture->wrap_s = FW64_TEXTURE_WRAP_REPEAT;
+
+    return texture;
 }
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {
