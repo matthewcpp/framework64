@@ -41,8 +41,8 @@ struct fw64Mesh {
     fw64Primitive* primitives;
     fw64Texture* textures;
     Lights1* colors;
-    Vtx* vertex_buffer;
-    Gfx* display_list;
+    Vtx* vertex_buffer;  //contains ALL the vertices for this mesh
+    Gfx* display_list;  //contains ALL the display lists for this mesh
 };
 
 void fw64_n64_mesh_init(fw64Mesh* mesh);

@@ -1,4 +1,4 @@
-const N64Model = require("./N64Model")
+const N64Mesh = require("./N64Mesh")
 const N64Primitive = require("./N64Primitive")
 const N64Material = require("./N64Material")
 const N64Image = require("./N64Image");
@@ -28,7 +28,7 @@ class GLTFLoader {
         this.loadedBuffers = new Map();
         this.gltfPath = null;
         this.gltf = null;
-        this.model = null;
+        this.mesh = null;
     }
 
     /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
@@ -41,14 +41,14 @@ class GLTFLoader {
         }
 
         const modelName = path.basename(gltfPath, ".gltf");
-        this.model = new N64Model(modelName);
+        this.mesh = new N64Mesh(modelName);
 
         this._readMaterials();
         await this._readImages();
 
         this._loadMesh(this.gltf.meshes[0]);
 
-        return this.model;
+        return this.mesh;
     }
 
     _loadMesh(gltfMesh) {
@@ -64,7 +64,7 @@ class GLTFLoader {
             }
 
             const primitive = new N64Primitive(mode);
-            this.model.primitives.push(primitive);
+            this.mesh.primitives.push(primitive);
 
             this._readPositions(gltfPrimitive, primitive);
 
@@ -252,7 +252,7 @@ class GLTFLoader {
             console.log("No image specified.  Ignoring texture coordinates.")
             return;
         }
-        const image = this.model.images[material.pbrMetallicRoughness.baseColorTexture.index];
+        const image = this.mesh.images[material.pbrMetallicRoughness.baseColorTexture.index];
 
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
 
@@ -279,7 +279,7 @@ class GLTFLoader {
     _readMaterials() {
         // if the file does not specify any materials use the default.
         if (!this.gltf.hasOwnProperty("materials") || this.gltf.materials.length === 0) {
-            this.model.materials.push(new N64Material());
+            this.mesh.materials.push(new N64Material());
             return;
         }
 
@@ -299,7 +299,7 @@ class GLTFLoader {
                 material.texture = pbr.baseColorTexture.index;
             }
 
-            this.model.materials.push(material)
+            this.mesh.materials.push(material)
         }
     }
 
@@ -322,7 +322,7 @@ class GLTFLoader {
                 console.log(`Resize image: ${gltfImage.uri} to ${dimensions[0]}x${dimensions[1]}`);
             }
 
-            this.model.images.push(image);
+            this.mesh.images.push(image);
         }
     }
 

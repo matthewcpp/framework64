@@ -1,6 +1,6 @@
 const Bounding = require("./Bounding");
 
-class N64Model {
+class N64Mesh {
     constructor(name) {
         this.name = name;
         this.primitives = [];
@@ -27,4 +27,4 @@ class N64Model {
     }
 }
 
-module.exports = N64Model;
+module.exports = N64Mesh;

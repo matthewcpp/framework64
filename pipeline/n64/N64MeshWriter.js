@@ -3,6 +3,7 @@ const N64Material = require("./N64Material");
 const N64Primitive = require("./N64Primitive");
 const N64ImageWriter = require("./N64ImageWriter");
 const N64SpriteWriter = require("./N64SpriteWriter");
+const N64Slicer = require("./N64Slicer");
 const DisplayList = require("./DisplayList");
 const Bounding = require("./Bounding");
 
@@ -191,8 +192,8 @@ const ShadingMode  = {
     GouraudTextured: 4
 }
 
-function getShadingMode(primitive, model){
-    const material = model.materials[primitive.material];
+function getShadingMode(primitive, mesh){
+    const material = mesh.materials[primitive.material];
 
     if (primitive.hasNormals) {
         return material.texture !== N64Material.NoTexture ? ShadingMode.GouraudTextured: ShadingMode.Gouraud;
@@ -201,15 +202,15 @@ function getShadingMode(primitive, model){
         return ShadingMode.UnlitVertexColors;
     }
 
-    throw new Error(`Could not determine shading mode for mesh in model: ${model.name}`);
+    throw new Error(`Could not determine shading mode for primitive in mesh: ${mesh.name}`);
 }
 
 // TODO: Add support for sliced sprites?
-function prepareTextures(model, outputDir, archive) {
-    const textureAssetIndicesBuffer = Buffer.alloc(model.images.length * 4);
+function prepareTextures(mesh, outputDir, archive) {
+    const textureAssetIndicesBuffer = Buffer.alloc(mesh.images.length * 4);
     let bufferIndex = 0;
 
-    for (const image of model.images) {
+    for (const image of mesh.images) {
         const texturePath = path.join(outputDir, `${image.name}.sprite`);
         let entry = archive.entries.get(texturePath);
 
@@ -225,25 +226,25 @@ function prepareTextures(model, outputDir, archive) {
     return textureAssetIndicesBuffer;
 }
 
-function writeStaticMesh(model, outputDir, archive) {
-    const modelPath = path.join(outputDir, `${model.name}.model`);
-    archive.add(modelPath, "mesh");
+function writeStaticMesh(mesh, outputDir, archive) {
+    const destPath = path.join(outputDir, `${mesh.name}.mesh`);
+    archive.add(destPath, "mesh");
 
     const meshInfo = new MeshInfo();
-    meshInfo.primitiveCount = model.primitives.length;
-    meshInfo.colorCount = model.materials.length;
-    meshInfo.textureCount = model.images.length;
-    meshInfo.vertexPointerDataSize = model.primitives.length * 4;
-    meshInfo.bounding = model.bounding;
+    meshInfo.primitiveCount = mesh.primitives.length;
+    meshInfo.colorCount = mesh.materials.length;
+    meshInfo.textureCount = mesh.images.length;
+    meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
+    meshInfo.bounding = mesh.bounding;
 
     const primitiveInfos = [];
     const vertexBuffers = [];
     const displayListBuffers = [];
     const vertexPointerBuffers = []
-    const vertexPointerCountBuffer = Buffer.alloc(model.primitives.length * 4); // holds number of vertex pointer indices per primitive
+    const vertexPointerCountBuffer = Buffer.alloc(mesh.primitives.length * 4); // holds number of vertex pointer indices per primitive
 
-    for (let i = 0; i <  model.primitives.length; i++) {
-        const primitive = model.primitives[i];
+    for (let i = 0; i <  mesh.primitives.length; i++) {
+        const primitive = mesh.primitives[i];
 
         const primitiveInfo = new PrimitiveInfo();
         primitiveInfo.bounding = primitive.bounding;
@@ -257,16 +258,16 @@ function writeStaticMesh(model, outputDir, archive) {
             primitiveInfo.materialTextureFrame = 0;
         }
         else {
-            primitiveInfo.materialMode = getShadingMode(primitive, model);
+            primitiveInfo.materialMode = getShadingMode(primitive, mesh);
             primitiveInfo.materialColor = primitive.material;
-            primitiveInfo.materialTexture = model.materials[primitive.material].texture;
+            primitiveInfo.materialTexture = mesh.materials[primitive.material].texture;
             primitiveInfo.materialTextureFrame = 0;
         }
 
         primitiveInfos.push(primitiveInfo);
 
         // slice the vertices into chunks that can fit into N64 vertex cache
-        const slices = primitive.slice();
+        const slices = N64Slicer.slice(primitive);
 
         // generate the display list for rendering the primitive geometry
         const vertexBuffer = createVertexBuffer(slices, primitive.hasNormals);
@@ -284,7 +285,7 @@ function writeStaticMesh(model, outputDir, archive) {
         vertexPointerBuffers.push(vertexPointers);
     }
 
-    const file = fs.openSync(modelPath, "w");
+    const file = fs.openSync(destPath, "w");
     fs.writeSync(file, meshInfo.buffer);
 
     for (const buffer of vertexBuffers)
@@ -293,7 +294,7 @@ function writeStaticMesh(model, outputDir, archive) {
     for (const buffer of displayListBuffers)
         fs.writeSync(file, buffer);
 
-    for (const material of model.materials) {
+    for (const material of mesh.materials) {
         fs.writeSync(file, material.colorBuffer);
     }
 
@@ -305,8 +306,8 @@ function writeStaticMesh(model, outputDir, archive) {
     for (const buffer of vertexPointerBuffers)
         fs.writeSync(file, buffer);
 
-    if (model.images.length > 0) {
-        const textureAssetIndices = prepareTextures(model, outputDir, archive);
+    if (mesh.images.length > 0) {
+        const textureAssetIndices = prepareTextures(mesh, outputDir, archive);
         fs.writeSync(file, textureAssetIndices);
     }
 
