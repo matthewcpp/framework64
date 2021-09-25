@@ -31,9 +31,14 @@ class GLTFLoader {
         this.model = null;
     }
 
-    async load(gltfPath) {
+    /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
+    async loadStaticMesh(gltfPath) {
         this.gltfPath = gltfPath;
         this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
+
+        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
+            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
+        }
 
         const modelName = path.basename(gltfPath, ".gltf");
         this.model = new N64Model(modelName);
@@ -41,20 +46,12 @@ class GLTFLoader {
         this._readMaterials();
         await this._readImages();
 
-        const scene = this.gltf.scenes[this.gltf.scene];
+        this._loadStaticMesh(this.gltf.meshes[0]);
 
-        for (const nodeIndex of scene.nodes) {
-            const gltfNode = this.gltf.nodes[nodeIndex];
-
-            if (!gltfNode.hasOwnProperty("mesh"))
-                continue;
-
-            this._processNode(gltfNode);
-        }
+        return this.model;
     }
 
-    _processNode(gltfNode) {
-        const gltfMesh = this.gltf.meshes[gltfNode.mesh];
+    _loadStaticMesh(gltfMesh) {
         const supportedPrimitiveModes = new Set(Object.values(N64Mesh.ElementType));
 
         for (const gltfPrimitive of gltfMesh.primitives) {
@@ -99,8 +96,6 @@ class GLTFLoader {
             const bufferDir = path.dirname(this.gltfPath);
             const bufferPath = path.join(bufferDir, gltfBuffer.uri);
 
-            console.log(`Load Buffer: ${bufferPath}`);
-            
             buffer = fs.readFileSync(bufferPath);
             this.loadedBuffers.set(bufferIndex, buffer);
         }

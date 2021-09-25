@@ -10,6 +10,7 @@
 static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle);
 static void fixup_material_texture_pointers(fw64Mesh* mesh);
 static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle);
+static uint32_t compute_scratch_data_buffer_size(fw64Mesh* mesh);
 
 fw64Mesh* fw64_mesh_load(fw64AssetDatabase* database, uint32_t asset_index) {
     (void)database;
@@ -34,7 +35,7 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* database, uint32_t asset_index) {
     mesh->primitives = malloc(sizeof(fw64Primitive) * mesh->info.primitive_count);
     fw64_filesystem_read(mesh->primitives, sizeof(fw64Primitive), mesh->info.primitive_count, handle);
 
-    uint32_t scratch_data_size = mesh->info._vertex_pointer_data_size > mesh->info.texture_count * sizeof(uint32_t) ? mesh->info._vertex_pointer_data_size : mesh->info.texture_count * sizeof(uint32_t);
+    uint32_t scratch_data_size = compute_scratch_data_buffer_size(mesh);
     uint32_t* scratch_data = malloc(scratch_data_size);
 
     fixup_vertex_pointers(mesh, scratch_data, handle);
@@ -46,6 +47,13 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* database, uint32_t asset_index) {
     fw64_filesystem_close(handle);
 
     return mesh;
+}
+
+/** Calculates the amount of scratch data that will need to be allocated in order to contain all the variable length mesh data needed to load the file. */
+static uint32_t compute_scratch_data_buffer_size(fw64Mesh* mesh) {
+    uint32_t texture_scratch_data_size = mesh->info.texture_count * sizeof(uint32_t);
+    
+    return mesh->info._vertex_pointer_data_size > texture_scratch_data_size ? mesh->info._vertex_pointer_data_size : texture_scratch_data_size;
 }
 
 static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle) {

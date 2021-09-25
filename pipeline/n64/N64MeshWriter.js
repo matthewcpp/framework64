@@ -225,7 +225,7 @@ function prepareTextures(model, outputDir, archive) {
     return textureAssetIndicesBuffer;
 }
 
-function write(model, outputDir, archive) {
+function writeStaticMesh(model, outputDir, archive) {
     const modelPath = path.join(outputDir, `${model.name}.model`);
     archive.add(modelPath, "mesh");
 
@@ -314,5 +314,5 @@ function write(model, outputDir, archive) {
 }
 
 module.exports = {
-    write: write
+    writeStaticMesh: writeStaticMesh
 };

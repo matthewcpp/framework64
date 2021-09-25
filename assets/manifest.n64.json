@@ -52,7 +52,7 @@
             "resize": "72x36"
         }
     ],
-    "models": [
+    "meshes": [
         {
             "src": "blue_cube/blue_cube.gltf"
         },
