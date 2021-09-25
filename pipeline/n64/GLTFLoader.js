@@ -1,5 +1,5 @@
 const N64Model = require("./N64Model")
-const N64Mesh = require("./N64Mesh")
+const N64Primitive = require("./N64Primitive")
 const N64Material = require("./N64Material")
 const N64Image = require("./N64Image");
 
@@ -46,44 +46,44 @@ class GLTFLoader {
         this._readMaterials();
         await this._readImages();
 
-        this._loadStaticMesh(this.gltf.meshes[0]);
+        this._loadMesh(this.gltf.meshes[0]);
 
         return this.model;
     }
 
-    _loadStaticMesh(gltfMesh) {
-        const supportedPrimitiveModes = new Set(Object.values(N64Mesh.ElementType));
+    _loadMesh(gltfMesh) {
+        const supportedPrimitiveModes = new Set(Object.values(N64Primitive.ElementType));
 
         for (const gltfPrimitive of gltfMesh.primitives) {
             // only support triangles for now
-            const mode = gltfPrimitive.hasOwnProperty("mode") ? gltfPrimitive.mode : N64Mesh.ElementType.Triangles;
+            const mode = gltfPrimitive.hasOwnProperty("mode") ? gltfPrimitive.mode : N64Primitive.ElementType.Triangles;
 
             if (!supportedPrimitiveModes.has(mode)) {
                 console.log(`Skipping primitive with mode: ${mode}`);
                 continue;
             }
 
-            const n64Mesh = new N64Mesh(mode);
-            this.model.meshes.push(n64Mesh);
+            const primitive = new N64Primitive(mode);
+            this.model.primitives.push(primitive);
 
-            this._readPositions(gltfPrimitive, n64Mesh);
+            this._readPositions(gltfPrimitive, primitive);
 
             if (gltfPrimitive.attributes.COLOR_0) {
-                this._readVertexColors(gltfPrimitive, n64Mesh);
+                this._readVertexColors(gltfPrimitive, primitive);
             }
             else if (gltfPrimitive.attributes.NORMAL) {
-                this._readNormals(gltfPrimitive, n64Mesh);
+                this._readNormals(gltfPrimitive, primitive);
             }
 
             if (gltfPrimitive.attributes.TEXCOORD_0)
-                this._readTexCoords(gltfPrimitive, n64Mesh);
+                this._readTexCoords(gltfPrimitive, primitive);
 
             if (gltfPrimitive.hasOwnProperty("material"))
-                n64Mesh.material = gltfPrimitive.material;
+                primitive.material = gltfPrimitive.material;
             else
-                n64Mesh.material = 0; //use default
+                primitive.material = 0; //use default
 
-            this._readIndices(gltfPrimitive, n64Mesh);
+            this._readIndices(gltfPrimitive, primitive);
         }
     }
 
@@ -103,7 +103,7 @@ class GLTFLoader {
         return buffer;
     }
 
-    _readPositions(gltfPrimitive, n64Mesh) {
+    _readPositions(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.POSITION];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -127,8 +127,8 @@ class GLTFLoader {
                 0, 0, 0, 0 /* color or normal */
             ];
 
-            n64Mesh.vertices.push(vertex);
-            n64Mesh.bounding.encapsulatePoint(position);
+            primitive.vertices.push(vertex);
+            primitive.bounding.encapsulatePoint(position);
             offset += byteStride;
         }
     }
@@ -181,7 +181,7 @@ class GLTFLoader {
         return componentSize * componentCount;
     }
 
-    _readVertexColors(gltfPrimitive, n64Mesh) {
+    _readVertexColors(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.COLOR_0];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -211,14 +211,14 @@ class GLTFLoader {
         }
 
         for (let i = 0; i < accessor.count; i++) {
-            parseVertexColor(n64Mesh.vertices[i], buffer, offset);
+            parseVertexColor(primitive.vertices[i], buffer, offset);
             offset += byteStride;
         }
 
-        n64Mesh.hasVertexColors = true;
+        primitive.hasVertexColors = true;
     }
 
-    _readNormals(gltfPrimitive, n64Mesh) {
+    _readNormals(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.NORMAL];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -227,7 +227,7 @@ class GLTFLoader {
 
         let offset = bufferView.byteOffset;
         for (let i = 0; i < accessor.count; i++) {
-            const vertex = n64Mesh.vertices[i];
+            const vertex = primitive.vertices[i];
 
             // the normals are treated as 8-bit signed values (-128 to 127).
             vertex[6] = Math.min(Math.round(buffer.readFloatLE(offset) * 128), 127);
@@ -238,10 +238,10 @@ class GLTFLoader {
             offset += byteStride;
         }
 
-        n64Mesh.hasNormals = true;
+        primitive.hasNormals = true;
     }
 
-    _readTexCoords(gltfPrimitive, n64Mesh) {
+    _readTexCoords(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.TEXCOORD_0];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -258,11 +258,12 @@ class GLTFLoader {
 
         let offset = bufferView.byteOffset;
         for (let i = 0; i < accessor.count; i++) {
-            const vertex = n64Mesh.vertices[i];
+            const vertex = primitive.vertices[i];
 
             let s = buffer.readFloatLE(offset);
             let t = buffer.readFloatLE(offset + 4);
 
+            // TODO: this needs to be fixed, its not correct
             // clamp tex coords to (0, 1)
             s = Math.min(Math.max(s, 0.0), 1.0) * image.width * 2;
             t = Math.min(Math.max(t, 0.0), 1.0) * image.height * 2;
@@ -351,14 +352,14 @@ class GLTFLoader {
         mesh.elements.push(element);
     }
 
-    _readIndices(gltfPrimitive, n64Mesh) {
+    _readIndices(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.indices];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
-        const elementSize = n64Mesh.elementType === N64Mesh.ElementType.Triangles ? 3 : 2;
+        const elementSize = primitive.elementType === N64Primitive.ElementType.Triangles ? 3 : 2;
 
-        GLTFLoader._readElementList(buffer, bufferView.byteOffset, accessor.count, elementSize, accessor.componentType, n64Mesh);
+        GLTFLoader._readElementList(buffer, bufferView.byteOffset, accessor.count, elementSize, accessor.componentType, primitive);
     }
 
 }

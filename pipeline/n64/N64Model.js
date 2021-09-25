@@ -3,7 +3,7 @@ const Bounding = require("./Bounding");
 class N64Model {
     constructor(name) {
         this.name = name;
-        this.meshes = [];
+        this.primitives = [];
         this.materials = [];
         this.images = [];
     }
@@ -11,7 +11,7 @@ class N64Model {
     get bounding() {
         const bounding = new Bounding();
 
-        for (const mesh of this.meshes) {
+        for (const mesh of this.primitives) {
             bounding.encapsulateBox(mesh.bounding);
         }
 
@@ -19,7 +19,7 @@ class N64Model {
     }
 
     get hasNormals() {
-        for (const mesh of this.meshes) {
+        for (const mesh of this.primitives) {
             if (mesh.hasNormals)
                 return true;
         }

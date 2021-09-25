@@ -1,6 +1,6 @@
 const N64Image = require("./N64Image");
 const N64Material = require("./N64Material");
-const N64Mesh = require("./N64Mesh");
+const N64Primitive = require("./N64Primitive");
 const N64ImageWriter = require("./N64ImageWriter");
 const N64SpriteWriter = require("./N64SpriteWriter");
 const DisplayList = require("./DisplayList");
@@ -230,29 +230,29 @@ function writeStaticMesh(model, outputDir, archive) {
     archive.add(modelPath, "mesh");
 
     const meshInfo = new MeshInfo();
-    meshInfo.primitiveCount = model.meshes.length;
+    meshInfo.primitiveCount = model.primitives.length;
     meshInfo.colorCount = model.materials.length;
     meshInfo.textureCount = model.images.length;
-    meshInfo.vertexPointerDataSize = model.meshes.length * 4;
+    meshInfo.vertexPointerDataSize = model.primitives.length * 4;
     meshInfo.bounding = model.bounding;
 
     const primitiveInfos = [];
     const vertexBuffers = [];
     const displayListBuffers = [];
     const vertexPointerBuffers = []
-    const vertexPointerCountBuffer = Buffer.alloc(model.meshes.length * 4); // holds number of vertex pointer indices per primitive
+    const vertexPointerCountBuffer = Buffer.alloc(model.primitives.length * 4); // holds number of vertex pointer indices per primitive
 
-    for (let i = 0; i <  model.meshes.length; i++) {
-        const primitive = model.meshes[i];
+    for (let i = 0; i <  model.primitives.length; i++) {
+        const primitive = model.primitives[i];
 
         const primitiveInfo = new PrimitiveInfo();
         primitiveInfo.bounding = primitive.bounding;
         primitiveInfo.vertices = meshInfo.vertexCount;
         primitiveInfo.displayList = meshInfo.displayListCount;
 
-        if (primitive.elementType === N64Mesh.ElementType.Lines) {
+        if (primitive.elementType === N64Primitive.ElementType.Lines) {
             primitiveInfo.materialMode = ShadingMode.UnlitVertexColors;
-            primitiveInfo.materialColor = N64Mesh.NoMaterial;
+            primitiveInfo.materialColor = N64Primitive.NoMaterial;
             primitiveInfo.materialTexture = N64Material.NoTexture;
             primitiveInfo.materialTextureFrame = 0;
         }
@@ -270,7 +270,7 @@ function writeStaticMesh(model, outputDir, archive) {
 
         // generate the display list for rendering the primitive geometry
         const vertexBuffer = createVertexBuffer(slices, primitive.hasNormals);
-        const {displayList, vertexPointers} = primitive.elementType === N64Mesh.ElementType.Triangles ?
+        const {displayList, vertexPointers} = primitive.elementType === N64Primitive.ElementType.Triangles ?
             createTriangleDisplayListBuffer(slices) : createLineDisplayListBuffer(slices);
 
         // update the mesh info totals

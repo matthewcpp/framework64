@@ -36,7 +36,7 @@ class MeshSlice {
     }
 }
 
-class N64Mesh {
+class N64Primitive {
     static ElementType = {
         Lines: 1,
         Triangles: 4
@@ -117,4 +117,4 @@ class N64Mesh {
     }
 }
 
-module.exports = N64Mesh;
+module.exports = N64Primitive;
