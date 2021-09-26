@@ -116,18 +116,6 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
     renderer->mesh_renderer.drawStaticMesh(transform, mesh);
 }
 
-void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color) {
-
-}
-
-void fw64_renderer_set_fill_mode(fw64Renderer* renderer) {
-
-}
-
-void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect) {
-
-}
-
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {
     assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
     renderer->sprite_renderer.drawSprite(texture, static_cast<float>(x), static_cast<float>(y));

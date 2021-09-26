@@ -1,13 +1,9 @@
-#ifndef FW64_COLOR_H
-#define FW64_COLOR_H
+#pragma once
 
 #include <stdint.h>
 
 typedef struct {
-    uint8_t r, g, b;
-} Color;
+    uint8_t r, g, b, a;
+} fw64ColorRGBA8;
 
-void color_set(Color* color, uint8_t r, uint8_t g, uint8_t b);
-void color_assign(Color* dest, Color* src);
-
-#endif
+void fw64_color_rgba8_set(fw64ColorRGBA8* color, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
