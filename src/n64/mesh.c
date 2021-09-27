@@ -30,7 +30,7 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* database, uint32_t asset_index) {
     fw64_filesystem_read(mesh->display_list, sizeof(Gfx), mesh->info.display_list_count, handle);
 
     if (mesh->info.material_count > 0) {
-        mesh->materials = memalign(8, sizeof(fw64Material) * mesh->info.material_count);
+        mesh->materials = malloc(sizeof(fw64Material) * mesh->info.material_count);
         fw64_filesystem_read(mesh->materials, sizeof(fw64Material), mesh->info.material_count, handle);
     }
     else {
