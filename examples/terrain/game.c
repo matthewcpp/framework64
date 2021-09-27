@@ -9,7 +9,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->fps_camera.camera.transform.position.y = -50;
     game->fps_camera.movement_speed = 75.0f;
 
-    game->terrain = fw64_terrain_load(engine->assets, FW64_ASSET_terrain_fogworld);
+    game->terrain = fw64_terrain_load(engine->assets, 0);
 }
 
 void game_update(Game* game){

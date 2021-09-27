@@ -9,7 +9,7 @@
 
 typedef struct {
     fw64Engine* engine;
-    FpsCamera fps;
+    fw64FpsCamera fps;
     Entity blue_cube;
     Entity nintendo_seal;
     Entity n64_logo;

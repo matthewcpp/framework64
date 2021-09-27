@@ -3,32 +3,34 @@
 #include "framework64/mesh.h"
 
 #include "framework64/box.h"
+#include "framework64/color.h"
 #include "framework64/n64/texture.h"
 
 #include <nusys.h>
 
 #include <stdint.h>
 
+#define FW64_PRIMITIVE_NO_MATERIAL UINT32_MAX
 #define FW64_MATERIAL_NO_TEXTURE UINT32_MAX
-#define FW64_MATERIAL_NO_COLOR UINT32_MAX
+
 
 struct fw64Material {
-    uint32_t color;
+    fw64ColorRGBA8 color;
     fw64Texture* texture;
     uint32_t texture_frame;
-    uint32_t mode;
+    uint32_t shading_mode;
 };
 
 struct fw64Primitive{
     Box bounding_box;
     uint32_t vertices; // offset into mesh vertex array
     uint32_t display_list; // offset into mesh display_list array
-    fw64Material material;
+    fw64Material* material;
 } ;
 
 typedef struct {
     uint32_t primitive_count;
-    uint32_t color_count;
+    uint32_t material_count;
     uint32_t texture_count;
     uint32_t vertex_count;
     uint32_t display_list_count;
@@ -40,7 +42,7 @@ struct fw64Mesh {
     fw64MeshInfo info;
     fw64Primitive* primitives;
     fw64Texture* textures;
-    Lights1* colors;
+    fw64Material* materials;
     Vtx* vertex_buffer;  //contains ALL the vertices for this mesh
     Gfx* display_list;  //contains ALL the display lists for this mesh
 };

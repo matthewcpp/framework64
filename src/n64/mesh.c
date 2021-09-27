@@ -8,7 +8,7 @@
 #include <string.h>
 
 static void fixup_vertex_pointers(fw64Mesh* mesh, uint32_t* vertex_pointer_data, int handle);
-static void fixup_material_texture_pointers(fw64Mesh* mesh);
+static void fixup_material_pointers(fw64Mesh* mesh);
 static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle);
 static uint32_t compute_scratch_data_buffer_size(fw64Mesh* mesh);
 
@@ -29,8 +29,13 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* database, uint32_t asset_index) {
     mesh->display_list = memalign(8, sizeof(Gfx) * mesh->info.display_list_count);
     fw64_filesystem_read(mesh->display_list, sizeof(Gfx), mesh->info.display_list_count, handle);
 
-    mesh->colors = memalign(8, sizeof(Lights1) * mesh->info.color_count);
-    fw64_filesystem_read(mesh->colors, sizeof(Lights1), mesh->info.color_count, handle);
+    if (mesh->info.material_count > 0) {
+        mesh->materials = memalign(8, sizeof(fw64Material) * mesh->info.material_count);
+        fw64_filesystem_read(mesh->materials, sizeof(fw64Material), mesh->info.material_count, handle);
+    }
+    else {
+        mesh->materials = NULL;
+    }
 
     mesh->primitives = malloc(sizeof(fw64Primitive) * mesh->info.primitive_count);
     fw64_filesystem_read(mesh->primitives, sizeof(fw64Primitive), mesh->info.primitive_count, handle);
@@ -40,7 +45,7 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* database, uint32_t asset_index) {
 
     fixup_vertex_pointers(mesh, scratch_data, handle);
     load_textures(mesh, scratch_data, handle);
-    fixup_material_texture_pointers(mesh);
+    fixup_material_pointers(mesh);
 
     free(scratch_data);
 
@@ -93,20 +98,31 @@ static void load_textures(fw64Mesh* mesh, uint32_t* asset_index_data, int handle
     }
 }
 
-/** When the mesh info is loaded from ROM, the value in the texture pointer represents an index into the mesh's texture array.
- * After the textures are loaded, we need to convert each material's texture index into an actual pointer to the correct texture object.
+/** When the mesh info is loaded from ROM, the value in material and texture pointers represents an index into top level mesh arrays.
+ * After the textures are loaded, we need to convert each index into an actual pointer to the correct object type.
 */
-static void fixup_material_texture_pointers(fw64Mesh* mesh) {
-    for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
-        fw64Material* material = &mesh->primitives[i].material;
-        uint32_t texture_index = (uint32_t)material->texture;
+static void fixup_material_pointers(fw64Mesh* mesh) {
+    //first fixup texture pointers for materials
+    for (uint32_t i = 0; i < mesh->info.material_count; i++) {
+        fw64Material* material = mesh->materials + i;
 
-        if (texture_index == FW64_MATERIAL_NO_TEXTURE) {
+        uint32_t material_texture_index = (uint32_t)material->texture;
+        if (material_texture_index == FW64_MATERIAL_NO_TEXTURE) 
             material->texture = NULL;
-        }
-        else {
-            material->texture = mesh->textures + texture_index;
-        }
+        else
+            material->texture = mesh->textures + material_texture_index;
+    }
+
+    // fixup material pointers for primitives
+    for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh->primitives + i;
+
+        uint32_t primitive_material_index = (uint32_t)primitive->material;
+        // TODO: Investigate this further.  This indicates that this primitive contains lines
+        if (primitive_material_index == FW64_PRIMITIVE_NO_MATERIAL)
+            primitive->material == NULL;
+        else
+            primitive->material = mesh->materials + primitive_material_index;
     }
 }
 
@@ -125,8 +141,8 @@ void fw64_mesh_delete(fw64Mesh* mesh) {
     if (mesh->display_list)
         free(mesh->display_list);
     
-    if (mesh->colors)
-        free(mesh->colors);
+    if (mesh->materials)
+        free(mesh->materials);
 
     if (mesh->primitives)
         free(mesh->primitives);
@@ -148,7 +164,7 @@ fw64Primitive* fw64_mesh_get_primitive(fw64Mesh* mesh, int index) {
 }
 
 fw64Material* fw64_mesh_primitive_get_material(fw64Primitive* primitive) {
-    return &primitive->material;
+    return primitive->material;
 }
 
 fw64Texture* fw64_material_get_texture(fw64Material* material) {

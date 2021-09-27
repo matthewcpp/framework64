@@ -82,6 +82,9 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
     mesh->info.primitive_count = slice_count;
     mesh->primitives = malloc(mesh->info.primitive_count * sizeof(fw64Primitive));
 
+    mesh->info.material_count = slice_count;
+    mesh->materials = memalign(8, mesh->info.primitive_count * sizeof(fw64Material));
+
     mesh->info.vertex_count = mesh->info.primitive_count * 4;
     mesh->vertex_buffer = memalign(8, mesh->info.primitive_count * sizeof(Vtx) * 4);
 
@@ -113,11 +116,13 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
             create_quad_slice(mesh, primitive_index, tl_x, tl_y, size, texture);
 
             fw64Primitive* primitive = mesh->primitives + primitive_index;
-
-            primitive->material.color = FW64_MATERIAL_NO_COLOR;
-            primitive->material.texture = texture;
-            primitive->material.texture_frame = primitive_index;
-            primitive->material.mode = FW64_SHADING_MODE_UNLIT_TEXTURED;
+            fw64Material* material = mesh->materials + primitive_index;
+            
+            primitive->material = material;
+            fw64_color_rgba8_set(&material->color, 255, 255, 255, 255);
+            material->texture = texture;
+            material->shading_mode = FW64_SHADING_MODE_UNLIT_TEXTURED;
+            material->texture_frame = primitive_index;
 
             primitive_index += 1;
             tl_x += size;

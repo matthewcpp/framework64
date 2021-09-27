@@ -1,4 +1,5 @@
 const Bounding = require("./Bounding");
+const N64Material = require("./N64Material");
 
 class N64Mesh {
     constructor(name) {
@@ -24,6 +25,24 @@ class N64Mesh {
                 return true;
         }
         return false;
+    }
+
+    /* determines what shading mode will be used for each material in this mesh */
+    setMaterialShadingModes() {
+        for (const primitive of this.primitives) {
+            const material = this.materials[primitive.material];
+
+            if (primitive.hasNormals) {
+                material.shadingMode = material.texture !== N64Material.NoTexture ?
+                    N64Material.ShadingMode.GouraudTextured: N64Material.ShadingMode.Gouraud;
+            }
+            else if (primitive.hasVertexColors) {
+                material.shadingMode = N64Material.ShadingMode.UnlitVertexColors;
+            }
+            else {
+                throw new Error(`Could not determine shading mode for primitive in mesh: ${this.name}`);
+            }
+        }
     }
 }
 

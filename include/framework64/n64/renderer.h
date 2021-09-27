@@ -28,7 +28,7 @@ struct fw64Renderer{
     fw64RendererFlags flags;
 
     Lights2 lights;
-    int active_light_mask;
+    uint32_t active_light_mask;
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);

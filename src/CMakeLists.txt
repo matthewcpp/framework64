@@ -53,6 +53,7 @@ if (FW64_PLATFORM_N64)
             ../include/framework64/n64/mesh.h n64/mesh.c
             n64/quad.c
             ../include/framework64/n64/renderer.h n64/renderer.c
+            n64/terrain.c
             ../include/framework64/n64/texture.h n64/texture.c
         )
 else()

@@ -138,9 +138,13 @@ function createLineDisplayListBuffer(slices) {
     }
 }
 
+/**
+ * This class represents the header of the Mesh data.
+ * It is read first and describes the counts of the various components of the mesh.
+ * */
 class MeshInfo {
     primitiveCount = 0;
-    colorCount = 0;
+    materialCount = 0;
     textureCount = 0;
     vertexCount = 0;
     displayListCount = 0;
@@ -149,63 +153,46 @@ class MeshInfo {
 
     get buffer() {
         const buff = Buffer.alloc(24 + Bounding.SizeOf);
+        let index = 0;
 
-        buff.writeUInt32BE(this.primitiveCount, 0);
-        buff.writeUInt32BE(this.colorCount, 4);
-        buff.writeUInt32BE(this.textureCount, 8);
-        buff.writeUInt32BE(this.vertexCount, 12);
-        buff.writeUInt32BE(this.displayListCount, 16);
-        buff.writeUInt32BE(this.vertexPointerDataSize, 20);
-        this.bounding.writeToBuffer(buff, 24);
+        index = buff.writeUInt32BE(this.primitiveCount, index);
+        index = buff.writeUInt32BE(this.materialCount, index);
+        index = buff.writeUInt32BE(this.textureCount, index);
+        index = buff.writeUInt32BE(this.vertexCount, index);
+        index = buff.writeUInt32BE(this.displayListCount, index);
+        index = buff.writeUInt32BE(this.vertexPointerDataSize, index);
+        index = this.bounding.writeToBuffer(buff, index);
 
         return buff;
     }
 }
 
+/**
+ * This class represents a single primitive in the mesh.
+ * It contains indices into the various mesh-level arrays
+ */
 class PrimitiveInfo {
     bounding;
-    vertices;
-    displayList;
-    materialColor;
-    materialTexture;
-    materialTextureFrame;
-    materialMode;
+    verticesBufferIndex;
+    displayListBufferIndex;
+    material;// index into mesh's material array
 
     get buffer() {
-        const buff = Buffer.alloc(48)
+        const buff = Buffer.alloc(36)
 
         let index = this.bounding.writeToBuffer(buff, 0);
-        index = buff.writeUInt32BE(this.vertices, index);
-        index = buff.writeUInt32BE(this.displayList, index);
-        index = buff.writeUInt32BE(this.materialColor, index);
-        index = buff.writeUInt32BE(this.materialTexture, index);
-        index = buff.writeUInt32BE(this.materialTextureFrame, index);
-        index = buff.writeUInt32BE(this.materialMode, index);
+        index = buff.writeUInt32BE(this.verticesBufferIndex, index);
+        index = buff.writeUInt32BE(this.displayListBufferIndex, index);
+        index = buff.writeUInt32BE(this.material, index);
 
         return buff;
     }
 }
 
-const ShadingMode  = {
-    UnlitVertexColors: 1,
-    Gouraud: 3,
-    GouraudTextured: 4
-}
-
-function getShadingMode(primitive, mesh){
-    const material = mesh.materials[primitive.material];
-
-    if (primitive.hasNormals) {
-        return material.texture !== N64Material.NoTexture ? ShadingMode.GouraudTextured: ShadingMode.Gouraud;
-    }
-    else if (primitive.hasVertexColors) {
-        return ShadingMode.UnlitVertexColors;
-    }
-
-    throw new Error(`Could not determine shading mode for primitive in mesh: ${mesh.name}`);
-}
-
-// TODO: Add support for sliced sprites?
+/**
+ * Textures are written out as individual assets into the archive.
+ * This function will return a buffer of the asset indices which corresponds to the image array of the mesh.
+ */
 function prepareTextures(mesh, outputDir, archive) {
     const textureAssetIndicesBuffer = Buffer.alloc(mesh.images.length * 4);
     let bufferIndex = 0;
@@ -230,9 +217,11 @@ function writeStaticMesh(mesh, outputDir, archive) {
     const destPath = path.join(outputDir, `${mesh.name}.mesh`);
     archive.add(destPath, "mesh");
 
+    mesh.setMaterialShadingModes();
+
     const meshInfo = new MeshInfo();
     meshInfo.primitiveCount = mesh.primitives.length;
-    meshInfo.colorCount = mesh.materials.length;
+    meshInfo.materialCount = mesh.materials.length;
     meshInfo.textureCount = mesh.images.length;
     meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
     meshInfo.bounding = mesh.bounding;
@@ -248,21 +237,9 @@ function writeStaticMesh(mesh, outputDir, archive) {
 
         const primitiveInfo = new PrimitiveInfo();
         primitiveInfo.bounding = primitive.bounding;
-        primitiveInfo.vertices = meshInfo.vertexCount;
-        primitiveInfo.displayList = meshInfo.displayListCount;
-
-        if (primitive.elementType === N64Primitive.ElementType.Lines) {
-            primitiveInfo.materialMode = ShadingMode.UnlitVertexColors;
-            primitiveInfo.materialColor = N64Primitive.NoMaterial;
-            primitiveInfo.materialTexture = N64Material.NoTexture;
-            primitiveInfo.materialTextureFrame = 0;
-        }
-        else {
-            primitiveInfo.materialMode = getShadingMode(primitive, mesh);
-            primitiveInfo.materialColor = primitive.material;
-            primitiveInfo.materialTexture = mesh.materials[primitive.material].texture;
-            primitiveInfo.materialTextureFrame = 0;
-        }
+        primitiveInfo.verticesBufferIndex = meshInfo.vertexCount; // the index for this primitive is set to the total size of the mesh's vertices buffer added thus far
+        primitiveInfo.displayListBufferIndex = meshInfo.displayListCount; // the index for this primitive is set to the total size of the mesh's display list buffer this far
+        primitiveInfo.material = primitive.material;
 
         primitiveInfos.push(primitiveInfo);
 
@@ -278,7 +255,7 @@ function writeStaticMesh(mesh, outputDir, archive) {
         meshInfo.vertexCount += vertexBuffer.length / SizeOfVtx;
         meshInfo.displayListCount += displayList.length / SizeOfGfx;
         meshInfo.vertexPointerDataSize += vertexPointers.length;
-        vertexPointerCountBuffer.writeUInt32BE(vertexPointers.length / 4, i * 4);
+        vertexPointerCountBuffer.writeUInt32BE(vertexPointers.length / 4, i * 4); // vertexPointers is a binary buffer of uint 32's so we divide to get the actual count of items in the buffer
 
         vertexBuffers.push(vertexBuffer);
         displayListBuffers.push(displayList);
@@ -295,7 +272,7 @@ function writeStaticMesh(mesh, outputDir, archive) {
         fs.writeSync(file, buffer);
 
     for (const material of mesh.materials) {
-        fs.writeSync(file, material.colorBuffer);
+        fs.writeSync(file, material.buffer);
     }
 
     for (const primitiveInfo of primitiveInfos) {

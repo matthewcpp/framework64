@@ -41,8 +41,8 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     // set default lighting state - single white light
     Lights2 lights = gdSPDefLights2(
         25, 25, 25,
-        255, 255, 255, 40,40,40,
-        255, 255, 255, 40,40,40
+        255, 255, 255, 40, 40,40,
+        255, 255, 255, -40, -40, 40
     );
     renderer->lights = lights;
     renderer->active_light_mask = 1;
@@ -146,11 +146,6 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
         (flags & FW64_RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }
 
-static void enable_texture_mapping(fw64Renderer* renderer) {
-    gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
-    gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
-}
-
 static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMode shading_mode) {
     if (renderer->shading_mode == shading_mode) return;
 
@@ -161,12 +156,13 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
             gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
-            enable_texture_mapping(renderer);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
             break;
 
         case FW64_SHADING_MODE_GOURAUD:
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
-            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADING_SMOOTH)
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH)
             #define G_CC_PRIM_SHADE PRIMITIVE, 0, SHADE, 0, PRIMITIVE, 0, SHADE, 0
             gDPSetCombineMode(renderer->display_list++, G_CC_PRIM_SHADE, G_CC_PRIM_SHADE);
             fw64_n64_renderer_set_lighting_data(renderer);
@@ -174,16 +170,18 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
 
         case FW64_SHADING_MODE_GOURAUD_TEXTURED:
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
-            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADING_SMOOTH)
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH)
             gDPSetCombineMode(renderer->display_list++,G_CC_MODULATERGBA , G_CC_MODULATERGBA );
             fw64_n64_renderer_set_lighting_data(renderer);
-            enable_texture_mapping(renderer);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
             break;
 
         case FW64_SHADING_MODE_SPRITE:
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
-            enable_texture_mapping(renderer);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             break;
 
         case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
@@ -295,33 +293,38 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
         
-        fw64_renderer_set_shading_mode(renderer, primitive->material.mode);
+        fw64_renderer_set_shading_mode(renderer, primitive->material->shading_mode);
 
-        if (primitive->material.mode == FW64_SHADING_MODE_GOURAUD_TEXTURED || 
-            primitive->material.mode == FW64_SHADING_MODE_UNLIT_TEXTURED ) {
-            fw64Texture* texture = primitive->material.texture;
+        switch (primitive->material->shading_mode) {
+            case FW64_SHADING_MODE_GOURAUD: {
+                gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, primitive->material->color.r, 
+                    primitive->material->color.g, primitive->material->color.b, primitive->material->color.a);
+            }
+            break;
 
-            int slice_width = fw64_texture_slice_width(texture);
-            int slice_height = fw64_texture_slice_height(texture);
-            int frame_offset = slice_width * slice_height * 2 * primitive->material.texture_frame;
+            case FW64_SHADING_MODE_GOURAUD_TEXTURED:
+            case FW64_SHADING_MODE_UNLIT_TEXTURED: {
+                fw64Texture* texture = primitive->material->texture;
 
-            gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
-                G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
-                texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
-        }
+                int slice_width = fw64_texture_slice_width(texture);
+                int slice_height = fw64_texture_slice_height(texture);
+                int frame_offset = slice_width * slice_height * 2 * primitive->material->texture_frame;
 
-        if (primitive->material.color != FW64_MATERIAL_NO_COLOR) {
-            gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, 255, 255, 255, 255);
-            //gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
+                gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
+                    G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
+                    texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+            }
+            break;
+
+            default:
+                break;
         }
             
-
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
         gDPPipeSync(renderer->display_list++);
     }
@@ -332,12 +335,17 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
 // TODO: handle no active lights correctly...first light should be set to all black
 static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer) {
     int light_num = 1;
-    for (int i = 0; i < Fw64_RENDERER_MAX_LIGHT_COUNT; i++) {
-        if (renderer->active_light_mask & (1 << i)) {
-            gSPLight(renderer->display_list++, &renderer->lights.l[i], light_num++);
-        }
+    int light_count = 0;
+    if (renderer->active_light_mask & (1 << 0)) {
+        gSPLight(renderer->display_list++, &renderer->lights.l[0], light_num++);
+        light_count += 1;
     }
-    
+
+    if (renderer->active_light_mask & (1 << 1)) { 
+        gSPLight(renderer->display_list++, &renderer->lights.l[1], light_num++);
+        light_count += 1;
+    }
+
     gSPLight(renderer->display_list++, &renderer->lights.a, light_num);
-    gSPNumLights(renderer->display_list++, light_num - 1);
+    gSPNumLights(renderer->display_list++, light_count);
 }
