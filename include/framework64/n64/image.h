@@ -11,8 +11,7 @@ typedef struct {
 
 struct fw64Image {
     fw64N64ImageInfo info;
-    int ref_count;
     uint8_t* data;
 };
 
-void fw64_n64_image_delete(fw64Image* image);
+int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t assetIndex);

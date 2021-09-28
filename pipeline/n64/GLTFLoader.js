@@ -1,7 +1,9 @@
-const N64Mesh = require("./N64Mesh")
-const N64Primitive = require("./N64Primitive")
-const N64Material = require("./N64Material")
 const N64Image = require("./N64Image");
+const N64Material = require("./N64Material");
+const N64Mesh = require("./N64Mesh");
+const N64MeshResources = require("./N64MeshResources");
+const N64Primitive = require("./N64Primitive");
+const N64Texture = require("./N64Texture");
 
 const glMatrix = require("gl-matrix");
 
@@ -22,10 +24,13 @@ class GLTFLoader {
     gltfPath = null;
     gltf = null;
     mesh = null;
+    resources = null;
 
-    // these maps provide a way to convert from the GLTF file level indicies to the currently loaded mesh's indicces
-    materialMap = new Map();
+    // these maps provide a way to convert from the GLTF file level indices to the currently loaded mesh's indices
     imageMap = new Map();
+    textureMap = new Map();
+    materialMap = new Map();
+
 
     constructor(options) {
         this.options =  {
@@ -45,7 +50,7 @@ class GLTFLoader {
 
         const modelName = path.basename(gltfPath, ".gltf");
         this.mesh = new N64Mesh(modelName);
-
+        this.mesh.resources = this.resources;
         await this._loadMesh(this.gltf.meshes[0]);
 
         return this.mesh;
@@ -55,9 +60,11 @@ class GLTFLoader {
         this.gltfPath = gltfPath;
         this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
 
+        this.resources = new N64MeshResources();
         this.loadedBuffers.clear();
-        this.materialMap.clear();
         this.imageMap.clear();
+        this.textureMap.clear();
+        this.materialMap.clear();
     }
 
     async _loadMesh(gltfMesh) {
@@ -97,8 +104,8 @@ class GLTFLoader {
      * If a negative index is passed in, a default material will be used. **/
     async _getMaterial(index) {
         if (index < 0) {
-            const materialIndex = this.mesh.materials.length;
-            this.mesh.materials.push(new N64Material());
+            const materialIndex = this.resources.materials.length;
+            this.resources.materials.push(new N64Material());
             return materialIndex;
         }
 
@@ -108,7 +115,7 @@ class GLTFLoader {
         }
 
         // new material
-        const materialIndex = this.mesh.materials.length;
+        const materialIndex = this.resources.materials.length;
         const material = new N64Material();
 
         const gltfMaterial = this.gltf.materials[index];
@@ -126,22 +133,23 @@ class GLTFLoader {
             material.texture = await this._getTexture(pbr.baseColorTexture.index);
         }
 
-        this.mesh.materials.push(material)
+        this.resources.materials.push(material)
         this.materialMap.set(index, materialIndex);
 
         return materialIndex;
     }
 
-    async _getTexture(index) {
-        if (this.imageMap.has(index)) {
-            return this.imageMap.get(index);
+    async _getImage(gltfIndex) {
+        if (this.imageMap.has(gltfIndex)) {
+            return this.imageMap.get(gltfIndex);
         }
 
-        const imageIndex = this.mesh.images.length;
+        const imageIndex = this.resources.images.length;
         const gltfDir = path.dirname(this.gltfPath);
 
-        const gltfImage = this.gltf.images[index];
+        const gltfImage = this.gltf.images[gltfIndex];
         const imagePath = path.join(gltfDir, gltfImage.uri);
+
 
         //TODO: This should probably be more robust: e.g. image.something.ext will break asset macro name
         const imageName = path.basename(gltfImage.uri, path.extname(gltfImage.uri));
@@ -154,10 +162,27 @@ class GLTFLoader {
             console.log(`Resize image: ${gltfImage.uri} to ${dimensions[0]}x${dimensions[1]}`);
         }
 
-        this.mesh.images.push(image);
-        this.imageMap.set(index, imageIndex);
+        this.resources.images.push(image);
+        this.imageMap.set(gltfIndex, imageIndex);
 
         return imageIndex;
+    }
+
+    async _getTexture(gltfIndex) {
+        if (this.textureMap.has(gltfIndex)) {
+            return this.textureMap.get(gltfIndex);
+        }
+
+        const textureIndex = this.resources.textures.length;
+        const gltfTexture = this.gltf.textures[gltfIndex];
+
+        const sourceImage = await this._getImage(gltfTexture.source);
+        this.resources.textures.push(new N64Texture(sourceImage));
+
+        // TODO: Get sampler info (repeat, etc)
+
+        this.textureMap.set(gltfIndex, textureIndex);
+        return textureIndex;
     }
 
     _getBuffer(bufferIndex) {
@@ -319,14 +344,15 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
-        const material = this.mesh.materials[this.materialMap.get(gltfPrimitive.material)];
+        const material = this.resources.materials[this.materialMap.get(gltfPrimitive.material)];
 
         if (material.texture === N64Material.NoTexture) {
             console.log("No image specified.  Ignoring texture coordinates.")
             return;
         }
 
-        const image = this.mesh.images[material.texture];
+        const texture = this.resources.textures[material.texture];
+        const image = this.resources.images[texture.image];
 
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
 

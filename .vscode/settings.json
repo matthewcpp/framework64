@@ -19,6 +19,7 @@
         "texture.h": "c",
         "color.h": "c",
         "game.h": "c",
-        "terrain.h": "c"
+        "terrain.h": "c",
+        "loader.h": "c"
     }
 }

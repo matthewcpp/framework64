@@ -5,8 +5,7 @@ class N64Mesh {
     constructor(name) {
         this.name = name;
         this.primitives = [];
-        this.materials = [];
-        this.images = [];
+        this.resources = null;
     }
 
     get bounding() {
@@ -30,7 +29,7 @@ class N64Mesh {
     /* determines what shading mode will be used for each material in this mesh */
     setMaterialShadingModes() {
         for (const primitive of this.primitives) {
-            const material = this.materials[primitive.material];
+            const material = this.resources.materials[primitive.material]; //TODO: fix me
 
             if (primitive.hasNormals) {
                 material.shadingMode = material.texture !== N64Material.NoTexture ?

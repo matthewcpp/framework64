@@ -16,20 +16,16 @@ const fs = require("fs")
  * */
 class MeshInfo {
     primitiveCount = 0;
-    materialCount = 0;
-    textureCount = 0;
     vertexCount = 0;
     displayListCount = 0;
     vertexPointerDataSize = 0;
     bounding = null;
 
     get buffer() {
-        const buff = Buffer.alloc(24 + Bounding.SizeOf);
+        const buff = Buffer.alloc(16 + Bounding.SizeOf);
         let index = 0;
 
         index = buff.writeUInt32BE(this.primitiveCount, index);
-        index = buff.writeUInt32BE(this.materialCount, index);
-        index = buff.writeUInt32BE(this.textureCount, index);
         index = buff.writeUInt32BE(this.vertexCount, index);
         index = buff.writeUInt32BE(this.displayListCount, index);
         index = buff.writeUInt32BE(this.vertexPointerDataSize, index);
@@ -61,28 +57,69 @@ class PrimitiveInfo {
     }
 }
 
+class ResourcesInfo {
+    imageCount;
+    textureCount;
+    materialCount;
+
+    constructor(resources) {
+        this.imageCount = resources.images.length;
+        this.textureCount = resources.textures.length;
+        this.materialCount = resources.materials.length;
+    }
+
+    get buffer() {
+        const buff = Buffer.alloc(12);
+
+        let index = 0;
+        index = buff.writeUInt32BE(this.imageCount, index);
+        index = buff.writeUInt32BE(this.textureCount, index);
+        index = buff.writeUInt32BE(this.materialCount, index);
+
+        return buff;
+    }
+}
+
 /**
  * Textures are written out as individual assets into the archive.
  * This function will return a buffer of the asset indices which corresponds to the image array of the mesh.
  */
-function prepareTextures(mesh, outputDir, archive) {
-    const textureAssetIndicesBuffer = Buffer.alloc(mesh.images.length * 4);
+function prepareTextures(resources, outputDir, archive) {
+    const textureAssetIndicesBuffer = Buffer.alloc(resources.images.length * 4);
     let bufferIndex = 0;
 
-    for (const image of mesh.images) {
-        const texturePath = path.join(outputDir, `${image.name}.sprite`);
+    for (const image of resources.images) {
+        const texturePath = path.join(outputDir, `${image.name}.image`);
         let entry = archive.entries.get(texturePath);
 
         if (!entry){
-            entry = archive.add(texturePath, "sprite");
+            entry = archive.add(texturePath, "image");
             N64SpriteWriter.write(image, 1, 1, texturePath);
         }
-
 
         bufferIndex = textureAssetIndicesBuffer.writeUInt32BE(entry.index, bufferIndex);
     }
 
     return textureAssetIndicesBuffer;
+}
+
+function writeMeshResources(resources, file, outputDir, archive) {
+    const resourceInfo = new ResourcesInfo(resources);
+
+    fs.writeSync(file, resourceInfo.buffer);
+
+    if (resources.images.length > 0) {
+        const textureAssetIndices = prepareTextures(resources, outputDir, archive);
+        fs.writeSync(file, textureAssetIndices);
+    }
+
+    for (const texture of resources.textures) {
+        fs.writeSync(file, texture.buffer);
+    }
+
+    for (const material of resources.materials) {
+        fs.writeSync(file, material.buffer);
+    }
 }
 
 function writeStaticMesh(mesh, outputDir, archive) {
@@ -93,8 +130,6 @@ function writeStaticMesh(mesh, outputDir, archive) {
 
     const meshInfo = new MeshInfo();
     meshInfo.primitiveCount = mesh.primitives.length;
-    meshInfo.materialCount = mesh.materials.length;
-    meshInfo.textureCount = mesh.images.length;
     meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
     meshInfo.bounding = mesh.bounding;
 
@@ -135,6 +170,9 @@ function writeStaticMesh(mesh, outputDir, archive) {
     }
 
     const file = fs.openSync(destPath, "w");
+
+    writeMeshResources(mesh.resources, file, outputDir, archive);
+
     fs.writeSync(file, meshInfo.buffer);
 
     for (const buffer of vertexBuffers)
@@ -143,10 +181,6 @@ function writeStaticMesh(mesh, outputDir, archive) {
     for (const buffer of displayListBuffers)
         fs.writeSync(file, buffer);
 
-    for (const material of mesh.materials) {
-        fs.writeSync(file, material.buffer);
-    }
-
     for (const primitiveInfo of primitiveInfos) {
         fs.writeSync(file, primitiveInfo.buffer)
     }
@@ -154,11 +188,6 @@ function writeStaticMesh(mesh, outputDir, archive) {
     fs.writeSync(file, vertexPointerCountBuffer);
     for (const buffer of vertexPointerBuffers)
         fs.writeSync(file, buffer);
-
-    if (mesh.images.length > 0) {
-        const textureAssetIndices = prepareTextures(mesh, outputDir, archive);
-        fs.writeSync(file, textureAssetIndices);
-    }
 
     fs.closeSync(file);
 }

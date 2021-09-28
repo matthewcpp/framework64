@@ -5,8 +5,9 @@
 
 #include <vector>
 
-fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Image* image, float max_s, float max_t) {
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t) {
     auto* f64_engine = reinterpret_cast<framework64::Engine*>(engine);
+    auto* image = fw64_image_load(engine->assets, image_asset_index);
     uint32_t slice_count = image->hslices * image->vslices;
 
     auto* mesh = new fw64Mesh();
@@ -57,6 +58,6 @@ fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Image* image,
     return mesh;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
-    return textured_quad_create_with_params(engine, image, 1.0f, 1.0f);
+fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
+    return textured_quad_create_with_params(engine, image_asset_index, 1.0f, 1.0f);
 }

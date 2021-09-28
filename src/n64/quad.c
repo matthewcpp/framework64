@@ -38,10 +38,11 @@ static void vertex_set_p_tc(Vtx* vertex, short x, short y, short z, float s, flo
 void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t) {
     int index = frame * 4;
 
-    vertex_set_tc(mesh->vertex_buffer + index, 0.0f, 0.0f, mesh->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 1, s, 0.0f, mesh->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 2, s, t, mesh->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 3, 0.0f, t, mesh->textures);
+    // TODO: this needs to be changed back to textures
+    vertex_set_tc(mesh->vertex_buffer + index, 0.0f, 0.0f, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 1, s, 0.0f, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 2, s, t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 3, 0.0f, t, mesh->resources->textures);
 }
 
 static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, short tl_y, short size, fw64Texture* texture) {
@@ -67,23 +68,30 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
-    fw64Texture* texture = fw64_texture_create_from_image(image);
-
+fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
     (void)engine;
+
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);
+    
+    fw64Image* image = fw64_image_load(NULL, image_asset_index);
+    fw64Texture* texture = fw64_texture_create_from_image(image);
 
-    mesh->info.texture_count = 1;
-    mesh->textures = texture;
+    mesh->resources = malloc(sizeof(fw64MeshResources));
+
+    mesh->resources->image_count = 1;
+    mesh->resources->images = image;
+
+    mesh->resources->texture_count = 1;
+    mesh->resources->textures = texture;
 
     uint32_t slice_count = texture->image->info.hslices * texture->image->info.vslices;
 
     mesh->info.primitive_count = slice_count;
     mesh->primitives = malloc(mesh->info.primitive_count * sizeof(fw64Primitive));
 
-    mesh->info.material_count = slice_count;
-    mesh->materials = memalign(8, mesh->info.primitive_count * sizeof(fw64Material));
+    mesh->resources->material_count = slice_count;
+    mesh->resources->materials = memalign(8, mesh->info.primitive_count * sizeof(fw64Material));
 
     mesh->info.vertex_count = mesh->info.primitive_count * 4;
     mesh->vertex_buffer = memalign(8, mesh->info.primitive_count * sizeof(Vtx) * 4);
@@ -116,7 +124,7 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
             create_quad_slice(mesh, primitive_index, tl_x, tl_y, size, texture);
 
             fw64Primitive* primitive = mesh->primitives + primitive_index;
-            fw64Material* material = mesh->materials + primitive_index;
+            fw64Material* material = mesh->resources->materials + primitive_index;
             
             primitive->material = material;
             fw64_color_rgba8_set(&material->color, 255, 255, 255, 255);
@@ -135,8 +143,8 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, fw64Image* image) {
     return mesh;
 }
 
-fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, fw64Image* image, float max_s, float max_t){
-    fw64Mesh* mesh = textured_quad_create(engine, image);
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t){
+    fw64Mesh* mesh = textured_quad_create(engine, image_asset_index);
     textured_quad_set_tex_coords(mesh, 0, max_s, max_t);
 
     return mesh;

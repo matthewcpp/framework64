@@ -34,7 +34,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->sound_id = 0;
 
-    fw64Mesh* mesh = textured_quad_create(game->engine, fw64_image_load(engine->assets, FW64_ASSET_image_n64_logo));
+    fw64Mesh* mesh = textured_quad_create(game->engine, FW64_ASSET_image_n64_logo);
     entity_init(&game->n64_logo, mesh);
 
     game->rotation = 0.0f;

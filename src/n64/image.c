@@ -9,9 +9,23 @@
 fw64Image* fw64_image_load(fw64AssetDatabase* database, uint32_t assetIndex) {
     (void)database;
     
+    fw64Image img;
+    
+    if (fw64_n64_image_init_from_rom(&img, assetIndex)) {
+        fw64Image* image = malloc(sizeof(fw64Image));
+        *image = img;
+
+        return image;
+    }
+    else {
+        return NULL;
+    }
+}
+
+int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t assetIndex) {
     int handle = fw64_filesystem_open(assetIndex);
     if (handle < 0)
-        return NULL;
+        return 0;
 
     fw64N64ImageInfo image_info;
 
@@ -19,7 +33,7 @@ fw64Image* fw64_image_load(fw64AssetDatabase* database, uint32_t assetIndex) {
 
     if (bytes_read != sizeof(fw64N64ImageInfo)) {
         fw64_filesystem_close(handle);
-        return NULL;
+        return 0;
     }
 
     int data_size = image_info.width * image_info.height * 2;
@@ -29,30 +43,14 @@ fw64Image* fw64_image_load(fw64AssetDatabase* database, uint32_t assetIndex) {
 
     if (bytes_read != data_size) {
         free(image_data);
-        return NULL;
+        return 0;
     }
 
-    fw64Image* image = malloc(sizeof(fw64Image));
     image->info = image_info;
     image->data = image_data;
-    image->ref_count = 0;
-
-    return image;
 }
 
-void fw64_n64_image_delete(fw64Image* image) {
+void fw64_image_delete(fw64Image* image) {
     free(image->data);
     free(image);
-}
-
-void fw64_image_reference_add(fw64Image* image) {
-    image->ref_count += 1;
-}
-
-void fw64_image_reference_remove(fw64Image* image) {
-    image->ref_count -= 1;
-
-    if (image->ref_count <= 0) {
-        fw64_n64_image_delete(image);
-    }
 }

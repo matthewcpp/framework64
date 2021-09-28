@@ -16,8 +16,6 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
     game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons));
-    game->image = fw64_image_load(engine->assets, FW64_ASSET_image_pyoro64);
-    fw64_image_reference_add(game->image);
 
     entity_init(&game->quad_entity, NULL);
     set_texture_mode(game, MODE_DEFAULT);
@@ -93,6 +91,7 @@ void set_texture_mode(Game* game, Mode mode) {
     if (game->quad_entity.mesh)
         fw64_mesh_delete(game->quad_entity.mesh);
 
-    entity_init(&game->quad_entity, textured_quad_create_with_params(game->engine, game->image, coords_max.x, coords_max.y));
-    fw64_texture_set_wrap_mode(fw64_mesh_get_texture(game->quad_entity.mesh, 0), wrap_mode, wrap_mode);
+    entity_init(&game->quad_entity, textured_quad_create_with_params(game->engine, FW64_ASSET_image_pyoro64, coords_max.x, coords_max.y));
+    fw64Texture* texture = fw64_material_get_texture(fw64_mesh_get_material_for_primitive(game->quad_entity.mesh, 0));
+    fw64_texture_set_wrap_mode(texture, wrap_mode, wrap_mode);
 }
