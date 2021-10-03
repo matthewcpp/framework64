@@ -58,9 +58,7 @@ struct fw64Mesh {
 
 void fw64_n64_mesh_init(fw64Mesh* mesh);
 
-/**
-Unloads a mesh that was loaded with \ref mesh_load
-*/
-void fw64_n64_mesh_unload(fw64Mesh* mesh);
+/** Frees the resources used by this mesh, but does not delete the actual mesh */
+void fw64_n64_mesh_uninit(fw64Mesh* mesh);
 
 void fw64_n64_mesh_resources_delete(fw64MeshResources* resources);

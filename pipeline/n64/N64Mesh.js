@@ -26,21 +26,9 @@ class N64Mesh {
         return false;
     }
 
-    /* determines what shading mode will be used for each material in this mesh */
-    setMaterialShadingModes() {
+    prunePrimitiveVertices() {
         for (const primitive of this.primitives) {
-            const material = this.resources.materials[primitive.material]; //TODO: fix me
-
-            if (primitive.hasNormals) {
-                material.shadingMode = material.texture !== N64Material.NoTexture ?
-                    N64Material.ShadingMode.GouraudTextured: N64Material.ShadingMode.Gouraud;
-            }
-            else if (primitive.hasVertexColors) {
-                material.shadingMode = N64Material.ShadingMode.UnlitVertexColors;
-            }
-            else {
-                throw new Error(`Could not determine shading mode for primitive in mesh: ${this.name}`);
-            }
+            primitive.pruneUnusedVertices();
         }
     }
 }

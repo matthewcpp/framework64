@@ -8,6 +8,9 @@ typedef struct {
     fw64Engine* engine;
     fw64FpsCamera fps_camera;
     fw64Terrain* terrain;
+    fw64Font* font;
+    char position_text[64];
+    char render_text[32];
 } Game;
 
 #ifdef __cplusplus

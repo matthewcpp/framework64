@@ -1,4 +1,5 @@
 const processMesh = require("./ProcessMesh");
+const processTerrain = require("./ProcessTerrain");
 const imageConvert = require("./ImageConvert");
 const FontConvert = require("./FontConvert");
 const AudioConvert = require("./AudioConvert");
@@ -58,13 +59,20 @@ async function prepare(manifest, manifestFile, outputDirectory) {
         }
     }
 
-        if (manifest.raw) {
-            for (const item of manifest.raw) {
-                console.log(`Processing Raw File: ${item}`);
-                const sourceFile = path.join(manifestDirectory, item);
-                archive.add(sourceFile, "raw");
-            }
+    if (manifest.terrains) {
+        for (const terrain of manifest.terrains) {
+            console.log(`Processing Terrain: ${terrain.src}`)
+            await processTerrain(terrain, archive, manifestDirectory, outputDirectory);
         }
+    }
+
+    if (manifest.raw) {
+        for (const item of manifest.raw) {
+            console.log(`Processing Raw File: ${item}`);
+            const sourceFile = path.join(manifestDirectory, item);
+            archive.add(sourceFile, "raw");
+        }
+    }
 
     archive.write(outputDirectory);
 }

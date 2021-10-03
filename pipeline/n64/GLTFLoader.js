@@ -40,6 +40,28 @@ class GLTFLoader {
         Object.assign(this.options, options);
     }
 
+    /** Loads all meshes in the file and returns them as an array. */
+    async loadTerrain(gltfPath) {
+        this._loadFile(gltfPath);
+
+        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
+            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
+        }
+
+        const meshes = [];
+
+        for (let i = 0; i < this.gltf.meshes.length; i++) {
+            this.mesh = new N64Mesh(null);
+            await this._loadMesh(this.gltf.meshes[i]);
+            meshes.push(this.mesh);
+        }
+
+        return {
+            meshes: meshes,
+            resources: this.resources
+        }
+    }
+
     /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
     async loadStaticMesh(gltfPath) {
         this._loadFile(gltfPath);
@@ -97,7 +119,14 @@ class GLTFLoader {
                 this._readTexCoords(gltfPrimitive, primitive);
 
             this._readIndices(gltfPrimitive, primitive);
+
+            const material = this.resources.materials[primitive.material];
+            if (material.shadingMode === N64Material.ShadingMode.Unset) {
+                material.setShadingMode(primitive);
+            }
         }
+
+        this.mesh.prunePrimitiveVertices();
     }
 
     /** Gets the correct index for the GLTF material.  I
@@ -177,9 +206,13 @@ class GLTFLoader {
         const gltfTexture = this.gltf.textures[gltfIndex];
 
         const sourceImage = await this._getImage(gltfTexture.source);
-        this.resources.textures.push(new N64Texture(sourceImage));
+        const texture = new N64Texture(sourceImage);
+        this.resources.textures.push(texture);
 
         // TODO: Get sampler info (repeat, etc)
+        const image = this.resources.images[sourceImage];
+        texture.maskS = Math.log2(image.width);
+        texture.maskT = Math.log2(image.height);
 
         this.textureMap.set(gltfIndex, textureIndex);
         return textureIndex;
@@ -363,10 +396,8 @@ class GLTFLoader {
             let s = buffer.readFloatLE(offset);
             let t = buffer.readFloatLE(offset + 4);
 
-            // TODO: this needs to be fixed, its not correct
-            // clamp tex coords to (0, 1)
-            s = Math.min(Math.max(s, 0.0), 1.0) * image.width * 2;
-            t = Math.min(Math.max(t, 0.0), 1.0) * image.height * 2;
+            s *= image.width * 2;
+            t *= image.height * 2;
 
             // Note that the texture coordinates (s,t) are encoded in S10.5 format.
             vertex[4] = Math.round(s * (1 << 5));

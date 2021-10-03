@@ -102,6 +102,13 @@
             "dir": "music/bank2"
         }
     ],
+    "terrains": [
+        {
+            "src": "fogworld/fogworld.gltf",
+            "dimensionX": 32,
+            "dimensionZ": 32
+        }
+    ],
     "raw": [
         "sample.txt"
     ]

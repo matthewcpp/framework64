@@ -10,25 +10,8 @@
 
 static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, int handle);
 static void fixup_mesh_primitive_material_pointers(fw64N64Loader* loader, fw64Mesh* mesh);
-static void load_mesh_resources(fw64N64Loader* loader, int handle);
-static fw64Mesh* fw64_n64_loader_read_mesh(fw64N64Loader* loader, int handle);
 
-
-fw64Mesh* fw64_n64_loader_parse_static_mesh(fw64N64Loader* loader, uint32_t asset_index) {
-    int handle = fw64_filesystem_open(asset_index);
-    if (handle < 0)
-        return NULL;
-
-    load_mesh_resources(loader, handle);
-    fw64Mesh* mesh = fw64_n64_loader_read_mesh(loader, handle);
-    mesh->resources = loader->resources;
-
-    fw64_filesystem_close(handle);
-
-    return mesh;
-}
-
-static void load_mesh_resources(fw64N64Loader* loader, int handle) {
+void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle) {
     fw64MeshResources* resources = malloc(sizeof(fw64MeshResources));
     fw64_filesystem_read(resources, FW64_MESH_RESOURCES_HEADER_SIZE, 1, handle);
 
@@ -95,9 +78,7 @@ void fw64_n64_loader_uninit(fw64N64Loader* loader) {
     (void)loader;
 }
 
-static fw64Mesh* fw64_n64_loader_read_mesh(fw64N64Loader* loader, int handle) {
-    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
-
+void fw64_n64_loader_load_mesh(fw64N64Loader* loader, fw64Mesh* mesh, int handle) {
     fw64_filesystem_read(&mesh->info, sizeof(fw64MeshInfo), 1, handle);
 
     mesh->vertex_buffer = memalign(8, sizeof(Vtx) * mesh->info.vertex_count );
@@ -111,8 +92,6 @@ static fw64Mesh* fw64_n64_loader_read_mesh(fw64N64Loader* loader, int handle) {
     
     fixup_mesh_vertex_pointers(mesh, handle);
     fixup_mesh_primitive_material_pointers(loader, mesh);
-
-    return mesh;
 }
 
 

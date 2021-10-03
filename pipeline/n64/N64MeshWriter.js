@@ -126,8 +126,18 @@ function writeStaticMesh(mesh, outputDir, archive) {
     const destPath = path.join(outputDir, `${mesh.name}.mesh`);
     archive.add(destPath, "mesh");
 
-    mesh.setMaterialShadingModes();
+    const file = fs.openSync(destPath, "w");
 
+    if (mesh.resources) {
+        writeMeshResources(mesh.resources, file, outputDir, archive);
+    }
+
+    writeStaticMeshData(mesh, file);
+
+    fs.closeSync(file);
+}
+
+function writeStaticMeshData(mesh, file) {
     const meshInfo = new MeshInfo();
     meshInfo.primitiveCount = mesh.primitives.length;
     meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
@@ -155,7 +165,7 @@ function writeStaticMesh(mesh, outputDir, archive) {
 
         // generate the display list for rendering the primitive geometry
         const vertexBuffer = VertexBuffer.createVertexBuffer(slices, primitive.hasNormals);
-        const {displayList, vertexPointers} = primitive.elementType === N64Primitive.ElementType.Triangles ?
+        const {displayList, vertexPointers, vertexCommandIndices} = primitive.elementType === N64Primitive.ElementType.Triangles ?
             DisplayList.createTriangleDisplayListBuffer(slices) : DisplayList.createLineDisplayListBuffer(slices);
 
         // update the mesh info totals
@@ -168,10 +178,6 @@ function writeStaticMesh(mesh, outputDir, archive) {
         displayListBuffers.push(displayList);
         vertexPointerBuffers.push(vertexPointers);
     }
-
-    const file = fs.openSync(destPath, "w");
-
-    writeMeshResources(mesh.resources, file, outputDir, archive);
 
     fs.writeSync(file, meshInfo.buffer);
 
@@ -188,10 +194,10 @@ function writeStaticMesh(mesh, outputDir, archive) {
     fs.writeSync(file, vertexPointerCountBuffer);
     for (const buffer of vertexPointerBuffers)
         fs.writeSync(file, buffer);
-
-    fs.closeSync(file);
 }
 
 module.exports = {
-    writeStaticMesh: writeStaticMesh
+    writeStaticMesh: writeStaticMesh,
+    writeStaticMeshData: writeStaticMeshData,
+    writeMeshResources: writeMeshResources
 };
