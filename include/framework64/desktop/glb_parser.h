@@ -4,7 +4,12 @@
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
+
 #include <nlohmann/json.hpp>
 
 #include <array>

@@ -3,7 +3,11 @@
 #include "framework64/asset_database.h"
 #include "framework64/image.h"
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
 
 #include <string>
 

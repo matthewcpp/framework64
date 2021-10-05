@@ -4,8 +4,6 @@
 #include "framework64/matrix.h"
 
 #include <cassert>
-#include <limits>
-#include <iostream>
 
 namespace framework64 {
 
@@ -217,9 +215,6 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
         gl_info.setPrimitiveValues(primitive);
         shader_cache.setShaderProgram(primitive);
     }
-
-    std::cout << mesh->bounding_box.min.x << ", " << mesh->bounding_box.min.y << ", " << mesh->bounding_box.min.z << ", "
-              << mesh->bounding_box.max.x << ", " << mesh->bounding_box.max.y << ", " << mesh->bounding_box.max.z << std::endl;
 
     return mesh;
 }

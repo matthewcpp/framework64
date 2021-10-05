@@ -4,7 +4,11 @@
 #include "framework64/desktop/mesh.h"
 #include "framework64/desktop/shader_cache.h"
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
 
 #include <array>
 #include <string>

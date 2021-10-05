@@ -96,8 +96,8 @@ IVec2 fw64_font_measure_text(fw64Font* font, const char* text) {
     Vec2 measurement = font->measureString(text);
 
     IVec2 result;
-    result.x = static_cast<int>(std::ceilf(measurement.x));
-    result.y = static_cast<int>(std::ceilf(measurement.y));
+    result.x = static_cast<int>(std::ceil(measurement.x));
+    result.y = static_cast<int>(std::ceil(measurement.y));
 
     return result;
 }

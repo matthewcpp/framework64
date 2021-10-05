@@ -8,7 +8,11 @@
 
 #include <SDL2/SDL.h>
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
 
 #include <array>
 
