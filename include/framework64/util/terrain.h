@@ -13,7 +13,7 @@ typedef struct fw64Terrain fw64Terrain;
 extern "C" {
 #endif
 
-void fw64_terrain_draw(fw64Terrain* terrain, fw64Renderer* renderer);
+int fw64_terrain_draw(fw64Terrain* terrain, fw64Renderer* renderer);
 float fw64_terrain_get_height(fw64Terrain* terrain, float x, float z);
 
 uint32_t fw64_terrain_get_mesh_count(fw64Terrain* terrain);

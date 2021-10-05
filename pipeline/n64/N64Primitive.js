@@ -22,6 +22,7 @@ class N64Primitive {
     }
 
     pruneUnusedVertices() {
+        this.bounding = new Bounding();
         const elementMap = new Map();
         const newVertices = [];
         const newElements = [];
@@ -37,6 +38,7 @@ class N64Primitive {
                     const newVertexIndex = newVertices.length;
                     elementMap.set(vertex, newVertexIndex);
                     newVertices.push(this.vertices[vertex]);
+                    this.bounding.encapsulatePoint(this.vertices[vertex]);
                     newTriangle.push(newVertexIndex);
                 }
             }

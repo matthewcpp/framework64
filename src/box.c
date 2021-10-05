@@ -24,9 +24,9 @@ void box_invalidate(Box* box) {
     box->min.y = FLT_MAX;
     box->min.z = FLT_MAX;
 
-    box->max.x = FLT_MIN;
-    box->max.y = FLT_MIN;
-    box->max.z = FLT_MIN;
+    box->max.x = -FLT_MAX;
+    box->max.y = -FLT_MAX;
+    box->max.z = -FLT_MAX;
 }
 
 void box_encapsulate_point(Box* box, Vec3* pt) {

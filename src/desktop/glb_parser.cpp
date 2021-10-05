@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <limits>
+#include <iostream>
 
 namespace framework64 {
 
@@ -196,7 +197,6 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
             auto accessor = attributes_node["POSITION"].get<size_t>();
             primitive.bounding_box = getBoxFromAccessor(accessor);
             box_encapsulate_box(&mesh->bounding_box, &primitive.bounding_box);
-
         }
 
         auto const & element_accessor_node = json_doc["accessors"][primitive_node["indices"].get<size_t>()];
@@ -217,6 +217,9 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
         gl_info.setPrimitiveValues(primitive);
         shader_cache.setShaderProgram(primitive);
     }
+
+    std::cout << mesh->bounding_box.min.x << ", " << mesh->bounding_box.min.y << ", " << mesh->bounding_box.min.z << ", "
+              << mesh->bounding_box.max.x << ", " << mesh->bounding_box.max.y << ", " << mesh->bounding_box.max.z << std::endl;
 
     return mesh;
 }

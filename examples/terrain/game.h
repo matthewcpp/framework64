@@ -9,6 +9,7 @@ typedef struct {
     fw64FpsCamera fps_camera;
     fw64Terrain* terrain;
     fw64Font* font;
+    int render_count;
     char position_text[64];
     char render_text[32];
 } Game;

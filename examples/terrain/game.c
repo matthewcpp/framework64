@@ -14,6 +14,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderer_set_clear_color(engine->renderer, 39, 58, 93);
     game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
     game->terrain = fw64_terrain_load(engine->assets, FW64_ASSET_terrain_fogworld);
+    game->render_count = 0;
 }
 
 void game_update(Game* game){
@@ -28,12 +29,12 @@ void game_update(Game* game){
 
     Vec3* pos = &game->fps_camera.camera.transform.position;
     sprintf(game->position_text, "Pos: %.2f, %.2f, %.2f", pos->x, pos->y, pos->z);
-    sprintf(game->render_text, "Meshes: %d", fw64_terrain_get_mesh_count(game->terrain));
+    sprintf(game->render_text, "Meshes: %d/%d", game->render_count, fw64_terrain_get_mesh_count(game->terrain));
 }
 
 void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, &game->fps_camera.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_terrain_draw(game->terrain, game->engine->renderer);
+    game->render_count = fw64_terrain_draw(game->terrain, game->engine->renderer);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
     fw64_renderer_begin(game->engine->renderer, &game->fps_camera.camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
