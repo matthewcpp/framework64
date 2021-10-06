@@ -36,7 +36,7 @@ int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t assetIndex) {
         return 0;
     }
 
-    int data_size = image_info.width * image_info.height * 2;
+    int data_size = image_info.width * image_info.height * image_info.bpp;
     uint8_t* image_data = memalign(8, data_size);
     bytes_read = fw64_filesystem_read(image_data, data_size, 1, handle);
     fw64_filesystem_close(handle);

@@ -11,6 +11,8 @@ typedef struct {
     fw64Engine* engine;
     fw64FpsCamera fps;
     Entity campfire;
+    Entity ground;
+    Entity moon;
     Flame flame;
 } Game;
 

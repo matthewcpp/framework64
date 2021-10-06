@@ -15,6 +15,7 @@
 
 static void fw64_n64_renderer_update_lighting_data(fw64Renderer* renderer);
 static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer);
+static void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame);
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
     renderer->screen_size.x = screen_width;
@@ -204,20 +205,11 @@ fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {
 }
 
 static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y) {
-    int slice_width = fw64_texture_slice_width(sprite);
-    int slice_height = fw64_texture_slice_height(sprite);
-
-    uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
-
-    gDPLoadTextureBlock(renderer->display_list++, sprite->image->data + frame_offset, 
-        G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
-        sprite->wrap_s, sprite->wrap_t, sprite->mask_s, sprite->mask_t, G_TX_NOLOD, G_TX_NOLOD);
-
-    gDPLoadSync(renderer->display_list++);
+    fw64_n64_renderer_load_texture(renderer, sprite, frame);
 
     gSPTextureRectangle(renderer->display_list++, 
             x << 2, y << 2, 
-            (x + slice_width) << 2, (y + slice_height) << 2,
+            (x + fw64_texture_slice_width(sprite)) << 2, (y + fw64_texture_slice_height(sprite)) << 2,
             G_TX_RENDERTILE, 
             0 << 5, 0 << 5, 
             1 << 10, 1 << 10);
@@ -309,15 +301,7 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
 
             case FW64_SHADING_MODE_GOURAUD_TEXTURED:
             case FW64_SHADING_MODE_UNLIT_TEXTURED: {
-                fw64Texture* texture = primitive->material->texture;
-
-                int slice_width = fw64_texture_slice_width(texture);
-                int slice_height = fw64_texture_slice_height(texture);
-                int frame_offset = slice_width * slice_height * 2 * primitive->material->texture_frame;
-
-                gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
-                    G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
-                    texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+                fw64_n64_renderer_load_texture(renderer, primitive->material->texture, primitive->material->texture_frame);
             }
             break;
 
@@ -348,4 +332,33 @@ static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer) {
 
     gSPLight(renderer->display_list++, &renderer->lights.a, light_num);
     gSPNumLights(renderer->display_list++, light_count);
+}
+
+
+void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {
+    fw64Image* image = texture->image;
+    int slice_width = fw64_texture_slice_width(texture);
+    int slice_height = fw64_texture_slice_height(texture);
+    int frame_offset = slice_width * slice_height * image->info.bpp * frame;
+
+    // unfortunetly due to the way that the gDPLoadTextureBlock macro is setup we have to pass G_IM_SIZ_16b in or G_IM_SIZ_32b
+    switch (image->info.format)
+    {
+    case FW64_N64_IMAGE_FORMAT_RGBA16:
+    gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
+        G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
+        texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+        break;
+
+    case FW64_N64_IMAGE_FORMAT_RGBA32:
+    gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
+        G_IM_FMT_RGBA, G_IM_SIZ_32b,  slice_width, slice_height, 0,
+        texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+        break;
+    
+    default:
+        break;
+    }
+
+    gDPLoadSync(renderer->display_list++);
 }

@@ -1,6 +1,6 @@
 const N64Primitive = require("./N64Primitive");
 const N64Defs = require("./N64Defs");
-const N64SpriteWriter = require("./N64SpriteWriter");
+const N64ImageWriter = require("./N64ImageWriter");
 const N64Slicer = require("./N64Slicer");
 const DisplayList = require("./DisplayList");
 const VertexBuffer = require("./VertexBuffer");
@@ -94,7 +94,7 @@ function prepareTextures(resources, outputDir, archive) {
 
         if (!entry){
             entry = archive.add(texturePath, "image");
-            N64SpriteWriter.write(image, 1, 1, texturePath);
+            N64ImageWriter.writeBinary(image, 1, 1, texturePath);
         }
 
         bufferIndex = textureAssetIndicesBuffer.writeUInt32BE(entry.index, bufferIndex);

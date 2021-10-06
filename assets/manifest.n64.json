@@ -12,6 +12,11 @@
             "vslices": 1
         },
         {
+            "src": "moon.png",
+            "hslices": 1,
+            "vslices": 1
+        },
+        {
             "src": "n64_logo.png",
             "hslices": 2,
             "vslices": 2
@@ -68,7 +73,8 @@
             "hslices": 10,
             "vslices": 1,
             "frameSize": "128x128",
-            "resize": "320x32"
+            "resize": "320x32",
+            "format": "rgba32"
         }
     ],
     "meshes": [
