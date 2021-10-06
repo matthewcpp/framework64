@@ -50,6 +50,25 @@
             "vslices": 3,
             "frameSize": "128x128",
             "resize": "72x36"
+        },
+        {
+            "name": "fire_sprite",
+            "frames": [
+                "fire_sprite/fireB0001.png",
+                "fire_sprite/fireB0003.png",
+                "fire_sprite/fireB0005.png",
+                "fire_sprite/fireB0009.png",
+                "fire_sprite/fireB0011.png",
+                "fire_sprite/fireB0015.png",
+                "fire_sprite/fireB0017.png",
+                "fire_sprite/fireB0021.png",
+                "fire_sprite/fireB0023.png",
+                "fire_sprite/fireB0025.png"
+            ],
+            "hslices": 10,
+            "vslices": 1,
+            "frameSize": "128x128",
+            "resize": "320x32"
         }
     ],
     "meshes": [

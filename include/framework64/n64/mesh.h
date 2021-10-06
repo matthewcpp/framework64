@@ -5,6 +5,7 @@
 #include "framework64/box.h"
 #include "framework64/color.h"
 #include "framework64/n64/image.h"
+#include "framework64/n64/material.h"
 #include "framework64/n64/texture.h"
 
 #include <nusys.h>
@@ -15,12 +16,6 @@
 #define FW64_MATERIAL_NO_TEXTURE UINT32_MAX
 
 
-struct fw64Material {
-    fw64ColorRGBA8 color;
-    fw64Texture* texture;
-    uint32_t texture_frame;
-    uint32_t shading_mode;
-};
 
 typedef struct {
     Box bounding_box;

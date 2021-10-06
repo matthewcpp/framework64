@@ -51,6 +51,7 @@ if (FW64_PLATFORM_N64)
             ../include/framework64/n64/image.h n64/image.c
             ../include/framework64/n64/input.h n64/input.c
             ../include/framework64/n64/loader.h n64/loader.c
+            ../include/framework64/n64/material.h n64/material.c
             ../include/framework64/n64/mesh.h n64/mesh.c
             n64/quad.c
             ../include/framework64/n64/renderer.h n64/renderer.c

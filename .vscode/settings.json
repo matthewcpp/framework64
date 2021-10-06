@@ -20,6 +20,7 @@
         "color.h": "c",
         "game.h": "c",
         "terrain.h": "c",
-        "loader.h": "c"
+        "loader.h": "c",
+        "quad.h": "c"
     }
 }

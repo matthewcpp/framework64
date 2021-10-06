@@ -14,12 +14,12 @@ void game_init(Game* game, fw64Engine* engine) {
     game->fps.camera.near = 1.0f;
     game->fps.camera.far = 200.0f;
     fw64_camera_update_projection_matrix(&game->fps.camera);
-    vec3_set(&game->fps.camera.transform.position, 0.6f, 12.0f, 20.0f);
+    vec3_set(&game->fps.camera.transform.position, 0.6f, 12.0f, 40.0f);
 
     fw64Image* flame_image = fw64_image_load(engine->assets, FW64_ASSET_image_fire_sprite);
     flame_init(&game->flame, engine, flame_image);
-    vec3_set(&game->flame.entity.transform.scale, 10.0f, 10.0f, 10.0f);
-    vec3_set(&game->flame.entity.transform.position, 0, 10.0f, 0.0f);
+    vec3_set(&game->flame.entity.transform.scale, 10.0f, 12.0f, 10.0f);
+    vec3_set(&game->flame.entity.transform.position, 0, 11.0f, 0.0f);
 
     entity_init(&game->campfire, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_campfire));
     vec3_set(&game->campfire.transform.scale, 0.5f, 0.5f, 0.5f);

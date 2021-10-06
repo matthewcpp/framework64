@@ -68,13 +68,11 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
-    (void)engine;
-
+static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vslices) {
     fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);
     
-    fw64Image* image = fw64_image_load(NULL, image_asset_index);
+    uint32_t slice_count = hslices * vslices;
     fw64Texture* texture = fw64_texture_create_from_image(image);
 
     mesh->resources = malloc(sizeof(fw64MeshResources));
@@ -85,7 +83,7 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
     mesh->resources->texture_count = 1;
     mesh->resources->textures = texture;
 
-    uint32_t slice_count = texture->image->info.hslices * texture->image->info.vslices;
+    
 
     mesh->info.primitive_count = slice_count;
     mesh->primitives = malloc(mesh->info.primitive_count * sizeof(fw64Primitive));
@@ -107,8 +105,8 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
         size = 2;
     }
     else {
-        start_x = -texture->image->info.hslices / 2;
-        start_y = texture->image->info.vslices / 2;
+        start_x = -hslices / 2;
+        start_y = vslices / 2;
         size = 1;
     }
 
@@ -119,8 +117,8 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
 
     box_invalidate(&mesh->info.bounding_box);
     
-    for (int y = 0; y < texture->image->info.vslices; y++) {
-        for (int x = 0; x < texture->image->info.hslices; x++) {
+    for (int y = 0; y < vslices; y++) {
+        for (int x = 0; x < hslices; x++) {
             create_quad_slice(mesh, primitive_index, tl_x, tl_y, size, texture);
 
             fw64Primitive* primitive = mesh->primitives + primitive_index;
@@ -143,9 +141,27 @@ fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
     return mesh;
 }
 
+fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
+    (void)engine;
+
+    fw64Image* image = fw64_image_load(NULL, image_asset_index);
+    
+
+    return make_quad_mesh(image, image->info.hslices, image->info.vslices);
+}
+
 fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t){
     fw64Mesh* mesh = textured_quad_create(engine, image_asset_index);
     textured_quad_set_tex_coords(mesh, 0, max_s, max_t);
+
+    return mesh;
+}
+
+fw64Mesh* textured_quad_create_with_image(fw64Engine* engine, fw64Image* image, int frame_index) {
+    (void)engine;
+
+    fw64Mesh* mesh = make_quad_mesh(image, 1, 1);
+    mesh->resources->materials[0].texture_frame = frame_index;
 
     return mesh;
 }
