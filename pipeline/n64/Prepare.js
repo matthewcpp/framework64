@@ -46,7 +46,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
 
             const sourceDir = path.join(manifestDirectory, soundBank.dir);
-            //await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, archive);
+            await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, archive);
         }
     }
 
@@ -55,7 +55,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
 
             const sourceDir = path.join(manifestDirectory, musicBank.dir);
-            //await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
+            await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
         }
     }
 
