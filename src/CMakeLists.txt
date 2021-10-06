@@ -59,7 +59,7 @@ if (FW64_PLATFORM_N64)
         )
 else()
     set(platform_source_files
-            ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
+        ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
         ../include/framework64/desktop/audio.h desktop/audio.cpp
         ../include/framework64/desktop/audio_bank.h desktop/audio_bank.cpp
         ../include/framework64/desktop/engine.h desktop/engine.cpp
@@ -76,6 +76,7 @@ else()
         ../include/framework64/desktop/mesh_data.h desktop/mesh_data.cpp
         ../include/framework64/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
         ../include/framework64/desktop/n64_input_interface.h desktop/n64_input_interface.cpp
+        ../include/framework64/desktop/particle_shader.h desktop/particle_shader.cpp
         desktop/quad.cpp
         ../include/framework64/desktop/renderer.h desktop/renderer.cpp
         ../include/framework64/desktop/shader.h desktop/shader.cpp
@@ -83,6 +84,7 @@ else()
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
         desktop/terrain.cpp
         ../include/framework64/desktop/texture.h desktop/texture.cpp
+        ../include/framework64/desktop/uniform_block.h
         ../include/framework64/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp
         ../include/framework64/n64/controller_button.h
         )

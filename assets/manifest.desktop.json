@@ -50,6 +50,12 @@
             "vslices": 3,
             "frameSize": "128x128",
             "resize": "72x36"
+        },
+        {
+            "src": "fire_sprite.png",
+            "resize": "800x32",
+            "hslices": 25,
+            "vslices": 1
         }
     ],
     "fonts": [
@@ -80,6 +86,9 @@
         },
         {
             "src": "n64_logo_model/n64_logo.gltf"
+        },
+        {
+            "src": "campfire/campfire.gltf"
         }
     ],
     "soundBanks": [

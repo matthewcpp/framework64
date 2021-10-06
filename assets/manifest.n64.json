@@ -67,6 +67,9 @@
         },
         {
             "src": "n64_logo_model/n64_logo.gltf"
+        },
+        {
+            "src": "campfire/campfire.gltf"
         }
     ],
     "fonts": [

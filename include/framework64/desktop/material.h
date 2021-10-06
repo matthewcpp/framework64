@@ -18,6 +18,7 @@ struct fw64Material {
 
     std::array<float, 4> color = {1.0f, 1.0f, 1.0f, 1.0f};
     fw64Texture* texture = nullptr;
+    int texture_frame = 0;
     framework64::ShaderProgram* shader = nullptr;
 
     [[nodiscard]] uint32_t featureMask() const {

@@ -1,5 +1,7 @@
 #include "framework64/desktop/shader_cache.h"
 
+#include <limits>
+
 namespace framework64 {
 
 void ShaderCache::setShaderProgram(fw64Primitive & primitive) {
@@ -12,18 +14,11 @@ void ShaderCache::setShaderProgram(fw64Primitive & primitive) {
 
     // check for existing shader
     auto program_hash = programHash(primitive);
-    auto result = shader_programs.equal_range(shader);
+    setProgram(primitive, shader, program_hash);
+}
 
-    for (auto it = result.first; it != result.second; ++it) {
-        if (it->second->hash == program_hash)
-            primitive.material.shader = it->second.get();
-    }
-
-    auto * program = shader->create(primitive.attributes, primitive.material.featureMask(), shader_dir);
-    program->hash = program_hash;
-    shader_programs.insert(std::make_pair(shader, program));
-
-    primitive.material.shader = program;
+void ShaderCache::setParticleShader(fw64Primitive & primitive) {
+    setProgram(primitive, &particle_shader, std::numeric_limits<uint64_t>::max());
 }
 
 uint64_t ShaderCache::programHash(fw64Primitive const & primitive) const {
@@ -43,6 +38,21 @@ Shader* ShaderCache::getShader(fw64Primitive const & primitive) {
         return &line_shader;
 
     return nullptr;
+}
+
+void ShaderCache::setProgram(fw64Primitive & primitive, Shader* shader, uint64_t program_hash) {
+    auto result = shader_programs.equal_range(shader);
+
+    for (auto it = result.first; it != result.second; ++it) {
+        if (it->second->hash == program_hash)
+            primitive.material.shader = it->second.get();
+    }
+
+    auto * program = shader->create(primitive.attributes, primitive.material.featureMask(), shader_dir);
+    program->hash = program_hash;
+    shader_programs.insert(std::make_pair(shader, program));
+
+    primitive.material.shader = program;
 }
 
 }

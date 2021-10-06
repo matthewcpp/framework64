@@ -29,7 +29,7 @@ void main() {
     vec3 light_dir = normalize(fw64_light_direction);
     float diff = max(dot(normal, light_dir), 0.0f);
 
-    calculated_color = vec4(fw64_ambient_light_color, 1.0) * fw64_ambient_light_intensity;
+    calculated_color = vec4(fw64_ambient_light_color * fw64_ambient_light_intensity, 1.0) * diffuse_color;
     calculated_color += vec4(fw64_light_color * diff, 1.0) * diffuse_color;
 
     #ifdef FW64_DIFFUSE_TEXTURE
