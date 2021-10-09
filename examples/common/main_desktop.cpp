@@ -1,5 +1,6 @@
 #include "game.h"
 #include "framework64/desktop/engine.h"
+#include "framework64/desktop/input.h"
 
 #include <SDL2/SDL.h>
 
@@ -30,6 +31,14 @@ int main(int argc, char** argv) {
             switch (event.type) {
                 case SDL_QUIT:
                     keep_going = 0;
+                    break;
+
+                case SDL_JOYDEVICEADDED:
+                    engine.input->onDeviceAdded(event.jdevice.which);
+                    break;
+
+                case SDL_JOYDEVICEREMOVED:
+                    engine.input->onDeviceRemoved(event.jdevice.which);
                     break;
             }
         }

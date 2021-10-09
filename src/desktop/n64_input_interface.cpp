@@ -7,7 +7,79 @@
 
 namespace framework64 {
 
-static bool button_down(framework64::InputState::Controller const & state, int button) {
+bool N64InputInterface::buttonPressed(Controller const & current, Controller const & previous, int button) {
+    return buttonIsDown(current, button) && !buttonIsDown(previous, button);
+}
+
+bool N64InputInterface::buttonDown(Controller const & current, int button) {
+    return buttonIsDown(current, button);
+}
+
+Vec2 N64InputInterface::stick(Controller const & current, int stick_index) {
+    Vec2 result = {0.0f, 0.0f};
+
+    result.x = current.axis[SDL_CONTROLLER_AXIS_LEFTX];
+    result.y = current.axis[SDL_CONTROLLER_AXIS_LEFTY];
+
+    return result;
+}
+
+void N64InputInterface::updateControllerFromKeyboard(Controller & controller, uint8_t const * sdl_keyboard_state) {
+    controller.buttons[SDL_CONTROLLER_BUTTON_A] = sdl_keyboard_state[SDL_SCANCODE_X];
+    controller.buttons[SDL_CONTROLLER_BUTTON_A] = sdl_keyboard_state[SDL_SCANCODE_C];
+    controller.axis[SDL_CONTROLLER_AXIS_TRIGGERLEFT] = sdl_keyboard_state[SDL_SCANCODE_Z] ? 1.0f : 0.0f;
+    controller.buttons[SDL_CONTROLLER_BUTTON_START] = sdl_keyboard_state[SDL_SCANCODE_RETURN];
+    controller.buttons[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = sdl_keyboard_state[SDL_SCANCODE_A];
+    controller.buttons[SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = sdl_keyboard_state[SDL_SCANCODE_S];
+    controller.buttons[SDL_CONTROLLER_BUTTON_DPAD_UP] = sdl_keyboard_state[SDL_SCANCODE_I];
+    controller.buttons[SDL_CONTROLLER_BUTTON_DPAD_DOWN] = sdl_keyboard_state[SDL_SCANCODE_K];
+    controller.buttons[SDL_CONTROLLER_BUTTON_DPAD_RIGHT] = sdl_keyboard_state[SDL_SCANCODE_L];
+    controller.buttons[SDL_CONTROLLER_BUTTON_DPAD_LEFT] = sdl_keyboard_state[SDL_SCANCODE_J];
+
+    float stick_modifier = (sdl_keyboard_state[SDL_SCANCODE_LSHIFT] || sdl_keyboard_state[SDL_SCANCODE_RSHIFT]) ? 0.5f : 1.0f;
+
+    if (sdl_keyboard_state[SDL_SCANCODE_RIGHT]) {
+        controller.axis[SDL_CONTROLLER_AXIS_LEFTX] = 1.0f * stick_modifier;
+    }
+    else if (sdl_keyboard_state[SDL_SCANCODE_LEFT]) {
+        controller.axis[SDL_CONTROLLER_AXIS_LEFTX] = -1.0f * stick_modifier;
+    }
+    else {
+        controller.axis[SDL_CONTROLLER_AXIS_LEFTX] = 0;
+    }
+
+    if (sdl_keyboard_state[SDL_SCANCODE_UP]) {
+        controller.axis[SDL_CONTROLLER_AXIS_LEFTY] = 1.0f * stick_modifier;
+    }
+    else if (sdl_keyboard_state[SDL_SCANCODE_DOWN]) {
+        controller.axis[SDL_CONTROLLER_AXIS_LEFTY] = -1.0f * stick_modifier;
+    }
+    else {
+        controller.axis[SDL_CONTROLLER_AXIS_LEFTY] = 0;
+    }
+
+    if (sdl_keyboard_state[SDL_SCANCODE_T]) {
+        controller.axis[SDL_CONTROLLER_AXIS_RIGHTY] = 1.0f;
+    }
+    else if (sdl_keyboard_state[SDL_SCANCODE_G]) {
+        controller.axis[SDL_CONTROLLER_AXIS_RIGHTY] = -1.0f;
+    }
+    else {
+        controller.axis[SDL_CONTROLLER_AXIS_RIGHTY] = 0.0f;
+    }
+
+    if (sdl_keyboard_state[SDL_SCANCODE_H]) {
+        controller.axis[SDL_CONTROLLER_AXIS_RIGHTX] = 1.0f;
+    }
+    else if (sdl_keyboard_state[SDL_SCANCODE_F]) {
+        controller.axis[SDL_CONTROLLER_AXIS_RIGHTX] = -1.0f;
+    }
+    else {
+        controller.axis[SDL_CONTROLLER_AXIS_RIGHTX] = 0.0f;
+    }
+}
+
+bool N64InputInterface::buttonIsDown(Controller const & state, int button) {
     switch (button) {
         case FW64_N64_CONTROLLER_BUTTON_A:
             return state.buttons[SDL_CONTROLLER_BUTTON_A];
@@ -54,36 +126,5 @@ static bool button_down(framework64::InputState::Controller const & state, int b
             return false;
     }
 }
-
-void N64InputInterface::setInput(InputState const * input_state) {
-    input = input_state;
-}
-
-bool N64InputInterface::buttonPressed(int controller_index, int button) {
-    if (!input->controllerIsConnected(controller_index)) return false;
-
-    return !button_down(input->previous_states[controller_index], button) && button_down(input->current_states[controller_index], button);
-}
-
-bool N64InputInterface::buttonDown(int controller_index, int button) {
-    if (!input->controllerIsConnected(controller_index)) return false;
-
-    return button_down(input->current_states[controller_index], button);
-}
-
-Vec2 N64InputInterface::stick(int controller_index, int stick_index) {
-    Vec2 result = {0.0f, 0.0f};
-
-    if (input->controllerIsConnected(controller_index)) {
-        auto const & controller = input->current_states[controller_index];
-
-        result.x = controller.axis[SDL_CONTROLLER_AXIS_LEFTX];
-        result.y = controller.axis[SDL_CONTROLLER_AXIS_LEFTY];
-    }
-
-    return result;
-}
-
-
 
 }

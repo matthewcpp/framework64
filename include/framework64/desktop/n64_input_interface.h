@@ -6,13 +6,14 @@ namespace framework64 {
 
 class N64InputInterface : public InputInterface {
 public:
-    virtual void setInput(InputState const * input_state) override;
-    virtual bool buttonPressed(int controller_index, int button) override;
-    virtual bool buttonDown(int controller_index, int button) override;
-    virtual Vec2 stick(int controller_index, int stick_index) override;
+    virtual bool buttonPressed(Controller const & current, Controller const & previous, int button) override;
+    virtual bool buttonDown(Controller const & current, int button) override;
+    virtual Vec2 stick(Controller const & current, int stick_index) override;
+
+    virtual void updateControllerFromKeyboard(Controller & controller, uint8_t const * sdl_keyboard_state) override;
 
 private:
-    InputState const * input;
+    static bool buttonIsDown(Controller const & state, int button);
 };
 
 }
