@@ -4,7 +4,7 @@
 #include "framework64/desktop/mesh.h"
 #include "framework64/desktop/shader_cache.h"
 
-#include <gl/glew.h>
+#include "framework64/desktop/uniform_block.h"
 
 #include <array>
 #include <string>
@@ -42,16 +42,6 @@ private:
         std::array<float, 16> normal_matrix;
     };
 
-    template <typename T>
-    struct UniformBlock {
-        T data;
-        GLuint buffer;
-        GLuint binding_index = 0;
-
-        void create(GLuint bind_index);
-        void update();
-    };
-
 private:
     UniformBlock<LightingData> lighting_data_uniform_block;
     UniformBlock<MeshTransformData> mesh_transform_uniform_block;
@@ -62,19 +52,5 @@ private:
     ShaderProgram* active_shader = nullptr;
 };
 
-template<typename T>
-void MeshRenderer::UniformBlock<T>::create(GLuint bind_index) {
-    binding_index = bind_index;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(T), &data, GL_DYNAMIC_DRAW);
-    glBindBufferRange(GL_UNIFORM_BUFFER, binding_index, buffer, 0, sizeof(T));
-}
-
-template<typename T>
-void MeshRenderer::UniformBlock<T>::update() {
-    glBindBuffer(GL_UNIFORM_BUFFER, buffer);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(T), &data);
-}
 
 }

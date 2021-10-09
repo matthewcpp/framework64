@@ -1,10 +1,12 @@
 const Bundle = require("./Bundle");
 
-const processSprite = require("./ProcessImage");
 const processFont = require("./ProcessFont");
+const processImage = require("./ProcessImage");
 const processMesh = require("./ProcessMesh");
-const processSoundBank = require("./ProcessSoundBank");
 const processMusicBank = require("./ProcessMusicBank");
+const processSoundBank = require("./ProcessSoundBank");
+const processTerrain = require("./ProcessTerrain")
+
 const processRaw = require("./ProcessRaw");
 
 const path = require("path");
@@ -21,7 +23,7 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
             else
                 console.log(`Processing Image Atlas: ${image.name}`);
 
-            await processSprite(image, bundle, manifestDirectory, outputDirectory);
+            await processImage(image, bundle, manifestDirectory, outputDirectory);
         }
     }
 
@@ -57,6 +59,13 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
         for (const rawFile of manifest.raw) {
             console.log(`Processing Raw File: ${rawFile}`);
             processRaw(rawFile, bundle, manifestDirectory, outputDirectory);
+        }
+    }
+
+    if (manifest.terrains) {
+        for (const terrain of manifest.terrains) {
+            console.log(`Processing Terrain: ${terrain.src}`);
+            await processTerrain(terrain, bundle, manifestDirectory, outputDirectory);
         }
     }
 

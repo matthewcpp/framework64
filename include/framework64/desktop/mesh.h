@@ -5,7 +5,11 @@
 #include "framework64/desktop/material.h"
 #include "framework64/desktop/texture.h"
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
 
 #include <array>
 #include <memory>

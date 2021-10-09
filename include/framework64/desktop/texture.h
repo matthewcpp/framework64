@@ -8,7 +8,6 @@
 
 struct fw64Texture {
     fw64Texture(fw64Image* img);
-    ~fw64Texture();
 
     fw64Image* image;
     fw64TextureWrapMode wrap_s = FW64_TEXTURE_WRAP_CLAMP;

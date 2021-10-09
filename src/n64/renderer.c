@@ -13,6 +13,10 @@
 #include <malloc.h>
 #include <string.h>
 
+static void fw64_n64_renderer_update_lighting_data(fw64Renderer* renderer);
+static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer);
+static void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame);
+
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
     renderer->screen_size.x = screen_width;
     renderer->screen_size.y = screen_height;
@@ -35,8 +39,18 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->view_port.vp.vtrans[2] = G_MAXZ / 2;
     renderer->view_port.vp.vtrans[3] = 0;
 
+    // set default lighting state - single white light
+    Lights2 lights = gdSPDefLights2(
+        25, 25, 25,
+        255, 255, 255, 40, 40,40,
+        255, 255, 255, -40, -40, 40
+    );
+    renderer->lights = lights;
+    renderer->active_light_mask = 1;
+
     renderer->render_mode = FW64_RENDERER_MODE_UNSET;
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
+    renderer->flags = FW64_RENDERER_FLAG_NONE;
 }
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
@@ -97,6 +111,7 @@ void fw64_renderer_clear_frame_buffer(fw64Renderer* renderer) {
 void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags) {
     renderer->render_mode = render_mode;
     renderer->camera = camera;
+    renderer->flags = flags;
 
     if (flags & FW64_RENDERER_FLAG_CLEAR) {
         renderer->display_list = &renderer->gfx_list[0];
@@ -113,29 +128,10 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderM
         fw64_renderer_clear_frame_buffer(renderer);
     }
 
-    switch (renderer->render_mode) {
-        case FW64_RENDERER_MODE_UNSET:
-            break;
-        case FW64_RENDERER_MODE_TRIANGLES:
-        case FW64_RENDERER_MODE_ORTHO2D:
-            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
-        break;
-
-        case FW64_RENDERER_MODE_LINES:
-            gDPSetRenderMode(renderer->display_list++,  G_RM_AA_ZB_XLU_LINE,  G_RM_AA_ZB_XLU_LINE2);
-        break;
-
-        case FW64_RENDERER_MODE_RECTANGLES:
-            gSPClearGeometryMode(renderer->display_list++, 0xFFFFFFFF);
-        break;
-    }
-
     // sets the projection matrix (modelling set in individual draw calls)
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
     gSPPerspNormalize(renderer->display_list++, camera->perspNorm);
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-    
-    gDPPipeSync(renderer->display_list++);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
@@ -143,6 +139,7 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
     gSPEndDisplayList(renderer->display_list++);
 
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
+    renderer->flags = FW64_RENDERER_FLAG_NONE;
 
     nuGfxTaskStart(renderer->display_list_start, 
         (s32)(renderer->display_list - renderer->display_list_start) * sizeof (Gfx), 
@@ -157,33 +154,40 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
 
     switch(renderer->shading_mode) {
         case FW64_SHADING_MODE_UNLIT_TEXTURED:
-            gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
-            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
             break;
 
         case FW64_SHADING_MODE_GOURAUD:
-            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
-            gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH)
+            #define G_CC_PRIM_SHADE PRIMITIVE, 0, SHADE, 0, PRIMITIVE, 0, SHADE, 0
+            gDPSetCombineMode(renderer->display_list++, G_CC_PRIM_SHADE, G_CC_PRIM_SHADE);
+            fw64_n64_renderer_set_lighting_data(renderer);
             break;
 
         case FW64_SHADING_MODE_GOURAUD_TEXTURED:
-            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING)
-            gDPSetCombineMode(renderer->display_list++,G_CC_MODULATERGBA , G_CC_MODULATERGBA );
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH)
+            gDPSetCombineMode(renderer->display_list++,G_CC_MODULATERGBA , G_CC_MODULATERGBA );
+            fw64_n64_renderer_set_lighting_data(renderer);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
-            gDPSetTextureFilter(renderer->display_list++,G_TF_POINT);
             break;
 
         case FW64_SHADING_MODE_SPRITE:
-            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
+            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             break;
+
+        case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF2);
+        break;
 
         default:
             break;
@@ -196,40 +200,16 @@ void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {
     *screen_size = renderer->screen_size;
 }
 
-void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color) {
-    renderer->fill_color = GPACK_RGBA5551(color->r, color->g, color->b, 255);
-
-    if (renderer->display_list) {
-        gDPSetFillColor(renderer->display_list++, (renderer->fill_color << 16 | renderer->fill_color));
-    }
-}
-
-void fw64_renderer_set_fill_mode(fw64Renderer* renderer) {
-    gDPSetFillColor(renderer->display_list++, (renderer->fill_color << 16 | renderer->fill_color));
-    gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
-    //TODO: do i need to sync pipe here?
-}
-
-void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect) {
-    gDPFillRectangle(renderer->display_list++, rect->x, rect->y, rect->x + rect->width, rect->y + rect->height);
-    gDPPipeSync(renderer->display_list++);
+fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {
+    return renderer->camera;
 }
 
 static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y) {
-    int slice_width = fw64_texture_slice_width(sprite);
-    int slice_height = fw64_texture_slice_height(sprite);
-
-    uint32_t frame_offset = (slice_width * slice_height * 2) * frame;
-
-    gDPLoadTextureBlock(renderer->display_list++, sprite->image->data + frame_offset, 
-        G_IM_FMT_RGBA, G_IM_SIZ_16b, slice_width, slice_height, 0, 
-        sprite->wrap_s, sprite->wrap_t, sprite->mask_s, sprite->mask_t, G_TX_NOLOD, G_TX_NOLOD);
-
-    gDPLoadSync(renderer->display_list++);
+    fw64_n64_renderer_load_texture(renderer, sprite, frame);
 
     gSPTextureRectangle(renderer->display_list++, 
             x << 2, y << 2, 
-            (x + slice_width) << 2, (y + slice_height) << 2,
+            (x + fw64_texture_slice_width(sprite)) << 2, (y + fw64_texture_slice_height(sprite)) << 2,
             G_TX_RENDERTILE, 
             0 << 5, 0 << 5, 
             1 << 10, 1 << 10);
@@ -305,33 +285,80 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
         
-        fw64_renderer_set_shading_mode(renderer, primitive->material.mode);
+        fw64_renderer_set_shading_mode(renderer, primitive->material->shading_mode);
 
-        if (primitive->material.mode == FW64_SHADING_MODE_GOURAUD_TEXTURED || 
-            primitive->material.mode == FW64_SHADING_MODE_UNLIT_TEXTURED ) {
-            fw64Texture* texture = primitive->material.texture;
+        switch (primitive->material->shading_mode) {
+            case FW64_SHADING_MODE_GOURAUD: {
+                gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, primitive->material->color.r, 
+                    primitive->material->color.g, primitive->material->color.b, primitive->material->color.a);
+            }
+            break;
 
-            int slice_width = fw64_texture_slice_width(texture);
-            int slice_height = fw64_texture_slice_height(texture);
-            int frame_offset = slice_width * slice_height * 2 * primitive->material.texture_frame;
+            case FW64_SHADING_MODE_GOURAUD_TEXTURED:
+            case FW64_SHADING_MODE_UNLIT_TEXTURED: {
+                fw64_n64_renderer_load_texture(renderer, primitive->material->texture, primitive->material->texture_frame);
+            }
+            break;
 
-            gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
-                G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
-                texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+            default:
+                break;
         }
-
-        if (primitive->material.color != FW64_MATERIAL_NO_COLOR)
-            gSPSetLights1(renderer->display_list++, mesh->colors[primitive->material.color]);
-
+            
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
         gDPPipeSync(renderer->display_list++);
     }
 
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+}
+
+// TODO: handle no active lights correctly...first light should be set to all black
+static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer) {
+    int light_num = 1;
+    int light_count = 0;
+    if (renderer->active_light_mask & (1 << 0)) {
+        gSPLight(renderer->display_list++, &renderer->lights.l[0], light_num++);
+        light_count += 1;
+    }
+
+    if (renderer->active_light_mask & (1 << 1)) { 
+        gSPLight(renderer->display_list++, &renderer->lights.l[1], light_num++);
+        light_count += 1;
+    }
+
+    gSPLight(renderer->display_list++, &renderer->lights.a, light_num);
+    gSPNumLights(renderer->display_list++, light_count);
+}
+
+
+void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {
+    fw64Image* image = texture->image;
+    int slice_width = fw64_texture_slice_width(texture);
+    int slice_height = fw64_texture_slice_height(texture);
+    int frame_offset = slice_width * slice_height * image->info.bpp * frame;
+
+    // unfortunetly due to the way that the gDPLoadTextureBlock macro is setup we have to pass G_IM_SIZ_16b in or G_IM_SIZ_32b
+    switch (image->info.format)
+    {
+    case FW64_N64_IMAGE_FORMAT_RGBA16:
+    gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
+        G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
+        texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+        break;
+
+    case FW64_N64_IMAGE_FORMAT_RGBA32:
+    gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
+        G_IM_FMT_RGBA, G_IM_SIZ_32b,  slice_width, slice_height, 0,
+        texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+        break;
+    
+    default:
+        break;
+    }
+
+    gDPLoadSync(renderer->display_list++);
 }

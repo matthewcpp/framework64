@@ -16,6 +16,11 @@
         "mesh.h": "c",
         "controller_button.h": "c",
         "variant": "c",
-        "texture.h": "c"
+        "texture.h": "c",
+        "color.h": "c",
+        "game.h": "c",
+        "terrain.h": "c",
+        "loader.h": "c",
+        "quad.h": "c"
     }
 }

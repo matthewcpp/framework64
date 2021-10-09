@@ -1,7 +1,9 @@
-const N64Model = require("./N64Model")
-const N64Mesh = require("./N64Mesh")
-const N64Material = require("./N64Material")
 const N64Image = require("./N64Image");
+const N64Material = require("./N64Material");
+const N64Mesh = require("./N64Mesh");
+const N64MeshResources = require("./N64MeshResources");
+const N64Primitive = require("./N64Primitive");
+const N64Texture = require("./N64Texture");
 
 const glMatrix = require("gl-matrix");
 
@@ -18,76 +20,202 @@ const GltfComponentType = {
 }
 
 class GLTFLoader {
+    loadedBuffers = new Map();
+    gltfPath = null;
+    gltf = null;
+    mesh = null;
+    resources = null;
+
+    // these maps provide a way to convert from the GLTF file level indices to the currently loaded mesh's indices
+    imageMap = new Map();
+    textureMap = new Map();
+    materialMap = new Map();
+
+
     constructor(options) {
         this.options =  {
             resizeImages: {}
         };
 
         Object.assign(this.options, options);
-
-        this.loadedBuffers = new Map();
-        this.gltfPath = null;
-        this.gltf = null;
-        this.model = null;
     }
 
-    async load(gltfPath) {
-        this.gltfPath = gltfPath;
-        this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
+    /** Loads all meshes in the file and returns them as an array. */
+    async loadTerrain(gltfPath) {
+        this._loadFile(gltfPath);
 
-        const modelName = path.basename(gltfPath, ".gltf");
-        this.model = new N64Model(modelName);
+        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
+            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
+        }
 
-        this._readMaterials();
-        await this._readImages();
+        const meshes = [];
 
-        const scene = this.gltf.scenes[this.gltf.scene];
+        for (let i = 0; i < this.gltf.meshes.length; i++) {
+            this.mesh = new N64Mesh(null);
+            await this._loadMesh(this.gltf.meshes[i]);
+            meshes.push(this.mesh);
+        }
 
-        for (const nodeIndex of scene.nodes) {
-            const gltfNode = this.gltf.nodes[nodeIndex];
-
-            if (!gltfNode.hasOwnProperty("mesh"))
-                continue;
-
-            this._processNode(gltfNode);
+        return {
+            meshes: meshes,
+            resources: this.resources
         }
     }
 
-    _processNode(gltfNode) {
-        const gltfMesh = this.gltf.meshes[gltfNode.mesh];
-        const supportedPrimitiveModes = new Set(Object.values(N64Mesh.ElementType));
+    /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
+    async loadStaticMesh(gltfPath) {
+        this._loadFile(gltfPath);
+
+        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
+            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
+        }
+
+        const modelName = path.basename(gltfPath, ".gltf");
+        this.mesh = new N64Mesh(modelName);
+        this.mesh.resources = this.resources;
+        await this._loadMesh(this.gltf.meshes[0]);
+
+        return this.mesh;
+    }
+
+    _loadFile(gltfPath) {
+        this.gltfPath = gltfPath;
+        this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
+
+        this.resources = new N64MeshResources();
+        this.loadedBuffers.clear();
+        this.imageMap.clear();
+        this.textureMap.clear();
+        this.materialMap.clear();
+    }
+
+    async _loadMesh(gltfMesh) {
+        const supportedPrimitiveModes = new Set(Object.values(N64Primitive.ElementType));
 
         for (const gltfPrimitive of gltfMesh.primitives) {
             // only support triangles for now
-            const mode = gltfPrimitive.hasOwnProperty("mode") ? gltfPrimitive.mode : N64Mesh.ElementType.Triangles;
+            const mode = gltfPrimitive.hasOwnProperty("mode") ? gltfPrimitive.mode : N64Primitive.ElementType.Triangles;
 
             if (!supportedPrimitiveModes.has(mode)) {
                 console.log(`Skipping primitive with mode: ${mode}`);
                 continue;
             }
 
-            const n64Mesh = new N64Mesh(mode);
-            this.model.meshes.push(n64Mesh);
+            const primitive = new N64Primitive(mode);
+            this.mesh.primitives.push(primitive);
 
-            this._readPositions(gltfPrimitive, n64Mesh);
+            primitive.material = await this._getMaterial(gltfPrimitive.hasOwnProperty("material") ? gltfPrimitive.material : -1);
+
+            this._readPositions(gltfPrimitive, primitive);
 
             if (gltfPrimitive.attributes.COLOR_0) {
-                this._readVertexColors(gltfPrimitive, n64Mesh);
+                this._readVertexColors(gltfPrimitive, primitive);
             }
             else if (gltfPrimitive.attributes.NORMAL) {
-                this._readNormals(gltfPrimitive, n64Mesh);
+                this._readNormals(gltfPrimitive, primitive);
             }
 
             if (gltfPrimitive.attributes.TEXCOORD_0)
-                this._readTexCoords(gltfPrimitive, n64Mesh);
+                this._readTexCoords(gltfPrimitive, primitive);
 
-            if (gltfPrimitive.hasOwnProperty("material"))
-                n64Mesh.material = gltfPrimitive.material;
-            else
-                n64Mesh.material = 0; //use default
+            this._readIndices(gltfPrimitive, primitive);
 
-            this._readIndices(gltfPrimitive, n64Mesh);
+            const material = this.resources.materials[primitive.material];
+            if (material.shadingMode === N64Material.ShadingMode.Unset) {
+                material.setShadingMode(primitive);
+            }
         }
+
+        this.mesh.prunePrimitiveVertices();
+    }
+
+    /** Gets the correct index for the GLTF material.  I
+     * If a negative index is passed in, a default material will be used. **/
+    async _getMaterial(index) {
+        if (index < 0) {
+            const materialIndex = this.resources.materials.length;
+            this.resources.materials.push(new N64Material());
+            return materialIndex;
+        }
+
+        // we have already parsed this material
+        if (this.materialMap.has(index)) {
+            return this.materialMap.get(index);
+        }
+
+        // new material
+        const materialIndex = this.resources.materials.length;
+        const material = new N64Material();
+
+        const gltfMaterial = this.gltf.materials[index];
+        const pbr = gltfMaterial.pbrMetallicRoughness;
+
+        if (pbr.baseColorFactor) {
+            const baseColor = pbr.baseColorFactor;
+            material.color[0] = Math.round(baseColor[0] * 255);
+            material.color[1] = Math.round(baseColor[1] * 255);
+            material.color[2] = Math.round(baseColor[2] * 255);
+            material.color[3] = Math.round(baseColor[3] * 255);
+        }
+
+        if (pbr.baseColorTexture) {
+            material.texture = await this._getTexture(pbr.baseColorTexture.index);
+        }
+
+        this.resources.materials.push(material)
+        this.materialMap.set(index, materialIndex);
+
+        return materialIndex;
+    }
+
+    async _getImage(gltfIndex) {
+        if (this.imageMap.has(gltfIndex)) {
+            return this.imageMap.get(gltfIndex);
+        }
+
+        const imageIndex = this.resources.images.length;
+        const gltfDir = path.dirname(this.gltfPath);
+
+        const gltfImage = this.gltf.images[gltfIndex];
+        const imagePath = path.join(gltfDir, gltfImage.uri);
+
+
+        //TODO: This should probably be more robust: e.g. image.something.ext will break asset macro name
+        const imageName = path.basename(gltfImage.uri, path.extname(gltfImage.uri));
+        const image = new N64Image(imageName, N64Image.Format.RGBA16);
+        await image.load(imagePath);
+
+        if (this.options.resizeImages.hasOwnProperty(gltfImage.uri)) {
+            const dimensions = this.options.resizeImages[gltfImage.uri].split("x");
+            image.data.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
+            console.log(`Resize image: ${gltfImage.uri} to ${dimensions[0]}x${dimensions[1]}`);
+        }
+
+        this.resources.images.push(image);
+        this.imageMap.set(gltfIndex, imageIndex);
+
+        return imageIndex;
+    }
+
+    async _getTexture(gltfIndex) {
+        if (this.textureMap.has(gltfIndex)) {
+            return this.textureMap.get(gltfIndex);
+        }
+
+        const textureIndex = this.resources.textures.length;
+        const gltfTexture = this.gltf.textures[gltfIndex];
+
+        const sourceImage = await this._getImage(gltfTexture.source);
+        const texture = new N64Texture(sourceImage);
+        this.resources.textures.push(texture);
+
+        // TODO: Get sampler info (repeat, etc)
+        const image = this.resources.images[sourceImage];
+        texture.maskS = Math.log2(image.width);
+        texture.maskT = Math.log2(image.height);
+
+        this.textureMap.set(gltfIndex, textureIndex);
+        return textureIndex;
     }
 
     _getBuffer(bufferIndex) {
@@ -99,8 +227,6 @@ class GLTFLoader {
             const bufferDir = path.dirname(this.gltfPath);
             const bufferPath = path.join(bufferDir, gltfBuffer.uri);
 
-            console.log(`Load Buffer: ${bufferPath}`);
-            
             buffer = fs.readFileSync(bufferPath);
             this.loadedBuffers.set(bufferIndex, buffer);
         }
@@ -108,7 +234,7 @@ class GLTFLoader {
         return buffer;
     }
 
-    _readPositions(gltfPrimitive, n64Mesh) {
+    _readPositions(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.POSITION];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -132,8 +258,8 @@ class GLTFLoader {
                 0, 0, 0, 0 /* color or normal */
             ];
 
-            n64Mesh.vertices.push(vertex);
-            n64Mesh.bounding.encapsulatePoint(position);
+            primitive.vertices.push(vertex);
+            primitive.bounding.encapsulatePoint(position);
             offset += byteStride;
         }
     }
@@ -186,7 +312,7 @@ class GLTFLoader {
         return componentSize * componentCount;
     }
 
-    _readVertexColors(gltfPrimitive, n64Mesh) {
+    _readVertexColors(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.COLOR_0];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -216,14 +342,14 @@ class GLTFLoader {
         }
 
         for (let i = 0; i < accessor.count; i++) {
-            parseVertexColor(n64Mesh.vertices[i], buffer, offset);
+            parseVertexColor(primitive.vertices[i], buffer, offset);
             offset += byteStride;
         }
 
-        n64Mesh.hasVertexColors = true;
+        primitive.hasVertexColors = true;
     }
 
-    _readNormals(gltfPrimitive, n64Mesh) {
+    _readNormals(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.NORMAL];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -232,7 +358,7 @@ class GLTFLoader {
 
         let offset = bufferView.byteOffset;
         for (let i = 0; i < accessor.count; i++) {
-            const vertex = n64Mesh.vertices[i];
+            const vertex = primitive.vertices[i];
 
             // the normals are treated as 8-bit signed values (-128 to 127).
             vertex[6] = Math.min(Math.round(buffer.readFloatLE(offset) * 128), 127);
@@ -243,90 +369,41 @@ class GLTFLoader {
             offset += byteStride;
         }
 
-        n64Mesh.hasNormals = true;
+        primitive.hasNormals = true;
     }
 
-    _readTexCoords(gltfPrimitive, n64Mesh) {
+    _readTexCoords(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.TEXCOORD_0];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
-        const material = this.gltf.materials[gltfPrimitive.material];
+        const material = this.resources.materials[this.materialMap.get(gltfPrimitive.material)];
 
-        if (!material.pbrMetallicRoughness.baseColorTexture) {
+        if (material.texture === N64Material.NoTexture) {
             console.log("No image specified.  Ignoring texture coordinates.")
             return;
         }
-        const image = this.model.images[material.pbrMetallicRoughness.baseColorTexture.index];
+
+        const texture = this.resources.textures[material.texture];
+        const image = this.resources.images[texture.image];
 
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
 
         let offset = bufferView.byteOffset;
         for (let i = 0; i < accessor.count; i++) {
-            const vertex = n64Mesh.vertices[i];
+            const vertex = primitive.vertices[i];
 
             let s = buffer.readFloatLE(offset);
             let t = buffer.readFloatLE(offset + 4);
 
-            // clamp tex coords to (0, 1)
-            s = Math.min(Math.max(s, 0.0), 1.0) * image.width * 2;
-            t = Math.min(Math.max(t, 0.0), 1.0) * image.height * 2;
+            s *= image.width * 2;
+            t *= image.height * 2;
 
             // Note that the texture coordinates (s,t) are encoded in S10.5 format.
             vertex[4] = Math.round(s * (1 << 5));
             vertex[5] = Math.round(t * (1 << 5));
 
             offset += byteStride;
-        }
-    }
-
-    _readMaterials() {
-        // if the file does not specify any materials use the default.
-        if (!this.gltf.hasOwnProperty("materials") || this.gltf.materials.length === 0) {
-            this.model.materials.push(new N64Material());
-            return;
-        }
-
-        for (const gltfMaterial of this.gltf.materials) {
-            const material = new N64Material();
-
-            const pbr = gltfMaterial.pbrMetallicRoughness;
-
-            if (pbr.baseColorFactor) {
-                const baseColor = pbr.baseColorFactor;
-                material.ambient[0] = parseInt(baseColor[0] * 255);
-                material.ambient[1] = parseInt(baseColor[1] * 255);
-                material.ambient[2] = parseInt(baseColor[2] * 255);
-            }
-
-            if (pbr.baseColorTexture) {
-                material.texture = pbr.baseColorTexture.index;
-            }
-
-            this.model.materials.push(material)
-        }
-    }
-
-    async _readImages() {
-        if (!this.gltf.images) return;
-
-        const gltfDir = path.dirname(this.gltfPath);
-
-        for (const gltfImage of this.gltf.images) {
-            const imagePath = path.join(gltfDir, gltfImage.uri);
-
-            //TODO: This should probably be more robust: e.g. image.something.ext will break asset macro name
-            const imageName = path.basename(gltfImage.uri, path.extname(gltfImage.uri));
-            const image = new N64Image(imageName);
-            await image.load(imagePath);
-
-            if (this.options.resizeImages.hasOwnProperty(gltfImage.uri)) {
-                const dimensions = this.options.resizeImages[gltfImage.uri].split("x");
-                image.data.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
-                console.log(`Resize image: ${gltfImage.uri} to ${dimensions[0]}x${dimensions[1]}`);
-            }
-
-            this.model.images.push(image);
         }
     }
 
@@ -356,14 +433,14 @@ class GLTFLoader {
         mesh.elements.push(element);
     }
 
-    _readIndices(gltfPrimitive, n64Mesh) {
+    _readIndices(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.indices];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
-        const elementSize = n64Mesh.elementType === N64Mesh.ElementType.Triangles ? 3 : 2;
+        const elementSize = primitive.elementType === N64Primitive.ElementType.Triangles ? 3 : 2;
 
-        GLTFLoader._readElementList(buffer, bufferView.byteOffset, accessor.count, elementSize, accessor.componentType, n64Mesh);
+        GLTFLoader._readElementList(buffer, bufferView.byteOffset, accessor.count, elementSize, accessor.componentType, primitive);
     }
 
 }

@@ -90,7 +90,7 @@ class N64Font {
 
         // note this actualy dumps image in BRGA but since we write everything as 255 white no swapping is needed
         const imageBuffer = canvas.toBuffer("raw");
-        const image = new N64Image(this.name);
+        const image = new N64Image(this.name, N64Image.Format.RGBA16); // TODO: This can probably change to use IA Tex
         await image.loadBuffer(imageBuffer, imageWidth, imageHeight);
 
         return  {

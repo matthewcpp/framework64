@@ -1,10 +1,12 @@
-const fs = require("fs")
+const N64Defs = require("./N64Defs")
 
 const G_VTX = 0x01;
 const G_TRI1 = 0x05;
 const G_TRI2 = 0x06;
 const G_LINE3D = 0x08;
 const G_ENDDL = 0xdf;
+
+const UlongMax = BigInt(0xFFFFFFFF);
 
 function _SHIFTL(v, s, w) {
     return ((((v) & ((0x01 << (w)) - 1)) << (s)));
@@ -48,32 +50,124 @@ function gSPLine3D(gfx, v0, v1, flag) {
     gfx.writeUInt32BE(0, 4);
 }
 
-const UlongMax = BigInt(0xFFFFFFFF);
-
 function gSPEndDisplayList(gfx) {
     const val = BigInt(_SHIFTL(G_ENDDL, 24, 8));
     gfx.writeUInt32BE(parseInt(val & UlongMax), 0);
     gfx.writeUInt32BE(0, 4);
 }
 
-/*
-const gfx = Buffer.alloc(8);
-const displayList = Buffer.alloc(24);
+function createTriangleDisplayListBuffer(slices) {
+    let displayListSize = 1; // gSPEndDisplayList
+    for (const slice of slices) {
+        displayListSize += 1 // gSPVertex;
+        displayListSize += Math.ceil(slice.elements.length / 2); // gSP2Triangles , gSP1Triangle
+    }
 
-gSPVertex(gfx, 500, 30, 0);
-gfx.copy(displayList, 0, 0, 8);
-gSP1Triangle(gfx, 0,1,2, 0)
-gfx.copy(displayList, 8, 0, 8);
-gSP2Triangles(gfx, 3,4,5,0,6,7,8,0);
-gfx.copy(displayList, 16, 0, 8);
+    const gfx = Buffer.alloc(8);
 
-fs.writeFileSync("/Users/matthew/development/scratch/dl_test/cmake-build-debug/dl_node.dat", displayList);
-*/
+    const displayListBuffer = Buffer.alloc(displayListSize * N64Defs.SizeOfGfx);
+    let displayListIndex = 0; // holds the current index into the display list array.
+
+    const vertexPointerBuffer = Buffer.alloc(slices.length * 4); // holds indices of this primitive's display list that contain vertex cache pointers (gSPVertex)
+    let vertexPointerBufferIndex = 0;
+
+    // holds all the indices of calls to gspVertex in this display list.
+    // at runtime, the base address of the vertex array will be appended to the value stored in the command at each of these indices
+    const gspVertexIndices = [];
+
+    let vertexBufferOffset = 0; // holds the offset into the vertex buffer for this primitive.  Incremented every slice
+
+    for (const slice of slices) {
+        // writes the index of the gSPVertex call of the display list into the list of items that need to be fixed up when loaded at runtime
+        vertexPointerBufferIndex = vertexPointerBuffer.writeInt32BE(displayListIndex, vertexPointerBufferIndex);
+        gspVertexIndices.push(displayListIndex);
+
+        // writes the relative offset into the vertex buffer for this slice.  At runtime the base address of the primitive's vertex buffer will be added to this value
+        gSPVertex(gfx, vertexBufferOffset, slice.vertices.length, 0)
+        gfx.copy(displayListBuffer, displayListIndex++ * N64Defs.SizeOfGfx);
+
+        let currentElement = 0;
+        let elementsRemaining = slice.elements.length;
+
+        while (elementsRemaining > 0) {
+            if (elementsRemaining >= 2) {
+                const t1 = slice.elements[currentElement++];
+                const t2 = slice.elements[currentElement++];
+
+                gSP2Triangles(gfx, t1[0],t1[1],t1[2],0,t2[0],t2[1],t2[2],0);
+                elementsRemaining -= 2;
+            }
+            else {
+                const t1 = slice.elements[slice.elements.length - 1];
+                gSP1Triangle(gfx, t1[0],t1[1],t1[2],0);
+                elementsRemaining -= 1;
+            }
+
+            gfx.copy(displayListBuffer, displayListIndex++ * N64Defs.SizeOfGfx);
+        }
+
+        vertexBufferOffset += slice.vertices.length * N64Defs.SizeOfVtx;
+    }
+
+    gSPEndDisplayList(gfx);
+    gfx.copy(displayListBuffer, displayListIndex++ * N64Defs.SizeOfGfx);
+
+    return {
+        displayList: displayListBuffer,
+        vertexPointers: vertexPointerBuffer,
+        vertexCommandIndices: gspVertexIndices
+    }
+}
+
+function createLineDisplayListBuffer(slices) {
+    let displayListSize = 1; // gSPEndDisplayList
+    for (const slice of slices) {
+        displayListSize += 1; // gSPVertex
+        displayListSize += slice.elements.length; // gSPLine3D
+    }
+
+    const gfx = Buffer.alloc(8);
+
+    const displayListBuffer = Buffer.alloc(displayListSize * N64Defs.SizeOfGfx);
+    let displayListIndex = 0; // holds the current index into the display list array.
+
+    const vertexPointerBuffer = Buffer.alloc(slices.length * 4); // holds indices of this primitive's display list that contain vertex cache pointers (gSPVertex)
+    let vertexPointerBufferIndex = 0;
+
+    // holds all the indices of calls to gspVertex in this display list.
+    // at runtime, the base address of the vertex array will be appended to the value stored in the command at each of these indices
+    const gspVertexIndices = [];
+
+    let vertexBufferOffset = 0; // holds the offset into the vertex buffer for this primitive.  Incremented every slice
+
+    for (const slice of slices) {
+        // writes the index of the gSPVertex call of the display list into the list of items that need to be fixed up when loaded at runtime
+        vertexPointerBufferIndex = vertexPointerBuffer.writeInt32BE(displayListIndex, vertexPointerBufferIndex);
+        gspVertexIndices.push(displayListIndex);
+
+        // writes the relative offset into the vertex buffer for this slice.  At runtime the base address of the primitive's vertex buffer will be added to this value
+        gSPVertex(gfx, vertexBufferOffset, slice.vertices.length, 0)
+        gfx.copy(displayListBuffer, displayListIndex++ * N64Defs.SizeOfGfx);
+
+        for (const line of slice.elements) {
+            gSPLine3D(gfx, line[0], line[1], 0);
+            gfx.copy(displayListBuffer, displayListIndex++ * N64Defs.SizeOfGfx);
+        }
+
+        vertexBufferOffset += slice.vertices.length * N64Defs.SizeOfVtx;
+    }
+
+    gSPEndDisplayList(gfx);
+    gfx.copy(displayListBuffer, displayListIndex++ * N64Defs.SizeOfGfx);
+
+    return {
+        displayList: displayListBuffer,
+        vertexPointers: vertexPointerBuffer,
+        vertexCommandIndices: gspVertexIndices
+    }
+}
 
 module.exports = {
-    gSPVertex: gSPVertex,
-    gSP1Triangle: gSP1Triangle,
-    gSP2Triangles: gSP2Triangles,
-    gSPLine3D: gSPLine3D,
-    gSPEndDisplayList: gSPEndDisplayList
+    createTriangleDisplayListBuffer: createTriangleDisplayListBuffer,
+    createLineDisplayListBuffer: createLineDisplayListBuffer
 };

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "framework64/renderer.h"
+#include "framework64/color.h"
+
 #include <nusys.h>
 
 /* The maximum length of the display list of one task  */
@@ -22,6 +25,10 @@ struct fw64Renderer{
     IVec2 screen_size;
     fw64RenderMode render_mode;
     fw64ShadingMode shading_mode;
+    fw64RendererFlags flags;
+
+    Lights2 lights;
+    uint32_t active_light_mask;
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);

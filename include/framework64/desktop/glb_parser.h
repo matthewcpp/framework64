@@ -4,7 +4,12 @@
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
+
 #include <nlohmann/json.hpp>
 
 #include <array>
@@ -20,6 +25,8 @@ public:
     /** Extracts a single, static mesh from the GLB file. */
     fw64Mesh* parseStaticMesh(std::string const & path);
 
+    std::vector<fw64Mesh*> parseStaticMeshes(std::string const & path);
+
 private:
     bool parseHeader();
     bool parseJsonChunk();
@@ -27,6 +34,7 @@ private:
 
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
     void parseMaterial(fw64Material& material, size_t material_index);
+    fw64Texture* getTexture(size_t texture_index);
     fw64Texture* parseTexture(size_t texture_index);
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
 
@@ -41,6 +49,8 @@ private:
 
     Box getBoxFromAccessor(size_t accessor_index) const;
     void seekInBinaryChunk(size_t pos);
+
+    bool openFile(std::string const& path);
 
 private:
     struct Header {
@@ -61,6 +71,7 @@ private:
     std::ifstream glb_file;
     nlohmann::json json_doc;
     ShaderCache& shader_cache;
+    std::vector<fw64Texture*> loaded_textures;
 };
 
     template <typename T>

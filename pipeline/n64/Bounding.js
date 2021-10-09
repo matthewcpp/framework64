@@ -2,8 +2,8 @@ class Bounding {
     static SizeOf = 24;
 
     constructor() {
-        this.min = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE];
-        this.max = [Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE];
+        this.min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+        this.max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
     }
 
     encapsulatePoint(point) {
@@ -11,7 +11,6 @@ class Bounding {
             if (point[i] < this.min[i]){
                 this.min[i] = point[i];
             }
-                
 
             if (point[i] > this.max[i]) {
                 this.max[i] = point[i];

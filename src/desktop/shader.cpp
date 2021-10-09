@@ -1,7 +1,5 @@
 #include "framework64/desktop/shader.h"
 
-#include <gl/glew.h>
-
 #include <fstream>
 #include <iostream>
 #include <sstream>

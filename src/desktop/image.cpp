@@ -77,21 +77,13 @@ void fw64Image::freeGlResources() {
     glDeleteTextures(1, &gl_handle);
 }
 
-void fw64_image_reference_add(fw64Image* image) {
-    image->ref_count += 1;
-}
-
-void fw64_image_reference_remove(fw64Image* image) {
-    image->ref_count -= 1;
-
-    if (image->ref_count <= 0) {
-        image->freeGlResources();
-        delete(image);
-    }
-
-}
 
 // C API
 fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t index) {
     return fw64Image::loadFromDatabase(asset_database, index);
+}
+
+void fw64_image_delete(fw64Image* image) {
+    image->freeGlResources();
+    delete image;
 }

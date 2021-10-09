@@ -1,16 +1,10 @@
 #include "framework64/texture.h"
 #include "framework64/desktop/texture.h"
 
-#include <gl/glew.h>
 #include <SDL2/SDL_image.h>
 
 fw64Texture::fw64Texture(fw64Image* img) {
     image = img;
-    fw64_image_reference_add(img);
-}
-
-fw64Texture::~fw64Texture() {
-    fw64_image_reference_remove(image);
 }
 
 // C Interface

@@ -1,4 +1,5 @@
-const gltfConvert = require("./GLTFConvert");
+const processMesh = require("./ProcessMesh");
+const processTerrain = require("./ProcessTerrain");
 const imageConvert = require("./ImageConvert");
 const FontConvert = require("./FontConvert");
 const AudioConvert = require("./AudioConvert");
@@ -10,31 +11,31 @@ async function prepare(manifest, manifestFile, outputDirectory) {
     const manifestDirectory = path.dirname(manifestFile);
     const archive = new Archive();
 
-    if (manifest.models) {
-        for (const model of manifest.models) {
-            const sourceFile = path.join(manifestDirectory, model.src);
+    if (manifest.meshes) {
+        for (const mesh of manifest.meshes) {
+            console.log(`Processing Mesh: ${mesh.src}`)
 
-            await gltfConvert(sourceFile, outputDirectory, model, archive);
+            await processMesh(mesh, archive, manifestDirectory, outputDirectory);
         }
     }
 
     if (manifest.images) {
         for (const image of manifest.images) {
             if (image.src) {
+                console.log(`Processing Image: ${image.src}`);
                 const sourceFile = path.join(manifestDirectory, image.src);
                 await imageConvert.convertSprite(sourceFile, outputDirectory, image, archive);
             }
             else if (image.frames){
+                console.log(`Processing Image Atlas: ${image.name}`);
                 await imageConvert.assembleSprite(manifestDirectory, outputDirectory, image, archive);
-            }
-            else {
-                throw new Error("Image element must specify 'src' or 'frames'");
             }
         }
     }
 
     if (manifest.fonts) {
         for (const font of manifest.fonts) {
+            console.log(`Processing Font: ${font.src}`);
             const sourceFile = path.join(manifestDirectory, font.src);
             await FontConvert.convertFont(sourceFile, outputDirectory, font, archive);
         }
@@ -58,12 +59,20 @@ async function prepare(manifest, manifestFile, outputDirectory) {
         }
     }
 
-        if (manifest.raw) {
-            for (const item of manifest.raw) {
-                const sourceFile = path.join(manifestDirectory, item);
-                archive.add(sourceFile, "raw");
-            }
+    if (manifest.terrains) {
+        for (const terrain of manifest.terrains) {
+            console.log(`Processing Terrain: ${terrain.src}`)
+            await processTerrain(terrain, archive, manifestDirectory, outputDirectory);
         }
+    }
+
+    if (manifest.raw) {
+        for (const item of manifest.raw) {
+            console.log(`Processing Raw File: ${item}`);
+            const sourceFile = path.join(manifestDirectory, item);
+            archive.add(sourceFile, "raw");
+        }
+    }
 
     archive.write(outputDirectory);
 }

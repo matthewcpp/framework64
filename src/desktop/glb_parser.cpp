@@ -3,7 +3,7 @@
 #include "framework64/desktop/mesh_data.h"
 #include "framework64/matrix.h"
 
-#include <limits>
+#include <cassert>
 
 namespace framework64 {
 
@@ -19,15 +19,41 @@ enum GltfComponentType {
 
 // note this function assumes scene 0 is the "active scene"
 fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
-    glb_file.open(path, std::ios::binary);
-
-    if (!glb_file)
-        return nullptr;
-
-    if (!parseHeader() || !parseJsonChunk() || !parseBinaryChunk() )
+    if (!openFile(path))
         return nullptr;
 
     return createStaticMesh(json_doc["meshes"][0]);
+}
+
+std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {
+    std::vector<fw64Mesh*> meshes;
+
+    if (!openFile(path))
+        return meshes;
+
+    for (auto const & mesh : json_doc["meshes"] ) {
+        meshes.push_back(createStaticMesh(mesh));
+    }
+
+    return meshes;
+}
+
+bool GlbParser::openFile(std::string const& path) {
+    loaded_textures.clear();
+
+    glb_file.open(path, std::ios::binary);
+
+    if (!glb_file)
+        return false;
+
+    if (!parseHeader() || !parseJsonChunk() || !parseBinaryChunk() )
+        return false;
+
+    if (json_doc.contains("textures")) {
+        loaded_textures.resize(json_doc["textures"].size(), nullptr);
+    }
+
+    return true;
 }
 
 bool GlbParser::parseHeader() {
@@ -169,7 +195,6 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
             auto accessor = attributes_node["POSITION"].get<size_t>();
             primitive.bounding_box = getBoxFromAccessor(accessor);
             box_encapsulate_box(&mesh->bounding_box, &primitive.bounding_box);
-
         }
 
         auto const & element_accessor_node = json_doc["accessors"][primitive_node["indices"].get<size_t>()];
@@ -208,11 +233,24 @@ void GlbParser::parseMaterial(fw64Material& material, size_t material_index) {
 
     if (pbr.contains("baseColorTexture")) {
         auto texture_index = pbr["baseColorTexture"]["index"].get<size_t>();
-        material.texture = parseTexture(texture_index);
+        material.texture = getTexture(texture_index);
     }
 }
 
+fw64Texture* GlbParser::getTexture(size_t texture_index) {
+    if (loaded_textures[texture_index])
+        return loaded_textures[texture_index];
+
+    auto* texture = parseTexture(texture_index);
+    loaded_textures[texture_index] = texture;
+
+    return texture;
+}
+
+//TODO: read sampler parameters and apply to texture object
 fw64Texture* GlbParser::parseTexture(size_t texture_index) {
+    assert(loaded_textures[texture_index] == nullptr);
+
     auto source_index = json_doc["textures"][texture_index]["source"].get<size_t>();
     auto image_node = json_doc["images"][source_index];
 
@@ -222,7 +260,13 @@ fw64Texture* GlbParser::parseTexture(size_t texture_index) {
     auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
 
     auto* image = fw64Image::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size());
-    return new fw64Texture(image);
+    auto* texture =  new fw64Texture(image);
+
+    // Note: default wrap mode for GLTF is repeat
+    texture->wrap_t = FW64_TEXTURE_WRAP_REPEAT;
+    texture->wrap_s = FW64_TEXTURE_WRAP_REPEAT;
+
+    return texture;
 }
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {

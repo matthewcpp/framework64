@@ -36,6 +36,7 @@ set(common_source_files
         ../include/framework64/util/arcball_camera.h util/arcball_camera.c
         ../include/framework64/util/fps_camera.h util/fps_camera.c
         ../include/framework64/util/quad.h
+        ../include/framework64/util/terrain.h util/terrain.c
         )
 
 if (FW64_PLATFORM_N64)
@@ -49,14 +50,17 @@ if (FW64_PLATFORM_N64)
             ../include/framework64/n64/font n64/font.c
             ../include/framework64/n64/image.h n64/image.c
             ../include/framework64/n64/input.h n64/input.c
+            ../include/framework64/n64/loader.h n64/loader.c
+            ../include/framework64/n64/material.h n64/material.c
             ../include/framework64/n64/mesh.h n64/mesh.c
             n64/quad.c
             ../include/framework64/n64/renderer.h n64/renderer.c
+            n64/terrain.c
             ../include/framework64/n64/texture.h n64/texture.c
         )
 else()
     set(platform_source_files
-            ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
+        ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
         ../include/framework64/desktop/audio.h desktop/audio.cpp
         ../include/framework64/desktop/audio_bank.h desktop/audio_bank.cpp
         ../include/framework64/desktop/engine.h desktop/engine.cpp
@@ -73,12 +77,15 @@ else()
         ../include/framework64/desktop/mesh_data.h desktop/mesh_data.cpp
         ../include/framework64/desktop/mesh_renderer.h desktop/mesh_renderer.cpp
         ../include/framework64/desktop/n64_input_interface.h desktop/n64_input_interface.cpp
+        ../include/framework64/desktop/particle_shader.h desktop/particle_shader.cpp
         desktop/quad.cpp
         ../include/framework64/desktop/renderer.h desktop/renderer.cpp
         ../include/framework64/desktop/shader.h desktop/shader.cpp
         ../include/framework64/desktop/shader_cache.h desktop/shader_cache.cpp
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
+        desktop/terrain.cpp
         ../include/framework64/desktop/texture.h desktop/texture.cpp
+        ../include/framework64/desktop/uniform_block.h
         ../include/framework64/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp
         ../include/framework64/n64/controller_button.h
         )

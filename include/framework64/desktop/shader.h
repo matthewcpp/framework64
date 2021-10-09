@@ -2,7 +2,11 @@
 
 #include "framework64/desktop/material.h"
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
 
 #include <string>
 #include <vector>

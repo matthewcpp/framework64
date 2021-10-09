@@ -1,5 +1,4 @@
-#ifndef FW64_BOX_H
-#define FW64_BOX_H
+#pragma once
 
 #include "vec3.h"
 
@@ -24,6 +23,4 @@ void matrix_transform_box(float* matrix, Box* box, Box* out);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

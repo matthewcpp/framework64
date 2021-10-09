@@ -2,6 +2,8 @@
 
 #include "framework64/matrix.h"
 
+#include <string.h>
+
 void fw64_camera_init(fw64Camera* camera) {
     fw64_transform_init(&camera->transform);
 
@@ -41,14 +43,15 @@ void fw64_camera_update_view_matrix(fw64Camera* camera) {
 }
 
 void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* frustum) {
-    #ifdef PLATFORM_N64
-    #else
-    float cameraWorldMatrixInverse[16];
-    matrix_invert(&cameraWorldMatrixInverse[0], &camera->transform.matrix.m[0]);
-
     float projScreenMatrix[16];
-    matrix_multiply(&projScreenMatrix[0], &camera->projection.m[0], &cameraWorldMatrixInverse[0]);
+
+    #ifdef PLATFORM_N64
+    Mtx projViewMatrix;
+    guMtxCatL(&camera->view, &camera->projection, &projViewMatrix);
+    guMtxL2F(&projScreenMatrix[0], &projViewMatrix);
+    #else
+    matrix_multiply(&projScreenMatrix[0], &camera->projection.m[0], &camera->view.m[0]);
+    #endif
 
     fw64_frustum_set_from_matrix(frustum, &projScreenMatrix[0]);
-    #endif
 }

@@ -1,9 +1,23 @@
 const Jimp = require("jimp");
 
 class N64Image {
-    constructor(name) {
+    name;
+    format;
+    _data = null;
+
+    static Format = {
+        RGBA16: 0,
+        RGBA32: 1
+    };
+
+    constructor(name, format) {
         this.name = name;
-        this._data = null;
+
+        if (format === null || format === undefined) {
+            throw new Error(`Invalid Image format: ${format}`);
+        }
+
+        this.format = format;
     }
 
     async load(path) {
@@ -72,7 +86,7 @@ class N64Image {
         return buffer;
     }
 
-    static encode32bpp(data) {
+    static encodeRGBA32(data) {
         const buffer = Buffer.alloc(data.length);
 
         for (let i = 0; i < data.length; i++) {

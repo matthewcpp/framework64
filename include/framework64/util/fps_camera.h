@@ -1,5 +1,4 @@
-#ifndef GOLDENEYE_CAMERA_H
-#define GOLDENEYE_CAMERA_H
+#pragma once
 
 #include "framework64/camera.h"
 #include "framework64/input.h"
@@ -7,19 +6,19 @@
 
 typedef struct {
     fw64Camera camera;
-    fw64Input* input;
-    Vec2 rotation;
-} FpsCamera;
+    float movement_speed;
+    float turn_speed;
+    fw64Input* _input;
+    Vec2 _rotation;
+} fw64FpsCamera;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void fps_camera_init(FpsCamera *fps, fw64Input *input);
-void fps_camera_update(FpsCamera *fps, float time_delta);
+void fw64_fps_camera_init(fw64FpsCamera *fps, fw64Input *input);
+void fw64_fps_camera_update(fw64FpsCamera *fps, float time_delta);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

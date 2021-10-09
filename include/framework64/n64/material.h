@@ -1,0 +1,15 @@
+#pragma once
+
+#include "framework64/material.h"
+
+#include "framework64/color.h"
+#include "framework64/texture.h"
+
+#include <stdint.h>
+
+struct fw64Material {
+    fw64ColorRGBA8 color;
+    fw64Texture* texture;
+    uint32_t texture_frame;
+    uint32_t shading_mode;
+};

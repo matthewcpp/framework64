@@ -35,9 +35,6 @@ void game_init(Game* game, fw64Engine* engine) {
     game->arcball.camera.far = 1000.0f;
     fw64_camera_update_projection_matrix(&game->arcball.camera);
 
-    Color fill_color = {255, 0, 0};
-    fw64_renderer_set_fill_color(engine->renderer, &fill_color);
-
     game->consolas = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
     game->button_sprite = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons));
 

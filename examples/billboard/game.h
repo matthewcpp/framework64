@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity.h"
+#include "flame.h"
 
 #include "framework64/util/fps_camera.h"
 #include "framework64/util/quad.h"
@@ -9,10 +9,11 @@
 
 typedef struct {
     fw64Engine* engine;
-    FpsCamera fps;
-    Entity blue_cube;
-    Entity nintendo_seal;
-    Entity n64_logo;
+    fw64FpsCamera fps;
+    Entity campfire;
+    Entity ground;
+    Entity moon;
+    Flame flame;
 } Game;
 
 #ifdef __cplusplus

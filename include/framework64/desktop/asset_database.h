@@ -22,11 +22,12 @@ public:
     framework64::ShaderCache& shader_cache;
 
     sqlite3* database = nullptr;
-    sqlite3_stmt* select_image_statement = nullptr;
     sqlite3_stmt* select_font_statement = nullptr;
+    sqlite3_stmt* select_image_statement = nullptr;
     sqlite3_stmt* select_mesh_statement = nullptr;
-    sqlite3_stmt* select_sound_bank_statement = nullptr;
     sqlite3_stmt* select_music_bank_statement = nullptr;
     sqlite3_stmt* select_raw_file_statement = nullptr;
+    sqlite3_stmt* select_sound_bank_statement = nullptr;
+    sqlite3_stmt* select_terrain_statement = nullptr;
 };
 

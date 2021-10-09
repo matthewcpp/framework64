@@ -3,7 +3,11 @@
 #include "framework64/asset_database.h"
 #include "framework64/image.h"
 
+#ifdef __linux__
+#include <GL/glew.h>
+#else
 #include <gl/glew.h>
+#endif
 
 #include <string>
 
@@ -12,7 +16,6 @@ struct fw64Image {
     int height;
     int hslices;
     int vslices;
-    int ref_count = 0;
     GLuint gl_handle = 0;
 
     void freeGlResources();

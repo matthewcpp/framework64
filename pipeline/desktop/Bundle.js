@@ -14,6 +14,7 @@ class Bundle {
     _soundBankStmt = null;
     _musicBankStmt = null;
     _rawFileStmt = null;
+    _terrainStmt = null;
 
     constructor(outputDirectory) {
         this._initDatabase(outputDirectory);
@@ -36,6 +37,7 @@ class Bundle {
             db.run("CREATE TABLE soundBanks (assetId INTEGER PRIMARY KEY, path TEXT, count INTEGER)");
             db.run("CREATE TABLE musicBanks (assetId INTEGER PRIMARY KEY, path TEXT, count INTEGER)");
             db.run("CREATE TABLE rawFiles (assetId INTEGER PRIMARY KEY, path TEXT, size INTEGER)");
+            db.run("CREATE TABLE terrains (assetId INTEGER PRIMARY KEY, path TEXT, dimx INTEGER, dimz INTEGER)");
         });
 
         this._imageStmt = db.prepare("INSERT INTO images VALUES (?, ?, ?, ?)");
@@ -44,6 +46,7 @@ class Bundle {
         this._soundBankStmt = db.prepare("INSERT INTO soundBanks VALUES (?, ?, ?)");
         this._musicBankStmt = db.prepare("INSERT INTO musicBanks VALUES (?, ?, ?)");
         this._rawFileStmt = db.prepare("INSERT INTO rawFiles VALUES (?, ?, ?)");
+        this._terrainStmt = db.prepare("INSERT INTO terrains VALUES (?, ?, ?, ?)");
 
         this._db = db;
     }
@@ -113,6 +116,15 @@ class Bundle {
         this._rawFileStmt.run(assetId, rawPath, size);
     }
 
+    addTerrain(terrain, assetPath) {
+        const assetId = this._nextAssetId++;
+        const assetName = path.basename(terrain.src, path.extname(terrain.src));
+
+        fs.writeSync(this._headerFile,`#define FW64_ASSET_terrain_${assetName} ${assetId}\n`);
+
+        this._terrainStmt.run(assetId, assetPath, terrain.dimensionX, terrain.dimensionZ)
+    }
+
     finalize() {
         this._imageStmt.finalize();
         this._fontStmt.finalize();
@@ -120,6 +132,7 @@ class Bundle {
         this._soundBankStmt.finalize();
         this._musicBankStmt.finalize();
         this._rawFileStmt.finalize();
+        this._terrainStmt.finalize();
         this._db.close();
 
         const assetCount = this._nextAssetId - 1;

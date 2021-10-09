@@ -14,7 +14,6 @@ typedef enum {
     FW64_RENDERER_MODE_TRIANGLES,
     FW64_RENDERER_MODE_LINES,
     FW64_RENDERER_MODE_ORTHO2D,
-    FW64_RENDERER_MODE_RECTANGLES
 } fw64RenderMode;
 
 typedef enum {
@@ -25,6 +24,8 @@ typedef enum {
     FW64_RENDERER_FLAG_NOSWAP = 0,
     FW64_RENDERER_FLAG_SWAP = 2,
 } fw64RendererFlags;
+
+#define Fw64_RENDERER_MAX_LIGHT_COUNT 2
 
 typedef struct fw64Renderer fw64Renderer;
 
@@ -38,15 +39,12 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
 
-void fw64_renderer_set_fill_color(fw64Renderer* renderer, Color* color);
-void fw64_renderer_set_fill_mode(fw64Renderer* renderer);
-void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, IRect* rect);
-
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y);
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y);
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
+fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);
 
 #ifdef __cplusplus
 }

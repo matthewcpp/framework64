@@ -1,5 +1,5 @@
 const N64Image = require("./N64Image")
-const N64SpriteWriter = require("./N64SpriteWriter");
+const N64ImageWriter = require("./N64ImageWriter");
 
 const Jimp = require("jimp");
 
@@ -12,20 +12,21 @@ function finalizeImage(image, outDir, options, archive) {
     }
 
     const filePath = path.join(outDir, `${image.name}.sprite`);
-    N64SpriteWriter.write(image, options.hslices, options.vslices, filePath);
+    N64ImageWriter.writeBinary(image, options.hslices, options.vslices, filePath);
     archive.add(filePath, "image");
 }
 
 async function convertSprite(imagePath, outDir, params, archive) {
     const options = {
         hslices: 1,
-        vslices: 1
+        vslices: 1,
+        format: "RGBA16"
     }
     Object.assign(options, params);
 
     const name = path.basename(imagePath, path.extname(imagePath));
 
-    const image = new N64Image(name);
+    const image = new N64Image(name, N64Image.Format[options.format]);
     await image.load(imagePath);
 
     finalizeImage(image, outDir, options, archive)
@@ -46,6 +47,11 @@ function createNewImage(width, height) {
 
 // TODO: Validate params
 async function assembleSprite(rootDir, outDir, params, archive) {
+    const options = {
+        format: "RGBA16"
+    }
+    Object.assign(options, params);
+
     const [frameWidth, frameHeight] = getDimension(params);
 
     const atlas = await createNewImage(params.hslices * frameWidth, params.vslices * frameHeight);
@@ -59,7 +65,7 @@ async function assembleSprite(rootDir, outDir, params, archive) {
         }
     }
 
-    const image = new N64Image(params.name);
+    const image = new N64Image(params.name, N64Image.Format[options.format.toUpperCase()]);
     await image.assign(atlas);
 
     finalizeImage(image, outDir, params, archive)
