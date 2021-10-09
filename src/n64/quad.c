@@ -76,6 +76,7 @@ static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vsl
     fw64Texture* texture = fw64_texture_create_from_image(image);
 
     mesh->resources = malloc(sizeof(fw64MeshResources));
+    mesh->resources->flags = FW64_MESH_FLAGS_IMAGES_ARE_SHARED;
 
     mesh->resources->image_count = 1;
     mesh->resources->images = image;

@@ -14,6 +14,7 @@ static void fixup_mesh_primitive_material_pointers(fw64N64Loader* loader, fw64Me
 void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle) {
     fw64MeshResources* resources = malloc(sizeof(fw64MeshResources));
     fw64_filesystem_read(resources, FW64_MESH_RESOURCES_HEADER_SIZE, 1, handle);
+    resources->flags = 0;
 
     if (resources->image_count > 0) {
         // read the asset ID's and then load the images

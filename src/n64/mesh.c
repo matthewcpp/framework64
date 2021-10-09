@@ -75,7 +75,9 @@ void fw64_n64_mesh_resources_delete(fw64MeshResources* resources) {
         free(resources->textures);
     }
 
-    if (resources->image_count > 0) {
+    int delete_images = !(resources->flags & FW64_MESH_FLAGS_IMAGES_ARE_SHARED);
+
+    if (delete_images && resources->image_count > 0) {
         for (uint32_t i = 0; i < resources->image_count; i++) {
             fw64Image* image = resources->images + i;
             free(image->data);

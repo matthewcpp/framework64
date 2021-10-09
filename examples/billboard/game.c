@@ -14,7 +14,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_fps_camera_init(&game->fps, engine->input);
     game->fps.movement_speed = 70.0f;
     game->fps.camera.near = 1.0f;
-    game->fps.camera.far = 200.0f;
+    game->fps.camera.far = 300.0f;
     fw64_camera_update_projection_matrix(&game->fps.camera);
     vec3_set(&game->fps.camera.transform.position, 0.6f, 12.0f, 40.0f);
 

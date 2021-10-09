@@ -26,10 +26,13 @@ typedef struct {
 
 #define FW64_MESH_RESOURCES_HEADER_SIZE 3 * sizeof(uint32_t)
 
+#define FW64_MESH_FLAGS_IMAGES_ARE_SHARED 1
+
 typedef struct {
     uint32_t image_count;
     uint32_t texture_count;
     uint32_t material_count;
+    uint32_t flags;
     fw64Image* images;
     fw64Texture* textures;
     fw64Material* materials;
