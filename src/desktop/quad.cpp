@@ -36,7 +36,6 @@ fw64Mesh* textured_quad_create_with_image(fw64Engine* engine, fw64Image* image, 
     auto* mesh = create_mesh(f64_engine, mesh_data, image);
 
     mesh->primitives[0].material.texture_frame = frame_index;
-    f64_engine->shader_cache->setParticleShader(mesh->primitives[0]);
     return mesh;
 }
 
@@ -81,7 +80,7 @@ fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & m
     mesh_info.setPrimitiveValues(primitive);
     primitive.mode = fw64Primitive::Mode::Triangles;
     primitive.material.texture = mesh->textures[0].get();
-    f64_engine->shader_cache->setShaderProgram(primitive);
+    f64_engine->shader_cache->setParticleShader(mesh->primitives[0]);
     return mesh;
 }
 

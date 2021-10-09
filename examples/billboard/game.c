@@ -38,10 +38,6 @@ void game_init(Game* game, fw64Engine* engine) {
     vec3_set(&game->moon.transform.scale, 5.0f, 5.0f, 5.0f);
     vec3_set(&game->moon.transform.position, -100.0f, 50.0f, -100.0f);
     entity_refresh(&game->moon);
-
-    fw64MusicBank* music_bank = fw64_music_bank_load(engine->assets, FW64_ASSET_musicbank_musicbank2);
-    fw64_audio_set_music_bank(engine->audio, music_bank);
-    fw64_audio_play_music(engine->audio, 2);
 }
 
 void game_update(Game* game){
