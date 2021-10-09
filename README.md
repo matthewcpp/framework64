@@ -3,7 +3,7 @@ This framework consists of an asset pipeline and minimal C library providing a q
 This framework utilizes [Crash's Modern n64 SDK](https://github.com/CrashOveride95/n64sdkmod).
 
 ### Requirements
-In order to build you will need to have [nodejs](https://nodejs.org/en/) and [docker](https://www.docker.com/) installed.
+In order to build you will need to have [cmake](https://cmake.org/), [nodejs](https://nodejs.org/en/) and [docker](https://www.docker.com/) installed.
 
 ### Building for N64
 

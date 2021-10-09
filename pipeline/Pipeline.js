@@ -9,25 +9,36 @@ const path = require("path");
 
 const prepare = require("./Prepare");
 
+const supportedPlatforms = new Set(["n64", "desktop"]);
+
 async function main() {
     let assetManifestPath = null;
     let outputDirectoryPath = null;
+    let buildPlatform = null;
 
     program.version("0.1.0");
 
-    program.arguments("<manifest> <outDir>");
+    program.arguments("<manifest> <platform> <outDir>");
     program.option("-f, --force", "force asset creation in existing directory");
 
     program.description("command", {
         manifest: "path to asset manifest file",
+        platform: "the platform that assets will be prepared for",
         outDir: "path to output directory"
     });
-    program.action((manifest, outDir) => {
+
+    program.action((manifest, platform, outDir) => {
         assetManifestPath = path.resolve(manifest);
+        buildPlatform = platform;
         outputDirectoryPath = path.resolve(outDir);
     });
 
     program.parse(process.argv);
+
+    if (!supportedPlatforms.has(buildPlatform)) {
+        console.log(`Unknown platform: ${buildPlatform}`);
+        process.exit(1);
+    }
 
     if (!fs.existsSync(assetManifestPath)) {
         console.log(`manifest file: ${assetManifestPath} does not exist.`);
@@ -45,7 +56,7 @@ async function main() {
 
     await fse.ensureDir(outputDirectoryPath);
 
-    await prepare(assetManifestPath, outputDirectoryPath);
+    await prepare(assetManifestPath, buildPlatform, outputDirectoryPath);
 }
 
 if (require.main === module) {

@@ -1,5 +1,4 @@
 {
-    "platform": "desktop",
     "images": [
         {
             "src": "nintendo_seal.png",
@@ -78,20 +77,8 @@
             "hslices": 10,
             "vslices": 1,
             "frameSize": "128x128",
-            "resize": "320x32"
-        }
-    ],
-    "fonts": [
-        {
-            "src": "Consolas.ttf",
-            "size": 12,
-            "name": "Consolas12"
-        },
-        {
-            "src": "basicLAZER.otf",
-            "size": 12,
-            "name": "basicLAZER",
-            "sourceString": "ELAPSED TIME:0123456789."
+            "resize": "320x32",
+            "format": "rgba32"
         }
     ],
     "meshes": [
@@ -114,6 +101,19 @@
             "src": "campfire/campfire.gltf"
         }
     ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12"
+        },
+        {
+            "src": "basicLAZER.otf",
+            "size": 12,
+            "name": "basicLAZER",
+            "sourceString": "ELAPSED TIME:0123456789."
+        }
+    ],
     "soundBanks": [
         {
             "name": "soundbank1",
@@ -134,14 +134,14 @@
             "dir": "music/bank2"
         }
     ],
-    "raw": [
-        "sample.txt"
-    ],
     "terrains": [
         {
             "src": "fogworld/fogworld.gltf",
             "dimensionX": 32,
             "dimensionZ": 32
         }
+    ],
+    "raw": [
+        "sample.txt"
     ]
 }

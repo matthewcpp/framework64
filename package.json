@@ -11,8 +11,8 @@
     "libultra"
   ],
   "scripts": {
-    "prepare-n64-assets": "node pipeline/Pipeline.js -f assets/manifest.n64.json build_n64/bin/assets",
-    "prepare-desktop-assets": "node pipeline/Pipeline.js -f assets/manifest.desktop.json build_desktop/bin/assets",
+    "prepare-n64-assets": "node pipeline/Pipeline.js -f assets/manifest.json n64 build_n64/bin/assets",
+    "prepare-desktop-assets": "node pipeline/Pipeline.js -f assets/manifest.json desktop build_desktop/bin/assets",
     "prepare-desktop-shaders": "node scripts/PrepareDesktopShaders.js src/desktop/glsl build_desktop/bin/glsl"
   },
   "author": "Matthew LaRocca",

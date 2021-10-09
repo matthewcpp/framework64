@@ -1,14 +1,10 @@
 const fs = require("fs");
 const prepareN64 = require("./n64/Prepare");
 
-async function prepare(manifestFile, outputDirectory) {
+async function prepare(manifestFile, platform, outputDirectory) {
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
 
-    if (!manifest.platform) {
-        throw new Error("Manifest file does not specify a platform");
-    }
-
-    switch (manifest.platform) {
+    switch (platform) {
         case "n64":
             const prepareN64 = require("./n64/Prepare");
             await prepareN64(manifest, manifestFile, outputDirectory);
