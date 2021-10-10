@@ -1,5 +1,6 @@
-#ifndef ARCBALL_H
-#define ARCBALL_H
+#pragma once
+
+/** \file arcball_camera.h */
 
 #include "framework64/camera.h"
 #include "framework64/input.h"
@@ -26,6 +27,4 @@ void arcball_update(ArcballCamera* arcball, float time_delta);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

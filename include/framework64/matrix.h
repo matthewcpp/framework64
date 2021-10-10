@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file matrix.h */
+
 #include "framework64/vec2.h"
 #include "framework64/vec3.h"
 #include "framework64/quat.h"

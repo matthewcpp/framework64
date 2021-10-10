@@ -1,5 +1,6 @@
-#ifndef FW64_CAMERA_H
-#define FW64_CAMERA_H
+#pragma once
+
+/** \file camera.h */
 
 #include "framework64/frustum.h"
 #include "framework64/transform.h"
@@ -29,6 +30,4 @@ void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* planes)
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

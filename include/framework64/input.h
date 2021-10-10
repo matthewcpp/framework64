@@ -1,5 +1,6 @@
-#ifndef FW64_INPUT_H
-#define FW64_INPUT_H
+#pragma once
+
+/** \file input.h */
 
 #include "vec2.h"
 
@@ -15,6 +16,4 @@ void fw64_input_stick(fw64Input* input, int controller, Vec2* current);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file quad.h */
+
 #include "framework64/color.h"
 #include "framework64/engine.h"
 #include "framework64/mesh.h"

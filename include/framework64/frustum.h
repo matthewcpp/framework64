@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file frustum.h */
+
 #include "framework64/box.h"
 #include "framework64/plane.h"
 

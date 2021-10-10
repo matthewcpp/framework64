@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file fps_camera.h */
+
 #include "framework64/camera.h"
 #include "framework64/input.h"
 #include "framework64/vec2.h"

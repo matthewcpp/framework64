@@ -1,5 +1,6 @@
-#ifndef FW64_MATERIAL_H
-#define FW64_MATERIAL_H
+#pragma once
+
+/** \file material.h */
 
 #include "framework64/texture.h"
 
@@ -15,7 +16,4 @@ int fw64_material_get_texture_frame(fw64Material* material);
 
 #ifdef __cplusplus
 }
-#endif
-
-
 #endif

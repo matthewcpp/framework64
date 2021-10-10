@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file node.h */
+
 #include "framework64/box.h"
 #include "framework64/camera.h"
 #include "framework64/mesh.h"

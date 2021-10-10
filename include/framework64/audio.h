@@ -1,6 +1,8 @@
 #ifndef FW64_AUDIO_H
 #define FW64_AUDIO_H
 
+/** \file audio.h */
+
 #include "framework64/audio_bank.h"
 
 #include <limits.h>

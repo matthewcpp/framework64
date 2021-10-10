@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file box.h */
+
 #include "vec3.h"
 
 typedef struct {

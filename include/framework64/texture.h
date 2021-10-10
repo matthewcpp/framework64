@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file texture.h */
+
 #include "framework64/image.h"
 
 typedef struct fw64Texture fw64Texture;
