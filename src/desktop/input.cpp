@@ -76,10 +76,20 @@ void fw64Input::update() {
 
 void fw64Input::onDeviceAdded(int index) {
     std::cout << "Controller added to port: " << index << std::endl;
+
+    if (index < 4) {
+        sdl_gamecontrollers[index] = SDL_GameControllerOpen(index);
+    }
 }
 
 void fw64Input::onDeviceRemoved(int index) {
     std::cout << "Controller removed from port: " << index << std::endl;
+
+    if (index < 4) {
+        SDL_GameControllerClose(sdl_gamecontrollers[index]);
+        sdl_gamecontrollers[index] = nullptr;
+
+    }
 }
 
 bool fw64Input::controllerIsConnected(int index) const {
