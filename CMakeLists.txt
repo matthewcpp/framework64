@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
+option(BUILD_Fw64_TESTS "Builds the gtest based test applications" OFF)
+option(BUILD_FW64_EXAMPLES "builds the example applications" OFF)
+
 if (FW64_PLATFORM_N64)
     message("Configuring for Platform: Nintendo64")
     set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMake/framework64.modernsdk.cmake)
@@ -15,7 +18,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(src)
-add_subdirectory(examples)
-if (FW64_PLATFORM_DESKTOP)
+
+if (BUILD_FW64_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+
+if (FW64_PLATFORM_DESKTOP AND BUILD_Fw64_TESTS)
     add_subdirectory(tests)
 endif()

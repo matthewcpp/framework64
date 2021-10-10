@@ -4,7 +4,6 @@
 #include "camera.h"
 #include "color.h"
 #include "mesh.h"
-#include "rect.h"
 #include "texture.h"
 #include "vec2.h"
 #include "font.h"

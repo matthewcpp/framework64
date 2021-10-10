@@ -11,7 +11,7 @@ To Build all the sample roms run the following command from your terminal, using
 ```
 npm install
 npm run prepare-n64-assets
-docker run -it --rm --mount type=bind,source=/path/to/framework64,target=/src matthewcpp/n64-modern-sdk bash /src/scripts/build_all_n64.sh
+docker run -it --rm --mount type=bind,source=/path/to/framework64,target=/src matthewcpp/n64-modern-sdk bash /build_all_n64_examples.sh
 ```
 
 All roms will be placed in the `build_n64/bin` folder.
