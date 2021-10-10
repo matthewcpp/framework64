@@ -3,16 +3,17 @@
 
 #include "framework64/n64/controller_button.h"
 
+#include <iostream>
+
 void fw64Input::init(framework64::InputInterface& interface_) {
     interface = &interface_;
-    interface->setInput(&input_state);
 
     int joystick_count = SDL_NumJoysticks();
     int controller_index = 0;
 
     for (int i = 0; i < joystick_count; i++) {
         if (SDL_IsGameController(i)) {
-            input_state.controllers[controller_index++] = SDL_GameControllerOpen(i);
+            sdl_gamecontrollers[controller_index++] = SDL_GameControllerOpen(i);
 
             if (controller_index == 4)
                 break;
@@ -42,8 +43,8 @@ static float map_value_range(float value, float initial_min, float initial_max, 
     map_value_range(static_cast<float>((val)), TRIGGER_MIN_VAL, TRIGGER_MAX_VAL, TRIGGER_MAPPED_MIN, TRIGGER_MAPPED_MAX)
 
 void fw64Input::updateControllerState(int controller_index) {
-    SDL_GameController* controller = input_state.controllers[controller_index];
-    auto & controller_state = input_state.current_states[controller_index];
+    SDL_GameController* controller = sdl_gamecontrollers[controller_index];
+    auto & controller_state = current_controller_states[controller_index];
 
     for (int b = (int)SDL_CONTROLLER_BUTTON_INVALID + 1 ; b < SDL_CONTROLLER_BUTTON_MAX; b++) {
         controller_state.buttons[b] = SDL_GameControllerGetButton(controller, static_cast<SDL_GameControllerButton>(b));
@@ -61,34 +62,74 @@ void fw64Input::updateControllerState(int controller_index) {
 }
 
 void fw64Input::update() {
-    input_state.previous_states = input_state.current_states;
+    previous_controller_sattes = current_controller_states;
 
     for (int i = 0; i < 4; i++) {
-        if(input_state.controllers[i]) {
+        if(sdl_gamecontrollers[i]) {
             updateControllerState(i);
+        }
+        else if (i == 0) {
+            interface->updateControllerFromKeyboard(current_controller_states[i], SDL_GetKeyboardState(nullptr));
         }
     }
 }
 
 void fw64Input::onDeviceAdded(int index) {
-    for (int i = 0; i < 4; i++) {
-        if (input_state.controllers[i] == nullptr) {
-            input_state.controllers[i] = SDL_GameControllerOpen(index);
-        }
+    std::cout << "Controller added to port: " << index << std::endl;
+
+    if (index < 4) {
+        sdl_gamecontrollers[index] = SDL_GameControllerOpen(index);
     }
+}
+
+void fw64Input::onDeviceRemoved(int index) {
+    std::cout << "Controller removed from port: " << index << std::endl;
+
+    if (index < 4) {
+        SDL_GameControllerClose(sdl_gamecontrollers[index]);
+        sdl_gamecontrollers[index] = nullptr;
+
+    }
+}
+
+bool fw64Input::controllerIsConnected(int index) const {
+    // for now we always will have a keyboard controller in port 0
+    if (index == 0)
+        return true;
+
+    return sdl_gamecontrollers[index] != nullptr;
+}
+
+bool fw64Input::buttonPressed(int controller, int button) {
+    if (controllerIsConnected(controller))
+        return interface->buttonPressed(current_controller_states[controller], previous_controller_sattes[controller], button);
+    else
+        return false;
+}
+bool fw64Input::buttonDown(int controller, int button) {
+    if (controllerIsConnected(controller))
+        return interface->buttonDown(current_controller_states[controller], button);
+    else
+        return false;
+}
+Vec2 fw64Input::stick(int controller, int stick_index) {
+    if (controllerIsConnected(controller))
+        return interface->stick(current_controller_states[controller], stick_index);
+    else
+        return {0.0f, 0.0f};
 }
 
 
 // C interface
 
 int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
-    return input->interface->buttonPressed(controller, button);
+    return input->buttonPressed(controller, button);
 }
 
 int fw64_input_button_down(fw64Input* input, int controller, int button) {
-    return input->interface->buttonDown(controller, button);
+    return input->buttonDown(controller, button);
 }
 
 void fw64_input_stick(fw64Input* input, int controller, Vec2* current) {
-    *current = input->interface->stick(controller, 0);
+    *current = input->stick(controller, 0);
 }

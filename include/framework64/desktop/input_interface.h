@@ -8,26 +8,18 @@
 #include <cstdint>
 
 namespace framework64 {
-struct InputState {
-public:
-    struct Controller {
-        std::array<uint8_t, SDL_CONTROLLER_BUTTON_MAX> buttons;
-        std::array<float, SDL_CONTROLLER_AXIS_MAX> axis;
-    };
-
-    std::array<SDL_GameController*, 4> controllers = {nullptr, nullptr, nullptr, nullptr};
-    std::array<Controller, 4> current_states;
-    std::array<Controller, 4> previous_states;
-
-    [[nodiscard]] inline bool controllerIsConnected(int controller_index) const { return controllers[controller_index] != nullptr; }
+struct Controller {
+    std::array<uint8_t, SDL_CONTROLLER_BUTTON_MAX> buttons;
+    std::array<float, SDL_CONTROLLER_AXIS_MAX> axis;
 };
 
 class InputInterface {
 public:
 public:
-    virtual void setInput(InputState const * input_state) = 0;
-    virtual bool buttonPressed(int controller_index, int button) = 0;
-    virtual bool buttonDown(int controller_index, int button) = 0;
-    virtual Vec2 stick(int controller_index, int stick_index) = 0;
+    virtual bool buttonPressed(Controller const & current, Controller const & previous, int button) = 0;
+    virtual bool buttonDown(Controller const & current, int button) = 0;
+    virtual Vec2 stick(Controller const & current, int stick_index) = 0;
+
+    virtual void updateControllerFromKeyboard(Controller & controller, uint8_t const * sdl_keyboard_state) = 0;
 };
 }
