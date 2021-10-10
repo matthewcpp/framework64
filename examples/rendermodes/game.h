@@ -1,10 +1,9 @@
 #pragma once
 
-#include "entity.h"
-
 #include "framework64/util/arcball_camera.h"
 #include "framework64/camera.h"
 #include "framework64/engine.h"
+#include "framework64/node.h"
 
 #define ENTITY_COUNT 3
 
@@ -15,7 +14,7 @@ typedef struct {
     fw64Font* consolas;
     fw64Texture* button_sprite;
 
-    Entity entity;
+    fw64Node entity;
     int current_entity;
     uint32_t mesh_assets[ENTITY_COUNT];
 

@@ -2,17 +2,18 @@
 
 #include "flame.h"
 
+#include "framework64/engine.h"
+#include "framework64/node.h"
+
 #include "framework64/util/fps_camera.h"
 #include "framework64/util/quad.h"
-
-#include "framework64/engine.h"
 
 typedef struct {
     fw64Engine* engine;
     fw64FpsCamera fps;
-    Entity campfire;
-    Entity ground;
-    Entity moon;
+    fw64Node campfire;
+    fw64Node ground;
+    fw64Node moon;
     Flame flame;
 } Game;
 

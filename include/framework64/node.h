@@ -1,5 +1,4 @@
-#ifndef FW64_ENTITY_H
-#define FW64_ENTITY_H
+#pragma once
 
 #include "framework64/box.h"
 #include "framework64/camera.h"
@@ -10,20 +9,18 @@ typedef struct {
     fw64Transform transform;
     Box bounding;
     fw64Mesh* mesh;
-} Entity;
+} fw64Node;
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void entity_init(Entity* entity, fw64Mesh* mesh);
-void entity_set_mesh(Entity* entity, fw64Mesh* mesh);
-void entity_refresh(Entity* entity);
-void entity_billboard(Entity* entity, fw64Camera* camera);
+void fw64_node_init(fw64Node* node, fw64Mesh* mesh);
+void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh);
+void fw64_node_refresh(fw64Node* node);
+void fw64_node_billboard(fw64Node* node, fw64Camera* camera);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

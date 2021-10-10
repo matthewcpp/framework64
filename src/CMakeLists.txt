@@ -22,6 +22,7 @@ set(common_source_files
         ../include/framework64/input.h
         ../include/framework64/matrix.h matrix.c
         ../include/framework64/mesh.h
+        ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
         ../include/framework64/quat.h quat.c
         ../include/framework64/renderer.h
@@ -87,8 +88,7 @@ else()
         ../include/framework64/desktop/texture.h desktop/texture.cpp
         ../include/framework64/desktop/uniform_block.h
         ../include/framework64/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp
-        ../include/framework64/n64/controller_button.h
-        )
+        ../include/framework64/n64/controller_button.h)
 endif()
 
 add_library(framework64 STATIC ${common_source_files} ${platform_source_files})

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "entity.h"
+#include "framework64/node.h"
 
 typedef enum {
     CUBE_TOP_LEFT,
@@ -15,9 +15,9 @@ typedef enum {
 typedef struct {
     fw64Engine* engine;
     fw64Camera camera;
-    Entity penguin;
-    Entity penguin_box;
-    Entity cubes[CUBE_COUNT];
+    fw64Node penguin;
+    fw64Node penguin_box;
+    fw64Node cubes[CUBE_COUNT];
     CubeId intersection;
     fw64Font* font;
 } Game;

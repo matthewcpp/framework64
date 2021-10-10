@@ -4,7 +4,7 @@
 #define FLAME_UPDATE_TIME 1.0f / 15.0f
 
 void flame_init(Flame* flame, fw64Engine* engine, fw64Image* image){
-    entity_init(&flame->entity, textured_quad_create_with_image(engine, image, 0));
+    fw64_node_init(&flame->entity, textured_quad_create_with_image(engine, image, 0));
     flame->update_time_remaining = FLAME_UPDATE_TIME;
 }
 
@@ -23,7 +23,6 @@ void flame_update(Flame* flame, float time_delta) {
 }
 
 void flame_draw(Flame* flame, fw64Renderer* renderer) {
-    entity_billboard(&flame->entity, fw64_renderer_get_camera(renderer));
-    entity_refresh(&flame->entity);
+    fw64_node_billboard(&flame->entity, fw64_renderer_get_camera(renderer));
     fw64_renderer_draw_static_mesh(renderer, &flame->entity.transform, flame->entity.mesh);
 }

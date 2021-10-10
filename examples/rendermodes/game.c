@@ -1,13 +1,8 @@
 #include "game.h"
 
-#include "entity.h"
-
 #include "assets.h"
 
 #include "framework64/n64/controller_button.h"
-
-#include <string.h>
-#include <stdio.h>
 
 #define ENTITY_N64_LOGO 0
 #define ENTITY_SUZANNE 1
@@ -27,7 +22,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->mesh_assets[1] = FW64_ASSET_mesh_suzanne;
     game->mesh_assets[2] = FW64_ASSET_mesh_penguin;
 
-    entity_init(&game->entity, fw64_mesh_load(engine->assets, game->mesh_assets[game->current_entity]));
+    fw64_node_init(&game->entity, fw64_mesh_load(engine->assets, game->mesh_assets[game->current_entity]));
     arcball_set_initial(&game->arcball, &game->entity.bounding);
 
     game->arcball.camera.near = 4.0f;
@@ -57,7 +52,7 @@ void game_update(Game* game) {
     }
 
     if (previous_entity != game->current_entity) {
-        entity_set_mesh(&game->entity, fw64_mesh_load(game->engine->assets, game->mesh_assets[game->current_entity]));
+        fw64_node_set_mesh(&game->entity, fw64_mesh_load(game->engine->assets, game->mesh_assets[game->current_entity]));
         arcball_set_initial(&game->arcball, &game->entity.bounding);
     }
 

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../common/entity.h"
-
 #include "framework64/font.h"
 #include "framework64/engine.h"
+#include "framework64/node.h"
 
 typedef enum {
     MODE_DEFAULT,
@@ -15,7 +14,7 @@ typedef enum {
 typedef struct {
     fw64Engine* engine;
     fw64Camera camera;
-    Entity quad_entity;
+    fw64Node quad;
     Mode mode;
     const char* mode_name;
     fw64Texture* buttons;

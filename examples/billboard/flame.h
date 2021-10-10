@@ -1,11 +1,11 @@
 #pragma once
 
-#include "entity.h"
+#include "framework64/node.h"
 
 #include "framework64/engine.h"
 
 typedef struct {
-    Entity entity;
+    fw64Node entity;
     float update_time_remaining;
 } Flame;
 

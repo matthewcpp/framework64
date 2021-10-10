@@ -1,6 +1,5 @@
 set(src_files
     ../common/${platform_main_file}
-    ../common/entity.h ../common/entity.c
     game.h game.c)
 
 add_executable(audio ${src_files})

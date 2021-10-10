@@ -22,8 +22,8 @@ float stick_adjust[4];
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     
-    entity_init(&game->penguin, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin));
-    entity_init(&game->penguin_box, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
+    fw64_node_init(&game->penguin, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin));
+    fw64_node_init(&game->penguin_box, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
     game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
     game->intersection = CUBE_NONE;
 
@@ -62,12 +62,12 @@ void game_update(Game* game){
         vec3_add(&game->penguin.transform.scale, &game->penguin.transform.scale, &scale_delta);
     }
 
-    entity_refresh(&game->penguin);
+    fw64_node_refresh(&game->penguin);
 
     box_center(&game->penguin.bounding, &game->penguin_box.transform.position);
     box_extents(&game->penguin.bounding, &game->penguin_box.transform.scale);
 
-    entity_refresh(&game->penguin_box);
+    fw64_node_refresh(&game->penguin_box);
 
     game->intersection = check_intersection(game);
 }
@@ -125,11 +125,11 @@ void init_cubes(Game* game) {
     fw64Mesh* cube_mesh = fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_blue_cube);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
-        Entity* cube = &game->cubes[i];
-        entity_init(cube, cube_mesh);
+        fw64Node* cube = &game->cubes[i];
+        fw64_node_init(cube, cube_mesh);
         cube->transform.position = cube_positions[i];
         vec3_set(&cube->transform.scale, 40, 40, 40);
-        entity_refresh(cube);
+        fw64_node_refresh(cube);
     }
 }
 

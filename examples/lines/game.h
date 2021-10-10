@@ -1,9 +1,8 @@
 #pragma once
 
-#include "entity.h"
-
 #include "framework64/camera.h"
 #include "framework64/engine.h"
+#include "framework64/node.h"
 
 typedef enum {
     EXAMPLE_DRAW_MODE_SHADED,
@@ -16,8 +15,8 @@ typedef struct lines_example {
     fw64Camera camera;
     DrawMode draw_mode;
     float rotation;
-    Entity solid_cube;
-    Entity wire_cube;
+    fw64Node solid_cube;
+    fw64Node wire_cube;
 } Game;
 
 #ifdef __cplusplus

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "entity.h"
+#include "framework64/node.h"
 
 typedef struct {
     fw64Engine* engine;
@@ -15,7 +15,7 @@ typedef struct {
     int music_bank;
     int music_track;
 
-    Entity n64_logo;
+    fw64Node n64_logo;
     float rotation;
 } Game;
 
