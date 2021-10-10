@@ -1,5 +1,6 @@
-#ifndef FW64_QUAT_H
-#define FW64_QUAT_H
+#pragma once
+
+/** \file quat.h */
 
 #include "framework64/vec3.h"
 
@@ -21,6 +22,4 @@ void quat_from_euler(Quat* q, float x, float y, float z);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

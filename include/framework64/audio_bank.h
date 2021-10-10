@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file audio_bank.h */
+
 #include "framework64/asset_database.h"
 
 #include <stdint.h>

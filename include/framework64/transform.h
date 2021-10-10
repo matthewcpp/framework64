@@ -1,5 +1,6 @@
-#ifndef FW64_TRANSFORM_H
-#define FW64_TRANSFORM_H
+#pragma once
+
+/** \file transform.h */
 
 #include "framework64/quat.h"
 #include "framework64/types.h"
@@ -31,4 +32,3 @@ void fw64_transform_update_matrix(fw64Transform* transform);
 }
 #endif
 
-#endif

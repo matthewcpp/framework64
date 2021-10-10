@@ -1,5 +1,6 @@
-#ifndef FW64_VEC3_H
-#define FW64_VEC3_H
+#pragma once
+
+/** \file vec3.h */
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,4 +29,3 @@ float vec3_dot(Vec3* a, Vec3* b);
 }
 #endif
 
-#endif

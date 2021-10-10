@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file mesh.h */
+
 #include "framework64/asset_database.h"
 #include "framework64/box.h"
 #include "framework64/material.h"

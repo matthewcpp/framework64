@@ -1,5 +1,6 @@
-#ifndef FW64_PLANE_H
-#define FW64_PLANE_H
+#pragma once
+
+/** \file plane.h */
 
 #include "framework64/vec3.h"
 
@@ -23,6 +24,4 @@ float fw64_plane_signed_distance_to_point(fw64Plane* plane, Vec3* point);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

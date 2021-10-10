@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file image.h */
+
 #include "framework64/asset_database.h"
 
 #include <stdint.h>

@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file font.h */
+
 #include "framework64/asset_database.h"
 #include "framework64/vec2.h"
 

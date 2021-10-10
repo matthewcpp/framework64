@@ -1,5 +1,6 @@
-#ifndef FW64_VEC2_H
-#define FW64_VEC2_H
+#pragma once
+
+/** \file vec2.h */
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +20,4 @@ void ivec2_add(IVec2 *out, IVec2 *a, IVec2 *b);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

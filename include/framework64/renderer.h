@@ -1,5 +1,6 @@
-#ifndef FW64_RENDERER_H
-#define FW64_RENDERER_H
+#pragma once
+
+/** \file renderer.h */
 
 #include "camera.h"
 #include "color.h"
@@ -47,6 +48,4 @@ fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

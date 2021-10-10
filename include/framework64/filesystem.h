@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file filesystem.h */
+
 #include <stdint.h>
 
 #define FW64_FILESYSTEM_MAX_OPEN_FILES 4

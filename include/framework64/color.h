@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file color.h */
+
 #include <stdint.h>
 
 typedef struct {

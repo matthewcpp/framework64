@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file sparse_set.h */
+
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
