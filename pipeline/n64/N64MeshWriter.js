@@ -104,22 +104,25 @@ function prepareTextures(resources, outputDir, archive) {
 }
 
 function writeMeshResources(resources, file, outputDir, archive) {
+    let bytesWritten = 0;
     const resourceInfo = new ResourcesInfo(resources);
 
-    fs.writeSync(file, resourceInfo.buffer);
+    bytesWritten += fs.writeSync(file, resourceInfo.buffer);
 
     if (resources.images.length > 0) {
         const textureAssetIndices = prepareTextures(resources, outputDir, archive);
-        fs.writeSync(file, textureAssetIndices);
+        bytesWritten += fs.writeSync(file, textureAssetIndices);
     }
 
     for (const texture of resources.textures) {
-        fs.writeSync(file, texture.buffer);
+        bytesWritten += fs.writeSync(file, texture.buffer);
     }
 
     for (const material of resources.materials) {
-        fs.writeSync(file, material.buffer);
+        bytesWritten += fs.writeSync(file, material.buffer);
     }
+
+    return bytesWritten;
 }
 
 function writeStaticMesh(mesh, outputDir, archive) {
@@ -178,22 +181,24 @@ function writeStaticMeshData(mesh, file) {
         displayListBuffers.push(displayList);
         vertexPointerBuffers.push(vertexPointers);
     }
-
-    fs.writeSync(file, meshInfo.buffer);
+    let bytesWritten = 0;
+    bytesWritten += fs.writeSync(file, meshInfo.buffer);
 
     for (const buffer of vertexBuffers)
-        fs.writeSync(file, buffer);
+        bytesWritten += fs.writeSync(file, buffer);
 
     for (const buffer of displayListBuffers)
-        fs.writeSync(file, buffer);
+        bytesWritten += fs.writeSync(file, buffer);
 
     for (const primitiveInfo of primitiveInfos) {
-        fs.writeSync(file, primitiveInfo.buffer)
+        bytesWritten += fs.writeSync(file, primitiveInfo.buffer)
     }
 
-    fs.writeSync(file, vertexPointerCountBuffer);
+    bytesWritten += fs.writeSync(file, vertexPointerCountBuffer);
     for (const buffer of vertexPointerBuffers)
-        fs.writeSync(file, buffer);
+        bytesWritten += fs.writeSync(file, buffer);
+
+    return bytesWritten;
 }
 
 module.exports = {

@@ -6,6 +6,7 @@ const processMesh = require("./ProcessMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processTerrain = require("./ProcessTerrain")
+const processScene = require("./ProcessScene")
 
 const processRaw = require("./ProcessRaw");
 
@@ -44,14 +45,14 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
             console.log(`Processing Sound Bank: ${soundBank.name}`);
-            await processSoundBank(soundBank, bundle, manifestDirectory, outputDirectory);
+            //await processSoundBank(soundBank, bundle, manifestDirectory, outputDirectory);
         }
     }
 
     if (manifest.musicBanks) {
         for (const musicBank of manifest.musicBanks) {
             console.log(`Processing Music Bank: ${musicBank.name}`);
-            await processMusicBank(musicBank, bundle, manifestDirectory, outputDirectory);
+            //await processMusicBank(musicBank, bundle, manifestDirectory, outputDirectory);
         }
     }
 
@@ -66,6 +67,16 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
         for (const terrain of manifest.terrains) {
             console.log(`Processing Terrain: ${terrain.src}`);
             await processTerrain(terrain, bundle, manifestDirectory, outputDirectory);
+        }
+    }
+
+    if (manifest.scenes) {
+        for (const scene of manifest.scenes) {
+            console.log(`Processing Scene: ${scene.src}`);
+
+            const typemap = scene.hasOwnProperty("typemap") ? manifest.typemaps[scene.typemap] : {};
+
+            await processScene(scene, typemap, bundle, manifestDirectory, outputDirectory);
         }
     }
 

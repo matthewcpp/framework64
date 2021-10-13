@@ -3,6 +3,7 @@ const processTerrain = require("./ProcessTerrain");
 const imageConvert = require("./ImageConvert");
 const FontConvert = require("./FontConvert");
 const AudioConvert = require("./AudioConvert");
+const processScene = require("./ProcessScene");
 const Archive = require("./Archive");
 
 const path = require("path");
@@ -46,7 +47,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
 
             const sourceDir = path.join(manifestDirectory, soundBank.dir);
-            await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, archive);
+            //await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, archive);
         }
     }
 
@@ -55,7 +56,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
 
             const sourceDir = path.join(manifestDirectory, musicBank.dir);
-            await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
+            //await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
         }
     }
 
@@ -63,6 +64,16 @@ async function prepare(manifest, manifestFile, outputDirectory) {
         for (const terrain of manifest.terrains) {
             console.log(`Processing Terrain: ${terrain.src}`)
             await processTerrain(terrain, archive, manifestDirectory, outputDirectory);
+        }
+    }
+
+    if (manifest.scenes) {
+        for (const scene of manifest.scenes) {
+            console.log(`Processing Scene: ${scene.src}`);
+
+            const typemap = scene.hasOwnProperty("typemap") ? manifest.typemaps[scene.typemap] : {};
+
+            await processScene(scene, typemap, archive, manifestDirectory, outputDirectory);
         }
     }
 

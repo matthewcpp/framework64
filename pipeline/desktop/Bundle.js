@@ -15,6 +15,7 @@ class Bundle {
     _musicBankStmt = null;
     _rawFileStmt = null;
     _terrainStmt = null;
+    _sceneStmt = null;
 
     constructor(outputDirectory) {
         this._initDatabase(outputDirectory);
@@ -38,6 +39,7 @@ class Bundle {
             db.run("CREATE TABLE musicBanks (assetId INTEGER PRIMARY KEY, path TEXT, count INTEGER)");
             db.run("CREATE TABLE rawFiles (assetId INTEGER PRIMARY KEY, path TEXT, size INTEGER)");
             db.run("CREATE TABLE terrains (assetId INTEGER PRIMARY KEY, path TEXT, dimx INTEGER, dimz INTEGER)");
+            db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, typemap TEXT)");
         });
 
         this._imageStmt = db.prepare("INSERT INTO images VALUES (?, ?, ?, ?)");
@@ -47,6 +49,7 @@ class Bundle {
         this._musicBankStmt = db.prepare("INSERT INTO musicBanks VALUES (?, ?, ?)");
         this._rawFileStmt = db.prepare("INSERT INTO rawFiles VALUES (?, ?, ?)");
         this._terrainStmt = db.prepare("INSERT INTO terrains VALUES (?, ?, ?, ?)");
+        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?)");
 
         this._db = db;
     }
@@ -122,7 +125,16 @@ class Bundle {
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_terrain_${assetName} ${assetId}\n`);
 
-        this._terrainStmt.run(assetId, assetPath, terrain.dimensionX, terrain.dimensionZ)
+        this._terrainStmt.run(assetId, assetPath, terrain.dimensionX, terrain.dimensionZ);
+    }
+
+    addScene(scene, assetPath, typemapStr) {
+        const assetId = this._nextAssetId++;
+        const assetName = path.basename(scene.src, path.extname(scene.src));
+
+        fs.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
+
+        this._sceneStmt.run(assetId, assetPath, typemapStr);
     }
 
     finalize() {
@@ -133,6 +145,7 @@ class Bundle {
         this._musicBankStmt.finalize();
         this._rawFileStmt.finalize();
         this._terrainStmt.finalize();
+        this._sceneStmt.finalize();
         this._db.close();
 
         const assetCount = this._nextAssetId - 1;
