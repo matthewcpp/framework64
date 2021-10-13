@@ -1,6 +1,6 @@
 set(src_files
     ../common/${platform_main_file}
-    flame.h flame.c
+    ../common/flame.h ../common/flame.c
     game.h game.c)
 
 add_executable(billboard ${src_files})

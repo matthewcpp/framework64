@@ -68,6 +68,12 @@ int fw64_filesystem_size(int handle) {
     return open_files[handle].size;
 }
 
+int fw64_filesystem_tell(int handle) {
+    fw64FileHandle* file_handle = &open_files[handle];
+
+    return file_handle->get_pos;
+}
+
 int fw64_filesystem_read(void* buffer, int size, int count, int handle) {
     if (handle < 0 || handle > FW64_FILESYSTEM_MAX_OPEN_FILES || open_files[handle].data_loc == 0)
         return FW64_FILESYSTEM_INVALID_HANDLE;

@@ -17,6 +17,7 @@ public:
     int open(int asset_index);
     int close(int file_handle);
     int fileSize(int file_handle);
+    int tell(int file_handle);
     int read(char* buffer, int count, int file_handle);
     int openHandleCount();
 

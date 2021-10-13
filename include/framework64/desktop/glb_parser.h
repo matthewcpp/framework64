@@ -1,5 +1,7 @@
 #pragma once
 
+#include "framework64/scene.h"
+
 #include "framework64/desktop/mesh.h"
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
@@ -14,6 +16,8 @@
 
 #include <array>
 #include <fstream>
+#include <string>
+#include <unordered_map>
 
 namespace framework64 {
 
@@ -24,6 +28,8 @@ public:
 public:
     /** Extracts a single, static mesh from the GLB file. */
     fw64Mesh* parseStaticMesh(std::string const & path);
+    fw64Scene* parseScene(std::string const & path, std::unordered_map<std::string, int> const & typemap);
+
 
     std::vector<fw64Mesh*> parseStaticMeshes(std::string const & path);
 

@@ -26,6 +26,7 @@ set(common_source_files
         ../include/framework64/plane.h plane.c
         ../include/framework64/quat.h quat.c
         ../include/framework64/renderer.h
+        ../include/framework64/scene.h scene.c
         ../include/framework64/sparse_set.h sparse_set.c
         ../include/framework64/texture.h
         ../include/framework64/transform.h transform.c
@@ -56,6 +57,7 @@ if (FW64_PLATFORM_N64)
             ../include/framework64/n64/mesh.h n64/mesh.c
             n64/quad.c
             ../include/framework64/n64/renderer.h n64/renderer.c
+            ../include/framework64/n64/scene.h n64/scene.c
             n64/terrain.c
             ../include/framework64/n64/texture.h n64/texture.c
         )
@@ -81,6 +83,7 @@ else()
         ../include/framework64/desktop/particle_shader.h desktop/particle_shader.cpp
         desktop/quad.cpp
         ../include/framework64/desktop/renderer.h desktop/renderer.cpp
+            ../include/framework64/desktop/scene.h desktop/scene.cpp
         ../include/framework64/desktop/shader.h desktop/shader.cpp
         ../include/framework64/desktop/shader_cache.h desktop/shader_cache.cpp
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp

@@ -4,6 +4,7 @@ const N64Mesh = require("./N64Mesh");
 const N64MeshResources = require("./N64MeshResources");
 const N64Primitive = require("./N64Primitive");
 const N64Texture = require("./N64Texture");
+const N64SceneExtra = require("./N64SceneExtra")
 
 const glMatrix = require("gl-matrix");
 
@@ -62,6 +63,28 @@ class GLTFLoader {
         }
     }
 
+    async loadScene(gltfPath) {
+        this._loadFile(gltfPath);
+
+        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
+            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
+        }
+
+        const meshes = [];
+
+        for (let i = 0; i < this.gltf.meshes.length; i++) {
+            this.mesh = new N64Mesh(null);
+            await this._loadMesh(this.gltf.meshes[i]);
+            meshes.push(this.mesh);
+        }
+
+        return {
+            meshes: meshes,
+            resources: this.resources,
+            extras: this._loadExtras()
+        }
+    }
+
     /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
     async loadStaticMesh(gltfPath) {
         this._loadFile(gltfPath);
@@ -87,6 +110,30 @@ class GLTFLoader {
         this.imageMap.clear();
         this.textureMap.clear();
         this.materialMap.clear();
+    }
+
+    _loadExtras() {
+        const extras = [];
+        for (const node of this.gltf.nodes) {
+            if (!node.hasOwnProperty("extras")) continue;
+
+            const extra = new N64SceneExtra();
+
+            extra.type = node.extras.type;
+
+            if (node.translation)
+                extra.position = node.translation.slice();
+
+            if (node.rotation)
+                extra.rotation = node.rotation.slice();
+
+            if (node.scale)
+                extra.scale = node.scale.slice();
+
+            extras.push(extra);
+        }
+
+        return extras;
     }
 
     async _loadMesh(gltfMesh) {

@@ -29,5 +29,6 @@ public:
     sqlite3_stmt* select_raw_file_statement = nullptr;
     sqlite3_stmt* select_sound_bank_statement = nullptr;
     sqlite3_stmt* select_terrain_statement = nullptr;
+    sqlite3_stmt* select_scene_statement = nullptr;
 };
 

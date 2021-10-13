@@ -1,4 +1,3 @@
-#include "framework64/filesystem.h"
 #include "framework64/desktop/filesystem.h"
 
 #include <memory>
@@ -49,6 +48,19 @@ int Filesystem::close(int file_handle) {
     if (file.is_open()) {
         file.close();
         return 1;
+    }
+    else {
+        return FW64_FILESYSTEM_INVALID_HANDLE;
+    }
+}
+
+int Filesystem::tell(int file_handle) {
+    if (file_handle < 0 || file_handle >= FW64_FILESYSTEM_MAX_OPEN_FILES)
+        return FW64_FILESYSTEM_INVALID_HANDLE;
+
+    auto& file = file_handles[file_handle];
+    if (file.is_open()) {
+        return static_cast<int>(file.tellg());
     }
     else {
         return FW64_FILESYSTEM_INVALID_HANDLE;
@@ -112,4 +124,8 @@ int fw64_filesystem_close(int file_handle) {
 }
 int fw64_filesystem_get_open_handle_count() {
     return framework64::Filesystem::get()->openHandleCount();
+}
+
+int fw64_filesystem_tell(int file_handle) {
+    return framework64::Filesystem::get()->tell(file_handle);
 }
