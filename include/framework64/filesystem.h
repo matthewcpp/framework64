@@ -21,6 +21,7 @@ int fw64_filesystem_open(int asset_index);
 
 int fw64_filesystem_size(int file_handle);
 int fw64_filesystem_read(void* buffer, int size, int count, int file_handle);
+int fw64_filesystem_tell(int file_handle);
 int fw64_filesystem_close(int file_handle);
 int fw64_filesystem_get_open_handle_count();
 
