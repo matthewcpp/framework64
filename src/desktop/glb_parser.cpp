@@ -1,6 +1,7 @@
 #include "framework64/desktop/glb_parser.h"
 
 #include "framework64/desktop/mesh_data.h"
+#include "framework64/desktop/scene.h"
 #include "framework64/matrix.h"
 
 #include <cassert>
@@ -17,12 +18,46 @@ enum GltfComponentType {
     Float = 5126
 };
 
-// note this function assumes scene 0 is the "active scene"
+static void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale);
+
+    // note this function assumes scene 0 is the "active scene"
 fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     if (!openFile(path))
         return nullptr;
 
     return createStaticMesh(json_doc["meshes"][0]);
+}
+
+fw64Scene* GlbParser::parseScene(std::string const & path, std::unordered_map<std::string, int> const & typemap) {
+    if (!openFile(path))
+        return nullptr;
+
+    auto* scene = new fw64Scene();
+    fw64_transform_init(&scene->transform);
+
+    for (auto const & mesh : json_doc["meshes"] ) {
+        scene->meshes.push_back(createStaticMesh(mesh));
+    }
+
+    for (auto const & node : json_doc["nodes"]) {
+        if (node.contains("extras")) {
+            fw64SceneExtra extra;
+            extractTransformFromNode(node, extra.position, extra.rotation, extra.scale);
+
+            auto extra_type_name = node["extras"]["type"].get<std::string>();
+
+            auto result = typemap.find(extra_type_name);
+
+            if (result != typemap.end())
+                extra.type = result->second;
+            else
+                extra.type = 0;
+
+            scene->extras.push_back(extra);
+        }
+    }
+
+    return scene;
 }
 
 std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {
@@ -115,24 +150,16 @@ static fw64Primitive::Mode getPrimitiveMode(nlohmann::json const & primitive_nod
     }
 }
 
-// note this assumes there is only one mesh at the top level
-// it will need to be modified in the future
-static std::array<float, 16> extractMatrixFromNode(nlohmann::json const & node) {
-    std::array<float, 16> transform;
-    matrix_set_identity(transform.data());
-
-    Vec3 translation = {0.0f, 0.0f, 0.0f};
-    Quat rotation;
+void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale) {
+    vec3_zero(&position);
     quat_ident(&rotation);
-    Vec3 scale = {1.0f, 1.0f, 1.0f};
-
-    bool set_trs = true;
+    vec3_one(&scale);
 
     if (node.contains("translation")) {
         auto const & translation_node = node["translation"];
-        translation.x = translation_node[0].get<float>();
-        translation.y = translation_node[1].get<float>();
-        translation.z = translation_node[2].get<float>();
+        position.x = translation_node[0].get<float>();
+        position.y = translation_node[1].get<float>();
+        position.z = translation_node[2].get<float>();
     }
 
     if (node.contains("rotation")) {
@@ -149,22 +176,36 @@ static std::array<float, 16> extractMatrixFromNode(nlohmann::json const & node) 
         scale.y = scale_node[1].get<float>();
         scale.z = scale_node[2].get<float>();
     }
+}
+
+// note this assumes there is only one mesh at the top level
+// it will need to be modified in the future
+static std::array<float, 16> extractMatrixFromNode(nlohmann::json const & node) {
+    std::array<float, 16> transform_matrix;
+    matrix_set_identity(transform_matrix.data());
+
+    Vec3 position, scale;
+    Quat rotation;
+
+    extractTransformFromNode(node, position, rotation, scale);
+
+    bool set_trs = true;
 
     if (node.contains("matrix")) {
         auto const &matrix_node = node["matrix"];
 
         for (size_t i = 0; i < 16; i++) {
-            transform[i] = matrix_node[i].get<float>();
+            transform_matrix[i] = matrix_node[i].get<float>();
         }
 
         set_trs = false;
     }
 
     if (set_trs) {
-        matrix_from_trs(transform.data(), &translation, &rotation, &scale);
+        matrix_from_trs(transform_matrix.data(), &position, &rotation, &scale);
     }
 
-    return transform;
+    return transform_matrix;
 }
 
 fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
