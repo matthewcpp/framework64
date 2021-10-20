@@ -2,6 +2,11 @@
 
 #include "framework64/types.h"
 
+#include <math.h>
+#include <stdlib.h>
+
+// Implementation based on: https://glmatrix.net/docs/vec3.js.html
+
 void vec3_zero(Vec3* v) {
     v->x = 0.0f;
     v->y = 0.0f;
@@ -38,6 +43,12 @@ void vec3_add(Vec3* out, Vec3* a, Vec3* b) {
     out->z = a->z + b->z;
 }
 
+void vec3_add_and_scale(Vec3* out, Vec3* a, Vec3* b, float k) {
+    out->x = a->x + b->x * k;
+    out->y = a->y + b->y * k;
+    out->z = a->z + b->z * k;
+}
+
 void vec3_subtract(Vec3* out, Vec3* a, Vec3* b) {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
@@ -56,6 +67,14 @@ float vec3_distance(Vec3* a, Vec3* b) {
     float z = b->z - a->z;
 
     return fw64_sqrtf(x * x + y * y + z * z);
+}
+
+float vec3_distance_squared(Vec3* a, Vec3* b) {
+    float x = b->x - a->x;
+    float y = b->y - a->y;
+    float z = b->z - a->z;
+
+    return x * x + y * y + z * z;
 }
 
 void vec3_normalize(Vec3* v) {
@@ -84,4 +103,16 @@ void vec3_cross(Vec3* out, Vec3* a, Vec3* b) {
 
 float vec3_dot(Vec3* a, Vec3* b) {
     return a->x * b->x + a->y * b->y + a->z * b->z;
+}
+
+int vec3_equals(Vec3* a, Vec3* b, float epsilon) {
+    float dx = fabsf(a->x - b->x);
+    float dy = fabsf(a->y - b->y);
+    float dz = fabsf(a->z - b->z);
+
+    float max_val_x = epsilon * fmaxf(1.0f, fmaxf(fabsf(a->x), fabsf(b->x)));
+
+    return dx <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->x), fabsf(b->x))) &&
+            dy <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->y), fabsf(b->y))) &&
+            dz <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->z), fabsf(b->z)));
 }

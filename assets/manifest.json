@@ -154,6 +154,10 @@
         {
             "src": "simple_scene/simple_scene.gltf",
             "typemap": 0
+        },
+        {
+            "src": "ramp_test/ramp_test.gltf",
+            "typemap": 0
         }
     ],
     "raw": [

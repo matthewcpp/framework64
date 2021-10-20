@@ -1,10 +1,11 @@
-#ifndef FW64_TYPES_H
-#define FW64_TYPES_H
+#pragma once
 
 #ifdef PLATFORM_N64
 #include <nusys.h>
 
 #include <math.h>
+
+#include "framework64/n64/compat.h"
 
 typedef Mtx fw64Matrix;
 
@@ -37,5 +38,6 @@ typedef struct {
 
 #endif
 
+#ifndef EPSILON
+    #define EPSILON 0.000001f
 #endif
-

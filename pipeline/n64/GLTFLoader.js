@@ -474,6 +474,9 @@ class GLTFLoader {
                     element.push(buffer.readUInt32LE(offset));
                     offset += 4;
                     break;
+
+                default:
+                    throw new Error(`Unsupported element type: ${componentType}`);
             }
         }
 

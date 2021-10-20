@@ -44,21 +44,18 @@ void fw64_scene_delete(fw64Scene* scene) {
 
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index) {
     assert(index < scene->meshes.size());
-    return scene->meshes[index];
+    return scene->meshes[index].get();
 }
 
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene) {
     return static_cast<uint32_t>(scene->meshes.size());
 }
 
-fw64Transform* fw64_scene_get_transform(fw64Scene* scene) {
-    return &scene->transform;
+fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index) {
+    assert(index < scene->nodes.size());
+    return scene->nodes[index].get();
 }
 
-uint32_t fw64_scene_get_extra_count(fw64Scene* scene){
-    return static_cast<uint32_t>(scene->extras.size());
-}
-
-fw64SceneExtra* fw64_scene_get_extras(fw64Scene* scene) {
-    return scene->extras.data();
+uint32_t fw64_scene_get_node_count(fw64Scene* scene) {
+    return static_cast<uint32_t>(scene->nodes.size());
 }

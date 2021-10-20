@@ -16,4 +16,7 @@ void main() {
         fw64_texture_slice_top + (tex_coords.y * fw64_texture_slice_height));
 
     final_color = texture(diffuse_texture_sampler, sample_coords);
+
+    if (final_color.a < 0.1)
+        discard;
 }

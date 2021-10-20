@@ -25,6 +25,7 @@ set(common_source_files
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
         ../include/framework64/quat.h quat.c
+        ../include/framework64/raycast.h raycast.c
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
         ../include/framework64/sparse_set.h sparse_set.c
@@ -46,6 +47,7 @@ if (FW64_PLATFORM_N64)
             ../include/framework64/n64/asset_database.h
             ../include/framework64/n64/audio.h n64/audio.c
             ../include/framework64/n64/audio_bank.h n64/audio_bank.c
+            ../include/framework64/n64/compat.h n64/compat.c
             ../include/framework64/n64/controller_button.h
             ../include/framework64/n64/engine.h n64/engine.c
             ../include/framework64/n64/filesystem.h n64/filesystem.c

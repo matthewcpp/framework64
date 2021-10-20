@@ -13,6 +13,8 @@ static void _node_update_bounding_box_with_matrix(fw64Node* node, float* matrix)
 void fw64_node_init(fw64Node* node, fw64Mesh* mesh) {
     fw64_transform_init(&node->transform);
     fw64_node_set_mesh(node, mesh);
+    node->type = FW64_NODE_UNSPECIFIED_TYPE;
+    node->layer_mask = UINT32_MAX;
 }
 
 void fw64_node_refresh(fw64Node* node) {
@@ -50,4 +52,13 @@ void fw64_node_billboard(fw64Node* node, fw64Camera* camera) {
     fw64_transform_look_at(&node->transform, &target, &camera_up);
 
     fw64_node_refresh(node);
+}
+
+void fw64_node_sphere(fw64Node* node, Vec3* center, float* radius) {
+    box_center(&node->bounding, center);
+    *radius = vec3_distance(center, &node->bounding.max);
+
+    Vec3 extents;
+    box_extents(&node->bounding, &extents);
+    *radius = extents.y * 2;
 }

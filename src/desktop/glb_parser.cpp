@@ -20,7 +20,7 @@ enum GltfComponentType {
 
 static void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale);
 
-    // note this function assumes scene 0 is the "active scene"
+// note this function assumes scene 0 is the "active scene"
 fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     if (!openFile(path))
         return nullptr;
@@ -33,28 +33,42 @@ fw64Scene* GlbParser::parseScene(std::string const & path, std::unordered_map<st
         return nullptr;
 
     auto* scene = new fw64Scene();
-    fw64_transform_init(&scene->transform);
 
-    for (auto const & mesh : json_doc["meshes"] ) {
-        scene->meshes.push_back(createStaticMesh(mesh));
+    if (json_doc.contains("meshes")) {
+        scene->meshes.resize(json_doc["meshes"].size());
     }
 
     for (auto const & node : json_doc["nodes"]) {
-        if (node.contains("extras")) {
-            fw64SceneExtra extra;
-            extractTransformFromNode(node, extra.position, extra.rotation, extra.scale);
+        auto* n = new fw64Node();
 
-            auto extra_type_name = node["extras"]["type"].get<std::string>();
+        fw64Mesh* mesh = nullptr;
+        if (node.contains("mesh")) {
+            int mesh_index = node["mesh"].get<int>();
 
-            auto result = typemap.find(extra_type_name);
-
-            if (result != typemap.end())
-                extra.type = result->second;
-            else
-                extra.type = 0;
-
-            scene->extras.push_back(extra);
+            if (scene->meshes[mesh_index] == nullptr) {
+                mesh = createStaticMesh(json_doc["meshes"][mesh_index]);
+                scene->meshes[mesh_index].reset(mesh);
+            }
+            else {
+                mesh = scene->meshes[mesh_index].get();
+            }
         }
+
+        fw64_node_init(n, mesh);
+        extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
+
+        if (node.contains("extras")) {
+            auto& extras = node["extras"];
+            if (extras.contains("type")) {
+                auto result = typemap.find(extras["type"].get<std::string>());
+
+                if (result != typemap.end())
+                    n->type = result->second;
+            }
+        }
+
+        fw64_node_refresh(n);
+        scene->nodes.emplace_back(n);
     }
 
     return scene;

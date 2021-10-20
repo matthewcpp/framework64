@@ -1,18 +1,19 @@
 #pragma once
 
-#include "flame.h"
+#include "level1.h"
+#include "level2.h"
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
-#include "framework64/scene.h"
-#include "framework64/camera.h"
+
+typedef union {
+    Level1 level1;
+    Level2 level2;
+} Levels;
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
-    fw64Scene* scene;
-    fw64Node player;
-    Flame flames[2];
+    Levels levels;
+    int level;
 } Game;
 
 #ifdef __cplusplus
