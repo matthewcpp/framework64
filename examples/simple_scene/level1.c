@@ -7,7 +7,7 @@
 
 void level1_init(Level1* level, fw64Engine* engine) {
     level->engine = engine;
-    chase_camera_init(&level->chase_cam);
+    chase_camera_init(&level->chase_cam, engine);
 
     level->scene = fw64_scene_load(level->engine->assets, FW64_ASSET_scene_simple_scene);
 

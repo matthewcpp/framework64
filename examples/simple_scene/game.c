@@ -2,7 +2,7 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    game->level = 1;
+    game->level = 2;
 
     switch (game->level) {
         case 1:

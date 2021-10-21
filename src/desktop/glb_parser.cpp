@@ -5,6 +5,8 @@
 #include "framework64/matrix.h"
 
 #include <cassert>
+#include <exception>
+#include <sstream>
 
 namespace framework64 {
 
@@ -28,7 +30,7 @@ fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     return createStaticMesh(json_doc["meshes"][0]);
 }
 
-fw64Scene* GlbParser::parseScene(std::string const & path, std::unordered_map<std::string, int> const & typemap) {
+fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_map, LayerMap const & layer_map) {
     if (!openFile(path))
         return nullptr;
 
@@ -39,10 +41,16 @@ fw64Scene* GlbParser::parseScene(std::string const & path, std::unordered_map<st
     }
 
     for (auto const & node : json_doc["nodes"]) {
+        bool has_mesh = node.contains("mesh");
+        bool has_extras = node.contains("extras");
+
+        if (!has_mesh && !has_extras)
+            continue;
+
         auto* n = new fw64Node();
 
         fw64Mesh* mesh = nullptr;
-        if (node.contains("mesh")) {
+        if (has_mesh) {
             int mesh_index = node["mesh"].get<int>();
 
             if (scene->meshes[mesh_index] == nullptr) {
@@ -55,15 +63,34 @@ fw64Scene* GlbParser::parseScene(std::string const & path, std::unordered_map<st
         }
 
         fw64_node_init(n, mesh);
+
         extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
         if (node.contains("extras")) {
             auto& extras = node["extras"];
-            if (extras.contains("type")) {
-                auto result = typemap.find(extras["type"].get<std::string>());
 
-                if (result != typemap.end())
-                    n->type = result->second;
+            if (extras.contains("type")) {
+                auto type_name = extras["type"].get<std::string>();
+                auto result = type_map.find(type_name);
+
+                assert (result != type_map.end());
+                n->type = result->second;
+
+            }
+
+            if (extras.contains("layers")) {
+                auto layers_str = extras["layers"].get<std::string>();
+                uint32_t layer_mask = 0U;
+
+                std::istringstream ss(layers_str);
+                for (std::string layer_name; ss >> layer_name; ) {
+                    auto result = layer_map.find(layer_name);
+
+                    assert (result != layer_map.end());
+                    layer_mask |= result->second;
+                }
+
+                n->layer_mask = layer_mask;
             }
         }
 

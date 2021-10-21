@@ -14,7 +14,7 @@ void fw64_node_init(fw64Node* node, fw64Mesh* mesh) {
     fw64_transform_init(&node->transform);
     fw64_node_set_mesh(node, mesh);
     node->type = FW64_NODE_UNSPECIFIED_TYPE;
-    node->layer_mask = UINT32_MAX;
+    node->layer_mask = 1U;
 }
 
 void fw64_node_refresh(fw64Node* node) {

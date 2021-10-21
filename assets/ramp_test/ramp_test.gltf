@@ -36,10 +36,16 @@
             ]
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 0,
             "name" : "Ground Plane"
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 1,
             "name" : "Platform top"
         },
@@ -60,6 +66,9 @@
             "name" : "Pole.002"
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 6,
             "name" : "Ramp"
         },

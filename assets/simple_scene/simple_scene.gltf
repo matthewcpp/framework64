@@ -30,10 +30,16 @@
     ],
     "nodes" : [
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 0,
             "name" : "Cylinder.001"
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 1,
             "name" : "Cube"
         },
@@ -46,6 +52,9 @@
             "name" : "Cube.002"
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 4,
             "name" : "Cube.003"
         },
@@ -58,6 +67,9 @@
             "name" : "Cube.005"
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 7,
             "name" : "Cube.008"
         },
@@ -74,10 +86,16 @@
             "name" : "Cylinder.002"
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 11,
             "name" : "Cube.009"
         },
         {
+            "extras" : {
+                "layers" : "ground"
+            },
             "mesh" : 12,
             "name" : "Cube.010"
         },

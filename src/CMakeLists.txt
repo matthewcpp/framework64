@@ -76,6 +76,7 @@ else()
         ../include/framework64/desktop/input.h desktop/input.cpp
         ../include/framework64/desktop/image.h desktop/image.cpp
         ../include/framework64/desktop/input_interface.h
+            ../include/framework64/desktop/json_map.h desktop/json_map.cpp
         ../include/framework64/desktop/line_shader.h desktop/line_shader.cpp
         ../include/framework64/desktop/material.h desktop/material.cpp
         ../include/framework64/desktop/mesh.h desktop/mesh.cpp

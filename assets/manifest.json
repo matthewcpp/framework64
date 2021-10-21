@@ -144,20 +144,28 @@
             "dimensionZ": 32
         }
     ],
-    "typemaps": [
+    "typeMaps": [
         {
             "start": 0,
             "fire": 1
         }
     ],
+    "layerMaps": [
+        {
+            "default": 1,
+            "ground": 2
+        }
+    ],
     "scenes": [
         {
             "src": "simple_scene/simple_scene.gltf",
-            "typemap": 0
+            "typeMap": 0,
+            "layerMap": 0
         },
         {
             "src": "ramp_test/ramp_test.gltf",
-            "typemap": 0
+            "typeMap": 0,
+            "layerMap": 0
         }
     ],
     "raw": [

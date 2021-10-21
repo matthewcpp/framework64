@@ -70,13 +70,28 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
         }
     }
 
+    if (manifest.typeMaps) {
+        let index = 0;
+        for (const typeMap of manifest.typeMaps) {
+            bundle.addTypeMap(typeMap, index++);
+        }
+    }
+
+    if (manifest.layerMaps) {
+        let index = 0;
+        for (const layerMap of manifest.layerMaps) {
+            bundle.addLayerMap(layerMap, index++);
+        }
+    }
+
     if (manifest.scenes) {
         for (const scene of manifest.scenes) {
             console.log(`Processing Scene: ${scene.src}`);
 
             const typemap = scene.hasOwnProperty("typemap") ? manifest.typemaps[scene.typemap] : {};
+            const layermap = scene.hasOwnProperty("layermap") ? manifest.layermaps[scene.layermap] : {};
 
-            await processScene(scene, typemap, bundle, manifestDirectory, outputDirectory);
+            await processScene(scene, typemap, layermap, bundle, manifestDirectory, outputDirectory);
         }
     }
 

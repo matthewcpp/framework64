@@ -15,8 +15,7 @@ typedef struct {
 
 
 typedef struct {
-    fw64Mesh* mesh;
-    int primitive;
+    fw64Node* node;
     Vec3 point;
 } fw64OverlapSphereResult;
 

@@ -71,7 +71,7 @@ void process_input(Player* player) {
         float decel = player->deceleration * player->engine->time->time_delta;
         if (player->speed > 0.0f)
             player->speed = fmaxf(player->speed - decel, 0.0f);
-        else
+        else if (player->speed < 0.0f)
             player->speed = fminf(player->speed + decel, 0.0f);
     }
 
@@ -82,8 +82,7 @@ void process_input(Player* player) {
     }
 }
 
-void update_position(Player* player) {
-    Vec3* position = &player->node.transform.position;
+static Vec3 calculate_movement_vector(Player* player) {
     float time_delta = player->engine->time->time_delta;
 
     Vec3 movement;
@@ -92,6 +91,20 @@ void update_position(Player* player) {
 
     movement.y += (player->air_velocity * time_delta) + (player->gravity * time_delta * time_delta / 2.0f);
     player->air_velocity += player->gravity * time_delta;
+
+    return movement;
+}
+
+#define LAYER_GROUND 2
+
+static void check_floor(Player* player) {
+    fw64RaycastHit hit;
+}
+
+void update_position(Player* player) {
+    Vec3* position = &player->node.transform.position;
+
+    Vec3 movement = calculate_movement_vector(player);
 
     Vec3 center;
     float radius;
