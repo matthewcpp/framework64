@@ -13,6 +13,8 @@ set(common_source_files
         ../include/framework64/audio_bank.h
         ../include/framework64/box.h box.c
         ../include/framework64/camera.h camera.c
+        ../include/framework64/collide.h collide.c
+        ../include/framework64/collider.h collider.c
         ../include/framework64/color.h color.c
         ../include/framework64/engine.h
         ../include/framework64/filesystem.h
@@ -25,7 +27,6 @@ set(common_source_files
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
         ../include/framework64/quat.h quat.c
-        ../include/framework64/raycast.h raycast.c
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
         ../include/framework64/sparse_set.h sparse_set.c

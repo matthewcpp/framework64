@@ -24,7 +24,8 @@ void level1_init(Level1* level, fw64Engine* engine) {
             player_init(&level->player, level->engine, level->scene, FW64_ASSET_mesh_penguin, NULL);
             vec3_set(&level->player.node.transform.scale, 0.01f, 0.01f, 0.01f);
             level->player.node.transform.position = node->transform.position;
-            fw64_node_refresh(&level->player.node);
+            fw64_node_update(&level->player.node);
+            player_calculate_size(&level->player);
 
             level->chase_cam.target = &level->player.node.transform;
         }

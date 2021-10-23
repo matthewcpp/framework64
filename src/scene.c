@@ -26,7 +26,7 @@ int fw64_scene_raycast(fw64Scene* scene, Vec3* origin, Vec3* direction, uint32_t
         if ((mask & node->layer_mask) == 0)
             continue;
 
-        if (fw64_collision_test_ray_box(origin, direction, &node->bounding, &hit_pos, &dist)) {
+        if (fw64_collider_test_ray(&node->collider, origin, direction, &hit_pos, &dist)) {
             if (dist > hit->distance) continue;
 
             hit->point = hit_pos;
@@ -46,7 +46,7 @@ int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint
     for (int i = 0; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
-        if (fw64_collision_test_box_sphere(&node->bounding, center, radius, &sphere_hit->point)) {
+        if (fw64_collider_test_sphere(&node->collider, center, radius, &sphere_hit->point)) {
             sphere_hit->node = node;
             sphere_hit = &result->results[++result->count];
         }

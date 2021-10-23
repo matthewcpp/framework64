@@ -19,7 +19,10 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_
     player->process_input = 1;
     player->controller_num = 0;
 
-    fw64_node_init(&player->node, fw64_mesh_load(engine->assets, mesh_index));
+    player->height = PLAYER_DEFAULT_HEIGHT;
+    player->radius = PLAYER_DEFAULT_RADIUS;
+
+    fw64_node_init(&player->node, fw64_mesh_load(engine->assets, mesh_index), FW64_COLLIDER_BOX);
 
     player_reset(player, position);
 }
@@ -34,7 +37,7 @@ void player_reset(Player* player, Vec3* position) {
 
     if (position) {
         player->node.transform.position = *position;
-        fw64_node_refresh(&player->node);
+        fw64_node_update(&player->node);
     }
 }
 
@@ -97,30 +100,24 @@ static Vec3 calculate_movement_vector(Player* player) {
 
 #define LAYER_GROUND 2
 
-static void check_floor(Player* player) {
-    fw64RaycastHit hit;
-}
-
 void update_position(Player* player) {
     Vec3* position = &player->node.transform.position;
 
     Vec3 movement = calculate_movement_vector(player);
-
-    Vec3 center;
-    float radius;
-    fw64_node_sphere(&player->node, &center, &radius);
-    vec3_add(&center, &center, &movement);
     vec3_add(position, position, &movement);
 
     PlayerState new_state = PLAYER_STATE_FALLING;
+    float height_radius = player->height / 2.0f;
+    Vec3 query_center = *position;
+    query_center.y += height_radius;
 
     fw64OverlapSphereQueryResult result;
-    if (fw64_scene_overlap_sphere(player->scene, &center, radius, 0xFFFFFFFF, &result)) {
+    if (fw64_scene_overlap_sphere(player->scene, &query_center, height_radius, 0xFFFFFFFF, &result)) {
         for (int i = 0; i < result.count; i++) {
             fw64OverlapSphereResult *hit = result.results + i;
 
             Vec3 direction;
-            vec3_subtract(&direction, &center, &hit->point);
+            vec3_subtract(&direction, &query_center, &hit->point);
             vec3_normalize(&direction);
 
             // ground
@@ -129,16 +126,10 @@ void update_position(Player* player) {
                 player->air_velocity = 0;
                 player->node.transform.position.y = hit->point.y;
             } else { // walls
-                float hit_distance = vec3_distance(&center, &hit->point);
+                float hit_distance = vec3_distance(&query_center, &hit->point);
 
-                Vec3 extents;
-                box_extents(&player->node.bounding, &extents);
-
-                float test_radius = direction.x > direction.z ? extents.x : extents.z;
-
-                if (hit_distance < test_radius) {
-                    float test_direction = direction.x > direction.z ? direction.x : direction.z;
-                    vec3_add_and_scale(position, position, &direction, test_radius - hit_distance);
+                if (hit_distance < player->radius) {
+                    vec3_add_and_scale(position, position, &direction, player->radius - hit_distance);
                 }
             }
         }
@@ -146,7 +137,7 @@ void update_position(Player* player) {
 
     set_state(player, new_state);
 
-    fw64_node_refresh(&player->node);
+    fw64_node_update(&player->node);
 }
 
 static void set_state(Player* player, PlayerState new_state) {
@@ -158,4 +149,11 @@ static void set_state(Player* player, PlayerState new_state) {
 
 void player_draw(Player* player) {
     fw64_renderer_draw_static_mesh(player->engine->renderer, &player->node.transform, player->node.mesh);
+}
+
+void player_calculate_size(Player* player) {
+    Vec3 extents;
+    box_extents(&player->node.collider.bounding, &extents);
+    player->height = extents.y * 2.0f;
+    player->radius = extents.x > extents.z ? extents.x : extents.z;
 }

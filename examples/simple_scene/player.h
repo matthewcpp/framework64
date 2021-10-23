@@ -12,9 +12,12 @@
 #define PLAYER_DEFAULT_ROTATION_SPEED 90.0f
 
 #define PLAYER_DEFAULT_JUMP_VELOCITY 10.0f
-#define PLAYER_DEFAULT_GRAVITY -20.0f
+#define PLAYER_DEFAULT_GRAVITY (-20.0f)
 
-#define PLAYER_STICK_THRESHOLD 0.15
+#define PLAYER_STICK_THRESHOLD 0.15f
+
+#define PLAYER_DEFAULT_HEIGHT 10.0f
+#define PLAYER_DEFAULT_RADIUS 3.0f;
 
 typedef enum {
     PLAYER_STATE_ON_GROUND,
@@ -31,6 +34,9 @@ typedef struct {
     float jump_impulse;
     float air_velocity;
     float gravity;
+
+    float height;
+    float radius;
 
     float speed;
     float acceleration;
@@ -55,6 +61,7 @@ void player_update(Player* player);
 void player_draw(Player* player);
 
 void player_reset(Player* player, Vec3* position);
+void player_calculate_size(Player* player);
 
 #ifdef __cplusplus
 }

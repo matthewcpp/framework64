@@ -30,6 +30,27 @@ fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     return createStaticMesh(json_doc["meshes"][0]);
 }
 
+int GlbParser::getSceneNodeIndex() {
+    int scene_index = json_doc["scene"].get<int>();
+    auto const & scene_node = json_doc["scenes"][scene_index];
+    auto const & node_arr = scene_node["nodes"];
+
+    for (auto const & node_index : node_arr) {
+        int index = node_index.get<int>();
+        const auto & node = json_doc["nodes"][index];
+
+        if (node.contains("name")) {
+            std::string node_name = node["name"].get<std::string>();
+
+            if (node_name == "Scene") {
+                return index;
+            }
+        }
+    }
+
+    return -1;
+}
+
 fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_map, LayerMap const & layer_map) {
     if (!openFile(path))
         return nullptr;
@@ -40,7 +61,18 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
         scene->meshes.resize(json_doc["meshes"].size());
     }
 
-    for (auto const & node : json_doc["nodes"]) {
+    int scene_node_index = getSceneNodeIndex();
+    assert(scene_node_index != -1);
+
+    // this node corresponds to the top level node in the scene of which all scene nodes are children
+    // not to be confused with a scene object in gltf
+    auto const & scene_node = json_doc["nodes"][scene_node_index];
+    if (!scene_node.contains("children")) // empty scene
+        return scene;
+
+    for (auto const & child_index : scene_node["children"]) {
+        auto const & node = json_doc["nodes"][child_index.get<int>()];
+
         bool has_mesh = node.contains("mesh");
         bool has_extras = node.contains("extras");
 
@@ -62,7 +94,7 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
             }
         }
 
-        fw64_node_init(n, mesh);
+        fw64_node_init(n, mesh, FW64_COLLIDER_BOX);
 
         extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
@@ -94,7 +126,7 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
             }
         }
 
-        fw64_node_refresh(n);
+        fw64_node_update(n);
         scene->nodes.emplace_back(n);
     }
 

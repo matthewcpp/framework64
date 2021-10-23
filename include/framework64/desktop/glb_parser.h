@@ -40,6 +40,7 @@ private:
     bool parseBinaryChunk();
 
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
+    int getSceneNodeIndex();
     void parseMaterial(fw64Material& material, size_t material_index);
     fw64Texture* getTexture(size_t texture_index);
     fw64Texture* parseTexture(size_t texture_index);
