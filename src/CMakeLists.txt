@@ -69,6 +69,7 @@ else()
         ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
         ../include/framework64/desktop/audio.h desktop/audio.cpp
         ../include/framework64/desktop/audio_bank.h desktop/audio_bank.cpp
+        ../include/framework64/desktop/collider.h
         ../include/framework64/desktop/engine.h desktop/engine.cpp
         ../include/framework64/desktop/filesystem.h desktop/filesystem.cpp
         ../include/framework64/desktop/font.h desktop/font.cpp

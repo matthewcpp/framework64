@@ -30,7 +30,7 @@ fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     return createStaticMesh(json_doc["meshes"][0]);
 }
 
-int GlbParser::getSceneNodeIndex() {
+void GlbParser::parseSceneNode() {
     int scene_index = json_doc["scene"].get<int>();
     auto const & scene_node = json_doc["scenes"][scene_index];
     auto const & node_arr = scene_node["nodes"];
@@ -43,25 +43,26 @@ int GlbParser::getSceneNodeIndex() {
             std::string node_name = node["name"].get<std::string>();
 
             if (node_name == "Scene") {
-                return index;
+                scene_node_index = index;
+            }
+            else if (node_name == "Colliders") {
+                collider_node_index = index;
             }
         }
     }
-
-    return -1;
 }
 
 fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_map, LayerMap const & layer_map) {
     if (!openFile(path))
         return nullptr;
 
-    auto* scene = new fw64Scene();
+    scene = new fw64Scene();
 
     if (json_doc.contains("meshes")) {
         scene->meshes.resize(json_doc["meshes"].size());
     }
 
-    int scene_node_index = getSceneNodeIndex();
+    parseSceneNode();
     assert(scene_node_index != -1);
 
     // this node corresponds to the top level node in the scene of which all scene nodes are children
@@ -80,8 +81,11 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
             continue;
 
         auto* n = new fw64Node();
+        fw64_node_init(n, nullptr);
 
         fw64Mesh* mesh = nullptr;
+        fw64MeshCollider* mesh_collider = nullptr;
+
         if (has_mesh) {
             int mesh_index = node["mesh"].get<int>();
 
@@ -93,10 +97,6 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
                 mesh = scene->meshes[mesh_index].get();
             }
         }
-
-        fw64_node_init(n, mesh, FW64_COLLIDER_BOX);
-
-        extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
         if (node.contains("extras")) {
             auto& extras = node["extras"];
@@ -124,13 +124,99 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
 
                 n->layer_mask = layer_mask;
             }
+
+            if (extras.contains("collider")) {
+                std::string mesh_collider_name = extras["collider"].get<std::string>();
+                mesh_collider = getMeshCollider(mesh_collider_name);
+            }
         }
+
+        if (mesh) {
+            fw64_node_set_mesh(n, mesh);
+
+            if (mesh_collider) {
+                fw64_collider_set_type_mesh(&n->collider, mesh_collider);
+            }
+            else {
+                Box box;
+                fw64_mesh_get_bounding_box(mesh, &box);
+                fw64_collider_set_type_box(&n->collider, &box);
+            }
+        }
+
+        extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
         fw64_node_update(n);
         scene->nodes.emplace_back(n);
     }
 
     return scene;
+}
+
+fw64MeshCollider* GlbParser::getMeshCollider(std::string const & name) {
+    auto result = scene->mesh_colliders.find(name);
+
+    if (result != scene->mesh_colliders.end()) {
+        return result->second.get();
+    }
+
+    int collider_mesh_index = findMeshColliderIndex(name);
+
+    assert(collider_mesh_index != -1);
+
+    auto* collider = parseMeshCollider(json_doc["meshes"][collider_mesh_index]);
+    scene->mesh_colliders.emplace(std::make_pair(name, collider));
+
+    return collider;
+}
+
+int GlbParser::findMeshColliderIndex(std::string const& name){
+    assert(collider_node_index != -1);
+
+    auto const & collider_root_node = json_doc["nodes"][collider_node_index];
+    assert(collider_root_node.contains("children"));
+
+    int collider_node_mesh_index = -1;
+
+    for (auto const & child : collider_root_node["children"]) {
+        auto const & collider_node = json_doc["nodes"][child.get<int>()];
+
+        if (!collider_node.contains("name"))
+            continue;
+
+        std::string collider_name = collider_node["name"].get<std::string>();
+
+        if (collider_name != name)
+            continue;
+
+        if (!collider_node.contains("mesh"))
+            continue;
+
+        collider_node_mesh_index = collider_node["mesh"].get<int>();
+        break;
+    }
+
+    return collider_node_mesh_index;
+}
+
+framework64::MeshCollider* GlbParser::parseMeshCollider(nlohmann::json const & mesh_node) {
+    auto* mesh_collider = new framework64::MeshCollider();
+
+    auto const & primitive_node = mesh_node["primitives"][0];
+    auto const & attributes_node = primitive_node["attributes"];
+    auto accessor = attributes_node["POSITION"].get<size_t>();
+
+    MeshData mesh_data = readPrimitiveMeshData(primitive_node);
+
+    mesh_collider->point_data = std::move(mesh_data.positions);
+    mesh_collider->element_data = std::move(mesh_data.indices_array_uint16);
+    mesh_collider->element_count = static_cast<uint32_t>(mesh_collider->element_data.size());
+    mesh_collider->point_count = static_cast<uint32_t>(mesh_collider->point_data.size()) / 3;
+    mesh_collider->points = reinterpret_cast<Vec3*>(mesh_collider->point_data.data());
+    mesh_collider->elements = mesh_collider->element_data.data();
+    mesh_collider->box = getBoxFromAccessor(accessor);
+
+    return mesh_collider;
 }
 
 std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {
@@ -297,31 +383,16 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
         if (primitive_node.contains("material"))
             parseMaterial(primitive.material, primitive_node["material"].get<size_t>());
 
-        auto const & attributes_node = primitive_node["attributes"];
-        MeshData mesh_data;
-
-        mesh_data.positions = readPrimitiveAttributeBuffer<float>(attributes_node, "POSITION");
-        mesh_data.normals = readPrimitiveAttributeBuffer<float>(attributes_node, "NORMAL");
-        mesh_data.tex_coords = readPrimitiveAttributeBuffer<float>(attributes_node, "TEXCOORD_0");
-        mesh_data.colors = parseVertexColors(primitive_node);
+        MeshData mesh_data = readPrimitiveMeshData(primitive_node);
 
         if (!mesh_data.positions.empty()) {
+            auto const & attributes_node = primitive_node["attributes"];
             auto accessor = attributes_node["POSITION"].get<size_t>();
             primitive.bounding_box = getBoxFromAccessor(accessor);
             box_encapsulate_box(&mesh->bounding_box, &primitive.bounding_box);
         }
 
-        auto const & element_accessor_node = json_doc["accessors"][primitive_node["indices"].get<size_t>()];
-        auto componentType = element_accessor_node["componentType"].get<uint32_t>();
-        auto bufferViewIndex = element_accessor_node["bufferView"].get<size_t>();
-
-        if (componentType == GltfComponentType::UnsignedShort) {
-            mesh_data.indices_array_uint16 = readBufferViewData<uint16_t>(bufferViewIndex);
-        }
-        else if (componentType == GltfComponentType::UnsignedInt) {
-            mesh_data.indices_array_uint32 = readBufferViewData<uint32_t >(bufferViewIndex);
-        }
-        else {
+        if (mesh_data.indices_array_uint16.empty() && mesh_data.indices_array_uint32.empty()) {
             return nullptr; // error?
         }
 
@@ -331,6 +402,30 @@ fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
     }
 
     return mesh;
+}
+
+MeshData GlbParser::readPrimitiveMeshData(nlohmann::json const & primitive_node) {
+    MeshData mesh_data;
+
+    auto const & attributes_node = primitive_node["attributes"];
+
+    mesh_data.positions = readPrimitiveAttributeBuffer<float>(attributes_node, "POSITION");
+    mesh_data.normals = readPrimitiveAttributeBuffer<float>(attributes_node, "NORMAL");
+    mesh_data.tex_coords = readPrimitiveAttributeBuffer<float>(attributes_node, "TEXCOORD_0");
+    mesh_data.colors = parseVertexColors(primitive_node);
+
+    auto const & element_accessor_node = json_doc["accessors"][primitive_node["indices"].get<size_t>()];
+    auto componentType = element_accessor_node["componentType"].get<uint32_t>();
+    auto bufferViewIndex = element_accessor_node["bufferView"].get<size_t>();
+
+    if (componentType == GltfComponentType::UnsignedShort) {
+        mesh_data.indices_array_uint16 = readBufferViewData<uint16_t>(bufferViewIndex);
+    }
+    else if (componentType == GltfComponentType::UnsignedInt) {
+        mesh_data.indices_array_uint32 = readBufferViewData<uint32_t >(bufferViewIndex);
+    }
+
+    return mesh_data;
 }
 
 void GlbParser::parseMaterial(fw64Material& material, size_t material_index) {

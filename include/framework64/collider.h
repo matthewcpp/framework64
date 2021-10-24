@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file collider.h */
+
 #include "framework64/box.h"
 #include "framework64/mesh.h"
 #include "framework64/transform.h"
@@ -11,14 +13,16 @@ typedef enum {
 } fw64ColliderType;
 
 typedef struct {
-    Box box;
+    uint32_t element_count;
     uint32_t point_count;
+    Box box;
     Vec3* points;
+    uint16_t* elements;
 } fw64MeshCollider;
 
 typedef union {
     Box box;
-    fw64Mesh* mesh;
+    fw64MeshCollider* mesh;
 } fw64ColliderSource;
 
 typedef struct {
@@ -35,7 +39,7 @@ extern "C" {
 void fw64_collider_init(fw64Collider* collider, fw64Transform* transform);
 void fw64_collider_set_type_none(fw64Collider* collider);
 void fw64_collider_set_type_box(fw64Collider* collider, Box* box);
-void fw64_collider_set_type_mesh(fw64Collider* collider, fw64Mesh* mesh);
+void fw64_collider_set_type_mesh(fw64Collider* collider, fw64MeshCollider* mesh_collider);
 void fw64_collider_update(fw64Collider* collider);
 
 int fw64_collider_test_sphere(fw64Collider* collider, Vec3* center, float radius, Vec3* out_point);

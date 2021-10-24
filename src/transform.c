@@ -64,3 +64,17 @@ void fw64_transform_update_matrix(fw64Transform* transform) {
     matrix_from_trs(&transform->matrix.m[0], &transform->position, &transform->rotation, &transform->scale);
 #endif
 }
+
+void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* out) {
+    Quat inv_rot = transform->rotation;
+    quat_conjugate(&inv_rot);
+
+    vec3_subtract(out, point, &transform->position);
+    quat_transform_vec3(out, &inv_rot, out);
+
+}
+
+void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out) {
+    quat_transform_vec3(out, &transform->rotation, point);
+    vec3_add(out, &transform->position, out);
+}

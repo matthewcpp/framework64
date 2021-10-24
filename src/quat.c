@@ -9,6 +9,13 @@ void quat_ident(Quat* q) {
     q->w = 1.0f;
 }
 
+void quat_conjugate(Quat* q) {
+    q->x = -q->x;
+    q->y = -q->y;
+    q->z = -q->z;
+    // q->w = q->w;
+}
+
 void quat_set(Quat* q, float x, float y, float z, float w) {
     q->x = x;
     q->y = y;

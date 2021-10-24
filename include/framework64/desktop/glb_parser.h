@@ -2,8 +2,10 @@
 
 #include "framework64/scene.h"
 
+#include "framework64/desktop/collider.h"
 #include "framework64/desktop/json_map.h"
 #include "framework64/desktop/mesh.h"
+#include "framework64/desktop/mesh_data.h"
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 
@@ -31,7 +33,6 @@ public:
     fw64Mesh* parseStaticMesh(std::string const & path);
     fw64Scene* parseScene(std::string const & path, TypeMap const & type_map, LayerMap const & layer_map);
 
-
     std::vector<fw64Mesh*> parseStaticMeshes(std::string const & path);
 
 private:
@@ -40,11 +41,20 @@ private:
     bool parseBinaryChunk();
 
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
-    int getSceneNodeIndex();
+
+    /** Parses the scene node from the glTF JSON to determine the root nodes for the scene and mesh colliders. */
+    void parseSceneNode();
+
+    MeshData readPrimitiveMeshData(nlohmann::json const & primitive_node);
+
     void parseMaterial(fw64Material& material, size_t material_index);
     fw64Texture* getTexture(size_t texture_index);
     fw64Texture* parseTexture(size_t texture_index);
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
+
+    fw64MeshCollider* getMeshCollider(std::string const & name);
+    int findMeshColliderIndex(std::string const& name);
+    framework64::MeshCollider* parseMeshCollider(nlohmann::json const & mesh_node);
 
     template <typename T>
     std::vector<T> readBufferViewData(size_t bufferViewIndex);
@@ -80,6 +90,10 @@ private:
     nlohmann::json json_doc;
     ShaderCache& shader_cache;
     std::vector<fw64Texture*> loaded_textures;
+
+    fw64Scene* scene = nullptr;
+    int scene_node_index = 1;
+    int collider_node_index = 1;
 };
 
     template <typename T>

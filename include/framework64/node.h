@@ -25,8 +25,8 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_node_init(fw64Node* node, fw64Mesh* mesh, fw64ColliderType collider_type);
-void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh, fw64ColliderType collider_type);
+void fw64_node_init(fw64Node* node, fw64Mesh* mesh);
+void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh);
 void fw64_node_update(fw64Node* node);
 void fw64_node_billboard(fw64Node* node, fw64Camera* camera);
 

@@ -2,20 +2,6 @@
 
 #include "framework64/types.h"
 
-static float fsign(float in) {
-    if (in > 0.0f)
-        return 1.0f;
-    else if (in < 0.0f)
-        return -1.0f;
-    else
-        return 0.0f;
-}
-
-void fw64_ray_point_at_distance(Vec3* origin, Vec3* direction, float dist, Vec3* ray_point) {
-    vec3_scale(ray_point, direction, dist);
-    vec3_add(ray_point, origin, ray_point);
-}
-
 static inline void swapf(float* a, float* b) {
     float temp = *a;
     *a = *b;

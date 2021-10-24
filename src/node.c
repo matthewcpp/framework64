@@ -3,10 +3,10 @@
 #include "framework64/matrix.h"
 
 
-void fw64_node_init(fw64Node* node, fw64Mesh* mesh, fw64ColliderType collider_type) {
+void fw64_node_init(fw64Node* node, fw64Mesh* mesh) {
     fw64_transform_init(&node->transform);
     fw64_collider_init(&node->collider, &node->transform);
-    fw64_node_set_mesh(node, mesh, collider_type);
+    fw64_node_set_mesh(node, mesh);
     node->type = FW64_NODE_UNSPECIFIED_TYPE;
     node->layer_mask = 1U;
 }
@@ -16,29 +16,17 @@ void fw64_node_update(fw64Node* node) {
     fw64_collider_update(&node->collider);
 }
 
-void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh, fw64ColliderType collider_type) {
+void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh) {
     node->mesh = mesh;
 
     if (node->mesh == NULL) {
+        fw64_collider_set_type_none(&node->collider);
         return;
     }
 
-    switch(collider_type) {
-        case FW64_COLLIDER_BOX: {
-            Box box;
-            fw64_mesh_get_bounding_box(node->mesh, &box);
-            fw64_collider_set_type_box(&node->collider, &box);
-            break;
-        }
-
-        case FW64_COLLIDER_MESH:
-            fw64_collider_set_type_mesh(&node->collider, node->mesh);
-            break;
-
-        case FW64_COLLIDER_NONE:
-            fw64_collider_set_type_none(&node->collider);
-            break;
-    }
+    Box box;
+    fw64_mesh_get_bounding_box(node->mesh, &box);
+    fw64_collider_set_type_box(&node->collider, &box);
 }
 
 void fw64_node_billboard(fw64Node* node, fw64Camera* camera) {
