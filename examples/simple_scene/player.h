@@ -26,6 +26,7 @@ typedef enum {
 
 typedef struct {
     fw64Node node;
+    fw64Collider collider;
     fw64Engine* engine;
     fw64Scene* scene;
 

@@ -12,20 +12,20 @@
 #define ORBIT_CAMERA_TEXT "Orbit"
 #define ZOOM_CAMERA_TEXT "ZOOM"
 
+static void set_current_mesh(Game* game, int index);
+
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
     arcball_init(&game->arcball, engine->input);
 
-    game->current_entity = 0;
-    game->mesh_assets[0] = FW64_ASSET_mesh_n64_logo;
-    game->mesh_assets[1] = FW64_ASSET_mesh_suzanne;
-    game->mesh_assets[2] = FW64_ASSET_mesh_penguin;
+    game->meshes[0] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo);
+    game->meshes[1] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_suzanne);
+    game->meshes[2] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin);
 
-    fw64_node_init(&game->entity, fw64_mesh_load(engine->assets, game->mesh_assets[game->current_entity]));
-    arcball_set_initial(&game->arcball, &game->entity.bounding);
+    fw64_node_init(&game->node);
 
-    game->arcball.camera.near = 4.0f;
+    game->arcball.camera.near = 1.0f;
     game->arcball.camera.far = 1000.0f;
     fw64_camera_update_projection_matrix(&game->arcball.camera);
 
@@ -34,26 +34,30 @@ void game_init(Game* game, fw64Engine* engine) {
 
     IVec2 text_measurement = fw64_font_measure_text(game->consolas, SWITCH_MODEL_TEXT);
     game->switch_model_text_width = text_measurement.x;
+
+    set_current_mesh(game, 0);
+}
+
+static void set_current_mesh(Game* game, int index) {
+    game->current_mesh = index;
+
+    fw64Mesh* mesh = game->meshes[game->current_mesh];
+
+    fw64_node_set_mesh(&game->node, mesh);
+
+    Box bounding_box;
+    fw64_mesh_get_bounding_box(mesh, &bounding_box);
+
+    arcball_set_initial(&game->arcball, &bounding_box);
 }
 
 void game_update(Game* game) {
-    int previous_entity = game->current_entity;
-
     if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
-        game->current_entity += 1;
-        if (game->current_entity >= ENTITY_COUNT)
-            game->current_entity = 0;
+        set_current_mesh(game, ++game->current_mesh % MESH_COUNT);
     }
 
     if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
-        game->current_entity -= 1;
-        if (game->current_entity < 0)
-            game->current_entity = ENTITY_COUNT - 1;
-    }
-
-    if (previous_entity != game->current_entity) {
-        fw64_node_set_mesh(&game->entity, fw64_mesh_load(game->engine->assets, game->mesh_assets[game->current_entity]));
-        arcball_set_initial(&game->arcball, &game->entity.bounding);
+        set_current_mesh(game, game->current_mesh > 0 ? game->current_mesh - 1 : MESH_COUNT - 1);
     }
 
     arcball_update(&game->arcball, game->engine->time->time_delta);
@@ -62,7 +66,7 @@ void game_update(Game* game) {
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
     fw64_renderer_begin(renderer, &game->arcball.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_renderer_draw_static_mesh(renderer, &game->entity.transform, game->entity.mesh);
+    fw64_renderer_draw_static_mesh(renderer, &game->node.transform, game->node.mesh);
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_NOSWAP);
 
     IVec2 screen_size;

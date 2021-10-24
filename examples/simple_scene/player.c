@@ -23,7 +23,11 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_
     player->height = PLAYER_DEFAULT_HEIGHT;
     player->radius = PLAYER_DEFAULT_RADIUS;
 
-    fw64_node_init(&player->node, fw64_mesh_load(engine->assets, mesh_index));
+
+    fw64_node_init(&player->node);
+    player->node.collider = &player->collider;
+    fw64_collider_init(&player->collider, &player->node.transform);
+    fw64_node_set_mesh(&player->node, fw64_mesh_load(engine->assets, mesh_index));
 
     player_reset(player, position);
 }
@@ -149,7 +153,7 @@ void player_draw(Player* player) {
 
 void player_calculate_size(Player* player) {
     Vec3 extents;
-    box_extents(&player->node.collider.bounding, &extents);
+    box_extents(&player->node.collider->bounding, &extents);
     player->height = extents.y * 2.0f;
     player->radius = extents.x > extents.z ? extents.x : extents.z;
 }
