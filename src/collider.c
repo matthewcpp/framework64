@@ -21,9 +21,9 @@ void fw64_collider_set_type_box(fw64Collider* collider, Box* box) {
     fw64_collider_update_box(collider);
 }
 
-void fw64_collider_set_type_mesh(fw64Collider* collider,fw64MeshCollider* mesh_collider) {
+void fw64_collider_set_type_mesh(fw64Collider* collider, fw64CollisionMesh * collision_mesh) {
     collider->type = FW64_COLLIDER_MESH;
-    collider->source.mesh = mesh_collider;
+    collider->source.mesh = collision_mesh;
 
     fw64_collider_update_mesh(collider);
 }
@@ -31,8 +31,7 @@ void fw64_collider_set_type_mesh(fw64Collider* collider,fw64MeshCollider* mesh_c
 static void fw64_collider_update_box_with_transform(fw64Transform* transform, Box* source, Box* target) {
 #ifdef PLATFORM_N64
     float fmatrix[16];
-    guMtxF2L((float (*)[4])fmatrix, &transform.matrix);
-
+    matrix_from_trs(fmatrix, &transform->position, &transform->rotation, &transform->scale);
     matrix_transform_box(&fmatrix[0], source, target);
 #else
     matrix_transform_box(&transform->matrix.m[0], source, target);
@@ -181,6 +180,16 @@ int fw64_collider_test_ray(fw64Collider* collider, Vec3* origin, Vec3* direction
     switch (collider->type) {
         case FW64_COLLIDER_BOX:
             return fw64_collision_test_ray_box(origin, direction, &collider->bounding, out_point, out_dist);
+        default:
+            return 0;
+    }
+}
+
+int fw64_collider_test_box(fw64Collider* collider, Box* box) {
+    switch (collider->type) {
+        case FW64_COLLIDER_BOX:
+            return box_intersection(&collider->bounding, box);
+
         default:
             return 0;
     }

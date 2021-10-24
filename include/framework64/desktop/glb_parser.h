@@ -52,9 +52,9 @@ private:
     fw64Texture* parseTexture(size_t texture_index);
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
 
-    fw64MeshCollider* getMeshCollider(std::string const & name);
-    int findMeshColliderIndex(std::string const& name);
-    framework64::MeshCollider* parseMeshCollider(nlohmann::json const & mesh_node);
+    fw64CollisionMesh * getCollisionMesh(std::string const & name);
+    int findCollisionMeshIndex(std::string const& name);
+    framework64::CollisionMesh* parseCollisionMesh(nlohmann::json const & mesh_node);
 
     template <typename T>
     std::vector<T> readBufferViewData(size_t bufferViewIndex);
@@ -65,7 +65,7 @@ private:
     template <typename T>
     static std::vector<T> vec3ToVec4Array(std::vector<T> const & vec3_arr, T fill_val);
 
-    Box getBoxFromAccessor(size_t accessor_index) const;
+    [[nodiscard]] Box getBoxFromAccessor(size_t accessor_index) const;
     void seekInBinaryChunk(size_t pos);
 
     bool openFile(std::string const& path);

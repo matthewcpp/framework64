@@ -13,7 +13,6 @@ struct fw64Scene {
     fw64SceneInfo info;
     fw64Transform transform;
     fw64Mesh* meshes;
-    fw64SceneExtra* extras;
     fw64MeshResources* mesh_resources;
     int debug;
 };

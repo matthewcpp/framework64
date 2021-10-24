@@ -12,7 +12,7 @@
 
 typedef struct {
     fw64Transform transform;
-    fw64Collider collider;
+    fw64Collider* collider;
     fw64Mesh* mesh;
     int type;
     uint32_t layer_mask;
@@ -25,7 +25,8 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_node_init(fw64Node* node, fw64Mesh* mesh);
+void fw64_node_init(fw64Node* node);
+void fw64_node_set_collider(fw64Node* node, fw64Collider* collider);
 void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh);
 void fw64_node_update(fw64Node* node);
 void fw64_node_billboard(fw64Node* node, fw64Camera* camera);

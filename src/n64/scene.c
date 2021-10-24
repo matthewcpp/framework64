@@ -27,9 +27,6 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
         fw64_n64_loader_load_mesh(&loader, scene->meshes + i, handle);
     }
 
-    scene->extras = malloc(scene->info.extras_count * sizeof(fw64SceneExtra));
-    fw64_filesystem_read(scene->extras, sizeof(fw64SceneExtra), scene->info.extras_count, handle);
-
     scene->debug = fw64_filesystem_tell(handle);
 
     fw64_filesystem_close(handle);
@@ -42,7 +39,6 @@ void fw64_scene_delete(fw64Scene* scene) {
         fw64_n64_mesh_uninit(scene->meshes + i);
 
     fw64_n64_mesh_resources_delete(scene->mesh_resources);
-    free(scene->extras);
     free(scene);
 }
 
@@ -52,14 +48,6 @@ fw64Transform* fw64_scene_get_transform(fw64Scene* scene) {
 
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index) {
     return scene->meshes + index;
-}
-
-uint32_t fw64_scene_get_extra_count(fw64Scene* scene) {
-    return scene->info.extras_count;
-}
-
-fw64SceneExtra* fw64_scene_get_extras(fw64Scene* scene) {
-    return scene->extras;
 }
 
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene) {

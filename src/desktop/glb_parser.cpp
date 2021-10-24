@@ -80,11 +80,11 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
         if (!has_mesh && !has_extras)
             continue;
 
-        auto* n = new fw64Node();
-        fw64_node_init(n, nullptr);
+        auto* n = scene->createNode();
+        fw64_node_init(n);
 
         fw64Mesh* mesh = nullptr;
-        fw64MeshCollider* mesh_collider = nullptr;
+        fw64CollisionMesh * collision_mesh = nullptr;
 
         if (has_mesh) {
             int mesh_index = node["mesh"].get<int>();
@@ -126,51 +126,51 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
             }
 
             if (extras.contains("collider")) {
-                std::string mesh_collider_name = extras["collider"].get<std::string>();
-                mesh_collider = getMeshCollider(mesh_collider_name);
+                std::string collision_mesh_name = extras["collider"].get<std::string>();
+                collision_mesh = getCollisionMesh(collision_mesh_name);
             }
         }
 
         if (mesh) {
             fw64_node_set_mesh(n, mesh);
+            fw64_node_set_collider(n, scene->createCollider());
 
-            if (mesh_collider) {
-                fw64_collider_set_type_mesh(&n->collider, mesh_collider);
+            if (collision_mesh) {
+                fw64_collider_set_type_mesh(n->collider, collision_mesh);
             }
             else {
                 Box box;
                 fw64_mesh_get_bounding_box(mesh, &box);
-                fw64_collider_set_type_box(&n->collider, &box);
+                fw64_collider_set_type_box(n->collider, &box);
             }
         }
 
         extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
         fw64_node_update(n);
-        scene->nodes.emplace_back(n);
     }
 
     return scene;
 }
 
-fw64MeshCollider* GlbParser::getMeshCollider(std::string const & name) {
+fw64CollisionMesh* GlbParser::getCollisionMesh(std::string const & name) {
     auto result = scene->mesh_colliders.find(name);
 
     if (result != scene->mesh_colliders.end()) {
         return result->second.get();
     }
 
-    int collider_mesh_index = findMeshColliderIndex(name);
+    int collider_mesh_index = findCollisionMeshIndex(name);
 
     assert(collider_mesh_index != -1);
 
-    auto* collider = parseMeshCollider(json_doc["meshes"][collider_mesh_index]);
-    scene->mesh_colliders.emplace(std::make_pair(name, collider));
+    auto* collision_mesh = parseCollisionMesh(json_doc["meshes"][collider_mesh_index]);
+    scene->mesh_colliders.emplace(std::make_pair(name, collision_mesh));
 
-    return collider;
+    return collision_mesh;
 }
 
-int GlbParser::findMeshColliderIndex(std::string const& name){
+int GlbParser::findCollisionMeshIndex(std::string const& name){
     assert(collider_node_index != -1);
 
     auto const & collider_root_node = json_doc["nodes"][collider_node_index];
@@ -199,8 +199,8 @@ int GlbParser::findMeshColliderIndex(std::string const& name){
     return collider_node_mesh_index;
 }
 
-framework64::MeshCollider* GlbParser::parseMeshCollider(nlohmann::json const & mesh_node) {
-    auto* mesh_collider = new framework64::MeshCollider();
+framework64::CollisionMesh* GlbParser::parseCollisionMesh(nlohmann::json const & mesh_node) {
+    auto* collision_mesh = new framework64::CollisionMesh();
 
     auto const & primitive_node = mesh_node["primitives"][0];
     auto const & attributes_node = primitive_node["attributes"];
@@ -208,15 +208,15 @@ framework64::MeshCollider* GlbParser::parseMeshCollider(nlohmann::json const & m
 
     MeshData mesh_data = readPrimitiveMeshData(primitive_node);
 
-    mesh_collider->point_data = std::move(mesh_data.positions);
-    mesh_collider->element_data = std::move(mesh_data.indices_array_uint16);
-    mesh_collider->element_count = static_cast<uint32_t>(mesh_collider->element_data.size());
-    mesh_collider->point_count = static_cast<uint32_t>(mesh_collider->point_data.size()) / 3;
-    mesh_collider->points = reinterpret_cast<Vec3*>(mesh_collider->point_data.data());
-    mesh_collider->elements = mesh_collider->element_data.data();
-    mesh_collider->box = getBoxFromAccessor(accessor);
+    collision_mesh->point_data = std::move(mesh_data.positions);
+    collision_mesh->element_data = std::move(mesh_data.indices_array_uint16);
+    collision_mesh->element_count = static_cast<uint32_t>(collision_mesh->element_data.size());
+    collision_mesh->point_count = static_cast<uint32_t>(collision_mesh->point_data.size()) / 3;
+    collision_mesh->points = reinterpret_cast<Vec3*>(collision_mesh->point_data.data());
+    collision_mesh->elements = collision_mesh->element_data.data();
+    collision_mesh->box = getBoxFromAccessor(accessor);
 
-    return mesh_collider;
+    return collision_mesh;
 }
 
 std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {

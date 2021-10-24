@@ -18,11 +18,11 @@ typedef struct {
     Box box;
     Vec3* points;
     uint16_t* elements;
-} fw64MeshCollider;
+} fw64CollisionMesh;
 
 typedef union {
     Box box;
-    fw64MeshCollider* mesh;
+    fw64CollisionMesh* mesh;
 } fw64ColliderSource;
 
 typedef struct {
@@ -39,12 +39,12 @@ extern "C" {
 void fw64_collider_init(fw64Collider* collider, fw64Transform* transform);
 void fw64_collider_set_type_none(fw64Collider* collider);
 void fw64_collider_set_type_box(fw64Collider* collider, Box* box);
-void fw64_collider_set_type_mesh(fw64Collider* collider, fw64MeshCollider* mesh_collider);
+void fw64_collider_set_type_mesh(fw64Collider* collider, fw64CollisionMesh * collision_mesh);
 void fw64_collider_update(fw64Collider* collider);
 
 int fw64_collider_test_sphere(fw64Collider* collider, Vec3* center, float radius, Vec3* out_point);
 int fw64_collider_test_ray(fw64Collider* collider, Vec3* origin, Vec3* direction, Vec3* out_point, float* out_dist);
-
+int fw64_collider_test_box(fw64Collider* collider, Box* box);
 
 #ifdef __cplusplus
 }
