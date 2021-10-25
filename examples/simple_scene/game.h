@@ -1,19 +1,12 @@
 #pragma once
 
-#include "level1.h"
-#include "level2.h"
+#include "level.h"
 
 #include "framework64/engine.h"
 
-typedef union {
-    Level1 level1;
-    Level2 level2;
-} Levels;
-
 typedef struct {
     fw64Engine* engine;
-    Levels levels;
-    int level;
+    Level level;
 } Game;
 
 #ifdef __cplusplus

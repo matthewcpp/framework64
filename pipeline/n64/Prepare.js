@@ -68,12 +68,16 @@ async function prepare(manifest, manifestFile, outputDirectory) {
     }
 
     if (manifest.scenes) {
+        const requiredFields = ["src", "typeMap", "layerMap"];
+
         for (const scene of manifest.scenes) {
             console.log(`Processing Scene: ${scene.src}`);
+            checkRequiredFields("scene", scene, requiredFields);
 
-            const typemap = scene.hasOwnProperty("typemap") ? manifest.typemaps[scene.typemap] : {};
+            const typeMap = manifest.typeMaps[scene.typeMap];
+            const layerMap = manifest.layerMaps[scene.layerMap];
 
-            await processScene(scene, typemap, archive, manifestDirectory, outputDirectory);
+            await processScene(scene, typeMap, layerMap, archive, manifestDirectory, outputDirectory);
         }
     }
 

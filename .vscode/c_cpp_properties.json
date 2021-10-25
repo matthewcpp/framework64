@@ -3,7 +3,8 @@
         {
             "name": "N64",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/build_n64/bin/assets",
                 "/usr/include/n64",
                 "/usr/include/n64/nusys",
                 "/usr/include/n64/nustd"

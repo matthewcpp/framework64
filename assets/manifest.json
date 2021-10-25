@@ -159,11 +159,6 @@
     ],
     "scenes": [
         {
-            "src": "simple_scene/simple_scene.gltf",
-            "typeMap": 0,
-            "layerMap": 0
-        },
-        {
             "src": "ramp_test/ramp_test.gltf",
             "typeMap": 0,
             "layerMap": 0

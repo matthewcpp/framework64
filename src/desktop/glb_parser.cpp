@@ -1,6 +1,5 @@
 #include "framework64/desktop/glb_parser.h"
 
-#include "framework64/desktop/mesh_data.h"
 #include "framework64/desktop/scene.h"
 #include "framework64/matrix.h"
 

@@ -1,6 +1,7 @@
 #include "framework64/collider.h"
 
 #include "framework64/collide.h"
+#include "framework64/matrix.h"
 
 static void fw64_collider_update_box(fw64Collider* collider);
 static void fw64_collider_update_mesh(fw64Collider* collider);

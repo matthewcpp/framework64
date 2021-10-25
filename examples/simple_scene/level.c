@@ -1,14 +1,14 @@
-#include "level2.h"
+#include "level.h"
 
 #include "assets.h"
 
 #define EXTRA_TYPE_START 0
 
-void level2_init(Level2* level, fw64Engine* engine) {
+void level_init(Level* level, fw64Engine* engine) {
     level->engine = engine;
     chase_camera_init(&level->chase_cam, engine);
 
-    level->scene = fw64_scene_load(level->engine->assets, FW64_ASSET_scene_ramp_test);
+    level->scene = fw64_scene_load(level->engine->assets, FW64_ASSET_scene_n64);
 
     uint32_t node_count = fw64_scene_get_node_count(level->scene);
 
@@ -30,7 +30,7 @@ void level2_init(Level2* level, fw64Engine* engine) {
     ui_init(&level->ui, engine, &level->player);
 }
 
-void level2_update(Level2* level) {
+void level_update(Level* level) {
     player_update(&level->player);
     chase_camera_update(&level->chase_cam);
 
@@ -41,8 +41,7 @@ void level2_update(Level2* level) {
     ui_update(&level->ui);
 }
 
-
-void level2_draw(Level2* level) {
+void level_draw(Level* level) {
     fw64Renderer* renderer = level->engine->renderer;
 
     fw64_renderer_begin(renderer, &level->chase_cam.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
