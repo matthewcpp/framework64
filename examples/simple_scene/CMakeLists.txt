@@ -3,7 +3,6 @@ set(src_files
     ../common/flame.h ../common/flame.c
         chase_cam.h chase_cam.c
     player.h player.c
-        level.h level.c
     ui.h ui.c
     game.h game.c )
 

@@ -13,8 +13,8 @@ typedef enum {
 } fw64ColliderType;
 
 typedef struct {
-    uint32_t element_count;
     uint32_t point_count;
+    uint32_t element_count;
     Box box;
     Vec3* points;
     uint16_t* elements;

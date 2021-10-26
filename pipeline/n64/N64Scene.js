@@ -3,7 +3,6 @@ class N64Scene {
     meshes = [];
     colliderCount = 0;
     collisionMeshes = [];
-    collisionMeshMap = new Map();
     meshResources = null;
 }
 

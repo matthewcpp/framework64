@@ -1,5 +1,4 @@
 const Bounding = require("./Bounding");
-const N64Material = require("./N64Material");
 
 class N64Mesh {
     constructor(name) {

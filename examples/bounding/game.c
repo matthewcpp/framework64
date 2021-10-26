@@ -23,7 +23,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_node_init(&game->penguin);
     fw64_node_set_mesh(&game->penguin, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin));
-    fw64_node_set_collider(&game->penguin, &game->penguin_collider);
+    fw64_node_set_box_collider(&game->penguin, &game->penguin_collider);
     vec3_set(&game->penguin.transform.scale, 0.1f, 0.1f, 0.1f);
     quat_set_axis_angle(&game->penguin.transform.rotation, 0, 1, 0, M_PI);
     fw64_node_update(&game->penguin);
@@ -127,8 +127,8 @@ void init_cubes(Game* game) {
     for (int i = 0; i < CUBE_COUNT; i++) {
         fw64Node* cube = &game->cubes[i];
         fw64_node_init(cube);
-        fw64_node_set_collider(cube, &game->cube_colliders[i]);
         fw64_node_set_mesh(&game->cubes[i], cube_mesh);
+        fw64_node_set_box_collider(cube, &game->cube_colliders[i]);
         cube->transform.position = cube_positions[i];
         vec3_set_all(&cube->transform.scale, 10.0f);
         fw64_node_update(cube);

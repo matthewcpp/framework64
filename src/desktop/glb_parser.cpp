@@ -130,21 +130,18 @@ fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_
             }
         }
 
+        extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
+
         if (mesh) {
             fw64_node_set_mesh(n, mesh);
-            fw64_node_set_collider(n, scene->createCollider());
 
             if (collision_mesh) {
-                fw64_collider_set_type_mesh(n->collider, collision_mesh);
+                fw64_node_set_mesh_collider(n, scene->createCollider(), collision_mesh);
             }
             else {
-                Box box;
-                fw64_mesh_get_bounding_box(mesh, &box);
-                fw64_collider_set_type_box(n->collider, &box);
+                fw64_node_set_box_collider(n, scene->createCollider());
             }
         }
-
-        extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
         fw64_node_update(n);
     }

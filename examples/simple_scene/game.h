@@ -1,12 +1,20 @@
 #pragma once
 
-#include "level.h"
-
 #include "framework64/engine.h"
+#include "framework64/scene.h"
+#include "player.h"
+#include "chase_cam.h"
+#include "ui.h"
 
 typedef struct {
     fw64Engine* engine;
-    Level level;
+
+    fw64Scene* scene;
+    UI ui;
+
+    Player player;
+    ChaseCamera chase_cam;
+    fw64Node* respawn_node;
 } Game;
 
 #ifdef __cplusplus

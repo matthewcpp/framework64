@@ -15,7 +15,7 @@ TypeMap load_type_map(fw64AssetDatabase* database, int index) {
         return {};
 
     std::string typemapStr = reinterpret_cast<const char *>(sqlite3_column_text(database->select_typemap_statement, 0));
-    return parseMapJson<int>(typemapStr);
+    return parseMapJson<uint32_t>(typemapStr);
 }
 
 LayerMap load_layer_map(fw64AssetDatabase* database, int index) {

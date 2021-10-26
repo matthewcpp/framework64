@@ -16,5 +16,6 @@ struct fw64Scene {
     fw64Node* nodes;
     fw64Collider* colliders;
     fw64Mesh* meshes;
+    fw64CollisionMesh* collision_meshes;
     fw64MeshResources* mesh_resources;
 };

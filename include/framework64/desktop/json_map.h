@@ -6,7 +6,7 @@
 #include <string>
 
 namespace framework64 {
-typedef std::unordered_map<std::string, int> TypeMap;
+typedef std::unordered_map<std::string, uint32_t> TypeMap;
 typedef std::unordered_map<std::string, uint32_t> LayerMap;
 
 TypeMap load_type_map(fw64AssetDatabase* assets, int index);

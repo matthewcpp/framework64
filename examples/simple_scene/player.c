@@ -25,9 +25,8 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_
 
 
     fw64_node_init(&player->node);
-    player->node.collider = &player->collider;
-    fw64_collider_init(&player->collider, &player->node.transform);
     fw64_node_set_mesh(&player->node, fw64_mesh_load(engine->assets, mesh_index));
+    fw64_node_set_box_collider(&player->node, &player->collider);
 
     player_reset(player, position);
 }
@@ -105,6 +104,7 @@ static Vec3 calculate_movement_vector(Player* player) {
 
 #define LAYER_DEFAULT 1U
 #define LAYER_GROUND 2U
+#define LAYER_WALL 4U
 
 void update_position(Player* player) {
     Vec3* position = &player->node.transform.position;
@@ -118,7 +118,7 @@ void update_position(Player* player) {
     query_center.y += height_radius;
 
     fw64OverlapSphereQueryResult result;
-    if (fw64_scene_overlap_sphere(player->scene, &query_center, height_radius, LAYER_GROUND | LAYER_DEFAULT, &result)) {
+    if (fw64_scene_overlap_sphere(player->scene, &query_center, height_radius, 0xFFFFFFFF, &result)) {
         for (int i = 0; i < result.count; i++) {
             fw64OverlapSphereResult *hit = result.results + i;
 
@@ -126,8 +126,10 @@ void update_position(Player* player) {
             vec3_subtract(&direction, &query_center, &hit->point);
             vec3_normalize(&direction);
 
+            int is_grounded = (hit->node->layer_mask & LAYER_GROUND) || direction.y > 0.9f;
+
             // ground
-            if ((hit->node->layer_mask & LAYER_GROUND) && player->air_velocity <= 0.0f) {
+            if (is_grounded && player->air_velocity <= 0.0f) {
                 new_state = PLAYER_STATE_ON_GROUND;
                 player->air_velocity = 0;
                 float hit_distance = vec3_distance(&query_center, &hit->point);
