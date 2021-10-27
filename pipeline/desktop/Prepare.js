@@ -45,14 +45,14 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
             console.log(`Processing Sound Bank: ${soundBank.name}`);
-            //await processSoundBank(soundBank, bundle, manifestDirectory, outputDirectory);
+            await processSoundBank(soundBank, bundle, manifestDirectory, outputDirectory);
         }
     }
 
     if (manifest.musicBanks) {
         for (const musicBank of manifest.musicBanks) {
             console.log(`Processing Music Bank: ${musicBank.name}`);
-            //await processMusicBank(musicBank, bundle, manifestDirectory, outputDirectory);
+            await processMusicBank(musicBank, bundle, manifestDirectory, outputDirectory);
         }
     }
 
