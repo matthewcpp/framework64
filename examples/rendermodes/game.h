@@ -5,7 +5,7 @@
 #include "framework64/engine.h"
 #include "framework64/node.h"
 
-#define ENTITY_COUNT 3
+#define MESH_COUNT 3
 
 typedef struct {
     fw64Engine* engine;
@@ -14,9 +14,9 @@ typedef struct {
     fw64Font* consolas;
     fw64Texture* button_sprite;
 
-    fw64Node entity;
-    int current_entity;
-    uint32_t mesh_assets[ENTITY_COUNT];
+    fw64Node node;
+    int current_mesh;
+    fw64Mesh* meshes[MESH_COUNT];
 
     int switch_model_text_width;
 } Game;

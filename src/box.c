@@ -85,3 +85,13 @@ int box_intersection(Box* a, Box* b) {
 
     return 1;
 }
+
+// Real Time Collision Detection 5.1.3
+void box_closest_point(Box* b, Vec3* p, Vec3* q) {
+    for (int i = 0; i < 3; i++) {
+        float v = p->el[i];
+        if (v < b->min.el[i]) v = b->min.el[i]; // v = max(v, b->min[i])
+        if (v > b->max.el[i]) v = b->max.el[i]; // v = min(v, b->max[i])
+        q->el[i] = v;
+    }
+}

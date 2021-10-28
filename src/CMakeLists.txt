@@ -13,6 +13,8 @@ set(common_source_files
         ../include/framework64/audio_bank.h
         ../include/framework64/box.h box.c
         ../include/framework64/camera.h camera.c
+        ../include/framework64/collide.h collide.c
+        ../include/framework64/collider.h collider.c
         ../include/framework64/color.h color.c
         ../include/framework64/engine.h
         ../include/framework64/filesystem.h
@@ -46,6 +48,7 @@ if (FW64_PLATFORM_N64)
             ../include/framework64/n64/asset_database.h
             ../include/framework64/n64/audio.h n64/audio.c
             ../include/framework64/n64/audio_bank.h n64/audio_bank.c
+            ../include/framework64/n64/compat.h n64/compat.c
             ../include/framework64/n64/controller_button.h
             ../include/framework64/n64/engine.h n64/engine.c
             ../include/framework64/n64/filesystem.h n64/filesystem.c
@@ -66,6 +69,7 @@ else()
         ../include/framework64/desktop/asset_database.h desktop/asset_database.cpp
         ../include/framework64/desktop/audio.h desktop/audio.cpp
         ../include/framework64/desktop/audio_bank.h desktop/audio_bank.cpp
+        ../include/framework64/desktop/collider.h
         ../include/framework64/desktop/engine.h desktop/engine.cpp
         ../include/framework64/desktop/filesystem.h desktop/filesystem.cpp
         ../include/framework64/desktop/font.h desktop/font.cpp
@@ -74,6 +78,7 @@ else()
         ../include/framework64/desktop/input.h desktop/input.cpp
         ../include/framework64/desktop/image.h desktop/image.cpp
         ../include/framework64/desktop/input_interface.h
+            ../include/framework64/desktop/json_map.h desktop/json_map.cpp
         ../include/framework64/desktop/line_shader.h desktop/line_shader.cpp
         ../include/framework64/desktop/material.h desktop/material.cpp
         ../include/framework64/desktop/mesh.h desktop/mesh.cpp

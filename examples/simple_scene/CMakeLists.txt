@@ -1,7 +1,10 @@
 set(src_files
     ../common/${platform_main_file}
     ../common/flame.h ../common/flame.c
-    game.h game.c)
+        chase_cam.h chase_cam.c
+    player.h player.c
+    ui.h ui.c
+    game.h game.c )
 
 add_executable(simple_scene ${src_files})
 

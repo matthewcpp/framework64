@@ -3,7 +3,6 @@
 #include "assets.h"
 
 #include "framework64/filesystem.h"
-#include "framework64/n64/controller_button.h"
 
 #include <string.h>
 

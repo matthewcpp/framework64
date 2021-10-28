@@ -16,8 +16,10 @@ typedef struct {
     fw64Engine* engine;
     fw64Camera camera;
     fw64Node penguin;
+    fw64Collider penguin_collider;
     fw64Node penguin_box;
     fw64Node cubes[CUBE_COUNT];
+    fw64Collider cube_colliders[CUBE_COUNT];
     CubeId intersection;
     fw64Font* font;
 } Game;

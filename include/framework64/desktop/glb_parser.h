@@ -2,7 +2,10 @@
 
 #include "framework64/scene.h"
 
+#include "framework64/desktop/collider.h"
+#include "framework64/desktop/json_map.h"
 #include "framework64/desktop/mesh.h"
+#include "framework64/desktop/mesh_data.h"
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 
@@ -28,8 +31,7 @@ public:
 public:
     /** Extracts a single, static mesh from the GLB file. */
     fw64Mesh* parseStaticMesh(std::string const & path);
-    fw64Scene* parseScene(std::string const & path, std::unordered_map<std::string, int> const & typemap);
-
+    fw64Scene* parseScene(std::string const & path, TypeMap const & type_map, LayerMap const & layer_map);
 
     std::vector<fw64Mesh*> parseStaticMeshes(std::string const & path);
 
@@ -39,10 +41,20 @@ private:
     bool parseBinaryChunk();
 
     fw64Mesh* createStaticMesh(nlohmann::json const & node);
+
+    /** Parses the scene node from the glTF JSON to determine the root nodes for the scene and mesh colliders. */
+    void parseSceneNode();
+
+    MeshData readPrimitiveMeshData(nlohmann::json const & primitive_node);
+
     void parseMaterial(fw64Material& material, size_t material_index);
     fw64Texture* getTexture(size_t texture_index);
     fw64Texture* parseTexture(size_t texture_index);
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
+
+    fw64CollisionMesh * getCollisionMesh(std::string const & name);
+    int findCollisionMeshIndex(std::string const& name);
+    framework64::CollisionMesh* parseCollisionMesh(nlohmann::json const & mesh_node);
 
     template <typename T>
     std::vector<T> readBufferViewData(size_t bufferViewIndex);
@@ -53,7 +65,7 @@ private:
     template <typename T>
     static std::vector<T> vec3ToVec4Array(std::vector<T> const & vec3_arr, T fill_val);
 
-    Box getBoxFromAccessor(size_t accessor_index) const;
+    [[nodiscard]] Box getBoxFromAccessor(size_t accessor_index) const;
     void seekInBinaryChunk(size_t pos);
 
     bool openFile(std::string const& path);
@@ -78,6 +90,10 @@ private:
     nlohmann::json json_doc;
     ShaderCache& shader_cache;
     std::vector<fw64Texture*> loaded_textures;
+
+    fw64Scene* scene = nullptr;
+    int scene_node_index = 1;
+    int collider_node_index = 1;
 };
 
     template <typename T>

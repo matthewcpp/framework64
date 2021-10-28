@@ -66,6 +66,12 @@ fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index) {
     return primitive->material;
 }
 
+Box fw64_mesh_get_bounding_for_primitive(fw64Mesh* mesh, int index) {
+    fw64Primitive* primitive = mesh->primitives + index;
+
+    return primitive->bounding_box;
+}
+
 void fw64_n64_mesh_resources_delete(fw64MeshResources* resources) {
     if (resources->material_count > 0) {
         free(resources->materials);

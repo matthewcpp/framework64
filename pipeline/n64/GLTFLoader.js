@@ -1,10 +1,11 @@
 const N64Image = require("./N64Image");
 const N64Material = require("./N64Material");
 const N64Mesh = require("./N64Mesh");
+const N64Node = require("./N64Node");
 const N64MeshResources = require("./N64MeshResources");
 const N64Primitive = require("./N64Primitive");
 const N64Texture = require("./N64Texture");
-const N64SceneExtra = require("./N64SceneExtra")
+const N64Scene = require("./N64Scene")
 
 const glMatrix = require("gl-matrix");
 
@@ -31,7 +32,13 @@ class GLTFLoader {
     imageMap = new Map();
     textureMap = new Map();
     materialMap = new Map();
+    meshMap = new Map();
+    collisionMeshMap = new Map();
 
+    /** this holds the index into the nodes array of the root scene node.
+     * Not to be confused with the GLTF scene node index. */
+    _sceneNodeIndex = -1;
+    _meshColliderNodeIndex = -1;
 
     constructor(options) {
         this.options =  {
@@ -63,26 +70,150 @@ class GLTFLoader {
         }
     }
 
-    async loadScene(gltfPath) {
+    _extractNodeTransform(gltfNode, node) {
+        if (gltfNode.translation)
+            node.position = gltfNode.translation.slice();
+
+        if (gltfNode.rotation)
+            node.rotation = gltfNode.rotation.slice();
+
+        if (gltfNode.scale)
+            node.scale = gltfNode.scale.slice();
+    }
+
+    async loadScene(gltfPath, typeMap, layerMap) {
         this._loadFile(gltfPath);
 
-        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
-            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
+        this._parseSceneNode();
+
+        const scene = new N64Scene();
+        scene.meshResources = this.resources;
+
+        const sceneNode = this.gltf.nodes[this._sceneNodeIndex];
+        if (!sceneNode.children) // empty scene
+            return scene;
+
+        for (const child_index of sceneNode.children) {
+            const gltfNode = this.gltf.nodes[child_index];
+            const node = new N64Node();
+
+            const hasMesh = gltfNode.hasOwnProperty("mesh");
+            const hasExtras = gltfNode.hasOwnProperty("extras");
+
+            this._extractNodeTransform(gltfNode, node);
+
+            if (hasMesh) {
+                // if we already loaded this mesh then grab the index of it in the scene mesh array
+                if (this.meshMap.has(gltfNode.mesh)) {
+                    node.mesh = this.meshMap.get(gltfNode.mesh);
+                }
+                else { // load mesh we haven't seen before
+                    this.mesh = new N64Mesh(gltfNode.name);
+                    await this._loadMesh(this.gltf.meshes[gltfNode.mesh]);
+                    node.mesh = scene.meshes.length;
+                    scene.meshes.push(this.mesh);
+                    this.meshMap.set(gltfNode.mesh, node.mesh);
+                }
+
+                scene.colliderCount += 1;
+                node.collider = N64Node.ColliderType.Box;
+            }
+
+            if (hasExtras) {
+                if (gltfNode.extras.hasOwnProperty("type")) {
+                    const typeName = gltfNode.extras.type;
+
+                    if (!typeMap.has(typeName))
+                        throw new Error(`No id value found for type: ${typeName}`);
+
+                    node.type = typeMap.get(typeName);
+                }
+
+                if (gltfNode.extras.hasOwnProperty("layers")) {
+                    const layerNames = gltfNode.extras.layers.split(' ');
+                    let layerMask = 0;
+
+                    for (const layerName of layerNames) {
+                        if (!layerMap.has(layerName))
+                            throw new Error(`No layer mask value found for layer: ${layerName}`);
+
+                        layerMask |= layerMap.get(layerName);
+                    }
+
+                    node.layerMask = layerMask;
+                }
+
+                if (gltfNode.extras.hasOwnProperty("collider")) {
+                    const colliderName = gltfNode.extras.collider;
+                    let meshColliderIndex;
+
+                    if (this.collisionMeshMap.has(colliderName)) {
+                        meshColliderIndex = this.collisionMeshMap.get(colliderName);
+                    }
+                    else {
+                        meshColliderIndex = scene.collisionMeshes.length;
+                        await this._parseCollisionMap(colliderName);
+                        scene.collisionMeshes.push(this.mesh);
+                        this.collisionMeshMap.set(colliderName, meshColliderIndex);
+                    }
+
+                    node.collider = N64Node.ColliderType.Mesh | (meshColliderIndex << 16);
+                }
+            }
+
+            scene.nodes.push(node);
         }
 
-        const meshes = [];
+        return scene;
+    }
 
-        for (let i = 0; i < this.gltf.meshes.length; i++) {
-            this.mesh = new N64Mesh(null);
-            await this._loadMesh(this.gltf.meshes[i]);
-            meshes.push(this.mesh);
+    async _parseCollisionMap(name) {
+        if (this._meshColliderNodeIndex === -1)
+            throw new Error("No collision mesh root node present in scene.");
+
+        const collisionMeshParentNode = this.gltf.nodes[this._meshColliderNodeIndex];
+        let collisionMeshIndex = -1;
+
+        for (const child of collisionMeshParentNode.children) {
+            const node = this.gltf.nodes[child];
+
+            if (node.name !== name)
+                continue;
+
+            if (node.hasOwnProperty("mesh"))
+                collisionMeshIndex = node.mesh;
         }
 
-        return {
-            meshes: meshes,
-            resources: this.resources,
-            extras: this._loadExtras()
+        if (collisionMeshIndex === -1)
+            throw new Error(`Unable to locate collision mesh with name: ${name}`)
+
+        this.mesh = new N64Mesh(name);
+        await this._loadMesh(this.gltf.meshes[collisionMeshIndex]);
+    }
+
+    /** Parses the scene node from the glTF JSON to determine the root nodes for the scene and mesh colliders. */
+    _parseSceneNode() {
+        const sceneIndex = this.gltf.scene;
+        const sceneNode = this.gltf.scenes[sceneIndex];
+
+        for (const nodeIndex of sceneNode.nodes) {
+            const node = this.gltf.nodes[nodeIndex];
+
+            if (!node.hasOwnProperty("name"))
+                continue;
+
+            if (node.name === "Scene") {
+                this._sceneNodeIndex = nodeIndex;
+            }
+
+            if (node.name === "Colliders") {
+                this._meshColliderNodeIndex = nodeIndex;
+            }
         }
+
+        if (this._sceneNodeIndex === -1)
+            throw new Error("Unable to locate Scene Root node in gltf file.  Ensure you have a node named 'Scene' in the root of the scene graph.")
+
     }
 
     /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
@@ -110,30 +241,8 @@ class GLTFLoader {
         this.imageMap.clear();
         this.textureMap.clear();
         this.materialMap.clear();
-    }
-
-    _loadExtras() {
-        const extras = [];
-        for (const node of this.gltf.nodes) {
-            if (!node.hasOwnProperty("extras")) continue;
-
-            const extra = new N64SceneExtra();
-
-            extra.type = node.extras.type;
-
-            if (node.translation)
-                extra.position = node.translation.slice();
-
-            if (node.rotation)
-                extra.rotation = node.rotation.slice();
-
-            if (node.scale)
-                extra.scale = node.scale.slice();
-
-            extras.push(extra);
-        }
-
-        return extras;
+        this.meshMap.clear();
+        this.collisionMeshMap.clear();
     }
 
     async _loadMesh(gltfMesh) {
@@ -474,6 +583,9 @@ class GLTFLoader {
                     element.push(buffer.readUInt32LE(offset));
                     offset += 4;
                     break;
+
+                default:
+                    throw new Error(`Unsupported element type: ${componentType}`);
             }
         }
 

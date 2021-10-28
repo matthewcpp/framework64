@@ -1,44 +1,45 @@
 #include "framework64/node.h"
 
-#include "framework64/matrix.h"
 
-static void _node_update_bounding_box_with_matrix(fw64Node* node, float* matrix) {
-    if (node->mesh) {
-        Box mesh_bounding_box;
-        fw64_mesh_get_bounding_box(node->mesh, &mesh_bounding_box);
-        matrix_transform_box(matrix, &mesh_bounding_box, &node->bounding);
-    }
-}
-
-void fw64_node_init(fw64Node* node, fw64Mesh* mesh) {
+void fw64_node_init(fw64Node* node) {
     fw64_transform_init(&node->transform);
-    fw64_node_set_mesh(node, mesh);
+    node->mesh = NULL;
+    node->collider = NULL;
+    node->type = FW64_NODE_UNSPECIFIED_TYPE;
+    node->layer_mask = 1U;
 }
 
-void fw64_node_refresh(fw64Node* node) {
-#ifdef PLATFORM_N64
-    float fmatrix[16];
-    matrix_from_trs(fmatrix, &node->transform.position, &node->transform.rotation, &node->transform.scale);
-
-    guMtxF2L((float (*)[4])fmatrix, &node->transform.matrix);
-
-    _node_update_bounding_box_with_matrix(node, &fmatrix[0]);
-#else
+void fw64_node_update(fw64Node* node) {
     fw64_transform_update_matrix(&node->transform);
-    _node_update_bounding_box_with_matrix(node, &node->transform.matrix.m[0]);
-#endif
+    if (node->collider)
+        fw64_collider_update(node->collider);
+}
+
+static void setup_box_collider(fw64Node* node) {
+    Box box;
+    fw64_mesh_get_bounding_box(node->mesh, &box);
+    fw64_collider_set_type_box(node->collider, &box);
+}
+
+void fw64_node_set_collider(fw64Node* node, fw64Collider* collider) {
+    node->collider = collider;
+    fw64_collider_init(node->collider, &node->transform);
+}
+
+void fw64_node_set_box_collider(fw64Node* node, fw64Collider* collider) {
+    fw64_node_set_collider(node, collider);
+    
+    if (node->mesh != NULL)
+        setup_box_collider(node);
+}
+
+void fw64_node_set_mesh_collider(fw64Node* node, fw64Collider* collider, fw64CollisionMesh* collision_mesh) {
+    fw64_node_set_collider(node, collider);
+    fw64_collider_set_type_mesh(node->collider, collision_mesh);
 }
 
 void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh) {
     node->mesh = mesh;
-
-    if (mesh) {
-        fw64_node_refresh(node);
-    }
-    else {
-        node->bounding.min = node->transform.position;
-        node->bounding.max = node->transform.position;
-    }
 }
 
 void fw64_node_billboard(fw64Node* node, fw64Camera* camera) {
@@ -49,5 +50,5 @@ void fw64_node_billboard(fw64Node* node, fw64Camera* camera) {
     vec3_add(&target, &node->transform.position, &camera_forward);
     fw64_transform_look_at(&node->transform, &target, &camera_up);
 
-    fw64_node_refresh(node);
+    fw64_node_update(node);
 }

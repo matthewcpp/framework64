@@ -21,6 +21,7 @@ typedef enum {
 
 
 typedef struct fw64Mesh fw64Mesh;
+typedef struct fw64Primitive fw64Primitive;
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,6 +40,8 @@ void fw64_mesh_delete(fw64Mesh* mesh);
 
 void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box);
 int fw64_mesh_get_primitive_count(fw64Mesh* mesh);
+
+Box fw64_mesh_get_bounding_for_primitive(fw64Mesh* mesh, int index);
 fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index);
 
 #ifdef __cplusplus

@@ -99,9 +99,6 @@
         },
         {
             "src": "campfire/campfire.gltf"
-        },
-        {
-            "src": "simple_scene/simple_scene.gltf"
         }
     ],
     "fonts": [
@@ -137,23 +134,24 @@
             "dir": "music/bank2"
         }
     ],
-    "terrains": [
-        {
-            "src": "fogworld/fogworld.gltf",
-            "dimensionX": 32,
-            "dimensionZ": 32
-        }
-    ],
-    "typemaps": [
+    "typeMaps": [
         {
             "start": 0,
             "fire": 1
         }
     ],
+    "layerMaps": [
+        {
+            "default": 1,
+            "ground": 2,
+            "wall": 4
+        }
+    ],
     "scenes": [
         {
             "src": "simple_scene/simple_scene.gltf",
-            "typemap": 0
+            "typeMap": 0,
+            "layerMap": 0
         }
     ],
     "raw": [

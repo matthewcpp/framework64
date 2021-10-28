@@ -2,13 +2,13 @@
 
 #include "framework64/desktop/asset_database.h"
 #include "framework64/desktop/glb_parser.h"
+#include "framework64/desktop/json_map.h"
 
 #include <assert.h>
 #include <unordered_map>
 #include <string>
 
 
-std::unordered_map<std::string, int> parseTypemap(std::string const & typemapJson);
 
 fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index) {
     sqlite3_reset(database->select_scene_statement);
@@ -20,22 +20,24 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index) {
     std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_scene_statement, 0));
     const std::string scene_path = database->asset_dir + asset_path;
 
-    std::string typemapStr = reinterpret_cast<const char *>(sqlite3_column_text(database->select_scene_statement, 1));
-    auto const typemap = parseTypemap(typemapStr);
+    int type_map_index = sqlite3_column_int(database->select_scene_statement, 1);
+    int layer_map_index = sqlite3_column_int(database->select_scene_statement, 1);
+
+    auto type_map = framework64::load_type_map(database, type_map_index);
+    auto layer_map = framework64::load_layer_map(database, layer_map_index);
 
     framework64::GlbParser glb(database->shader_cache);
-    return glb.parseScene(scene_path, typemap);
+    return glb.parseScene(scene_path, type_map, layer_map);
 }
 
-std::unordered_map<std::string, int> parseTypemap(std::string const & typemapJson) {
-    std::unordered_map<std::string, int> typemap;
-    nlohmann::json json_doc = nlohmann::json ::parse(typemapJson);
+template <typename T>
+std::unordered_map<std::string, T> parseMapJson(std::string const& json_str) {
+    std::unordered_map<std::string, T> typemap;
+    nlohmann::json json_doc = nlohmann::json ::parse(json_str);
 
     for (auto const & item : json_doc.items()) {
-        typemap[item.key()] = item.value().get<int>();
+        typemap[item.key()] = item.value().get<T>();
     }
-
-    return typemap;
 }
 
 void fw64_scene_delete(fw64Scene* scene) {
@@ -44,21 +46,18 @@ void fw64_scene_delete(fw64Scene* scene) {
 
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index) {
     assert(index < scene->meshes.size());
-    return scene->meshes[index];
+    return scene->meshes[index].get();
 }
 
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene) {
     return static_cast<uint32_t>(scene->meshes.size());
 }
 
-fw64Transform* fw64_scene_get_transform(fw64Scene* scene) {
-    return &scene->transform;
+fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index) {
+    assert(index < scene->nodes.size());
+    return scene->nodes[index].get();
 }
 
-uint32_t fw64_scene_get_extra_count(fw64Scene* scene){
-    return static_cast<uint32_t>(scene->extras.size());
-}
-
-fw64SceneExtra* fw64_scene_get_extras(fw64Scene* scene) {
-    return scene->extras.data();
+uint32_t fw64_scene_get_node_count(fw64Scene* scene) {
+    return static_cast<uint32_t>(scene->nodes.size());
 }

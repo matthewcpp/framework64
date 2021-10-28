@@ -35,7 +35,7 @@ void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle) {
 
     if (resources->texture_count > 0) {
         resources->textures = malloc(resources->texture_count * sizeof(fw64Texture));
-        fw64_filesystem_read(resources->textures , sizeof(fw64Texture), resources->image_count, handle);
+        fw64_filesystem_read(resources->textures , sizeof(fw64Texture), resources->texture_count, handle);
     }
     else {
         resources->textures = NULL;

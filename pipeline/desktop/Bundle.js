@@ -15,6 +15,8 @@ class Bundle {
     _musicBankStmt = null;
     _rawFileStmt = null;
     _terrainStmt = null;
+    _typemapStmt = null;
+    _layermapStmt = null;
     _sceneStmt = null;
 
     constructor(outputDirectory) {
@@ -39,7 +41,9 @@ class Bundle {
             db.run("CREATE TABLE musicBanks (assetId INTEGER PRIMARY KEY, path TEXT, count INTEGER)");
             db.run("CREATE TABLE rawFiles (assetId INTEGER PRIMARY KEY, path TEXT, size INTEGER)");
             db.run("CREATE TABLE terrains (assetId INTEGER PRIMARY KEY, path TEXT, dimx INTEGER, dimz INTEGER)");
-            db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, typemap TEXT)");
+            db.run("CREATE TABLE typeMaps (assetId INTEGER PRIMARY KEY, jsonIndex INTEGER, jsonStr TEXT)");
+            db.run("CREATE TABLE layerMaps (assetId INTEGER PRIMARY KEY, jsonIndex INTEGER, jsonStr TEXT)");
+            db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, typeMap INTEGER, layerMap INTEGER)");
         });
 
         this._imageStmt = db.prepare("INSERT INTO images VALUES (?, ?, ?, ?)");
@@ -49,7 +53,9 @@ class Bundle {
         this._musicBankStmt = db.prepare("INSERT INTO musicBanks VALUES (?, ?, ?)");
         this._rawFileStmt = db.prepare("INSERT INTO rawFiles VALUES (?, ?, ?)");
         this._terrainStmt = db.prepare("INSERT INTO terrains VALUES (?, ?, ?, ?)");
-        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?)");
+        this._typemapStmt = db.prepare("INSERT INTO typeMaps VALUES (?, ?, ?)");
+        this._layermapStmt = db.prepare("INSERT INTO layerMaps VALUES (?, ?, ?)");
+        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?, ?)");
 
         this._db = db;
     }
@@ -128,13 +134,23 @@ class Bundle {
         this._terrainStmt.run(assetId, assetPath, terrain.dimensionX, terrain.dimensionZ);
     }
 
-    addScene(scene, assetPath, typemapStr) {
+    addTypeMap(typemap, index) {
+        const assetId = this._nextAssetId++;
+        this._typemapStmt.run(assetId, index, JSON.stringify(typemap));
+    }
+
+    addLayerMap(layermap, index) {
+        const assetId = this._nextAssetId++;
+        this._layermapStmt.run(assetId, index, JSON.stringify(layermap));
+    }
+
+    addScene(scene, assetPath) {
         const assetId = this._nextAssetId++;
         const assetName = path.basename(scene.src, path.extname(scene.src));
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
 
-        this._sceneStmt.run(assetId, assetPath, typemapStr);
+        this._sceneStmt.run(assetId, assetPath, scene.typeMap, scene.layerMap);
     }
 
     finalize() {
@@ -145,6 +161,8 @@ class Bundle {
         this._musicBankStmt.finalize();
         this._rawFileStmt.finalize();
         this._terrainStmt.finalize();
+        this._typemapStmt.finalize();
+        this._layermapStmt.finalize();
         this._sceneStmt.finalize();
         this._db.close();
 

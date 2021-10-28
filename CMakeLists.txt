@@ -23,6 +23,6 @@ if (BUILD_FW64_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-if (FW64_PLATFORM_DESKTOP AND BUILD_Fw64_TESTS)
+if (FW64_PLATFORM_DESKTOP AND BUILD_FW64_TESTS)
     add_subdirectory(tests)
 endif()
