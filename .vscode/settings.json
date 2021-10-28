@@ -1,4 +1,10 @@
 {
+    "cmake.buildDirectory": "${workspaceFolder}/build_n64",
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/CMake/framework64.modernsdk.cmake",
+        "FW64_PLATFORM_N64": "ON",
+        "BUILD_FW64_EXAMPLES": "ON"
+    },
     "files.associations": {
         "cstdlib": "c",
         "typeinfo": "c",
@@ -23,5 +29,6 @@
         "loader.h": "c",
         "quad.h": "c",
         "material.h": "c"
-    }
+    },
+    "cmake.configureOnOpen": true
 }
