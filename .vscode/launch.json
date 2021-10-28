@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "by-gdb",
+            "name": "CEN64 Debug ROM Mac",
+            "request": "launch",
+            "debuggerPath": "gdb-multiarch",
+            "program": "${workspaceFolder}/build_n64/bin/bounding.out",
+            "remote": {
+                "enabled": true,
+                "address": "host.docker.internal:8080",
+                "mode": "remote",
+                "execfile": "${workspaceFolder}/build_n64/bin/bounding.out"
+            },
+            "commandsBeforeExec": [
+                "set arch mips:4300",
+            ],
+            "cwd": "${workspaceRoot}",
+        },
+        {
+            "type": "by-gdb",
+            "name": "CEN64 Debug ROM Linux",
+            "request": "launch",
+            "debuggerPath": "gdb-multiarch",
+            "program": "${workspaceFolder}/build_n64/bin/bounding.out",
+            "remote": {
+                "enabled": true,
+                "address": "localhost:8080",
+                "mode": "remote",
+                "execfile": "${workspaceFolder}/build_n64/bin/bounding.out"
+            },
+            "commandsBeforeExec": [
+                "set arch mips:4300",
+            ],
+            "cwd": "${workspaceRoot}",
+        }
+    ]
+}

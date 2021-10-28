@@ -54,7 +54,7 @@ function(create_n64_rom)
 	# build the rom with spicy
 	add_custom_command(TARGET ${target_name} POST_BUILD
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-	    COMMAND spicy ${specfile_dest} -I/usr/include/n64/nusys -r ${target_name}.n64 -s 10 -e ${target_name}.out --cpp_command mips-n64-gcc --as_command mips-n64-as --ld_command mips-n64-ld --objcopy_command mips-n64-objcopy
+	    COMMAND spicy ${specfile_dest} -I/usr/include/n64/nusys -r ${target_name}.n64 -s 10 -e ${target_name}.out --cpp_command=mips-n64-gcc --as_command=mips-n64-as --ld_command=mips-n64-ld --objcopy_command=mips-n64-objcopy
 	)
 
 	# mask the rom

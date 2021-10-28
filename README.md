@@ -16,18 +16,21 @@ docker run -it --rm --mount type=bind,source=/path/to/framework64,target=/src ma
 
 All roms will be placed in the `build_n64/bin` folder.
 
-#### Visual Studio Code Development Setup
-- Ensure that you have the remote containers extension installed.
-- Copy `config/devcontainer/devcontainer.n64.json` to `.devcontainer.json` in the repo's root folder
-- Open the repo root folder in VS Code.
-- Install the C/C++ development extension into the container via the extensions panel.
-- After opening the project, add the following entries to `.vscode/c_cpp_properties.json` for IntelliSense assistance:
-  - defines:
-    - PLATFORM_N64
-  - includePath:
-    - /usr/include/n64
-    - /usr/include/n64/nusys
-    - /usr/include/n64/nustd
+#### N64 Visual Studio Code Development Setup
+- Copy `config/devcontainer/devcontainer.n64.json` to `.devcontainer.json` in the repo's root folder.
+- Open the repo root folder in VS Code.  If prompted to reopen the folder in a container, click OK.
+- When the container is opened for the first time C/C++, GDB, and Cmake extensions will be installed in the container.
+- Configure the project by running the `Cmake:Configure` command from the palette or the popup window when the project opens.
+- If prompted to specify a kit, choose `Unspecified`.
+- After configuration is complete, choose a target and press build on the bottom status bar.
+
+#### N64 Debugging with cen64
+- Download or build a recent version of [cen64](https://github.com/n64dev/cen64).
+- Ensure that your CMake build type is set to Debug.
+- Build the rom you wish to debug.
+- Start cen64 using the `-debug localhost:8080` parameter and point it to your newly built ROM.
+- From the VS Code debugging panel, use the dropdown to select the configuration based on your *Host* platform.  You will need to edit the `launch.json` file to contain the name of the ROM you just built.
+- The debugger will start and attach to cen64.
 
 
 ### Building For Desktop
