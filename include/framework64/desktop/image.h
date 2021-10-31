@@ -18,8 +18,9 @@ struct fw64Image {
     int vslices;
     GLuint gl_handle = 0;
 
-    void freeGlResources();
+    ~fw64Image();
 
+public:
     static fw64Image* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 
     /** Load image file into OpenGL */

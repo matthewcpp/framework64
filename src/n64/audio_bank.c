@@ -34,6 +34,11 @@ fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t asset_id
     return sound_bank;
 }
 
+void fw64_sound_bank_delete(fw64AssetDatabase* assets, fw64SoundBank* sound_bank) {
+    (void)assets;
+    free(sound_bank);
+}
+
 typedef struct {
     uint32_t track_count;
     uint32_t bank_asset_id;
@@ -81,4 +86,9 @@ fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t asset_id
     music_bank->tbl_file_address = tbl_file_address;
 
     return music_bank;
+}
+
+void fw64_music_bank_delete(fw64AssetDatabase* assets, fw64MusicBank* music_bank) {
+    (void)assets;
+    free(music_bank);
 }

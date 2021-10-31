@@ -1,14 +1,18 @@
 #include "framework64/n64/mesh.h"
 
+#include "framework64/n64/asset_database.h"
 #include "framework64/n64/loader.h"
-
 #include "framework64/filesystem.h"
 
 #include <malloc.h>
 #include <string.h>
 
 fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index) {
-    (void)assets;
+    fw64Mesh* mesh = fw64_data_cache_retain(&assets->cache, index);
+    if (mesh){
+        return mesh;
+    } 
+
     fw64N64Loader loader;
     fw64_n64_loader_init(&loader);
 
@@ -17,7 +21,7 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index) {
         return NULL;
 
     fw64_n64_loader_load_mesh_resources(&loader, handle);
-    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
+    mesh = malloc(sizeof(fw64Mesh));
     fw64_n64_loader_load_mesh(&loader, mesh, handle);
     mesh->resources = loader.resources;
 
@@ -25,7 +29,18 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index) {
 
     fw64_n64_loader_uninit(&loader);
 
+    fw64_data_cache_add(&assets->cache, index, mesh);
+
     return mesh;
+}
+
+void fw64_mesh_delete(fw64AssetDatabase* database, fw64Mesh* mesh) {
+    int references_remaining = fw64_data_cache_release(&database->cache, mesh);
+
+    if (references_remaining <= 0) { 
+        fw64_n64_mesh_uninit(mesh);
+        free(mesh);
+    }
 }
 
 void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box) {
@@ -49,11 +64,6 @@ void fw64_n64_mesh_uninit(fw64Mesh* mesh) {
     if (mesh->resources) {
         fw64_n64_mesh_resources_delete(mesh->resources);
     }
-}
-
-void fw64_mesh_delete(fw64Mesh* mesh) {
-    fw64_n64_mesh_uninit(mesh);
-    free(mesh);
 }
 
 int fw64_mesh_get_primitive_count(fw64Mesh* mesh) {

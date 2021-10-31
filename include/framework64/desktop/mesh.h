@@ -34,6 +34,7 @@ struct fw64Primitive {
 
 struct fw64Mesh {
     fw64Mesh();
+    ~fw64Mesh();
 
     Box bounding_box;
 
@@ -41,6 +42,4 @@ struct fw64Mesh {
     std::vector<std::unique_ptr<fw64Texture>> textures;
 
     static fw64Mesh* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
-
-    void freeGlResources();
 };

@@ -37,6 +37,14 @@ fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t handle) 
     return fw64SoundBank::loadFromDatabase(assets, handle);
 }
 
+void fw64_sound_bank_delete(fw64AssetDatabase* assets, fw64SoundBank* sound_bank) {
+    delete sound_bank;
+}
+
 fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t handle) {
     return fw64MusicBank::loadFromDatabase(assets, handle);
+}
+
+void fw64_music_bank_delete(fw64AssetDatabase* assets, fw64MusicBank* music_bank) {
+    delete music_bank;
 }

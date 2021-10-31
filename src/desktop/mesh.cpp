@@ -2,6 +2,7 @@
 
 #include "framework64/desktop/asset_database.h"
 #include "framework64/desktop/glb_parser.h"
+#include "framework64/desktop/texture.h"
 
 #include <cassert>
 
@@ -25,7 +26,7 @@ fw64Mesh* fw64Mesh::loadFromDatabase(fw64AssetDatabase* database, uint32_t index
     return mesh;
 }
 
-void fw64Mesh::freeGlResources(){
+fw64Mesh::~fw64Mesh(){
     for (auto const & primitive : primitives) {
         glDeleteVertexArrays(1, &primitive.gl_vertex_array_object);
         glDeleteBuffers(1, &primitive.gl_array_buffer_object);
@@ -39,8 +40,7 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index) {
     return fw64Mesh::loadFromDatabase(assets, index);
 }
 
-void fw64_mesh_delete(fw64Mesh* mesh) {
-    mesh->freeGlResources();
+void fw64_mesh_delete(fw64AssetDatabase* assets, fw64Mesh* mesh) {
     delete mesh;
 }
 

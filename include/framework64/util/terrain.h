@@ -21,7 +21,7 @@ fw64Mesh* fw64_terrain_get_mesh(fw64Terrain* terrain, uint32_t index);
 fw64Transform* fw64_terrain_get_transform(fw64Terrain* terrain);
 
 fw64Terrain* fw64_terrain_load(fw64AssetDatabase* database, uint32_t index);
-void fw64_terrain_delete(fw64Terrain* terrain);
+void fw64_terrain_delete(fw64AssetDatabase* database, fw64Terrain* terrain);
 
 #ifdef __cplusplus
 }
