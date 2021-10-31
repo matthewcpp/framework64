@@ -10,6 +10,11 @@ function nextPowerOf2(v) {
     return ++v;
 }
 
+function isPowerOf2(x) {
+    return (x & (x - 1)) === 0;
+}
+
 module.exports = {
-    nextPowerOf2: nextPowerOf2
+    nextPowerOf2: nextPowerOf2,
+    isPowerOf2: isPowerOf2
 }

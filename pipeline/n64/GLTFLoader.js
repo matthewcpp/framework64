@@ -6,6 +6,7 @@ const N64MeshResources = require("./N64MeshResources");
 const N64Primitive = require("./N64Primitive");
 const N64Texture = require("./N64Texture");
 const N64Scene = require("./N64Scene")
+const Util = require("../Util")
 
 const glMatrix = require("gl-matrix");
 
@@ -536,12 +537,15 @@ class GLTFLoader {
         const material = this.resources.materials[this.materialMap.get(gltfPrimitive.material)];
 
         if (material.texture === N64Material.NoTexture) {
-            console.log("No image specified.  Ignoring texture coordinates.")
             return;
         }
 
         const texture = this.resources.textures[material.texture];
         const image = this.resources.images[texture.image];
+
+        if (!Util.isPowerOf2(image.width) || !Util.isPowerOf2(image.height)) {
+            throw new Error(`image: ${image.name} has non power of 2 dimensions: ${image.width}x${image.height}`);
+        }
 
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
 
