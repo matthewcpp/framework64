@@ -21,6 +21,9 @@ struct fw64Renderer{
     u16 fill_color;
     u16 clear_color;
 
+    u32 rendermode_depth_test_flags;
+    u32 rendermode_aa_flags;
+
     Vp view_port;
     IVec2 screen_size;
     fw64RenderMode render_mode;

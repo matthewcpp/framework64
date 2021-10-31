@@ -20,6 +20,7 @@ public:
     void drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh);
 
     void setDepthTestingEnabled(bool enabled);
+    inline bool depthTestingEnabled() const { return depth_testing_enabled; }
 
 public:
     fw64Primitive::Mode render_mode = fw64Primitive::Mode::Unknown;
