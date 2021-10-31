@@ -85,7 +85,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
         for (const item of manifest.raw) {
             console.log(`Processing Raw File: ${item}`);
             const sourceFile = path.join(manifestDirectory, item);
-            archive.add(sourceFile, "raw");
+            await archive.add(sourceFile, "raw");
         }
     }
 

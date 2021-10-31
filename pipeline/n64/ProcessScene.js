@@ -108,14 +108,13 @@ async function processScene(scene, typeMap, layerMap, archive, baseDirectory, ou
 
     const destName = path.basename(scene.src, path.extname(scene.src));
     const destFile = path.join(outputDirectory, destName + ".scene");
-    archive.add(destFile, "scene");
 
     const sceneInfo = new SceneInfo(n64Scene);
 
     const file = fs.openSync(destFile, "w");
     fs.writeSync(file, sceneInfo.buffer);
 
-    MeshWriter.writeMeshResources(n64Scene.meshResources, file, outputDirectory, archive);
+    await MeshWriter.writeMeshResources(n64Scene.meshResources, file, outputDirectory, archive);
 
     for (const mesh of n64Scene.meshes) {
         MeshWriter.writeStaticMeshData(mesh, file);
@@ -125,6 +124,8 @@ async function processScene(scene, typeMap, layerMap, archive, baseDirectory, ou
     writeNodes(n64Scene, file);
 
     fs.closeSync(file);
+
+    await archive.add(destFile, "scene");
 }
 
 module.exports = processScene;

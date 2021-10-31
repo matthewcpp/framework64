@@ -1,31 +1,59 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require('crypto')
 
 class ArchiveEntry {
     path
     type
     index
+    assetId
 
-    constructor(path, type, index) {
-        this.path = path;
+    constructor(assetPath, type, index) {
+        this.path = assetPath;
         this.type = type;
         this.index = index;
+
+        const name = path.basename(assetPath, path.extname(assetPath));
+        this.assetId = `FW64_ASSET_${type}_${name}`;
     }
 }
 
 class Archive {
     entries = new Map();
+    entryHashes = new Map();
     fileName = "assets"
 
-    add(path, type) {
+    async add(path, type) {
         if (this.entries.has(path))
             throw new Error(`Duplicate key in archive: ${path}`);
 
+        if (!fs.existsSync(path)) {
+            throw new Error(`Compiled asset path: ${path} does not exist.  This is most likely an error in the asset pipeline itself.`);
+        }
+
+        const hash = await this._hashFile(path);
+
+        let entry = this.entryHashes.get(hash);
+        if (entry) {
+            return entry;
+        }
+
         const index = this.entries.size;
-        const entry = new ArchiveEntry(path, type, index);
+        entry = new ArchiveEntry(path, type, index);
         this.entries.set(path, entry);
+        this.entryHashes.set(hash, entry);
 
         return entry;
+    }
+
+    async _hashFile(path) {
+        return new Promise((resolve, reject) => {
+            const hash = crypto.createHash('sha1')
+            const rs = fs.createReadStream(path)
+            rs.on('error', reject)
+            rs.on('data', chunk => hash.update(chunk))
+            rs.on('end', () => resolve(hash.digest('hex')))
+        })
     }
 
     write(outputDir) {
@@ -49,8 +77,7 @@ class Archive {
     }
 
     _write(header, archive, manifest) {
-        fs.writeSync(header, "#ifndef ASSETS_H\n");
-        fs.writeSync(header, "#define ASSETS_H\n\n");
+        fs.writeSync(header, "#pragma once\n");
 
         fs.writeSync(header, `#define FW64_ASSET_COUNT ${this.entries.size}\n\n`);
 
@@ -68,7 +95,7 @@ class Archive {
 
             // define the asset index in the header file
             const name = path.basename(entry.path, path.extname(entry.path));
-            fs.writeSync(header, `#define FW64_ASSET_${entry.type}_${name} ${entry.index}\n`);
+            fs.writeSync(header, `#define ${entry.assetId} ${entry.index}\n`);
 
             const data = fs.readFileSync(entry.path);
 
@@ -96,7 +123,6 @@ class Archive {
         //write the completed header into the archive
         fs.writeSync(archive, headerBuffer, 0, headerBuffer.length, 0);
 
-        fs.writeSync(header, `#endif\n`);
         fs.writeSync(archive, headerBuffer);
     }
 }

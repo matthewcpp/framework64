@@ -5,7 +5,7 @@ const Jimp = require("jimp");
 
 const path = require("path");
 
-function finalizeImage(image, outDir, options, archive) {
+async function finalizeImage(image, outDir, options, archive) {
     if (options.resize) {
         const dimensions = options.resize.split("x");
         image.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
@@ -13,7 +13,7 @@ function finalizeImage(image, outDir, options, archive) {
 
     const filePath = path.join(outDir, `${image.name}.sprite`);
     N64ImageWriter.writeBinary(image, options.hslices, options.vslices, filePath);
-    archive.add(filePath, "image");
+    await archive.add(filePath, "image");
 }
 
 async function convertSprite(imagePath, outDir, params, archive) {
@@ -29,7 +29,7 @@ async function convertSprite(imagePath, outDir, params, archive) {
     const image = new N64Image(name, N64Image.Format[options.format]);
     await image.load(imagePath);
 
-    finalizeImage(image, outDir, options, archive)
+    await finalizeImage(image, outDir, options, archive)
 }
 
 function getDimension(params) {
@@ -68,7 +68,7 @@ async function assembleSprite(rootDir, outDir, params, archive) {
     const image = new N64Image(params.name, N64Image.Format[options.format.toUpperCase()]);
     await image.assign(atlas);
 
-    finalizeImage(image, outDir, params, archive)
+    await finalizeImage(image, outDir, params, archive)
 }
 
 module.exports = {

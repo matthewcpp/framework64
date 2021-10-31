@@ -26,8 +26,8 @@ async function convertFont(sourceFile, outputDir, params, archive) {
 
     const data = await font.generateSpriteFont(options.sourceString, options.size);
     const fontPath = path.join(outputDir, `${font.name}.font`);
-    archive.add(fontPath, "font");
     N64FontWriter.write(data, fontPath);
+    await archive.add(fontPath, "font");
 }
 
 module.exports = {
