@@ -40,7 +40,8 @@ std::unordered_map<std::string, T> parseMapJson(std::string const& json_str) {
     }
 }
 
-void fw64_scene_delete(fw64Scene* scene) {
+void fw64_scene_delete(fw64AssetDatabase* assets, fw64Scene* scene) {
+    (void)assets;
     delete scene;
 }
 

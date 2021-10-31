@@ -113,14 +113,17 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
     return scene;
 }
 
-void fw64_scene_delete(fw64Scene* scene) {
+void fw64_scene_delete(fw64AssetDatabase * assets, fw64Scene* scene) {
+    (void)assets;
     if (scene->meshes) {
         for (uint32_t i = 0; i < scene->info.mesh_count; i++)
             fw64_n64_mesh_uninit(scene->meshes + i);
 
-        fw64_n64_mesh_resources_delete(scene->mesh_resources);
-
         free(scene->meshes);
+    }
+
+    if (scene->mesh_resources) {
+        fw64_n64_mesh_resources_delete(scene->mesh_resources);
     }
 
     if (scene->collision_meshes) {

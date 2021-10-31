@@ -20,5 +20,3 @@ struct fw64Font {
 };
 
 uint16_t fw64_font_get_glyph_index(fw64Font* font, uint16_t codepoint);
-
-void fw64_font_unload(fw64Font* font);

@@ -1,5 +1,6 @@
 #include "framework64/n64/font.h"
 
+#include "framework64/n64/asset_database.h"
 #include "framework64/filesystem.h"
 #include "framework64/vec2.h"
 
@@ -8,13 +9,18 @@
 #include <string.h>
 
 fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index) {
-    (void)database;
+    fw64Font* font = fw64_data_cache_retain(&database->cache, index);
+    if (font) {
+        return font;
+    }
+
     int handle = fw64_filesystem_open(index);
 
-    if (handle == FW64_FILESYSTEM_INVALID_HANDLE)
-        return 0;
+    if (handle == FW64_FILESYSTEM_INVALID_HANDLE) {
+        return NULL;
+    }
 
-    fw64Font* font = malloc(sizeof(fw64Font));
+    font = malloc(sizeof(fw64Font));
 
     fw64_filesystem_read(font, sizeof(uint16_t), 4, handle);
 
@@ -31,8 +37,13 @@ fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index) {
     return font;
 }
 
-void fw64_font_unload(fw64Font* font) {
-    free(font->spritefont); // note: font and glyph data were allocated in same call
+void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font) {
+    int references_remaining = fw64_data_cache_release(&assets->cache, font);
+
+    if (references_remaining <= 0) {
+        free(font->spritefont); // note: font and glyph data were allocated in same call
+        free(font);
+    }
 }
 
 uint16_t find_font_glyph_rec(fw64FontGlyph* glyphs, int min_index, int max_index, uint16_t codepoint) {

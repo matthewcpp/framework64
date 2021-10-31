@@ -36,7 +36,7 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index);
 /**
 Cleans up a mesh that was manually constructed after calling \ref mesh_init
 */
-void fw64_mesh_delete(fw64Mesh* mesh);
+void fw64_mesh_delete(fw64AssetDatabase* assets, fw64Mesh* mesh);
 
 void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box);
 int fw64_mesh_get_primitive_count(fw64Mesh* mesh);

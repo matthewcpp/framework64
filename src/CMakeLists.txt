@@ -16,6 +16,7 @@ set(common_source_files
         ../include/framework64/collide.h collide.c
         ../include/framework64/collider.h collider.c
         ../include/framework64/color.h color.c
+        ../include/framework64/internal/data_cache.h data_cache.c
         ../include/framework64/engine.h
         ../include/framework64/filesystem.h
         ../include/framework64/font.h

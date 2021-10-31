@@ -58,7 +58,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_n64_input_init(engine->input);
     memset(engine->time, 0, sizeof(fw64Time));
-    memset(engine->assets, 0, sizeof(fw64AssetDatabase));
+    fw64_data_cache_init(&engine->assets->cache);
     fw64_n64_audio_init(engine->audio);
 
     fw64_n64_filesystem_init(asset_count);

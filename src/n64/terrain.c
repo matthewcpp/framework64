@@ -37,7 +37,7 @@ fw64Terrain* fw64_terrain_load(fw64AssetDatabase* database, uint32_t index) {
     return terrain;
 }
 
-void fw64_terrain_delete(fw64Terrain* terrain) {
+void fw64_terrain_delete(fw64AssetDatabase* database, fw64Terrain* terrain) {
     for (uint32_t i = 0; i < terrain->mesh_count; i++) {
         fw64_n64_mesh_uninit(terrain->meshes + i);
     }

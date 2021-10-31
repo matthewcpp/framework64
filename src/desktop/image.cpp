@@ -73,7 +73,7 @@ fw64Image* fw64Image::loadImageBuffer(void* data, size_t size) {
     return texture;
 }
 
-void fw64Image::freeGlResources() {
+fw64Image::~fw64Image() {
     glDeleteTextures(1, &gl_handle);
 }
 
@@ -84,6 +84,5 @@ fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t index) {
 }
 
 void fw64_image_delete(fw64Image* image) {
-    image->freeGlResources();
     delete image;
 }

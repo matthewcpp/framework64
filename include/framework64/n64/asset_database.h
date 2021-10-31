@@ -1,6 +1,8 @@
 #pragma once
 
+#include "framework64/internal/data_cache.h"
+
 struct fw64AssetDatabase{
-    int unused;
+    fw64DataCache cache;
 };
 

@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 
 namespace framework64 {
 class ShaderProgram;

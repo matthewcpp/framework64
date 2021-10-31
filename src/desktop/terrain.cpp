@@ -24,7 +24,7 @@ fw64Terrain* fw64_terrain_load(fw64AssetDatabase* database, uint32_t index) {
     framework64::GlbParser glb(database->shader_cache);
     auto const meshes = glb.parseStaticMeshes(terrain_path);
 
-    fw64Terrain* terrain = new fw64Terrain();
+    auto* terrain = new fw64Terrain();
     fw64_transform_init(&terrain->transform);
 
     std::copy(meshes.begin(), meshes.end(), std::back_inserter(terrain->meshes));
@@ -33,9 +33,9 @@ fw64Terrain* fw64_terrain_load(fw64AssetDatabase* database, uint32_t index) {
     return terrain;
 }
 
-void fw64_terrain_delete(fw64Terrain* terrain) {
+void fw64_terrain_delete(fw64AssetDatabase* assets, fw64Terrain* terrain) {
     for (size_t i = 0; i < terrain->meshes.size(); i++)
-        fw64_mesh_delete(terrain->meshes[i]);
+        fw64_mesh_delete(assets, terrain->meshes[i]);
 
     delete terrain;
 }

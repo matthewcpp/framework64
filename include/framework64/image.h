@@ -20,7 +20,7 @@ fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t index);
 /**
  * Deletes the image and frees all assocated resources for an image created with \ref fw64_image_load
  **/
-void fw64_image_delete(fw64Image* image);
+void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image);
 
 #ifdef __cplusplus
 }
