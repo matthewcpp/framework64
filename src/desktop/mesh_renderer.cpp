@@ -16,7 +16,7 @@ void MeshRenderer::begin(fw64Camera * cam) {
 
     matrix_multiply(view_projection_matrix.data(), &camera->projection.m[0], &camera->view.m[0]);
 
-    glEnable(GL_DEPTH_TEST);
+    setGlDepthTestingState();
 }
 
 void MeshRenderer::end(){
@@ -62,6 +62,22 @@ void MeshRenderer::setActiveShader(ShaderProgram* shader) {
         if (active_shader->mesh_transform_uniform_block_index != GL_INVALID_INDEX)
             glUniformBlockBinding(active_shader->handle, active_shader->mesh_transform_uniform_block_index, mesh_transform_uniform_block.binding_index);
     }
+}
+
+void MeshRenderer::setDepthTestingEnabled(bool enabled) {
+    depth_testing_enabled = enabled;
+
+    if (render_mode == fw64Primitive::Mode::Unknown)
+        return;
+
+    setGlDepthTestingState();
+}
+
+void MeshRenderer::setGlDepthTestingState() {
+    if (depth_testing_enabled)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
 }
 
 }

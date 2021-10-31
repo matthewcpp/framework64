@@ -154,7 +154,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
 
     switch(renderer->shading_mode) {
         case FW64_SHADING_MODE_UNLIT_TEXTURED:
-            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_TEX_EDGE, G_RM_AA_ZB_TEX_EDGE2);
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE2);
             gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
@@ -361,4 +361,8 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
     }
 
     gDPLoadSync(renderer->display_list++);
+}
+
+void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
+
 }

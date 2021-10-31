@@ -19,12 +19,15 @@ public:
 
     void drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh);
 
+    void setDepthTestingEnabled(bool enabled);
+
 public:
     fw64Primitive::Mode render_mode = fw64Primitive::Mode::Unknown;
 
 private:
     void updateMeshTransformBlock(fw64Transform* transform);
     void setActiveShader(ShaderProgram* shader);
+    void setGlDepthTestingState();
 
 private:
 
@@ -50,6 +53,8 @@ private:
 
     fw64Camera* camera = nullptr;
     ShaderProgram* active_shader = nullptr;
+
+    bool depth_testing_enabled = 1;
 };
 
 
