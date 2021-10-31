@@ -2,6 +2,7 @@
 find_package(GTest CONFIG REQUIRED)
 
 set(test_files
+        test_data_cache.cpp
         test_camera.cpp
         test_frustum.cpp
         test_ray.cpp
