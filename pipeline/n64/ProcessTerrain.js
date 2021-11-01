@@ -25,10 +25,9 @@ async function processTerrain(terrain, archive, baseDirectory, outputDirectory) 
 
     const destName = path.basename(terrain.src, path.extname(terrain.src));
     const destFile = path.join(outputDirectory, destName + ".terrain");
-    archive.add(destFile, "terrain");
 
     const file = fs.openSync(destFile, "w");
-    MeshWriter.writeMeshResources(resources, file, outputDirectory, archive);
+    await MeshWriter.writeMeshResources(resources, file, outputDirectory, archive);
 
     const terrainInfo = new TerrainInfo();
     terrainInfo.meshCount = meshes.length;
@@ -40,6 +39,7 @@ async function processTerrain(terrain, archive, baseDirectory, outputDirectory) 
     }
 
     fs.closeSync(file);
+    await archive.add(destFile, "terrain");
 }
 
 module.exports = processTerrain;

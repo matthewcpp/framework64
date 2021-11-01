@@ -84,7 +84,7 @@ class ResourcesInfo {
  * Textures are written out as individual assets into the archive.
  * This function will return a buffer of the asset indices which corresponds to the image array of the mesh.
  */
-function prepareTextures(resources, outputDir, archive) {
+async function prepareTextures(resources, outputDir, archive) {
     const textureAssetIndicesBuffer = Buffer.alloc(resources.images.length * 4);
     let bufferIndex = 0;
 
@@ -93,8 +93,8 @@ function prepareTextures(resources, outputDir, archive) {
         let entry = archive.entries.get(texturePath);
 
         if (!entry){
-            entry = archive.add(texturePath, "image");
             N64ImageWriter.writeBinary(image, 1, 1, texturePath);
+            entry = await archive.add(texturePath, "image");
         }
 
         bufferIndex = textureAssetIndicesBuffer.writeUInt32BE(entry.index, bufferIndex);
@@ -103,14 +103,14 @@ function prepareTextures(resources, outputDir, archive) {
     return textureAssetIndicesBuffer;
 }
 
-function writeMeshResources(resources, file, outputDir, archive) {
+async function writeMeshResources(resources, file, outputDir, archive) {
     let bytesWritten = 0;
     const resourceInfo = new ResourcesInfo(resources);
 
     bytesWritten += fs.writeSync(file, resourceInfo.buffer);
 
     if (resources.images.length > 0) {
-        const textureAssetIndices = prepareTextures(resources, outputDir, archive);
+        const textureAssetIndices = await prepareTextures(resources, outputDir, archive);
         bytesWritten += fs.writeSync(file, textureAssetIndices);
     }
 
@@ -125,19 +125,19 @@ function writeMeshResources(resources, file, outputDir, archive) {
     return bytesWritten;
 }
 
-function writeStaticMesh(mesh, outputDir, archive) {
+async function writeStaticMesh(mesh, outputDir, archive) {
     const destPath = path.join(outputDir, `${mesh.name}.mesh`);
-    archive.add(destPath, "mesh");
 
     const file = fs.openSync(destPath, "w");
 
     if (mesh.resources) {
-        writeMeshResources(mesh.resources, file, outputDir, archive);
+        await writeMeshResources(mesh.resources, file, outputDir, archive);
     }
 
     writeStaticMeshData(mesh, file);
 
     fs.closeSync(file);
+    archive.add(destPath, "mesh");
 }
 
 function writeStaticMeshData(mesh, file) {
