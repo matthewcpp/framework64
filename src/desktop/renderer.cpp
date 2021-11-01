@@ -139,3 +139,11 @@ void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {
 fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {
     return renderer->camera;
 }
+
+void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
+    renderer->mesh_renderer.setDepthTestingEnabled(enabled);
+}
+
+int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
+    return renderer->mesh_renderer->depth_testing_enabled();
+}

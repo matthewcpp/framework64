@@ -37,6 +37,9 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderM
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
 
+void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled);
+int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
+
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y);

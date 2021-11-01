@@ -55,7 +55,7 @@ npm run prepare-desktop-assets
 npm run prepare-desktop-shaders
 cd build_desktop
 cmake -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-cmae --build .
+cmake --build .
 ```
 
 Executables will be placed in the `build_desktop/bin` folder.
