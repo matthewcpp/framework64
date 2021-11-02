@@ -106,6 +106,12 @@ bool fw64Input::buttonPressed(int controller, int button) {
     else
         return false;
 }
+bool fw64Input::buttonReleased(int controller, int button) {
+    if (controllerIsConnected(controller))
+        return interface->buttonPressed(!current_controller_states[controller], previous_controller_sattes[controller], button);
+    else
+        return false;
+}
 bool fw64Input::buttonDown(int controller, int button) {
     if (controllerIsConnected(controller))
         return interface->buttonDown(current_controller_states[controller], button);
@@ -124,6 +130,10 @@ Vec2 fw64Input::stick(int controller, int stick_index) {
 
 int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
     return input->buttonPressed(controller, button);
+}
+
+int fw64_input_button_released(fw64Input* input, int controller, int button) {
+    return input->buttonReleased(controller, button);
 }
 
 int fw64_input_button_down(fw64Input* input, int controller, int button) {

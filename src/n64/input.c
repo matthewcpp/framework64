@@ -20,6 +20,10 @@ int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
     return input->current_state[controller].trigger & button;
 }
 
+int fw64_input_button_released(fw64Input* input, int controller, int button) {
+    return (!(input->current_state[controller].button & button)) && (input->previous_state[controller].button & button);
+}
+
 int fw64_input_button_down(fw64Input* input, int controller, int button) {
     return input->current_state[controller].button & button;
 }

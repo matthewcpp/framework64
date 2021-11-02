@@ -13,6 +13,7 @@ public:
     void onDeviceRemoved(int index);
 
     bool buttonPressed(int controller, int button);
+    bool buttonReleased(int controller, int button);
     bool buttonDown(int controller, int button);
     Vec2 stick(int controller, int stick_index);
 

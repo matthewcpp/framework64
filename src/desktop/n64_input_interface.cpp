@@ -11,6 +11,10 @@ bool N64InputInterface::buttonPressed(Controller const & current, Controller con
     return buttonIsDown(current, button) && !buttonIsDown(previous, button);
 }
 
+bool N64InputInterface::buttonReleased(Controller const & current, Controller const & previous, int button) {
+    return !buttonIsDown(current, button) && buttonIsDown(previous, button);
+}
+
 bool N64InputInterface::buttonDown(Controller const & current, int button) {
     return buttonIsDown(current, button);
 }
