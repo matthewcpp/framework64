@@ -62,7 +62,7 @@ void fw64Input::updateControllerState(int controller_index) {
 }
 
 void fw64Input::update() {
-    previous_controller_sattes = current_controller_states;
+    previous_controller_states = current_controller_states;
 
     for (int i = 0; i < 4; i++) {
         if(sdl_gamecontrollers[i]) {
@@ -102,7 +102,13 @@ bool fw64Input::controllerIsConnected(int index) const {
 
 bool fw64Input::buttonPressed(int controller, int button) {
     if (controllerIsConnected(controller))
-        return interface->buttonPressed(current_controller_states[controller], previous_controller_sattes[controller], button);
+        return interface->buttonPressed(current_controller_states[controller], previous_controller_states[controller], button);
+    else
+        return false;
+}
+bool fw64Input::buttonReleased(int controller, int button) {
+    if (controllerIsConnected(controller))
+        return interface->buttonReleased(current_controller_states[controller], previous_controller_states[controller], button);
     else
         return false;
 }
@@ -124,6 +130,10 @@ Vec2 fw64Input::stick(int controller, int stick_index) {
 
 int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
     return input->buttonPressed(controller, button);
+}
+
+int fw64_input_button_released(fw64Input* input, int controller, int button) {
+    return input->buttonReleased(controller, button);
 }
 
 int fw64_input_button_down(fw64Input* input, int controller, int button) {

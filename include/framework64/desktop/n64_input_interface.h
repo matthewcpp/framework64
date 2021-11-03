@@ -7,6 +7,7 @@ namespace framework64 {
 class N64InputInterface : public InputInterface {
 public:
     virtual bool buttonPressed(Controller const & current, Controller const & previous, int button) override;
+    virtual bool buttonReleased(Controller const & current, Controller const & previous, int button) override;
     virtual bool buttonDown(Controller const & current, int button) override;
     virtual Vec2 stick(Controller const & current, int stick_index) override;
 

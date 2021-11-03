@@ -17,6 +17,7 @@ class InputInterface {
 public:
 public:
     virtual bool buttonPressed(Controller const & current, Controller const & previous, int button) = 0;
+    virtual bool buttonReleased(Controller const & current, Controller const & previous, int button) = 0;
     virtual bool buttonDown(Controller const & current, int button) = 0;
     virtual Vec2 stick(Controller const & current, int stick_index) = 0;
 
