@@ -57,7 +57,7 @@ class Archive {
     }
 
     write(outputDir) {
-        const headerPath = path.join(outputDir, `${this.fileName}.h`);
+        const headerPath = path.join(outputDir, "include", `${this.fileName}.h`);
         const archivePath = path.join(outputDir, `${this.fileName}.dat`);
         const manifestPath = path.join(outputDir, `${this.fileName}.manifest.json`);
 

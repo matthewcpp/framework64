@@ -5,6 +5,15 @@ const Bounding = require("./Bounding")
 const path = require("path");
 const fs = require("fs");
 
+const SceneDefines = require("../Common/SceneDefines");
+
+function writeSceneDefs(scene, gltf, outputDirectory) {
+    const sceneName = path.basename(scene.src, path.extname(scene.src));
+    const outputFilePath = path.join(outputDirectory, "include", `scene_${sceneName}.h`);
+
+    SceneDefines.writeToFile(gltf, sceneName, outputFilePath);
+}
+
 class SceneInfo {
     nodeCount;
     meshCount;
@@ -126,6 +135,7 @@ async function processScene(scene, typeMap, layerMap, archive, baseDirectory, ou
     fs.closeSync(file);
 
     await archive.add(destFile, "scene");
+    writeSceneDefs(scene, gltfLoader.gltf, outputDirectory);
 }
 
 module.exports = processScene;

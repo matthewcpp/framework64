@@ -145,5 +145,5 @@ void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled
 }
 
 int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
-    return renderer->mesh_renderer->depth_testing_enabled();
+    return renderer->mesh_renderer.depthTestingEnabled();
 }
