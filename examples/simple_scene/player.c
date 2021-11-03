@@ -2,8 +2,6 @@
 
 #include "framework64/n64/controller_button.h"
 
-#include <stdio.h>
-
 static void process_input(Player* player);
 static void update_position(Player* player);
 
@@ -108,6 +106,7 @@ static Vec3 calculate_movement_vector(Player* player) {
 
 void update_position(Player* player) {
     Vec3* position = &player->node.transform.position;
+    player->previous_position = *position;
 
     Vec3 movement = calculate_movement_vector(player);
     vec3_add(position, position, &movement);
