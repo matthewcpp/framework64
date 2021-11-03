@@ -54,7 +54,8 @@ async function main() {
         rimraf.sync(outputDirectoryPath);
     }
 
-    await fse.ensureDir(outputDirectoryPath);
+    const outputDirectoryIncludePath = path.join(outputDirectoryPath, "include");
+    await fse.ensureDir(outputDirectoryIncludePath);
 
     await prepare(assetManifestPath, buildPlatform, outputDirectoryPath);
 }

@@ -1,8 +1,7 @@
 #include "game.h"
 
 #include "assets.h"
-
-#define NODE_TYPE_START 0U
+#include "scene_simple_scene.h"
 
 void game_init(Game* level, fw64Engine* engine) {
     level->engine = engine;
@@ -10,22 +9,17 @@ void game_init(Game* level, fw64Engine* engine) {
 
     level->scene = fw64_scene_load(level->engine->assets, FW64_ASSET_scene_simple_scene);
 
-    uint32_t node_count = fw64_scene_get_node_count(level->scene);
+    fw64Node *node = fw64_scene_get_node(level->scene, FW64_scene_simple_scene_node_Player_Start);
 
-    for (uint32_t i = 0; i < node_count; i++) {
-        fw64Node *node = fw64_scene_get_node(level->scene, i);
+    level->respawn_node = node;
+    player_init(&level->player, level->engine, level->scene, FW64_ASSET_mesh_penguin, NULL);
+    vec3_set(&level->player.node.transform.scale, 0.01f, 0.01f, 0.01f);
+    level->player.node.transform.position = node->transform.position;
+    fw64_node_update(&level->player.node);
+    player_calculate_size(&level->player);
 
-        if (node->type == NODE_TYPE_START) {
-            level->respawn_node = node;
-            player_init(&level->player, level->engine, level->scene, FW64_ASSET_mesh_penguin, NULL);
-            vec3_set(&level->player.node.transform.scale, 0.01f, 0.01f, 0.01f);
-            level->player.node.transform.position = node->transform.position;
-            fw64_node_update(&level->player.node);
-            player_calculate_size(&level->player);
+    level->chase_cam.target = &level->player.node.transform;
 
-            level->chase_cam.target = &level->player.node.transform;
-        }
-    }
 
     ui_init(&level->ui, engine, &level->player);
 }

@@ -25,7 +25,7 @@ class Bundle {
     }
 
     _initHeaderFile(outputDirectory) {
-        const headerPath = path.join(outputDirectory, "assets.h");
+        const headerPath = path.join(outputDirectory, "include", "assets.h");
         this._headerFile = fs.openSync(headerPath, "w");
     }
 
