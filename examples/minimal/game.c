@@ -10,10 +10,6 @@ void game_init(Game* game, fw64Engine* engine) {
 
 void game_update(Game* game){
     (void)game;
-
-    if (fw64_input_button_released(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_A)) {
-        fw64_renderer_set_clear_color(game->engine->renderer, 0, 255, 0);
-    }
 }
 
 void game_draw(Game* game) {
