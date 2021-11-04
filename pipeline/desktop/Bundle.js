@@ -3,6 +3,8 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require("fs");
 const path = require("path");
 
+const Util = require("../Util")
+
 class Bundle {
     _nextAssetId = 1
     _headerFile = 0;
@@ -43,7 +45,7 @@ class Bundle {
             db.run("CREATE TABLE terrains (assetId INTEGER PRIMARY KEY, path TEXT, dimx INTEGER, dimz INTEGER)");
             db.run("CREATE TABLE typeMaps (assetId INTEGER PRIMARY KEY, jsonIndex INTEGER, jsonStr TEXT)");
             db.run("CREATE TABLE layerMaps (assetId INTEGER PRIMARY KEY, jsonIndex INTEGER, jsonStr TEXT)");
-            db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, typeMap INTEGER, layerMap INTEGER)");
+            db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, sceneIndex INTEGER, typeMap INTEGER, layerMap INTEGER)");
         });
 
         this._imageStmt = db.prepare("INSERT INTO images VALUES (?, ?, ?, ?)");
@@ -55,7 +57,7 @@ class Bundle {
         this._terrainStmt = db.prepare("INSERT INTO terrains VALUES (?, ?, ?, ?)");
         this._typemapStmt = db.prepare("INSERT INTO typeMaps VALUES (?, ?, ?)");
         this._layermapStmt = db.prepare("INSERT INTO layerMaps VALUES (?, ?, ?)");
-        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?, ?)");
+        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?, ?, ?)");
 
         this._db = db;
     }
@@ -144,13 +146,13 @@ class Bundle {
         this._layermapStmt.run(assetId, index, JSON.stringify(layermap));
     }
 
-    addScene(scene, assetPath) {
+    addScene(name, index, typeMap, layerMap, assetPath) {
         const assetId = this._nextAssetId++;
-        const assetName = path.basename(scene.src, path.extname(scene.src));
+        const assetName = Util.safeDefineName(name);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
 
-        this._sceneStmt.run(assetId, assetPath, scene.typeMap, scene.layerMap);
+        this._sceneStmt.run(assetId, assetPath, index, typeMap, layerMap);
     }
 
     finalize() {

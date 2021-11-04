@@ -21,20 +21,26 @@ enum GltfComponentType {
 
 static void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale);
 
-// note this function assumes scene 0 is the "active scene"
 fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
     if (!openFile(path))
         return nullptr;
 
+    resetMaps();
     return createStaticMesh(json_doc["meshes"][0]);
 }
 
-void GlbParser::parseSceneNode() {
-    int scene_index = json_doc["scene"].get<int>();
-    auto const & scene_node = json_doc["scenes"][scene_index];
-    auto const & node_arr = scene_node["nodes"];
+void GlbParser::parseSceneNode(int rootNodeIndex) {
+    scene_node_index = GLTF_INVALID_INDEX;
+    collider_node_index = GLTF_INVALID_INDEX;
 
-    for (auto const & node_index : node_arr) {
+    auto const & node_arr = json_doc["nodes"][rootNodeIndex];
+
+    if (!node_arr.contains("children"))
+        return;
+
+    auto const & children = node_arr["children"];
+
+    for (auto const & node_index : children) {
         int index = node_index.get<int>();
         const auto & node = json_doc["nodes"][index];
 
@@ -51,18 +57,19 @@ void GlbParser::parseSceneNode() {
     }
 }
 
-fw64Scene* GlbParser::parseScene(std::string const & path, TypeMap const & type_map, LayerMap const & layer_map) {
-    if (!openFile(path))
-        return nullptr;
+fw64Scene* GlbParser::parseScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map) {
+    if (path != file_path) {
+        if (!openFile(path))
+            return nullptr;
 
-    scene = new fw64Scene();
-
-    if (json_doc.contains("meshes")) {
-        scene->meshes.resize(json_doc["meshes"].size());
+        file_path = path;
     }
 
-    parseSceneNode();
-    assert(scene_node_index != -1);
+    scene = new fw64Scene();
+    resetMaps();
+
+    parseSceneNode(rootNodeIndex);
+    assert(scene_node_index != GLTF_INVALID_INDEX);
 
     // this node corresponds to the top level node in the scene of which all scene nodes are children
     // not to be confused with a scene object in gltf
@@ -229,8 +236,6 @@ std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {
 }
 
 bool GlbParser::openFile(std::string const& path) {
-    loaded_textures.clear();
-
     glb_file.open(path, std::ios::binary);
 
     if (!glb_file)
@@ -239,11 +244,13 @@ bool GlbParser::openFile(std::string const& path) {
     if (!parseHeader() || !parseJsonChunk() || !parseBinaryChunk() )
         return false;
 
-    if (json_doc.contains("textures")) {
-        loaded_textures.resize(json_doc["textures"].size(), nullptr);
-    }
-
     return true;
+}
+
+void GlbParser::resetMaps() {
+    gltfToTexture.clear();
+    gltfToMesh.clear();
+    gltfToImage.clear();
 }
 
 bool GlbParser::parseHeader() {
@@ -443,23 +450,23 @@ void GlbParser::parseMaterial(fw64Material& material, size_t material_index) {
 }
 
 fw64Texture* GlbParser::getTexture(size_t texture_index) {
-    if (loaded_textures[texture_index])
-        return loaded_textures[texture_index];
+    auto result = gltfToTexture.find(texture_index);
+    if (result != gltfToTexture.end()) {
+        return result->second;
+    }
 
     auto* texture = parseTexture(texture_index);
-    loaded_textures[texture_index] = texture;
+    gltfToTexture[texture_index] = texture;
 
     return texture;
 }
 
 //TODO: read sampler parameters and apply to texture object
 fw64Texture* GlbParser::parseTexture(size_t texture_index) {
-    assert(loaded_textures[texture_index] == nullptr);
+    assert(gltfToTexture.count(texture_index) == 0);
 
     auto source_index = json_doc["textures"][texture_index]["source"].get<size_t>();
     auto image_node = json_doc["images"][source_index];
-
-    std::string image_name = image_node["name"].get<std::string>();
 
     auto buffer_view_index = image_node["bufferView"].get<size_t>();
     auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
@@ -473,6 +480,15 @@ fw64Texture* GlbParser::parseTexture(size_t texture_index) {
 
     return texture;
 }
+
+fw64Image* GlbParser::getImage(size_t image_index) {
+
+}
+
+fw64Image* GlbParser::parseImage(size_t image_index) {
+
+}
+
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {
     std::vector<float> vertex_colors;

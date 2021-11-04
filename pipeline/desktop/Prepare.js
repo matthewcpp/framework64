@@ -6,7 +6,7 @@ const processMesh = require("./ProcessMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processTerrain = require("./ProcessTerrain")
-const processScene = require("./ProcessScene")
+const processLevel = require("./ProcessLevel")
 
 const processRaw = require("./ProcessRaw");
 
@@ -84,14 +84,14 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
         }
     }
 
-    if (manifest.scenes) {
-        for (const scene of manifest.scenes) {
-            console.log(`Processing Scene: ${scene.src}`);
+    if (manifest.levels) {
+        for (const level of manifest.levels) {
+            console.log(`Processing Level: ${level.src}`);
 
-            const typemap = scene.hasOwnProperty("typemap") ? manifest.typemaps[scene.typemap] : {};
-            const layermap = scene.hasOwnProperty("layermap") ? manifest.layermaps[scene.layermap] : {};
+            const typemap = level.hasOwnProperty("typemap") ? manifest.typemaps[level.typemap] : {};
+            const layermap = level.hasOwnProperty("layermap") ? manifest.layermaps[level.layermap] : {};
 
-            await processScene(scene, typemap, layermap, bundle, manifestDirectory, outputDirectory);
+            await processLevel(level, typemap, layermap, bundle, manifestDirectory, outputDirectory);
         }
     }
 

@@ -20,14 +20,15 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index) {
     std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_scene_statement, 0));
     const std::string scene_path = database->asset_dir + asset_path;
 
-    int type_map_index = sqlite3_column_int(database->select_scene_statement, 1);
-    int layer_map_index = sqlite3_column_int(database->select_scene_statement, 1);
+    int scene_index = sqlite3_column_int(database->select_scene_statement, 1);
+    int type_map_index = sqlite3_column_int(database->select_scene_statement, 2);
+    int layer_map_index = sqlite3_column_int(database->select_scene_statement, 3);
 
     auto type_map = framework64::load_type_map(database, type_map_index);
     auto layer_map = framework64::load_layer_map(database, layer_map_index);
 
     framework64::GlbParser glb(database->shader_cache);
-    return glb.parseScene(scene_path, type_map, layer_map);
+    return glb.parseScene(scene_path, scene_index, type_map, layer_map);
 }
 
 template <typename T>

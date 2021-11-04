@@ -147,7 +147,7 @@
             "wall": 4
         }
     ],
-    "scenes": [
+    "levels": [
         {
             "src": "simple_scene/simple_scene.gltf",
             "typeMap": 0,
