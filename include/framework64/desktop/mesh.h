@@ -16,6 +16,15 @@
 #include <string>
 #include <vector>
 
+namespace framework64 {
+
+struct SharedResources {
+    std::vector<std::unique_ptr<fw64Texture>> textures;
+    std::vector<std::unique_ptr<fw64Image>> images;
+};
+
+}
+
 struct fw64Primitive {
     enum Mode { Triangles = GL_TRIANGLES, Lines = GL_LINES, Unknown = 0};
     enum Attributes { Positions = 1, Normals = 2, TexCoords = 4, VertexColors = 8 };
@@ -39,7 +48,7 @@ struct fw64Mesh {
     Box bounding_box;
 
     std::vector<fw64Primitive> primitives;
-    std::vector<std::unique_ptr<fw64Texture>> textures;
+    std::unique_ptr<framework64::SharedResources> resources;
 
     static fw64Mesh* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 };

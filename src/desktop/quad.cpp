@@ -73,13 +73,14 @@ framework64::MeshData make_mesh_data(Vec3 const & min_pt, Vec3 const & max_pt, f
 
 fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & mesh_data, fw64Image* image) {
     auto* mesh = new fw64Mesh();
-    mesh->textures.emplace_back(new fw64Texture(image));
+    mesh->resources = std::make_unique<framework64::SharedResources>();
+    mesh->resources->textures.emplace_back(new fw64Texture(image));
 
     auto& primitive = mesh->primitives.emplace_back();
     auto mesh_info = mesh_data.createMesh();
     mesh_info.setPrimitiveValues(primitive);
     primitive.mode = fw64Primitive::Mode::Triangles;
-    primitive.material.texture = mesh->textures[0].get();
+    primitive.material.texture = mesh->resources->textures[0].get();
     f64_engine->shader_cache->setParticleShader(mesh->primitives[0]);
     return mesh;
 }

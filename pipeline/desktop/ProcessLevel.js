@@ -21,6 +21,9 @@ function extractScenes(gltf) {
 }
 
 function getSceneNode(gltf, rootNode) {
+    if (!rootNode.children)
+        return null;
+
     // a node is a scene root node if it has a child that begins with Scene
     for (const childIndex of rootNode.children) {
         const childNode = gltf.nodes[childIndex];

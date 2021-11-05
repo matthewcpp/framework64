@@ -20,7 +20,7 @@ void box_invalidate(Box* box);
 void box_encapsulate_point(Box* box, Vec3* pt);
 void box_encapsulate_box(Box* box, Box* to_encapsulate);
 int box_intersection(Box* a, Box* b);
-
+int box_contains_point(Box* box, Vec3* pt);
 /**
  * Compute Point on or in AABB that is closest to supplied point p
  */

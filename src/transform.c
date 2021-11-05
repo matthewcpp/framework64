@@ -78,3 +78,13 @@ void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out)
     quat_transform_vec3(out, &transform->rotation, point);
     vec3_add(out, &transform->position, out);
 }
+
+void fw64_transform_xform_box(fw64Transform* transform, Box* source, Box* target) {
+    #ifdef PLATFORM_N64
+        float fmatrix[16];
+        matrix_from_trs(fmatrix, &transform->position, &transform->rotation, &transform->scale);
+        matrix_transform_box(&fmatrix[0], source, target);
+    #else
+        matrix_transform_box(&transform->matrix.m[0], source, target);
+    #endif
+}

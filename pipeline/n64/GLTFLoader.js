@@ -106,8 +106,6 @@ class GLTFLoader {
             const scene = await this._parseScene(sceneIndex, typeMap, layerMap);
             if (scene)
                 scenes.push(scene);
-            else
-                console.log(`Skip: ${sceneIndex}`);
         }
 
         return scenes;
@@ -164,7 +162,6 @@ class GLTFLoader {
                     this.meshMap.set(gltfNode.mesh, node.mesh);
                 }
 
-                scene.colliderCount += 1;
                 node.collider = N64Node.ColliderType.Box;
             }
 
@@ -194,20 +191,30 @@ class GLTFLoader {
 
                 if (gltfNode.extras.hasOwnProperty("collider")) {
                     const colliderName = gltfNode.extras.collider;
-                    let meshColliderIndex;
 
-                    if (this.collisionMeshMap.has(colliderName)) {
-                        meshColliderIndex = this.collisionMeshMap.get(colliderName);
+                    if (colliderName === "none") {
+                        node.collider = N64Node.NoCollider;
                     }
                     else {
-                        meshColliderIndex = scene.collisionMeshes.length;
-                        await this._parseCollisionMap(colliderName);
-                        scene.collisionMeshes.push(this.mesh);
-                        this.collisionMeshMap.set(colliderName, meshColliderIndex);
-                    }
+                        let meshColliderIndex;
 
-                    node.collider = N64Node.ColliderType.Mesh | (meshColliderIndex << 16);
+                        if (this.collisionMeshMap.has(colliderName)) {
+                            meshColliderIndex = this.collisionMeshMap.get(colliderName);
+                        }
+                        else {
+                            meshColliderIndex = scene.collisionMeshes.length;
+                            await this._parseCollisionMap(colliderName);
+                            scene.collisionMeshes.push(this.mesh);
+                            this.collisionMeshMap.set(colliderName, meshColliderIndex);
+                        }
+    
+                        node.collider = N64Node.ColliderType.Mesh | (meshColliderIndex << 16);
+                    }
                 }
+            }
+
+            if (node.collider != N64Node.ColliderType.None) {
+                scene.colliderCount += 1;
             }
 
             scene.nodes.push(node);

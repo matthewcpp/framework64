@@ -30,6 +30,11 @@ typedef struct fw64Scene fw64Scene;
 extern "C" {
 #endif
 
+/** Gets the original bounding box for the scene as it was authored. 
+ * This result may be inaccurate if nodes are transformed from their initial state
+ * */
+Box* fw64_scene_get_initial_bounds(fw64Scene* scene);
+
 fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int handle);
 void fw64_scene_delete(fw64AssetDatabase* assets, fw64Scene* scene);
 

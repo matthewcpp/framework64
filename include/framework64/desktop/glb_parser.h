@@ -32,8 +32,8 @@ public:
 
 public:
     /** Extracts a single, static mesh from the GLB file. */
-    fw64Mesh* parseStaticMesh(std::string const & path);
-    fw64Scene* parseScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map);
+    fw64Mesh* loadStaticMesh(std::string const & path);
+    fw64Scene* loadScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map);
 
     std::vector<fw64Mesh*> parseStaticMeshes(std::string const & path);
 
@@ -42,8 +42,6 @@ private:
     bool parseJsonChunk();
     bool parseBinaryChunk();
 
-    fw64Mesh* createStaticMesh(nlohmann::json const & node);
-
     /** Parses a scene Root node in order to get indices for scene and mesh collider container nodes. */
     void parseSceneNode(int rootNodeIndex);
 
@@ -51,6 +49,8 @@ private:
 
     void parseMaterial(fw64Material& material, size_t material_index);
 
+    fw64Mesh* getStaticMesh(size_t mesh_index);
+    fw64Mesh* parseStaticMesh(nlohmann::json const & node);
     fw64Texture* getTexture(size_t texture_index);
     fw64Texture* parseTexture(size_t texture_index);
     fw64Image* getImage(size_t image_index);
@@ -103,9 +103,11 @@ private:
     std::unordered_map<size_t, fw64Texture*> gltfToTexture;
     std::unordered_map<size_t, fw64Mesh*> gltfToMesh;
     std::unordered_map<size_t, fw64Image*> gltfToImage;
+    std::unordered_map<std::string, framework64::CollisionMesh*> collisionMeshes;
     /* --- */
 
     fw64Scene* scene = nullptr;
+    SharedResources* shared_resources = nullptr;
     int scene_node_index = GLTF_INVALID_INDEX;
     int collider_node_index = GLTF_INVALID_INDEX;
 };

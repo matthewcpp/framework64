@@ -2,6 +2,7 @@
 
 /** \file transform.h */
 
+#include "framework64/box.h"
 #include "framework64/quat.h"
 #include "framework64/types.h"
 #include "framework64/vec3.h"
@@ -27,6 +28,7 @@ void fw64_transform_right(fw64Transform* transform, Vec3* out);
 
 void fw64_transform_look_at(fw64Transform* transform, Vec3* target, Vec3* up);
 void fw64_transform_update_matrix(fw64Transform* transform);
+void fw64_transform_xform_box(fw64Transform* transform, Box* source, Box* target);
 
 void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out);
 void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* out);

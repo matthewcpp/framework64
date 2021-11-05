@@ -21,12 +21,19 @@ enum GltfComponentType {
 
 static void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale);
 
-fw64Mesh* GlbParser::parseStaticMesh(std::string const & path) {
+fw64Mesh* GlbParser::loadStaticMesh(std::string const & path) {
     if (!openFile(path))
         return nullptr;
 
     resetMaps();
-    return createStaticMesh(json_doc["meshes"][0]);
+
+    shared_resources = new SharedResources();
+    auto* static_mesh = parseStaticMesh(json_doc["meshes"][0]);
+    static_mesh->resources.reset(shared_resources);
+
+    shared_resources = nullptr;
+
+    return static_mesh;
 }
 
 void GlbParser::parseSceneNode(int rootNodeIndex) {
@@ -47,17 +54,17 @@ void GlbParser::parseSceneNode(int rootNodeIndex) {
         if (node.contains("name")) {
             std::string node_name = node["name"].get<std::string>();
 
-            if (node_name == "Scene") {
+            if (node_name.rfind("Scene", 0) == 0) {
                 scene_node_index = index;
             }
-            else if (node_name == "Colliders") {
+            else if (node_name.rfind("Colliders", 0) == 0) {
                 collider_node_index = index;
             }
         }
     }
 }
 
-fw64Scene* GlbParser::parseScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map) {
+fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map) {
     if (path != file_path) {
         if (!openFile(path))
             return nullptr;
@@ -66,6 +73,7 @@ fw64Scene* GlbParser::parseScene(std::string const & path, int rootNodeIndex, Ty
     }
 
     scene = new fw64Scene();
+    shared_resources = &scene->shared_resources;
     resetMaps();
 
     parseSceneNode(rootNodeIndex);
@@ -91,17 +99,11 @@ fw64Scene* GlbParser::parseScene(std::string const & path, int rootNodeIndex, Ty
 
         fw64Mesh* mesh = nullptr;
         fw64CollisionMesh * collision_mesh = nullptr;
+        fw64ColliderType collider_type = FW64_COLLIDER_BOX;
 
         if (has_mesh) {
-            int mesh_index = node["mesh"].get<int>();
-
-            if (scene->meshes[mesh_index] == nullptr) {
-                mesh = createStaticMesh(json_doc["meshes"][mesh_index]);
-                scene->meshes[mesh_index].reset(mesh);
-            }
-            else {
-                mesh = scene->meshes[mesh_index].get();
-            }
+            size_t mesh_index = node["mesh"].get<size_t>();
+            mesh = getStaticMesh(mesh_index);
         }
 
         if (node.contains("extras")) {
@@ -113,7 +115,6 @@ fw64Scene* GlbParser::parseScene(std::string const & path, int rootNodeIndex, Ty
 
                 assert (result != type_map.end());
                 n->type = result->second;
-
             }
 
             if (extras.contains("layers")) {
@@ -133,7 +134,14 @@ fw64Scene* GlbParser::parseScene(std::string const & path, int rootNodeIndex, Ty
 
             if (extras.contains("collider")) {
                 std::string collision_mesh_name = extras["collider"].get<std::string>();
-                collision_mesh = getCollisionMesh(collision_mesh_name);
+
+                if (collision_mesh_name == "none") {
+                    collider_type = FW64_COLLIDER_NONE;
+                } else {
+                    collision_mesh = getCollisionMesh(collision_mesh_name);
+                    collider_type = FW64_COLLIDER_MESH;
+                }
+                    
             }
         }
 
@@ -141,34 +149,38 @@ fw64Scene* GlbParser::parseScene(std::string const & path, int rootNodeIndex, Ty
 
         if (mesh) {
             fw64_node_set_mesh(n, mesh);
+        }
+        else {
+            collider_type = FW64_COLLIDER_NONE;
+        }
 
-            if (collision_mesh) {
-                fw64_node_set_mesh_collider(n, scene->createCollider(), collision_mesh);
-            }
-            else {
-                fw64_node_set_box_collider(n, scene->createCollider());
-            }
+        if (collider_type == FW64_COLLIDER_MESH && collision_mesh) {
+            fw64_node_set_mesh_collider(n, scene->createCollider(), collision_mesh);
+        }
+        else if (collider_type == FW64_COLLIDER_BOX){
+            fw64_node_set_box_collider(n, scene->createCollider());
         }
 
         fw64_node_update(n);
     }
 
+    shared_resources = nullptr;
     return scene;
 }
 
 fw64CollisionMesh* GlbParser::getCollisionMesh(std::string const & name) {
-    auto result = scene->mesh_colliders.find(name);
+    auto result = collisionMeshes.find(name);
 
-    if (result != scene->mesh_colliders.end()) {
-        return result->second.get();
+    if (result != collisionMeshes.end()) {
+        return result->second;
     }
 
     int collider_mesh_index = findCollisionMeshIndex(name);
-
     assert(collider_mesh_index != -1);
 
     auto* collision_mesh = parseCollisionMesh(json_doc["meshes"][collider_mesh_index]);
-    scene->mesh_colliders.emplace(std::make_pair(name, collision_mesh));
+    collisionMeshes[name] = collision_mesh;
+    scene->collision_meshes.emplace_back(collision_mesh);
 
     return collision_mesh;
 }
@@ -229,7 +241,7 @@ std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {
         return meshes;
 
     for (auto const & mesh : json_doc["meshes"] ) {
-        meshes.push_back(createStaticMesh(mesh));
+        meshes.push_back(parseStaticMesh(mesh));
     }
 
     return meshes;
@@ -251,6 +263,7 @@ void GlbParser::resetMaps() {
     gltfToTexture.clear();
     gltfToMesh.clear();
     gltfToImage.clear();
+    collisionMeshes.clear();
 }
 
 bool GlbParser::parseHeader() {
@@ -370,10 +383,10 @@ static std::array<float, 16> extractMatrixFromNode(nlohmann::json const & node) 
     return transform_matrix;
 }
 
-fw64Mesh* GlbParser::createStaticMesh(nlohmann::json const & mesh_node) {
+fw64Mesh* GlbParser::parseStaticMesh(nlohmann::json const & node) {
     auto mesh = new fw64Mesh();
 
-    for (auto const & primitive_node : mesh_node["primitives"]) {
+    for (auto const & primitive_node : node["primitives"]) {
         auto const primitive_mode = getPrimitiveMode(primitive_node);
 
         if (primitive_mode == fw64Primitive::Mode::Unknown)
@@ -458,7 +471,26 @@ fw64Texture* GlbParser::getTexture(size_t texture_index) {
     auto* texture = parseTexture(texture_index);
     gltfToTexture[texture_index] = texture;
 
+    if (shared_resources)
+        shared_resources->textures.emplace_back(texture);
+
     return texture;
+}
+
+fw64Mesh* GlbParser::getStaticMesh(size_t mesh_index) {
+    auto result = gltfToMesh.find(mesh_index);
+
+    if (result != gltfToMesh.end()) {
+        return result->second;
+    }
+
+    auto* mesh = parseStaticMesh(json_doc["meshes"][mesh_index]);
+    gltfToMesh[mesh_index] = mesh;
+
+    if (scene)
+        scene->meshes.emplace_back(mesh);
+
+    return mesh;
 }
 
 //TODO: read sampler parameters and apply to texture object
@@ -466,12 +498,8 @@ fw64Texture* GlbParser::parseTexture(size_t texture_index) {
     assert(gltfToTexture.count(texture_index) == 0);
 
     auto source_index = json_doc["textures"][texture_index]["source"].get<size_t>();
-    auto image_node = json_doc["images"][source_index];
 
-    auto buffer_view_index = image_node["bufferView"].get<size_t>();
-    auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
-
-    auto* image = fw64Image::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size());
+    auto* image = getImage(source_index);
     auto* texture =  new fw64Texture(image);
 
     // Note: default wrap mode for GLTF is repeat
@@ -482,13 +510,29 @@ fw64Texture* GlbParser::parseTexture(size_t texture_index) {
 }
 
 fw64Image* GlbParser::getImage(size_t image_index) {
+    auto result = gltfToImage.find(image_index);
 
+    if (result != gltfToImage.end()) {
+        return result->second;
+    }
+
+    auto* image = parseImage(image_index);
+    gltfToImage[image_index] = image;
+
+    if (shared_resources)
+        shared_resources->images.emplace_back(image);
+
+    return image;
 }
 
 fw64Image* GlbParser::parseImage(size_t image_index) {
+    auto image_node = json_doc["images"][image_index];
 
+    auto buffer_view_index = image_node["bufferView"].get<size_t>();
+    auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
+
+    return fw64Image::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size());
 }
-
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {
     std::vector<float> vertex_colors;
