@@ -367,25 +367,6 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
-// TODO: handle no active lights correctly...first light should be set to all black
-static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer) {
-    int light_num = 1;
-    int light_count = 0;
-    if (renderer->active_light_mask & (1 << 0)) {
-        gSPLight(renderer->display_list++, &renderer->lights.l[0], light_num++);
-        light_count += 1;
-    }
-
-    if (renderer->active_light_mask & (1 << 1)) { 
-        gSPLight(renderer->display_list++, &renderer->lights.l[1], light_num++);
-        light_count += 1;
-    }
-
-    gSPLight(renderer->display_list++, &renderer->lights.a, light_num);
-    gSPNumLights(renderer->display_list++, light_count);
-}
-
-
 void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {
     fw64Image* image = texture->image;
     int slice_width = fw64_texture_slice_width(texture);
@@ -412,4 +393,57 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
     }
 
     gDPLoadSync(renderer->display_list++);
+}
+
+// TODO: handle no active lights correctly...first light should be set to all black
+static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer) {
+    int light_num = 1;
+    int light_count = 0;
+    if (renderer->active_light_mask & (1 << 0)) {
+        gSPLight(renderer->display_list++, &renderer->lights.l[0], light_num++);
+        light_count += 1;
+    }
+
+    if (renderer->active_light_mask & (1 << 1)) { 
+        gSPLight(renderer->display_list++, &renderer->lights.l[1], light_num++);
+        light_count += 1;
+    }
+
+    gSPLight(renderer->display_list++, &renderer->lights.a, light_num);
+    gSPNumLights(renderer->display_list++, light_count);
+}
+
+
+void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
+    renderer->lights.a.l.col[0] = r;
+    renderer->lights.a.l.col[1] = g;
+    renderer->lights.a.l.col[2] = b;
+    memcpy(&renderer->lights.a.l.colc[0], &renderer->lights.a.l.col[0], 3);
+}
+
+void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled) {
+    if (enabled) {
+        renderer->active_light_mask |= (1 << index);
+    }
+    else {
+        renderer->active_light_mask &= ~(1 << index);
+    }
+}
+
+void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z) {
+    Light* light = &renderer->lights.l[index];
+
+    light->l.dir[0] = (uint8_t)(x * 100.0f);
+    light->l.dir[1] = (uint8_t)(y * 100.0f);
+    light->l.dir[2] = (uint8_t)(z * 100.0f);
+}
+
+void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b) {
+    Light* light = &renderer->lights.l[index];
+
+    light->l.col[0] = r;
+    light->l.col[1] = g;
+    light->l.col[2] = b;
+
+    memcpy(&light->l.colc[0], &light->l.col[0], 3);
 }

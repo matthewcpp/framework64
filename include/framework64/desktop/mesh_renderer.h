@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/camera.h"
+#include "framework64/renderer.h"
 #include "framework64/desktop/mesh.h"
 #include "framework64/desktop/shader_cache.h"
 
@@ -22,23 +23,36 @@ public:
     void setDepthTestingEnabled(bool enabled);
     inline bool depthTestingEnabled() const { return depth_testing_enabled; }
 
+    void setAmbientLightColor(uint8_t r, uint8_t g, uint8_t b);
+    void setLightEnabled(int index, int enabled);
+    void setLightDirection(int index, float x, float y, float z);
+    void setLightColor(int index, uint8_t r, uint8_t g, uint8_t b);
+
 public:
     fw64Primitive::Mode render_mode = fw64Primitive::Mode::Unknown;
 
 private:
     void updateMeshTransformBlock(fw64Transform* transform);
+    void updateLightingBlock();
     void setActiveShader(ShaderProgram* shader);
     void setGlDepthTestingState();
 
 private:
 
+    struct Light {
+        std::array<float, 4> light_color;
+        std::array<float, 4> light_direction;
+    };
+
+    struct LightInfo {
+        Light light;
+        int active;
+    };
+
     struct LightingData {
-        std::array<float, 3> ambient_light_color = {1.0f, 1.0f, 1.0f};
-        float ambient_light_intensity = 0.1;
-        std::array<float, 3> light_color = {1.0f, 1.0f, 1.0f};
-        float align1 = 0.0f;
-        std::array<float, 3> light_direction = {0.57735f, 0.57735f, 0.57735f};
-        float align2 = 0.0f;
+        std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
+        std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+        int light_count;
     };
 
     struct MeshTransformData {
@@ -55,8 +69,10 @@ private:
     fw64Camera* camera = nullptr;
     ShaderProgram* active_shader = nullptr;
 
-    bool depth_testing_enabled = 1;
-};
+    bool depth_testing_enabled = true;
 
+    std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+    bool lighting_dirty = false;
+};
 
 }
