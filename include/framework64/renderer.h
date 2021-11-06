@@ -25,7 +25,7 @@ typedef enum {
     FW64_RENDERER_FLAG_SWAP = 2,
 } fw64RendererFlags;
 
-#define Fw64_RENDERER_MAX_LIGHT_COUNT 2
+#define FW64_RENDERER_MAX_LIGHT_COUNT 2
 
 typedef struct fw64Renderer fw64Renderer;
 
@@ -48,6 +48,11 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
 fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);
+
+void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
+void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled);
+void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z);
+void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b);
 
 #ifdef __cplusplus
 }

@@ -147,3 +147,19 @@ void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled
 int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
     return renderer->mesh_renderer.depthTestingEnabled();
 }
+
+void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
+    renderer->mesh_renderer.setAmbientLightColor(r, g, b);
+}
+
+void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled) {
+    renderer->mesh_renderer.setLightEnabled(index, enabled);
+}
+
+void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z) {
+    renderer->mesh_renderer.setLightDirection(index, x, y, z);
+}
+
+void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b) {
+    renderer->mesh_renderer.setLightColor(index, r, g, b);
+}

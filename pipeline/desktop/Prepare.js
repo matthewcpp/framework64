@@ -52,7 +52,7 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
     if (manifest.musicBanks) {
         for (const musicBank of manifest.musicBanks) {
             console.log(`Processing Music Bank: ${musicBank.name}`);
-            //await processMusicBank(musicBank, bundle, manifestDirectory, outputDirectory);
+            await processMusicBank(musicBank, bundle, manifestDirectory, outputDirectory);
         }
     }
 
