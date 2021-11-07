@@ -3,6 +3,8 @@
 #include "framework64/matrix.h"
 #include "framework64/desktop/shader.h"
 
+#include <assert.h>
+
 namespace framework64 {
 bool MeshRenderer::init(std::string const & shader_dir) {
     lights[0].light.light_direction = {0.57735f, 0.57735f, 0.57735f, 1.0f};

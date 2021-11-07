@@ -70,7 +70,7 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
         255, 255, 255, -40, -40, 40
     );
     renderer->lights = lights;
-    renderer->active_light_mask = 3;
+    renderer->active_light_mask = 1;
 }
 
 void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {

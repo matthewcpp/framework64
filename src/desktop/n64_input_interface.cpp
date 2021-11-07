@@ -30,7 +30,7 @@ Vec2 N64InputInterface::stick(Controller const & current, int stick_index) {
 
 void N64InputInterface::updateControllerFromKeyboard(Controller & controller, uint8_t const * sdl_keyboard_state) {
     controller.buttons[SDL_CONTROLLER_BUTTON_A] = sdl_keyboard_state[SDL_SCANCODE_X];
-    controller.buttons[SDL_CONTROLLER_BUTTON_B] = sdl_keyboard_state[SDL_SCANCODE_C];
+    controller.buttons[SDL_CONTROLLER_BUTTON_X] = sdl_keyboard_state[SDL_SCANCODE_C];
     controller.axis[SDL_CONTROLLER_AXIS_TRIGGERLEFT] = sdl_keyboard_state[SDL_SCANCODE_Z] ? 1.0f : 0.0f;
     controller.buttons[SDL_CONTROLLER_BUTTON_START] = sdl_keyboard_state[SDL_SCANCODE_RETURN];
     controller.buttons[SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = sdl_keyboard_state[SDL_SCANCODE_A];
