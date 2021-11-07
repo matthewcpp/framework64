@@ -137,7 +137,8 @@
     "typeMaps": [
         {
             "start": 0,
-            "fire": 1
+            "nextlevel": 1,
+            "key": 2
         }
     ],
     "layerMaps": [
@@ -147,7 +148,7 @@
             "wall": 4
         }
     ],
-    "scenes": [
+    "levels": [
         {
             "src": "simple_scene/simple_scene.gltf",
             "typeMap": 0,

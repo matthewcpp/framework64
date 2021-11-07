@@ -4,6 +4,7 @@ const imageConvert = require("./ImageConvert");
 const FontConvert = require("./FontConvert");
 const AudioConvert = require("./AudioConvert");
 const processScene = require("./ProcessScene");
+const processLevel = require("./ProcessLevel");
 const Archive = require("./Archive");
 
 const path = require("path");
@@ -78,6 +79,20 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             const layerMap = manifest.layerMaps[scene.layerMap];
 
             await processScene(scene, typeMap, layerMap, archive, manifestDirectory, outputDirectory);
+        }
+    }
+
+    if (manifest.levels) {
+        const requiredFields = ["src", "typeMap", "layerMap"];
+
+        for (const level of manifest.levels) {
+            console.log(`Processing Level: ${level.src}`);
+            checkRequiredFields("level", level, requiredFields);
+
+            const typeMap = manifest.typeMaps[level.typeMap];
+            const layerMap = manifest.layerMaps[level.layerMap];
+
+            await processLevel(level, typeMap, layerMap, archive, manifestDirectory, outputDirectory);
         }
     }
 

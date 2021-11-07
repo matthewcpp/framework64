@@ -14,7 +14,12 @@ function isPowerOf2(x) {
     return (x & (x - 1)) === 0;
 }
 
+function safeDefineName(name) {
+    return name.replaceAll(' ', '_').replaceAll('-', '_');
+}
+
 module.exports = {
     nextPowerOf2: nextPowerOf2,
-    isPowerOf2: isPowerOf2
+    isPowerOf2: isPowerOf2,
+    safeDefineName: safeDefineName
 }

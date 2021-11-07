@@ -22,6 +22,8 @@
 #include <string>
 #include <unordered_map>
 
+#define GLTF_INVALID_INDEX (-1)
+
 namespace framework64 {
 
 class GlbParser {
@@ -30,8 +32,8 @@ public:
 
 public:
     /** Extracts a single, static mesh from the GLB file. */
-    fw64Mesh* parseStaticMesh(std::string const & path);
-    fw64Scene* parseScene(std::string const & path, TypeMap const & type_map, LayerMap const & layer_map);
+    fw64Mesh* loadStaticMesh(std::string const & path);
+    fw64Scene* loadScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map);
 
     std::vector<fw64Mesh*> parseStaticMeshes(std::string const & path);
 
@@ -40,16 +42,20 @@ private:
     bool parseJsonChunk();
     bool parseBinaryChunk();
 
-    fw64Mesh* createStaticMesh(nlohmann::json const & node);
-
-    /** Parses the scene node from the glTF JSON to determine the root nodes for the scene and mesh colliders. */
-    void parseSceneNode();
+    /** Parses a scene Root node in order to get indices for scene and mesh collider container nodes. */
+    void parseSceneNode(int rootNodeIndex);
 
     MeshData readPrimitiveMeshData(nlohmann::json const & primitive_node);
 
     void parseMaterial(fw64Material& material, size_t material_index);
+
+    fw64Mesh* getStaticMesh(size_t mesh_index);
+    fw64Mesh* parseStaticMesh(nlohmann::json const & node);
     fw64Texture* getTexture(size_t texture_index);
     fw64Texture* parseTexture(size_t texture_index);
+    fw64Image* getImage(size_t image_index);
+    fw64Image* parseImage(size_t image_index);
+
     std::vector<float> parseVertexColors(nlohmann::json const & primitive_node);
 
     fw64CollisionMesh * getCollisionMesh(std::string const & name);
@@ -70,6 +76,8 @@ private:
 
     bool openFile(std::string const& path);
 
+    void resetMaps();
+
 private:
     struct Header {
         uint32_t magic;
@@ -87,13 +95,21 @@ private:
     ChunkInfo binary_chunk_info;
 
     std::ifstream glb_file;
+    std::string file_path;
     nlohmann::json json_doc;
     ShaderCache& shader_cache;
-    std::vector<fw64Texture*> loaded_textures;
+
+    /* Map gltf resource indices to object pointers.  Useful for lookup when multiple nodes reference the same resources*/
+    std::unordered_map<size_t, fw64Texture*> gltfToTexture;
+    std::unordered_map<size_t, fw64Mesh*> gltfToMesh;
+    std::unordered_map<size_t, fw64Image*> gltfToImage;
+    std::unordered_map<std::string, framework64::CollisionMesh*> collisionMeshes;
+    /* --- */
 
     fw64Scene* scene = nullptr;
-    int scene_node_index = 1;
-    int collider_node_index = 1;
+    SharedResources* shared_resources = nullptr;
+    int scene_node_index = GLTF_INVALID_INDEX;
+    int collider_node_index = GLTF_INVALID_INDEX;
 };
 
     template <typename T>

@@ -65,6 +65,8 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
     }
 
     if (scene->info.node_count > 0) {
+        box_invalidate(&scene->bounding_box);
+
         scene->nodes = memalign(8, scene->info.node_count * sizeof(fw64Node));
         fw64_filesystem_read(scene->nodes, sizeof(fw64Node), scene->info.node_count, handle);
 
@@ -99,11 +101,14 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
                 }
 
                 collider_index += 1;
+                box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
             }
         }
     }
     else {
         scene->nodes = NULL;
+        vec3_set_all(&scene->bounding_box.min, -1.0f);
+        vec3_set_all(&scene->bounding_box.max, 1.0f);
     }
 
 
@@ -160,4 +165,8 @@ fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index) {
 
 uint32_t fw64_scene_get_node_count(fw64Scene* scene) {
     return scene->info.node_count;
+}
+
+Box* fw64_scene_get_initial_bounds(fw64Scene* scene) {
+    return &scene->bounding_box;
 }

@@ -95,3 +95,9 @@ void box_closest_point(Box* b, Vec3* p, Vec3* q) {
         q->el[i] = v;
     }
 }
+
+int box_contains_point(Box* box, Vec3* pt) {
+    return  pt->x >= box->min.x && pt->x <= box->max.x &&
+            pt->y >= box->min.y && pt->y <= box->max.y &&
+            pt->z >= box->min.z && pt->z <= box->max.z;
+}

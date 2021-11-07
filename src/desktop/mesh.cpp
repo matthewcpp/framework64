@@ -21,7 +21,7 @@ fw64Mesh* fw64Mesh::loadFromDatabase(fw64AssetDatabase* database, uint32_t index
     const std::string mesh_path = database->asset_dir + asset_path;
 
     framework64::GlbParser glb(database->shader_cache);
-    auto* mesh = glb.parseStaticMesh(mesh_path);
+    auto* mesh = glb.loadStaticMesh(mesh_path);
 
     return mesh;
 }

@@ -3,7 +3,7 @@ const {ConvertGltfToGLB} = require('gltf-import-export');
 const fs = require("fs");
 const path = require("path");
 
-const SceneDefines = require("../Common/SceneDefines");
+const SceneDefines = require("../SceneDefines");
 
 function writeSceneDefs(scene, srcPath, outputDirectory) {
     const sceneJson = JSON.parse(fs.readFileSync(srcPath, {encoding: "utf-8"}));

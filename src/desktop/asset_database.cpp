@@ -52,7 +52,7 @@ bool fw64AssetDatabase::init(std::string const & database_path) {
         return false;
     }
 
-    result = sqlite3_prepare_v2(database, "SELECT path, typeMap, layerMap FROM scenes WHERE assetId = ?;", -1, &select_scene_statement, nullptr);
+    result = sqlite3_prepare_v2(database, "SELECT path, sceneIndex, typeMap, layerMap FROM scenes WHERE assetId = ?;", -1, &select_scene_statement, nullptr);
     if (result) {
         return false;
     }

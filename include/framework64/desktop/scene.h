@@ -7,14 +7,13 @@
 #include <memory>
 #include <unordered_map>
 
-struct fw64Scene{
+struct fw64Scene {
     std::vector<std::unique_ptr<fw64Mesh>> meshes;
-    std::vector<fw64Material*> materials;
-    std::vector<fw64Texture*> textures;
-    std::vector<fw64Image*> images;
     std::vector<std::unique_ptr<fw64Node>> nodes;
     std::vector<std::unique_ptr<fw64Collider>> colliders;
-    std::unordered_map<std::string, std::unique_ptr<framework64::CollisionMesh>> mesh_colliders;
+    std::vector<std::unique_ptr<framework64::CollisionMesh>> collision_meshes;
+    framework64::SharedResources shared_resources;
+    Box bounding_box;
 
     fw64Collider* createCollider() {
         colliders.emplace_back(new fw64Collider());
@@ -25,6 +24,8 @@ struct fw64Scene{
         nodes.emplace_back(new fw64Node());
         return nodes.back().get();
     }
+
+    void calculateBounding();
 
 };
 
