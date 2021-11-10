@@ -18,5 +18,6 @@ struct fw64Scene {
     fw64Mesh* meshes;
     fw64CollisionMesh* collision_meshes;
     fw64MeshResources* mesh_resources;
+    fw64Allocator* allocator;
     Box bounding_box;
 };

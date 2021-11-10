@@ -15,6 +15,7 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* 
         return NULL;
 
     fw64Scene* scene = allocator->malloc(allocator, sizeof(fw64Scene));
+    scene->allocator = allocator;
 
     fw64_filesystem_read(&scene->info, sizeof(fw64SceneInfo), 1, handle);
 
@@ -171,4 +172,8 @@ uint32_t fw64_scene_get_node_count(fw64Scene* scene) {
 
 Box* fw64_scene_get_initial_bounds(fw64Scene* scene) {
     return &scene->bounding_box;
+}
+
+fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene) {
+    return scene->allocator;
 }

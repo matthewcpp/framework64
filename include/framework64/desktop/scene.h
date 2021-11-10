@@ -14,6 +14,7 @@ struct fw64Scene {
     std::vector<std::unique_ptr<framework64::CollisionMesh>> collision_meshes;
     framework64::SharedResources shared_resources;
     Box bounding_box;
+    fw64Allocator* allocator;
 
     fw64Collider* createCollider() {
         colliders.emplace_back(new fw64Collider());

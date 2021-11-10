@@ -29,6 +29,8 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index, fw64Allocator
     framework64::GlbParser glb(database->shader_cache);
     auto* scene = glb.loadScene(scene_path, scene_index, type_map, layer_map);
     scene->calculateBounding();
+
+    scene->allocator = allocator;
     
     return scene;
 }
@@ -86,4 +88,8 @@ void fw64Scene::calculateBounding() {
 
         box_encapsulate_box(&bounding_box, &node->collider->bounding);
     }
+}
+
+fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene) {
+    return scene->allocator;
 }
