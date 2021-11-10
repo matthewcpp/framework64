@@ -35,8 +35,6 @@ public:
     fw64Mesh* loadStaticMesh(std::string const & path);
     fw64Scene* loadScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map);
 
-    std::vector<fw64Mesh*> parseStaticMeshes(std::string const & path);
-
 private:
     bool parseHeader();
     bool parseJsonChunk();

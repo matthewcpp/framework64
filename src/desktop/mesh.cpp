@@ -36,11 +36,11 @@ fw64Mesh::~fw64Mesh(){
 
 // C interface
 
-fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index) {
+fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index, fw64Allocator* allocator) {
     return fw64Mesh::loadFromDatabase(assets, index);
 }
 
-void fw64_mesh_delete(fw64AssetDatabase* assets, fw64Mesh* mesh) {
+void fw64_mesh_delete(fw64AssetDatabase* assets, fw64Mesh* mesh, fw64Allocator* allocator) {
     delete mesh;
 }
 

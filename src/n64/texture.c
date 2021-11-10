@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-fw64Texture* fw64_texture_create_from_image(fw64Image* image) {
-    fw64Texture* texture = malloc(sizeof(fw64Texture));
+fw64Texture* fw64_texture_create_from_image(fw64Image* image, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
+    fw64Texture* texture = allocator->malloc(allocator, sizeof(fw64Texture));
 
     fw64_n64_texture_init_with_image(texture, image);
 
@@ -18,6 +19,11 @@ void fw64_n64_texture_init_with_image(fw64Texture* texture, fw64Image* image) {
     texture->wrap_t = G_TX_CLAMP;
     texture->mask_s = G_TX_NOMASK;
     texture->mask_t = G_TX_NOMASK;
+}
+
+void fw64_texture_delete(fw64Texture* texture, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
+    allocator->free(allocator, texture);
 }
 
 int fw64_texture_slice_width(fw64Texture* texture) {
@@ -50,8 +56,4 @@ void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s
 
     texture->wrap_t = wrap_t;
     texture->mask_t = (wrap_t == FW64_TEXTURE_WRAP_CLAMP) ? 0 : 4;
-}
-
-void fw64_texture_delete(fw64Texture* texture) {
-    free(texture);
 }

@@ -23,7 +23,7 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_
 
 
     fw64_node_init(&player->node);
-    fw64_node_set_mesh(&player->node, fw64_mesh_load(engine->assets, mesh_index));
+    fw64_node_set_mesh(&player->node, fw64_mesh_load(engine->assets, mesh_index, NULL));
     fw64_node_set_box_collider(&player->node, &player->collider);
 
     player_reset(player, position);

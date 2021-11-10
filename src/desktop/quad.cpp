@@ -8,9 +8,9 @@
 static framework64::MeshData make_mesh_data(Vec3 const & min_pt, Vec3 const & max_pt, float max_s, float max_t);
 static fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & mesh_data, fw64Image* image);
 
-fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t) {
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t, fw64Allocator* allocator) {
     auto* f64_engine = reinterpret_cast<framework64::Engine*>(engine);
-    auto* image = fw64_image_load(engine->assets, image_asset_index);
+    auto* image = fw64_image_load(engine->assets, image_asset_index, allocator);
     uint32_t slice_count = image->hslices * image->vslices;
 
     Vec3 min_pt = {-1.0f, -1.0f, 0.0f};
@@ -26,7 +26,7 @@ fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_i
 
 }
 
-fw64Mesh* textured_quad_create_with_image(fw64Engine* engine, fw64Image* image, int frame_index) {
+fw64Mesh* textured_quad_create_with_image(fw64Engine* engine, fw64Image* image, int frame_index, fw64Allocator* allocator) {
     auto* f64_engine = reinterpret_cast<framework64::Engine*>(engine);
 
     Vec3 min_pt = {-1.0f, -1.0f, 0.0f};
@@ -85,6 +85,6 @@ fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & m
     return mesh;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
-    return textured_quad_create_with_params(engine, image_asset_index, 1.0f, 1.0f);
+fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index, fw64Allocator* allocator) {
+    return textured_quad_create_with_params(engine, image_asset_index, 1.0f, 1.0f, allocator);
 }

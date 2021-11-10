@@ -2,32 +2,32 @@
 
 #include "framework64/n64/filesystem.h"
 
-#include <malloc.h>
-
 #define FW64_N64_NODE_NO_MESH UINT32_MAX
 #define FW64_N64_NODE_NO_COLLIDER UINT32_MAX
 
-fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
+fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
+
     (void)assets;
     int handle = fw64_filesystem_open(index);
 
     if (handle < 0)
         return NULL;
 
-    fw64Scene* scene = malloc(sizeof(fw64Scene));
+    fw64Scene* scene = allocator->malloc(allocator, sizeof(fw64Scene));
 
     fw64_filesystem_read(&scene->info, sizeof(fw64SceneInfo), 1, handle);
 
     fw64N64Loader loader;
     fw64_n64_loader_init(&loader);
-    fw64_n64_loader_load_mesh_resources(&loader, handle);
+    fw64_n64_loader_load_mesh_resources(&loader, handle, allocator);
     scene->mesh_resources = loader.resources;
 
     if (scene->info.mesh_count > 0) {
-        scene->meshes = malloc(scene->info.mesh_count * sizeof(fw64Mesh));
+        scene->meshes = allocator->malloc(allocator, scene->info.mesh_count * sizeof(fw64Mesh));
 
         for (uint32_t i = 0; i < scene->info.mesh_count; i++) {
-            fw64_n64_loader_load_mesh(&loader, scene->meshes + i, handle);
+            fw64_n64_loader_load_mesh(&loader, scene->meshes + i, handle, allocator);
         }
     }
     else {
@@ -35,14 +35,14 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
     }
 
     if (scene->info.node_count > 0) {
-        scene->colliders = malloc(scene->info.collider_count * sizeof(fw64Collider));
+        scene->colliders = allocator->malloc(allocator, scene->info.collider_count * sizeof(fw64Collider));
     }
     else {
         scene->colliders = NULL;
     }
 
     if (scene->info.collision_mesh_count > 0) {
-        scene->collision_meshes = malloc(scene->info.collision_mesh_count * sizeof(fw64CollisionMesh));
+        scene->collision_meshes = allocator->malloc(allocator, scene->info.collision_mesh_count * sizeof(fw64CollisionMesh));
 
         for(uint32_t i = 0; i < scene->info.collision_mesh_count; i++) {
             fw64CollisionMesh* collision_mesh = scene->collision_meshes + i;
@@ -52,7 +52,7 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
 
             uint32_t point_data_size = collision_mesh->point_count * sizeof(Vec3);
             uint32_t element_data_size = collision_mesh->element_count * sizeof(uint16_t);
-            char* data_buffer = malloc(point_data_size + element_data_size);
+            char* data_buffer = allocator->malloc(allocator, point_data_size + element_data_size);
 
             //read data buffer and update pointers
             fw64_filesystem_read(data_buffer, 1, point_data_size + element_data_size, handle);
@@ -67,7 +67,7 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
     if (scene->info.node_count > 0) {
         box_invalidate(&scene->bounding_box);
 
-        scene->nodes = memalign(8, scene->info.node_count * sizeof(fw64Node));
+        scene->nodes = allocator->memalign(allocator, 8, scene->info.node_count * sizeof(fw64Node));
         fw64_filesystem_read(scene->nodes, sizeof(fw64Node), scene->info.node_count, handle);
 
         uint32_t collider_index = 0;
@@ -118,37 +118,39 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index) {
     return scene;
 }
 
-void fw64_scene_delete(fw64AssetDatabase * assets, fw64Scene* scene) {
+void fw64_scene_delete(fw64AssetDatabase * assets, fw64Scene* scene, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
+
     (void)assets;
     if (scene->meshes) {
         for (uint32_t i = 0; i < scene->info.mesh_count; i++)
-            fw64_n64_mesh_uninit(scene->meshes + i);
+            fw64_n64_mesh_uninit(scene->meshes + i, allocator);
 
-        free(scene->meshes);
+        allocator->free(allocator, scene->meshes);
     }
 
     if (scene->mesh_resources) {
-        fw64_n64_mesh_resources_delete(scene->mesh_resources);
+        fw64_n64_mesh_resources_delete(scene->mesh_resources, allocator);
     }
 
     if (scene->collision_meshes) {
         for (uint32_t i = 0; i < scene->info.collision_mesh_count; i++) {
             fw64CollisionMesh* collision_mesh = scene->collision_meshes + i;
             // note the chunk of data for the mesh collider is allocated together so just need to free the start
-            free(collision_mesh->points);
+            allocator->free(allocator, collision_mesh->points);
         }
 
-        free(scene->collision_meshes);
+        allocator->free(allocator, scene->collision_meshes);
     }
 
     if (scene->colliders)
-        free(scene->colliders);
+        allocator->free(allocator, scene->colliders);
     
     if (scene->nodes) {
-        free(scene->nodes);
+        allocator->free(allocator, scene->nodes);
     }
 
-    free(scene);
+    allocator->free(allocator, scene);
 }
 
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index) {

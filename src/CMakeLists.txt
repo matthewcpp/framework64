@@ -8,6 +8,7 @@ if(FW64_PLATFORM_DESKTOP)
 endif()
 
 set(common_source_files
+        ../include/framework64/allocator.h allocator.c
         ../include/framework64/asset_database.h
         ../include/framework64/audio.h
         ../include/framework64/audio_bank.h
@@ -39,9 +40,9 @@ set(common_source_files
         ../include/framework64/vec3.h vec3.c
 
         ../include/framework64/util/arcball_camera.h util/arcball_camera.c
+        ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/fps_camera.h util/fps_camera.c
         ../include/framework64/util/quad.h
-        ../include/framework64/util/terrain.h util/terrain.c
         )
 
 if (FW64_PLATFORM_N64)
@@ -62,7 +63,6 @@ if (FW64_PLATFORM_N64)
             n64/quad.c
             ../include/framework64/n64/renderer.h n64/renderer.c
             ../include/framework64/n64/scene.h n64/scene.c
-            n64/terrain.c
             ../include/framework64/n64/texture.h n64/texture.c
         )
 else()
@@ -79,7 +79,7 @@ else()
         ../include/framework64/desktop/input.h desktop/input.cpp
         ../include/framework64/desktop/image.h desktop/image.cpp
         ../include/framework64/desktop/input_interface.h
-            ../include/framework64/desktop/json_map.h desktop/json_map.cpp
+        ../include/framework64/desktop/json_map.h desktop/json_map.cpp
         ../include/framework64/desktop/line_shader.h desktop/line_shader.cpp
         ../include/framework64/desktop/material.h desktop/material.cpp
         ../include/framework64/desktop/mesh.h desktop/mesh.cpp
@@ -89,11 +89,10 @@ else()
         ../include/framework64/desktop/particle_shader.h desktop/particle_shader.cpp
         desktop/quad.cpp
         ../include/framework64/desktop/renderer.h desktop/renderer.cpp
-            ../include/framework64/desktop/scene.h desktop/scene.cpp
+        ../include/framework64/desktop/scene.h desktop/scene.cpp
         ../include/framework64/desktop/shader.h desktop/shader.cpp
         ../include/framework64/desktop/shader_cache.h desktop/shader_cache.cpp
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
-        desktop/terrain.cpp
         ../include/framework64/desktop/texture.h desktop/texture.cpp
         ../include/framework64/desktop/uniform_block.h
         ../include/framework64/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp

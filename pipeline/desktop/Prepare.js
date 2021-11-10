@@ -5,7 +5,6 @@ const processImage = require("./ProcessImage");
 const processMesh = require("./ProcessMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
-const processTerrain = require("./ProcessTerrain")
 const processLevel = require("./ProcessLevel")
 
 const processRaw = require("./ProcessRaw");
@@ -60,13 +59,6 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
         for (const rawFile of manifest.raw) {
             console.log(`Processing Raw File: ${rawFile}`);
             processRaw(rawFile, bundle, manifestDirectory, outputDirectory);
-        }
-    }
-
-    if (manifest.terrains) {
-        for (const terrain of manifest.terrains) {
-            console.log(`Processing Terrain: ${terrain.src}`);
-            await processTerrain(terrain, bundle, manifestDirectory, outputDirectory);
         }
     }
 
