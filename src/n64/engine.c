@@ -1,5 +1,6 @@
 #include "framework64/engine.h"
 
+#include "framework64/allocator.h"
 #include "framework64/n64/audio.h"
 #include "framework64/n64/asset_database.h"
 #include "framework64/n64/input.h"
@@ -49,6 +50,8 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     engine->input = &input;
     engine->renderer = &renderer;
     engine->time = &time;
+
+    fw64_default_allocator_init();
 
     InitHeap(memory_heap, FW64_N64_HEAP_SIZE);
 

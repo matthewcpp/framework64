@@ -7,12 +7,8 @@
 #include <malloc.h>
 #include <string.h>
 
-fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index) {
-    fw64Mesh* mesh = fw64_data_cache_retain(&assets->cache, index);
-    if (mesh){
-        return mesh;
-    } 
-
+fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
     fw64N64Loader loader;
     fw64_n64_loader_init(&loader);
 
@@ -20,27 +16,23 @@ fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index) {
     if (handle < 0)
         return NULL;
 
-    fw64_n64_loader_load_mesh_resources(&loader, handle);
-    mesh = malloc(sizeof(fw64Mesh));
-    fw64_n64_loader_load_mesh(&loader, mesh, handle);
+    fw64_n64_loader_load_mesh_resources(&loader, handle, allocator);
+    fw64Mesh* mesh = allocator->malloc(allocator, sizeof(fw64Mesh));
+    fw64_n64_loader_load_mesh(&loader, mesh, handle, allocator);
     mesh->resources = loader.resources;
 
     fw64_filesystem_close(handle);
 
     fw64_n64_loader_uninit(&loader);
 
-    fw64_data_cache_add(&assets->cache, index, mesh);
-
     return mesh;
 }
 
-void fw64_mesh_delete(fw64AssetDatabase* database, fw64Mesh* mesh) {
-    int references_remaining = fw64_data_cache_release(&database->cache, mesh);
+void fw64_mesh_delete(fw64AssetDatabase* database, fw64Mesh* mesh, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
 
-    if (references_remaining <= 0) { 
-        fw64_n64_mesh_uninit(mesh);
-        free(mesh);
-    }
+    fw64_n64_mesh_uninit(mesh, allocator);
+    allocator->free(allocator, mesh);
 }
 
 void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box) {
@@ -51,18 +43,18 @@ void fw64_n64_mesh_init(fw64Mesh* mesh) {
     memset(mesh, 0, sizeof(fw64Mesh));
 }
 
-void fw64_n64_mesh_uninit(fw64Mesh* mesh) {
+void fw64_n64_mesh_uninit(fw64Mesh* mesh, fw64Allocator* allocator) {
     if (mesh->vertex_buffer)
-        free(mesh->vertex_buffer);
+        allocator->free(allocator, mesh->vertex_buffer);
 
     if (mesh->display_list)
-        free(mesh->display_list);
+        allocator->free(allocator, mesh->display_list);
 
     if (mesh->primitives)
-        free(mesh->primitives);
+        allocator->free(allocator, mesh->primitives);
 
     if (mesh->resources) {
-        fw64_n64_mesh_resources_delete(mesh->resources);
+        fw64_n64_mesh_resources_delete(mesh->resources, allocator);
     }
 }
 
@@ -82,13 +74,13 @@ Box fw64_mesh_get_bounding_for_primitive(fw64Mesh* mesh, int index) {
     return primitive->bounding_box;
 }
 
-void fw64_n64_mesh_resources_delete(fw64MeshResources* resources) {
+void fw64_n64_mesh_resources_delete(fw64MeshResources* resources, fw64Allocator* allocator) {
     if (resources->material_count > 0) {
-        free(resources->materials);
+        allocator->free(allocator, resources->materials);
     }
 
     if (resources->texture_count > 0) {
-        free(resources->textures);
+        allocator->free(allocator, resources->textures);
     }
 
     int delete_images = !(resources->flags & FW64_MESH_FLAGS_IMAGES_ARE_SHARED);
@@ -96,11 +88,11 @@ void fw64_n64_mesh_resources_delete(fw64MeshResources* resources) {
     if (delete_images && resources->image_count > 0) {
         for (uint32_t i = 0; i < resources->image_count; i++) {
             fw64Image* image = resources->images + i;
-            free(image->data);
+            allocator->free(allocator, image->data);
         }
         
-        free(resources->images);
+        allocator->free(allocator, resources->images);
     }
 
-    free(resources);
+    allocator->free(allocator, resources);
 }

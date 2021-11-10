@@ -19,7 +19,7 @@ fw64Terrain* fw64_terrain_load(fw64AssetDatabase* database, uint32_t index) {
         return NULL;
 
     fw64N64Loader loader;
-    fw64_n64_loader_load_mesh_resources(&loader, handle);
+    fw64_n64_loader_load_mesh_resources(&loader, handle, NULL);
 
     fw64Terrain* terrain = malloc(sizeof(fw64Terrain));
     fw64_transform_init(&terrain->transform);
@@ -29,7 +29,7 @@ fw64Terrain* fw64_terrain_load(fw64AssetDatabase* database, uint32_t index) {
     terrain->mesh_resources = loader.resources;
 
     for (uint32_t i = 0; i < terrain->mesh_count; i++) {
-        fw64_n64_loader_load_mesh(&loader, terrain->meshes + i, handle);
+        fw64_n64_loader_load_mesh(&loader, terrain->meshes + i, handle, NULL);
     }
 
     fw64_filesystem_close(handle);
@@ -39,7 +39,7 @@ fw64Terrain* fw64_terrain_load(fw64AssetDatabase* database, uint32_t index) {
 
 void fw64_terrain_delete(fw64AssetDatabase* database, fw64Terrain* terrain) {
     for (uint32_t i = 0; i < terrain->mesh_count; i++) {
-        fw64_n64_mesh_uninit(terrain->meshes + i);
+        fw64_n64_mesh_uninit(terrain->meshes + i, NULL);
     }
 
     free(terrain->meshes);

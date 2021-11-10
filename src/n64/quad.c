@@ -4,8 +4,6 @@
 #include "framework64/n64/mesh.h"
 
 #include <nusys.h>
-
-#include <malloc.h>
 #include <string.h>
 
 static void vertex_set_tc(Vtx* vertex, float s, float t, fw64Texture* texture) {
@@ -68,14 +66,14 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vslices) {
-    fw64Mesh* mesh = malloc(sizeof(fw64Mesh));
+static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vslices, fw64Allocator* allocator) {
+    fw64Mesh* mesh = allocator->malloc(allocator, sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);
     
     uint32_t slice_count = hslices * vslices;
-    fw64Texture* texture = fw64_texture_create_from_image(image);
+    fw64Texture* texture = fw64_texture_create_from_image(image, allocator);
 
-    mesh->resources = malloc(sizeof(fw64MeshResources));
+    mesh->resources = allocator->malloc(allocator, sizeof(fw64MeshResources));
     mesh->resources->flags = FW64_MESH_FLAGS_IMAGES_ARE_SHARED;
 
     mesh->resources->image_count = 1;
@@ -87,16 +85,16 @@ static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vsl
     
 
     mesh->info.primitive_count = slice_count;
-    mesh->primitives = malloc(mesh->info.primitive_count * sizeof(fw64Primitive));
+    mesh->primitives = allocator->malloc(allocator, mesh->info.primitive_count * sizeof(fw64Primitive));
 
     mesh->resources->material_count = slice_count;
-    mesh->resources->materials = memalign(8, mesh->info.primitive_count * sizeof(fw64Material));
+    mesh->resources->materials = allocator->memalign(allocator, 8, mesh->info.primitive_count * sizeof(fw64Material));
 
     mesh->info.vertex_count = mesh->info.primitive_count * 4;
-    mesh->vertex_buffer = memalign(8, mesh->info.primitive_count * sizeof(Vtx) * 4);
+    mesh->vertex_buffer = allocator->memalign(allocator, 8, mesh->info.primitive_count * sizeof(Vtx) * 4);
 
     mesh->info.display_list_count = mesh->info.primitive_count * 3;
-    mesh->display_list = memalign(8, mesh->info.display_list_count * sizeof(Gfx));
+    mesh->display_list = allocator->memalign(allocator, 8, mesh->info.display_list_count * sizeof(Gfx));
 
     short start_x, start_y, size;
 
@@ -142,26 +140,29 @@ static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vsl
     return mesh;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index) {
+fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index, fw64Allocator* allocator) {
     (void)engine;
+    if (!allocator) allocator = fw64_default_allocator();
 
-    fw64Image* image = fw64_image_load(NULL, image_asset_index);
+    fw64Image* image = fw64_image_load(NULL, image_asset_index, allocator);
     
 
-    return make_quad_mesh(image, image->info.hslices, image->info.vslices);
+    return make_quad_mesh(image, image->info.hslices, image->info.vslices, allocator);
 }
 
-fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t){
-    fw64Mesh* mesh = textured_quad_create(engine, image_asset_index);
+fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t, fw64Allocator* allocator){
+    if (!allocator) allocator = fw64_default_allocator();
+    fw64Mesh* mesh = textured_quad_create(engine, image_asset_index, allocator);
     textured_quad_set_tex_coords(mesh, 0, max_s, max_t);
 
     return mesh;
 }
 
-fw64Mesh* textured_quad_create_with_image(fw64Engine* engine, fw64Image* image, int frame_index) {
+fw64Mesh* textured_quad_create_with_image(fw64Engine* engine, fw64Image* image, int frame_index, fw64Allocator* allocator) {
     (void)engine;
+    if (!allocator) allocator = fw64_default_allocator();
 
-    fw64Mesh* mesh = make_quad_mesh(image, 1, 1);
+    fw64Mesh* mesh = make_quad_mesh(image, 1, 1, allocator);
     mesh->resources->materials[0].texture_frame = frame_index;
 
     return mesh;
