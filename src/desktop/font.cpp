@@ -88,7 +88,7 @@ const char* fw64Font::getNextGlyphIndex(const char* text, uint32_t& glyph_index)
 
 // C interface
 
-fw64Font * fw64_font_load(fw64AssetDatabase* assets, uint32_t index) {
+fw64Font * fw64_font_load(fw64AssetDatabase* assets, uint32_t index, fw64Allocator* allocator) {
     return fw64Font::loadFromDatabase(assets, index);
 }
 
@@ -102,6 +102,6 @@ IVec2 fw64_font_measure_text(fw64Font* font, const char* text) {
     return result;
 }
 
-void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font) {
+void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator) {
     delete font;
 }
