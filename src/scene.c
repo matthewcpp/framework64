@@ -13,6 +13,21 @@ void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer) {
     }
 }
 
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frustum* frustum) {
+    uint32_t node_count = fw64_scene_get_node_count(scene);
+
+    for (uint32_t i = 0 ; i < node_count; i++) {
+        fw64Node* node = fw64_scene_get_node(scene, i);
+
+        if (!node->mesh || !node->collider) // TODO: requiring collider may not be the most ideal setup
+            continue;
+
+        if (fw64_frustum_intersects_box(frustum, &node->collider->bounding)) {
+            fw64_renderer_draw_static_mesh(renderer, &node->transform, node->mesh);
+        }
+    }
+}
+
 int fw64_scene_raycast(fw64Scene* scene, Vec3* origin, Vec3* direction, uint32_t mask, fw64RaycastHit* hit) {
     uint32_t node_count = fw64_scene_get_node_count(scene);
     hit->distance = FLT_MAX;

@@ -1,5 +1,4 @@
 const processMesh = require("./ProcessMesh");
-const processTerrain = require("./ProcessTerrain");
 const imageConvert = require("./ImageConvert");
 const FontConvert = require("./FontConvert");
 const AudioConvert = require("./AudioConvert");
@@ -58,13 +57,6 @@ async function prepare(manifest, manifestFile, outputDirectory) {
 
             const sourceDir = path.join(manifestDirectory, musicBank.dir);
             await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
-        }
-    }
-
-    if (manifest.terrains) {
-        for (const terrain of manifest.terrains) {
-            console.log(`Processing Terrain: ${terrain.src}`)
-            await processTerrain(terrain, archive, manifestDirectory, outputDirectory);
         }
     }
 

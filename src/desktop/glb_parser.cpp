@@ -234,19 +234,6 @@ framework64::CollisionMesh* GlbParser::parseCollisionMesh(nlohmann::json const &
     return collision_mesh;
 }
 
-std::vector<fw64Mesh*> GlbParser::parseStaticMeshes(std::string const & path) {
-    std::vector<fw64Mesh*> meshes;
-
-    if (!openFile(path))
-        return meshes;
-
-    for (auto const & mesh : json_doc["meshes"] ) {
-        meshes.push_back(parseStaticMesh(mesh));
-    }
-
-    return meshes;
-}
-
 bool GlbParser::openFile(std::string const& path) {
     glb_file.open(path, std::ios::binary);
 

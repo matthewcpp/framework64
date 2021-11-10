@@ -39,6 +39,8 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int handle, fw64Allocator*
 void fw64_scene_delete(fw64AssetDatabase* assets, fw64Scene* scene, fw64Allocator* allocator);
 
 void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer);
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frustum* frustum);
+
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene);
 
