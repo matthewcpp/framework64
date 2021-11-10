@@ -40,6 +40,7 @@ set(common_source_files
         ../include/framework64/vec3.h vec3.c
 
         ../include/framework64/util/arcball_camera.h util/arcball_camera.c
+        ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/fps_camera.h util/fps_camera.c
         ../include/framework64/util/quad.h
         ../include/framework64/util/terrain.h util/terrain.c
@@ -80,7 +81,7 @@ else()
         ../include/framework64/desktop/input.h desktop/input.cpp
         ../include/framework64/desktop/image.h desktop/image.cpp
         ../include/framework64/desktop/input_interface.h
-            ../include/framework64/desktop/json_map.h desktop/json_map.cpp
+        ../include/framework64/desktop/json_map.h desktop/json_map.cpp
         ../include/framework64/desktop/line_shader.h desktop/line_shader.cpp
         ../include/framework64/desktop/material.h desktop/material.cpp
         ../include/framework64/desktop/mesh.h desktop/mesh.cpp
@@ -90,7 +91,7 @@ else()
         ../include/framework64/desktop/particle_shader.h desktop/particle_shader.cpp
         desktop/quad.cpp
         ../include/framework64/desktop/renderer.h desktop/renderer.cpp
-            ../include/framework64/desktop/scene.h desktop/scene.cpp
+        ../include/framework64/desktop/scene.h desktop/scene.cpp
         ../include/framework64/desktop/shader.h desktop/shader.cpp
         ../include/framework64/desktop/shader_cache.h desktop/shader_cache.cpp
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
