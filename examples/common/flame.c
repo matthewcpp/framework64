@@ -5,7 +5,7 @@
 
 void flame_init(Flame* flame, fw64Engine* engine, fw64Image* image){
     fw64_node_init(&flame->entity);
-    fw64_node_set_mesh(&flame->entity, textured_quad_create_with_image(engine, image, 0));
+    fw64_node_set_mesh(&flame->entity, textured_quad_create_with_image(engine, image, 0, NULL));
     flame->update_time_remaining = FLAME_UPDATE_TIME;
 }
 

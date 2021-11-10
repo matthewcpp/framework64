@@ -19,9 +19,9 @@ void game_init(Game* game, fw64Engine* engine) {
 
     arcball_init(&game->arcball, engine->input);
 
-    game->meshes[0] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo);
-    game->meshes[1] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_suzanne);
-    game->meshes[2] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin);
+    game->meshes[0] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo, NULL);
+    game->meshes[1] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_suzanne, NULL);
+    game->meshes[2] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin, NULL);
 
     fw64_node_init(&game->node);
 
@@ -29,8 +29,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->arcball.camera.far = 1000.0f;
     fw64_camera_update_projection_matrix(&game->arcball.camera);
 
-    game->consolas = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
-    game->button_sprite = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons));
+    game->consolas = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
+    game->button_sprite = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
 
     IVec2 text_measurement = fw64_font_measure_text(game->consolas, SWITCH_MODEL_TEXT);
     game->switch_model_text_width = text_measurement.x;

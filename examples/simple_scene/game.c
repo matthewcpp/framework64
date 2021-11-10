@@ -7,7 +7,7 @@ void game_init(Game* level, fw64Engine* engine) {
     level->engine = engine;
     chase_camera_init(&level->chase_cam, engine);
 
-    level->scene = fw64_scene_load(level->engine->assets, FW64_ASSET_scene_playground);
+    level->scene = fw64_scene_load(level->engine->assets, FW64_ASSET_scene_playground, NULL);
 
     fw64Node *node = fw64_scene_get_node(level->scene, FW64_scene_playground_node_Player_Start);
 
