@@ -18,9 +18,9 @@ void game_init(Game* game, fw64Engine* engine) {
     game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 
     fw64_node_init(&game->solid_cube);
-    fw64_node_set_mesh(&game->solid_cube, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube));
+    fw64_node_set_mesh(&game->solid_cube, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube, NULL));
     fw64_node_init(&game->wire_cube);
-    fw64_node_set_mesh(&game->wire_cube, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
+    fw64_node_set_mesh(&game->wire_cube, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube_wire, NULL));
 
     game->rotation = 0.0f;
 }

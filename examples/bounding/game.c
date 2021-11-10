@@ -22,15 +22,15 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
     fw64_node_init(&game->penguin);
-    fw64_node_set_mesh(&game->penguin, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin));
+    fw64_node_set_mesh(&game->penguin, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin, NULL));
     fw64_node_set_box_collider(&game->penguin, &game->penguin_collider);
     vec3_set(&game->penguin.transform.scale, 0.1f, 0.1f, 0.1f);
     quat_set_axis_angle(&game->penguin.transform.rotation, 0, 1, 0, M_PI);
     fw64_node_update(&game->penguin);
 
     fw64_node_init(&game->penguin_box);
-    fw64_node_set_mesh(&game->penguin_box, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube_wire));
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
+    fw64_node_set_mesh(&game->penguin_box, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube_wire, NULL));
+    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
     game->intersection = CUBE_NONE;
 
     setup_camera(game);
@@ -122,7 +122,7 @@ Vec3 cube_positions[CUBE_COUNT] = {
 
 void init_cubes(Game* game) {
     
-    fw64Mesh* cube_mesh = fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_blue_cube);
+    fw64Mesh* cube_mesh = fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_blue_cube, NULL);
 
     for (int i = 0; i < CUBE_COUNT; i++) {
         fw64Node* cube = &game->cubes[i];

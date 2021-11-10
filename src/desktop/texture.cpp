@@ -38,10 +38,6 @@ void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s
     texture->wrap_t = wrap_t;
 }
 
-fw64Texture* fw64_texture_create_from_image(fw64Image* image) {
-    return new fw64Texture(image);
-}
-
 void fw64_texture_delete(fw64Texture* texture) {
     delete (texture);
 }

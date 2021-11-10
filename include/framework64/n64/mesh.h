@@ -55,6 +55,7 @@ struct fw64Mesh {
 void fw64_n64_mesh_init(fw64Mesh* mesh);
 
 /** Frees the resources used by this mesh, but does not delete the actual mesh */
-void fw64_n64_mesh_uninit(fw64Mesh* mesh);
+void fw64_n64_mesh_uninit(fw64Mesh* mesh, fw64Allocator* allocator);
 
-void fw64_n64_mesh_resources_delete(fw64MeshResources* resources);
+/** Precondition: allocator should not be NULL */
+void fw64_n64_mesh_resources_delete(fw64MeshResources* resources, fw64Allocator* allocator);

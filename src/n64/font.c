@@ -8,19 +8,15 @@
 #include <malloc.h>
 #include <string.h>
 
-fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index) {
-    fw64Font* font = fw64_data_cache_retain(&database->cache, index);
-    if (font) {
-        return font;
-    }
-
+fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
     int handle = fw64_filesystem_open(index);
 
     if (handle == FW64_FILESYSTEM_INVALID_HANDLE) {
         return NULL;
     }
 
-    font = malloc(sizeof(fw64Font));
+    fw64Font* font = allocator->malloc(allocator, sizeof(fw64Font));
 
     fw64_filesystem_read(font, sizeof(uint16_t), 4, handle);
 
@@ -37,13 +33,10 @@ fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index) {
     return font;
 }
 
-void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font) {
-    int references_remaining = fw64_data_cache_release(&assets->cache, font);
-
-    if (references_remaining <= 0) {
-        free(font->spritefont); // note: font and glyph data were allocated in same call
-        free(font);
-    }
+void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator) {
+    if (!allocator) allocator = fw64_default_allocator();
+    allocator->free(allocator, font->spritefont); // note: font and glyph data were allocated in same call
+    allocator->free(allocator, font);
 }
 
 uint16_t find_font_glyph_rec(fw64FontGlyph* glyphs, int min_index, int max_index, uint16_t codepoint) {

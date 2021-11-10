@@ -8,7 +8,7 @@ void ui_init(UI* ui, fw64Engine* engine, Player* player) {
     ui->engine = engine;
     ui->player = player;
 
-    ui->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12);
+    ui->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
 }
 
 void ui_update(UI* ui) {

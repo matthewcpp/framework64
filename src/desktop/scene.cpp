@@ -9,7 +9,7 @@
 #include <string>
 
 
-fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index) {
+fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index, fw64Allocator* allocator) {
     sqlite3_reset(database->select_scene_statement);
     sqlite3_bind_int(database->select_scene_statement, 1, index);
 
@@ -43,7 +43,7 @@ std::unordered_map<std::string, T> parseMapJson(std::string const& json_str) {
     }
 }
 
-void fw64_scene_delete(fw64AssetDatabase* assets, fw64Scene* scene) {
+void fw64_scene_delete(fw64AssetDatabase* assets, fw64Scene* scene, fw64Allocator* allocator) {
     (void)assets;
     delete scene;
 }

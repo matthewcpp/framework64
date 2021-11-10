@@ -8,33 +8,33 @@
 #include <string.h>
 
 
-static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, int handle);
+static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, int handle, fw64Allocator* allocator);
 static void fixup_mesh_primitive_material_pointers(fw64N64Loader* loader, fw64Mesh* mesh);
 
-void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle) {
-    fw64MeshResources* resources = malloc(sizeof(fw64MeshResources));
+void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle, fw64Allocator* allocator) {
+    fw64MeshResources* resources = allocator->malloc(allocator, sizeof(fw64MeshResources));
     fw64_filesystem_read(resources, FW64_MESH_RESOURCES_HEADER_SIZE, 1, handle);
     resources->flags = 0;
 
     if (resources->image_count > 0) {
         // read the asset ID's and then load the images
         // TODO: get rid of this allocation when adding a small read optimization in the filesystem
-        uint32_t* asset_index_data = malloc(resources->image_count * sizeof(uint32_t));
+        uint32_t* asset_index_data = allocator->malloc(allocator, resources->image_count * sizeof(uint32_t));
         fw64_filesystem_read(asset_index_data, sizeof(uint32_t), resources->image_count, handle);
-        resources->images = malloc(sizeof(fw64Image) * resources->image_count);
+        resources->images = allocator->malloc(allocator, sizeof(fw64Image) * resources->image_count);
 
         for (uint32_t i = 0; i < resources->image_count; i++) {
-            fw64_n64_image_init_from_rom(resources->images + i, asset_index_data[i]);
+            fw64_n64_image_init_from_rom(resources->images + i, asset_index_data[i], allocator);
         }
 
-        free(asset_index_data);
+        allocator->free(allocator, asset_index_data);
     }
     else {
         resources->images = NULL;
     }
 
     if (resources->texture_count > 0) {
-        resources->textures = malloc(resources->texture_count * sizeof(fw64Texture));
+        resources->textures = allocator->malloc(allocator, resources->texture_count * sizeof(fw64Texture));
         fw64_filesystem_read(resources->textures , sizeof(fw64Texture), resources->texture_count, handle);
     }
     else {
@@ -42,7 +42,7 @@ void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle) {
     }
 
     if (resources->material_count > 0) { // this should always be the case
-        resources->materials = malloc(sizeof(fw64Material) * resources->material_count);
+        resources->materials = allocator->malloc(allocator, sizeof(fw64Material) * resources->material_count);
         fw64_filesystem_read(resources->materials, sizeof(fw64Material), resources->material_count, handle);
     }
     else {
@@ -79,26 +79,26 @@ void fw64_n64_loader_uninit(fw64N64Loader* loader) {
     (void)loader;
 }
 
-void fw64_n64_loader_load_mesh(fw64N64Loader* loader, fw64Mesh* mesh, int handle) {
+void fw64_n64_loader_load_mesh(fw64N64Loader* loader, fw64Mesh* mesh, int handle, fw64Allocator* allocator) {
     fw64_filesystem_read(&mesh->info, sizeof(fw64MeshInfo), 1, handle);
 
-    mesh->vertex_buffer = memalign(8, sizeof(Vtx) * mesh->info.vertex_count );
+    mesh->vertex_buffer = allocator->memalign(allocator, 8, sizeof(Vtx) * mesh->info.vertex_count );
     fw64_filesystem_read(mesh->vertex_buffer, sizeof(Vtx),  mesh->info.vertex_count, handle);
 
-    mesh->display_list = memalign(8, sizeof(Gfx) * mesh->info.display_list_count);
+    mesh->display_list = allocator->memalign(allocator, 8, sizeof(Gfx) * mesh->info.display_list_count);
     fw64_filesystem_read(mesh->display_list, sizeof(Gfx), mesh->info.display_list_count, handle);
 
-    mesh->primitives = malloc(sizeof(fw64Primitive) * mesh->info.primitive_count);
+    mesh->primitives = allocator->malloc(allocator, sizeof(fw64Primitive) * mesh->info.primitive_count);
     fw64_filesystem_read(mesh->primitives, sizeof(fw64Primitive), mesh->info.primitive_count, handle);
     
-    fixup_mesh_vertex_pointers(mesh, handle);
+    fixup_mesh_vertex_pointers(mesh, handle, allocator);
     fixup_mesh_primitive_material_pointers(loader, mesh);
 }
 
 
-static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, int handle) {
+static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, int handle, fw64Allocator* allocator) {
     //TODO: Get rid of this allocation when filesystem has a small read optimization
-    uint32_t* vertex_pointer_data = malloc(mesh->info._vertex_pointer_data_size);
+    uint32_t* vertex_pointer_data = allocator->malloc(allocator, mesh->info._vertex_pointer_data_size);
     fw64_filesystem_read(vertex_pointer_data, 1, mesh->info._vertex_pointer_data_size, handle);
 
     uint32_t* vertex_pointer_counts = vertex_pointer_data;
@@ -119,7 +119,7 @@ static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, int handle) {
         }
     }
 
-    free(vertex_pointer_data);
+    allocator->free(allocator, vertex_pointer_data);
 }
 
 /** When the mesh info is loaded from ROM, the value in material and texture pointers represents an index into top level mesh arrays.
