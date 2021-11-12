@@ -72,3 +72,19 @@ int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint
 
     return result->count;
 }
+
+int fw64_scene_find_nodes_with_type(fw64Scene* scene, int type, fw64Node** results, int results_size) {
+    uint32_t node_count = fw64_scene_get_node_count(scene);
+
+    int found_count = 0;
+
+    for (uint32_t i = 0; i < node_count && found_count < results_size; i++) {
+        fw64Node* node = fw64_scene_get_node(scene, i);
+
+        if (node->type == type) {
+            results[found_count++] = node;
+        }
+    }
+
+    return found_count;
+}
