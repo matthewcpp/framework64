@@ -37,6 +37,9 @@ void vec3_negate(Vec3* v);
 void vec3_cross(Vec3* out, Vec3* a, Vec3* b);
 float vec3_dot(Vec3* a, Vec3* b);
 
+void vec3_smoothstep(Vec3* out, Vec3* a, Vec3* b, float t);
+void vec3_lerp(Vec3* out, Vec3* a, Vec3* b, float t);
+
 #ifdef __cplusplus
 }
 #endif
