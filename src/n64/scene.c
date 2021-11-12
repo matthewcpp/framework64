@@ -119,6 +119,20 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* 
     return scene;
 }
 
+void fw64_scene_update_bounding(fw64Scene* scene) {
+    box_invalidate(&scene->bounding_box);
+
+    for (uint32_t i = 0; i < scene->info.node_count; i++) {
+        fw64Node* node = &scene->nodes[i];
+
+        if (!node->collider || node->collider->type == FW64_COLLIDER_NONE) {
+            continue;
+        }
+
+        box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
+    }
+}
+
 void fw64_scene_delete(fw64AssetDatabase * assets, fw64Scene* scene, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
 

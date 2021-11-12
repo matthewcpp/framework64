@@ -88,11 +88,10 @@ fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, Typ
     for (auto const & child_index : scene_node["children"]) {
         auto const & node = json_doc["nodes"][child_index.get<int>()];
 
+        std::string name = node["name"].get<std::string>();
+
         bool has_mesh = node.contains("mesh");
         bool has_extras = node.contains("extras");
-
-        if (!has_mesh && !has_extras)
-            continue;
 
         auto* n = scene->createNode();
         fw64_node_init(n);

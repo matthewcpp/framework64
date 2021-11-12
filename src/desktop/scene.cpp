@@ -93,3 +93,7 @@ void fw64Scene::calculateBounding() {
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene) {
     return scene->allocator;
 }
+
+void fw64_scene_update_bounding(fw64Scene* scene) {
+    scene->calculateBounding();
+}

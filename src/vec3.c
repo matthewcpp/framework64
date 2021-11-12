@@ -1,6 +1,7 @@
 #include "framework64/vec3.h"
 
 #include "framework64/types.h"
+#include "framework64/math.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -115,4 +116,15 @@ int vec3_equals(Vec3* a, Vec3* b, float epsilon) {
     return dx <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->x), fabsf(b->x))) &&
             dy <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->y), fabsf(b->y))) &&
             dz <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->z), fabsf(b->z)));
+}
+
+void vec3_smoothstep(Vec3* out, Vec3* a, Vec3* b, float t) {
+    vec3_lerp(out, a, b, fw64_smoothstep(0.0f, 1.0f, t));
+}
+
+void vec3_lerp(Vec3* out, Vec3* a, Vec3* b, float t) {
+    float one_minus_t = 1.0f - t;
+    out->x = a->x * one_minus_t + b->x * t;
+    out->y = a->y * one_minus_t + b->y * t;
+    out->z = a->z * one_minus_t + b->z * t;
 }
