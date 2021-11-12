@@ -34,9 +34,11 @@ extern "C" {
  * This result may be inaccurate if nodes are transformed from their initial state
  * */
 Box* fw64_scene_get_initial_bounds(fw64Scene* scene);
+void fw64_scene_update_bounding(fw64Scene* scene);
 
 fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int handle, fw64Allocator* allocator);
 void fw64_scene_delete(fw64AssetDatabase* assets, fw64Scene* scene, fw64Allocator* allocator);
+
 
 void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer);
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frustum* frustum);
