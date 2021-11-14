@@ -236,6 +236,13 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             break;
 
+        case FW64_SHADING_MODE_DECAL_TEXTURE:
+            gDPSetRenderMode(renderer->display_list++, G_RM_ZB_XLU_DECAL, G_RM_ZB_XLU_DECAL);
+            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
+            break;
+
         case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
             gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_OPAQUE_SHADED(renderer), FW64_RM_3D_OPAQUE_SHADED2(renderer));
         break;
@@ -359,6 +366,23 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
             default:
                 break;
         }
+            
+        gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
+        gDPPipeSync(renderer->display_list++);
+    }
+
+    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+}
+
+void fw64_renderer_draw_decal(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    
+    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh->primitives + i;
+        
+        fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_DECAL_TEXTURE);
+
+        fw64_n64_renderer_load_texture(renderer, primitive->material->texture, primitive->material->texture_frame);
             
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
         gDPPipeSync(renderer->display_list++);
