@@ -357,6 +357,7 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
             }
             break;
 
+            case FW64_SHADING_MODE_DECAL_TEXTURE:
             case FW64_SHADING_MODE_GOURAUD_TEXTURED:
             case FW64_SHADING_MODE_UNLIT_TEXTURED: {
                 fw64_n64_renderer_load_texture(renderer, primitive->material->texture, primitive->material->texture_frame);
@@ -366,23 +367,6 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
             default:
                 break;
         }
-            
-        gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
-        gDPPipeSync(renderer->display_list++);
-    }
-
-    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
-}
-
-void fw64_renderer_draw_decal(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
-    
-    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
-        fw64Primitive* primitive = mesh->primitives + i;
-        
-        fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_DECAL_TEXTURE);
-
-        fw64_n64_renderer_load_texture(renderer, primitive->material->texture, primitive->material->texture_frame);
             
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
         gDPPipeSync(renderer->display_list++);

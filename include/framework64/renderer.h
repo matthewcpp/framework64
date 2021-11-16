@@ -42,8 +42,6 @@ int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
 
-void fw64_renderer_draw_decal(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
-
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y);
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y);
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
