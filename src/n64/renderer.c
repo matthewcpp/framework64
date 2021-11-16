@@ -236,6 +236,13 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             break;
 
+        case FW64_SHADING_MODE_DECAL_TEXTURE:
+            gDPSetRenderMode(renderer->display_list++, G_RM_ZB_XLU_DECAL, G_RM_ZB_XLU_DECAL);
+            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
+            break;
+
         case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
             gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_OPAQUE_SHADED(renderer), FW64_RM_3D_OPAQUE_SHADED2(renderer));
         break;
@@ -350,6 +357,7 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
             }
             break;
 
+            case FW64_SHADING_MODE_DECAL_TEXTURE:
             case FW64_SHADING_MODE_GOURAUD_TEXTURED:
             case FW64_SHADING_MODE_UNLIT_TEXTURED: {
                 fw64_n64_renderer_load_texture(renderer, primitive->material->texture, primitive->material->texture_frame);

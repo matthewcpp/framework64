@@ -14,3 +14,7 @@ void fw64_material_set_texture_frame(fw64Material* material, int frame) {
 int fw64_material_get_texture_frame(fw64Material* material) {
     return material->texture_frame;
 }
+
+void fw64_material_set_shading_mode(fw64Material* material, fw64ShadingMode mode) {
+    return; //n64-required api change. stubbed on desktop for now.
+}

@@ -10,18 +10,6 @@
 
 #include <stdint.h>
 
-typedef enum {
-    FW64_SHADING_MODE_UNSET,
-    FW64_SHADING_MODE_UNLIT_VERTEX_COLORS,
-    FW64_SHADING_MODE_UNLIT_TEXTURED,
-    FW64_SHADING_MODE_GOURAUD,
-    FW64_SHADING_MODE_GOURAUD_TEXTURED,
-    FW64_SHADING_MODE_SPRITE,
-    FW64_SHADING_MODE_FILL,
-    Fw64_SHADING_MODE_COUNT
-} fw64ShadingMode;
-
-
 typedef struct fw64Mesh fw64Mesh;
 typedef struct fw64Primitive fw64Primitive;
 
