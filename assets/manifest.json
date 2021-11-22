@@ -101,6 +101,18 @@
             "src": "campfire/campfire.gltf"
         }
     ],
+    "skinnedMeshes": [
+        {
+            "src": "catherine/catherine.gltf",
+            "animations": [
+                "Idle",
+                "Run",
+                "Walk",
+                "Attack1",
+                "Tired"
+            ]
+        }
+    ],
     "fonts": [
         {
             "src": "Consolas.ttf",
