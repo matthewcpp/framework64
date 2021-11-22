@@ -20,8 +20,8 @@ beginseg
 	flags	BOOT OBJECT
 	entry 	nuBoot
 	address NU_SPEC_BOOT_ADDR
-    stack   NU_SPEC_BOOT_STACK
-	include "spin_cube.o"
+        stack   NU_SPEC_BOOT_STACK
+	include "character_animation.o"
 	include "/usr/lib/n64/PR/rspboot.o"
 	include "/usr/lib/n64/PR/aspMain.o"
 	include "/usr/lib/n64/PR/n_aspMain.o"
@@ -41,7 +41,7 @@ beginseg
 endseg
 
 beginwave
-	name	"spin_cube"
+	name	"character_animation"
 	include	"code"
 	include "asset_data"
 endwave
