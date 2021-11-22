@@ -1,5 +1,7 @@
 const Bounding = require("./Bounding");
 
+const Splitter = require("./N64Splitter");
+
 class N64Mesh {
     constructor(name) {
         this.name = name;
@@ -28,6 +30,35 @@ class N64Mesh {
     prunePrimitiveVertices() {
         for (const primitive of this.primitives) {
             primitive.pruneUnusedVertices();
+        }
+    }
+
+    // due to the way GLTF is exported from blender, it is possible that primitives may
+    // contain faces which are influenced by more than one bone.
+    // In this case we need to split the primitives so that each draw call uses the correct joint matrix
+    splitPrimitivesForSkinning(){
+        const primitives = this.primitives;
+        this.primitives = [];
+
+        for (const primitive of primitives) {
+            if (primitive.containsMultipleJointIndices) {
+                this.primitives.push(...Splitter.split(primitive));
+            }
+            else {
+                this.primitives.push(primitive);
+            }
+        }
+    }
+
+    remapJointIndices(jointMap) {
+        for (const primitive of this.primitives) {
+            const jointIndex = jointMap.get(primitive.jointIndices[0]);
+
+            if (typeof(jointIndex) === "undefined") {
+                throw new Error("Unable map to all animation joints");
+            }
+
+            primitive.jointIndices[0] = jointIndex;
         }
     }
 }

@@ -43,15 +43,17 @@ class PrimitiveInfo {
     bounding;
     verticesBufferIndex;
     displayListBufferIndex;
-    material;// index into mesh's material array
+    material; // index into mesh's material array
+    jointIndex;
 
     get buffer() {
-        const buff = Buffer.alloc(36)
+        const buff = Buffer.alloc(40)
 
         let index = this.bounding.writeToBuffer(buff, 0);
         index = buff.writeUInt32BE(this.verticesBufferIndex, index);
         index = buff.writeUInt32BE(this.displayListBufferIndex, index);
         index = buff.writeUInt32BE(this.material, index);
+        index = buff.writeUInt32BE(this.jointIndex, index);
 
         return buff;
     }
@@ -137,7 +139,7 @@ async function writeStaticMesh(mesh, outputDir, archive) {
     writeStaticMeshData(mesh, file);
 
     fs.closeSync(file);
-    archive.add(destPath, "mesh");
+    await archive.add(destPath, "mesh");
 }
 
 function writeStaticMeshData(mesh, file) {
@@ -160,7 +162,7 @@ function writeStaticMeshData(mesh, file) {
         primitiveInfo.verticesBufferIndex = meshInfo.vertexCount; // the index for this primitive is set to the total size of the mesh's vertices buffer added thus far
         primitiveInfo.displayListBufferIndex = meshInfo.displayListCount; // the index for this primitive is set to the total size of the mesh's display list buffer this far
         primitiveInfo.material = primitive.material;
-
+        primitiveInfo.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : N64Primitive.NoJoint; // used for skinning, refer to N64Mesh.splitPrimitivesForSkinning
         primitiveInfos.push(primitiveInfo);
 
         // slice the vertices into chunks that can fit into N64 vertex cache

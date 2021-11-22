@@ -8,7 +8,7 @@ async function processMesh(mesh, archive, baseDirectory, outputDirectory) {
     const gltfLoader = new GLTFLoader({});
     const staticMesh = await gltfLoader.loadStaticMesh(sourceFile);
 
-    MeshWriter.writeStaticMesh(staticMesh, outputDirectory, archive);
+    await MeshWriter.writeStaticMesh(staticMesh, outputDirectory, archive);
 }
 
 module.exports = processMesh;
