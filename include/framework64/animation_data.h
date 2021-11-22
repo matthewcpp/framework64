@@ -49,7 +49,7 @@ extern "C" {
 
 fw64AnimationData* fw64_animation_data_load(fw64AssetDatabase* database, uint32_t index, fw64Allocator* allocator);
 void fw64_animation_data_delete(fw64AnimationData* animation_data, fw64Allocator* allocator);
-
+fw64Animation* fw64_animation_data_get_animation(fw64AnimationData* animation_data, int index);
 
 
 #ifdef __cplusplus
