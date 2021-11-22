@@ -3,6 +3,7 @@ const Bundle = require("./Bundle");
 const processFont = require("./ProcessFont");
 const processImage = require("./ProcessImage");
 const processMesh = require("./ProcessMesh");
+const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processLevel = require("./ProcessLevel")
@@ -38,6 +39,13 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`);
             await processMesh(mesh, bundle, manifestDirectory, outputDirectory);
+        }
+    }
+
+    if (manifest.skinnedMeshes) {
+        for (const skinnedMesh of manifest.skinnedMeshes) {
+            console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
+            await processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory);
         }
     }
 
