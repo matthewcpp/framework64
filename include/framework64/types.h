@@ -18,6 +18,7 @@ typedef Mtx fw64Matrix;
 #define fw64_cosf _ncosf
 #define fw64_tanf tanf
 #define fw64_sqrtf _nsqrtf
+#define fw64_acosf acosf
 
 #define fw64_malloc malloc
 #define fw64_memalign memalign
@@ -38,12 +39,11 @@ typedef struct {
     #define M_PI 3.14159265358979323846
 #endif
 
-void* fw64_desktop_memalign(size_t alignment, size_t size);
-
 #define fw64_sinf sinf
 #define fw64_cosf cosf
 #define fw64_tanf tanf
 #define fw64_sqrtf sqrtf
+#define fw64_acosf acosf
 
 #define fw64_malloc malloc
 #define fw64_memalign(align, size) malloc((size))

@@ -1,4 +1,5 @@
 const processMesh = require("./ProcessMesh");
+const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const imageConvert = require("./ImageConvert");
 const FontConvert = require("./FontConvert");
 const AudioConvert = require("./AudioConvert");
@@ -17,6 +18,13 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             console.log(`Processing Mesh: ${mesh.src}`)
 
             await processMesh(mesh, archive, manifestDirectory, outputDirectory);
+        }
+    }
+
+    if (manifest.skinnedMeshes) {
+        for (const skinnedMesh of manifest.skinnedMeshes) {
+            console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
+            await processSkinnedMesh(skinnedMesh, archive, manifestDirectory, outputDirectory);
         }
     }
 

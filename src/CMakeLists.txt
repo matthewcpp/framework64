@@ -9,6 +9,8 @@ endif()
 
 set(common_source_files
         ../include/framework64/allocator.h allocator.c
+        ../include/framework64/animation_controller.h animation_controller.c
+        ../include/framework64/animation_data.h animation_data.c
         ../include/framework64/asset_database.h
         ../include/framework64/audio.h
         ../include/framework64/audio_bank.h
@@ -93,6 +95,7 @@ else()
         ../include/framework64/desktop/scene.h desktop/scene.cpp
         ../include/framework64/desktop/shader.h desktop/shader.cpp
         ../include/framework64/desktop/shader_cache.h desktop/shader_cache.cpp
+        ../include/framework64/desktop/splitter.h desktop/splitter.cpp
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
         ../include/framework64/desktop/texture.h desktop/texture.cpp
         ../include/framework64/desktop/uniform_block.h

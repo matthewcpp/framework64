@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const crypto = require('crypto')
+const crypto = require('crypto');
 
 class ArchiveEntry {
     path

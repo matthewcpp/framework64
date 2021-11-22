@@ -2,12 +2,13 @@
 
 /** \file renderer.h */
 
+#include "animation_controller.h"
 #include "camera.h"
 #include "color.h"
+#include "font.h"
 #include "mesh.h"
 #include "texture.h"
 #include "vec2.h"
-#include "font.h"
 
 typedef enum {
     FW64_RENDERER_MODE_UNSET,
@@ -41,6 +42,7 @@ void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled
 int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
+void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y);
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y);

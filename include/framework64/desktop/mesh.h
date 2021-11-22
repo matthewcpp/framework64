@@ -32,6 +32,7 @@ struct fw64Primitive {
     fw64Material material;
     Mode mode = Mode::Unknown;
     uint32_t attributes = 0;
+    uint32_t joint_index = FW64_JOINT_INDEX_NONE;
     Box bounding_box;
 
     GLuint  gl_vertex_array_object = 0;

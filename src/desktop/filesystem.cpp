@@ -40,6 +40,18 @@ int Filesystem::open(int asset_index) {
     return file_handle_index;
 }
 
+int Filesystem::openFile(const std::string& path) {
+    int file_handle_index = getNextAvailableHandle();
+
+    if (file_handle_index < 0)
+        return file_handle_index;
+
+    file_handles[file_handle_index].open(path.c_str(), std::ios::binary);
+    file_sizes[file_handle_index] = sqlite3_column_int(database.select_raw_file_statement, 1);
+
+    return file_handle_index;
+}
+
 int Filesystem::close(int file_handle) {
     if (file_handle < 0 || file_handle >= FW64_FILESYSTEM_MAX_OPEN_FILES)
         return FW64_FILESYSTEM_INVALID_HANDLE;

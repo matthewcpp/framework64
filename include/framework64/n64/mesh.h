@@ -20,6 +20,7 @@ struct fw64Primitive {
     uint32_t vertices; // offset into mesh vertex array
     uint32_t display_list; // offset into mesh display_list array
     fw64Material* material;
+    uint32_t joint_index; // used for skinning
 };
 
 #define FW64_MESH_RESOURCES_HEADER_SIZE 3 * sizeof(uint32_t)

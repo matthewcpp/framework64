@@ -41,6 +41,8 @@ bool Engine::init(int screen_width, int screen_height) {
         return false;
     }
 
+    fw64_default_allocator_init();
+
     n64_input_interface = std::make_unique<N64InputInterface>();
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
 

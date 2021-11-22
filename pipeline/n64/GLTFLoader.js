@@ -66,28 +66,6 @@ class GLTFLoader {
         return this.mesh;
     }
 
-    /** Loads all meshes in the file and returns them as an array. */
-    async loadTerrain(gltfPath) {
-        this._loadFile(gltfPath);
-
-        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
-            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
-        }
-
-        const meshes = [];
-
-        for (let i = 0; i < this.gltf.meshes.length; i++) {
-            this.mesh = new N64Mesh(null);
-            await this._loadMesh(this.gltf.meshes[i]);
-            meshes.push(this.mesh);
-        }
-
-        return {
-            meshes: meshes,
-            resources: this.resources
-        }
-    }
-
     async loadScene(gltfPath, typeMap, layerMap) {
         this._loadFile(gltfPath);
 
@@ -315,6 +293,9 @@ class GLTFLoader {
             if (gltfPrimitive.attributes.TEXCOORD_0)
                 this._readTexCoords(gltfPrimitive, primitive);
 
+            if (gltfPrimitive.attributes.JOINTS_0)
+                this._readJointIndices(gltfPrimitive, primitive);
+
             this._readIndices(gltfPrimitive, primitive);
 
             const material = this.resources.materials[primitive.material];
@@ -461,6 +442,28 @@ class GLTFLoader {
         }
     }
 
+    _readJointIndices(gltfPrimitive, primitive) {
+        const accessor = this.gltf.accessors[gltfPrimitive.attributes.JOINTS_0];
+        const bufferView = this.gltf.bufferViews[accessor.bufferView];
+        const buffer = this._getBuffer(bufferView.buffer);
+
+        if (accessor.componentType !== GltfComponentType.UnsignedByte) {
+            throw new Error("Currently only vertex weights specified as Unsigned byte are supported.");
+        }
+
+        const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : 4;
+        let offset = bufferView.byteOffset;
+
+        primitive.jointIndices = [];
+
+        // TODO: Validate that there are no other non zero weighted indices
+        for (let i = 0; i < accessor.count; i++) {
+            primitive.jointIndices.push(buffer.readUInt8(offset));
+
+            offset += byteStride;
+        }
+    }
+
     _getDefaultStride(type, componentType) {
         let componentCount = 0;
         let componentSize = 0;
@@ -528,9 +531,12 @@ class GLTFLoader {
         }
         else if (accessor.componentType === GltfComponentType.UnsignedShort) { // these values need to be normalized to 0 - 255
             parseVertexColor = (vertex, buffer, offset) => {
-                vertex[6] = Math.round(buffer.readUInt16LE(offset) / 0xFF);
-                vertex[7] = Math.round(buffer.readUInt16LE(offset + 2) / 0xFF);
-                vertex[8] = Math.round(buffer.readUInt16LE(offset + 4) / 0xFF);
+                let r = buffer.readUInt16LE(offset);
+                let g = buffer.readUInt16LE(offset + 2);
+                let b = buffer.readUInt16LE(offset + 4);
+                vertex[6] = Math.round( (r / 65535.0) * 255);
+                vertex[7] = Math.round( (g / 65535.0) * 255);
+                vertex[8] = Math.round( (b / 65535.0) * 255);
                 vertex[9] = 255;
             };
         }

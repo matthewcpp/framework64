@@ -7,8 +7,10 @@ class N64Primitive {
     };
 
     static NoMaterial = 0xFFFF;
+    static NoJoint = 0xFFFF;
 
     vertices = [];
+    jointIndices = null;
     elements = [];
     elementType;
     material = 0;
@@ -21,11 +23,25 @@ class N64Primitive {
         this.elementType = elementType;
     }
 
+    get containsMultipleJointIndices () {
+        if (this.jointIndices == null)
+            return false;
+
+        const jointIndex = this.jointIndices[0];
+        for (let i = 0; i < this.jointIndices.length; i++) {
+            if (this.jointIndices[i] !== jointIndex)
+                return true;
+        }
+
+        return false;
+    }
+
     pruneUnusedVertices() {
         this.bounding = new Bounding();
         const elementMap = new Map();
         const newVertices = [];
         const newElements = [];
+        const newJointIndices = this.jointIndices ? [] : null;
 
         for (const triangle of this.elements) {
             const newTriangle = [];
@@ -38,6 +54,11 @@ class N64Primitive {
                     const newVertexIndex = newVertices.length;
                     elementMap.set(vertex, newVertexIndex);
                     newVertices.push(this.vertices[vertex]);
+
+                    if (newJointIndices) {
+                        newJointIndices.push(this.jointIndices[vertex]);
+                    }
+
                     this.bounding.encapsulatePoint(this.vertices[vertex]);
                     newTriangle.push(newVertexIndex);
                 }
@@ -48,6 +69,7 @@ class N64Primitive {
 
         this.vertices = newVertices;
         this.elements = newElements;
+        this.jointIndices = newJointIndices;
     }
 }
 

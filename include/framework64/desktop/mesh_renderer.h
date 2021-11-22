@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/animation_data.h"
 #include "framework64/camera.h"
 #include "framework64/renderer.h"
 #include "framework64/desktop/mesh.h"
@@ -18,7 +19,8 @@ public:
     void begin(fw64Camera * cam);
     void end();
 
-    void drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh);
+    void drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform);
+    void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
     void setDepthTestingEnabled(bool enabled);
     inline bool depthTestingEnabled() const { return depth_testing_enabled; }
@@ -32,10 +34,11 @@ public:
     fw64Primitive::Mode render_mode = fw64Primitive::Mode::Unknown;
 
 private:
-    void updateMeshTransformBlock(fw64Transform* transform);
+    void updateMeshTransformBlock(fw64Matrix & matrix);
     void updateLightingBlock();
     void setActiveShader(ShaderProgram* shader);
     void setGlDepthTestingState();
+    void drawPrimitive(fw64Primitive const & primitive);
 
 private:
 

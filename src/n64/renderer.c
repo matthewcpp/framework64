@@ -342,12 +342,7 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
     }
 }
 
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
-    
-    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
-        fw64Primitive* primitive = mesh->primitives + i;
-        
+static void fw64_renderer_draw_primitive(fw64Renderer* renderer, fw64Mesh* mesh, fw64Primitive* primitive) {
         fw64_renderer_set_shading_mode(renderer, primitive->material->shading_mode);
 
         switch (primitive->material->shading_mode) {
@@ -370,6 +365,31 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
             
         gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
         gDPPipeSync(renderer->display_list++);
+}
+
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    
+    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh->primitives + i;
+        
+        fw64_renderer_draw_primitive(renderer, mesh, primitive);
+    }
+
+    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+}
+
+void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    
+    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh->primitives + i;
+
+        gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+        
+        fw64_renderer_draw_primitive(renderer, mesh, primitive);
+
+        gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     }
 
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);

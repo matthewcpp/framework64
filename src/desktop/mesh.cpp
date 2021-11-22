@@ -2,6 +2,7 @@
 
 #include "framework64/desktop/asset_database.h"
 #include "framework64/desktop/glb_parser.h"
+#include "framework64/desktop/json_map.h"
 #include "framework64/desktop/texture.h"
 
 #include <cassert>
@@ -20,8 +21,18 @@ fw64Mesh* fw64Mesh::loadFromDatabase(fw64AssetDatabase* database, uint32_t index
     std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_mesh_statement, 0));
     const std::string mesh_path = database->asset_dir + asset_path;
 
+
+    auto* joint_map_str = reinterpret_cast<const char *>(sqlite3_column_text(database->select_mesh_statement, 1));
+
+    framework64::JointMap joint_map = [&joint_map_str](){
+        if (joint_map_str)
+            return framework64::parseJointMap(joint_map_str);
+        else
+            return framework64::JointMap();
+    }();
+
     framework64::GlbParser glb(database->shader_cache);
-    auto* mesh = glb.loadStaticMesh(mesh_path);
+    auto* mesh = glb.loadStaticMesh(mesh_path, joint_map);
 
     return mesh;
 }

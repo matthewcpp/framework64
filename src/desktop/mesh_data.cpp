@@ -1,5 +1,7 @@
 #include "framework64/desktop/mesh_data.h"
 
+#include <unordered_map>
+
 namespace framework64 {
 
 GLMeshInfo MeshData::createMesh() {
@@ -71,6 +73,26 @@ GLMeshInfo MeshData::createMesh() {
     glBindVertexArray(0);
 
     return mesh_info;
+}
+
+bool MeshData::hasMultipleJointIndices() {
+    if (joint_indices.empty())
+        return false;
+
+    uint8_t joint = joint_indices[0];
+    // note: these are read in as VEC4 with type unsigned byte...current implementation supports only a single joint
+    for (size_t i = 4; i < joint_indices.size(); i += 4) {
+        if (joint_indices[i] != joint)
+            return true;
+    }
+
+    return false;
+}
+
+std::vector<MeshData> MeshData::splitByJointIndex() {
+    std::vector<MeshData> split_data;
+
+    return split_data;
 }
 
 void GLMeshInfo::setPrimitiveValues(fw64Primitive& primitive) {

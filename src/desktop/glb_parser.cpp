@@ -1,6 +1,7 @@
 #include "framework64/desktop/glb_parser.h"
 
 #include "framework64/desktop/scene.h"
+#include "framework64/desktop/splitter.h"
 #include "framework64/matrix.h"
 
 #include <cassert>
@@ -21,7 +22,7 @@ enum GltfComponentType {
 
 static void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale);
 
-fw64Mesh* GlbParser::loadStaticMesh(std::string const & path) {
+fw64Mesh* GlbParser::loadStaticMesh(std::string const & path, JointMap const & joint_map) {
     if (!openFile(path))
         return nullptr;
 
@@ -31,7 +32,13 @@ fw64Mesh* GlbParser::loadStaticMesh(std::string const & path) {
     auto* static_mesh = parseStaticMesh(json_doc["meshes"][0]);
     static_mesh->resources.reset(shared_resources);
 
-    shared_resources = nullptr;
+    for (auto & primitive : static_mesh->primitives) {
+        auto mapped_joint = joint_map.find(primitive.joint_index);
+
+        if (mapped_joint != joint_map.end()) {
+            primitive.joint_index = mapped_joint->second;
+        }
+    }
 
     return static_mesh;
 }
@@ -373,37 +380,50 @@ fw64Mesh* GlbParser::parseStaticMesh(nlohmann::json const & node) {
     auto mesh = new fw64Mesh();
 
     for (auto const & primitive_node : node["primitives"]) {
-        auto const primitive_mode = getPrimitiveMode(primitive_node);
-
-        if (primitive_mode == fw64Primitive::Mode::Unknown)
-            continue;
-
-        auto & primitive = mesh->primitives.emplace_back();
-
-        primitive.mode = primitive_mode;
-
-        if (primitive_node.contains("material"))
-            parseMaterial(primitive.material, primitive_node["material"].get<size_t>());
-
         MeshData mesh_data = readPrimitiveMeshData(primitive_node);
 
-        if (!mesh_data.positions.empty()) {
-            auto const & attributes_node = primitive_node["attributes"];
-            auto accessor = attributes_node["POSITION"].get<size_t>();
-            primitive.bounding_box = getBoxFromAccessor(accessor);
-            box_encapsulate_box(&mesh->bounding_box, &primitive.bounding_box);
-        }
+        if (mesh_data.hasMultipleJointIndices()) {
+            auto partitions = splitByJointIndex(mesh_data);
 
-        if (mesh_data.indices_array_uint16.empty() && mesh_data.indices_array_uint32.empty()) {
-            return nullptr; // error?
+            for (auto & partition : partitions) {
+                createPrimitive(mesh, primitive_node, partition);
+            }
         }
-
-        GLMeshInfo gl_info = mesh_data.createMesh();
-        gl_info.setPrimitiveValues(primitive);
-        shader_cache.setShaderProgram(primitive);
+        else {
+            createPrimitive(mesh, primitive_node, mesh_data);
+        }
     }
 
     return mesh;
+}
+
+void GlbParser::createPrimitive(fw64Mesh* mesh, nlohmann::json const & primitive_node, MeshData& mesh_data) {
+    auto const primitive_mode = getPrimitiveMode(primitive_node);
+
+    if (primitive_mode == fw64Primitive::Mode::Unknown)
+        return;
+
+    auto & primitive = mesh->primitives.emplace_back();
+
+    primitive.mode = primitive_mode;
+
+    if (!mesh_data.joint_indices.empty()) {
+        primitive.joint_index = static_cast<uint32_t>(mesh_data.joint_indices[0]);
+    }
+
+    if (primitive_node.contains("material"))
+        parseMaterial(primitive.material, primitive_node["material"].get<size_t>());
+
+    if (!mesh_data.positions.empty()) {
+        auto const & attributes_node = primitive_node["attributes"];
+        auto accessor = attributes_node["POSITION"].get<size_t>();
+        primitive.bounding_box = getBoxFromAccessor(accessor);
+        box_encapsulate_box(&mesh->bounding_box, &primitive.bounding_box);
+    }
+
+    GLMeshInfo gl_info = mesh_data.createMesh();
+    gl_info.setPrimitiveValues(primitive);
+    shader_cache.setShaderProgram(primitive);
 }
 
 MeshData GlbParser::readPrimitiveMeshData(nlohmann::json const & primitive_node) {
@@ -414,6 +434,7 @@ MeshData GlbParser::readPrimitiveMeshData(nlohmann::json const & primitive_node)
     mesh_data.positions = readPrimitiveAttributeBuffer<float>(attributes_node, "POSITION");
     mesh_data.normals = readPrimitiveAttributeBuffer<float>(attributes_node, "NORMAL");
     mesh_data.tex_coords = readPrimitiveAttributeBuffer<float>(attributes_node, "TEXCOORD_0");
+    mesh_data.joint_indices = readPrimitiveAttributeBuffer<uint8_t>(attributes_node, "JOINTS_0"); // TODO: support other component types?
     mesh_data.colors = parseVertexColors(primitive_node);
 
     auto const & element_accessor_node = json_doc["accessors"][primitive_node["indices"].get<size_t>()];
@@ -426,6 +447,8 @@ MeshData GlbParser::readPrimitiveMeshData(nlohmann::json const & primitive_node)
     else if (componentType == GltfComponentType::UnsignedInt) {
         mesh_data.indices_array_uint32 = readBufferViewData<uint32_t >(bufferViewIndex);
     }
+
+    assert (!mesh_data.indices_array_uint16.empty() || !mesh_data.indices_array_uint32.empty());
 
     return mesh_data;
 }

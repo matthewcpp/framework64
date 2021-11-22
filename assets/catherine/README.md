@@ -1,0 +1,1 @@
+This Model was exported to glTF from the source model provided by buu342 for the [Sausage64 Blender Plugin](https://github.com/buu342/Blender-Sausage64)

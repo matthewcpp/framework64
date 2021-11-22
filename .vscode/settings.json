@@ -28,7 +28,8 @@
         "terrain.h": "c",
         "loader.h": "c",
         "quad.h": "c",
-        "material.h": "c"
+        "material.h": "c",
+        "animation.h": "c"
     },
     "cmake.configureOnOpen": true
 }
