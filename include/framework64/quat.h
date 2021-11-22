@@ -22,6 +22,7 @@ void quat_normalize(Quat* q);
 void quat_conjugate(Quat* q);
 
 void quat_from_euler(Quat* q, float x, float y, float z);
+void quat_slerp(Quat* out, Quat* a, Quat* b, float t);
 
 #ifdef __cplusplus
 }

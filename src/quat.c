@@ -101,3 +101,39 @@ void quat_from_euler(Quat* q, float x, float y, float z) {
     q->z = cx * cy * sz - sx * sy * cz;
     q->w = cx * cy * cz + sx * sy * sz;
 }
+
+void quat_slerp(Quat* out, Quat* a, Quat* b, float t) {
+    float omega, cosom, sinom, scale0, scale1;
+
+    // calc cosine
+    cosom = a->x * b->x + a->y * b->y + a->z * b->z + a->w * b->w;
+
+    // adjust signs (if necessary)
+    if (cosom < 0.0) {
+        cosom = -cosom;
+        b->x = -b->x;
+        b->y = -b->y;
+        b->z = -b->z;
+        b->w = -b->w;
+    }
+
+    // calculate coefficients
+    if (1.0f - cosom > EPSILON) {
+        // standard case (slerp)
+        omega = fw64_acosf(cosom);
+        sinom = fw64_sinf(omega);
+        scale0 = fw64_sinf((1.0f - t) * omega) / sinom;
+        scale1 = fw64_sinf(t * omega) / sinom;
+    } else {
+        // "from" and "to" quaternions are very close
+        //  ... so we can do a linear interpolation
+        scale0 = 1.0f - t;
+        scale1 = t;
+    }
+
+    // calculate final values
+    out->x = scale0 * a->x + scale1 * b->x;
+    out->y = scale0 * a->y + scale1 * b->y;
+    out->z = scale0 * a->z + scale1 * b->z;
+    out->w = scale0 * a->w + scale1 * b->w;
+}
