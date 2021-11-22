@@ -18,8 +18,18 @@ function safeDefineName(name) {
     return name.replaceAll(' ', '_').replaceAll('-', '_');
 }
 
+function mat4IdentityBuffer() {
+    const b = Buffer.alloc(16 * 4, 0);
+    b.writeFloatLE(1.0, 0);
+    b.writeFloatLE(1.0, 5 * 4);
+    b.writeFloatLE(1.0, 10 * 4);
+    b.writeFloatLE(1.0, 15 * 4);
+    return b;
+}
+
 module.exports = {
     nextPowerOf2: nextPowerOf2,
     isPowerOf2: isPowerOf2,
-    safeDefineName: safeDefineName
+    safeDefineName: safeDefineName,
+    mat4IdentityBuffer: mat4IdentityBuffer
 }
