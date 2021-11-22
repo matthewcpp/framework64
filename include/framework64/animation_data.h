@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file animation_data.h */
+
 #include "framework64/allocator.h"
 #include "framework64/asset_database.h"
 #include "framework64/types.h"

@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file scene.h */
+
 #include "framework64/asset_database.h"
 #include "framework64/mesh.h"
 #include "framework64/node.h"
