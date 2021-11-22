@@ -9,6 +9,7 @@ endif()
 
 set(common_source_files
         ../include/framework64/allocator.h allocator.c
+        ../include/framework64/animation_data.h animation_data.c
         ../include/framework64/asset_database.h
         ../include/framework64/audio.h
         ../include/framework64/audio_bank.h
