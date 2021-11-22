@@ -41,29 +41,47 @@ void MeshRenderer::end(){
     render_mode = fw64Primitive::Mode::Unknown;
 }
 
-void MeshRenderer::updateMeshTransformBlock(fw64Transform* transform) {
+void MeshRenderer::updateMeshTransformBlock(fw64Matrix & matrix) {
     // compute the normal matrix: transpose(inverse(modelView))
-    matrix_multiply(mesh_transform_uniform_block.data.normal_matrix.data(), &camera->view.m[0], &transform->matrix.m[0]);
+    matrix_multiply(mesh_transform_uniform_block.data.normal_matrix.data(), &camera->view.m[0], &matrix.m[0]);
     matrix_invert(mesh_transform_uniform_block.data.normal_matrix.data(), mesh_transform_uniform_block.data.normal_matrix.data());
     matrix_transpose(mesh_transform_uniform_block.data.normal_matrix.data());
 
-    matrix_multiply(mesh_transform_uniform_block.data.mvp_matrix.data(), view_projection_matrix.data(), &transform->matrix.m[0]);
+    matrix_multiply(mesh_transform_uniform_block.data.mvp_matrix.data(), view_projection_matrix.data(), &matrix.m[0]);
 
     mesh_transform_uniform_block.update();
 }
 
-void MeshRenderer::drawStaticMesh(fw64Transform* transform, fw64Mesh* mesh) {
-    updateMeshTransformBlock(transform);
+void MeshRenderer::drawPrimitive(fw64Primitive const & primitive) {
+    setActiveShader(primitive.material.shader);
+    active_shader->shader->setUniforms(primitive.material);
+    glBindVertexArray(primitive.gl_vertex_array_object);
+
+    glDrawElements(primitive.mode, primitive.element_count, primitive.element_type, 0);
+}
+
+void MeshRenderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
+    updateMeshTransformBlock(transform->matrix);
 
     for (auto const & primitive : mesh->primitives) {
         if (primitive.mode != render_mode)
             continue;
 
-        setActiveShader(primitive.material.shader);
-        active_shader->shader->setUniforms(primitive.material);
-        glBindVertexArray(primitive.gl_vertex_array_object);
+        drawPrimitive(primitive);
+    }
+}
 
-        glDrawElements(primitive.mode, primitive.element_count, primitive.element_type, 0);
+void MeshRenderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* controller, fw64Transform *transform) {
+    for (auto const & primitive : mesh->primitives) {
+        if (primitive.mode != render_mode)
+            continue;
+
+        // should this be done in the shader?
+        fw64Matrix transform_matrix;
+        matrix_multiply(&transform_matrix.m[0], &transform->matrix.m[0], &controller->matrices[primitive.joint_index].m[0]);
+        updateMeshTransformBlock(transform_matrix);
+
+        drawPrimitive(primitive);
     }
 }
 

@@ -30,11 +30,15 @@ struct MeshData {
     std::vector<float> normals;
     std::vector<float> tex_coords;
     std::vector<float> colors;
+    std::vector<uint8_t> joint_indices;
 
     std::vector<uint16_t> indices_array_uint16;
     std::vector<uint32_t> indices_array_uint32;
 
     GLMeshInfo createMesh();
+    bool hasMultipleJointIndices();
+
+    std::vector<MeshData> splitByJointIndex();
 };
 
 

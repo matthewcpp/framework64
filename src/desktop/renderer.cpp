@@ -113,7 +113,12 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
     assert(renderer->render_mode == FW64_RENDERER_MODE_TRIANGLES || renderer->render_mode == FW64_RENDERER_MODE_LINES);
-    renderer->mesh_renderer.drawStaticMesh(transform, mesh);
+    renderer->mesh_renderer.drawStaticMesh(mesh, transform);
+}
+
+void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
+    assert(renderer->render_mode == FW64_RENDERER_MODE_TRIANGLES || renderer->render_mode == FW64_RENDERER_MODE_LINES);
+    renderer->mesh_renderer.drawAnimatedMesh(mesh, controller, transform);
 }
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {

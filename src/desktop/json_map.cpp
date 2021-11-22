@@ -41,4 +41,22 @@ std::unordered_map<std::string, T> parseMapJson(std::string const& json_str) {
     return typemap;
 }
 
+JointMap parseJointMap(std::string const & json_str) {
+    JointMap jointMap;
+
+    if (!json_str.empty()) {
+
+    }
+    nlohmann::json json_doc = nlohmann::json ::parse(json_str);
+
+    for (auto const & item : json_doc.items()) {
+        uint32_t original_index = static_cast<uint32_t>(std::stoi(item.key()));
+        uint32_t mapped_index = item.value().get<uint32_t>();
+
+        jointMap[original_index] = mapped_index;
+    }
+
+    return jointMap;
+}
+
 }

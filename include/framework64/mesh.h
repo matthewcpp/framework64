@@ -8,6 +8,7 @@
 #include "framework64/material.h"
 #include "framework64/texture.h"
 
+#include <limits.h>
 #include <stdint.h>
 
 typedef enum {
@@ -20,6 +21,8 @@ typedef enum {
     FW64_SHADING_MODE_FILL,
     Fw64_SHADING_MODE_COUNT
 } fw64ShadingMode;
+
+#define FW64_JOINT_INDEX_NONE UINT32_MAX
 
 
 typedef struct fw64Mesh fw64Mesh;

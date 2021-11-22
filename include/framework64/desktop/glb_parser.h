@@ -32,7 +32,7 @@ public:
 
 public:
     /** Extracts a single, static mesh from the GLB file. */
-    fw64Mesh* loadStaticMesh(std::string const & path);
+    fw64Mesh* loadStaticMesh(std::string const & path, JointMap const & joint_map);
     fw64Scene* loadScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map);
 
 private:
@@ -49,6 +49,7 @@ private:
 
     fw64Mesh* getStaticMesh(size_t mesh_index);
     fw64Mesh* parseStaticMesh(nlohmann::json const & node);
+    void createPrimitive(fw64Mesh* mesh, nlohmann::json const & primitive_node, MeshData& mesh_data);
     fw64Texture* getTexture(size_t texture_index);
     fw64Texture* parseTexture(size_t texture_index);
     fw64Image* getImage(size_t image_index);
