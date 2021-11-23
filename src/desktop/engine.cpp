@@ -59,7 +59,7 @@ bool Engine::init(int screen_width, int screen_height) {
         return false;
     }
 
-    if (!renderer->init(screen_width, screen_height, shader_dir_path)) {
+    if (!renderer->init(screen_width, screen_height, *shader_cache)) {
         std::cout << "Failed to initialize renderer" << std::endl;
         return false;
     }

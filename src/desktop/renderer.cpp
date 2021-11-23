@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 
-bool fw64Renderer::init(int screen_width, int screen_height, const std::string & shader_dir_path) {
+bool fw64Renderer::init(int screen_width, int screen_height, framework64::ShaderCache& shader_cache) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
@@ -26,8 +26,8 @@ bool fw64Renderer::init(int screen_width, int screen_height, const std::string &
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    if (!sprite_renderer.init(shader_dir_path)) return false;
-    if (!mesh_renderer.init(shader_dir_path)) return false;
+    if (!sprite_renderer.init(shader_cache)) return false;
+    if (!mesh_renderer.init(shader_cache)) return false;
     setScreenSize(screen_width, screen_height);
 
     return true;

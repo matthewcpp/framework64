@@ -21,6 +21,8 @@ public:
 
     void setParticleShader(fw64Primitive & primitive);
 
+    inline std::string shaderDir() const { return shader_dir; }
+
 private:
     void setProgram(fw64Primitive & primitive, Shader* shader, uint64_t program_hash);
     uint64_t programHash(fw64Primitive const & primitive) const;

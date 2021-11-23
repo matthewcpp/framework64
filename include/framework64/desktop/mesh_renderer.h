@@ -4,6 +4,7 @@
 #include "framework64/camera.h"
 #include "framework64/renderer.h"
 #include "framework64/desktop/mesh.h"
+#include "framework64/desktop/screen_overlay.h"
 #include "framework64/desktop/shader_cache.h"
 
 #include "framework64/desktop/uniform_block.h"
@@ -15,7 +16,7 @@ namespace framework64 {
 
 class MeshRenderer {
 public:
-    bool init(std::string const & shader_dir);
+    bool init(ShaderCache& shader_cache);
     void begin(fw64Camera * cam);
     void end();
 
@@ -29,6 +30,8 @@ public:
     void setLightEnabled(int index, int enabled);
     void setLightDirection(int index, float x, float y, float z);
     void setLightColor(int index, uint8_t r, uint8_t g, uint8_t b);
+
+    void renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 public:
     fw64Primitive::Mode render_mode = fw64Primitive::Mode::Unknown;
@@ -76,6 +79,8 @@ private:
 
     std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
     bool lighting_dirty = false;
+
+    ScreenOverlay screen_overlay;
 };
 
 }

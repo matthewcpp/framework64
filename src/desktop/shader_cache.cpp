@@ -25,10 +25,11 @@ uint64_t ShaderCache::programHash(fw64Primitive const & primitive) const {
     return ( static_cast<uint64_t>(primitive.attributes) << 32) | static_cast<uint64_t>(primitive.material.featureMask());
 }
 
-// TODO: This will get more involved
+// TODO: This will continue to get more involved
 Shader* ShaderCache::getShader(fw64Primitive const & primitive) {
     if (primitive.mode == fw64Primitive::Mode::Triangles) {
-        if (primitive.attributes & fw64Primitive::Attributes::VertexColors)
+        if ((primitive.attributes & fw64Primitive::Attributes::VertexColors) ||
+            (primitive.attributes & fw64Primitive::Attributes::Normals) == 0)
             return &vertex_color_shader;
         else
             return &gouraud_shader;

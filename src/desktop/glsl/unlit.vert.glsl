@@ -9,6 +9,10 @@ layout(location = 0) in vec4 fw64_vertex_position;
 layout(location = 3) in vec4 fw64_vertex_color;
 #endif
 
+#ifdef FW64_DIFFUSE_COLOR
+uniform vec4 diffuse_color;
+#endif
+
 out vec4 unlit_color;
 
 void main() {
@@ -16,5 +20,9 @@ void main() {
 
     #ifdef FW64_VERTEX_COLORS
     unlit_color = fw64_vertex_color;
+    #endif
+
+    #ifdef FW64_DIFFUSE_COLOR
+    unlit_color = diffuse_color;
     #endif
 }

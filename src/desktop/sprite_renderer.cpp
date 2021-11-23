@@ -5,7 +5,10 @@
 #include "framework64/desktop/shader.h"
 
 namespace framework64 {
-    bool SpriteRenderer::init(std::string const & shader_dir) {
+    bool SpriteRenderer::init(ShaderCache& shader_cache) {
+        // TODO: create sprite shader object
+        std::string shader_dir = shader_cache.shaderDir();
+
         // compile sprite shader and setup uniform locations
         const std::string vertex_path = shader_dir + "sprite.vert.glsl";
         const std::string frag_path = shader_dir + "sprite.frag.glsl";

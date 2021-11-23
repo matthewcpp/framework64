@@ -94,7 +94,9 @@ else()
         ../include/framework64/desktop/particle_shader.h desktop/particle_shader.cpp
         desktop/quad.cpp
         ../include/framework64/desktop/renderer.h desktop/renderer.cpp
+        desktop/render_util.cpp
         ../include/framework64/desktop/scene.h desktop/scene.cpp
+        ../include/framework64/desktop/screen_overlay.h desktop/screen_overlay.cpp
         ../include/framework64/desktop/shader.h desktop/shader.cpp
         ../include/framework64/desktop/shader_cache.h desktop/shader_cache.cpp
         ../include/framework64/desktop/splitter.h desktop/splitter.cpp
