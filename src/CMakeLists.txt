@@ -101,7 +101,7 @@ else()
         ../include/framework64/desktop/sprite_renderer.h desktop/sprite_renderer.cpp
         ../include/framework64/desktop/texture.h desktop/texture.cpp
         ../include/framework64/desktop/uniform_block.h
-        ../include/framework64/desktop/vertex_color_shader.h desktop/vertex_color_shader.cpp
+            ../include/framework64/desktop/unlit_shader.h desktop/unlit_shader.cpp
         ../include/framework64/n64/controller_button.h)
 endif()
 
