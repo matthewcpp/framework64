@@ -46,6 +46,7 @@ set(common_source_files
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/fps_camera.h util/fps_camera.c
         ../include/framework64/util/quad.h
+        ../include/framework64/util/renderer_util.h
         )
 
 if (FW64_PLATFORM_N64)
@@ -65,6 +66,7 @@ if (FW64_PLATFORM_N64)
             ../include/framework64/n64/mesh.h n64/mesh.c
             n64/quad.c
             ../include/framework64/n64/renderer.h n64/renderer.c
+            n64/renderer_util.c
             ../include/framework64/n64/scene.h n64/scene.c
             ../include/framework64/n64/texture.h n64/texture.c
         )
