@@ -21,7 +21,7 @@
 
 struct fw64Renderer {
 public:
-    bool init(int screen_width, int screen_height, std::string const & shader_dir_path);
+    bool init(int screen_width, int screen_height, framework64::ShaderCache& shader_cache);
 
     void setClearColor(float r, float g, float b, float a);
     void begin(fw64Camera* cam, fw64RenderMode new_render_mode, fw64RendererFlags flags);

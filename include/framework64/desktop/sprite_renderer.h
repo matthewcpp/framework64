@@ -3,6 +3,7 @@
 #include "framework64/camera.h"
 
 #include "framework64/desktop/font.h"
+#include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 
 #ifdef __linux__
@@ -21,7 +22,7 @@ class SpriteRenderer {
 public:
     SpriteRenderer() = default;
 
-    bool init(std::string const & shader_dir);
+    bool init(ShaderCache& shader_cache);
     void setScreenSize(int width, int height);
     void begin(fw64Camera const * camera);
     void end();

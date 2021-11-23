@@ -3,7 +3,7 @@
 #include "framework64/desktop/gouraud_shader.h"
 #include "framework64/desktop/line_shader.h"
 #include "framework64/desktop/particle_shader.h"
-#include "framework64/desktop/vertex_color_shader.h"
+#include "framework64/desktop/unlit_shader.h"
 #include "framework64/desktop/mesh.h"
 
 #include <memory>
@@ -21,6 +21,8 @@ public:
 
     void setParticleShader(fw64Primitive & primitive);
 
+    inline std::string shaderDir() const { return shader_dir; }
+
 private:
     void setProgram(fw64Primitive & primitive, Shader* shader, uint64_t program_hash);
     uint64_t programHash(fw64Primitive const & primitive) const;
@@ -30,7 +32,7 @@ private:
     GouraudShader gouraud_shader;
     LineShader line_shader;
     ParticleShader particle_shader;
-    VertexColorShader vertex_color_shader;
+    UnlitShader vertex_color_shader;
 
 
     std::unordered_multimap<Shader*, std::unique_ptr<ShaderProgram>> shader_programs;

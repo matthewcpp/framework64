@@ -193,14 +193,14 @@
         {
             "name" : "Pad",
             "rotation" : [
-                -0.5305756330490112,
-                0.31849420070648193,
-                0.6057383418083191,
-                0.5001320242881775
+                -0.5261521339416504,
+                0.31339365243911743,
+                0.6081940531730652,
+                0.5050232410430908
             ],
             "scale" : [
-                1.0000001192092896,
                 1,
+                1.0000001192092896,
                 1.0000001192092896
             ],
             "translation" : [
@@ -8400,12 +8400,9 @@
             "doubleSided" : true,
             "name" : "FaceTex",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.955087423324585,
-                    0.6477828025817871,
-                    0.4808657169342041,
-                    1
-                ],
+                "baseColorTexture" : {
+                    "index" : 0
+                },
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.5
             }
@@ -8512,12 +8509,9 @@
             "doubleSided" : true,
             "name" : "BootTex",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.08353099972009659,
-                    0.06174299865961075,
-                    0.020546000450849533,
-                    1
-                ],
+                "baseColorTexture" : {
+                    "index" : 1
+                },
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.5
             }
@@ -8526,12 +8520,9 @@
             "doubleSided" : true,
             "name" : "PantsTex",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.05496859923005104,
-                    0.05496859923005104,
-                    0.05496859923005104,
-                    1
-                ],
+                "baseColorTexture" : {
+                    "index" : 2
+                },
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.5
             }
@@ -8554,12 +8545,9 @@
             "doubleSided" : true,
             "name" : "ChestTex",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.36141112446784973,
-                    0.36141112446784973,
-                    0.36141112446784973,
-                    1
-                ],
+                "baseColorTexture" : {
+                    "index" : 3
+                },
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.5
             }
@@ -8568,12 +8556,9 @@
             "doubleSided" : true,
             "name" : "BackTex",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.3614110052585602,
-                    0.3614110052585602,
-                    0.3614110052585602,
-                    1
-                ],
+                "baseColorTexture" : {
+                    "index" : 4
+                },
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.5
             }
@@ -8582,12 +8567,9 @@
             "doubleSided" : true,
             "name" : "KnifeSheatheTex",
             "pbrMetallicRoughness" : {
-                "baseColorFactor" : [
-                    0.800000011920929,
-                    0.800000011920929,
-                    0.800000011920929,
-                    1
-                ],
+                "baseColorTexture" : {
+                    "index" : 5
+                },
                 "metallicFactor" : 0,
                 "roughnessFactor" : 0.5
             }
@@ -8777,6 +8759,64 @@
                     "material" : 14
                 }
             ]
+        }
+    ],
+    "textures" : [
+        {
+            "sampler" : 0,
+            "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
+        },
+        {
+            "sampler" : 0,
+            "source" : 2
+        },
+        {
+            "sampler" : 0,
+            "source" : 3
+        },
+        {
+            "sampler" : 0,
+            "source" : 4
+        },
+        {
+            "sampler" : 0,
+            "source" : 5
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "FaceTex",
+            "uri" : "FaceTex.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "BootTex",
+            "uri" : "BootTex.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "PantsTex",
+            "uri" : "PantsTex.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "ChestTex",
+            "uri" : "ChestTex.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "BackTex",
+            "uri" : "BackTex.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "KnifeSheatheTex",
+            "uri" : "KnifeSheatheTex.png"
         }
     ],
     "skins" : [
@@ -17236,6 +17276,12 @@
             "buffer" : 0,
             "byteLength" : 324,
             "byteOffset" : 260692
+        }
+    ],
+    "samplers" : [
+        {
+            "magFilter" : 9729,
+            "minFilter" : 9987
         }
     ],
     "buffers" : [

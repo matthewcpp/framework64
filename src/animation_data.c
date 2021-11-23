@@ -47,6 +47,10 @@ fw64AnimationData* fw64_animation_data_load(fw64AssetDatabase* database, uint32_
     return data;
 }
 
+fw64Animation* fw64_animation_data_get_animation(fw64AnimationData* animation_data, int index) {
+    return animation_data->animations + index;
+}
+
 void fw64_animation_data_delete(fw64AnimationData* data, fw64Allocator* allocator) {
     allocator->free(allocator, data->skin.joints); // note: joint hierarchy consists of single allocation
     allocator->free(allocator, data->skin.inverse_bind_matrices);
