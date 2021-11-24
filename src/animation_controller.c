@@ -85,8 +85,15 @@ void update_skin(fw64AnimationController* controller) {
     uint16_t* root_children = controller->animation_data->skin.hierarchy + root_joint->children_index;
 
 
+    fw64Matrix* root_matrix = controller->matrices;
     float local_matrix[16];
-    matrix_set_identity(&local_matrix[0]);
+
+    #ifdef PLATFORM_N64
+        guMtxL2F((float (*)[4])local_matrix, root_matrix);
+    #else
+        memcpy(local_matrix, &root_matrix->m[0], sizeof(float) * 16);
+    #endif
+    
     for (uint16_t i = 0; i < root_joint->children_count; i++) {
         update_joint(controller, root_children[i], &local_matrix[0]);
     }

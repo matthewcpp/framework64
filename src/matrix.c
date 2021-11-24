@@ -53,6 +53,42 @@ void matrix_from_trs(float* out, Vec3* v, Quat* q, Vec3* s) {
     out[15] = 1;
 }
 
+void matrix_from_quat(float* out, Quat* q) {
+  float x2 = q->x + q->x;
+  float y2 = q->y + q->y;
+  float z2 = q->z + q->z;
+
+  float xx = q->x * x2;
+  float yx = q->y * x2;
+  float yy = q->y * y2;
+  float zx = q->z * x2;
+  float zy = q->z * y2;
+  float zz = q->z * z2;
+  float wx = q->w * x2;
+  float wy = q->w * y2;
+  float wz = q->w * z2;
+
+  out[0] = 1 - yy - zz;
+  out[1] = yx + wz;
+  out[2] = zx - wy;
+  out[3] = 0;
+
+  out[4] = yx - wz;
+  out[5] = 1 - xx - zz;
+  out[6] = zy + wx;
+  out[7] = 0;
+
+  out[8] = zx + wy;
+  out[9] = zy - wx;
+  out[10] = 1 - xx - yy;
+  out[11] = 0;
+
+  out[12] = 0;
+  out[13] = 0;
+  out[14] = 0;
+  out[15] = 1;
+}
+
 void matrix_target_to(float* out, Vec3* eye, Vec3* target, Vec3* up) {
     float eyex = eye->x,
     eyey = eye->y,
