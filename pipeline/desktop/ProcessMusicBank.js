@@ -1,3 +1,5 @@
+const AudioHeader = require("../AudioHeader");
+
 const fs = require("fs");
 const path = require("path");
 const util = require("util");
@@ -41,11 +43,9 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
             fs.copyFileSync(sourceFilePath, destFilePath);
         }
     }
-    for (const file of files) {
-
-    }
 
     bundle.addMusicBank(musicBank, files);
+    AudioHeader.writeMusicBankHeader(sourceDir, outputDirectory);
 }
 
 module.exports = processMusicBank;

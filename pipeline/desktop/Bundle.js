@@ -108,12 +108,6 @@ class Bundle {
         this._soundBankStmt.run(assetId, assetName, files.length);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_soundbank_${assetName} ${assetId}\n`);
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const soundName = path.basename(file, path.extname(file));
-            fs.writeSync(this._headerFile,`#define FW64_ASSET_sound_${assetName}_${soundName}  ${i}\n`);
-        }
     }
 
     addMusicBank(musicBank, files) {
@@ -123,12 +117,6 @@ class Bundle {
         this._musicBankStmt.run(assetId, assetName, files.length);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_musicbank_${assetName} ${assetId}\n`);
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const musicName = path.basename(file, path.extname(file));
-            fs.writeSync(this._headerFile,`#define FW64_ASSET_music_${assetName}_${musicName}  ${i}\n`);
-        }
     }
 
     addRaw(rawPath, size) {
