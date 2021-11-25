@@ -24,7 +24,7 @@ void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle, fw64
         resources->images = allocator->malloc(allocator, sizeof(fw64Image) * resources->image_count);
 
         for (uint32_t i = 0; i < resources->image_count; i++) {
-            fw64_n64_image_init_from_rom(resources->images + i, asset_index_data[i], allocator);
+            fw64_n64_image_init_from_rom(resources->images + i, asset_index_data[i], FW64_IMAGE_FLAG_NONE, allocator);
         }
 
         allocator->free(allocator, asset_index_data);

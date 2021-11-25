@@ -79,8 +79,12 @@ fw64Image::~fw64Image() {
 
 
 // C API
-fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t index, fw64Allocator* allocator) {
-    return fw64Image::loadFromDatabase(asset_database, index);
+fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+    return fw64Image::loadFromDatabase(asset_database, asset_index);
+}
+
+fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint32_t asset_index, uint32_t options, fw64Allocator* allocator) {
+    return fw64Image::loadFromDatabase(asset_database, asset_index);
 }
 
 void fw64_image_delete(fw64Image* image, fw64Allocator* allocator) {

@@ -1,6 +1,4 @@
-#include "framework64/filesystem.h"
-
-#include <nusys.h>
+#include "framework64/n64/filesystem.h"
 
 #include <limits.h>
 #include <malloc.h>
@@ -88,6 +86,14 @@ int fw64_filesystem_read(void* buffer, int size, int count, int handle) {
 
     u32 rom_location = (u32)(&_asset_dataSegmentRomStart[0]) + file_handle->data_loc + file_handle->get_pos;
 
+    fw64_n64_filesystem_raw_read(buffer, rom_location, data_total);
+
+    open_files[handle].get_pos += data_total;
+
+    return data_total;
+}
+
+int fw64_n64_filesystem_raw_read(void* buffer, u32 rom_location, u32 data_total) {
     u8* dest_buffer = buffer;
     int buffer_is_aligned = ((u32)buffer & 7) == 0;
     u32 max_read_size = buffer_is_aligned ? MAX_DMA : MAX_UNALIGNED_READ;
@@ -105,7 +111,6 @@ int fw64_filesystem_read(void* buffer, int size, int count, int handle) {
         }
 
         dest_buffer += chunk_size;
-        open_files[handle].get_pos += chunk_size;
         rom_location += chunk_size;
         data_reamining -= chunk_size;
     }
