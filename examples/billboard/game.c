@@ -18,7 +18,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_update_projection_matrix(&game->fps.camera);
     vec3_set(&game->fps.camera.transform.position, 0.6f, 12.0f, 40.0f);
 
-    fw64Image* flame_image = fw64_image_load(engine->assets, FW64_ASSET_image_fire_sprite, NULL);
+    fw64Image* flame_image = fw64_image_load_with_options(engine->assets, FW64_ASSET_image_fire_sprite, FW64_IMAGE_FLAG_DMA_MODE, NULL);
     flame_init(&game->flame, engine, flame_image);
     vec3_set(&game->flame.entity.transform.scale, 10.0f, 12.0f, 10.0f);
     vec3_set(&game->flame.entity.transform.position, 0, 11.0f, 0.0f);
