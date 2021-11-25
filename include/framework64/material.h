@@ -22,6 +22,7 @@ typedef enum {
     Fw64_SHADING_MODE_COUNT
 } fw64ShadingMode;
 
+void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, int initial_frame);
 fw64Texture* fw64_material_get_texture(fw64Material* material);
 void fw64_material_set_texture_frame(fw64Material* material, int frame);
 int fw64_material_get_texture_frame(fw64Material* material);

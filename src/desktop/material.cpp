@@ -3,6 +3,11 @@
 
 // C Interface
 
+void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, int initial_frame) {
+    material->texture = texture;
+    fw64_material_set_texture_frame(material, initial_frame);
+}
+
 fw64Texture* fw64_material_get_texture(fw64Material* material) {
     return material->texture;
 }
