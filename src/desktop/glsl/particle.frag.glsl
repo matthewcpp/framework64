@@ -13,7 +13,8 @@ out vec4 final_color;
 void main() {
     vec2 sample_coords = vec2(
         fw64_texture_slice_left + (tex_coords.x  * fw64_texture_slice_width),
-        fw64_texture_slice_top + (tex_coords.y * fw64_texture_slice_height));
+        fw64_texture_slice_top + (tex_coords.y * fw64_texture_slice_height)
+    );
 
     final_color = texture(diffuse_texture_sampler, sample_coords);
 
