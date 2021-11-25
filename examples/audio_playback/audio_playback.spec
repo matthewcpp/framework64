@@ -21,7 +21,7 @@ beginseg
 	entry 	nuBoot
 	address NU_SPEC_BOOT_ADDR
 	stack   NU_SPEC_BOOT_STACK
-	include "audio.o"
+	include "audio_playback.o"
 	include "/usr/lib/n64/PR/rspboot.o"
 	include "/usr/lib/n64/PR/aspMain.o"
 	include "/usr/lib/n64/PR/n_aspMain.o"
@@ -41,7 +41,7 @@ beginseg
 endseg
 
 beginwave
-	name	"audio"
+	name	"audio_playback"
 	include	"code"
 	include "asset_data"
 endwave
