@@ -401,19 +401,18 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
     fw64Image* image = texture->image;
     int slice_width = fw64_texture_slice_width(texture);
     int slice_height = fw64_texture_slice_height(texture);
-    int frame_offset = slice_width * slice_height * image->info.bpp * frame;
 
     // unfortunetly due to the way that the gDPLoadTextureBlock macro is setup we have to pass G_IM_SIZ_16b in or G_IM_SIZ_32b
     switch (image->info.format)
     {
     case FW64_N64_IMAGE_FORMAT_RGBA16:
-    gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
+    gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
         G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
         texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
         break;
 
     case FW64_N64_IMAGE_FORMAT_RGBA32:
-    gDPLoadTextureBlock(renderer->display_list++, texture->image->data + frame_offset,
+    gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
         G_IM_FMT_RGBA, G_IM_SIZ_32b,  slice_width, slice_height, 0,
         texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
         break;
