@@ -15,7 +15,7 @@ function isPowerOf2(x) {
 }
 
 function safeDefineName(name) {
-    return name.replaceAll(' ', '_').replaceAll('-', '_');
+    return name.replaceAll(' ', '_').replaceAll('-', '_').replaceAll('.', '_');
 }
 
 function mat4IdentityBuffer() {

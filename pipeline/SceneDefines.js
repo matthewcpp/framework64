@@ -16,9 +16,6 @@ function writeSceneDefines(gltf, name, sceneNode, destFile) {
             if (!node.hasOwnProperty("name") || !node.hasOwnProperty("extras"))
                 continue;
 
-            if (!node.extras.type)
-                continue;
-
             const nodeName = Util.safeDefineName(node.name);
             fs.writeSync(file, `#define FW64_scene_${name}_node_${nodeName} ${i}\n`);
         }
