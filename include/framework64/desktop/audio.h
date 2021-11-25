@@ -21,6 +21,8 @@ public:
     void stopMusic();
     int musicTrackCount();
 
+    float music_playback_speed = 1.0f;
+
 private:
     void unloadCurrentMusicTrack();
     void unloadSoundBank();
