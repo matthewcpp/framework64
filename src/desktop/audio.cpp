@@ -72,7 +72,8 @@ bool fw64Audio::setCurrentMusicTrack(uint32_t track_num) {
     if (!music_bank)
         return false;
 
-    if (current_music_track && current_track_index == track_num)
+    
+    if (current_music_track && Mix_PlayingMusic() && current_track_index == track_num)
         return false;
 
     if (track_num >= music_bank->track_count)
@@ -144,5 +145,13 @@ int fw64_audio_music_track_count(fw64Audio* audio) {
 }
 
 fw64AudioStatus fw64_audio_get_music_status(fw64Audio* audio) {
-    return FW64_AUDIO_STOPPED;
+    return Mix_PlayingMusic() ? FW64_AUDIO_PLAYING : FW64_AUDIO_STOPPED;
+}
+
+float fw64_audio_get_playback_speed(fw64Audio* audio) {
+    return audio->music_playback_speed;
+}
+
+void fw64_audio_set_music_playback_speed(fw64Audio* audio, float speed) {
+    audio->music_playback_speed = speed;
 }

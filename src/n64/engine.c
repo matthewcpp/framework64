@@ -72,4 +72,5 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
 void fw64_n64_engine_update(fw64Engine* engine) {
     fw64_n64_engine_update_time(engine);
     fw64_n64_input_update(engine->input);
+    fw64_n64_audio_update(engine->audio);
 }

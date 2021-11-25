@@ -2,12 +2,6 @@
 #include "framework64/n64/filesystem.h"
 #include "framework64/n64/audio_bank.h"
 
-#include <nusys.h>
-
-#pragma GCC diagnostic ignored "-Wcomment"
-#include <nualsgi_n.h>
-#pragma GCC diagnostic pop
-
 #include <string.h>
 
 #define FW64_N64_MAX_VOL 0x7fff
@@ -17,6 +11,27 @@ void fw64_n64_audio_init(fw64Audio* audio) {
     audio->music_volume = 1.0f;
     audio->sound_bank = NULL;
     audio->music_bank = NULL;
+    audio->music_status = FW64_AUDIO_STOPPED;
+    audio->default_music_tempo = 0;
+    audio->music_playback_speed = 1.0f;
+}
+
+void fw64_n64_audio_update(fw64Audio* audio) {
+    int sequence_player_status = nuAuSeqPlayerGetState(0);
+    
+    if (audio->music_status == FW64_AUDIO_PLAYING) {
+        // the sequencer just started playing
+        if (audio->default_music_tempo == 0 && sequence_player_status == AL_PLAYING) {
+            audio->default_music_tempo = nuAuSeqPlayerGetTempo(0);
+            nuAuSeqPlayerSetTempo(0, (int)(audio->default_music_tempo * (1.0f / audio->music_playback_speed)));
+        }
+
+        // the sequencer just stopped
+        if (sequence_player_status == AL_STOPPED && audio->default_music_tempo != 0) {
+            audio->default_music_tempo = 0;
+            audio->music_status = FW64_AUDIO_STOPPED;
+        }
+    }
 }
 
 void fw64_audio_set_sound_bank(fw64Audio* audio, fw64SoundBank* sound_bank) {
@@ -67,7 +82,8 @@ int fw64_audio_play_music(fw64Audio* audio, uint32_t track_num) {
         nuAuSeqPlayerStop(0);
         nuAuSeqPlayerSetNo(0, track_num);
         nuAuSeqPlayerPlay(0);
-
+        audio->music_status = FW64_AUDIO_PLAYING;
+        
         return 1;
     }
 
@@ -76,6 +92,8 @@ int fw64_audio_play_music(fw64Audio* audio, uint32_t track_num) {
 
 void fw64_audio_stop_music(fw64Audio* audio){
     nuAuSeqPlayerStop(0);
+    audio->music_status = FW64_AUDIO_STOPPED;
+    audio->default_music_tempo = 0;
 }
 
 void fw64_audio_set_music_volume(fw64Audio* audio, float volume) {
@@ -84,8 +102,7 @@ void fw64_audio_set_music_volume(fw64Audio* audio, float volume) {
 }
 
 fw64AudioStatus fw64_audio_get_music_status(fw64Audio* audio) {
-    (void)audio;
-    return (fw64AudioStatus)nuAuSeqPlayerGetState(0);
+    return audio->music_status;
 }
 
 int fw64_audio_music_track_count(fw64Audio* audio) {
@@ -93,4 +110,18 @@ int fw64_audio_music_track_count(fw64Audio* audio) {
         return audio->music_bank->track_count;
     else
         return 0;
+}
+
+float fw64_audio_get_playback_speed(fw64Audio* audio) {
+    return audio->music_playback_speed;
+}
+
+void fw64_audio_set_music_playback_speed(fw64Audio* audio, float speed) {
+    if (speed <= 0.0f) return;
+
+    audio->music_playback_speed = speed;
+
+    if (audio->music_status == FW64_AUDIO_PLAYING) {
+        nuAuSeqPlayerSetTempo(0, (int)(audio->default_music_tempo * (1.0f / audio->music_playback_speed)));
+    }
 }

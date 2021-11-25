@@ -1,8 +1,9 @@
 #include "framework64/animation_controller.h"
 
 #include "framework64/matrix.h"
-
 #include "framework64/math.h"
+
+#include <string.h>
 
 #define VEC_KEYFRAME(buffer, index, count) ((buffer) + ((index) * (count)))
 #define VEC3_KEYFRAME(buffer, index) (Vec3*)VEC_KEYFRAME(buffer, index, 3)
