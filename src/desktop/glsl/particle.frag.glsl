@@ -1,4 +1,4 @@
-layout(std140) uniform fw64ParticleTextureData {
+layout(std140) uniform fw64TextureFrameData {
     float fw64_texture_slice_top;
     float fw64_texture_slice_left;
     float fw64_texture_slice_width;

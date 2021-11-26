@@ -18,12 +18,12 @@ ShaderProgram* ParticleShader::create(uint32_t primitive_attributes, uint32_t ma
     if (!program->handle)
         return nullptr;
 
-    texture_info.uniform_block.create(3);
+    texture_info.uniform_block.create(4);
     program->mesh_transform_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64MeshTransformData");
     program->diffuse_texture_location = glGetUniformLocation(program->handle, "diffuse_texture_sampler");
 
     // TODO: this should return a derived program object with this value, and the program should be passed to set uniforms
-    texture_info_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64ParticleTextureData");
+    texture_info_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64TextureFrameData");
 
     if (program->mesh_transform_uniform_block_index == GL_INVALID_INDEX || program->diffuse_texture_location == -1)
         return nullptr;
