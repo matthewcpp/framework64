@@ -1,6 +1,6 @@
 set(src_files
     ../common/${platform_main_file}
-    ../common/flame.h ../common/flame.c
+        ../billboard/flame.h ../billboard/flame.c
         chase_cam.h chase_cam.c
     player.h player.c
     ui.h ui.c

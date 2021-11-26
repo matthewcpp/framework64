@@ -58,32 +58,38 @@ void set_texture_mode(Game* game, Mode mode) {
     game->mode = mode;
 
     fw64TextureWrapMode wrap_mode;
-    Vec2 coords_max;
+    fw64TexturedQuadParams params;
+    fw64_textured_quad_params_init(&params);
+    params.image_asset_index = FW64_ASSET_image_pyoro64;
 
     switch (game->mode)
     {
         case MODE_DEFAULT:
             game->mode_name = "Default";
-            vec2_set(&coords_max, 1.0f, 1.0f);
+            params.max_s = 1.0f;
+            params.max_t = 1.0f;
             wrap_mode = FW64_TEXTURE_WRAP_CLAMP;
             break;
 
         case MODE_CLAMP:
             game->mode_name = "Clamp";
-            vec2_set(&coords_max, 2.0f, 2.0f);
+            params.max_s = 2.0f;
+            params.max_t = 2.0f;
             wrap_mode = FW64_TEXTURE_WRAP_CLAMP;
 
             break;
 
         case MODE_WRAP:
             game->mode_name = "Repeat";
-            vec2_set(&coords_max, 2.0f, 2.0f);
+            params.max_s = 2.0f;
+            params.max_t = 2.0f;
             wrap_mode = FW64_TEXTURE_WRAP_REPEAT;
             break;
 
         case MODE_MIRROR:
             game->mode_name = "Mirror";
-            vec2_set(&coords_max, 2.0f, 2.0f);
+            params.max_s = 2.0f;
+            params.max_t = 2.0f;
             wrap_mode = FW64_TEXTURE_WRAP_MIRROR;
             break;
     }
@@ -91,7 +97,7 @@ void set_texture_mode(Game* game, Mode mode) {
     if (game->quad.mesh)
         fw64_mesh_delete(game->engine->assets, game->quad.mesh, NULL);
 
-    fw64_node_set_mesh(&game->quad, textured_quad_create_with_params(game->engine, FW64_ASSET_image_pyoro64, coords_max.x, coords_max.y, NULL));
+    fw64_node_set_mesh(&game->quad, fw64_textured_quad_create_with_params(game->engine, &params, NULL));
     fw64Texture* texture = fw64_material_get_texture(fw64_mesh_get_material_for_primitive(game->quad.mesh, 0));
     fw64_texture_set_wrap_mode(texture, wrap_mode, wrap_mode);
 }

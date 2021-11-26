@@ -36,7 +36,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->sound_id = 0;
 
     fw64_node_init(&game->n64_logo);
-    fw64_node_set_mesh(&game->n64_logo, textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, NULL));
+    fw64_node_set_mesh(&game->n64_logo, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, NULL));
 
     game->rotation = 0.0f;
 }
