@@ -22,6 +22,14 @@ ShaderProgram* GouraudShader::create(uint32_t primitive_attributes, uint32_t mat
     if (!program->handle)
         return nullptr;
 
+    if (has_diffuse_texture) {
+        texture_info.uniform_block.create(3);
+        // TODO: this should return a derived program object with this value, and the program should be passed to set uniforms
+        texture_info_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64TextureFrameData");
+
+        if (texture_info_uniform_block_index == GL_INVALID_INDEX)
+            return nullptr;
+    }
 
     program->lighting_data_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64LightingData");
     program->mesh_transform_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64MeshTransformData");
@@ -43,6 +51,10 @@ void GouraudShader::setUniforms(fw64Material const & material) {
     glUniform4fv(material.shader->diffuse_color_location, 1, material.color.data());
 
     if (material.texture) {
+        texture_info.setUniformData(material);
+        texture_info.uniform_block.update();
+        glUniformBlockBinding(material.shader->handle, texture_info_uniform_block_index, texture_info.uniform_block.binding_index);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.texture->image->gl_handle);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, material.texture->wrap_s);

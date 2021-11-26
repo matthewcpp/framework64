@@ -53,7 +53,6 @@ int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_
         int data_size = image->info.width * image->info.height * image->info.bpp;
         uint8_t* image_data = allocator->memalign(allocator, 8, data_size);
         bytes_read = fw64_filesystem_read(image_data, data_size, 1, handle);
-        fw64_filesystem_close(handle);
 
         if (bytes_read != data_size) {
             allocator->free(allocator, image_data);
@@ -63,6 +62,8 @@ int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_
         image->data = image_data;
         image->rom_addr = 0;
     }
+
+    fw64_filesystem_close(handle);
 }
 
 void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator) {

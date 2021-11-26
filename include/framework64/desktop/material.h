@@ -11,6 +11,8 @@ namespace framework64 {
 class ShaderProgram;
 }
 
+#define FW64_DESKTOP_ENTIRE_TEXTURE_FRAME (-1)
+
 struct fw64Material {
     enum Features {
         None = 0,

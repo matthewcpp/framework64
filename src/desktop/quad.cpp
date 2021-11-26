@@ -86,5 +86,7 @@ fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & m
 }
 
 fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index, fw64Allocator* allocator) {
-    return textured_quad_create_with_params(engine, image_asset_index, 1.0f, 1.0f, allocator);
+    fw64Mesh* mesh = textured_quad_create_with_params(engine, image_asset_index, 1.0f, 1.0f, allocator);
+    mesh->primitives[0].material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME; //
+    return mesh;
 }
