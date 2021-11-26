@@ -5,10 +5,9 @@
 
 #include <vector>
 
-static framework64::MeshData make_mesh_data(Vec3 const & min_pt, Vec3 const & max_pt, float max_s, float max_t);
 static fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & mesh_data, fw64Image* image);
 
-framework64::MeshData make_mesh_data(Vec3 const & min_pt, Vec3 const & max_pt, float max_s, float max_t) {
+static framework64::MeshData make_mesh_data(Vec3 const & min_pt, Vec3 const & max_pt, float min_s, float max_s, float min_t, float max_t) {
     framework64::MeshData mesh_data;
 
     mesh_data.positions = {
@@ -26,10 +25,10 @@ framework64::MeshData make_mesh_data(Vec3 const & min_pt, Vec3 const & max_pt, f
     };
 
     mesh_data.tex_coords = {
-            0.0f, 0.0f,
-            max_s, 0.0f,
+            min_s, min_t,
+            max_s, min_t,
             max_s, max_t,
-            0.0f, max_t
+            min_s, max_t
     };
 
     mesh_data.indices_array_uint16 = {
@@ -75,7 +74,7 @@ static fw64Mesh* fw64_textured_quad_create_animated(fw64Engine* engine, fw64Text
     Vec3 min_pt = {-1.0f, -1.0f, 0.0f};
     Vec3 max_pt = {1.0f, 1.0f, 0.0f};
 
-    auto mesh_data = make_mesh_data(min_pt, max_pt, params->max_s, params->max_t);
+    auto mesh_data = make_mesh_data(min_pt, max_pt, params->min_s, params->max_s, params->min_t, params->max_t);
     auto* mesh = create_mesh(f64_engine, mesh_data, image);
 
     mesh->primitives[0].material.texture_frame = 0;
@@ -100,7 +99,7 @@ static fw64Mesh* fw64_textured_quad_create_static(fw64Engine* engine, fw64Textur
         max_pt = {image->hslices / 2.0f, image->vslices / 2.0f, 0.0f};
     }
 
-    auto mesh_data = make_mesh_data(min_pt, max_pt, params->max_s, params->max_t);
+    auto mesh_data = make_mesh_data(min_pt, max_pt, params->min_s, params->max_s, params->min_t, params->max_t);
     auto* mesh = create_mesh(f64_engine, mesh_data, image);
 
     mesh->primitives[0].material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;

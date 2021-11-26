@@ -33,14 +33,14 @@ static void vertex_set_p_tc(Vtx* vertex, short x, short y, short z, float s, flo
     vertex->n.a = 255;
 }
 
-static void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t) {
+static void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float min_s, float max_s, float min_t, float max_t) {
     int index = frame * 4;
 
     // TODO: this needs to be changed back to textures
-    vertex_set_tc(mesh->vertex_buffer + index, 0.0f, 0.0f, mesh->resources->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 1, s, 0.0f, mesh->resources->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 2, s, t, mesh->resources->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 3, 0.0f, t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index, min_s, min_t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 1, max_s, min_t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 2, max_s, max_t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 3, min_s, max_t, mesh->resources->textures);
 }
 
 static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, short tl_y, short size, fw64Texture* texture) {
@@ -168,7 +168,7 @@ fw64Mesh* fw64_textured_quad_create_with_params(fw64Engine* engine, fw64Textured
     fw64Mesh* mesh = make_quad_mesh(params, allocator);
 
     // This only works correctly for textures which have a single slice 
-    textured_quad_set_tex_coords(mesh, 0, params->max_s, params->max_t);
+    textured_quad_set_tex_coords(mesh, 0, params->min_s, params->max_s, params->min_t, params->max_t);
 
     return mesh;
 }

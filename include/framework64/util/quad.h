@@ -13,7 +13,9 @@ typedef struct {
     fw64Image* image;
     int image_asset_index;
     int is_animated;
+    float min_s;
     float max_s;
+    float min_t;
     float max_t;
 } fw64TexturedQuadParams;
 
