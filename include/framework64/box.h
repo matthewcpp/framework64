@@ -13,6 +13,8 @@ typedef struct {
 extern "C" {
 #endif
 
+void box_set_center_extents(Box* box, Vec3* center, Vec3* extents);
+
 void box_center(Box* box, Vec3* out);
 void box_size(Box* box, Vec3* out);
 void box_extents(Box* box, Vec3* out);
