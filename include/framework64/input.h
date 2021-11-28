@@ -10,6 +10,7 @@ typedef struct fw64Input fw64Input;
 extern "C" {
 #endif
 
+int fw64_input_controller_is_connected(fw64Input* input, int controller);
 int fw64_input_button_pressed(fw64Input* input, int controller, int button);
 int fw64_input_button_released(fw64Input* input, int controller, int button);
 int fw64_input_button_down(fw64Input* input, int controller, int button);

@@ -54,3 +54,7 @@ void fw64_input_stick(fw64Input* input, int controller, Vec2* current) {
     current->x = fw64_map_controller_axis_value((float)input->current_state[controller].stick_x, CONTROLLER_STICK_MIN_X, CONTROLLER_STICK_MAX_X);
     current->y = fw64_map_controller_axis_value((float)input->current_state[controller].stick_y, CONTROLLER_STICK_MIN_Y, CONTROLLER_STICK_MAX_Y);
 }
+
+int fw64_input_controller_is_connected(fw64Input* input, int controller) {
+    return input->current_state[controller].errno == 0;
+}

@@ -128,6 +128,10 @@ Vec2 fw64Input::stick(int controller, int stick_index) {
 
 // C interface
 
+int fw64_input_controller_is_connected(fw64Input* input, int controller) {
+    return input->controllerIsConnected(controller) ? 1 : 0;
+}
+
 int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
     return input->buttonPressed(controller, button);
 }
