@@ -3,6 +3,16 @@
 
 #include <string.h>
 
+void box_set_center_extents(Box* box, Vec3* center, Vec3* extents) {
+    box->min.x = center->x - extents->x;
+    box->min.y = center->y - extents->y;
+    box->min.z = center->z - extents->z;
+
+    box->max.x = center->x + extents->x;
+    box->max.y = center->y + extents->y;
+    box->max.z = center->z + extents->z;
+}
+
 void box_center(Box* box, Vec3* out) {
     vec3_add(out, &box->min, &box->max);
     vec3_scale(out, out, 0.5f);

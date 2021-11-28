@@ -6,6 +6,8 @@
 
 #include <math.h>
 
+static void create_ground_plane(Game* game);
+
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
@@ -18,29 +20,40 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_update_projection_matrix(&game->fps.camera);
     vec3_set(&game->fps.camera.transform.position, 0.6f, 12.0f, 40.0f);
 
-    fw64Image* flame_image = fw64_image_load_with_options(engine->assets, FW64_ASSET_image_fire_sprite, FW64_IMAGE_FLAG_DMA_MODE, NULL);
-    flame_init(&game->flame, engine, flame_image);
+
+    flame_init(&game->flame, engine);
     vec3_set(&game->flame.entity.transform.scale, 10.0f, 12.0f, 10.0f);
     vec3_set(&game->flame.entity.transform.position, 0, 11.0f, 0.0f);
+    fw64_node_update(&game->flame.entity);
 
     fw64_node_init(&game->campfire);
     fw64_node_set_mesh(&game->campfire, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_campfire, NULL));
     vec3_set(&game->campfire.transform.scale, 0.5f, 0.5f, 0.5f);
     fw64_node_update(&game->campfire);
 
+    create_ground_plane(game);
+
+    fw64_node_init(&game->moon);
+    fw64_node_set_mesh(&game->moon, fw64_textured_quad_create(engine, FW64_ASSET_image_moon, NULL));
+    vec3_set(&game->moon.transform.scale, 5.0f, 5.0f, 5.0f);
+    vec3_set(&game->moon.transform.position, -100.0f, 50.0f, -100.0f);
+    fw64_node_update(&game->moon);
+}
+
+void create_ground_plane(Game* game) {
+    fw64TexturedQuadParams params;
+    fw64_textured_quad_params_init(&params);
+    params.image_asset_index = FW64_ASSET_image_grass;
+    params.max_s = 4.0f;
+    params.max_t = 4.0f;
+
     fw64_node_init(&game->ground);
-    fw64_node_set_mesh(&game->ground, textured_quad_create_with_params(engine, FW64_ASSET_image_grass, 4.0, 4.0, NULL));
+    fw64_node_set_mesh(&game->ground, fw64_textured_quad_create_with_params(game->engine, &params, NULL));
     fw64Texture* texture = fw64_material_get_texture(fw64_mesh_get_material_for_primitive(game->ground.mesh, 0));
     fw64_texture_set_wrap_mode(texture, FW64_TEXTURE_WRAP_REPEAT, FW64_TEXTURE_WRAP_REPEAT);
     quat_from_euler(&game->ground.transform.rotation, 90.0f, 0.0f, 0.0f);
     vec3_set(&game->ground.transform.scale, 100.0f, 100.0f, 100.0f);
     fw64_node_update(&game->ground);
-
-    fw64_node_init(&game->moon);
-    fw64_node_set_mesh(&game->moon, textured_quad_create(engine, FW64_ASSET_image_moon, NULL));
-    vec3_set(&game->moon.transform.scale, 5.0f, 5.0f, 5.0f);
-    vec3_set(&game->moon.transform.position, -100.0f, 50.0f, -100.0f);
-    fw64_node_update(&game->moon);
 }
 
 void game_update(Game* game){

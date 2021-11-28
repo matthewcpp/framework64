@@ -17,7 +17,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
     game->music_bank = fw64_music_bank_load(engine->assets, FW64_ASSET_musicbank_musicbank2);
     fw64_node_init(&game->n64_logo);
-    fw64_node_set_mesh(&game->n64_logo, textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, NULL));
+    fw64_node_set_mesh(&game->n64_logo, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, NULL));
 
     fw64_audio_set_music_bank(engine->audio, game->music_bank);
     fw64_audio_play_music(engine->audio, 2);

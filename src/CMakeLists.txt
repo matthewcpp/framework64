@@ -45,7 +45,7 @@ set(common_source_files
         ../include/framework64/util/arcball_camera.h util/arcball_camera.c
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/fps_camera.h util/fps_camera.c
-        ../include/framework64/util/quad.h
+        ../include/framework64/util/quad.h util/quad.c
         ../include/framework64/util/renderer_util.h
         )
 

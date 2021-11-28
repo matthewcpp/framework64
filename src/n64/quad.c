@@ -33,14 +33,14 @@ static void vertex_set_p_tc(Vtx* vertex, short x, short y, short z, float s, flo
     vertex->n.a = 255;
 }
 
-void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float s, float t) {
+static void textured_quad_set_tex_coords(fw64Mesh* mesh, int frame, float min_s, float max_s, float min_t, float max_t) {
     int index = frame * 4;
 
     // TODO: this needs to be changed back to textures
-    vertex_set_tc(mesh->vertex_buffer + index, 0.0f, 0.0f, mesh->resources->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 1, s, 0.0f, mesh->resources->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 2, s, t, mesh->resources->textures);
-    vertex_set_tc(mesh->vertex_buffer + index + 3, 0.0f, t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index, min_s, min_t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 1, max_s, min_t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 2, max_s, max_t, mesh->resources->textures);
+    vertex_set_tc(mesh->vertex_buffer + index + 3, min_s, max_t, mesh->resources->textures);
 }
 
 static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, short tl_y, short size, fw64Texture* texture) {
@@ -66,23 +66,31 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     primitive->display_list = primitive_index * 3;
 }
 
-static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vslices, fw64Allocator* allocator) {
+static fw64Mesh* make_quad_mesh(fw64TexturedQuadParams* params, fw64Allocator* allocator) {
+    fw64Image* image = params->image;
     fw64Mesh* mesh = allocator->malloc(allocator, sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);
     
-    uint32_t slice_count = hslices * vslices;
+    mesh->resources = allocator->malloc(allocator, sizeof(fw64MeshResources));
+
+    // if the image is passed in then we should not delete it when the mesh is destroyed
+    if (image) 
+        mesh->resources->flags = FW64_MESH_FLAGS_IMAGES_ARE_SHARED;
+    else
+        image = fw64_image_load(NULL, params->image_asset_index, allocator);
+
     fw64Texture* texture = fw64_texture_create_from_image(image, allocator);
 
-    mesh->resources = allocator->malloc(allocator, sizeof(fw64MeshResources));
-    mesh->resources->flags = FW64_MESH_FLAGS_IMAGES_ARE_SHARED;
-
+    int hslices = params->is_animated ? 1 : fw64_texture_hslices(texture);
+    int vslices = params->is_animated ? 1 : fw64_texture_vslices(texture);
+    uint32_t slice_count = hslices * vslices;
+    
     mesh->resources->image_count = 1;
     mesh->resources->images = image;
 
     mesh->resources->texture_count = 1;
     mesh->resources->textures = texture;
 
-    
 
     mesh->info.primitive_count = slice_count;
     mesh->primitives = allocator->malloc(allocator, mesh->info.primitive_count * sizeof(fw64Primitive));
@@ -140,30 +148,27 @@ static fw64Mesh* make_quad_mesh(fw64Image* image, uint32_t hslices, uint32_t vsl
     return mesh;
 }
 
-fw64Mesh* textured_quad_create(fw64Engine* engine, int image_asset_index, fw64Allocator* allocator) {
+fw64Mesh* fw64_textured_quad_create(fw64Engine* engine, int image_asset_index, fw64Allocator* allocator) {
     (void)engine;
     if (!allocator) allocator = fw64_default_allocator();
 
-    fw64Image* image = fw64_image_load(NULL, image_asset_index, allocator);
-    
+    fw64TexturedQuadParams params;
+    fw64_textured_quad_params_init(&params);
 
-    return make_quad_mesh(image, image->info.hslices, image->info.vslices, allocator);
+    params.is_animated = 0;
+    params.image_asset_index = image_asset_index;
+
+    return make_quad_mesh(&params, allocator);
 }
 
-fw64Mesh* textured_quad_create_with_params(fw64Engine* engine, int image_asset_index, float max_s, float max_t, fw64Allocator* allocator){
-    if (!allocator) allocator = fw64_default_allocator();
-    fw64Mesh* mesh = textured_quad_create(engine, image_asset_index, allocator);
-    textured_quad_set_tex_coords(mesh, 0, max_s, max_t);
-
-    return mesh;
-}
-
-fw64Mesh* textured_quad_create_with_image(fw64Engine* engine, fw64Image* image, int frame_index, fw64Allocator* allocator) {
+fw64Mesh* fw64_textured_quad_create_with_params(fw64Engine* engine, fw64TexturedQuadParams* params, fw64Allocator* allocator) {
     (void)engine;
     if (!allocator) allocator = fw64_default_allocator();
 
-    fw64Mesh* mesh = make_quad_mesh(image, 1, 1, allocator);
-    mesh->resources->materials[0].texture_frame = frame_index;
+    fw64Mesh* mesh = make_quad_mesh(params, allocator);
+
+    // This only works correctly for textures which have a single slice 
+    textured_quad_set_tex_coords(mesh, 0, params->min_s, params->max_s, params->min_t, params->max_t);
 
     return mesh;
 }
