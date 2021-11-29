@@ -1,7 +1,7 @@
 const processMesh = require("./ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
-const imageConvert = require("./ImageConvert");
-const FontConvert = require("./FontConvert");
+const processImage = require("./ProcessImage");
+const FontConvert = require("./ProcessFont");
 const AudioConvert = require("./AudioConvert");
 const processScene = require("./ProcessScene");
 const processLevel = require("./ProcessLevel");
@@ -32,21 +32,23 @@ async function prepare(manifest, manifestFile, outputDirectory) {
         for (const image of manifest.images) {
             if (image.src) {
                 console.log(`Processing Image: ${image.src}`);
-                const sourceFile = path.join(manifestDirectory, image.src);
-                await imageConvert.convertSprite(sourceFile, outputDirectory, image, archive);
             }
-            else if (image.frames){
+            else if (image.frames || image.frameDir){
                 console.log(`Processing Image Atlas: ${image.name}`);
-                await imageConvert.assembleSprite(manifestDirectory, outputDirectory, image, archive);
             }
+
+            await processImage(manifestDirectory, outputDirectory, image, archive);
         }
     }
 
     if (manifest.fonts) {
         for (const font of manifest.fonts) {
-            console.log(`Processing Font: ${font.src}`);
-            const sourceFile = path.join(manifestDirectory, font.src);
-            await FontConvert.convertFont(sourceFile, outputDirectory, font, archive);
+            if (font.src)
+                console.log(`Processing Font: ${font.src}`);
+            else
+                console.log(`Processing Image Font: ${font.name}`);
+            
+            await FontConvert.convertFont(manifestDirectory, outputDirectory, font, archive);
         }
     }
 
