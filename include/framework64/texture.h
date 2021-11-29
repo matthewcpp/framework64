@@ -34,6 +34,11 @@ extern "C" {
 #endif
 
 fw64Texture* fw64_texture_create_from_image(fw64Image* image, fw64Allocator* allocator);
+
+/** 
+ * Note this method does not delete the image!  
+ * You will need to call \ref fw64_image_delete to free resources used by the underlying image 
+ * */
 void fw64_texture_delete(fw64Texture* texture, fw64Allocator* allocator);
 
 int fw64_texture_width(fw64Texture* texture);
@@ -44,6 +49,8 @@ int fw64_texture_slice_width(fw64Texture* texture);
 int fw64_texture_slice_height(fw64Texture* texture);
 
 void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s, fw64TextureWrapMode wrap_t);
+
+fw64Image* fw64_texture_get_image(fw64Texture* texture);
 
 #ifdef __cplusplus
 }

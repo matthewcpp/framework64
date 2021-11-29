@@ -21,6 +21,10 @@ void fw64_n64_texture_init_with_image(fw64Texture* texture, fw64Image* image) {
     texture->mask_t = G_TX_NOMASK;
 }
 
+fw64Image* fw64_texture_get_image(fw64Texture* texture) {
+    return texture->image;
+}
+
 void fw64_texture_delete(fw64Texture* texture, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
     allocator->free(allocator, texture);

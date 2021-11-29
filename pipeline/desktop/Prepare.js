@@ -30,7 +30,11 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
 
     if (manifest.fonts) {
         for (const font of manifest.fonts) {
-            console.log(`Processing Font: ${font.src}`);
+            if (font.src)
+                console.log(`Processing Font: ${font.src}`);
+            else
+                console.log(`Processing Image Font: ${font.name}`);
+
             await processFont(font, bundle, manifestDirectory, outputDirectory);
         }
     }

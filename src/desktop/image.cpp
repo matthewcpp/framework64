@@ -87,6 +87,6 @@ fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint3
     return fw64Image::loadFromDatabase(asset_database, asset_index);
 }
 
-void fw64_image_delete(fw64Image* image, fw64Allocator* allocator) {
+void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator) {
     delete image;
 }
