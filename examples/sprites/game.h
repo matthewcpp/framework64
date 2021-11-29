@@ -11,6 +11,7 @@ typedef struct {
     KenSprite ken_sprite;
     N64LogoSprite n64logo;
     ElapsedTime elapsed_time;
+    fw64Font* image_font;
 } Game;
 
 #ifdef __cplusplus
