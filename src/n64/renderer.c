@@ -311,7 +311,9 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
     char ch = text[0];
     uint16_t glyph_index = fw64_font_get_glyph_index(font, ch);
     fw64FontGlyph* glyph = font->glyphs + glyph_index;
-    uint16_t stride = font->spritefont_tile_width * font->spritefont_tile_height * 2;
+    fw64Texture* texture = &font->texture;
+    int spritefont_tile_width = fw64_texture_slice_width(texture);
+    int spritefont_tile_height = fw64_texture_slice_height(texture);
 
     int caret = x + glyph->left;
 
@@ -322,16 +324,11 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
         int draw_pos_x = caret + glyph->left;
         int draw_pos_y = y + glyph->top;
 
-        gDPLoadTextureBlock(renderer->display_list++, font->spritefont + (stride * glyph_index), 
-        G_IM_FMT_RGBA, G_IM_SIZ_16b, 
-        font->spritefont_tile_width, font->spritefont_tile_height, 0, 
-        G_TX_CLAMP, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOMASK, G_TX_NOLOD, G_TX_NOLOD);
-
-        gDPLoadSync(renderer->display_list++);
+        fw64_n64_renderer_load_texture(renderer, texture, glyph_index);
 
         gSPTextureRectangle(renderer->display_list++, 
             draw_pos_x << 2, draw_pos_y << 2, 
-            (draw_pos_x + font->spritefont_tile_width) << 2, (draw_pos_y + font->spritefont_tile_height) << 2,
+            (draw_pos_x + spritefont_tile_width) << 2, (draw_pos_y + spritefont_tile_height) << 2,
             G_TX_RENDERTILE, 
             0 << 5, 0 << 5, 
             1 << 10, 1 << 10);

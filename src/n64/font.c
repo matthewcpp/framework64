@@ -16,26 +16,29 @@ fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index, fw64Alloca
         return NULL;
     }
 
+    fw64N64FontInfo font_info;
+    fw64_filesystem_read(&font_info, sizeof(fw64N64FontInfo), 1, handle);
+
     fw64Font* font = allocator->malloc(allocator, sizeof(fw64Font));
+    font->glyph_count = font_info.glyph_count;
+    font->size = font_info.size;
 
-    fw64_filesystem_read(font, sizeof(uint16_t), 4, handle);
-
-    uint32_t spritefont_data_size = (font->spritefont_tile_width * font->spritefont_tile_height * 2) * font->glyph_count;
-    uint32_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
-
-    uint8_t* payload = memalign(8, spritefont_data_size + glyph_data_size);
-    fw64_filesystem_read(payload, 1, spritefont_data_size + glyph_data_size, handle);
+    size_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
+    font->glyphs = allocator->malloc(allocator, glyph_data_size);
+    fw64_filesystem_read(font->glyphs, 1, glyph_data_size, handle);
     fw64_filesystem_close(handle);
-    
-    font->spritefont = payload;
-    font->glyphs = (fw64FontGlyph*)(payload + spritefont_data_size);
 
+    // load the font's image
+    fw64Image* image = fw64_image_load(database, font_info.image_asset, allocator);
+    fw64_n64_texture_init_with_image(&font->texture, image);
+    
     return font;
 }
 
 void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
-    allocator->free(allocator, font->spritefont); // note: font and glyph data were allocated in same call
+    allocator->free(allocator, font->glyphs);
+    fw64_image_delete(assets, font->texture.image, allocator);
     allocator->free(allocator, font);
 }
 
