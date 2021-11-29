@@ -41,6 +41,24 @@ class Font {
         }
     }
 
+    loadImageFontGlyphs(name, sourceString, tileWidth, tileHeight) {
+        this.name = name;
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
+        this.size = tileHeight;
+
+        this.glyphs = [];
+        for (let i = 0; i < sourceString.length; i++) {
+            this.glyphs.push({
+                codepoint: sourceString.charCodeAt(i),
+                top: 0,
+                left: 0,
+                advance: tileWidth,
+                height: tileHeight
+            });
+        }
+    }
+
     _parseGlyphData(glyph) {
         const xMin = typeof (glyph.xMin) == "undefined" ? 0 : glyph.xMin;
         const xMax = typeof (glyph.xMin) == "undefined" ? 0 : glyph.xMax;

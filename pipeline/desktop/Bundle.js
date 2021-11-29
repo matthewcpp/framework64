@@ -73,6 +73,8 @@ class Bundle {
         this._rawFileStmt.run(assetId, animationDataPath, 0);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_animation_data_${assetName} ${assetId}\n`);
+
+        return assetId;
     }
 
     addImage(imagePath, hslices, vslices) {
@@ -82,6 +84,8 @@ class Bundle {
         this._imageStmt.run(assetId, imagePath, hslices, vslices);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_image_${assetName} ${assetId}\n`);
+
+        return assetId;
     }
 
     addFont(font, fontPath) {
@@ -90,6 +94,8 @@ class Bundle {
         this._fontStmt.run(assetId, fontPath, font.size, font.tileWidth, font.tileHeight, font.glyphs.length, font.desktopGlyphBuffer);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_font_${font.name} ${assetId}\n`);
+
+        return assetId;
     }
 
     addMesh(mesh, assetPath, jointMap) {
@@ -99,6 +105,8 @@ class Bundle {
         this._meshStmt.run(assetId, assetPath, jointMap ? JSON.stringify(jointMap): null);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_mesh_${assetName} ${assetId}\n`);
+
+        return assetId;
     }
 
     addSoundBank(soundBank, files) {
@@ -108,6 +116,8 @@ class Bundle {
         this._soundBankStmt.run(assetId, assetName, files.length);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_soundbank_${assetName} ${assetId}\n`);
+
+        return assetId;
     }
 
     addMusicBank(musicBank, files) {
@@ -117,6 +127,8 @@ class Bundle {
         this._musicBankStmt.run(assetId, assetName, files.length);
 
         fs.writeSync(this._headerFile,`#define FW64_ASSET_musicbank_${assetName} ${assetId}\n`);
+
+        return assetId;
     }
 
     addRaw(rawPath, size) {
@@ -126,16 +138,22 @@ class Bundle {
         fs.writeSync(this._headerFile,`#define FW64_ASSET_raw_${assetName} ${assetId}\n`);
 
         this._rawFileStmt.run(assetId, rawPath, size);
+
+        return assetId;
     }
 
     addTypeMap(typemap, index) {
         const assetId = this._nextAssetId++;
         this._typemapStmt.run(assetId, index, JSON.stringify(typemap));
+
+        return assetId;
     }
 
     addLayerMap(layermap, index) {
         const assetId = this._nextAssetId++;
         this._layermapStmt.run(assetId, index, JSON.stringify(layermap));
+
+        return assetId;
     }
 
     addScene(name, index, typeMap, layerMap, assetPath) {
@@ -145,6 +163,8 @@ class Bundle {
         fs.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
 
         this._sceneStmt.run(assetId, assetPath, index, typeMap, layerMap);
+
+        return assetId;
     }
 
     finalize() {

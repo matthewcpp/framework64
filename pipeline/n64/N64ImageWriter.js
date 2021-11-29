@@ -5,8 +5,6 @@ const fs = require("fs");
 const itemsPerLine = 32;
 
 function writeDataArray(file, name, buffer, width, height) {
-
-
     fs.writeSync(file, `unsigned char ${name}[] __attribute__ ((aligned (8))) = {`);
 
     for (let i =0; i < buffer.length; i++) {
