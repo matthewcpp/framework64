@@ -28,3 +28,9 @@ void fw64_material_set_shading_mode(fw64Material* material, fw64ShadingMode mode
     material->shading_mode = mode;
     return;
 }
+
+void fw64_material_set_color(fw64Material* material, uint8_t r, uint8_t g, uint8_t b) {
+    material->color.r = r;
+    material->color.g = g;
+    material->color.b = b;
+}
