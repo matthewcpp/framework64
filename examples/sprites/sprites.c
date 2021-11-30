@@ -3,6 +3,7 @@
 #include "assets.h"
 
 #include <stdio.h>
+#include <string.h>
 
 void n64_logo_sprite_init(N64LogoSprite* logo_sprite, fw64Image* image) {
     logo_sprite->sprite = fw64_texture_create_from_image(image, NULL);
@@ -59,4 +60,31 @@ void elapsed_time_draw(ElapsedTime* elapsed_time, fw64Renderer* renderer) {
     sprintf(elapsed_time_text, "ELAPSED TIME: %.2f", elapsed_time->total_time);
 
     fw64_renderer_draw_text(renderer, elapsed_time->font, 200, 10, elapsed_time_text);
+}
+
+#define CHARACTER_TIME 0.33f
+
+void typewriter_text_init(TypewriterText* text, const char* str, fw64Font* font) {
+    text->string = str;
+    text->str_length = strlen(str);
+    text->font = font;
+
+    text->current_length = 1;
+    text->current_time = 0.0f;
+}
+void typewriter_text_update(TypewriterText* text, float time_delta) {
+    text->current_time += time_delta;
+
+    if (text->current_time >= CHARACTER_TIME) {
+        text->current_length += 1;
+        text->current_time -= CHARACTER_TIME;
+
+        if (text->current_length > text->str_length) {
+            text->current_length = 1;
+        }
+    }
+}
+
+void typewriter_text_draw(TypewriterText* text, fw64Renderer* renderer) {
+    fw64_renderer_draw_text_count(renderer, text->font, 5, 150, text->string, text->current_length);
 }

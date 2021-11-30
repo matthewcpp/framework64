@@ -134,7 +134,7 @@ namespace framework64 {
 
 
 
-    void SpriteRenderer::drawText(fw64Font const * font, float x, float y, const char* text){
+    void SpriteRenderer::drawText(fw64Font const * font, float x, float y, const char* text, uint32_t count){
         if (!text || text[0] == 0) return;
 
         uint32_t glyph_index;
@@ -142,7 +142,7 @@ namespace framework64 {
         auto const & first_glyph = font->glyphs[glyph_index];
         x += -first_glyph.left;
 
-        for (;;) {
+        for (uint32_t i = 0; i < count; i++) {
             auto const & glyph = font->glyphs[glyph_index];
             drawSpriteFrame(font->texture.get(), glyph_index, x + glyph.left, y + glyph.top);
             x += glyph.advance;

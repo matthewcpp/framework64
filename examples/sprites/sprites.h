@@ -37,6 +37,18 @@ void elapsed_time_init(ElapsedTime* elapsed_time, fw64Font* font);
 void elapsed_time_update(ElapsedTime* elapsed_time, float time_delta);
 void elapsed_time_draw(ElapsedTime* elapsed_time, fw64Renderer* renderer);
 
+typedef struct {
+    const char* string;
+    uint32_t str_length;
+    uint32_t current_length;
+    float current_time;
+    fw64Font* font;
+} TypewriterText;
+
+void typewriter_text_init(TypewriterText* text, const char* str, fw64Font* font);
+void typewriter_text_update(TypewriterText* text, float time_delta);
+void typewriter_text_draw(TypewriterText* text, fw64Renderer* renderer);
+
 #ifdef __cplusplus
 }
 #endif

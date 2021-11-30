@@ -21,12 +21,16 @@ void game_init(Game* game, fw64Engine* engine) {
     game->ken_sprite.position.y = screen_size.y - 10 - fw64_texture_height(game->ken_sprite.sprite);
 
     elapsed_time_init(&game->elapsed_time, fw64_font_load(engine->assets, FW64_ASSET_font_basicLAZER, NULL));
-    game->image_font = fw64_font_load(engine->assets, FW64_ASSET_font_Mario64, NULL);
+    fw64Font* sm64_font = fw64_font_load(engine->assets, FW64_ASSET_font_Mario64, NULL);
+    typewriter_text_init(&game->typewriter_text, "super mario 64", sm64_font);
 }
 
 void game_update(Game* game){
-    ken_sprite_update(&game->ken_sprite, game->engine->time->time_delta);
-    elapsed_time_update(&game->elapsed_time, game->engine->time->time_delta);
+    float time_delta = game->engine->time->time_delta;
+
+    ken_sprite_update(&game->ken_sprite, time_delta);
+    elapsed_time_update(&game->elapsed_time, time_delta);
+    typewriter_text_update(&game->typewriter_text, time_delta);
 }
 
 void game_draw(Game* game){
@@ -36,6 +40,6 @@ void game_draw(Game* game){
     n64_logo_sprite_draw(&game->n64logo, renderer);
     ken_sprite_draw(&game->ken_sprite, renderer);
     elapsed_time_draw(&game->elapsed_time, renderer);
-    fw64_renderer_draw_text(renderer, game->image_font, 5, 150, "super mario 64");
+    typewriter_text_draw(&game->typewriter_text, renderer);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

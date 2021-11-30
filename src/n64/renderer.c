@@ -300,6 +300,10 @@ void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* sprite, int 
 }
 
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
+    fw64_renderer_draw_text_count(renderer, font, x, y, text, UINT32_MAX);
+}
+
+void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
     if (!text || text[0] == 0) return;
     fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
 /*
@@ -317,7 +321,7 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 
     int caret = x + glyph->left;
 
-    while (ch) {
+    for (uint32_t i = 0; i < count && ch != 0; i++) {
         glyph_index = fw64_font_get_glyph_index(font, ch);
         glyph = font->glyphs + glyph_index;
 

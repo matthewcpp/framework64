@@ -29,7 +29,7 @@ public:
 
     void drawSprite(fw64Texture const * texture, float x, float y);
     void drawSpriteFrame(fw64Texture const * texture, int frame, float x, float y);
-    void drawText(fw64Font const* font, float x, float y, const char* text);
+    void drawText(fw64Font const* font, float x, float y, const char* text, uint32_t count);
 
 private:
     struct SpriteVertex {

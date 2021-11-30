@@ -133,7 +133,12 @@ void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* textur
 
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
     assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
-    renderer->sprite_renderer.drawText(font, static_cast<float>(x), static_cast<float>(y), text);
+    renderer->sprite_renderer.drawText(font, static_cast<float>(x), static_cast<float>(y), text, std::numeric_limits<uint32_t>::max());
+}
+
+void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
+    assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
+    renderer->sprite_renderer.drawText(font, static_cast<float>(x), static_cast<float>(y), text, count);
 }
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {
