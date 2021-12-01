@@ -272,12 +272,12 @@ fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {
     return renderer->camera;
 }
 
-static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y) {
+static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y, int width, int height) {
     fw64_n64_renderer_load_texture(renderer, sprite, frame);
 
     gSPTextureRectangle(renderer->display_list++, 
             x << 2, y << 2, 
-            (x + fw64_texture_slice_width(sprite)) << 2, (y + fw64_texture_slice_height(sprite)) << 2,
+            (x + width) << 2, (y + height) << 2,
             G_TX_RENDERTILE, 
             0 << 5, 0 << 5, 
             1 << 10, 1 << 10);
@@ -287,7 +287,15 @@ static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite,
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y) {
     fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
-    _fw64_draw_sprite_slice(renderer, sprite, frame, x, y);
+    _fw64_draw_sprite_slice(renderer, sprite, frame, x, y, fw64_texture_slice_width(sprite), fw64_texture_slice_height(sprite));
+}
+
+void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y, float scale_x , float scale_y, float rotation) {
+    float width = (float)fw64_texture_slice_width(texture) * scale_x;
+    float height = (float)fw64_texture_slice_height(texture) * scale_y;
+
+    fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
+    _fw64_draw_sprite_slice(renderer, texture, frame, x, y, (int)width, (int)height);
 }
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* sprite, int x, int y) {
@@ -302,7 +310,7 @@ void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* sprite, int 
         for (uint8_t col = 0; col < sprite->image->info.hslices; col++) {
             int draw_x = x + slice_width * col;
 
-            _fw64_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y);
+            _fw64_draw_sprite_slice(renderer, sprite, slice++, draw_x, draw_y, slice_width, slice_height);
         }
     }
 }
