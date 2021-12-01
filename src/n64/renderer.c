@@ -232,7 +232,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             break;
 
         case FW64_SHADING_MODE_SPRITE:
-            gDPSetRenderMode(renderer->display_list++, G_RM_AA_TEX_EDGE, G_RM_AA_TEX_EDGE);
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF);
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
@@ -243,6 +243,14 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
+            break;
+
+        case FW64_SHADING_MODE_TEXT:
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+            gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
+            gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, 255, 255, 255, 255); // TODO: provide API to set text color
             break;
 
         case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
@@ -305,12 +313,7 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
     if (!text || text[0] == 0) return;
-    fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_SPRITE);
-/*
-    TODO: Color blending? need better alpha than 5551
-    gDPSetPrimColor(renderer->display_list++, 255, 255, color->r, color->g, color->b, 255);
-    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATERGBA_PRIM , G_CC_MODULATERGBA_PRIM );
-*/
+    fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_TEXT);
     
     char ch = text[0];
     uint16_t glyph_index = fw64_font_get_glyph_index(font, ch);
