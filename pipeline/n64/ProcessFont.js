@@ -73,6 +73,11 @@ async function processImageFont(manifestDirectory, outputDir, font, archive) {
 }
 
 async function convertFont(manifestDirectory, outputDir, font, archive) {
+    if (font.sourceFile) {
+        const sourceFilePath = path.join(manifestDirectory, font.sourceFile);
+        font.sourceString = Font.sourceStringFromFile(sourceFilePath);
+    }
+
     if (font.src) {
         await processFontFile(manifestDirectory, outputDir, font, archive);
     }

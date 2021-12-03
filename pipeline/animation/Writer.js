@@ -120,22 +120,9 @@ class Writer {
     }
 
     _writeKeyframeData(file, animationData, writeInterface, assetDir) {
-        const testDump = fs.openSync(path.join(assetDir, "animation.txt"), "w");
-        fs.writeSync(testDump, `${animationData.keyframeDataSize}\n`);
-
         for (const keyframeDataSlice of animationData.keyframeDataSlices) {
             fs.writeSync(file, writeInterface.floatBufferToNative(keyframeDataSlice));
-
-            for (let i = 0; i < keyframeDataSlice.byteLength; i+= 4) {
-                if (i) fs.writeSync(testDump, ' ');
-                const val = keyframeDataSlice.readFloatLE(i);
-                fs.writeSync(testDump, val.toString());
-            }
-
-            fs.writeSync(testDump, '\n');
         }
-
-        fs.closeSync(testDump);
     }
 
     _writeHeader(name, animationData, assetDir) {

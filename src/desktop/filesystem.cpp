@@ -35,18 +35,11 @@ int Filesystem::open(int asset_index) {
     std::string full_path = base_path + asset_path;
 
     file_handles[file_handle_index].open(full_path.c_str(), std::ios::binary);
-    file_sizes[file_handle_index] = sqlite3_column_int(database.select_raw_file_statement, 1);
 
-    return file_handle_index;
-}
+    if (!file_handles[file_handle_index].good()) {
+        return FW64_FILESYSTEM_MISSING;
+    }
 
-int Filesystem::openFile(const std::string& path) {
-    int file_handle_index = getNextAvailableHandle();
-
-    if (file_handle_index < 0)
-        return file_handle_index;
-
-    file_handles[file_handle_index].open(path.c_str(), std::ios::binary);
     file_sizes[file_handle_index] = sqlite3_column_int(database.select_raw_file_statement, 1);
 
     return file_handle_index;

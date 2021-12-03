@@ -105,3 +105,7 @@ IVec2 fw64_font_measure_text(fw64Font* font, const char* text) {
 void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator) {
     delete font;
 }
+
+int fw64_font_size(fw64Font* font) {
+    return font->size;
+}

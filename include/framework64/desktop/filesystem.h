@@ -15,7 +15,6 @@ public:
     Filesystem(std::string const & path, fw64AssetDatabase& db) : base_path(path), database(db){}
 
     int open(int asset_index);
-    int openFile(const std::string& path);
     int close(int file_handle);
     int fileSize(int file_handle);
     int tell(int file_handle);

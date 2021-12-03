@@ -5,8 +5,12 @@
 #include <stdint.h>
 
 #define FW64_FILESYSTEM_MAX_OPEN_FILES 4
-#define FW64_FILESYSTEM_INVALID_HANDLE -1
-#define FW64_FILESYSTEM_MAX_FILES_OPEN -2
+#define FW64_FILESYSTEM_INVALID_HANDLE (-1)
+#define FW64_FILESYSTEM_MAX_FILES_OPEN (-2)
+
+/** Indicates that the asset database believes the file to be present, but it was not found at runtime.
+ * This most likely indicates an error in the asset pipeline */
+#define FW64_FILESYSTEM_MISSING (-3)
 
 #ifdef __cplusplus
 extern "C" {

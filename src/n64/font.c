@@ -85,3 +85,7 @@ IVec2 fw64_font_measure_text(fw64Font* font, const char* str) {
 
     return measurement;
 }
+
+int fw64_font_size(fw64Font* font) {
+    return (int)font->size;
+}
