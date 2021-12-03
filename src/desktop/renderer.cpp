@@ -3,14 +3,14 @@
 #include <cassert>
 #include <iostream>
 
-bool fw64Renderer::init(int screen_width, int screen_height, framework64::ShaderCache& shader_cache) {
+bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_cache) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    window = SDL_CreateWindow("framework64", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("framework64", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     gl_context = SDL_GL_CreateContext(window );
 
     GLenum err = glewInit();
@@ -28,7 +28,7 @@ bool fw64Renderer::init(int screen_width, int screen_height, framework64::Shader
 
     if (!sprite_renderer.init(shader_cache)) return false;
     if (!mesh_renderer.init(shader_cache)) return false;
-    setScreenSize(screen_width, screen_height);
+    setScreenSize(width, height);
 
     return true;
 }
@@ -128,7 +128,13 @@ void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y) {
     assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
-    renderer->sprite_renderer.drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y));
+    renderer->sprite_renderer.drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y), 1.0f, 1.0f);
+}
+
+void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y, float scale_x , float scale_y, float rotation) {
+    (void)rotation;
+    assert(renderer->render_mode == FW64_RENDERER_MODE_ORTHO2D);
+    renderer->sprite_renderer.drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y), scale_x, scale_y);
 }
 
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {

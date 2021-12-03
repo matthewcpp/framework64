@@ -110,29 +110,28 @@ namespace framework64 {
         addQuad(a, b, c, d);
     }
 
-    void SpriteRenderer::drawSpriteFrame(fw64Texture const * texture, int frame, float x, float y) {
+    void SpriteRenderer::drawSpriteFrame(fw64Texture const * texture, int frame, float x, float y, float scale_x, float scale_y) {
         setCurrentTexture(texture);
 
-        auto xf = static_cast<float>(x);
-        auto yf = static_cast<float>(y);
         auto wf = static_cast<float>(texture->slice_width());
         auto hf = static_cast<float>(texture->slice_height());
 
         // calculate the texcord coordinate window
-        float tc_width = wf / texture->image->width;
-        float tc_height = hf / texture->image->height;
+        float tc_width = wf / static_cast<float>(texture->image->width);
+        float tc_height = hf / static_cast<float>(texture->image->height);
         float tc_x = static_cast<float>(frame % texture->image->hslices) * tc_width;
         float tc_y = 1.0f - static_cast<float>(frame / texture->image->hslices) * tc_height;
 
-        SpriteVertex a = {xf, yf, 0.0f, tc_x, tc_y};
-        SpriteVertex b = {xf + wf, yf, 0.0f, tc_x + tc_width, tc_y};
-        SpriteVertex c = {xf + wf, yf + hf, 0.0f, tc_x + tc_width, tc_y - tc_height};
-        SpriteVertex d = {xf, yf + hf, 0.0f, tc_x, tc_y - tc_height};
+        wf *= scale_x;
+        hf *= scale_y;
+
+        SpriteVertex a = {x, y, 0.0f, tc_x, tc_y};
+        SpriteVertex b = {x + wf, y, 0.0f, tc_x + tc_width, tc_y};
+        SpriteVertex c = {x + wf, y + hf, 0.0f, tc_x + tc_width, tc_y - tc_height};
+        SpriteVertex d = {x, y + hf, 0.0f, tc_x, tc_y - tc_height};
 
         addQuad(a, b, c, d);
     }
-
-
 
     void SpriteRenderer::drawText(fw64Font const * font, float x, float y, const char* text, uint32_t count){
         if (!text || text[0] == 0) return;
@@ -144,7 +143,7 @@ namespace framework64 {
 
         for (uint32_t i = 0; i < count; i++) {
             auto const & glyph = font->glyphs[glyph_index];
-            drawSpriteFrame(font->texture.get(), glyph_index, x + glyph.left, y + glyph.top);
+            drawSpriteFrame(font->texture.get(), glyph_index, x + glyph.left, y + glyph.top, 1.0f, 1.0f);
             x += glyph.advance;
 
             if (text[0] == 0)

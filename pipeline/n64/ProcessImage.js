@@ -37,7 +37,7 @@ async function convertSprite(manifestDirectory, outDir, params, archive) {
 
     const name = path.basename(imagePath, path.extname(imagePath));
 
-    const image = new N64Image(name, N64Image.Format[options.format]);
+    const image = new N64Image(name, N64Image.Format[options.format.toUpperCase()]);
     await image.load(imagePath);
 
     return finalizeImage(image, outDir, options, archive, params.name)

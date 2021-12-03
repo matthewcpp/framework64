@@ -12,6 +12,8 @@ typedef struct {
     N64LogoSprite n64logo;
     ElapsedTime elapsed_time;
     TypewriterText typewriter_text;
+    fw64Texture* overlay;
+    fw64Texture* nintendo_seal;
 } Game;
 
 #ifdef __cplusplus

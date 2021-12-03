@@ -1,4 +1,5 @@
 const Util = require("../Util");
+const N64Image = require("./N64Image");
 const N64Font = require("./N64Font");
 const Font = require("../Font");
 const N64FontWriter = require("./N64FontWriter");
@@ -12,7 +13,8 @@ const path = require("path")
 function _initOptions(sourceFile, params) {
     const options = {
         sourceString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~ ",
-        name: path.basename(sourceFile, path.extname(sourceFile)) + params.size.toString()
+        name: path.basename(sourceFile, path.extname(sourceFile)) + params.size.toString(),
+        imageFormat: "rgba16"
     }
 
     Object.assign(options, params);
@@ -32,7 +34,7 @@ async function processFontFile(manifestDirectory, outputDir, params, archive) {
     const font = new N64Font(options.name);
     await font.load(sourceFile);
 
-    const data = await font.generateSpriteFont(options.sourceString, options.size);
+    const data = await font.generateSpriteFont(options.sourceString, options.size, options.imageFormat);
     const fontPath = path.join(outputDir, `${font.name}.font`);
     const imagePath = path.join(outputDir, `${font.name}_image.image`);
 
@@ -111,7 +113,7 @@ async function main() {
 
     const font = new N64Font(options.name);
     await font.load(program.file);
-    await font.outputToDirectory(program.outDir, options.sourceString, options.size);
+    await font.outputToDirectory(program.outDir, options.sourceString, options.size, N64Image.Format.RGBA32);
 }
 
 if (require.main === module) {

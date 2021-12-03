@@ -13,6 +13,10 @@ class N64Image {
     constructor(name, format) {
         this.name = name;
 
+        if (typeof(format) === "string") {
+            format = N64Image.Format[format.toUpperCase()];
+        }
+
         if (format === null || format === undefined) {
             throw new Error(`Invalid Image format: ${format}`);
         }

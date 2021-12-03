@@ -19,8 +19,8 @@ class N64Font {
         this._font = await opentype.load(path);
     }
 
-    async outputToDirectory(outDir, sourceString, size) {
-        const data = await this.generateSpriteFont(sourceString, size);
+    async outputToDirectory(outDir, sourceString, size, imageFormat) {
+        const data = await this.generateSpriteFont(sourceString, size, imageFormat);
 
         const imagePath = path.join(outDir, `${this.name}.png`);
         data.image.writeToFile(imagePath);
@@ -36,7 +36,7 @@ class N64Font {
         }, null, 2));
     }
 
-    async generateSpriteFont(sourceString, size) {
+    async generateSpriteFont(sourceString, size, imageFormat) {
         const scale = 1.0 / this._font.unitsPerEm * size;
         const codepoints = [...new Set(Array.from(sourceString))];
         codepoints.sort();
@@ -90,7 +90,7 @@ class N64Font {
 
         // note this actualy dumps image in BRGA but since we write everything as 255 white no swapping is needed
         const imageBuffer = canvas.toBuffer("raw");
-        const image = new N64Image(this.name, N64Image.Format.RGBA16); // TODO: This can probably change to use IA Tex
+        const image = new N64Image(this.name, imageFormat); // TODO: This can probably change to use IA Tex
         await image.loadBuffer(imageBuffer, imageWidth, imageHeight);
 
         return  {

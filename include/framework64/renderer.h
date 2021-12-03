@@ -44,8 +44,22 @@ int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
+/**
+ * Draws all frames of a sprite. Useful for rendering a texture that does not fit into a single frame. The x.y position specifies the top left position of the sprite.
+ */
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y);
+
+/**
+ * Draws a single sprite frame. The x.y position specifies the top left position of the sprite.
+ * Note: the rotation value is currently ignored.
+ */
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y);
+
+/**
+ * Draws a sprite frame with the supplied transform values.  The x.y position specifies the top left position of the sprite.
+ * Note: the rotation value is currently ignored.
+ */
+void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y, float scale_x , float scale_y, float rotation);
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count);
 

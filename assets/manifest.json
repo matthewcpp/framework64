@@ -32,6 +32,12 @@
             "vslices": 2
         },
         {
+            "src": "overlay.png",
+            "hslices": 1,
+            "vslices": 1,
+            "format": "rgba32"
+        },
+        {
             "name": "buttons",
             "frames": [
                 "n64_buttons/button_a.png",
@@ -106,13 +112,15 @@
         {
             "src": "Consolas.ttf",
             "size": 12,
-            "name": "Consolas12"
+            "name": "Consolas12",
+            "imageFormat": "rgba32"
         },
         {
             "src": "basicLAZER.otf",
             "size": 12,
             "name": "basicLAZER",
-            "sourceString": "ELAPSED TIME:0123456789."
+            "sourceString": "ELAPSED TIME:0123456789.",
+            "imageFormat": "rgba32"
         },
         {
             "image": {
