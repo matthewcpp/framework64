@@ -22,6 +22,7 @@ public:
     int musicTrackCount();
 
     float music_playback_speed = 1.0f;
+    float music_volume = 1.0f;
 
 private:
     void unloadCurrentMusicTrack();

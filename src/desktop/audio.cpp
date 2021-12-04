@@ -137,7 +137,8 @@ void fw64_audio_stop_music(fw64Audio* audio) {
 }
 
 void fw64_audio_set_music_volume(fw64Audio* audio, float volume) {
-
+    audio->music_volume = volume;
+    Mix_VolumeMusic(static_cast<int>(volume * MIX_MAX_VOLUME));
 }
 
 int fw64_audio_music_track_count(fw64Audio* audio) {
