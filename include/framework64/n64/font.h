@@ -4,7 +4,7 @@
 #include "framework64/n64/texture.h"
 
 typedef struct {
-    uint16_t codepoint;
+    uint32_t codepoint;
     int8_t top;
     int8_t left;
     int8_t advance;

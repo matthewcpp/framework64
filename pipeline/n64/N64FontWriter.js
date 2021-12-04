@@ -3,7 +3,7 @@ const N64Image = require("./N64Image");
 const fs = require("fs");
 
 const SizeOfFontHeader = 8;
-const SizeOfFontGlyph = 6;
+const SizeOfFontGlyph = 8;
 
 function writeBinary(font, imageIndex, path) {
     const headerBuffer = Buffer.alloc(SizeOfFontHeader);
@@ -18,7 +18,7 @@ function writeBinary(font, imageIndex, path) {
     bufferOffset = 0;
 
     for (const glyph of font.glyphs) {
-        bufferOffset = glyphBuffer.writeUInt16BE(glyph.codepoint, bufferOffset);
+        bufferOffset = glyphBuffer.writeUInt32BE(glyph.codepoint, bufferOffset);
         bufferOffset = glyphBuffer.writeInt8(glyph.top, bufferOffset);
         bufferOffset = glyphBuffer.writeInt8(glyph.left, bufferOffset);
         bufferOffset = glyphBuffer.writeInt8(glyph.advance, bufferOffset);
