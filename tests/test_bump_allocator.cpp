@@ -39,6 +39,14 @@ TEST_F(BumpAllocatorTest, Malloc) {
     ASSERT_EQ( bump_allocator.next, bump_allocator.previous + ALLOCATION_SIZE);
 }
 
+TEST_F(BumpAllocatorTest, Malloc_Unaligned) {
+    void* data1 = allocator->malloc(allocator, 11);
+    void* data2 = allocator->malloc(allocator, 8);
+
+    auto ptr_diff = reinterpret_cast<uintptr_t>(data2) - reinterpret_cast<uintptr_t>(data1);
+    ASSERT_EQ(ptr_diff, 16);
+}
+
 TEST_F(BumpAllocatorTest, Memalign) {
     #define ALIGNMENT 8
     void* data1 = allocator->malloc(allocator, 8);

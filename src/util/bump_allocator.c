@@ -5,15 +5,20 @@
 #include <string.h>
 #include <stdint.h>
 
+#define ALIGN_SIZE 8
+
 static void* fw64_bump_allocator_malloc(fw64Allocator* allocator, size_t size) {
     fw64BumpAllocator* bump = (fw64BumpAllocator*)allocator;
 
+    size_t allocated_size = size + ALIGN_SIZE - 1;
+    allocated_size -= (allocated_size % ALIGN_SIZE);
+
     uintptr_t used = bump->next - bump->start;
-    if (size > (bump->size - used))
+    if (allocated_size > (bump->size - used))
         return NULL;
 
     bump->previous = bump->next;
-    bump->next += size;
+    bump->next += allocated_size;
     return bump->previous;
 }
 
