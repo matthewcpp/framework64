@@ -2,15 +2,16 @@
 #include "framework64/n64/filesystem.h"
 
 #include <stddef.h>
-#include <malloc.h>
 
 typedef struct {
     uint32_t song_count;
     uint32_t ctrl_file_size;
 } fw64SoundbankHeader;
 
-fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t asset_id) {
+fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t asset_id, fw64Allocator* allocator) {
     (void)assets;
+    if (!allocator) allocator = fw64_default_allocator();
+
     int handle = fw64_filesystem_open(asset_id);
 
     if (handle < 0)
@@ -24,7 +25,7 @@ fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t asset_id
     uint32_t ctrl_file_address = rom_address + sizeof(fw64SoundbankHeader);
     uint32_t tbl_file_address = ctrl_file_address + header.ctrl_file_size;
 
-    fw64SoundBank* sound_bank = malloc(sizeof(fw64SoundBank));
+    fw64SoundBank* sound_bank = allocator->malloc(allocator, sizeof(fw64SoundBank));
 
     sound_bank->song_count = header.song_count;
     sound_bank->ctrl_file_size = header.ctrl_file_size;
@@ -34,9 +35,11 @@ fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t asset_id
     return sound_bank;
 }
 
-void fw64_sound_bank_delete(fw64AssetDatabase* assets, fw64SoundBank* sound_bank) {
+void fw64_sound_bank_delete(fw64AssetDatabase* assets, fw64SoundBank* sound_bank, fw64Allocator* allocator) {
     (void)assets;
-    free(sound_bank);
+    if (!allocator) allocator = fw64_default_allocator();
+
+    allocator->free(allocator, sound_bank);
 }
 
 typedef struct {
@@ -45,8 +48,9 @@ typedef struct {
     uint32_t sequence_bank_size; // this is currently unused
 } fw64MusicHeader;
 
-fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t asset_id) {
+fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t asset_id, fw64Allocator* allocator) {
     (void)assets;
+    if (!allocator) allocator = fw64_default_allocator();
 
     // load the music bank header which contains sequence info and also the asset ID of the sound bank
     int handle = fw64_filesystem_open(asset_id);
@@ -77,7 +81,7 @@ fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t asset_id
     uint32_t ctrl_file_address = rom_address + sizeof(fw64SoundbankHeader);
     uint32_t tbl_file_address = ctrl_file_address + soundbank_header.ctrl_file_size;
 
-    fw64MusicBank* music_bank = malloc(sizeof(fw64MusicBank));
+    fw64MusicBank* music_bank = allocator->malloc(allocator, sizeof(fw64MusicBank));
     music_bank->track_count = music_header.track_count;
     music_bank->seq_file_address = seq_file_address;
 
@@ -88,7 +92,9 @@ fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t asset_id
     return music_bank;
 }
 
-void fw64_music_bank_delete(fw64AssetDatabase* assets, fw64MusicBank* music_bank) {
+void fw64_music_bank_delete(fw64AssetDatabase* assets, fw64MusicBank* music_bank, fw64Allocator* allocator) {
     (void)assets;
-    free(music_bank);
+    if (!allocator) allocator = fw64_default_allocator();
+
+    allocator->free(allocator, music_bank);
 }

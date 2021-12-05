@@ -33,18 +33,18 @@ fw64MusicBank* fw64MusicBank::loadFromDatabase(fw64AssetDatabase* database, uint
 
 
 // C Interface
-fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t handle) {
+fw64SoundBank* fw64_sound_bank_load(fw64AssetDatabase* assets, uint32_t handle, fw64Allocator* allocator) {
     return fw64SoundBank::loadFromDatabase(assets, handle);
 }
 
-void fw64_sound_bank_delete(fw64AssetDatabase* assets, fw64SoundBank* sound_bank) {
+void fw64_sound_bank_delete(fw64AssetDatabase* assets, fw64SoundBank* sound_bank, fw64Allocator* allocator) {
     delete sound_bank;
 }
 
-fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t handle) {
+fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t handle, fw64Allocator* allocator) {
     return fw64MusicBank::loadFromDatabase(assets, handle);
 }
 
-void fw64_music_bank_delete(fw64AssetDatabase* assets, fw64MusicBank* music_bank) {
+void fw64_music_bank_delete(fw64AssetDatabase* assets, fw64MusicBank* music_bank, fw64Allocator* allocator) {
     delete music_bank;
 }
