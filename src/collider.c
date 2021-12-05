@@ -181,6 +181,9 @@ int fw64_collider_test_ray(fw64Collider* collider, Vec3* origin, Vec3* direction
     switch (collider->type) {
         case FW64_COLLIDER_BOX:
             return fw64_collision_test_ray_box(origin, direction, &collider->bounding, out_point, out_dist);
+
+        case FW64_COLLIDER_MESH:
+            return fw64_mesh_collider_test_ray(collider, origin, direction, out_point, out_dist);
         default:
             return 0;
     }
