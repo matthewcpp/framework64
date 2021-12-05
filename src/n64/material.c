@@ -34,3 +34,7 @@ void fw64_material_set_color(fw64Material* material, uint8_t r, uint8_t g, uint8
     material->color.g = g;
     material->color.b = b;
 }
+
+void fw64_material_get_color(fw64Material* material, fw64ColorRGBA8* color) {
+    *color = material->color;
+}
