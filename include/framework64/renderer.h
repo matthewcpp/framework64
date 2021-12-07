@@ -41,6 +41,9 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
 void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled);
 int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
 
+void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled);
+int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
+
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 

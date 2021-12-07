@@ -36,6 +36,7 @@ public:
     int screen_height;
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
     fw64Camera* camera = nullptr;
+    bool anti_aliasing_enabled = true;
 private:
     SDL_Window* window;
     SDL_GLContext gl_context;

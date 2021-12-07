@@ -12,23 +12,6 @@
 #include <malloc.h>
 #include <string.h>
 
-/** based on G_RM_[AA]_[ZB]_TEX_EDGE macro definition. */
-#define FW64_RENDER_MODE_3D_TEXTURED(renderer, cycle) \
-	((renderer)->rendermode_aa_flags) | ((renderer)->rendermode_depth_test_flags) | IM_RD | CVG_DST_CLAMP |		\
-	CVG_X_ALPHA | ALPHA_CVG_SEL | ZMODE_OPA | TEX_EDGE |	\
-	GBL_c##cycle(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_A_MEM)
-
-#define FW64_RM_3D_TEXTURED(renderer) FW64_RENDER_MODE_3D_TEXTURED(renderer, 1)
-#define FW64_RM_3D_TEXTURED2(renderer) FW64_RENDER_MODE_3D_TEXTURED(renderer, 2)
-
-/** based on G_RM_[AA]_[ZB]_OPA_SURF macro definition. */
-#define FW64_RENDER_MODE_3D_OPAQUE_SHADED(renderer, cycle) \
-	((renderer)->rendermode_aa_flags) | ((renderer)->rendermode_depth_test_flags) | IM_RD | CVG_DST_CLAMP |		\
-	ZMODE_OPA | ALPHA_CVG_SEL |				\
-	GBL_c##cycle(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_A_MEM)
-
-#define FW64_RM_3D_OPAQUE_SHADED(renderer) FW64_RENDER_MODE_3D_OPAQUE_SHADED(renderer, 1)
-#define FW64_RM_3D_OPAQUE_SHADED2(renderer) FW64_RENDER_MODE_3D_OPAQUE_SHADED(renderer, 2)
 
 static void fw64_n64_renderer_update_lighting_data(fw64Renderer* renderer);
 static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer);
@@ -46,8 +29,8 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->fill_color = GPACK_RGBA5551(255, 255, 255, 1);
     renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
 
-    renderer->rendermode_aa_flags = AA_EN;
     fw64_renderer_set_depth_testing_enabled(renderer, 1);
+    fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
 
     /*
       The viewport structure 
@@ -73,16 +56,7 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->active_light_mask = 1;
 }
 
-void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
-    if (enabled)
-        renderer->rendermode_depth_test_flags = Z_CMP | Z_UPD;
-    else
-        renderer->rendermode_depth_test_flags = 0;
-
-    if (renderer->render_mode == FW64_RENDERER_MODE_UNSET)
-        return;
-
-
+static void refresh_shading_mode(fw64Renderer* renderer) {
     switch(renderer->shading_mode) {
         case FW64_SHADING_MODE_UNLIT_TEXTURED:
         case FW64_SHADING_MODE_GOURAUD_TEXTURED:
@@ -94,14 +68,35 @@ void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled
             gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_OPAQUE_SHADED(renderer), FW64_RM_3D_OPAQUE_SHADED2(renderer));
             break;
 
-        // node FW64_SHADING_MODE_SPRITE does not currently utilize the z buffer
+        case FW64_SHADING_MODE_SPRITE:
+            gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
+            break;
+
         default:
             break;
     }
 }
 
+void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled) {
+    renderer->aa_enabled = enabled;
+
+    if (renderer->render_mode != FW64_RENDERER_MODE_UNSET)
+        refresh_shading_mode(renderer);
+}
+
+int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
+    return renderer->aa_enabled;
+}
+
+void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
+    renderer->depth_test_enabled = enabled;
+
+    if (renderer->render_mode != FW64_RENDERER_MODE_UNSET)
+        refresh_shading_mode(renderer);
+}
+
 int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
-    return renderer->rendermode_depth_test_flags != 0;
+    return renderer->depth_test_enabled;
 }
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
@@ -232,7 +227,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             break;
 
         case FW64_SHADING_MODE_SPRITE:
-            gDPSetRenderMode(renderer->display_list++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF);
+            gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
             gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
@@ -246,7 +241,7 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             break;
 
         case FW64_SHADING_MODE_TEXT:
-            gDPSetRenderMode(renderer->display_list++, G_RM_AA_XLU_SURF, G_RM_AA_XLU_SURF2);
+            gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
             gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);

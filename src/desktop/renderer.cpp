@@ -179,3 +179,11 @@ void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float 
 void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b) {
     renderer->mesh_renderer.setLightColor(index, r, g, b);
 }
+
+void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled) {
+    renderer->anti_aliasing_enabled = static_cast<bool>(enabled);
+}
+
+int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
+    return static_cast<int>(renderer->anti_aliasing_enabled);
+}
