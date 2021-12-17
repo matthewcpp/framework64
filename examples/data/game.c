@@ -12,6 +12,8 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->consolas = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
 
+    fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
+
     memset(game->str_buff, 0, 32);
     int handle = fw64_filesystem_open(FW64_ASSET_raw_sample);
     int size= fw64_filesystem_size(handle);

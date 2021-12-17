@@ -24,6 +24,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     fw64_camera_init(&game->camera);
 
+    fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
+
     game->sound_bank = -1;
     change_sound_bank(game, 1);
 

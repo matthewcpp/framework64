@@ -38,10 +38,14 @@ void game_update(Game* game){
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
+     fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
+
     fw64_renderer_begin(renderer, &game->chase_cam.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_scene_draw_all(game->scene, renderer);
     player_draw(&game->player);
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_NOSWAP);
+
+     fw64_renderer_set_anti_aliasing_enabled(renderer, 0);
 
     fw64_renderer_begin(renderer, &game->chase_cam.camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
     ui_draw(&game->ui);

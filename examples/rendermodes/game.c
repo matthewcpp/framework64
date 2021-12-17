@@ -65,6 +65,9 @@ void game_update(Game* game) {
 
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
+
+    fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
+
     fw64_renderer_begin(renderer, &game->arcball.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_draw_static_mesh(renderer, &game->node.transform, game->node.mesh);
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_NOSWAP);
@@ -75,6 +78,8 @@ void game_draw(Game* game) {
     int button_width = fw64_texture_slice_width(game->button_sprite);
     int draw_pos_x = 10;
     int draw_pos_y = 200;
+
+    fw64_renderer_set_anti_aliasing_enabled(renderer, 0);
 
     fw64_renderer_begin(renderer, &game->arcball.camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
 
