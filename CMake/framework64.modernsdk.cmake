@@ -17,6 +17,7 @@ add_definitions(-DF3DEX_GBI_2 -DPLATFORM_N64)
 
 
 set(FW64_TARGET_PLATFORM_N64)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # note: roms will be copied into this directory as post build step
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pipeline/Prepare.js")  # running from within the framework64 source directory
     set(FW64_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})

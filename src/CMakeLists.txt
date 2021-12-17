@@ -1,12 +1,3 @@
-if(FW64_PLATFORM_DESKTOP)
-    find_package(GLEW REQUIRED)
-    find_package(nlohmann_json CONFIG REQUIRED)
-    find_package(SDL2 CONFIG REQUIRED)
-    find_package(sdl2-mixer CONFIG REQUIRED)
-    find_package(sdl2-image CONFIG REQUIRED)
-    find_package(unofficial-sqlite3 CONFIG REQUIRED)
-endif()
-
 set(common_source_files
         ../include/framework64/allocator.h allocator.c
         ../include/framework64/animation_controller.h animation_controller.c
@@ -58,9 +49,3 @@ endif()
 add_library(framework64 STATIC ${common_source_files} ${platform_source_files})
 target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 configure_core_library()
-
-if(FW64_PLATFORM_DESKTOP)
-    target_link_libraries(framework64 PRIVATE GLEW::GLEW)
-    target_link_libraries(framework64 INTERFACE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_mixer)
-    target_link_libraries(framework64 PRIVATE unofficial::sqlite3::sqlite3)
-endif()
