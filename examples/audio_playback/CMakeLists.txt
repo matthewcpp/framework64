@@ -1,15 +1,6 @@
 set(src_files
-    ../common/${platform_main_file}
     game.h game.c)
 
-add_executable(audio_playback ${src_files})
-
-target_link_libraries(audio_playback framework64)
-target_include_directories(audio_playback
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../common
-    PRIVATE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/include)
-
-if (FW64_PLATFORM_N64)
-    create_n64_rom(TARGET audio_playback)
-endif()
+create_game(
+    TARGET audio_playback
+    SOURCES ${src_files})

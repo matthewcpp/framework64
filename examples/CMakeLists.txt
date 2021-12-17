@@ -1,9 +1,3 @@
-if (FW64_PLATFORM_N64)
-    set(platform_main_file main_n64.c)
-else()
-    set(platform_main_file main_desktop.cpp)
-endif()
-
 add_subdirectory(audio_banks)
 add_subdirectory(audio_playback)
 add_subdirectory(billboard)
