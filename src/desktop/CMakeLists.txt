@@ -36,7 +36,7 @@ ${desktop_include_directory}/texture_info_uniform.h
 ${desktop_include_directory}/uniform_block.h
 ${desktop_include_directory}/unlit_shader.h desktop/unlit_shader.cpp
 
-../../include/framework64/n64/controller_button.h
+${CMAKE_CURRENT_SOURCE_DIR}/../../include/framework64/n64/controller_button.h
 
 PARENT_SCOPE
 )

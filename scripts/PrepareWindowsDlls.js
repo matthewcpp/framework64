@@ -22,7 +22,7 @@ async function prepareWindowsDlls(desktopBuildDir) {
 	const dllDestDir = path.join(desktopBuildDir, "bin");
 	await fse.ensureDir(dllDestDir);
 
-	const arch = buildInfo.sizeOfVoidP === 4 ? "x86" : "x64";
+	const arch = buildInfo.target.indexOf("x86") >= 0 ? "x86" : "x64";
 	const buildType = buildInfo.type === "Debug" ? "dbg" : "rel";
 
 	const vorbisRoot = path.join(vcpkgRoot, `buildtrees/libvorbis/${arch}-windows-${buildType}/lib`);
@@ -32,12 +32,14 @@ async function prepareWindowsDlls(desktopBuildDir) {
 		const dllSrc = path.join(vorbisRoot, vorbisDll);
 		const dllDest = path.join(dllDestDir, vorbisDll);
 		fse.copySync(dllSrc, dllDest);
+		console.log(`Copy ${dllSrc} --> ${dllDest}`)
 	}
 
 	const oggRootPath = path.join(vcpkgRoot, `buildtrees/libogg/${arch}-windows-${buildType}`);
 	const oggSrc = path.join(oggRootPath, "ogg.dll");
 	const oggDest = path.join(dllDestDir, "ogg.dll");
 	fse.copySync(oggSrc, oggDest);
+	console.log(`Copy ${oggSrc} --> ${oggDest}`)
 }
 
 module.exports = prepareWindowsDlls;
