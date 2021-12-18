@@ -12,14 +12,18 @@ else()
     project(framework64)
     set(CMAKE_CXX_STANDARD 17)
     set(FW64_PLATFORM_DESKTOP ON)
+
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+    set(platform_main_file main_desktop.cpp)
+    set(platform_assets_dir ${PROJECT_SOURCE_DIR}/build_desktop/bin/assets)
 endif()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(src)
 
-if (BUILD_FW64_EXAMPLES)
+if (FW64_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 

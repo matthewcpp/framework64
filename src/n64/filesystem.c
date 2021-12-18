@@ -8,8 +8,6 @@
 #define MAX_DMA 16384
 #define MAX_UNALIGNED_READ 256
 
-extern u8 _asset_dataSegmentRomStart[];
-
 typedef struct {
     uint32_t data_loc;
     uint32_t size;
@@ -26,7 +24,7 @@ int fw64_n64_filesystem_init(int num_assets) {
     asset_count = num_assets;
     asset_offsets = memalign(8, sizeof(uint32_t) * asset_count);
     memset(&open_files[0], 0, sizeof(fw64FileHandle) * FW64_FILESYSTEM_MAX_OPEN_FILES);
-    nuPiReadRom((u32)(&_asset_dataSegmentRomStart[0] + 4), asset_offsets, asset_count * sizeof(uint32_t));
+    nuPiReadRom((u32)(&_fw64bundleSegmentRomStart[0] + 4), asset_offsets, asset_count * sizeof(uint32_t));
 
     return 1;
 }
@@ -52,7 +50,7 @@ int fw64_filesystem_open(int asset_index) {
     handle->get_pos = 0;
 
     // read the header info for this asset
-    u32 rom_location = (u32)(&_asset_dataSegmentRomStart[0]) + asset_offsets[asset_index];
+    u32 rom_location = (u32)(&_fw64bundleSegmentRomStart[0]) + asset_offsets[asset_index];
     nuPiReadRom(rom_location, &read_cache[0], ASSET_HEADER_SIZE);
     memcpy(&handle->size, &read_cache[0], sizeof(uint32_t));
 
@@ -84,7 +82,7 @@ int fw64_filesystem_read(void* buffer, int size, int count, int handle) {
         data_total = file_handle->size - file_handle->get_pos;
     }
 
-    u32 rom_location = (u32)(&_asset_dataSegmentRomStart[0]) + file_handle->data_loc + file_handle->get_pos;
+    u32 rom_location = (u32)(&_fw64bundleSegmentRomStart[0]) + file_handle->data_loc + file_handle->get_pos;
 
     fw64_n64_filesystem_raw_read(buffer, rom_location, data_total);
 
@@ -128,7 +126,7 @@ int fw64_filesystem_close(int handle) {
 }
 
 uint32_t fw64_n64_filesystem_get_rom_address(int asset_index) {
-    return (u32)(&_asset_dataSegmentRomStart[0]) + asset_offsets[asset_index] + ASSET_HEADER_SIZE;
+    return (u32)(&_fw64bundleSegmentRomStart[0]) + asset_offsets[asset_index] + ASSET_HEADER_SIZE;
 }
 
 int fw64_filesystem_get_open_handle_count() {
