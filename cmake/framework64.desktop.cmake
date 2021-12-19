@@ -47,5 +47,11 @@ function(create_game)
     add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
     target_link_libraries(${target_name} PUBLIC framework64)
 
+    # Fixes linker error encountered on linux
+    # https://stackoverflow.com/a/55086637
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+        target_link_options(${target_name} PUBLIC "-Wl,--copy-dt-needed-entries")
+    endif()
+
     target_include_directories(${target_name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 endfunction()
