@@ -1,0 +1,190 @@
+/*
+	ROM spec file
+
+	Main memory map
+
+  	0x80000000  exception vectors, ...
+  	0x80000400  zbuffer (size 320*240*2)
+  	0x80025c00  codesegment
+	      :  
+  	0x8038F800  cfb 16b 3buffer (size 320*240*2*3)
+
+	Copyright (C) 1997-1999, NINTENDO Co,Ltd.
+*/
+
+OUTPUT_ARCH (mips)
+
+#include <nusys.h>
+
+/* Starts a segment */
+#define BEGIN_SEG(name, addr) \
+    _##name##SegmentStart = ADDR(.name); \
+    _##name##SegmentRomStart = __romPos; \
+    .name addr : AT(__romPos)
+
+/* Ends a segment */
+#define END_SEG(name) \
+    _##name##SegmentEnd = ADDR(.name) + SIZEOF(.name); \
+    _##name##SegmentRomEnd = __romPos + SIZEOF(.name); \
+    __romPos += SIZEOF(.name);
+
+/* Starts a noload segment which is intended to contain variables which do not have data yet. */
+#define BEGIN_NOLOAD(name) \
+    _##name##SegmentBssStart = ADDR(.name.noload); \
+    .name.noload (NOLOAD) :
+
+/* Ends a noload segment */
+#define END_NOLOAD(name) \
+    _##name##SegmentBssEnd = ADDR(.name.noload) + SIZEOF(.name.noload); \
+    _##name##SegmentBssSize = SIZEOF(.name.noload);
+
+SECTIONS
+{
+   __romPos = 0;
+
+   BEGIN_SEG(boot, 0x04000000)
+   {
+      ${rom_header_path}(.text); /* ROM Header */
+      ${bootcode_path}(.data); /* CIC 6102 bootcode */
+   }
+   END_SEG(boot)
+
+   BEGIN_SEG(code, NU_SPEC_BOOT_ADDR) SUBALIGN(16)
+   {
+      /* text */
+	${entry_path}(.start);
+      /usr/lib/n64/nusys/nusys_rom.o(.text);
+      *c.obj(.text);
+
+      */libframework64.a:*.o(.text);
+
+      */libultra_rom.a:*.o(.text);
+      */libnusys.a:*.o(.text);
+      */libnustd.a:*.o(.text);
+
+      */libnualsgi_n.a:*.o(.text);
+      */libn_audio.a:*.o(.text);
+
+      */libgcc.a:*.o(.text);
+      /usr/lib/n64/PR/rspboot.o(.text);
+      /usr/lib/n64/PR/aspMain.o(.text);
+      /usr/lib/n64/PR/n_aspMain.o(.text);
+      /usr/lib/n64/PR/gspF3DEX2.fifo.o(.text);
+      /usr/lib/n64/PR/gspL3DEX2.fifo.o(.text);
+      /usr/lib/n64/PR/gspF3DEX2.Rej.fifo.o(.text);
+      /usr/lib/n64/PR/gspF3DEX2.NoN.fifo.o(.text);
+      /usr/lib/n64/PR/gspF3DLX2.Rej.fifo.o(.text);
+      /usr/lib/n64/PR/gspS2DEX2.fifo.o(.text);
+
+      /* data */
+      /usr/lib/n64/nusys/nusys_rom.o(.data*);
+      *c.obj(.data*);
+
+      */libultra_rom.a:*.o(.data*);
+      */libnusys.a:*.o(.data*);
+      */libnustd.a:*.o(.data*);
+
+      */libnualsgi_n.a:*.o(.data*);
+      */libn_audio.a:*.o(.data*);
+
+      /usr/lib/n64/PR/rspboot.o(.data*);
+      /usr/lib/n64/PR/aspMain.o(.data*);
+      /usr/lib/n64/PR/n_aspMain.o(.data*);
+      /usr/lib/n64/PR/gspF3DEX2.fifo.o(.data*);
+      /usr/lib/n64/PR/gspL3DEX2.fifo.o(.data*);
+      /usr/lib/n64/PR/gspF3DEX2.Rej.fifo.o(.data*);
+      /usr/lib/n64/PR/gspF3DEX2.NoN.fifo.o(.data*);
+      /usr/lib/n64/PR/gspF3DLX2.Rej.fifo.o(.data*);
+      /usr/lib/n64/PR/gspS2DEX2.fifo.o(.data*);
+
+      /* rodata */
+      /usr/lib/n64/nusys/nusys_rom.o(.*rodata*);
+      *c.obj(.*rodata*);
+
+      */libframework64.a:*.o(.*rodata*);
+
+      */libultra_rom.a:*.o(.*rodata*);
+      */libnusys.a:*.o(.*rodata*);
+      */libnustd.a:*.o(.*rodata*);
+
+      */libnualsgi_n.a:*.o(.*rodata*);
+      */libn_audio.a:*.o(.*rodata*);
+
+      */libgcc.a:*.o(.*rodata*);
+   }
+   END_SEG(code)
+   BEGIN_NOLOAD(code)
+   {
+      /usr/lib/n64/nusys/nusys_rom.o(COMMON);
+      /usr/lib/n64/nusys/nusys_rom.o(.scommon);
+      /usr/lib/n64/nusys/nusys_rom.o(.*bss*);
+      *c.obj(.*bss*);
+
+      */libframework64.a:*.o(COMMON);
+      */libframework64.a:*.o(.scommon);
+      */libframework64.a:*.o(.*bss*);
+
+      */libultra_rom.a:*.o(COMMON);
+      */libultra_rom.a:*.o(.scommon);
+      */libultra_rom.a:*.o(.*bss*);
+      */libnusys.a:*.o(COMMON);
+      */libnusys.a:*.o(.scommon);
+      */libnusys.a:*.o(.*bss*);
+      */libnutd.a:*.o(COMMON);
+      */libnutd.a:*.o(.scommon);
+      */libnutd.a:*.o(.*bss*);
+
+      */libnualsgi_n.a:*.o(COMMON);
+      */libnualsgi_n.a:*.o(.scommon);
+      */libnualsgi_n.a:*.o(.*bss*);
+      */libn_audio.a:*.o(COMMON);
+      */libn_audio.a:*.o(.scommon);
+      */libn_audio.a:*.o(.*bss*);
+   }
+   END_NOLOAD(code)
+
+   BEGIN_SEG(asset_data, __romPos)
+   {
+      ${asset_data_path}(.data);
+   }
+   END_SEG(asset_data)
+
+
+  /* DWARF debug sections.
+     Symbols in the DWARF debugging sections are relative to the beginning
+     of the section so we begin them at 0.  */
+  /* DWARF 1 */
+  .debug          0 : { *(.debug) }
+  .line           0 : { *(.line) }
+  /* GNU DWARF 1 extensions */
+  .debug_srcinfo  0 : { *(.debug_srcinfo) }
+  .debug_sfnames  0 : { *(.debug_sfnames) }
+  /* DWARF 1.1 and DWARF 2 */
+  .debug_aranges  0 : { *(.debug_aranges) }
+  .debug_pubnames 0 : { *(.debug_pubnames) }
+  /* DWARF 2 */
+  .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
+  .debug_abbrev   0 : { *(.debug_abbrev) }
+  .debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end ) }
+  .debug_frame    0 : { *(.debug_frame) }
+  .debug_str      0 : { *(.debug_str) }
+  .debug_loc      0 : { *(.debug_loc) }
+  .debug_macinfo  0 : { *(.debug_macinfo) }
+  /* SGI/MIPS DWARF 2 extensions */
+  .debug_weaknames 0 : { *(.debug_weaknames) }
+  .debug_funcnames 0 : { *(.debug_funcnames) }
+  .debug_typenames 0 : { *(.debug_typenames) }
+  .debug_varnames  0 : { *(.debug_varnames) }
+  /* DWARF 3 */
+  .debug_pubtypes 0 : { *(.debug_pubtypes) }
+  .debug_ranges   0 : { *(.debug_ranges) }
+  /* DWARF Extension.  */
+  .debug_macro    0 : { *(.debug_macro) }
+  .gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
+   
+   /* Discard everything not specifically mentioned above. */
+   /DISCARD/ :
+   {
+      *(*);
+   }
+}

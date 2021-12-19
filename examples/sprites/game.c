@@ -9,6 +9,8 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_camera_init(&game->camera);
 
+    fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 0);
+
     n64_logo_sprite_init(&game->n64logo, fw64_image_load(game->engine->assets, FW64_ASSET_image_n64_logo, NULL));
     game->n64logo.position.x = 10;
     game->n64logo.position.y = 10;

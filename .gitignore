@@ -4,14 +4,9 @@
 .DS_Store
 .devcontainer.json
 
-assets/build_n64
-assets/build_desktop
 node_modules
 .idea
 
-/build
-/build_n64
-/build_desktop
-/cmake-build-debug
+/build**
 
 /docs/_build

@@ -13,7 +13,8 @@
   "scripts": {
     "prepare-n64-assets": "node pipeline/Pipeline.js -f assets/manifest.json n64 build_n64/bin/assets",
     "prepare-desktop-assets": "node pipeline/Pipeline.js -f assets/manifest.json desktop build_desktop/bin/assets",
-    "prepare-desktop-shaders": "node scripts/PrepareDesktopShaders.js src/desktop/glsl build_desktop/bin/glsl"
+    "prepare-desktop-shaders": "node scripts/PrepareDesktopShaders.js src/desktop/glsl build_desktop/bin/glsl",
+    "prepare-windows-dlls": "node scripts/PrepareWindowsDlls.js build_desktop"
   },
   "author": "Matthew LaRocca",
   "license": "MIT",

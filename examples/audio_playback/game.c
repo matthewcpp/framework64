@@ -13,6 +13,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     fw64_camera_init(&game->camera);
 
+    fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
+
     game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
     game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
     game->music_bank = fw64_music_bank_load(engine->assets, FW64_ASSET_musicbank_musicbank2, NULL);
