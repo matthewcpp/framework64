@@ -15,15 +15,15 @@ typedef struct {
     float _rot_x;
     float _rot_y;
     Vec3 _target;
-} ArcballCamera;
+} fw64ArcballCamera;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void arcball_init(ArcballCamera* arcball, fw64Input* input);
-void arcball_set_initial(ArcballCamera* arcball, Box* box);
-void arcball_update(ArcballCamera* arcball, float time_delta);
+void fw64_arcball_init(fw64ArcballCamera* arcball, fw64Input* input);
+void fw64_arcball_set_initial(fw64ArcballCamera* arcball, Box* box);
+void fw64_arcball_update(fw64ArcballCamera* arcball, float time_delta);
 
 #ifdef __cplusplus
 }

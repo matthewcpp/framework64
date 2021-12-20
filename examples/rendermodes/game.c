@@ -17,7 +17,7 @@ static void set_current_mesh(Game* game, int index);
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
-    arcball_init(&game->arcball, engine->input);
+    fw64_arcball_init(&game->arcball, engine->input);
 
     game->meshes[0] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo, NULL);
     game->meshes[1] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_suzanne, NULL);
@@ -48,7 +48,7 @@ static void set_current_mesh(Game* game, int index) {
     Box bounding_box;
     fw64_mesh_get_bounding_box(mesh, &bounding_box);
 
-    arcball_set_initial(&game->arcball, &bounding_box);
+    fw64_arcball_set_initial(&game->arcball, &bounding_box);
 }
 
 void game_update(Game* game) {
@@ -60,7 +60,7 @@ void game_update(Game* game) {
         set_current_mesh(game, game->current_mesh > 0 ? game->current_mesh - 1 : MESH_COUNT - 1);
     }
 
-    arcball_update(&game->arcball, game->engine->time->time_delta);
+    fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
 }
 
 void game_draw(Game* game) {

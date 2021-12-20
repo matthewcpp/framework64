@@ -9,7 +9,7 @@
 
 typedef struct {
     fw64Engine* engine;
-    ArcballCamera arcball;
+    fw64ArcballCamera arcball;
 
     fw64Font* consolas;
     fw64Texture* button_sprite;

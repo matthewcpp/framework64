@@ -5,13 +5,13 @@
 #define ARCBALL_ZOOM_SPEED 1.0f
 #define ARCBALL_DEAD_ZONE 0.2f
 
-static void _arcball_reset(ArcballCamera* arcball) {
+static void _arcball_reset(fw64ArcballCamera* arcball) {
     arcball->_rot_x = 0.0f;
     arcball->_rot_y = 0.0f;
     arcball->_distance = arcball->_diagonal * 2.0f;
 }
 
-void arcball_init(ArcballCamera* arcball, fw64Input* input) {
+void fw64_arcball_init(fw64ArcballCamera* arcball, fw64Input* input) {
     arcball->_input = input;
 
     fw64_camera_init(&arcball->camera);
@@ -21,7 +21,7 @@ void arcball_init(ArcballCamera* arcball, fw64Input* input) {
     vec3_zero(&arcball->_target);
 }
 
-void _arcball_update_camera_position(ArcballCamera* arcball) {
+void _arcball_update_camera_position(fw64ArcballCamera* arcball) {
     if (arcball->_rot_x > 90.0f)
         arcball->_rot_x = 90.0f;
     if (arcball->_rot_x < -90.0f)
@@ -45,7 +45,7 @@ void _arcball_update_camera_position(ArcballCamera* arcball) {
     fw64_camera_update_view_matrix(&arcball->camera);
 }
 
-void arcball_set_initial(ArcballCamera* arcball, Box* box) {
+void fw64_arcball_set_initial(fw64ArcballCamera* arcball, Box* box) {
     box_center(box, &arcball->_target);
     arcball->_diagonal = vec3_distance(&box->min, &box->max);
     _arcball_reset(arcball);
@@ -53,7 +53,7 @@ void arcball_set_initial(ArcballCamera* arcball, Box* box) {
     _arcball_update_camera_position(arcball);
 }
 
-void arcball_update(ArcballCamera* arcball, float time_delta) {
+void fw64_arcball_update(fw64ArcballCamera* arcball, float time_delta) {
     Vec2 stick;
     fw64_input_stick(arcball->_input, 0, &stick);
 

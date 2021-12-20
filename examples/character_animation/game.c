@@ -14,13 +14,13 @@ void game_init(Game* game, fw64Engine* engine) {
     game->current_animation = 0;
     game->current_speed = 1.0f;
 
-    arcball_init(&game->arcball, engine->input);
+    fw64_arcball_init(&game->arcball, engine->input);
     fw64_node_init(&game->node);
     game->mesh = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_catherine, NULL);
 
     Box bounding_box;
     fw64_mesh_get_bounding_box(game->mesh, &bounding_box);
-    arcball_set_initial(&game->arcball, &bounding_box);
+    fw64_arcball_set_initial(&game->arcball, &bounding_box);
     game->arcball.camera.near = 150.0f;
     game->arcball.camera.far = 750.0f;
     fw64_camera_update_projection_matrix(&game->arcball.camera);
@@ -35,7 +35,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
 
 void game_update(Game* game) {
-    arcball_update(&game->arcball, game->engine->time->time_delta);
+    fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
     fw64_animation_controller_update(&game->animation_state, game->engine->time->time_delta);
 
     if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
