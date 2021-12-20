@@ -1,6 +1,6 @@
 #pragma once
 
-/** \file collide.h */
+/** \file collision.h */
 
 #include "framework64/box.h"
 #include "framework64/vec3.h"

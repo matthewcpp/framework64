@@ -6,7 +6,7 @@
 #include "framework64/mesh.h"
 #include "framework64/node.h"
 #include "framework64/quat.h"
-#include "framework64/collide.h"
+#include "framework64/collision.h"
 #include "framework64/renderer.h"
 #include "framework64/vec3.h"
 

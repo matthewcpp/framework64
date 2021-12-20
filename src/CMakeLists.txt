@@ -7,7 +7,7 @@ set(common_source_files
         ../include/framework64/audio_bank.h
         ../include/framework64/box.h box.c
         ../include/framework64/camera.h camera.c
-        ../include/framework64/collide.h collide.c
+        ../include/framework64/collision.h collision.c
         ../include/framework64/collider.h collider.c
         ../include/framework64/color.h color.c
         ../include/framework64/internal/data_cache.h data_cache.c
