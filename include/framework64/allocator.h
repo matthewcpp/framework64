@@ -24,6 +24,8 @@ extern "C" {
 
 /** This function is automatically card when the library is initialized.  It does not need to be called in your application. */
 void fw64_default_allocator_init();
+
+/** Returns the default allocator which simply forwards calls to the corresponding standard library functions. */
 fw64Allocator* fw64_default_allocator();
 
 #ifdef __cplusplus

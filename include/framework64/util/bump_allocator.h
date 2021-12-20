@@ -1,6 +1,6 @@
 #pragma once
 
-/** \file fps_camera.h */
+/** \file bump_allocator.h */
 
 #include "framework64/allocator.h"
 
