@@ -3,6 +3,7 @@
 #include "framework64/matrix.h"
 
 #include "framework64/n64/font.h"
+#include "framework64/n64/framebuffer.h"
 #include "framework64/n64/image.h"
 #include "framework64/n64/mesh.h"
 #include "framework64/n64/texture.h"
@@ -54,6 +55,9 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     );
     renderer->lights = lights;
     renderer->active_light_mask = 1;
+
+    renderer->post_draw_func = NULL;
+    renderer->post_draw_func_arg = NULL;
 }
 
 static void refresh_shading_mode(fw64Renderer* renderer) {
@@ -101,6 +105,23 @@ int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
     renderer->clear_color = GPACK_RGBA5551(r, g, b, 1);
+}
+
+void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPostDrawFunc func, void* arg) {
+    renderer->post_draw_func = func;
+    renderer->post_draw_func_arg = arg;
+}
+
+void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask* gfxTaskPtr) {
+    if (renderer->post_draw_func == NULL)
+        return;
+
+    fw64Framebuffer framebuffer;
+    framebuffer.buffer = (u16*)gfxTaskPtr->framebuffer;
+    framebuffer.width = renderer->screen_size.x;
+    framebuffer.height = renderer->screen_size.y;
+
+    renderer->post_draw_func(&framebuffer, renderer->post_draw_func_arg);
 }
 
 Gfx _rdp_init_static_dl[] = {

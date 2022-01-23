@@ -40,8 +40,17 @@ static void fw64_n64_engine_update_time(fw64Engine* engine) {
 
     float ms_delta = (float)(current_ms - _previous_update_time);
     engine->time->time_delta = ms_delta / 1000.0f;
+    engine->time->total_time += engine->time->time_delta;
 
     _previous_update_time = current_ms;
+}
+
+void fw64_n64_swap_func(void* gfxTask)
+{
+    NUScTask* gfxTaskPtr = (NUScTask*)gfxTask;
+    fw64_n64_renderer_swap_func(&renderer, gfxTaskPtr);
+    
+    osViSwapBuffer(gfxTaskPtr->framebuffer);
 }
 
 int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
@@ -56,6 +65,8 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     InitHeap(memory_heap, FW64_N64_HEAP_SIZE);
 
     nuGfxInit(); // starts nusys graphics
+    nuGfxSwapCfbFuncSet(fw64_n64_swap_func);
+
     nuAuInit(); //starts the SGI tools audio manager
 
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);

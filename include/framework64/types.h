@@ -20,6 +20,8 @@ typedef Mtx fw64Matrix;
 #define fw64_sqrtf _nsqrtf
 #define fw64_acosf acosf
 #define fw64_fabsf fabsf
+#define fw64_floorf floorf
+#define fw64_ceilf ceilf
 
 #define fw64_malloc malloc
 #define fw64_memalign memalign
@@ -46,6 +48,8 @@ typedef struct {
 #define fw64_sqrtf sqrtf
 #define fw64_acosf acosf
 #define fw64_fabsf fabsf
+#define fw64_floorf floorf
+#define fw64_ceilf ceilf
 
 #define fw64_malloc malloc
 #define fw64_memalign(align, size) malloc((size))

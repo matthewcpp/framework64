@@ -32,9 +32,14 @@ struct fw64Renderer{
 
     Lights2 lights;
     uint32_t active_light_mask;
+
+    fw64RendererPostDrawFunc post_draw_func;
+    void* post_draw_func_arg;
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
+
+void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask*gfxTaskPtr);
 
 #define FW64_N64_OPA_ZB_FLAGS(renderer) ((renderer)->depth_test_enabled ? Z_CMP | Z_UPD : 0)
 #define FW64_N64_OPA_AA_FLAGS(renderer) ((renderer)->aa_enabled ? AA_EN : 0)
