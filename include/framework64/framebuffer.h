@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file framebuffer.h */
+
 #include <stdint.h>
 
 typedef struct fw64Framebuffer fw64Framebuffer;

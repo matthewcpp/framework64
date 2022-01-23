@@ -14,6 +14,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/engine.h \
                         ../include/framework64/filesystem.h \
                         ../include/framework64/font.h \
+                        ../include/framework64/framebuffer.h \
                         ../include/framework64/frustum.h \
                         ../include/framework64/image.h \
                         ../include/framework64/input.h \
