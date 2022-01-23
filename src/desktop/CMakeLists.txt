@@ -22,6 +22,7 @@ ${desktop_include_directory}/mesh_data.h desktop/mesh_data.cpp
 ${desktop_include_directory}/mesh_renderer.h desktop/mesh_renderer.cpp
 ${desktop_include_directory}/n64_input_interface.h desktop/n64_input_interface.cpp
 ${desktop_include_directory}/particle_shader.h desktop/particle_shader.cpp
+${desktop_include_directory}/pixel_texture.h desktop/pixel_texture.cpp
 desktop/quad.cpp
 ${desktop_include_directory}/renderer.h desktop/renderer.cpp
 desktop/render_util.cpp
