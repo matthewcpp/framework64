@@ -3,6 +3,7 @@
 #include "framework64/camera.h"
 
 #include "framework64/desktop/font.h"
+#include "framework64/desktop/pixel_texture.h"
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 
@@ -31,13 +32,10 @@ public:
     void drawSpriteFrame(fw64Texture const * texture, int frame, float x, float y, float scale_x, float scale_y);
     void drawText(fw64Font const* font, float x, float y, const char* text, uint32_t count);
 
-private:
-    struct SpriteVertex {
-        float x, y, z;
-        float u, v;
-    };
+    void drawPixelTexture(PixelTexture const & pixel_texture);
 
 private:
+    void drawSpriteVertices(SpriteVertex const * vertices, size_t vertex_count, GLuint texture_handle);
     void setCurrentTexture(fw64Texture const * texture);
     void submitCurrentBatch();
     void addQuad(SpriteVertex const & a, SpriteVertex const & b, SpriteVertex const & c, SpriteVertex const & d);
@@ -54,7 +52,7 @@ private:
     size_t gl_vertex_buffer_size_in_bytes = 0;
     std::vector<SpriteVertex> vertex_buffer;
     std::array<float, 16> matrix;
-
+    int screen_width, screen_height;
 };
 
 }

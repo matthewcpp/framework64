@@ -2,6 +2,7 @@
 
 #include "framework64/renderer.h"
 #include "framework64/desktop/mesh_renderer.h"
+#include "framework64/desktop/pixel_texture.h"
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/sprite_renderer.h"
 
@@ -18,6 +19,10 @@
 
 #include <string>
 #include <vector>
+
+struct fw64Framebuffer {
+    framework64::PixelTexture texture;
+};
 
 struct fw64Renderer {
 public:
@@ -37,6 +42,11 @@ public:
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
     fw64Camera* camera = nullptr;
     bool anti_aliasing_enabled = true;
+
+    fw64Framebuffer framebuffer_write_texture;
+    fw64RendererPostDrawFunc post_draw_callback = nullptr;
+    void* post_draw_callback_arg = nullptr;
+
 private:
     SDL_Window* window;
     SDL_GLContext gl_context;

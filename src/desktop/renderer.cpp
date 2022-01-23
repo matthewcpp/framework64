@@ -28,6 +28,7 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
 
     if (!sprite_renderer.init(shader_cache)) return false;
     if (!mesh_renderer.init(shader_cache)) return false;
+    framebuffer_write_texture.texture.init();
     setScreenSize(width, height);
 
     return true;
@@ -83,6 +84,12 @@ void fw64Renderer::end(fw64RendererFlags flags) {
             break;
     }
 
+    if (post_draw_callback) {
+        framebuffer_write_texture.texture.clear();
+        post_draw_callback(&framebuffer_write_texture, post_draw_callback_arg);
+        sprite_renderer.drawPixelTexture(framebuffer_write_texture.texture);
+    }
+
     if ((flags & FW64_RENDERER_FLAG_SWAP) == FW64_RENDERER_FLAG_SWAP){
         SDL_GL_SwapWindow(window);
     }
@@ -95,6 +102,7 @@ void fw64Renderer::setScreenSize(int width, int height) {
     screen_height = height;
 
     sprite_renderer.setScreenSize(width, height);
+    framebuffer_write_texture.texture.setSize(width, height);
 }
 
 // Public C interface
@@ -186,4 +194,13 @@ void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled
 
 int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
     return static_cast<int>(renderer->anti_aliasing_enabled);
+}
+
+void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPostDrawFunc func, void* arg) {
+    renderer->post_draw_callback = func;
+    renderer->post_draw_callback_arg = arg;
+}
+
+void fw64_framebuffer_set_pixel(fw64Framebuffer* framebuffer, int x, int y, uint8_t r, uint8_t g, uint8_t b) {
+    framebuffer->texture.setPixel(x, y, r, g, b);
 }

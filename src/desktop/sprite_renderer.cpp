@@ -55,34 +55,50 @@ namespace framework64 {
         submitCurrentBatch();
     }
 
+    void SpriteRenderer::drawPixelTexture(PixelTexture const & pixel_texture) {
+        // update the texture
+        glBindTexture(GL_TEXTURE_2D, pixel_texture.gl_texture_handle);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screen_width, screen_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel_texture.pixel_data.data());
+
+        glDisable(GL_DEPTH_TEST);
+
+        glUseProgram(shader);
+        glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, pixel_texture.matrix.data());
+        drawSpriteVertices(pixel_texture.sprite_vertices.data(), pixel_texture.sprite_vertices.size(), pixel_texture.gl_texture_handle);
+    }
+
     void SpriteRenderer::submitCurrentBatch() {
         if (vertex_buffer.size() == 0)
             return;
 
+        drawSpriteVertices(vertex_buffer.data(), vertex_buffer.size(), current_texture->image->gl_handle);
+        vertex_buffer.clear();
+    }
+
+    void SpriteRenderer::drawSpriteVertices(SpriteVertex const* vertices, size_t vertex_count, GLuint texture_handle) {
+        if (vertices == nullptr || vertex_count == 0)
+            return;
         // upload all vertices to GPU
         glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer);
 
-        size_t vertex_buffer_size_in_bytes = vertex_buffer.size() * sizeof(SpriteVertex);
+        size_t vertex_buffer_size_in_bytes = vertex_count * sizeof(SpriteVertex);
 
         if (vertex_buffer_size_in_bytes > gl_vertex_buffer_size_in_bytes) {
-            glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size_in_bytes, vertex_buffer.data(), GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, vertex_buffer_size_in_bytes, vertices, GL_DYNAMIC_DRAW);
             gl_vertex_buffer_size_in_bytes = vertex_buffer_size_in_bytes;
         }
         else {
-            glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_buffer_size_in_bytes, vertex_buffer.data());
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_buffer_size_in_bytes, vertices);
         }
-
 
         // set the current texture
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, current_texture->image->gl_handle);
+        glBindTexture(GL_TEXTURE_2D, texture_handle);
         glUniform1i(uniform_sampler, 0);
 
         glBindVertexArray(gl_vertex_array_object);
-        glDrawArrays(GL_TRIANGLES, 0, vertex_buffer.size());
+        glDrawArrays(GL_TRIANGLES, 0, vertex_count);
         glBindVertexArray(0);
-
-        vertex_buffer.clear();
     }
 
     void SpriteRenderer::setCurrentTexture(fw64Texture const* texture) {
@@ -154,6 +170,9 @@ namespace framework64 {
     }
 
     void SpriteRenderer::setScreenSize(int width, int height) {
+        screen_width = width;
+        screen_height = height;
+
         matrix_ortho(matrix.data(), 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
     }
 

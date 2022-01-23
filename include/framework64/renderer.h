@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "color.h"
 #include "font.h"
+#include "framebuffer.h"
 #include "mesh.h"
 #include "texture.h"
 #include "vec2.h"
@@ -29,6 +30,8 @@ typedef enum {
 #define FW64_RENDERER_MAX_LIGHT_COUNT 2
 
 typedef struct fw64Renderer fw64Renderer;
+
+typedef void(*fw64RendererPostDrawFunc)(fw64Framebuffer*, void*);
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,6 +76,8 @@ void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, ui
 void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled);
 void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z);
 void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b);
+
+void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPostDrawFunc func, void* arg);
 
 #ifdef __cplusplus
 }
