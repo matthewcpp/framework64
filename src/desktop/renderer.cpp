@@ -31,7 +31,7 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
     framebuffer_write_texture.texture.init();
     setScreenSize(width, height);
 
-    framebuffer_write_texture.texture.material.shader = shader_cache.particleShaderProgram();
+    framebuffer_write_texture.texture.material.shader = shader_cache.getSpriteShaderProgram();
 
     return true;
 }

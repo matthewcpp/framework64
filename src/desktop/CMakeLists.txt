@@ -21,7 +21,6 @@ ${desktop_include_directory}/mesh.h desktop/mesh.cpp
 ${desktop_include_directory}/mesh_data.h desktop/mesh_data.cpp
 ${desktop_include_directory}/mesh_renderer.h desktop/mesh_renderer.cpp
 ${desktop_include_directory}/n64_input_interface.h desktop/n64_input_interface.cpp
-${desktop_include_directory}/particle_shader.h desktop/particle_shader.cpp
 ${desktop_include_directory}/pixel_texture.h desktop/pixel_texture.cpp
 desktop/quad.cpp
 ${desktop_include_directory}/renderer.h desktop/renderer.cpp
@@ -32,6 +31,7 @@ ${desktop_include_directory}/shader.h desktop/shader.cpp
 ${desktop_include_directory}/shader_cache.h desktop/shader_cache.cpp
 ${desktop_include_directory}/splitter.h desktop/splitter.cpp
 ${desktop_include_directory}/sprite_renderer.h desktop/sprite_renderer.cpp
+${desktop_include_directory}/sprite_shader.h desktop/sprite_shader.cpp
 ${desktop_include_directory}/texture.h desktop/texture.cpp
 ${desktop_include_directory}/texture_info_uniform.h
 ${desktop_include_directory}/uniform_block.h

@@ -1,14 +1,13 @@
-precision mediump float;
+layout(std140) uniform fw64SpriteTransformData {
+    mat4 fw64_mvp_matrix;
+};
 
-layout(location = 0) in vec4 fw64_position;
-layout(location = 1) in vec2 fw64_tex_coords;
-
-uniform mat4 matrix;
+layout(location = 0) in vec4 fw64_vertex_position;
+layout(location = 2) in vec2 fw64_vertex_tex_coord;
 
 out vec2 tex_coords;
 
 void main() {
-    // image loaded by SDL_image has origin at top left
-    tex_coords = vec2(fw64_tex_coords.x, 1.0 - fw64_tex_coords.y);
-    gl_Position = matrix * fw64_position;
+    tex_coords = fw64_vertex_tex_coord;
+    gl_Position = fw64_mvp_matrix * fw64_vertex_position;
 }

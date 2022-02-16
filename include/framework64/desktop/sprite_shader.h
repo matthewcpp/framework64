@@ -6,7 +6,7 @@
 
 namespace framework64 {
 
-class ParticleShader : public Shader {
+class SpriteShader : public Shader {
 public:
     void setUniforms(fw64Material const & material) override;
     ShaderProgram* create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) override;
