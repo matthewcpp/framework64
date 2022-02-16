@@ -1,11 +1,12 @@
 #pragma once
 
 #include "framework64/renderer.h"
-#include "framework64/desktop/mesh_renderer.h"
-#include "framework64/desktop/pixel_texture.h"
-#include "framework64/desktop/shader_cache.h"
-#include "framework64/desktop/sprite_renderer.h"
 
+#include "framework64/desktop/shader_cache.h"
+#include "framework64/desktop/pixel_texture.h"
+#include "framework64/desktop/screen_overlay.h"
+#include "framework64/desktop/sprite_renderer.h"
+#include "framework64/desktop/uniform_block.h"
 
 #include <SDL2/SDL.h>
 
@@ -16,7 +17,6 @@
 #endif
 
 #include <array>
-
 #include <string>
 #include <vector>
 
@@ -33,19 +33,84 @@ public:
     void end(fw64RendererFlags flags);
     void setScreenSize(int width, int height);
 
+private:
+    bool initDisplay(int width, int height);
+    void initLighting();
+
+public:
+    void drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform);
+    void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
+
+    void setDepthTestingEnabled(bool enabled);
+    inline bool depthTestingEnabled() const { return depth_testing_enabled; }
+
+    void setAmbientLightColor(uint8_t r, uint8_t g, uint8_t b);
+    void setLightEnabled(int index, int enabled);
+    void setLightDirection(int index, float x, float y, float z);
+    void setLightColor(int index, uint8_t r, uint8_t g, uint8_t b);
+
+    void renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
+private:     
+    void updateMeshTransformBlock(fw64Matrix & matrix);
+    void updateLightingBlock();
+    void setActiveShader(framework64::ShaderProgram* shader);
+    void setGlDepthTestingState();
+    void drawPrimitive(fw64Primitive const & primitive);
+
+private:
+
+    struct Light {
+        std::array<float, 4> light_color;
+        std::array<float, 4> light_direction;
+    };
+
+    struct LightInfo {
+        Light light;
+        int active;
+    };
+
+    struct LightingData {
+        std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
+        std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+        int light_count;
+    };
+
+    struct MeshTransformData {
+        std::array<float, 16> mvp_matrix;
+        std::array<float, 16> normal_matrix;
+    };
+
+private:
+    framework64::UniformBlock<LightingData> lighting_data_uniform_block;
+    framework64::UniformBlock<MeshTransformData> mesh_transform_uniform_block;
+
+    std::array<float, 16> view_projection_matrix;
+
+    framework64::ShaderProgram* active_shader = nullptr;
+
+    bool depth_testing_enabled = true;
+
+    std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+    bool lighting_dirty = false;
+
+    framework64::ScreenOverlay screen_overlay;
+
+
+
 public:
     framework64::SpriteRenderer sprite_renderer;
-    framework64::MeshRenderer mesh_renderer;
-    fw64RenderMode render_mode;
+    fw64Primitive::Mode render_mode;
     int screen_width;
     int screen_height;
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
-    fw64Camera* camera = nullptr;
     bool anti_aliasing_enabled = true;
 
     fw64Framebuffer framebuffer_write_texture;
     fw64RendererPostDrawFunc post_draw_callback = nullptr;
     void* post_draw_callback_arg = nullptr;
+
+        fw64Camera* camera = nullptr;
 
 private:
     SDL_Window* window;
