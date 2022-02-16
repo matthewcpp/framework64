@@ -31,6 +31,8 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
     framebuffer_write_texture.texture.init();
     setScreenSize(width, height);
 
+    framebuffer_write_texture.texture.material.shader = shader_cache.particleShaderProgram();
+
     return true;
 }
 
@@ -85,8 +87,9 @@ void fw64Renderer::end(fw64RendererFlags flags) {
     }
 
     if (post_draw_callback) {
-        framebuffer_write_texture.texture.clear();
+        framebuffer_write_texture.texture.image.clear();
         post_draw_callback(&framebuffer_write_texture, post_draw_callback_arg);
+        framebuffer_write_texture.texture.image.updateGlImage();
         sprite_renderer.drawPixelTexture(framebuffer_write_texture.texture);
     }
 
@@ -202,5 +205,5 @@ void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPo
 }
 
 void fw64_framebuffer_set_pixel(fw64Framebuffer* framebuffer, int x, int y, uint8_t r, uint8_t g, uint8_t b) {
-    framebuffer->texture.setPixel(x, y, r, g, b);
+    framebuffer->texture.image.setPixel(x, y, r, g, b);
 }

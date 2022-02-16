@@ -19,7 +19,7 @@ public:
 public:
     void setShaderProgram(fw64Primitive & primitive);
 
-    void setParticleShader(fw64Primitive & primitive);
+    ShaderProgram* particleShaderProgram();
 
     inline std::string shaderDir() const { return shader_dir; }
 
