@@ -24,7 +24,7 @@ namespace framework64 {
 
         sprite_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
         sprite_material.shader = shader_cache.getSpriteShaderProgram();
-        sprite_transform_uniform_block.create(5);
+        sprite_transform_uniform_block.create();
 
         return true;
     }

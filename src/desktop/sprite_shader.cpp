@@ -5,6 +5,10 @@
 
 namespace framework64 {
 
+struct SpriteShaderProgram : public ShaderProgram {
+
+};
+
 ShaderProgram* SpriteShader::create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) {
     std::string vertex_path = shader_dir + "sprite.vert.glsl";
     std::string fragment_path = shader_dir + "sprite.frag.glsl";
@@ -18,7 +22,7 @@ ShaderProgram* SpriteShader::create(uint32_t primitive_attributes, uint32_t mate
     if (!program->handle)
         return nullptr;
 
-    texture_info.uniform_block.create(4);
+    texture_info.uniform_block.create();
     program->mesh_transform_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64SpriteTransformData");
     program->diffuse_texture_location = glGetUniformLocation(program->handle, "diffuse_texture_sampler");
 

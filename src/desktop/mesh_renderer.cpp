@@ -15,8 +15,8 @@ bool MeshRenderer::init(ShaderCache& shader_cache) {
     lights[1].light.light_color = {1.0f, 1.0f, 1.0f, 1.0f};
     lights[1].active = 0;
 
-    lighting_data_uniform_block.create(0);
-    mesh_transform_uniform_block.create(1);
+    lighting_data_uniform_block.create();
+    mesh_transform_uniform_block.create();
 
     lighting_dirty = true;
 

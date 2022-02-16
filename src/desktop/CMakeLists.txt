@@ -34,7 +34,7 @@ ${desktop_include_directory}/sprite_renderer.h desktop/sprite_renderer.cpp
 ${desktop_include_directory}/sprite_shader.h desktop/sprite_shader.cpp
 ${desktop_include_directory}/texture.h desktop/texture.cpp
 ${desktop_include_directory}/texture_info_uniform.h
-${desktop_include_directory}/uniform_block.h
+${desktop_include_directory}/uniform_block.h desktop/uniform_block.cpp
 ${desktop_include_directory}/unlit_shader.h desktop/unlit_shader.cpp
 
 ${CMAKE_CURRENT_SOURCE_DIR}/../../include/framework64/n64/controller_button.h

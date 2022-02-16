@@ -8,19 +8,39 @@
 
 namespace framework64 {
 
+GLint getNextUniformBindingIndex();
+void returnUniformBindingIndex(GLint index);
+
 template <typename T>
 struct UniformBlock {
+    UniformBlock() = default;
+    ~UniformBlock();
     T data;
-    GLuint buffer;
+    GLuint buffer = 0;
     GLuint binding_index = 0;
 
-    void create(GLuint bind_index);
+    void create();
     void update();
+    void freeGlResources();
 };
 
 template<typename T>
-void UniformBlock<T>::create(GLuint bind_index) {
-    binding_index = bind_index;
+UniformBlock<T>::~UniformBlock() {
+    freeGlResources();
+}
+
+template<typename T>
+void UniformBlock<T>::freeGlResources() {
+    if (buffer > 0) {
+        returnUniformBindingIndex(binding_index);
+        glDeleteBuffers(1, &buffer);
+        buffer = 0;
+    }
+}
+
+template<typename T>
+void UniformBlock<T>::create() {
+    binding_index = getNextUniformBindingIndex();
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_UNIFORM_BUFFER, buffer);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(T), &data, GL_DYNAMIC_DRAW);
