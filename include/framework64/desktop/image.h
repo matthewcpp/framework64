@@ -10,15 +10,26 @@
 #endif
 
 #include <string>
+#include <vector>
 
 struct fw64Image {
+    fw64Image() = default;
+    ~fw64Image();
+
+    void setSize(int w, int h, int h_slices, int v_slices);
+    void setPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b);
+    void updateGlImage();
+    void clear();
+
     int width;
     int height;
     int hslices;
     int vslices;
     GLuint gl_handle = 0;
 
-    ~fw64Image();
+    std::vector<uint8_t> pixel_data;
+
+
 
 public:
     static fw64Image* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
