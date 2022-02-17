@@ -17,7 +17,7 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
 
     initLighting();
 
-    if (!sprite_renderer.init(shader_cache)) return false;
+    if (!sprite_batch.init(shader_cache)) return false;
 
     framebuffer_write_texture.texture.init();
     setScreenSize(width, height);
@@ -116,7 +116,7 @@ void fw64Renderer::end(fw64RendererFlags flags) {
         framebuffer_write_texture.texture.image.clear();
         post_draw_callback(&framebuffer_write_texture, post_draw_callback_arg);
         framebuffer_write_texture.texture.image.updateGlImage();
-        sprite_renderer.drawPixelTexture(framebuffer_write_texture.texture);
+        sprite_batch.drawPixelTexture(framebuffer_write_texture.texture);
     }
 
     if ((flags & FW64_RENDERER_FLAG_SWAP) == FW64_RENDERER_FLAG_SWAP){
@@ -132,7 +132,7 @@ void fw64Renderer::setScreenSize(int width, int height) {
     screen_width = width;
     screen_height = height;
 
-    sprite_renderer.setScreenSize(width, height);
+    sprite_batch.setScreenSize(width, height);
     framebuffer_write_texture.texture.setSize(width, height);
 }
 
@@ -185,17 +185,17 @@ void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* con
 
 void fw64Renderer::drawSprite(fw64Texture* texture, float x, float y){
     setDrawingMode(DrawingMode::Rect);
-    sprite_renderer.drawSprite(texture, x, y);
+    sprite_batch.drawSprite(texture, x, y);
 }
 
 void fw64Renderer::drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y) {
     setDrawingMode(DrawingMode::Rect);
-    sprite_renderer.drawSpriteFrame(texture, frame, x, y, scale_x, scale_y);
+    sprite_batch.drawSpriteFrame(texture, frame, x, y, scale_x, scale_y);
 }
 
 void fw64Renderer::drawText(fw64Font* font, float x, float y, const char* text, uint32_t count) {
     setDrawingMode(DrawingMode::Rect);
-    sprite_renderer.drawText(font, x, y, text, count);
+    sprite_batch.drawText(font, x, y, text, count);
 }
 
 void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
@@ -288,7 +288,7 @@ void fw64Renderer::setDrawingMode(DrawingMode mode) {
 
     // cleanup actions from current drawing mode
     if (drawing_mode == DrawingMode::Rect) {
-        sprite_renderer.flush();   
+        sprite_batch.flush();   
     }
 
     drawing_mode = mode;
@@ -300,7 +300,7 @@ void fw64Renderer::setDrawingMode(DrawingMode mode) {
             break;
 
         case DrawingMode::Rect:
-            sprite_renderer.start();
+            sprite_batch.start();
             break;
     };
 }
@@ -330,7 +330,7 @@ void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw
 }
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {
-    renderer->sprite_renderer.drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
+    renderer->sprite_batch.drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y) {

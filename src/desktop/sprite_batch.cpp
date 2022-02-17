@@ -1,11 +1,11 @@
-#include "framework64/desktop/sprite_renderer.h"
+#include "framework64/desktop/sprite_batch.h"
 
 #include "framework64/matrix.h"
 
 #include "framework64/desktop/shader.h"
 
 namespace framework64 {
-    bool SpriteRenderer::init(ShaderCache& shader_cache) {
+    bool SpriteBatch::init(ShaderCache& shader_cache) {
         glGenBuffers(1, &gl_vertex_buffer);
 
         glGenVertexArrays(1, &gl_vertex_array_object);
@@ -29,7 +29,7 @@ namespace framework64 {
         return true;
     }
 
-    void SpriteRenderer::start() {
+    void SpriteBatch::start() {
         glDisable(GL_DEPTH_TEST);
         sprite_material.texture = nullptr;
 
@@ -40,11 +40,11 @@ namespace framework64 {
         glUniformBlockBinding(sprite_material.shader->handle, sprite_shader->mesh_transform_uniform_block_index, sprite_transform_uniform_block.binding_index);
     }
 
-    void SpriteRenderer::flush() {
+    void SpriteBatch::flush() {
         submitCurrentBatch();
     }
 
-    void SpriteRenderer::drawPixelTexture(PixelTexture& pixel_texture) {
+    void SpriteBatch::drawPixelTexture(PixelTexture& pixel_texture) {
         glDisable(GL_DEPTH_TEST);
 
         auto* sprite_shader = sprite_material.shader;
@@ -58,7 +58,7 @@ namespace framework64 {
         drawSpriteVertices(pixel_texture.sprite_vertices.data(), pixel_texture.sprite_vertices.size(), pixel_texture.material);
     }
 
-    void SpriteRenderer::submitCurrentBatch() {
+    void SpriteBatch::submitCurrentBatch() {
         if (vertex_buffer.size() == 0)
             return;
 
@@ -66,7 +66,7 @@ namespace framework64 {
         vertex_buffer.clear();
     }
 
-    void SpriteRenderer::drawSpriteVertices(SpriteVertex const* vertices, size_t vertex_count, fw64Material& material) {
+    void SpriteBatch::drawSpriteVertices(SpriteVertex const* vertices, size_t vertex_count, fw64Material& material) {
         if (vertices == nullptr || vertex_count == 0)
             return;
         // upload all vertices to GPU
@@ -89,7 +89,7 @@ namespace framework64 {
         glBindVertexArray(0);
     }
 
-    void SpriteRenderer::setCurrentTexture(fw64Texture* texture) {
+    void SpriteBatch::setCurrentTexture(fw64Texture* texture) {
         if (texture != sprite_material.texture) {
             if (sprite_material.texture != nullptr)
                 submitCurrentBatch();
@@ -98,7 +98,7 @@ namespace framework64 {
         }
     }
 
-    void SpriteRenderer::drawSprite(fw64Texture* texture, float x, float y) {
+    void SpriteBatch::drawSprite(fw64Texture* texture, float x, float y) {
         setCurrentTexture(texture);
 
         auto xf = static_cast<float>(x);
@@ -114,7 +114,7 @@ namespace framework64 {
         addQuad(a, b, c, d);
     }
 
-    void SpriteRenderer::drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y) {
+    void SpriteBatch::drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y) {
         setCurrentTexture(texture);
 
         auto wf = static_cast<float>(texture->slice_width());
@@ -138,7 +138,7 @@ namespace framework64 {
         addQuad(a, b, c, d);
     }
 
-    void SpriteRenderer::drawText(fw64Font* font, float x, float y, const char* text, uint32_t count){
+    void SpriteBatch::drawText(fw64Font* font, float x, float y, const char* text, uint32_t count){
         if (!text || text[0] == 0) return;
 
         uint32_t glyph_index;
@@ -158,12 +158,12 @@ namespace framework64 {
         }
     }
 
-    void SpriteRenderer::setScreenSize(int width, int height) {
+    void SpriteBatch::setScreenSize(int width, int height) {
         matrix_ortho(sprite_transform_uniform_block.data.mvp_matrix.data(), 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
         sprite_transform_uniform_block.update();
     }
 
-    void SpriteRenderer::addQuad(SpriteVertex const & a, SpriteVertex const & b, SpriteVertex const & c, SpriteVertex const & d) {
+    void SpriteBatch::addQuad(SpriteVertex const & a, SpriteVertex const & b, SpriteVertex const & c, SpriteVertex const & d) {
         vertex_buffer.push_back(a);
         vertex_buffer.push_back(b);
         vertex_buffer.push_back(c);

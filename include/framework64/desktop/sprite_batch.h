@@ -21,9 +21,9 @@
 
 namespace framework64 {
 
-class SpriteRenderer {
+class SpriteBatch {
 public:
-    SpriteRenderer() = default;
+    SpriteBatch() = default;
 
     bool init(ShaderCache& shader_cache);
     void setScreenSize(int width, int height);

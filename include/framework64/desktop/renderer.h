@@ -5,7 +5,7 @@
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/pixel_texture.h"
 #include "framework64/desktop/screen_overlay.h"
-#include "framework64/desktop/sprite_renderer.h"
+#include "framework64/desktop/sprite_batch.h"
 #include "framework64/desktop/uniform_block.h"
 
 #include <SDL2/SDL.h>
@@ -110,7 +110,7 @@ private:
     framework64::ScreenOverlay screen_overlay;
 
 public:
-    framework64::SpriteRenderer sprite_renderer;
+    framework64::SpriteBatch sprite_batch;
     fw64Primitive::Mode primitive_type;
     DrawingMode drawing_mode = DrawingMode::None;
     int screen_width;
