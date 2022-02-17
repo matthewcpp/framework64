@@ -29,33 +29,25 @@ namespace framework64 {
         return true;
     }
 
-    void SpriteRenderer::begin(fw64Camera const * camera) {
-        (void)camera;
-
+    void SpriteRenderer::start() {
         glDisable(GL_DEPTH_TEST);
         sprite_material.texture = nullptr;
 
-                auto* sprite_shader = sprite_material.shader;
+        auto* sprite_shader = sprite_material.shader;
 
         // activate the sprite shader and set the matrix
         glUseProgram(sprite_shader->handle);
-
-        matrix_ortho(sprite_transform_uniform_block.data.mvp_matrix.data(), 0.0f, static_cast<float>(screen_width), static_cast<float>(screen_height), 0.0f, -1.0f, 1.0f);
-        sprite_transform_uniform_block.update();
         glUniformBlockBinding(sprite_material.shader->handle, sprite_shader->mesh_transform_uniform_block_index, sprite_transform_uniform_block.binding_index);
     }
 
-    void SpriteRenderer::end() {
+    void SpriteRenderer::flush() {
         submitCurrentBatch();
     }
 
     void SpriteRenderer::drawPixelTexture(PixelTexture& pixel_texture) {
-        // update the texture
-
         glDisable(GL_DEPTH_TEST);
 
         auto* sprite_shader = sprite_material.shader;
-
         glUseProgram(sprite_shader->handle);
 
         matrix_set_identity(sprite_transform_uniform_block.data.mvp_matrix.data());
@@ -167,9 +159,6 @@ namespace framework64 {
     }
 
     void SpriteRenderer::setScreenSize(int width, int height) {
-        screen_width = width;
-        screen_height = height;
-
         matrix_ortho(sprite_transform_uniform_block.data.mvp_matrix.data(), 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
         sprite_transform_uniform_block.update();
     }

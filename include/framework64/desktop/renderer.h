@@ -41,9 +41,16 @@ public:
     void drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform);
     void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
+public:
+    void drawSprite(fw64Texture* texture, float x, float y);
+    void drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y);
+    void drawText(fw64Font* font, float x, float y, const char* text, uint32_t count);
+
+public:
     void setDepthTestingEnabled(bool enabled);
     inline bool depthTestingEnabled() const { return depth_testing_enabled; }
 
+public:
     void setAmbientLightColor(uint8_t r, uint8_t g, uint8_t b);
     void setLightEnabled(int index, int enabled);
     void setLightDirection(int index, float x, float y, float z);
@@ -81,6 +88,12 @@ private:
         std::array<float, 16> normal_matrix;
     };
 
+    enum DrawingMode {
+        None, Mesh, Rect
+    };
+
+    void setDrawingMode(DrawingMode mode);
+
 private:
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
     framework64::UniformBlock<MeshTransformData> mesh_transform_uniform_block;
@@ -96,21 +109,22 @@ private:
 
     framework64::ScreenOverlay screen_overlay;
 
-
-
 public:
     framework64::SpriteRenderer sprite_renderer;
-    fw64Primitive::Mode render_mode;
+    fw64Primitive::Mode primitive_type;
+    DrawingMode drawing_mode = DrawingMode::None;
     int screen_width;
     int screen_height;
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
+
+    // Note: This is not currently implemented for desktop rendering
     bool anti_aliasing_enabled = true;
 
     fw64Framebuffer framebuffer_write_texture;
     fw64RendererPostDrawFunc post_draw_callback = nullptr;
     void* post_draw_callback_arg = nullptr;
 
-        fw64Camera* camera = nullptr;
+    fw64Camera* camera = nullptr;
 
 private:
     SDL_Window* window;

@@ -79,7 +79,6 @@ void fw64Renderer::begin(fw64Camera* cam, fw64RenderMode new_render_mode, fw64Re
     camera = cam;
 
     matrix_multiply(view_projection_matrix.data(), &camera->projection.m[0], &camera->view.m[0]);
-    setGlDepthTestingState();
 
     if (lighting_dirty) {
         updateLightingBlock();
@@ -93,15 +92,11 @@ void fw64Renderer::begin(fw64Camera* cam, fw64RenderMode new_render_mode, fw64Re
 
     switch(new_render_mode) {
         case FW64_RENDERER_MODE_TRIANGLES:
-            render_mode = fw64Primitive::Mode::Triangles;
+            primitive_type = fw64Primitive::Mode::Triangles;
             break;
         case FW64_RENDERER_MODE_LINES:
-            render_mode = fw64Primitive::Mode::Lines;
+            primitive_type = fw64Primitive::Mode::Lines;
             break;
-        case FW64_RENDERER_MODE_ORTHO2D:
-            sprite_renderer.begin(camera);
-            break;
-
         default:
             break;
     }
@@ -115,7 +110,7 @@ void fw64Renderer::setGlDepthTestingState() {
 }
 
 void fw64Renderer::end(fw64RendererFlags flags) {
-    sprite_renderer.end();
+    setDrawingMode(DrawingMode::None);
 
     if (post_draw_callback) {
         framebuffer_write_texture.texture.image.clear();
@@ -130,7 +125,7 @@ void fw64Renderer::end(fw64RendererFlags flags) {
 
     camera = nullptr;
     active_shader = nullptr;
-    render_mode = render_mode = fw64Primitive::Mode::Unknown;
+    primitive_type = primitive_type = fw64Primitive::Mode::Unknown;
 }
 
 void fw64Renderer::setScreenSize(int width, int height) {
@@ -161,10 +156,11 @@ void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
 }
 
 void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
+    setDrawingMode(DrawingMode::Mesh);
     updateMeshTransformBlock(transform->matrix);
 
     for (auto const & primitive : mesh->primitives) {
-        if (primitive.mode != render_mode)
+        if (primitive.mode != primitive_type)
             continue;
 
         drawPrimitive(primitive);
@@ -172,8 +168,10 @@ void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
 }
 
 void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* controller, fw64Transform *transform) {
+    setDrawingMode(DrawingMode::Mesh);
+
     for (auto const & primitive : mesh->primitives) {
-        if (primitive.mode != render_mode)
+        if (primitive.mode != primitive_type)
             continue;
 
         // should this be done in the shader?
@@ -183,6 +181,21 @@ void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* con
 
         drawPrimitive(primitive);
     }
+}
+
+void fw64Renderer::drawSprite(fw64Texture* texture, float x, float y){
+    setDrawingMode(DrawingMode::Rect);
+    sprite_renderer.drawSprite(texture, x, y);
+}
+
+void fw64Renderer::drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y) {
+    setDrawingMode(DrawingMode::Rect);
+    sprite_renderer.drawSpriteFrame(texture, frame, x, y, scale_x, scale_y);
+}
+
+void fw64Renderer::drawText(fw64Font* font, float x, float y, const char* text, uint32_t count) {
+    setDrawingMode(DrawingMode::Rect);
+    sprite_renderer.drawText(font, x, y, text, count);
 }
 
 void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
@@ -202,10 +215,8 @@ void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
 void fw64Renderer::setDepthTestingEnabled(bool enabled) {
     depth_testing_enabled = enabled;
 
-    if (render_mode == fw64Primitive::Mode::Unknown)
-        return;
-
-    setGlDepthTestingState();
+    if (drawing_mode == DrawingMode::Mesh)
+        setGlDepthTestingState();
 }
 
 void fw64Renderer::updateLightingBlock() {
@@ -271,14 +282,37 @@ void fw64Renderer::renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint
     drawPrimitive(screen_overlay.primitive);
 }
 
+void fw64Renderer::setDrawingMode(DrawingMode mode) {
+    if (mode == drawing_mode)
+        return;
+
+    // cleanup actions from current drawing mode
+    if (drawing_mode == DrawingMode::Rect) {
+        sprite_renderer.flush();   
+    }
+
+    drawing_mode = mode;
+
+    // begin new drawing mode
+    switch (drawing_mode) {
+        case DrawingMode::Mesh:
+            setGlDepthTestingState();
+            break;
+
+        case DrawingMode::Rect:
+            sprite_renderer.start();
+            break;
+    };
+}
+
 // Public C interface
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
     renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags) {
-    renderer->begin(camera, render_mode, flags);
+void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode primitive_type, fw64RendererFlags flags) {
+    renderer->begin(camera, primitive_type, flags);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
@@ -286,39 +320,34 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    assert(renderer->render_mode == fw64Primitive::Mode::Triangles || renderer->render_mode == fw64Primitive::Mode::Lines);
+    assert(renderer->primitive_type == fw64Primitive::Mode::Triangles || renderer->primitive_type == fw64Primitive::Mode::Lines);
     renderer->drawStaticMesh(mesh, transform);
 }
 
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
-    assert(renderer->render_mode == fw64Primitive::Mode::Triangles || renderer->render_mode == fw64Primitive::Mode::Lines);
+    assert(renderer->primitive_type == fw64Primitive::Mode::Triangles || renderer->primitive_type == fw64Primitive::Mode::Lines);
     renderer->drawAnimatedMesh(mesh, controller, transform);
 }
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {
-    //assert(renderer->render_mode == fw64Primitive::Mode::Triangles);
     renderer->sprite_renderer.drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y) {
-    //assert(renderer->render_mode == fw64Primitive::Mode::Triangles);
-    renderer->sprite_renderer.drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y), 1.0f, 1.0f);
+    renderer->drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y), 1.0f, 1.0f);
 }
 
 void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y, float scale_x , float scale_y, float rotation) {
     (void)rotation;
-    //assert(renderer->render_mode == fw64Primitive::Mode::Triangles);
-    renderer->sprite_renderer.drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y), scale_x, scale_y);
+    renderer->drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y), scale_x, scale_y);
 }
 
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
-    //assert(renderer->render_mode == fw64Primitive::Mode::Triangles);
-    renderer->sprite_renderer.drawText(font, static_cast<float>(x), static_cast<float>(y), text, std::numeric_limits<uint32_t>::max());
+    renderer->drawText(font, static_cast<float>(x), static_cast<float>(y), text, std::numeric_limits<uint32_t>::max());
 }
 
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
-    //assert(renderer->render_mode == fw64Primitive::Mode::Triangles);
-    renderer->sprite_renderer.drawText(font, static_cast<float>(x), static_cast<float>(y), text, count);
+    renderer->drawText(font, static_cast<float>(x), static_cast<float>(y), text, count);
 }
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {

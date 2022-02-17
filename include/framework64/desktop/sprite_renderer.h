@@ -27,8 +27,9 @@ public:
 
     bool init(ShaderCache& shader_cache);
     void setScreenSize(int width, int height);
-    void begin(fw64Camera const * camera);
-    void end();
+    
+    void start();
+    void flush();
 
     void drawSprite(fw64Texture* texture, float x, float y);
     void drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y);
@@ -43,11 +44,10 @@ private:
     void addQuad(SpriteVertex const & a, SpriteVertex const & b, SpriteVertex const & c, SpriteVertex const & d);
 
 private:
-    GLuint gl_vertex_array_object;
-    GLuint gl_vertex_buffer;
+    GLuint gl_vertex_array_object = 0;
+    GLuint gl_vertex_buffer = 0;
     size_t gl_vertex_buffer_size_in_bytes = 0;
     std::vector<SpriteVertex> vertex_buffer;
-    int screen_width, screen_height;
 
     fw64Material sprite_material;
 
