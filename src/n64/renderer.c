@@ -195,12 +195,10 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderM
         fw64_renderer_clear_frame_buffer(renderer);
     }
 
-    if (render_mode != FW64_RENDERER_MODE_ORTHO2D) {
-        // sets the projection matrix (modelling set in individual draw calls)
-        gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
-        gSPPerspNormalize(renderer->display_list++, camera->perspNorm);
-        gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-    }
+    // sets the projection matrix (modelling set in individual draw calls)
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPPerspNormalize(renderer->display_list++, camera->perspNorm);
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
