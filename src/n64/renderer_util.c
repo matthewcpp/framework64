@@ -24,3 +24,7 @@ void fw64_renderer_util_fullscreen_overlay(fw64Renderer* renderer, uint8_t r, ui
     gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, r, g, b, a);
     gSPDisplayList(renderer->display_list++, &fullscreen_overlay_dl[0]);
 } 
+
+void fw64_renderer_util_clear_viewport(fw64Renderer* renderer, fw64Camera* camera) {
+    
+}

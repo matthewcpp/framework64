@@ -24,7 +24,6 @@ struct fw64Renderer{
     u32 depth_test_enabled;
     u32 aa_enabled;
 
-    Vp view_port;
     IVec2 screen_size;
     fw64RenderMode render_mode;
     fw64ShadingMode shading_mode;

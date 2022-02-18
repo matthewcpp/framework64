@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags);
+void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera);
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
 

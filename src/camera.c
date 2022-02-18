@@ -13,6 +13,9 @@ void fw64_camera_init(fw64Camera* camera) {
     camera->aspect = 1.33f;
     camera->transform.position.z = 5.0f;
 
+    vec2_set(&camera->viewport_pos, 0.0f, 0.0f);
+    vec2_set(&camera->viewport_size, 1.0f, 1.0f);
+
     fw64_camera_update_projection_matrix(camera);
     fw64_camera_update_view_matrix(camera);
 }

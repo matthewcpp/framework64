@@ -5,6 +5,7 @@
 #include "framework64/frustum.h"
 #include "framework64/transform.h"
 #include "framework64/types.h"
+#include "framework64/vec2.h"
 
 #include <stdint.h>
 
@@ -16,10 +17,15 @@ typedef struct {
     fw64Transform transform;
     fw64Matrix projection;
     fw64Matrix view;
+#ifdef PLATFORM_N64
+    Vp _viewport;
+#endif
     float near, far;
     float fovy;
     float aspect;
     uint16_t perspNorm;
+    Vec2 viewport_pos;
+    Vec2 viewport_size;
 } fw64Camera;
 
 void fw64_camera_init(fw64Camera* camera);
