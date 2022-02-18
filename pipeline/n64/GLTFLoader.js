@@ -575,6 +575,11 @@ class GLTFLoader {
         primitive.hasNormals = true;
     }
 
+    // ensure that the tex coord value will sit in a signed 16 bit integer
+    static _validateTexCoord(val) {
+        return val >= -32768 && val <= 32767;
+    }
+
     _readTexCoords(gltfPrimitive, primitive) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.TEXCOORD_0];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
@@ -608,6 +613,10 @@ class GLTFLoader {
             // Note that the texture coordinates (s,t) are encoded in S10.5 format.
             vertex[4] = Math.round(s * (1 << 5));
             vertex[5] = Math.round(t * (1 << 5));
+
+            if (!GLTFLoader._validateTexCoord(vertex[4]) || !GLTFLoader._validateTexCoord(vertex[5])) {
+                throw new Error(`Detected a tex coord value outside of S10.5 format range.  Check model source data.`);
+            }
 
             offset += byteStride;
         }
