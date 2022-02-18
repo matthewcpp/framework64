@@ -10,6 +10,7 @@ typedef struct {
     fw64Camera camera;
     float movement_speed;
     float turn_speed;
+    int player_index;
     fw64Input* _input;
     Vec2 _rotation;
 } fw64FpsCamera;
