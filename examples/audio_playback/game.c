@@ -57,10 +57,9 @@ void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
     fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_renderer_draw_static_mesh(renderer, &game->n64_logo.transform, game->n64_logo.mesh);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
-    fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
+    fw64_renderer_draw_static_mesh(renderer, &game->n64_logo.transform, game->n64_logo.mesh);
     fw64_renderer_draw_text(renderer, game->font, 30, 200, game->tempo_text);
+
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

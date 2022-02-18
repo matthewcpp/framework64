@@ -49,7 +49,8 @@ fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & m
     mesh_info.setPrimitiveValues(primitive);
     primitive.mode = fw64Primitive::Mode::Triangles;
     primitive.material.texture = mesh->resources->textures[0].get();
-    f64_engine->shader_cache->setParticleShader(mesh->primitives[0]);
+    mesh->primitives[0].material.shader = f64_engine->shader_cache->getSpriteShaderProgram();
+
     return mesh;
 }
 

@@ -17,8 +17,18 @@ void ShaderCache::setShaderProgram(fw64Primitive & primitive) {
     setProgram(primitive, shader, program_hash);
 }
 
-void ShaderCache::setParticleShader(fw64Primitive & primitive) {
-    setProgram(primitive, &particle_shader, std::numeric_limits<uint64_t>::max());
+ShaderProgram* ShaderCache::getSpriteShaderProgram() {
+    auto result = shader_programs.find(&sprite_shader);
+
+    if (result != shader_programs.end())
+        return result->second.get();
+
+    auto program = sprite_shader.create(std::numeric_limits<uint32_t>::max(), std::numeric_limits<uint32_t>::max(), shader_dir);
+    program->hash = std::numeric_limits<uint64_t>::max();
+    program->shader = &sprite_shader;
+    shader_programs.insert(std::make_pair(&sprite_shader, program));
+
+    return program;
 }
 
 uint64_t ShaderCache::programHash(fw64Primitive const & primitive) const {
@@ -45,12 +55,15 @@ void ShaderCache::setProgram(fw64Primitive & primitive, Shader* shader, uint64_t
     auto result = shader_programs.equal_range(shader);
 
     for (auto it = result.first; it != result.second; ++it) {
-        if (it->second->hash == program_hash)
+        if (it->second->hash == program_hash) {
             primitive.material.shader = it->second.get();
+            return;
+        }
     }
 
     auto * program = shader->create(primitive.attributes, primitive.material.featureMask(), shader_dir);
     program->hash = program_hash;
+    program->shader = shader;
     shader_programs.insert(std::make_pair(shader, program));
 
     primitive.material.shader = program;

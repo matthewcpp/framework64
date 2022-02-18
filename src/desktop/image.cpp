@@ -4,6 +4,8 @@
 
 #include <SDL2/SDL_image.h>
 
+#include <cassert>
+
 fw64Image* fw64Image::loadFromDatabase(fw64AssetDatabase* database, uint32_t index) {
     sqlite3_reset(database->select_image_statement);
     sqlite3_bind_int(database->select_image_statement, 1, index);
@@ -19,6 +21,10 @@ fw64Image* fw64Image::loadFromDatabase(fw64AssetDatabase* database, uint32_t ind
     image->vslices = sqlite3_column_int(database->select_image_statement, 2);
 
     return image;
+}
+
+fw64Image::~fw64Image() {
+    glDeleteTextures(1, &gl_handle);
 }
 
 static fw64Image* createTextureFromSurface(SDL_Surface* surface) {
@@ -41,7 +47,8 @@ static fw64Image* createTextureFromSurface(SDL_Surface* surface) {
     glBindTexture(GL_TEXTURE_2D, texture->gl_handle);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height, 0, textureFormat, GL_UNSIGNED_BYTE, surface->pixels);
 
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     return texture;
 }
@@ -73,8 +80,42 @@ fw64Image* fw64Image::loadImageBuffer(void* data, size_t size) {
     return texture;
 }
 
-fw64Image::~fw64Image() {
-    glDeleteTextures(1, &gl_handle);
+void fw64Image::setPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b) {
+    int index = (y * width + x) * 4;
+    pixel_data[index] = r;
+    pixel_data[index + 1] = g;
+    pixel_data[index + 2] = b;
+    pixel_data[index + 3] = 255U;
+}
+
+void fw64Image::setSize(int w, int h, int h_slices, int v_slices) {
+    width = w;
+    height = h;
+    hslices = h_slices;
+    vslices = v_slices;
+
+    pixel_data.resize(width * height * 4);
+
+    if (gl_handle == 0) {
+        glGenTextures(1, &gl_handle);
+        glBindTexture(GL_TEXTURE_2D, gl_handle);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+    else {
+        updateGlImage();
+    }
+}
+
+void fw64Image::updateGlImage() {
+    assert(gl_handle != 0 && pixel_data.size() > 0);
+
+    glBindTexture(GL_TEXTURE_2D, gl_handle);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel_data.data());
+}
+
+void fw64Image::clear() {
+    std::fill(pixel_data.begin(), pixel_data.end(), 0);
 }
 
 

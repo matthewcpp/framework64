@@ -19,9 +19,7 @@ ${desktop_include_directory}/line_shader.h desktop/line_shader.cpp
 ${desktop_include_directory}/material.h desktop/material.cpp
 ${desktop_include_directory}/mesh.h desktop/mesh.cpp
 ${desktop_include_directory}/mesh_data.h desktop/mesh_data.cpp
-${desktop_include_directory}/mesh_renderer.h desktop/mesh_renderer.cpp
 ${desktop_include_directory}/n64_input_interface.h desktop/n64_input_interface.cpp
-${desktop_include_directory}/particle_shader.h desktop/particle_shader.cpp
 ${desktop_include_directory}/pixel_texture.h desktop/pixel_texture.cpp
 desktop/quad.cpp
 ${desktop_include_directory}/renderer.h desktop/renderer.cpp
@@ -31,10 +29,11 @@ ${desktop_include_directory}/screen_overlay.h desktop/screen_overlay.cpp
 ${desktop_include_directory}/shader.h desktop/shader.cpp
 ${desktop_include_directory}/shader_cache.h desktop/shader_cache.cpp
 ${desktop_include_directory}/splitter.h desktop/splitter.cpp
-${desktop_include_directory}/sprite_renderer.h desktop/sprite_renderer.cpp
+${desktop_include_directory}/sprite_batch.h desktop/sprite_batch.cpp
+${desktop_include_directory}/sprite_shader.h desktop/sprite_shader.cpp
 ${desktop_include_directory}/texture.h desktop/texture.cpp
 ${desktop_include_directory}/texture_info_uniform.h
-${desktop_include_directory}/uniform_block.h
+${desktop_include_directory}/uniform_block.h desktop/uniform_block.cpp
 ${desktop_include_directory}/unlit_shader.h desktop/unlit_shader.cpp
 
 ${CMAKE_CURRENT_SOURCE_DIR}/../../include/framework64/n64/controller_button.h

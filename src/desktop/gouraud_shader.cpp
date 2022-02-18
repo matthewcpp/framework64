@@ -23,7 +23,7 @@ ShaderProgram* GouraudShader::create(uint32_t primitive_attributes, uint32_t mat
         return nullptr;
 
     if (has_diffuse_texture) {
-        texture_info.uniform_block.create(3);
+        texture_info.uniform_block.create();
         // TODO: this should return a derived program object with this value, and the program should be passed to set uniforms
         texture_info_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64TextureFrameData");
 

@@ -36,7 +36,6 @@ void game_draw(Game* game) {
 
     fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_draw_static_mesh(renderer, &game->quad.transform, game->quad.mesh);
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_NOSWAP);
 
     IVec2 screen_size;
     fw64_renderer_get_screen_size(renderer, &screen_size);
@@ -46,7 +45,6 @@ void game_draw(Game* game) {
 
     fw64_renderer_set_anti_aliasing_enabled(renderer, 0);
 
-    fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
     fw64_renderer_draw_text(renderer, game->font, x_pos, 10, game->mode_name);
 
     if (game->mode > MODE_DEFAULT)

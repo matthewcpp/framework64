@@ -142,9 +142,7 @@ void game_draw(Game* game) {
 
     fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_draw_static_mesh(renderer, &game->n64_logo.transform, game->n64_logo.mesh);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
-    fw64_renderer_begin(renderer, &game->camera, FW64_RENDERER_MODE_ORTHO2D, FW64_RENDERER_FLAG_NOCLEAR);
     draw_sound_controls(game);
     draw_music_controls(game);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);

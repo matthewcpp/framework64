@@ -7,9 +7,10 @@
 #include <cstdint>
 
 struct fw64Texture {
+    fw64Texture() = default;
     fw64Texture(fw64Image* img);
 
-    fw64Image* image;
+    fw64Image* image = nullptr;
     fw64TextureWrapMode wrap_s = FW64_TEXTURE_WRAP_CLAMP;
     fw64TextureWrapMode wrap_t = FW64_TEXTURE_WRAP_CLAMP;
     
