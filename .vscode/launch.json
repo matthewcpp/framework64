@@ -2,6 +2,26 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug N64 Asset Pipeline",
+            "program": "${workspaceFolder}/pipeline/Pipeline.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "N64", "${workspaceFolder}/build_n64/bin/assets"]
+        },
+        {
+            "name": "Debug Desktop Asset Pipeline",
+            "program": "${workspaceFolder}/pipeline/Pipeline.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "desktop", "${workspaceFolder}/build_desktop/bin/assets"]
+        },
+        {
             "type": "by-gdb",
             "name": "CEN64 Debug ROM Windows / Mac",
             "request": "launch",
