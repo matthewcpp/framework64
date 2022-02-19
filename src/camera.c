@@ -22,7 +22,7 @@ void fw64_camera_init(fw64Camera* camera) {
 
 void fw64_camera_update_projection_matrix(fw64Camera* camera) {
 #ifdef PLATFORM_N64
-    guPerspective(&camera->projection, &camera->perspNorm, 
+    guPerspective(&camera->projection, &camera->_persp_norm, 
     camera->fovy, camera->aspect, camera->near, camera->far, 1.0f);
 #else
     matrix_perspective(&camera->projection.m[0], camera->fovy, camera->aspect, camera->near, camera->far);

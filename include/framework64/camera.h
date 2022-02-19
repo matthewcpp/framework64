@@ -17,15 +17,15 @@ typedef struct {
     fw64Transform transform;
     fw64Matrix projection;
     fw64Matrix view;
-#ifdef PLATFORM_N64
-    Vp _viewport;
-#endif
     float near, far;
     float fovy;
     float aspect;
-    uint16_t perspNorm;
     Vec2 viewport_pos;
     Vec2 viewport_size;
+#ifdef PLATFORM_N64
+    Vp _viewport;
+    uint16_t _persp_norm;
+#endif
 } fw64Camera;
 
 void fw64_camera_init(fw64Camera* camera);
