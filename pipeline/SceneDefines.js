@@ -13,7 +13,7 @@ function writeSceneDefines(gltf, name, sceneNode, destFile) {
             const childIndex = sceneNode.children[i];
             const node = gltf.nodes[childIndex];
 
-            if (!node.hasOwnProperty("name") || !node.hasOwnProperty("extras"))
+            if (!node.hasOwnProperty("name"))
                 continue;
 
             const nodeName = Util.safeDefineName(node.name);

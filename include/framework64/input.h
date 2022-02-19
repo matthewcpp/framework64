@@ -4,6 +4,8 @@
 
 #include "vec2.h"
 
+#define FW64_MAX_CONTROLLER_COUNT 4
+
 typedef struct fw64Input fw64Input;
 
 #ifdef __cplusplus

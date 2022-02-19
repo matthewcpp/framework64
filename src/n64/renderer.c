@@ -33,20 +33,6 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     fw64_renderer_set_depth_testing_enabled(renderer, 1);
     fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
 
-    /*
-      The viewport structure 
-      The conversion from (-1,-1,-1)-(1,1,1).  The decimal part of 2-bit.
-    */
-    renderer->view_port.vp.vscale[0] = screen_width * 2;
-    renderer->view_port.vp.vscale[1] = screen_height * 2;
-    renderer->view_port.vp.vscale[2] = G_MAXZ / 2;
-    renderer->view_port.vp.vscale[3] = 0;
-
-    renderer->view_port.vp.vtrans[0] = screen_width * 2;
-    renderer->view_port.vp.vtrans[1] = screen_height * 2;
-    renderer->view_port.vp.vtrans[2] = G_MAXZ / 2;
-    renderer->view_port.vp.vtrans[3] = 0;
-
     // set default lighting state - single white light
     Lights2 lights = gdSPDefLights2(
         25, 25, 25,
@@ -55,6 +41,7 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     );
     renderer->lights = lights;
     renderer->active_light_mask = 1;
+    renderer->starting_new_frame = 1;
 
     renderer->post_draw_func = NULL;
     renderer->post_draw_func_arg = NULL;
@@ -113,6 +100,8 @@ void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPo
 }
 
 void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask* gfxTaskPtr) {
+    renderer->starting_new_frame = 1;
+
     if (renderer->post_draw_func == NULL)
         return;
 
@@ -149,38 +138,78 @@ void fw64_renderer_init_rdp(fw64Renderer* renderer) {
 
 
 void fw64_renderer_init_rsp(fw64Renderer* renderer) {
-    gSPViewport(renderer->display_list++, &renderer->view_port);
     gSPClearGeometryMode(renderer->display_list++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
     gSPTexture(renderer->display_list++, 0, 0, 0, 0, G_OFF);
     gSPSetGeometryMode(renderer->display_list++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH);
 }
 
-void fw64_renderer_clear_z_buffer(fw64Renderer* renderer) {
-    //gDPSetDepthImage(renderer->display_list++, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
-    gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b,renderer->screen_size.x, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
-    gDPPipeSync(renderer->display_list++);
+/** Note: This function assumes that the render mode is set to G_RM_OPA_SURF / G_RM_OPA_SURF2 */
+void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int width, int height, fw64RendererFlags flags) {
     gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
-    
-    gDPSetFillColor(renderer->display_list++,(GPACK_ZDZ(G_MAXFBZ,0) << 16 | GPACK_ZDZ(G_MAXFBZ,0)));
-    gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
-    gDPPipeSync(renderer->display_list++);
-}
 
-void fw64_renderer_clear_frame_buffer(fw64Renderer* renderer) {
-    gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
+    if (flags & FW64_RENDERER_FLAG_CLEAR_DEPTH) {
+        gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b,renderer->screen_size.x, OS_K0_TO_PHYSICAL(nuGfxZBuffer));
+        gDPSetFillColor(renderer->display_list++,(GPACK_ZDZ(G_MAXFBZ,0) << 16 | GPACK_ZDZ(G_MAXFBZ,0)));
+        gDPFillRectangle(renderer->display_list++, x, y, width - 1, height - 1);
+        gDPPipeSync(renderer->display_list++);
+    }
+
     gDPSetColorImage(renderer->display_list++, G_IM_FMT_RGBA, G_IM_SIZ_16b, renderer->screen_size.x, OS_K0_TO_PHYSICAL(nuGfxCfb_ptr));
     gDPSetFillColor(renderer->display_list++, (renderer->clear_color << 16 | renderer->clear_color));
-    gDPFillRectangle(renderer->display_list++, 0, 0, renderer->screen_size.x - 1, renderer->screen_size.y - 1);
-    gDPPipeSync(renderer->display_list++);
+
+    if (flags & FW64_RENDERER_FLAG_CLEAR_COLOR) {
+        gDPFillRectangle(renderer->display_list++, x, y, width - 1, height - 1);
+        gDPPipeSync(renderer->display_list++);
+    }
+
     gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE); 
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderMode render_mode, fw64RendererFlags flags) {
-    renderer->render_mode = render_mode;
+IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera) {
+    IVec2 viewport_size = {
+        (int)(renderer->screen_size.x * camera->viewport_size.x),
+        (int)(renderer->screen_size.y * camera->viewport_size.y)
+    };
+
+    return viewport_size;
+}
+
+void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     renderer->camera = camera;
+
+    float x = (renderer->screen_size.x * camera->viewport_pos.x);
+    float y = (renderer->screen_size.y * camera->viewport_pos.y);
+    float width = (renderer->screen_size.x * camera->viewport_size.x);
+    float height = (renderer->screen_size.y * camera->viewport_size.y);
+
+    camera->_viewport.vp.vscale[0] = (short)width * 2;
+    camera->_viewport.vp.vscale[1] = (short)height * 2;
+    camera->_viewport.vp.vscale[2] = G_MAXZ / 2;
+    camera->_viewport.vp.vscale[3] = 0;
+
+    camera->_viewport.vp.vtrans[0] = ((short)width * 2) + ((short)x * 4);
+    camera->_viewport.vp.vtrans[1] = ((short)height * 2) + ((short)y * 4);
+    camera->_viewport.vp.vtrans[2] = G_MAXZ / 2;
+    camera->_viewport.vp.vtrans[3] = 0;
+
+    gSPViewport(renderer->display_list++, &camera->_viewport);
+    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, x, y, x + width, y + height);
+
+    renderer->viewport_screen_pos.x = (int)(renderer->screen_size.x * camera->viewport_pos.x);
+    renderer->viewport_screen_pos.y = (int)(renderer->screen_size.y * camera->viewport_pos.y);
+
+    // sets the view projection matrices
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPPerspNormalize(renderer->display_list++, camera->_persp_norm);
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+}
+
+void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw64RendererFlags flags) {
+    renderer->render_mode = render_mode;
+    
     renderer->flags = flags;
 
-    if (flags & FW64_RENDERER_FLAG_CLEAR) {
+    if (renderer->starting_new_frame) {
         renderer->display_list = &renderer->gfx_list[0];
     }
     
@@ -191,14 +220,8 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64Camera* camera, fw64RenderM
     fw64_renderer_init_rsp(renderer);
 
     if (flags & FW64_RENDERER_FLAG_CLEAR) {
-        fw64_renderer_clear_z_buffer(renderer);
-        fw64_renderer_clear_frame_buffer(renderer);
+        fw64_n64_renderer_clear_rect(renderer, 0, 0, renderer->screen_size.x, renderer->screen_size.y, flags);
     }
-
-    // sets the projection matrix (modelling set in individual draw calls)
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
-    gSPPerspNormalize(renderer->display_list++, camera->perspNorm);
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
@@ -289,6 +312,9 @@ fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {
 static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y, int width, int height) {
     fw64_n64_renderer_load_texture(renderer, sprite, frame);
 
+    x = renderer->viewport_screen_pos.x + x;
+    y = renderer->viewport_screen_pos.y + y;
+
     gSPTextureRectangle(renderer->display_list++, 
             x << 2, y << 2, 
             (x + width) << 2, (y + height) << 2,
@@ -336,6 +362,9 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
     if (!text || text[0] == 0) return;
     fw64_renderer_set_shading_mode(renderer, FW64_SHADING_MODE_TEXT);
+
+    x = renderer->viewport_screen_pos.x + x;
+    y = renderer->viewport_screen_pos.y + y;
     
     char ch = text[0];
     uint16_t glyph_index = fw64_font_get_glyph_index(font, ch);

@@ -71,7 +71,8 @@ void game_draw(Game* game) {
 
     fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
 
-    fw64_renderer_begin(renderer, &game->arcball.camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_set_camera(renderer, &game->arcball.camera);
     fw64_renderer_draw_static_mesh(renderer, &game->node.transform, game->node.mesh);
 
     int button_width = fw64_texture_slice_width(game->button_sprite);

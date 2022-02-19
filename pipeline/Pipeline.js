@@ -29,7 +29,7 @@ async function main() {
 
     program.action((manifest, platform, outDir) => {
         assetManifestPath = path.resolve(manifest);
-        buildPlatform = platform;
+        buildPlatform = platform.toLowerCase();
         outputDirectoryPath = path.resolve(outDir);
     });
 

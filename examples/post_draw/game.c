@@ -33,7 +33,8 @@ void game_draw(Game* game) {
     IVec2 screen_size;
     fw64_renderer_get_screen_size(game->engine->renderer, &screen_size);
 
-    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_set_camera(game->engine->renderer, &game->camera);
     fw64_renderer_draw_static_mesh(game->engine->renderer, &game->node.transform, game->quad);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

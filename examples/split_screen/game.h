@@ -1,19 +1,17 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/input.h"
+#include "framework64/mesh.h"
+#include "framework64/scene.h"
 
-typedef struct {
-    fw64Camera camera;
-    int player_index;
-} ControllerInfo;
+#include "player.h"
 
 typedef struct {
     fw64Engine* engine;
-    ControllerInfo controller_infos[FW64_MAX_CONTROLLER_COUNT];
-    fw64Texture* buttons;
-    fw64Font* font;
-    IVec2 not_connected_text_dimensions;
+    Player players[4];
+    fw64Mesh* weapon_model;
+    Weapon us_ar33;
+    fw64Scene* scene;
 } Game;
 
 #ifdef __cplusplus

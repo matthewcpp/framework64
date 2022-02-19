@@ -29,9 +29,13 @@ public:
     bool init(int width, int height, framework64::ShaderCache& shader_cache);
 
     void setClearColor(float r, float g, float b, float a);
-    void begin(fw64Camera* cam, fw64RenderMode new_render_mode, fw64RendererFlags flags);
+    void begin(fw64RenderMode new_render_mode, fw64RendererFlags flags);
+    void setCamera(fw64Camera* cam);
     void end(fw64RendererFlags flags);
     void setScreenSize(int width, int height);
+
+    void clearViewport(fw64Camera* camera, fw64RendererFlags flags);
+    IVec2 getViewportSize(fw64Camera* camera);
 
 private:
     bool initDisplay(int width, int height);
@@ -88,11 +92,13 @@ private:
         std::array<float, 16> normal_matrix;
     };
 
-    enum DrawingMode {
-        None, Mesh, Rect
-    };
-
+private:
+    enum DrawingMode { None, Mesh, Rect };
     void setDrawingMode(DrawingMode mode);
+
+private:
+    struct ViewportRect{ GLint x, y; GLsizei width, height; };
+    ViewportRect getViewportRect(fw64Camera* camera) const;
 
 private:
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
@@ -124,7 +130,7 @@ public:
     fw64RendererPostDrawFunc post_draw_callback = nullptr;
     void* post_draw_callback_arg = nullptr;
 
-    fw64Camera* camera = nullptr;
+    fw64Camera* current_camera = nullptr;
 
 private:
     SDL_Window* window;

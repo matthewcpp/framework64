@@ -76,28 +76,31 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
+    fw64Renderer* renderer = game->engine->renderer;
     char text_buffer[64];
     sprintf(text_buffer, "Intersection: %s", intersection_text(game->intersection));
 
-    fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 1);
+    fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
 
-    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_set_camera(renderer, &game->camera);
     
-    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin.transform, game->penguin.mesh);
+    fw64_renderer_draw_static_mesh(renderer, &game->penguin.transform, game->penguin.mesh);
 
     for (int i = 0; i < CUBE_COUNT; i++){
-        fw64_renderer_draw_static_mesh(game->engine->renderer, &game->cubes[i].transform, game->cubes[i].mesh);
+        fw64_renderer_draw_static_mesh(renderer, &game->cubes[i].transform, game->cubes[i].mesh);
     }
 
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
+    fw64_renderer_set_anti_aliasing_enabled(renderer, 0);
 
-    fw64_renderer_begin(game->engine->renderer, &game->camera, FW64_RENDERER_MODE_LINES, FW64_RENDERER_FLAG_NOCLEAR);
-    fw64_renderer_draw_static_mesh(game->engine->renderer, &game->penguin_box.transform, game->penguin_box.mesh);
+    fw64_renderer_draw_text(renderer, game->font, 10, 10, text_buffer);
 
-    fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 0);
+    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_NOSWAP);
 
-    fw64_renderer_draw_text(game->engine->renderer, game->font, 10, 10, text_buffer);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
+    fw64_renderer_begin(renderer, FW64_RENDERER_MODE_LINES, FW64_RENDERER_FLAG_NOCLEAR);
+    fw64_renderer_set_camera(renderer, &game->camera);
+    fw64_renderer_draw_static_mesh(renderer, &game->penguin_box.transform, game->penguin_box.mesh);
+    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void setup_camera(Game* game) {

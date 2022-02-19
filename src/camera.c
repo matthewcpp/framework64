@@ -13,13 +13,16 @@ void fw64_camera_init(fw64Camera* camera) {
     camera->aspect = 1.33f;
     camera->transform.position.z = 5.0f;
 
+    vec2_set(&camera->viewport_pos, 0.0f, 0.0f);
+    vec2_set(&camera->viewport_size, 1.0f, 1.0f);
+
     fw64_camera_update_projection_matrix(camera);
     fw64_camera_update_view_matrix(camera);
 }
 
 void fw64_camera_update_projection_matrix(fw64Camera* camera) {
 #ifdef PLATFORM_N64
-    guPerspective(&camera->projection, &camera->perspNorm, 
+    guPerspective(&camera->projection, &camera->_persp_norm, 
     camera->fovy, camera->aspect, camera->near, camera->far, 1.0f);
 #else
     matrix_perspective(&camera->projection.m[0], camera->fovy, camera->aspect, camera->near, camera->far);
