@@ -12,7 +12,7 @@ typedef struct {
     float turn_speed;
     int player_index;
     fw64Input* _input;
-    Vec2 _rotation;
+    Vec2 rotation;
 } fw64FpsCamera;
 
 #ifdef __cplusplus
