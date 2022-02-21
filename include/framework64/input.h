@@ -18,6 +18,10 @@ int fw64_input_button_released(fw64Input* input, int controller, int button);
 int fw64_input_button_down(fw64Input* input, int controller, int button);
 void fw64_input_stick(fw64Input* input, int controller, Vec2* current);
 
+int fw64_input_controller_has_rumble(fw64Input* input, int controller);
+int fw64_input_controller_rumble_active(fw64Input* input, int controller);
+int fw64_input_controller_set_rumble(fw64Input* input, int controller, float value, float duration);
+
 #ifdef __cplusplus
 }
 #endif
