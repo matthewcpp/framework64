@@ -34,11 +34,11 @@ void game_update(Game* game){
     quat_from_euler(&game->wire_cube.transform.rotation, 0, game->rotation, 0.0f);
     fw64_node_update(&game->wire_cube);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT))
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME;
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP))
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP))
         game->draw_mode = EXAMPLE_DRAW_MODE_SHADED;
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT))
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT))
         game->draw_mode = EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED;
 }
 

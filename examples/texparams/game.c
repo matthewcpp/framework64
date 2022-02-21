@@ -22,10 +22,10 @@ void game_init(Game* game, fw64Engine* engine) {
 }
 
 void game_update(Game* game){
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT) && game->mode > MODE_DEFAULT)
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT) && game->mode > MODE_DEFAULT)
         set_texture_mode(game, game->mode - 1);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) && game->mode < MODE_MIRROR)
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) && game->mode < MODE_MIRROR)
         set_texture_mode(game, game->mode + 1);
 }
 

@@ -49,11 +49,11 @@ static void chase_camera_update_position(ChaseCamera* chase_cam) {
 }
 
 static void chase_camera_update_input(ChaseCamera* chase_cam) {
-    if (fw64_input_button_down(chase_cam->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_R)) {
+    if (fw64_input_controller_button_down(chase_cam->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_R)) {
         chase_cam->target_follow_height += chase_cam->camera_adjust_speed * chase_cam->engine->time->time_delta;
     }
 
-    if (fw64_input_button_down(chase_cam->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_L)) {
+    if (fw64_input_controller_button_down(chase_cam->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_L)) {
         chase_cam->target_follow_height -= chase_cam->camera_adjust_speed * chase_cam->engine->time->time_delta;
     }
 }

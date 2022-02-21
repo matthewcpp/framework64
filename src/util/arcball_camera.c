@@ -55,7 +55,7 @@ void fw64_arcball_set_initial(fw64ArcballCamera* arcball, Box* box) {
 
 void fw64_arcball_update(fw64ArcballCamera* arcball, float time_delta) {
     Vec2 stick;
-    fw64_input_stick(arcball->_input, 0, &stick);
+    fw64_input_controller_stick(arcball->_input, 0, &stick);
 
     if (stick.x > ARCBALL_DEAD_ZONE) {
         arcball->_rot_y -= ARCBALL_ORBIT_SPEED * time_delta;
@@ -71,14 +71,14 @@ void fw64_arcball_update(fw64ArcballCamera* arcball, float time_delta) {
         arcball->_rot_x -= ARCBALL_ORBIT_SPEED * time_delta;
     }
 
-    if (fw64_input_button_down(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_L)) {
+    if (fw64_input_controller_button_down(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_L)) {
         arcball->_distance += arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     }
-    else if (fw64_input_button_down(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_R)) {
+    else if (fw64_input_controller_button_down(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_R)) {
         arcball->_distance -= arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
     } 
 
-    if (fw64_input_button_pressed(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
+    if (fw64_input_controller_button_pressed(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
         _arcball_reset(arcball);
     }
 

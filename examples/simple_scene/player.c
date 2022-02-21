@@ -52,7 +52,7 @@ void player_update(Player* player) {
 
 void process_input(Player* player) {
     Vec2 stick;
-    fw64_input_stick(player->engine->input, 0, &stick);
+    fw64_input_controller_stick(player->engine->input, 0, &stick);
     if (stick.x >= PLAYER_STICK_THRESHOLD || stick.x <= -PLAYER_STICK_THRESHOLD) {
         float rotation_delta = PLAYER_DEFAULT_ROTATION_SPEED * player->engine->time->time_delta;
 
@@ -80,7 +80,7 @@ void process_input(Player* player) {
             player->speed = fminf(player->speed + decel, 0.0f);
     }
 
-    if (fw64_input_button_pressed(player->engine->input, player->controller_num, FW64_N64_CONTROLLER_BUTTON_A)) {
+    if (fw64_input_controller_button_pressed(player->engine->input, player->controller_num, FW64_N64_CONTROLLER_BUTTON_A)) {
         if (player->state == PLAYER_STATE_ON_GROUND) {
             player->air_velocity = player->jump_impulse;
         }

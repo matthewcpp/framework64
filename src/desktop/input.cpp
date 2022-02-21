@@ -155,19 +155,19 @@ int fw64_input_controller_is_connected(fw64Input* input, int controller) {
     return input->controllerIsConnected(controller) ? 1 : 0;
 }
 
-int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
+int fw64_input_controller_button_pressed(fw64Input* input, int controller, int button) {
     return input->buttonPressed(controller, button);
 }
 
-int fw64_input_button_released(fw64Input* input, int controller, int button) {
+int fw64_input_controller_button_released(fw64Input* input, int controller, int button) {
     return input->buttonReleased(controller, button);
 }
 
-int fw64_input_button_down(fw64Input* input, int controller, int button) {
+int fw64_input_controller_button_down(fw64Input* input, int controller, int button) {
     return input->buttonDown(controller, button);
 }
 
-void fw64_input_stick(fw64Input* input, int controller, Vec2* current) {
+void fw64_input_controller_stick(fw64Input* input, int controller, Vec2* current) {
     *current = input->stick(controller, 0);
 }
 

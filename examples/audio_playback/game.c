@@ -37,11 +37,11 @@ void game_update(Game* game){
         fw64_node_update(&game->n64_logo);
     }
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
         game->music_playback_speed += 0.1f;
         fw64_audio_set_music_playback_speed(game->engine->audio, game->music_playback_speed);
     }
-    else if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
         game->music_playback_speed -= 0.1f;
         fw64_audio_set_music_playback_speed(game->engine->audio, game->music_playback_speed);
     }

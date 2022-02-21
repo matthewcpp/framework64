@@ -44,14 +44,14 @@ static void fps_cam_left(fw64FpsCamera* fps, Vec3* out) {
 }
 
 static void move_camera(fw64FpsCamera* fps, float time_delta, Vec2* stick) {
-    if (fw64_input_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
+    if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         Vec3 move;
         fps_cam_right(fps, &move);
         vec3_scale(&move, &move, fps->movement_speed * time_delta);
         vec3_add(&fps->camera.transform.position, &fps->camera.transform.position, &move);
     }
 
-    if (fw64_input_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
+    if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
         Vec3 move;
         fps_cam_left(fps, &move);
         vec3_scale(&move, &move, fps->movement_speed * time_delta);
@@ -82,14 +82,14 @@ static void tilt_camera(fw64FpsCamera* fps, float time_delta, Vec2* stick) {
         fps->rotation.y += fps->turn_speed * time_delta;
     }
 
-    if (fw64_input_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
+    if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
         fps->rotation.x += fps->turn_speed * time_delta;
 
         if (fps->rotation.x > 90.0f)
             fps->rotation.x = 90.0f;
     }
 
-    if (fw64_input_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
+    if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
         fps->rotation.x -= fps->turn_speed * time_delta;
 
         if (fps->rotation.x < -90.0f)
@@ -99,7 +99,7 @@ static void tilt_camera(fw64FpsCamera* fps, float time_delta, Vec2* stick) {
 
 void fw64_fps_camera_update(fw64FpsCamera* fps, float time_delta) {
     Vec2 stick;
-    fw64_input_stick(fps->_input, fps->player_index, &stick);
+    fw64_input_controller_stick(fps->_input, fps->player_index, &stick);
 
     move_camera(fps, time_delta, &stick);
     tilt_camera(fps, time_delta, &stick);

@@ -38,10 +38,10 @@ void game_update(Game* game) {
     fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
     fw64_animation_controller_update(&game->animation_state, game->engine->time->time_delta);
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         set_animation(game, game->current_animation + 1);
     }
-    else if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
         set_animation(game, game->current_animation -1);
     }
 }

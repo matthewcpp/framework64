@@ -52,11 +52,11 @@ static void set_current_mesh(Game* game, int index) {
 }
 
 void game_update(Game* game) {
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         set_current_mesh(game, ++game->current_mesh % MESH_COUNT);
     }
 
-    if (fw64_input_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
         set_current_mesh(game, game->current_mesh > 0 ? game->current_mesh - 1 : MESH_COUNT - 1);
     }
 

@@ -33,17 +33,17 @@ void game_update(Game* game){
     int controller = 0;
     fw64Input* input = game->engine->input;
 
-    if (fw64_input_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_A)) {
+    if (fw64_input_controller_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_A)) {
         fw64_input_controller_set_rumble(input, 0, game->rumble_frequency, game->rumble_duration);
     }
 
-    if (fw64_input_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_B)) {
+    if (fw64_input_controller_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_B)) {
         fw64_input_controller_set_rumble(input, 0, 0.0f, 0.0f);
     }
 
     int controller_is_rumbling = fw64_input_controller_rumble_active(input, controller);
 
-    if (fw64_input_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+    if (fw64_input_controller_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
         game->rumble_frequency = fw64_minf(game->rumble_frequency + 0.1f, 1.0f);
         set_shake_speed(game);
         
@@ -51,7 +51,7 @@ void game_update(Game* game){
             fw64_input_controller_set_rumble(input, 0, game->rumble_frequency, game->rumble_duration);
     }
 
-    if (fw64_input_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
+    if (fw64_input_controller_button_pressed(input, controller, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
         game->rumble_frequency = fw64_maxf(game->rumble_frequency - 0.1f, 0.0f);
         set_shake_speed(game);
 

@@ -77,7 +77,7 @@ void display_controller_info(Game* game, int index) {
     }
 
     Vec2 stick;
-    fw64_input_stick(game->engine->input, index, &stick);
+    fw64_input_controller_stick(game->engine->input, index, &stick);
     sprintf(text, "Stick: %.2f, %.2f", stick.x, stick.y);
     fw64_renderer_draw_text(renderer, game->font, draw.x, draw.y, text);
     draw.y += 15;
@@ -85,20 +85,20 @@ void display_controller_info(Game* game, int index) {
     int pressed_button_count = 0;
     int pressed_buttons[16];
 
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_A)) pressed_buttons[pressed_button_count++] = 0;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_B)) pressed_buttons[pressed_button_count++] = 1;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) pressed_buttons[pressed_button_count++] = 2;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_UP)) pressed_buttons[pressed_button_count++] = 3;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) pressed_buttons[pressed_button_count++] = 4;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) pressed_buttons[pressed_button_count++] = 5;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_L)) pressed_buttons[pressed_button_count++] = 6;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_R)) pressed_buttons[pressed_button_count++] = 7;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN)) pressed_buttons[pressed_button_count++] = 8;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) pressed_buttons[pressed_button_count++] = 9;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) pressed_buttons[pressed_button_count++] = 10;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) pressed_buttons[pressed_button_count++] = 11;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_START)) pressed_buttons[pressed_button_count++] = 12;
-    if (fw64_input_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_Z)) pressed_buttons[pressed_button_count++] = 13;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_A)) pressed_buttons[pressed_button_count++] = 0;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_B)) pressed_buttons[pressed_button_count++] = 1;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) pressed_buttons[pressed_button_count++] = 2;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_UP)) pressed_buttons[pressed_button_count++] = 3;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) pressed_buttons[pressed_button_count++] = 4;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) pressed_buttons[pressed_button_count++] = 5;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_L)) pressed_buttons[pressed_button_count++] = 6;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_R)) pressed_buttons[pressed_button_count++] = 7;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN)) pressed_buttons[pressed_button_count++] = 8;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) pressed_buttons[pressed_button_count++] = 9;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) pressed_buttons[pressed_button_count++] = 10;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) pressed_buttons[pressed_button_count++] = 11;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_START)) pressed_buttons[pressed_button_count++] = 12;
+    if (fw64_input_controller_button_down(input, index, FW64_N64_CONTROLLER_BUTTON_Z)) pressed_buttons[pressed_button_count++] = 13;
 
 
     for (int i = 0; i < pressed_button_count; i++) {

@@ -38,15 +38,15 @@ void fw64_n64_input_update(fw64Input* input) {
     }
 }
 
-int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
+int fw64_input_controller_button_pressed(fw64Input* input, int controller, int button) {
     return input->current_state[controller].trigger & button;
 }
 
-int fw64_input_button_released(fw64Input* input, int controller, int button) {
+int fw64_input_controller_button_released(fw64Input* input, int controller, int button) {
     return (!(input->current_state[controller].button & button)) && (input->previous_state[controller].button & button);
 }
 
-int fw64_input_button_down(fw64Input* input, int controller, int button) {
+int fw64_input_controller_button_down(fw64Input* input, int controller, int button) {
     return input->current_state[controller].button & button;
 }
 
@@ -72,7 +72,7 @@ static float fw64_map_controller_axis_value(float value, float min_val, float ma
     return result;
 }
 
-void fw64_input_stick(fw64Input* input, int controller, Vec2* current) {
+void fw64_input_controller_stick(fw64Input* input, int controller, Vec2* current) {
     current->x = fw64_map_controller_axis_value((float)input->current_state[controller].stick_x, CONTROLLER_STICK_MIN_X, CONTROLLER_STICK_MAX_X);
     current->y = fw64_map_controller_axis_value((float)input->current_state[controller].stick_y, CONTROLLER_STICK_MIN_Y, CONTROLLER_STICK_MAX_Y);
 }
