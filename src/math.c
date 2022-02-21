@@ -15,3 +15,11 @@ float fw64_clamp(float x, float lower, float upper) {
     x = upper;
   return x;
 }
+
+float fw64_maxf(float a, float b) {
+  return a >= b ? a : b;
+}
+
+float fw64_minf(float a, float b) {
+  return a <=b ? a : b;
+}

@@ -56,12 +56,13 @@ void display_controller_info(Game* game, int index) {
 
     IVec2 viewport_size = fw64_renderer_get_viewport_size(renderer, &info->camera);
 
-    char text[16];
+    char text[32];
     sprintf(text, "Controller %d", info->player_index);
 
     IVec2 draw = {5, 5};
 
     fw64_renderer_draw_text(renderer, game->font, draw.x, draw.y, text);
+    draw.y += 15;
 
     if (!fw64_input_controller_is_connected(input, index)) {
         int text_x = (viewport_size.x / 2) - (game->not_connected_text_dimensions.x / 2);
@@ -70,6 +71,15 @@ void display_controller_info(Game* game, int index) {
         return;
     }
 
+    if (fw64_input_controller_has_rumble(input, index)){
+        fw64_renderer_draw_text(renderer, game->font, draw.x, draw.y, "Rumble Enabled");
+        draw.y += 15;
+    }
+
+    Vec2 stick;
+    fw64_input_stick(game->engine->input, index, &stick);
+    sprintf(text, "Stick: %.2f, %.2f", stick.x, stick.y);
+    fw64_renderer_draw_text(renderer, game->font, draw.x, draw.y, text);
     draw.y += 15;
 
     int pressed_button_count = 0;
