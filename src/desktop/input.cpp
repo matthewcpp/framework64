@@ -5,11 +5,14 @@
 
 #include <iostream>
 
-void fw64Input::init(framework64::InputInterface& interface_) {
+void fw64Input::init(framework64::InputInterface& interface_, fw64Time& time_) {
     interface = &interface_;
+    time = &time_;
 
     int joystick_count = SDL_NumJoysticks();
     int controller_index = 0;
+
+    std::fill(controller_rumble_durations.begin(), controller_rumble_durations.end(), 0.0f);
 
     for (int i = 0; i < joystick_count; i++) {
         if (SDL_IsGameController(i)) {
@@ -71,6 +74,10 @@ void fw64Input::update() {
         else if (i == 0) {
             interface->updateControllerFromKeyboard(current_controller_states[i], SDL_GetKeyboardState(nullptr));
         }
+
+        if (controller_rumble_durations[i] > 0.0f) {
+            controller_rumble_durations[i] -= time->time_delta;
+        }
     }
 }
 
@@ -88,7 +95,7 @@ void fw64Input::onDeviceRemoved(int index) {
     if (index < 4) {
         SDL_GameControllerClose(sdl_gamecontrollers[index]);
         sdl_gamecontrollers[index] = nullptr;
-
+        controller_rumble_durations[index] = 0.0f;
     }
 }
 
@@ -125,6 +132,22 @@ Vec2 fw64Input::stick(int controller, int stick_index) {
         return {0.0f, 0.0f};
 }
 
+bool fw64Input::controllerHasRumble(int index) const {
+    return SDL_JoystickHasRumble(SDL_GameControllerGetJoystick(sdl_gamecontrollers[index]));
+}
+
+int fw64Input::controllerSetRumble(int index, float value, float duration) {
+    auto rumble_val = static_cast<uint16_t>(value * std::numeric_limits<uint16_t>::max());
+    auto ms = static_cast<uint32_t>(duration * 1000);
+
+    controller_rumble_durations[index] = value > 0.0f ? duration : 0.0f;
+
+    return SDL_JoystickRumble(SDL_GameControllerGetJoystick(sdl_gamecontrollers[index]), rumble_val, rumble_val, ms);
+}
+
+bool fw64Input::controllerIsRumbling(int index) const {
+    return controller_rumble_durations[index] > 0.0f;
+}
 
 // C interface
 
@@ -146,4 +169,16 @@ int fw64_input_button_down(fw64Input* input, int controller, int button) {
 
 void fw64_input_stick(fw64Input* input, int controller, Vec2* current) {
     *current = input->stick(controller, 0);
+}
+
+int fw64_input_controller_has_rumble(fw64Input* input, int controller) {
+    return input->controllerHasRumble(controller);
+}
+
+int fw64_input_controller_set_rumble(fw64Input* input, int controller, float value, float duration) {
+    return input->controllerSetRumble(controller, value, duration);
+}
+
+int fw64_input_controller_rumble_active(fw64Input* input, int controller) {
+    return input->controllerIsRumbling(controller);
 }

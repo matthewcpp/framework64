@@ -70,7 +70,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     nuAuInit(); //starts the SGI tools audio manager
 
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
-    fw64_n64_input_init(engine->input);
+    fw64_n64_input_init(engine->input, engine->time);
     memset(engine->time, 0, sizeof(fw64Time));
     fw64_data_cache_init(&engine->assets->cache);
     fw64_n64_audio_init(engine->audio);

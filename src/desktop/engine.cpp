@@ -64,7 +64,7 @@ bool Engine::init(int screen_width, int screen_height) {
         return false;
     }
 
-    input->init(*n64_input_interface);
+    input->init(*n64_input_interface, *time);
 
     Filesystem::init(asset_dir_path, *assets);
 

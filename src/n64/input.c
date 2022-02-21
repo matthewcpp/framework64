@@ -1,4 +1,3 @@
-#include "framework64/input.h"
 #include "framework64/n64/input.h"
 
 #include <nusys.h>
@@ -6,14 +5,37 @@
 #include <string.h>
 #include <malloc.h>
 
-void fw64_n64_input_init(fw64Input* input) {
+void fw64_n64_input_init(fw64Input* input, fw64Time* time) {
     nuContInit(); // initialize nusys controller subsystem
+
+    memset(input, 0, sizeof(fw64Input));
+    input->time = time;
+
+    // check for rumble packs
+    for (int i = 0; i < NU_CONT_MAXCONTROLLERS; i++) {
+        int result = nuContRmbCheck(i); // 0 error code means rumble pack initialized
+
+        if (result == 0) {
+            nuContRmbModeSet(i, NU_CONT_RMB_MODE_ENABLE);
+            input->rumble_enabled[i] = 1;
+        }
+    }
 }
 
 void fw64_n64_input_update(fw64Input* input) {
     memcpy(&input->previous_state[0], &input->current_state[0], sizeof(NUContData) * NU_CONT_MAXCONTROLLERS);
 
     nuContDataGetExAll(input->current_state);
+
+    for (int i = 0; i < NU_CONT_MAXCONTROLLERS; i++) {
+        if (input->rumble_time[i] > 0.0f) {
+            input->rumble_time[i] -= input->time->time_delta;
+
+            if (input->rumble_time[i] <= 0.0f) {
+                nuContRmbStop(i);
+            }
+        }
+    }
 }
 
 int fw64_input_button_pressed(fw64Input* input, int controller, int button) {
@@ -57,4 +79,24 @@ void fw64_input_stick(fw64Input* input, int controller, Vec2* current) {
 
 int fw64_input_controller_is_connected(fw64Input* input, int controller) {
     return input->current_state[controller].errno == 0;
+}
+
+int fw64_input_controller_has_rumble(fw64Input* input, int controller) {
+    return input->rumble_enabled[controller];
+}
+
+int fw64_input_controller_set_rumble(fw64Input* input, int controller, float value, float duration) {
+    if (value == 0.0f && input->rumble_time[controller] > 0.0f) {
+        nuContRmbStop(controller);
+        input->rumble_time[controller] = 0.0f;
+    }
+    else {
+        u16 frequency = (u16)(value * 256.0f);
+        nuContRmbStart(controller, frequency, 10000);
+        input->rumble_time[controller] = duration;
+    }
+}
+
+int fw64_input_controller_rumble_active(fw64Input* input, int controller) {
+    return input->rumble_time[controller] > 0.0f;
 }
