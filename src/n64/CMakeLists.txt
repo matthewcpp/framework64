@@ -18,6 +18,7 @@ set(platform_source_files
     n64/quad.c
     ${n64_include_dir}/renderer.h n64/renderer.c
     n64/renderer_util.c
+    ${n64_include_dir}/save_file.h n64/save_file.c
     ${n64_include_dir}/scene.h n64/scene.c
     ${n64_include_dir}/texture.h n64/texture.c
     PARENT_SCOPE

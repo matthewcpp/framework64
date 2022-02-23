@@ -5,7 +5,7 @@
 
 #include <nusys.h>
 
-Game game;
+Game game __attribute__ ((aligned (8)));;
 fw64Engine engine;
 
 void nusys_game_tick(int pendingGfx) {
