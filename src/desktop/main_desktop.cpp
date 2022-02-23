@@ -5,10 +5,14 @@
 #include <SDL2/SDL.h>
 
 #include <iostream>
+#include <string>
+
+fw64SaveFile::SaveFileType getSaveFileType(std::string const & type_name);
 
 int main(int argc, char** argv) {
     framework64::Engine engine;
-    if (!engine.init(320, 240)) {
+
+    if (!engine.init(FW64_APPLICATION_NAME, getSaveFileType(FW64_SAVE_FILE_TYPE), 320, 240)) {
         std::cout << "Failed to initialize engine." << std::endl;
         return 1;
     }
@@ -58,4 +62,15 @@ int main(int argc, char** argv) {
     }
 
     return 0;
+}
+
+fw64SaveFile::SaveFileType getSaveFileType(std::string const & type_name) {
+    if (type_name == "NONE")
+        return fw64SaveFile::SaveFileType::None;
+    else if (type_name == "N64_EEPROM_4K")
+        return fw64SaveFile::SaveFileType::N64Eeprom4k;
+    else if (type_name == "N64_EEPROM_16K")
+        return fw64SaveFile::SaveFileType::N64Eeprom16K;
+
+    return fw64SaveFile::SaveFileType::Unknown;
 }

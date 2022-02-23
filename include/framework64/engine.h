@@ -6,6 +6,7 @@
 #include "framework64/audio.h"
 #include "framework64/input.h"
 #include "framework64/renderer.h"
+#include "framework64/save_file.h"
 #include "framework64/time.h"
 
 typedef struct {
@@ -13,5 +14,6 @@ typedef struct {
     fw64Audio* audio;
     fw64Input* input;
     fw64Renderer* renderer;
+    fw64SaveFile* save_file;
     fw64Time* time;
 } fw64Engine;

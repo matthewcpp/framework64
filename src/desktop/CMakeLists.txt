@@ -24,6 +24,7 @@ ${desktop_include_directory}/pixel_texture.h desktop/pixel_texture.cpp
 desktop/quad.cpp
 ${desktop_include_directory}/renderer.h desktop/renderer.cpp
 desktop/render_util.cpp
+${desktop_include_directory}/save_file.h desktop/save_file.cpp
 ${desktop_include_directory}/scene.h desktop/scene.cpp
 ${desktop_include_directory}/screen_overlay.h desktop/screen_overlay.cpp
 ${desktop_include_directory}/shader.h desktop/shader.cpp
