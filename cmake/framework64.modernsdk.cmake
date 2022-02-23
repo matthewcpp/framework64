@@ -37,9 +37,26 @@ endfunction()
 # performs platform specific configuration of a framework64 game
 function(create_game)
     set(options)
-    set(oneValueArgs TARGET)
+    set(oneValueArgs TARGET SAVE_FILE_TYPE)
     set(multiValueArgs SOURCES)
     cmake_parse_arguments(N64_ROM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+    # set the correct EEPROM type for the rom
+    # default setting is no EEPROM
+    set(FW64_N64_ROM_ID ".ascii \"  \"")
+    set(FW64_N64_SETTINGS_BYTE ".ascii \" \"")
+
+    if (DEFINED N64_ROM_SAVE_FILE_TYPE)
+        set(FW64_N64_ROM_ID ".ascii \"ED\"")
+
+        if ("${N64_ROM_SAVE_FILE_TYPE}" STREQUAL "N64_EEPROM_4K")
+            set(FW64_N64_SETTINGS_BYTE ".byte 0x12")
+        elseif("${N64_ROM_SAVE_FILE_TYPE}" STREQUAL "N64_EEPROM_16K")
+            set(FW64_N64_SETTINGS_BYTE ".byte 0x22")
+        else()
+            message(FATAL_ERROR "Unsupported Save File type specified for ${N64_ROM_TARGET}: ${N64_ROM_SAVE_FILE_TYPE}")
+        endif()
+    endif()
 
     set(target_name ${N64_ROM_TARGET})
     set(game_sources ${N64_ROM_SOURCES})
@@ -49,7 +66,7 @@ function(create_game)
 	file(MAKE_DIRECTORY ${asm_dest_dir})
 	configure_file(${FW64_N64_ASM_SRC_DIR}/macros.inc ${asm_dest_dir}/macros.inc COPYONLY)
 	configure_file(${FW64_N64_ASM_SRC_DIR}/entry.s ${asm_dest_dir}/entry.s COPYONLY)
-	configure_file(${FW64_N64_ASM_SRC_DIR}/rom_header.s ${asm_dest_dir}/rom_header.s COPYONLY)
+	configure_file(${FW64_N64_ASM_SRC_DIR}/rom_header.s ${asm_dest_dir}/rom_header.s)
 	configure_file(${FW64_N64_ASM_SRC_DIR}/asset_data.s ${asm_dest_dir}/asset_data.s)
 
 	set(asm_files

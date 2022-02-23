@@ -18,6 +18,8 @@
 .word  0x00000000               /* Unknown */
 /* Game ID (EXAMPLE: NSME) Begins here */
 .word  0x0000004E                /* Cartridge Type (N)*/
-.ascii "  "                     /* Cartridge ID (SM)*/
+/*.ascii "  "                     /* Cartridge ID (SM)*/
+${FW64_N64_ROM_ID}
 .ascii " "			/* Region (E)*/
-.byte  0x00			/* Version */
+/*.byte  0x00			/* Version */
+${FW64_N64_SETTINGS_BYTE}
