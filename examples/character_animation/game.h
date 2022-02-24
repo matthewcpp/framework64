@@ -1,10 +1,11 @@
 #pragma once
 
 #include "framework64/animation_controller.h"
-#include "framework64/util/arcball_camera.h"
 #include "framework64/camera.h"
 #include "framework64/engine.h"
 #include "framework64/node.h"
+
+#include "common/arcball_camera.h"
 
 typedef struct {
     fw64Engine* engine;

@@ -38,7 +38,7 @@ endfunction()
 function(create_game)
     set(options)
     set(oneValueArgs TARGET SAVE_FILE_TYPE)
-    set(multiValueArgs SOURCES)
+    set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(N64_ROM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     # set the correct EEPROM type for the rom
@@ -77,6 +77,11 @@ function(create_game)
 
     add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/n64/main_n64.c ${asm_files})
     target_link_libraries(${target_name} PUBLIC framework64)
+
+    # Add any extra libraries that need to be linked in
+    if (DEFINED N64_ROM_EXTRA_LIBS)
+        target_link_libraries(${target_name} PUBLIC ${N64_ROM_EXTRA_LIBS})
+    endif()
 
     set(elf_output_name ${target_name}.elf)
     set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${elf_output_name})

@@ -1,3 +1,5 @@
+add_subdirectory(common)
+
 add_subdirectory(audio_banks)
 add_subdirectory(audio_playback)
 add_subdirectory(billboard)
