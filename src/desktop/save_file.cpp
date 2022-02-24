@@ -100,6 +100,7 @@ int fw64SaveFile::write(uint32_t base_addr, const char* buffer, uint32_t buffer_
 
     file.seekp(base_addr);
     file.write(buffer, buffer_size);
+    file.flush();
 
     return 0;
 }

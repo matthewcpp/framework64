@@ -5,8 +5,9 @@
 #include "framework64/engine.h"
 #include "framework64/node.h"
 
-#include "framework64/util/fps_camera.h"
 #include "framework64/util/quad.h"
+
+#include "common/fps_camera.h"
 
 typedef struct {
     fw64Engine* engine;

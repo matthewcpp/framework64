@@ -38,7 +38,7 @@ endfunction()
 function(create_game)
     set(options)
     set(oneValueArgs TARGET SAVE_FILE_TYPE)
-    set(multiValueArgs SOURCES)
+    set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     set(target_name ${DESKTOP_GAME_TARGET})
@@ -46,6 +46,11 @@ function(create_game)
 
     add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
     target_link_libraries(${target_name} PUBLIC framework64)
+
+    # Add any extra libraries that need to be linked in
+    if (DEFINED DESKTOP_GAME_EXTRA_LIBS)
+        target_link_libraries(${target_name} PUBLIC ${DESKTOP_GAME_EXTRA_LIBS})
+    endif()
 
     # Fixes linker error encountered on linux
     # https://stackoverflow.com/a/55086637

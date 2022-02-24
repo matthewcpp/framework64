@@ -4,4 +4,5 @@ set(src_files
 
 create_game(
     TARGET billboard
-    SOURCES ${src_files})
+    SOURCES ${src_files}
+    EXTRA_LIBS example_common)

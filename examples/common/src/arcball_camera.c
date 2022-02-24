@@ -1,4 +1,5 @@
-#include "framework64/util/arcball_camera.h"
+#include "common/arcball_camera.h"
+
 #include "framework64/n64/controller_button.h"
 
 #define ARCBALL_ORBIT_SPEED 180.0f
