@@ -26,7 +26,6 @@ set(common_source_files
         ../include/framework64/random.h random.c
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
-        ../include/framework64/sparse_set.h sparse_set.c
         ../include/framework64/texture.h
         ../include/framework64/transform.h transform.c
         ../include/framework64/types.h
@@ -37,6 +36,7 @@ set(common_source_files
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/quad.h util/quad.c
         ../include/framework64/util/renderer_util.h
+        ../include/framework64/util/sparse_set.h util/sparse_set.c
         )
 
 if (FW64_PLATFORM_DESKTOP)
