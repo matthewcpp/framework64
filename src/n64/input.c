@@ -6,8 +6,6 @@
 #include <malloc.h>
 
 void fw64_n64_input_init(fw64Input* input, fw64Time* time) {
-    nuContInit(); // initialize nusys controller subsystem
-
     memset(input, 0, sizeof(fw64Input));
     input->time = time;
 

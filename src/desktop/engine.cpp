@@ -12,11 +12,19 @@
 #include <iostream>
 
 namespace framework64 {
-bool Engine::init(int screen_width, int screen_height) {
+bool Engine::init(std::string const & name, fw64SaveFile::SaveFileType save_file_type, int screen_width, int screen_height) {
+    application_name = name;
+
+    if (save_file_type == fw64SaveFile::SaveFileType::Unknown) {
+        std::cout << "`Unknown` is not a valid save file type for engine initialization." << std::endl;
+        return false;
+    }
+
     const std::string base_path = SDL_GetBasePath();
     const std::string asset_dir_path = base_path + "assets/";
     const std::string database_path = asset_dir_path + "assets.db";
     const std::string shader_dir_path = base_path + "glsl/";
+    const std::string save_file_path = base_path + application_name + ".save";
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
 
@@ -33,7 +41,6 @@ bool Engine::init(int screen_width, int screen_height) {
         return false;
     }
 
-
     result = Mix_Init(MIX_INIT_OGG);
 
     if ((result & MIX_INIT_OGG) != MIX_INIT_OGG) {
@@ -47,6 +54,7 @@ bool Engine::init(int screen_width, int screen_height) {
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
 
     renderer = new fw64Renderer();
+    save_file = new fw64SaveFile();
     assets = new fw64AssetDatabase(asset_dir_path, *shader_cache);
     audio = new fw64Audio();
     input = new fw64Input();
@@ -65,6 +73,7 @@ bool Engine::init(int screen_width, int screen_height) {
     }
 
     input->init(*n64_input_interface, *time);
+    save_file->init(save_file_path, save_file_type);
 
     Filesystem::init(asset_dir_path, *assets);
 
@@ -75,5 +84,8 @@ void Engine::update(float time_delta) {
     input->update();
     time->time_delta = time_delta;
     time->total_time += time_delta;
+
+    save_file->update(time_delta);
 }
+
 }

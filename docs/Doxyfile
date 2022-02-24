@@ -26,6 +26,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/quat.h \
                         ../include/framework64/random.h \
                         ../include/framework64/renderer.h \
+                        ../include/framework64/save_file.h \
                         ../include/framework64/texture.h \
                         ../include/framework64/time.h \
                         ../include/framework64/transform.h \

@@ -37,7 +37,7 @@ endfunction()
 # performs platform specific configuration of a framework64 game
 function(create_game)
     set(options)
-    set(oneValueArgs TARGET)
+    set(oneValueArgs TARGET SAVE_FILE_TYPE)
     set(multiValueArgs SOURCES)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -54,4 +54,13 @@ function(create_game)
     endif()
 
     target_include_directories(${target_name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+    if (NOT DEFINED DESKTOP_GAME_SAVE_FILE_TYPE)
+        set(DESKTOP_GAME_SAVE_FILE_TYPE "NONE")
+    endif()
+
+    target_compile_definitions(${target_name} 
+        PUBLIC FW64_APPLICATION_NAME="${target_name}"
+        PUBLIC FW64_SAVE_FILE_TYPE="${DESKTOP_GAME_SAVE_FILE_TYPE}")
+
 endfunction()

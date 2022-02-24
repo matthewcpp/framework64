@@ -356,6 +356,9 @@ void fw64Renderer::setDrawingMode(DrawingMode mode) {
         case DrawingMode::Rect:
             sprite_batch.start();
             break;
+
+        case DrawingMode::None:
+            break;
     };
 }
 
