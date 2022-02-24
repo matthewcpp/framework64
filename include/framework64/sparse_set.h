@@ -2,6 +2,8 @@
 
 /** \file sparse_set.h */
 
+#include "framework64/allocator.h"
+
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -26,7 +28,7 @@ typedef struct {
  * There is a dense array which is used for efficient iteration over the whole set.
  * A corresponding sparse array is used to track items as they move in the dense array.
  * The arrays will dynamically grow as more items are added into the set.
- * As items are added and delted, the dense array is updated and an objects location in memory may change.
+ * As items are added and deleted, the dense array is updated and an objects location in memory may change.
  * For this reason, use a \ref fw64SparseSetHandle as a persistent key for a particular object.
  */
 typedef struct {
@@ -37,14 +39,24 @@ typedef struct {
 
     char* dense_arr;
     fw64LookupInfo* lookup_arr;
+    fw64Allocator* allocator;
 } fw64SparseSet;
 
 
 /**
  * Initializes a new, empty sparse set.
  * @param item_size the size, in bytes of the items that will be stored in the set.
+ * @param allocator allocator which will be used for all allocations by this data structure
  */
-void fw64_sparse_set_init(fw64SparseSet* sparse_set, uint16_t item_size);
+void fw64_sparse_set_init(fw64SparseSet* sparse_set, uint16_t item_size, fw64Allocator* allocator);
+
+/**
+ * Initializes a new, empty sparse set.
+ * @param item_size the size, in bytes of the items that will be stored in the set.
+ * @param item_capacity the number of items that the data structure should be set up to hold
+ * @param allocator allocator which will be used for all allocations by this data structure
+ */
+void fw64_sparse_set_init_with_capacity(fw64SparseSet* sparse_set, uint16_t item_size, uint16_t item_capacity, fw64Allocator* allocator);
 
 /**
  * Frees all resources used by the sparse set.

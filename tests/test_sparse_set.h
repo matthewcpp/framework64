@@ -1,5 +1,6 @@
 #pragma once
 #include "framework64/sparse_set.h"
+#include "framework64/allocator.h"
 
 #include "gtest/gtest.h"
 
@@ -19,7 +20,8 @@ protected:
     fw64SparseSet sparse_set;
 
     void SetUp() override {
-        fw64_sparse_set_init(&sparse_set, sizeof(TestPlayer));
+        fw64_default_allocator_init();
+        fw64_sparse_set_init(&sparse_set, sizeof(TestPlayer), fw64_default_allocator());
     }
 
     void TearDown() override {
