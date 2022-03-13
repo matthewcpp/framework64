@@ -29,6 +29,7 @@ struct ShaderProgram {
     GLuint handle = 0;
     GLuint lighting_data_uniform_block_index = GL_INVALID_INDEX;
     GLuint mesh_transform_uniform_block_index = GL_INVALID_INDEX;
+    GLuint fog_uniform_block_index = GL_INVALID_INDEX;
     GLint diffuse_color_location = -1;
     GLint diffuse_texture_location = -1;
     Shader* shader = nullptr;

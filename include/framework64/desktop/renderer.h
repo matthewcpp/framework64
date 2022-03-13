@@ -17,6 +17,7 @@
 #endif
 
 #include <array>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -52,7 +53,13 @@ public:
 
 public:
     void setDepthTestingEnabled(bool enabled);
-    inline bool depthTestingEnabled() const { return depth_testing_enabled; }
+    [[nodiscard]] inline bool depthTestingEnabled() const { return depth_testing_enabled; }
+
+public:
+    void setFogEnabled(bool enabled);
+    [[nodiscard]] inline bool fogEnabled() const { return fog_enabled; }
+    void setFogPositions(float fog_min, float fog_max);
+    void setFogColor(float r, float g, float b);
 
 public:
     void setAmbientLightColor(uint8_t r, uint8_t g, uint8_t b);
@@ -68,6 +75,8 @@ private:
     void setActiveShader(framework64::ShaderProgram* shader);
     void setGlDepthTestingState();
     void drawPrimitive(fw64Primitive const & primitive);
+
+    void fogValuesChanged();
 
 private:
 
@@ -90,6 +99,14 @@ private:
     struct MeshTransformData {
         std::array<float, 16> mvp_matrix;
         std::array<float, 16> normal_matrix;
+        float camera_near;
+        float camera_far;
+    };
+
+    struct FogData {
+        std::array<float, 4> fog_color = {0.33f, 0.33f, 0.33f, 1.0f};
+        float min_distance = std::numeric_limits<float>::max();
+        float max_distance = std::numeric_limits<float>::max();
     };
 
 private:
@@ -103,17 +120,20 @@ private:
 private:
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
     framework64::UniformBlock<MeshTransformData> mesh_transform_uniform_block;
+    framework64::UniformBlock<FogData> fog_data_uniform_block;
 
     std::array<float, 16> view_projection_matrix;
-
     framework64::ShaderProgram* active_shader = nullptr;
+    std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+    framework64::ScreenOverlay screen_overlay;
+
+    float fog_min_distance = 0.4f;
+    float fog_max_distance = 0.8f;
 
     bool depth_testing_enabled = true;
-
-    std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+    bool fog_enabled = false;
+    bool fog_dirty = true;
     bool lighting_dirty = false;
-
-    framework64::ScreenOverlay screen_overlay;
 
 public:
     framework64::SpriteBatch sprite_batch;
