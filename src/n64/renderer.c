@@ -5,6 +5,7 @@
 #include "framework64/n64/font.h"
 #include "framework64/n64/framebuffer.h"
 #include "framework64/n64/image.h"
+#include "framework64/math.h"
 #include "framework64/n64/mesh.h"
 #include "framework64/n64/texture.h"
 
@@ -32,6 +33,10 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
 
     fw64_renderer_set_depth_testing_enabled(renderer, 1);
     fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
+    fw64_renderer_set_fog_enabled(renderer, 0);
+
+    fw64_renderer_set_fog_positions(renderer, 0.4f, 0.8f);
+    fw64_renderer_set_fog_color(renderer, 85, 85, 85);
 
     // set default lighting state - single white light
     Lights2 lights = gdSPDefLights2(
@@ -113,7 +118,7 @@ void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask* gfxTaskPtr) {
     renderer->post_draw_func(&framebuffer, renderer->post_draw_func_arg);
 }
 
-Gfx _rdp_init_static_dl[] = {
+static Gfx _rdp_init_static_dl[] = {
     gsDPSetTextureLOD(G_TL_TILE),
     gsDPSetTextureLUT(G_TT_NONE),
     gsDPSetTextureDetail(G_TD_CLAMP),
@@ -143,7 +148,9 @@ void fw64_renderer_init_rsp(fw64Renderer* renderer) {
     gSPSetGeometryMode(renderer->display_list++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH);
 }
 
-/** Note: This function assumes that the render mode is set to G_RM_OPA_SURF / G_RM_OPA_SURF2 */
+/** Note: This function assumes that the render mode is set to G_RM_OPA_SURF / G_RM_OPA_SURF2 
+ *  After the call to this function the cycle type will be set to G_CYC_FILL.  It is the caller's responsibility to reset the correct cycle after the call to this function.
+*/
 void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int width, int height, fw64RendererFlags flags) {
     gDPSetCycleType(renderer->display_list++, G_CYC_FILL);
 
@@ -161,8 +168,6 @@ void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int widt
         gDPFillRectangle(renderer->display_list++, x, y, width - 1, height - 1);
         gDPPipeSync(renderer->display_list++);
     }
-
-    gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE); 
 }
 
 IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera) {
@@ -199,9 +204,9 @@ void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     renderer->viewport_screen_pos.y = (int)(renderer->screen_size.y * camera->viewport_pos.y);
 
     // sets the view projection matrices
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
     gSPPerspNormalize(renderer->display_list++, camera->_persp_norm);
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
 }
 
 void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw64RendererFlags flags) {
@@ -222,6 +227,16 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw6
     if (flags & FW64_RENDERER_FLAG_CLEAR) {
         fw64_n64_renderer_clear_rect(renderer, 0, 0, renderer->screen_size.x, renderer->screen_size.y, flags);
     }
+
+    if (fw64_renderer_get_fog_enabled(renderer)) {
+        gDPSetCycleType(renderer->display_list++, G_CYC_2CYCLE);
+        gDPSetFogColor(renderer->display_list++, renderer->fog_color.r, renderer->fog_color.g, renderer->fog_color.b, renderer->fog_color.a);
+        gSPFogPosition(renderer->display_list++, renderer->fog_min, renderer->fog_max);
+        gSPSetGeometryMode(renderer->display_list++, G_FOG);
+    }
+    else {
+        gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
+    }
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
@@ -237,12 +252,23 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
         (flags & FW64_RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }
 
+static void fw64_n64_disable_fog_for_2d(fw64Renderer* renderer) {
+    if (fw64_renderer_get_fog_enabled(renderer)) {
+        gSPClearGeometryMode(renderer->display_list++, G_FOG);
+        gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
+    }
+}
+
 static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMode shading_mode) {
     if (renderer->shading_mode == shading_mode) return;
 
     renderer->shading_mode = shading_mode;
 
     switch(renderer->shading_mode) {
+        case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
+            gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_OPAQUE_SHADED(renderer), FW64_RM_3D_OPAQUE_SHADED2(renderer));
+        break;
+
         case FW64_SHADING_MODE_UNLIT_TEXTURED:
             gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_TEXTURED(renderer), FW64_RM_3D_TEXTURED2(renderer));
             gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
@@ -253,26 +279,20 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
 
         case FW64_SHADING_MODE_GOURAUD:
             gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_OPAQUE_SHADED(renderer), FW64_RM_3D_OPAQUE_SHADED2(renderer));
-            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH)
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH);
             #define G_CC_PRIM_SHADE PRIMITIVE, 0, SHADE, 0, PRIMITIVE, 0, SHADE, 0
             gDPSetCombineMode(renderer->display_list++, G_CC_PRIM_SHADE, G_CC_PRIM_SHADE);
             fw64_n64_renderer_set_lighting_data(renderer);
             break;
 
         case FW64_SHADING_MODE_GOURAUD_TEXTURED:
-            gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_TEXTURED(renderer), FW64_RM_3D_TEXTURED2(renderer));
-            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH)
+            //gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_TEXTURED(renderer), FW64_RM_3D_TEXTURED2(renderer));
+            gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_TEXTURED(renderer) , FW64_RM_3D_OPAQUE_SHADED2(renderer));
+            gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH);
             gDPSetCombineMode(renderer->display_list++,G_CC_MODULATERGBA , G_CC_MODULATERGBA );
             fw64_n64_renderer_set_lighting_data(renderer);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
-            break;
-
-        case FW64_SHADING_MODE_SPRITE:
-            gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
-            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
-            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
-            gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             break;
 
         case FW64_SHADING_MODE_DECAL_TEXTURE:
@@ -282,17 +302,24 @@ static void fw64_renderer_set_shading_mode(fw64Renderer* renderer, fw64ShadingMo
             gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
             break;
 
+        // 2D Specific render modes
+
+        case FW64_SHADING_MODE_SPRITE:
+            fw64_n64_disable_fog_for_2d(renderer);
+            gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
+            gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+            gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+            gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
+            break;
+
         case FW64_SHADING_MODE_TEXT:
+            fw64_n64_disable_fog_for_2d(renderer);
             gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
             gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
             gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
             gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
             gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, 255, 255, 255, 255); // TODO: provide API to set text color
             break;
-
-        case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
-            gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_OPAQUE_SHADED(renderer), FW64_RM_3D_OPAQUE_SHADED2(renderer));
-        break;
 
         default:
             break;
@@ -530,4 +557,35 @@ void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r,
     light->l.col[2] = b;
 
     memcpy(&light->l.colc[0], &light->l.col[0], 3);
+}
+
+void fw64_renderer_set_fog_enabled(fw64Renderer* renderer, int enabled) {
+    if (enabled) {
+        renderer->enabled_features |= N64_RENDERER_FEATURE_FOG;
+    }
+    else {
+        renderer->enabled_features &= ~N64_RENDERER_FEATURE_FOG;
+    }
+}
+
+int fw64_renderer_get_fog_enabled(fw64Renderer* renderer) {
+    return renderer->enabled_features & N64_RENDERER_FEATURE_FOG;
+}
+
+/**
+ * The N64 Fog Algorithm is not totally clear.
+ * This implementation attempts to provide a reasonable approximation of how I think it should work.
+ * Note that a crash has been observed if fog_min == fog_max
+ */
+void fw64_renderer_set_fog_positions(fw64Renderer* renderer, float fog_min, float fog_max) {
+    renderer->fog_min = (s32)fw64_clamp(900.0f + (fog_min * 100.0f), 0.0f, 1000.0f);
+    renderer->fog_max = (s32)fw64_clamp(900.0f + (fog_max * 100.0f), 0.0f, 1000.0f);
+
+    if (renderer->fog_min == renderer->fog_max) {
+        renderer->fog_min = renderer->fog_max - 8;
+    }
+}
+
+void fw64_renderer_set_fog_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
+    fw64_color_rgba8_set(&renderer->fog_color, r, g, b, 255);
 }

@@ -93,6 +93,17 @@ void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enab
 void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z);
 void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b);
 
+void fw64_renderer_set_fog_enabled(fw64Renderer* renderer, int enabled);
+int fw64_renderer_get_fog_enabled(fw64Renderer* renderer);
+
+/**
+ * Sets the min and max positions of fog.
+ * The values for min / max should be values in the range [0.0, 1.0]
+ * A values of 0.0 is on the near plane, while 1.0 is on the far plane.
+ */ 
+void fw64_renderer_set_fog_positions(fw64Renderer* renderer, float fog_min, float fog_max);
+void fw64_renderer_set_fog_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
+
 void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPostDrawFunc func, void* arg);
 
 #ifdef __cplusplus
