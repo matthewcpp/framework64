@@ -181,6 +181,11 @@
             "src": "split_screen_sample/split_screen_sample.gltf",
             "typeMap": 0,
             "layerMap": 0
+        },
+        {
+            "src": "fogworld/fogworld.gltf",
+            "typeMap": 0,
+            "layerMap": 0
         }
     ],
     "raw": [
