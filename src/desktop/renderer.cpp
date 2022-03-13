@@ -14,6 +14,7 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     mesh_transform_uniform_block.create();
+    fog_data_uniform_block.create();
 
     initLighting();
 
@@ -81,6 +82,11 @@ void fw64Renderer::begin(fw64RenderMode new_render_mode, fw64RendererFlags flags
         lighting_dirty = false;
     }
 
+    if (fog_dirty) {
+        fog_data_uniform_block.update();
+        fog_dirty = false;
+    }
+
     if ((flags & FW64_RENDERER_FLAG_CLEAR) == FW64_RENDERER_FLAG_CLEAR) {
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -120,6 +126,9 @@ IVec2 fw64Renderer::getViewportSize(fw64Camera* camera) {
 void fw64Renderer::setCamera(fw64Camera* camera) {
     if (camera == current_camera)
         return;
+
+    mesh_transform_uniform_block.data.camera_near = camera->near;
+    mesh_transform_uniform_block.data.camera_far = camera->far;
 
     auto viewport_rect = getViewportRect(camera);
 
@@ -256,13 +265,16 @@ void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
     if (active_shader != shader) {
         active_shader = shader;
 
-        glUseProgram(shader->handle);
+        glUseProgram(active_shader->handle);
 
         if (active_shader->lighting_data_uniform_block_index != GL_INVALID_INDEX)
             glUniformBlockBinding(active_shader->handle, active_shader->lighting_data_uniform_block_index, lighting_data_uniform_block.binding_index);
 
         if (active_shader->mesh_transform_uniform_block_index != GL_INVALID_INDEX)
             glUniformBlockBinding(active_shader->handle, active_shader->mesh_transform_uniform_block_index, mesh_transform_uniform_block.binding_index);
+
+        if (active_shader->fog_uniform_block_index != GL_INVALID_INDEX)
+            glUniformBlockBinding(active_shader->handle, active_shader->fog_uniform_block_index, fog_data_uniform_block.binding_index);
     }
 }
 
@@ -360,6 +372,30 @@ void fw64Renderer::setDrawingMode(DrawingMode mode) {
         case DrawingMode::None:
             break;
     };
+}
+
+void fw64Renderer::setFogEnabled(bool enabled) {
+    fog_enabled = enabled;
+
+    if (enabled)
+        setFogPositions(fog_min_distance, fog_max_distance);
+    else
+        setFogPositions(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+}
+
+void fw64Renderer::setFogPositions(float fog_min, float fog_max) {
+    fog_data_uniform_block.data.min_distance = fog_min;
+    fog_data_uniform_block.data.max_distance = fog_max;
+
+    fog_dirty = true;
+}
+
+void fw64Renderer::setFogColor(float r, float g, float b) {
+    fog_data_uniform_block.data.fog_color[0] = r;
+    fog_data_uniform_block.data.fog_color[1] = g;
+    fog_data_uniform_block.data.fog_color[2] = b;
+
+    fog_dirty = true;
 }
 
 // Public C interface
@@ -463,4 +499,28 @@ void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPo
 
 void fw64_framebuffer_set_pixel(fw64Framebuffer* framebuffer, int x, int y, uint8_t r, uint8_t g, uint8_t b) {
     framebuffer->texture.image.setPixel(x, y, r, g, b);
+}
+
+void fw64_renderer_set_fog_enabled(fw64Renderer* renderer, int enabled) {
+    renderer->setFogEnabled(enabled);
+}
+
+int fw64_renderer_get_fog_enabled(fw64Renderer* renderer) {
+    return renderer->fogEnabled();
+}
+
+void fw64_renderer_set_fog_positions(fw64Renderer* renderer, float fog_min, float fog_max) {
+    assert( fog_min >= 0.0f && fog_min <= 1.0f &&
+            fog_max >= 0.0f && fog_max <= 1.0f &&
+            fog_max >= fog_min);
+
+    renderer->setFogPositions(fog_min, fog_max);
+}
+
+void fw64_renderer_set_fog_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
+    renderer->setFogColor(
+        static_cast<float>(r) / 255.0f,
+        static_cast<float>(g) / 255.0f,
+        static_cast<float>(b) / 255.0f
+    );
 }

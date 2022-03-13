@@ -31,7 +31,10 @@ void fw64_renderer_util_clear_viewport(fw64Renderer* renderer, fw64Camera* camer
     int width = (int)(renderer->screen_size.x * camera->viewport_size.x);
     int height = (int)(renderer->screen_size.y * camera->viewport_size.y);
 
+    u32 cycle_type = fw64_renderer_get_fog_enabled(renderer) ? G_CYC_2CYCLE : G_CYC_1CYCLE;
+
     gDPSetRenderMode(renderer->display_list++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
     fw64_n64_renderer_clear_rect(renderer, x, y, width, height, flags);
+    gDPSetCycleType(renderer->display_list++, cycle_type); 
     renderer->render_mode = FW64_RENDERER_MODE_UNSET;
 }

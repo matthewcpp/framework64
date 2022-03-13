@@ -1,0 +1,134 @@
+#include "game.h"
+#include "assets.h"
+
+#include "framework64/math.h"
+#include "framework64/n64/controller_button.h"
+
+#include <stdio.h>
+
+static void update_fog_settings(Game* game);
+static void draw_fog_settings(Game* GAME_MODE_PLAYING);
+
+void game_init(Game* game, fw64Engine* engine) {
+    game->engine = engine;
+    game->mode = GAME_MODE_PLAYING;
+    fw64_fps_camera_init(&game->fps_camera, engine->input);
+
+    vec3_set(&game->fps_camera.camera.transform.position, -164.0f, 45.0f, 0.0f);
+    game->fps_camera.movement_speed = 100.0f;
+    game->fps_camera.camera.near = 10.0f;
+    game->fps_camera.camera.far = 500.0f;
+    fw64_camera_update_projection_matrix(&game->fps_camera.camera);
+
+    game->scene = fw64_scene_load(engine->assets, FW64_ASSET_scene_fogworld, NULL);
+    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
+    game->overlay = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_overlay, NULL), NULL);
+
+    fw64_renderer_set_clear_color(engine->renderer, 51, 187, 255);
+
+    game->fog_begin = 0.7;
+    game->fog_end = 1.0;
+    fw64_renderer_set_fog_color(engine->renderer, 51, 187, 255);
+    fw64_renderer_set_fog_positions(engine->renderer, game->fog_begin, game->fog_end);
+    fw64_renderer_set_fog_enabled(engine->renderer, 1);
+}
+
+void game_update(Game* game){
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
+        game->mode = game->mode == GAME_MODE_PLAYING ? GAME_MODE_PAUSED : GAME_MODE_PLAYING;
+        game->fog_setting = FOG_SETTING_ENABLED;
+    }
+
+    if (game->mode == GAME_MODE_PLAYING) {
+        fw64_fps_camera_update(&game->fps_camera, game->engine->time->time_delta);
+    }
+    else {
+        update_fog_settings(game);
+    }
+}
+
+void game_draw(Game* game) {
+    fw64Frustum view_frustum;
+    fw64_camera_extract_frustum_planes(&game->fps_camera.camera, &view_frustum);
+
+    fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 1);
+    fw64_renderer_begin(game->engine->renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_set_camera(game->engine->renderer, &game->fps_camera.camera);
+
+    fw64_scene_draw_frustrum(game->scene, game->engine->renderer, &view_frustum);
+
+    if (game->mode == GAME_MODE_PAUSED) {
+        fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 0);
+        draw_fog_settings(game);
+    }
+        
+
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
+}
+
+void update_fog_settings(Game* game) {
+    float direction = 0.0f;
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT) ||
+        fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
+        direction = 1.0f;
+    }
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT) ||
+        fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
+        direction = -1.0f;
+    }
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_UP) ||
+        fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
+        game->fog_setting = game->fog_setting == FOG_SETTING_ENABLED ? FOG_SETTING_FOG_END : game->fog_setting - 1;
+    }
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN) ||
+        fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
+        game->fog_setting = game->fog_setting == FOG_SETTING_FOG_END ? FOG_SETTING_ENABLED : game->fog_setting + 1;
+    }
+
+    if (direction == 0.0f)
+        return;
+
+    switch(game->fog_setting) {
+        case FOG_SETTING_ENABLED: 
+            fw64_renderer_set_fog_enabled(game->engine->renderer, !fw64_renderer_get_fog_enabled(game->engine->renderer));
+            break;
+
+        case FOG_SETTING_FOG_BEGIN: 
+            game->fog_begin = fw64_clamp(game->fog_begin + (0.1 * direction), 0.0f, game->fog_end);
+            fw64_renderer_set_fog_positions(game->engine->renderer, game->fog_begin, game->fog_end);
+            break;
+
+        case FOG_SETTING_FOG_END: 
+            game->fog_end = fw64_clamp(game->fog_end + (0.1 * direction), game->fog_begin, 1.0f);
+            fw64_renderer_set_fog_positions(game->engine->renderer, game->fog_begin, game->fog_end);
+            break;
+    }
+}
+
+static void draw_fog_settings(Game* game) {
+    fw64Renderer* renderer = game->engine->renderer;
+    char text[64];
+
+    int pos_x = 50, pos_y = 50;
+    fw64_renderer_draw_sprite_slice_transform(renderer, game->overlay, 0, pos_x - 20, pos_y - 5, 4.0f, 2.0f, 0.0f);
+
+    if (game->fog_setting == FOG_SETTING_ENABLED)
+        fw64_renderer_draw_text(renderer, game->font, pos_x - 20, pos_y, "*");
+
+    sprintf(text, "Fog: %s", fw64_renderer_get_fog_enabled(renderer) ? "ON" : "OFF");
+    fw64_renderer_draw_text(renderer, game->font, pos_x, pos_y, text);
+    pos_y += 16;
+
+    if (game->fog_setting == FOG_SETTING_FOG_BEGIN)
+        fw64_renderer_draw_text(renderer, game->font, pos_x - 20, pos_y, "*");
+
+    sprintf(text, "Begin: %0.1f", game->fog_begin);
+    fw64_renderer_draw_text(renderer, game->font, pos_x, pos_y, text);
+    pos_y += 16;
+
+    if (game->fog_setting == FOG_SETTING_FOG_END)
+        fw64_renderer_draw_text(renderer, game->font, pos_x - 20, pos_y, "*");
+        
+    sprintf(text, "End: %0.1f", game->fog_end);
+    fw64_renderer_draw_text(renderer, game->font, pos_x, pos_y, text);
+}

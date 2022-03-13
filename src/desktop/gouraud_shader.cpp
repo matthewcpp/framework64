@@ -33,6 +33,8 @@ ShaderProgram* GouraudShader::create(uint32_t primitive_attributes, uint32_t mat
 
     program->lighting_data_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64LightingData");
     program->mesh_transform_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64MeshTransformData");
+    program->fog_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64FogData");
+
     program->diffuse_color_location = glGetUniformLocation(program->handle, "diffuse_color");
     program->diffuse_texture_location = glGetUniformLocation(program->handle, "diffuse_texture_sampler");
 

@@ -48,8 +48,8 @@ void fw64_sparse_set_init_with_capacity(fw64SparseSet* sparse_set, uint16_t item
 }
 
 void fw64_sparse_set_uninit(fw64SparseSet* sparse_set) {
-    free(sparse_set->dense_arr);
-    free(sparse_set->lookup_arr);
+    sparse_set->allocator->free(sparse_set->allocator, sparse_set->dense_arr);
+    sparse_set->allocator->free(sparse_set->allocator, sparse_set->lookup_arr);
 }
 
 /**
