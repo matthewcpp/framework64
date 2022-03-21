@@ -16,9 +16,8 @@
 #define FW64_MATERIAL_NO_TEXTURE UINT32_MAX
 
 struct fw64Primitive {
-    Box bounding_box;
-    uint32_t vertices; // offset into mesh vertex array
-    uint32_t display_list; // offset into mesh display_list array
+    Vtx* vertices; // offset into mesh vertex array
+    Gfx* display_list; // offset into mesh display_list array
     fw64Material* material;
     uint32_t joint_index; // used for skinning
 };

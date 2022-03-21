@@ -40,16 +40,15 @@ class MeshInfo {
  * It contains indices into the various mesh-level arrays
  */
 class PrimitiveInfo {
-    bounding;
     verticesBufferIndex;
     displayListBufferIndex;
     material; // index into mesh's material array
     jointIndex;
 
     get buffer() {
-        const buff = Buffer.alloc(40)
+        const buff = Buffer.alloc(16)
 
-        let index = this.bounding.writeToBuffer(buff, 0);
+        let index = 0;
         index = buff.writeUInt32BE(this.verticesBufferIndex, index);
         index = buff.writeUInt32BE(this.displayListBufferIndex, index);
         index = buff.writeUInt32BE(this.material, index);
@@ -158,7 +157,6 @@ function writeStaticMeshData(mesh, file) {
         const primitive = mesh.primitives[i];
 
         const primitiveInfo = new PrimitiveInfo();
-        primitiveInfo.bounding = primitive.bounding;
         primitiveInfo.verticesBufferIndex = meshInfo.vertexCount; // the index for this primitive is set to the total size of the mesh's vertices buffer added thus far
         primitiveInfo.displayListBufferIndex = meshInfo.displayListCount; // the index for this primitive is set to the total size of the mesh's display list buffer this far
         primitiveInfo.material = primitive.material;
