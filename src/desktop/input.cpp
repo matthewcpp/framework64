@@ -133,7 +133,7 @@ Vec2 fw64Input::stick(int controller, int stick_index) {
 }
 
 bool fw64Input::controllerHasRumble(int index) const {
-    return SDL_JoystickHasRumble(SDL_GameControllerGetJoystick(sdl_gamecontrollers[index]));
+    return SDL_GameControllerHasRumble(sdl_gamecontrollers[index]);
 }
 
 int fw64Input::controllerSetRumble(int index, float value, float duration) {
