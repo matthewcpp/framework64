@@ -19,6 +19,7 @@ ${desktop_include_directory}/line_shader.h desktop/line_shader.cpp
 ${desktop_include_directory}/material.h desktop/material.cpp
 ${desktop_include_directory}/mesh.h desktop/mesh.cpp
 ${desktop_include_directory}/mesh_data.h desktop/mesh_data.cpp
+desktop/mesh_data_itr.cpp
 ${desktop_include_directory}/n64_input_interface.h desktop/n64_input_interface.cpp
 ${desktop_include_directory}/pixel_texture.h desktop/pixel_texture.cpp
 desktop/quad.cpp

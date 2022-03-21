@@ -15,6 +15,7 @@ set(platform_source_files
     ${n64_include_dir}/loader.h n64/loader.c
     ${n64_include_dir}/material.h n64/material.c
     ${n64_include_dir}/mesh.h n64/mesh.c
+    n64/mesh_data_itr.c
     n64/quad.c
     ${n64_include_dir}/renderer.h n64/renderer.c
     n64/renderer_util.c
