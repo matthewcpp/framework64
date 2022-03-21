@@ -54,13 +54,19 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
 
 static void refresh_shading_mode(fw64Renderer* renderer) {
     switch(renderer->shading_mode) {
-        case FW64_SHADING_MODE_UNLIT_TEXTURED:
+        // 3d without transparency
         case FW64_SHADING_MODE_GOURAUD_TEXTURED:
         case FW64_SHADING_MODE_GOURAUD:
         case FW64_SHADING_MODE_UNLIT_VERTEX_COLORS:
             gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_OPAQUE_SHADED(renderer), FW64_RM_3D_OPAQUE_SHADED2(renderer));
             break;
 
+        // 3d transparent (billboard quad)
+        case FW64_SHADING_MODE_UNLIT_TEXTURED:
+            gDPSetRenderMode(renderer->display_list++, FW64_RM_3D_TEXTURED(renderer), FW64_RM_3D_TEXTURED2(renderer));
+            break;
+
+        // 2D Sprite /w transparency
         case FW64_SHADING_MODE_SPRITE:
         case FW64_SHADING_MODE_TEXT:
             gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
@@ -448,7 +454,7 @@ static void fw64_renderer_draw_primitive(fw64Renderer* renderer, fw64Mesh* mesh,
                 break;
         }
             
-        gSPDisplayList(renderer->display_list++, mesh->display_list + primitive->display_list);
+        gSPDisplayList(renderer->display_list++, primitive->display_list);
         gDPPipeSync(renderer->display_list++);
 }
 

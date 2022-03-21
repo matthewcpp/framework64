@@ -78,3 +78,13 @@ void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int widt
 #define FW64_RM_TRANSLUCENT_SPRITE(renderer) FW64_RENDER_MODE_TRANSLUCENT_SPRITE(renderer, 1)
 #define FW64_RM_TRANSLUCENT_SPRITE2(renderer) FW64_RENDER_MODE_TRANSLUCENT_SPRITE(renderer, 2)
 
+
+/** based on G_RM_[AA]_[ZB]_TEX_EDGE macro definition. */
+#define FW64_RENDER_MODE_3D_TEXTURED(renderer, cycle) \
+	FW64_N64_OPA_AA_FLAGS((renderer)) | FW64_N64_OPA_ZB_FLAGS((renderer)) | IM_RD | CVG_DST_CLAMP |		\
+	CVG_X_ALPHA | ALPHA_CVG_SEL | ZMODE_OPA | TEX_EDGE |	\
+	GBL_c##cycle(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_A_MEM)
+
+#define FW64_RM_3D_TEXTURED(renderer) \
+    ((renderer)->enabled_features & N64_RENDERER_FEATURE_FOG) ? (G_RM_FOG_SHADE_A) : (FW64_RENDER_MODE_3D_TEXTURED(renderer, 1))
+#define FW64_RM_3D_TEXTURED2(renderer) FW64_RENDER_MODE_3D_TEXTURED(renderer, 2)
