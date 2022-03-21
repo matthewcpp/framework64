@@ -421,8 +421,9 @@ void GlbParser::createPrimitive(fw64Mesh* mesh, nlohmann::json const & primitive
         box_encapsulate_box(&mesh->bounding_box, &primitive.bounding_box);
     }
 
-    GLMeshInfo gl_info = mesh_data.createMesh();
+    GLMeshInfo gl_info = mesh_data.createGlMesh();
     gl_info.setPrimitiveValues(primitive);
+    mesh_data.moveMeshDataToPrimitive(primitive);
     shader_cache.setShaderProgram(primitive);
 }
 

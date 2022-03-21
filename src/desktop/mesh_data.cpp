@@ -1,10 +1,12 @@
 #include "framework64/desktop/mesh_data.h"
 
+#include <algorithm>
+#include <iterator>
 #include <unordered_map>
 
 namespace framework64 {
 
-GLMeshInfo MeshData::createMesh() {
+GLMeshInfo MeshData::createGlMesh() {
     GLMeshInfo mesh_info;
 
     GLuint array_buffer_size = (positions.size() + normals.size() + tex_coords.size() + colors.size()) * sizeof(float);
@@ -87,6 +89,25 @@ bool MeshData::hasMultipleJointIndices() {
     }
 
     return false;
+}
+
+void MeshData::moveMeshDataToPrimitive(fw64Primitive& primitive) {
+    primitive.positions = std::move(positions);
+    primitive.normals = std::move(normals);
+    primitive.tex_coords = std::move(tex_coords);
+    primitive.colors = std::move(colors);
+
+    if (!indices_array_uint16.empty()) {
+        primitive.indices = std::move(indices_array_uint16);
+    }
+    else if (!indices_array_uint32.empty()) {
+        std::transform(
+            indices_array_uint32.begin(), indices_array_uint32.end(), 
+            std::back_inserter(primitive.indices),
+            [](uint32_t index) -> uint16_t {
+                return static_cast<uint16_t>(index);
+            });
+    }
 }
 
 std::vector<MeshData> MeshData::splitByJointIndex() {
