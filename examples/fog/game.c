@@ -1,13 +1,19 @@
 #include "game.h"
 #include "assets.h"
 
+#include "framework64/collision.h"
 #include "framework64/math.h"
+#include "framework64/util/mesh_data_itr.h"
+
 #include "framework64/n64/controller_button.h"
 
 #include <stdio.h>
 
+#define CAMERA_EYE_OFFSET 20.0f
+
 static void update_fog_settings(Game* game);
 static void draw_fog_settings(Game* GAME_MODE_PLAYING);
+static void set_camera_ypos(Game* game);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
@@ -26,7 +32,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_renderer_set_clear_color(engine->renderer, 51, 187, 255);
 
-    game->fog_begin = 0.7;
+    game->fog_begin = 0.5;
     game->fog_end = 1.0;
     fw64_renderer_set_fog_color(engine->renderer, 51, 187, 255);
     fw64_renderer_set_fog_positions(engine->renderer, game->fog_begin, game->fog_end);
@@ -39,11 +45,43 @@ void game_update(Game* game){
         game->fog_setting = FOG_SETTING_ENABLED;
     }
 
-    if (game->mode == GAME_MODE_PLAYING) {
-        fw64_fps_camera_update(&game->fps_camera, game->engine->time->time_delta);
-    }
-    else {
+    if (game->mode != GAME_MODE_PLAYING) {
         update_fog_settings(game);
+        return;
+    }
+    
+    fw64_fps_camera_update(&game->fps_camera, game->engine->time->time_delta);
+    set_camera_ypos(game);
+}
+
+void set_camera_ypos(Game* game) {
+    Vec3 origin = game->fps_camera.camera.transform.position;
+    origin.y = 1000.0f;
+    Vec3 dir = { 0.0f, -1.0f, 0.0f };
+
+    fw64RaycastHit hit;
+    if (!fw64_scene_raycast(game->scene, &origin, &dir, 0xFFFFFFFF, &hit))
+        return;
+
+    Vec3 a, b, c, point;
+    float dist;
+    fw64MeshDataItr itr;
+
+    int primitive_count = fw64_mesh_get_primitive_count(hit.node->mesh);
+    for (int i = 0; i < primitive_count; i++) {
+        
+        fw64_mesh_data_itr_init(&itr, hit.node->mesh, i);
+
+        while(fw64_mesh_data_itr_next(&itr)) {
+            
+            fw64_mesh_data_itr_get_triangle_points(&itr, &a, &b, &c);
+
+            if (fw64_collision_test_ray_triangle(&origin, &dir, &a, &b, &c, &point, &dist)) {
+                point.y += CAMERA_EYE_OFFSET;
+                game->fps_camera.camera.transform.position = point;
+                return;
+            }
+        }
     }
 }
 
@@ -62,7 +100,6 @@ void game_draw(Game* game) {
         draw_fog_settings(game);
     }
         
-
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 

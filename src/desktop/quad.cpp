@@ -45,8 +45,9 @@ fw64Mesh* create_mesh(framework64::Engine* f64_engine, framework64::MeshData & m
     mesh->resources->textures.emplace_back(new fw64Texture(image));
 
     auto& primitive = mesh->primitives.emplace_back();
-    auto mesh_info = mesh_data.createMesh();
+    auto mesh_info = mesh_data.createGlMesh();
     mesh_info.setPrimitiveValues(primitive);
+    mesh_data.moveMeshDataToPrimitive(primitive);
     primitive.mode = fw64Primitive::Mode::Triangles;
     primitive.material.texture = mesh->resources->textures[0].get();
     mesh->primitives[0].material.shader = f64_engine->shader_cache->getSpriteShaderProgram();

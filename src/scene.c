@@ -31,6 +31,7 @@ void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frus
 int fw64_scene_raycast(fw64Scene* scene, Vec3* origin, Vec3* direction, uint32_t mask, fw64RaycastHit* hit) {
     uint32_t node_count = fw64_scene_get_node_count(scene);
     hit->distance = FLT_MAX;
+    hit->node = NULL;
 
     Vec3 hit_pos;
     float dist;
@@ -44,12 +45,13 @@ int fw64_scene_raycast(fw64Scene* scene, Vec3* origin, Vec3* direction, uint32_t
         if (fw64_collider_test_ray(node->collider, origin, direction, &hit_pos, &dist)) {
             if (dist > hit->distance) continue;
 
+            hit->node = node;
             hit->point = hit_pos;
             hit->distance = dist;
         }
     }
 
-    return hit->distance != FLT_MAX;
+    return hit->node != NULL;
 }
 
 int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint32_t mask, fw64OverlapSphereQueryResult* result) {

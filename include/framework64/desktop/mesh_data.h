@@ -35,7 +35,8 @@ struct MeshData {
     std::vector<uint16_t> indices_array_uint16;
     std::vector<uint32_t> indices_array_uint32;
 
-    GLMeshInfo createMesh();
+    GLMeshInfo createGlMesh();
+    void moveMeshDataToPrimitive(fw64Primitive& primitive);
     bool hasMultipleJointIndices();
 
     std::vector<MeshData> splitByJointIndex();

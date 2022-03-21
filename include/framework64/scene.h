@@ -11,6 +11,7 @@
 #include "framework64/vec3.h"
 
 typedef struct {
+    fw64Node* node;
     Vec3 point;
     float distance;
 } fw64RaycastHit;

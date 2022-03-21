@@ -19,8 +19,9 @@ void ScreenOverlay::init(ShaderCache& shader_cache) {
             0, 2, 3
     };
 
-    auto mesh_info = mesh_data.createMesh();
+    auto mesh_info = mesh_data.createGlMesh();
     mesh_info.setPrimitiveValues(primitive);
+    mesh_data.moveMeshDataToPrimitive(primitive);
     primitive.mode = fw64Primitive::Mode::Triangles;
 
     shader_cache.setShaderProgram(primitive);

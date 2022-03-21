@@ -32,9 +32,11 @@ INPUT             =     ../README.md \
                         ../include/framework64/transform.h \
                         ../include/framework64/vec2.h \
                         ../include/framework64/vec3.h \
-                        ../include/framework64/util/arcball_camera.h \
-                        ../include/framework64/util/fps_camera.h \
-                        ../include/framework64/util/quad.h
+                        ../include/framework64/util/bump_allocator.h \
+                        ../include/framework64/util/mesh_data_itr.h \
+                        ../include/framework64/util/quad.h \
+                        ../include/framework64/util/renderer_util.h \
+                        ../include/framework64/util/sparse_set.h
 USE_MDFILE_AS_MAINPAGE = ../README.md
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

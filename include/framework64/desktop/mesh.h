@@ -40,6 +40,12 @@ struct fw64Primitive {
     GLuint  gl_element_buffer_object = 0;
     GLsizei element_count = 0;
     GLenum element_type = 0;
+
+    std::vector<float> positions;
+    std::vector<float> normals;
+    std::vector<float> tex_coords;
+    std::vector<float> colors;
+    std::vector<uint16_t> indices;
 };
 
 struct fw64Mesh {

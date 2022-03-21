@@ -58,12 +58,13 @@ static void create_quad_slice(fw64Mesh* mesh, int primitive_index, short tl_x, s
     0, 2, 3, 0);
     gSPEndDisplayList(mesh->display_list + primitive_index * 3 + 2);
     
-    vec3_set(&primitive->bounding_box.min, tl_x, tl_y - size, 0.0f);
-    vec3_set(&primitive->bounding_box.max, tl_x + size, tl_y, 0.0f);
-    box_encapsulate_box(&mesh->info.bounding_box, &primitive->bounding_box);
+    Box slice_bounding;
+    vec3_set(&slice_bounding.min, tl_x, tl_y - size, 0.0f);
+    vec3_set(&slice_bounding.max, tl_x + size, tl_y, 0.0f);
+    box_encapsulate_box(&mesh->info.bounding_box, &slice_bounding);
 
-    primitive->vertices = primitive_index * 4;
-    primitive->display_list = primitive_index * 3;
+    primitive->vertices = mesh->vertex_buffer + (primitive_index * 4);
+    primitive->display_list = mesh->display_list + (primitive_index * 3);
 }
 
 static fw64Mesh* make_quad_mesh(fw64TexturedQuadParams* params, fw64Allocator* allocator) {

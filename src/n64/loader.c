@@ -109,14 +109,20 @@ static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, int handle, fw64Allocator
     for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
 
-        Vtx* vertex_buffer = mesh->vertex_buffer + primitive->vertices;
-        Gfx* display_list = mesh->display_list + primitive->display_list;
+        uint32_t vertices_index = (uint32_t)primitive->vertices;
+        uint32_t display_list_index = (uint32_t)primitive->display_list;
+
+        Vtx* vertex_buffer = mesh->vertex_buffer + vertices_index;
+        Gfx* display_list = mesh->display_list + display_list_index;
 
         for (uint32_t j = 0; j < vertex_pointer_counts[i]; j++) {
             // updates the memory location of the vertex cache relative to the start of the vertex buffer for this primitive
             Gfx* vertex_ptr = display_list + vertex_pointer_offsets[offset_index++];
             vertex_ptr->words.w1 += (uint32_t)vertex_buffer;
         }
+
+        primitive->vertices = mesh->vertex_buffer + vertices_index;
+        primitive->display_list = mesh->display_list + display_list_index;
     }
 
     allocator->free(allocator, vertex_pointer_data);

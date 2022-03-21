@@ -67,8 +67,3 @@ fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index) {
     assert(index >= 0 && index < mesh->primitives.size());
     return &mesh->primitives[index].material;
 }
-
-Box fw64_mesh_get_bounding_for_primitive(fw64Mesh* mesh, int index) {
-    assert(index >= 0 && index < mesh->primitives.size());
-    return mesh->primitives[index].bounding_box;
-}
