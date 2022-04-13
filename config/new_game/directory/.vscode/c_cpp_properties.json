@@ -3,11 +3,12 @@
         {
             "name": "N64",
             "includePath": [
-                "${workspaceFolder}/include",
-                "${workspaceFolder}/build_n64/bin/assets/include",
                 "/usr/include/n64",
                 "/usr/include/n64/nusys",
-                "/usr/include/n64/nustd"
+                "/usr/include/n64/nustd",
+                "${workspaceFolder}/lib/framework64/include",
+                "${workspaceFolder}/build_n64/bin/assets/include",
+                "${workspaceFolder}/src/**"
             ],
             "defines": [
                 "_LANGUAGE_C",

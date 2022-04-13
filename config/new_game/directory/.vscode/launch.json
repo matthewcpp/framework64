@@ -1,0 +1,59 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug N64 Asset Pipeline",
+            "program": "${workspaceFolder}/lib/framework64/pipeline/Pipeline.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "N64", "${workspaceFolder}/build_n64/bin/assets"]
+        },
+        {
+            "name": "Debug Desktop Asset Pipeline",
+            "program": "${workspaceFolder}/lib/framework64/pipeline/Pipeline.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "pwa-node",
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "desktop", "${workspaceFolder}/build_desktop/bin/assets"]
+        },
+        {
+            "type": "by-gdb",
+            "name": "CEN64 Debug ROM Windows / Mac",
+            "request": "launch",
+            "debuggerPath": "gdb-multiarch",
+            "program": "${workspaceFolder}/build_n64/src/minimal.elf",
+            "remote": {
+                "enabled": true,
+                "address": "host.docker.internal:8080",
+                "mode": "remote",
+                "execfile": "${workspaceFolder}/build_n64/src/minimal.elf"
+            },
+            "commandsBeforeExec": [
+                "set arch mips:4300",
+            ],
+            "cwd": "${workspaceRoot}",
+        },
+        {
+            "type": "by-gdb",
+            "name": "CEN64 Debug ROM Linux",
+            "request": "launch",
+            "debuggerPath": "gdb-multiarch",
+            "program": "${workspaceFolder}/build_n64/src/minimal.elf",
+            "remote": {
+                "enabled": true,
+                "address": "localhost:8080",
+                "mode": "remote",
+                "execfile": "${workspaceFolder}/build_n64/src/minimal.elf"
+            },
+            "commandsBeforeExec": [
+                "set arch mips:4300",
+            ],
+            "cwd": "${workspaceRoot}",
+        }
+    ]
+}
