@@ -11,6 +11,7 @@
     "libultra"
   ],
   "scripts": {
+    "create-game": "node scripts/CreateGame.js",
     "prepare-n64-assets": "node pipeline/Pipeline.js -f assets/manifest.json n64 build_n64/bin/assets",
     "prepare-desktop-assets": "node pipeline/Pipeline.js -f assets/manifest.json desktop build_desktop/bin/assets",
     "prepare-desktop-shaders": "node scripts/PrepareDesktopShaders.js src/desktop/glsl build_desktop/bin/glsl",
@@ -20,15 +21,16 @@
   "license": "MIT",
   "homepage": "https://github.com/matthewcpp/framework64#readme",
   "dependencies": {
-    "canvas": "^2.8.0",
-    "commander": "^6.2.1",
-    "fs-extra": "^10.0.0",
-    "gl-matrix": "^3.3.0",
+    "canvas": "^2.9.0",
+    "commander": "^9.0.0",
+    "fs-extra": "^10.0.1",
+    "gl-matrix": "^3.4.3",
     "gltf-import-export": "^1.0.18",
     "jimp": "^0.16.1",
-    "opentype.js": "^1.3.3",
+    "npm-check-updates": "^12.4.0",
+    "opentype.js": "^1.3.4",
     "rimraf": "^3.0.2",
-    "sqlite3": "^5.0.2",
+    "sqlite3": "^4.2.0",
     "tmp": "^0.2.1"
   }
 }
