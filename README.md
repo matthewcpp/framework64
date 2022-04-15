@@ -24,7 +24,9 @@ This library aims to make game development on N64 easy by providing easy yet fle
 - [Cen64](https://github.com/n64dev/cen64) debugging support
 
 ### Building and Getting Started
-Consult the wiki for building on [N64](https://github.com/matthewcpp/framework64/wiki/Building-for-N64) or [Desktop](https://github.com/matthewcpp/framework64/wiki/Building-For-Desktop)
+The [Quickstart Guide](https://github.com/matthewcpp/framework64/wiki/Quickstart-Guide) will walk you through the steps of creating a new game.
+
+Instructions on building the framework are available for [N64](https://github.com/matthewcpp/framework64/wiki/Building-for-N64) or [Desktop](https://github.com/matthewcpp/framework64/wiki/Building-For-Desktop)
 
 API documentation can be found [here](https://framework64.readthedocs.io/en/latest/index.html).
 
