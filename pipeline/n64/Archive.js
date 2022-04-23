@@ -22,6 +22,15 @@ class Archive {
     entries = new Map();
     entryHashes = new Map();
     fileName = "assets"
+    outputDirectory;
+
+    constructor(outputDirectory) {
+        this.outputDirectory = outputDirectory;
+        const headerDir = path.join(this.outputDirectory, "include");
+
+        if (!fs.existsSync(headerDir))
+            fs.mkdirSync(headerDir);
+    }
 
     async add(path, type) {
         if (this.entries.has(path))
@@ -56,10 +65,11 @@ class Archive {
         })
     }
 
-    write(outputDir) {
-        const headerPath = path.join(outputDir, "include", `${this.fileName}.h`);
-        const archivePath = path.join(outputDir, `${this.fileName}.dat`);
-        const manifestPath = path.join(outputDir, `${this.fileName}.manifest.json`);
+    write() {
+        const headerDir = path.join(this.outputDirectory, "include");
+        const headerPath = path.join(headerDir, `${this.fileName}.h`);
+        const archivePath = path.join(this.outputDirectory, `${this.fileName}.dat`);
+        const manifestPath = path.join(this.outputDirectory, `${this.fileName}.manifest.json`);
 
         const header = fs.openSync(headerPath, 'w');
         const archive = fs.openSync(archivePath, 'w');

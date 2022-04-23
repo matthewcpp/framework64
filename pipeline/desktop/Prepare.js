@@ -12,9 +12,7 @@ const processRaw = require("./ProcessRaw");
 
 const path = require("path");
 
-async function prepare(manifest, manifestFile, outputDirectory, filters) {
-    const manifestDirectory = path.dirname(manifestFile);
-
+async function prepare(manifest, assetDirectory, outputDirectory) {
     const bundle = new Bundle(outputDirectory);
 
     if (manifest.images) {
@@ -24,7 +22,7 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
             else
                 console.log(`Processing Image Atlas: ${image.name}`);
 
-            await processImage(image, bundle, manifestDirectory, outputDirectory);
+            await processImage(image, bundle, assetDirectory, outputDirectory);
         }
     }
 
@@ -35,42 +33,42 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
             else
                 console.log(`Processing Image Font: ${font.name}`);
 
-            await processFont(font, bundle, manifestDirectory, outputDirectory);
+            await processFont(font, bundle, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`);
-            await processMesh(mesh, bundle, manifestDirectory, outputDirectory);
+            await processMesh(mesh, bundle, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory);
+            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
             console.log(`Processing Sound Bank: ${soundBank.name}`);
-            await processSoundBank(soundBank, bundle, manifestDirectory, outputDirectory);
+            await processSoundBank(soundBank, bundle, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.musicBanks) {
         for (const musicBank of manifest.musicBanks) {
             console.log(`Processing Music Bank: ${musicBank.name}`);
-            await processMusicBank(musicBank, bundle, manifestDirectory, outputDirectory);
+            await processMusicBank(musicBank, bundle, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.raw) {
         for (const rawFile of manifest.raw) {
             console.log(`Processing Raw File: ${rawFile}`);
-            processRaw(rawFile, bundle, manifestDirectory, outputDirectory);
+            processRaw(rawFile, bundle, assetDirectory, outputDirectory);
         }
     }
 
@@ -95,7 +93,7 @@ async function prepare(manifest, manifestFile, outputDirectory, filters) {
             const typemap = level.hasOwnProperty("typemap") ? manifest.typemaps[level.typemap] : {};
             const layermap = level.hasOwnProperty("layermap") ? manifest.layermaps[level.layermap] : {};
 
-            await processLevel(level, typemap, layermap, bundle, manifestDirectory, outputDirectory);
+            await processLevel(level, typemap, layermap, bundle, assetDirectory, outputDirectory);
         }
     }
 

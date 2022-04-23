@@ -34,6 +34,7 @@ async function main() {
     });
 
     program.parse(process.argv);
+    const options = program.opts();
 
     if (!supportedPlatforms.has(buildPlatform)) {
         console.log(`Unknown platform: ${buildPlatform}`);
@@ -46,7 +47,7 @@ async function main() {
     }
 
     if (fs.existsSync(outputDirectoryPath)) {
-        if (!program.force) {
+        if (!options.force) {
             console.log(`specify -f or --force to build assets into existing directory.`);
             process.exit(1);
         }
@@ -54,10 +55,11 @@ async function main() {
         rimraf.sync(outputDirectoryPath);
     }
 
+    const assetDirectory = path.dirname(assetManifestPath);
     const outputDirectoryIncludePath = path.join(outputDirectoryPath, "include");
     await fse.ensureDir(outputDirectoryIncludePath);
 
-    await prepare(assetManifestPath, buildPlatform, outputDirectoryPath);
+    await prepare(assetManifestPath, assetDirectory, buildPlatform, outputDirectoryPath);
 }
 
 if (require.main === module) {
