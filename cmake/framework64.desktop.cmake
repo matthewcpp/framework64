@@ -1,17 +1,5 @@
 set(FW64_PLATFORM_DESKTOP ON)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# this is temporary and not ideal todo: figure out a bettwer way to deal with this
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
-
-set(FW64_DESKTOP_ASSET_DIR ${CMAKE_BINARY_DIR}/bin/assets)
 
 # performs platform specific configuration of the framework 64 library
 function (configure_core_library)
@@ -26,7 +14,9 @@ function (configure_core_library)
     target_link_libraries(framework64 PUBLIC SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_mixer)
     target_link_libraries(framework64 PUBLIC unofficial::sqlite3::sqlite3)
 
-    target_include_directories(framework64 PUBLIC ${FW64_DESKTOP_ASSET_DIR}/include)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
 
     # this is used on windows for the DLL utility copying script
     if (WIN32)
@@ -46,6 +36,17 @@ function(create_game)
 
     add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
     target_link_libraries(${target_name} PUBLIC framework64)
+
+    # Configure target specific output directories
+    set(output_dir ${CMAKE_BINARY_DIR}/bin/${target_name})
+    set_target_properties(${target_name} PROPERTIES 
+        RUNTIME_OUTPUT_DIRECTORY ${output_dir}
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${output_dir}
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${output_dir})
+
+    # include the game specific asset directory
+    set(asset_include_dir ${output_dir}/assets/include)
+    target_include_directories(${target_name} PUBLIC ${asset_include_dir})
 
     # Add any extra libraries that need to be linked in
     if (DEFINED DESKTOP_GAME_EXTRA_LIBS)

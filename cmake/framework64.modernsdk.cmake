@@ -20,7 +20,6 @@ set(FW64_TARGET_PLATFORM_N64)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # note: roms will be copied into this directory as post build step
 
 set(FW64_N64_ASM_SRC_DIR ${FW64_ROOT_DIR}/src/n64/asm)
-set(FW64_N64_ASSET_DIR ${CMAKE_SOURCE_DIR}/build_n64/bin/assets)
 
 # performs platform specific configuration of the framework 64 library
 function (configure_core_library)
@@ -30,7 +29,7 @@ function (configure_core_library)
 
     # target_compile_options(${target_name} PUBLIC -G 0 -mabi=32 -ffreestanding -mfix4300)
     target_include_directories(framework64 
-        PUBLIC /usr/include/n64 /usr/include/n64/PR  /usr/include/n64/nusys /usr/include/n64/nustd ${FW64_N64_ASSET_DIR}/include)
+        PUBLIC /usr/include/n64 /usr/include/n64/PR  /usr/include/n64/nusys /usr/include/n64/nustd)
 
 endfunction()
 
@@ -60,6 +59,7 @@ function(create_game)
 
     set(target_name ${N64_ROM_TARGET})
     set(game_sources ${N64_ROM_SOURCES})
+    set(game_asset_dir ${CMAKE_SOURCE_DIR}/build_n64/bin/${target_name}/assets)
 
 	# copy the assembly files into the build dir and add them to the target
 	set(asm_dest_dir ${CMAKE_CURRENT_BINARY_DIR}/asm)
@@ -77,6 +77,9 @@ function(create_game)
 
     add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/n64/main_n64.c ${asm_files})
     target_link_libraries(${target_name} PUBLIC framework64)
+
+    # Include the game specific asset directory
+    target_include_directories(${target_name} PUBLIC ${game_asset_dir}/include)
 
     # Add any extra libraries that need to be linked in
     if (DEFINED N64_ROM_EXTRA_LIBS)
