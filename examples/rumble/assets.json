@@ -1,0 +1,46 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12",
+            "imageFormat": "rgba32"
+        }
+    ],
+    "images": [
+        {
+            "name": "buttons",
+            "frames": [
+                "n64_buttons/button_a.png",
+                "n64_buttons/button_b.png",
+                "n64_buttons/button_c_down.png",
+                "n64_buttons/button_c_up.png",
+                "n64_buttons/button_c_left.png",
+                "n64_buttons/button_c_right.png",
+
+                "n64_buttons/button_l.png",
+                "n64_buttons/button_r.png",
+                "n64_buttons/d_pad_down.png",
+                "n64_buttons/d_pad_up.png",
+                "n64_buttons/d_pad_left.png",
+                "n64_buttons/d_pad_right.png",
+
+                "n64_buttons/button_start.png",
+                "n64_buttons/button_z.png",
+                "n64_buttons/stick_down.png",
+                "n64_buttons/stick_up.png",
+                "n64_buttons/stick_left.png",
+                "n64_buttons/stick_right.png"
+            ],
+            "hslices": 6,
+            "vslices": 3,
+            "frameSize": "128x128",
+            "resize": "72x36"
+        },
+        {
+            "src": "n64_logo.png",
+            "hslices": 2,
+            "vslices": 2
+        }
+    ]
+}

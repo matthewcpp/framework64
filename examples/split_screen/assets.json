@@ -1,0 +1,28 @@
+{
+    "levels": [
+        {
+            "src": "split_screen_sample/split_screen_sample.gltf",
+            "typeMap": 0,
+            "layerMap": 0
+        }
+    ],
+    "meshes": [
+        {
+            "src": "us_ar33/us_ar33.gltf"
+        }
+    ],
+    "typeMaps": [
+        {
+            "start": 0,
+            "nextlevel": 1,
+            "key": 2
+        }
+    ],
+    "layerMaps": [
+        {
+            "default": 1,
+            "ground": 2,
+            "wall": 4
+        }
+    ]
+}

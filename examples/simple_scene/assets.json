@@ -1,0 +1,47 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12",
+            "imageFormat": "rgba32"
+        }
+    ],
+    "images": [
+        {
+            "name": "fire_sprite",
+            "frameDir": "fire_sprite",
+            "hslices": 10,
+            "vslices": 1,
+            "frameSize": "128x128",
+            "resize": "320x32",
+            "format": "rgba32"
+        }
+    ],
+    "levels": [
+        {
+            "src": "simple_scene/simple_scene.gltf",
+            "typeMap": 0,
+            "layerMap": 0
+        }
+    ],
+    "meshes": [
+        {
+            "src": "penguin/penguin.gltf"
+        }
+    ],
+    "typeMaps": [
+        {
+            "start": 0,
+            "nextlevel": 1,
+            "key": 2
+        }
+    ],
+    "layerMaps": [
+        {
+            "default": 1,
+            "ground": 2,
+            "wall": 4
+        }
+    ]
+}
