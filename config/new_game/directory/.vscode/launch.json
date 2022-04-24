@@ -9,7 +9,7 @@
                 "<node_internals>/**"
             ],
             "type": "pwa-node",
-            "args":["-f", "${workspaceFolder}/assets/manifest.json", "N64", "${workspaceFolder}/build_n64/bin/assets"]
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "${workspaceFolder}/assets", "N64", "${workspaceFolder}/build_n64/bin/assets"]
         },
         {
             "name": "Debug Desktop Asset Pipeline",
@@ -19,7 +19,7 @@
                 "<node_internals>/**"
             ],
             "type": "pwa-node",
-            "args":["-f", "${workspaceFolder}/assets/manifest.json", "desktop", "${workspaceFolder}/build_desktop/bin/assets"]
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "${workspaceFolder}/assets", "desktop", "${workspaceFolder}/build_desktop/bin/assets"]
         },
         {
             "type": "by-gdb",

@@ -1,7 +1,4 @@
 {
-	"prepare-n64-assets": "node lib/framework64/pipeline/Pipeline.js -f assets/manifest.json n64 build_n64/bin/assets",
-	"prepare-n64-modernsdk-development": "cp lib/framework64/config/n64.modernsdk/n64.modernsdk.devcontainer.json .devcontainer.json",
-	"prepare-desktop-assets": "node lib/framework64/pipeline/Pipeline.js -f assets/manifest.json desktop build_desktop/bin/assets",
-	"prepare-desktop-shaders": "node lib/framework64/scripts/PrepareDesktopShaders.js lib/framework64/src/desktop/glsl build_desktop/bin/glsl",
-	"prepare-windows-dlls": "node lib/framework64/scripts/PrepareWindowsDlls.js build_desktop"
+	"prepare-game-assets": "node lib/framework64/scripts/PrepareGameAssets.js",
+	"prepare-n64-modernsdk-environment": "cp lib/framework64/config/n64.modernsdk/n64.modernsdk.devcontainer.json .devcontainer.json"
 }

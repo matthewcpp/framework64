@@ -4,9 +4,20 @@ const path = require("path");
 const fse = require("fs-extra");
 const rimraf = require("rimraf");
 
-const prepareAssets = require("../pipeline/Prepare");
-const prepareDesktopShaders = require("./PrepareDesktopShaders");
-const prepareWindowsDlls = require("./PrepareWindowsDlls");
+const prepareAssets = require("./PrepareAssets");
+
+
+program
+    .name("Prepare Example Assets")
+    .version("1.0.0")
+    .description("Prepares assets for a framework64 Example");
+
+program
+    .argument("<example>")
+    .argument("<platform>")
+    .action(prepareExampleAssets);
+
+program.parse();
 
 async function prepareExampleAssets(example, platform) {
     const exampleDirectory = path.resolve(__dirname, "..", "examples", example);
@@ -23,37 +34,6 @@ async function prepareExampleAssets(example, platform) {
 
     const assetDirectory = path.resolve(__dirname, "..", "assets");
     const platformBuildDir = path.resolve(__dirname, "..", `build_${platform}`);
-    const exampleOutDirectory = path.join(platformBuildDir, "bin", example)
-    const outputDirectory = path.join(exampleOutDirectory, "assets");
 
-    if (fse.existsSync(outputDirectory)) {
-        rimraf.sync(outputDirectory);
-    }
-
-    fse.ensureDirSync(outputDirectory);
-    await prepareAssets(exampleManifestFile, assetDirectory, platform, outputDirectory);
-
-    const shouldPrepareShaders = platform.toLowerCase() === "desktop";
-    const shouldPrepareDlls = process.platform === "win32" && platform.toLowerCase() === "desktop";
-
-    if (shouldPrepareShaders) {
-        const exampleShaderDir = path.join(exampleOutDirectory, "glsl");
-        prepareDesktopShaders(exampleShaderDir);
-    }
-
-    if (shouldPrepareDlls) {
-        prepareWindowsDlls(platformBuildDir, exampleOutDirectory);
-    }
+    await prepareAssets(exampleManifestFile, assetDirectory, platform, platformBuildDir, example);
 }
-
-program
-    .name("Prepare Example Assets")
-    .version("1.0.0")
-    .description("Prepares assets for a framework64 Example");
-
-program
-    .argument("<example>")
-    .argument("<platform>")
-    .action(prepareExampleAssets);
-
-program.parse();
