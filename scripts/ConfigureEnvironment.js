@@ -1,29 +1,21 @@
-const { program } = require("commander");
 const fs = require("fs");
-
 const path = require("path");
 
-program
-    .name("Configure Framework64 Enviornment")
-    .version("1.0.0")
-    .description("Performs and platform specific configuration to the game directory");
+if (process.argv.length < 3) {
+    console.log("Usage: node ./ConfigureEnvironment.js <platform>")
+    process.exit(1);
+}
 
-program
-    .argument("<platform>")
-    .action(configureEnvironment);
+const platform = process.argv[2].toLowerCase();
 
-program.parse();
+switch (platform) {
+    case "n64-modernsdk":
+        configureN64ModernSdk();
+        break;
 
-function configureEnvironment(platform) {
-    switch (platform.toLowerCase()) {
-        case "n64-modernsdk":
-            configureN64ModernSdk();
-            break;
-
-        default:
-            console.error(`Unsupported platform specified: ${platform}`);
-            process.exit(1);
-    }
+    default:
+        console.error(`Unsupported platform specified: ${platform}`);
+        process.exit(1);
 }
 
 function configureN64ModernSdk() {

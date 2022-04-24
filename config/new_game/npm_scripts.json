@@ -1,4 +1,0 @@
-{
-	"prepare-game-assets": "node lib/framework64/scripts/PrepareGameAssets.js",
-	"configure-environment-n64-modernsdk": "node lib/framework64/scripts/ConfigureEnvironment.js n64-modernsdk"
-}
