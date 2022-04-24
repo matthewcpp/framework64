@@ -52,13 +52,13 @@ function configureNewGame(gameDirectory, gameName) {
 
 	const newProjectDir = path.resolve(__dirname, "..", "config", "new_game", "directory");
 	console.log(`Copy game starter files: ${newProjectDir} -> ${gameDirectory}`);
-	copyDirSync(newProjectDir, gameDirectory, new Set([".c", ".json", ".txt"]), "minimal", gameName);
+	copyDirSync(newProjectDir, gameDirectory, new Set([".c", ".json", ".txt"]), "starter", gameName);
 
 	const srcDir = path.join(gameDirectory, "src");
-	const minimalDir = path.resolve(__dirname, "..", "examples", "minimal");
+	const minimalDir = path.resolve(__dirname, "..", "examples", "spin_n64");
 
-	console.log(`Copy minimal code: ${minimalDir} -> ${srcDir}`);
-	copyDirSync(minimalDir, srcDir, new Set([".c", ".txt"]), "minimal", gameName);
+	console.log(`Copy starter code: ${minimalDir} -> ${srcDir}`);
+	copyDirSync(minimalDir, srcDir, new Set([".c", ".txt"]), "spin_n64", gameName);
 	}
 
 function copyDirSync(sourceDir, destDir, replaceExtensions, target, replace) {

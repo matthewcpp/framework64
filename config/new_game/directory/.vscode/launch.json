@@ -9,7 +9,7 @@
                 "<node_internals>/**"
             ],
             "type": "pwa-node",
-            "args":["-f", "${workspaceFolder}/assets/manifest.json", "${workspaceFolder}/assets", "N64", "${workspaceFolder}/build_n64/bin/assets"]
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "${workspaceFolder}/assets", "N64", "${workspaceFolder}/build_n64/bin/debug_assets"]
         },
         {
             "name": "Debug Desktop Asset Pipeline",
@@ -19,19 +19,19 @@
                 "<node_internals>/**"
             ],
             "type": "pwa-node",
-            "args":["-f", "${workspaceFolder}/assets/manifest.json", "${workspaceFolder}/assets", "desktop", "${workspaceFolder}/build_desktop/bin/assets"]
+            "args":["-f", "${workspaceFolder}/assets/manifest.json", "${workspaceFolder}/assets", "desktop", "${workspaceFolder}/build_desktop/bin/debug_assets"]
         },
         {
             "type": "by-gdb",
             "name": "CEN64 Debug ROM Windows / Mac",
             "request": "launch",
             "debuggerPath": "gdb-multiarch",
-            "program": "${workspaceFolder}/build_n64/src/minimal.elf",
+            "program": "${workspaceFolder}/build_n64/src/starter.elf",
             "remote": {
                 "enabled": true,
                 "address": "host.docker.internal:8080",
                 "mode": "remote",
-                "execfile": "${workspaceFolder}/build_n64/src/minimal.elf"
+                "execfile": "${workspaceFolder}/build_n64/src/starter.elf"
             },
             "commandsBeforeExec": [
                 "set arch mips:4300",
@@ -43,12 +43,12 @@
             "name": "CEN64 Debug ROM Linux",
             "request": "launch",
             "debuggerPath": "gdb-multiarch",
-            "program": "${workspaceFolder}/build_n64/src/minimal.elf",
+            "program": "${workspaceFolder}/build_n64/src/starter.elf",
             "remote": {
                 "enabled": true,
                 "address": "localhost:8080",
                 "mode": "remote",
-                "execfile": "${workspaceFolder}/build_n64/src/minimal.elf"
+                "execfile": "${workspaceFolder}/build_n64/src/starter.elf"
             },
             "commandsBeforeExec": [
                 "set arch mips:4300",

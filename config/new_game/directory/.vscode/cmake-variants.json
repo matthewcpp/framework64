@@ -26,14 +26,15 @@
                 "long": "Desktop",
                 "settings": {
                     "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake",
-                    "VCPKG_MANIFEST_DIR": "${workspaceFolder}/lib/framework64"
+                    "VCPKG_MANIFEST_DIR": "${workspaceFolder}/lib/framework64",
+                    "FW64_PLATFORM_DESKTOP": "ON"
                 }
             },
             "n64": {
                 "short": "N64-libultra",
                 "long": "N64-libultra",
                 "settings": {
-                    "FW64_PLATFORM_N64": "ON",
+                    "FW64_PLATFORM_N64": "ON"
                 }
             }
         }
