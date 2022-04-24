@@ -4,19 +4,11 @@
 #include "framework64/engine.h"
 #include "framework64/node.h"
 
-typedef enum {
-    EXAMPLE_DRAW_MODE_SHADED,
-    EXAMPLE_DRAW_MODE_WIREFRAME,
-    EXAMPLE_DRAW_MODE_WIREFRAME_ON_SHADED
-} DrawMode;
-
 typedef struct lines_example {
     fw64Engine* engine;
     fw64Camera camera;
-    DrawMode draw_mode;
     float rotation;
-    fw64Node solid_cube;
-    fw64Node wire_cube;
+    fw64Node node;
 } Game;
 
 #ifdef __cplusplus
