@@ -11,10 +11,9 @@
     "libultra"
   ],
   "scripts": {
+    "configure-environment-n64-modernsdk": "node scripts/ConfigureEnvironment.js n64-modernsdk",
     "create-game": "node scripts/CreateGame.js",
-    "prepare-example-assets": "node scripts/PrepareExampleAssets.js",
-    "prepare-desktop-shaders": "node scripts/PrepareDesktopShaders.js src/desktop/glsl build_desktop/bin/glsl",
-    "prepare-windows-dlls": "node scripts/PrepareWindowsDlls.js build_desktop"
+    "prepare-example-assets": "node scripts/PrepareExampleAssets.js"
   },
   "author": "Matthew LaRocca",
   "license": "MIT",

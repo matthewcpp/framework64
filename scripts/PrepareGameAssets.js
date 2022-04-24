@@ -1,6 +1,5 @@
 const { program } = require("commander");
 const fse = require("fs-extra");
-const rimraf = require("rimraf");
 
 const path = require("path");
 
