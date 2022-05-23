@@ -1,0 +1,39 @@
+{
+    "images": [
+        {
+            "src": "overlay.png",
+            "hslices": 1,
+            "vslices": 1,
+            "format": "rgba32"
+        }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12",
+            "imageFormat": "rgba32"
+        }
+    ],
+    "levels": [
+        {
+            "src": "fogworld/fogworld.gltf",
+            "typeMap": 0,
+            "layerMap": 0
+        }
+    ],
+    "typeMaps": [
+        {
+            "start": 0,
+            "nextlevel": 1,
+            "key": 2
+        }
+    ],
+    "layerMaps": [
+        {
+            "default": 1,
+            "ground": 2,
+            "wall": 4
+        }
+    ]
+}

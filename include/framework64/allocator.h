@@ -1,8 +1,7 @@
 #pragma once
 
 /** \file allocator.h */
-
-#include <stddef.h>
+#include <stdlib.h>
 
 typedef struct fw64Allocator fw64Allocator;
 

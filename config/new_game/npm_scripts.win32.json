@@ -1,3 +1,0 @@
-{
-	"prepare-n64-modernsdk-development": "copy lib\\framework64\\config\\n64.modernsdk\\n64.modernsdk.devcontainer.json .devcontainer.json"
-}

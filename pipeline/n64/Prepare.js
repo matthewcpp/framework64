@@ -9,22 +9,21 @@ const Archive = require("./Archive");
 
 const path = require("path");
 
-async function prepare(manifest, manifestFile, outputDirectory) {
-    const manifestDirectory = path.dirname(manifestFile);
-    const archive = new Archive();
+async function prepare(manifest, assetDirectory, outputDirectory) {
+    const archive = new Archive(outputDirectory);
 
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`)
 
-            await processMesh(mesh, archive, manifestDirectory, outputDirectory);
+            await processMesh(mesh, archive, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, archive, manifestDirectory, outputDirectory);
+            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory);
         }
     }
 
@@ -37,7 +36,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
                 console.log(`Processing Image Atlas: ${image.name}`);
             }
 
-            await processImage(manifestDirectory, outputDirectory, image, archive);
+            await processImage(assetDirectory, outputDirectory, image, archive);
         }
     }
 
@@ -48,7 +47,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             else
                 console.log(`Processing Image Font: ${font.name}`);
             
-            await FontConvert.convertFont(manifestDirectory, outputDirectory, font, archive);
+            await FontConvert.convertFont(assetDirectory, outputDirectory, font, archive);
         }
     }
 
@@ -56,7 +55,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
         for (const soundBank of manifest.soundBanks) {
             checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
 
-            const sourceDir = path.join(manifestDirectory, soundBank.dir);
+            const sourceDir = path.join(assetDirectory, soundBank.dir);
             await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, archive);
         }
     }
@@ -65,7 +64,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
         for (const musicBank of manifest.musicBanks) {
             checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
 
-            const sourceDir = path.join(manifestDirectory, musicBank.dir);
+            const sourceDir = path.join(assetDirectory, musicBank.dir);
             await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
         }
     }
@@ -80,7 +79,7 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             const typeMap = manifest.typeMaps[scene.typeMap];
             const layerMap = manifest.layerMaps[scene.layerMap];
 
-            await processScene(scene, typeMap, layerMap, archive, manifestDirectory, outputDirectory);
+            await processScene(scene, typeMap, layerMap, archive, assetDirectory, outputDirectory);
         }
     }
 
@@ -94,19 +93,19 @@ async function prepare(manifest, manifestFile, outputDirectory) {
             const typeMap = manifest.typeMaps[level.typeMap];
             const layerMap = manifest.layerMaps[level.layerMap];
 
-            await processLevel(level, typeMap, layerMap, archive, manifestDirectory, outputDirectory);
+            await processLevel(level, typeMap, layerMap, archive, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.raw) {
         for (const item of manifest.raw) {
             console.log(`Processing Raw File: ${item}`);
-            const sourceFile = path.join(manifestDirectory, item);
+            const sourceFile = path.join(assetDirectory, item);
             await archive.add(sourceFile, "raw");
         }
     }
 
-    archive.write(outputDirectory);
+    archive.write();
 }
 
 function checkRequiredFields(type, obj, fields) {

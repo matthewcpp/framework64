@@ -2,24 +2,23 @@ const fse = require("fs-extra");
 const path = require("path");
 
 
-async function prepareWindowsDlls(desktopBuildDir) {
+async function prepareWindowsDlls(desktopBuildDir, outputDirectory) {
+	console.log("Preparing Windows DLL's");
 	const buildInfoPath = path.join(desktopBuildDir, "build_info.json");
 
 	if (!fse.existsSync(buildInfoPath)) {
-		console.log("Unable to locate build_info.json.  Ensure that you have configured a desktop build");
-		process.exit(1);
+		throw new Error("Unable to locate build_info.json.  Ensure that you have configured a desktop build");
 	}
 
 	const buildInfo = JSON.parse(fse.readFileSync(buildInfoPath, {encoding: "utf-8"}))
 
 	if (!process.env.VCPKG_DIR) {
-		console.log("Please ensure that the VCPKG_DIR environment is set and points to the root directory of vcpkg");
-		process.exit(1);
+		throw new Error("Please ensure that the VCPKG_DIR environment is set and points to the root directory of vcpkg");
 	}
 
 	const vcpkgRoot = process.env.VCPKG_DIR;
 
-	const dllDestDir = path.join(desktopBuildDir, "bin");
+	const dllDestDir = outputDirectory;
 	await fse.ensureDir(dllDestDir);
 
 	const arch = buildInfo.target.indexOf("x86") >= 0 ? "x86" : "x64";
@@ -52,9 +51,15 @@ if (require.main === module) {
 	}
 
 	if (process.argv.length < 3) {
-		console.log("Usage: node prepareWindowsDlls.js C:/path/to/framework64/build_desktop");
+		console.log("Usage: node prepareWindowsDlls.js /path/to/build_desktop /path/to/outdir");
 		process.exit(1);
 	}
 
-	prepareWindowsDlls(process.argv[2])
+	try {
+		prepareWindowsDlls(process.argv[2])
+	}
+	catch (e) {
+		console.error(e);
+		process.exit(1);
+	}
 }

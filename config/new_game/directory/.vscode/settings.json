@@ -1,4 +1,0 @@
-{
-    "cmake.buildDirectory": "${workspaceFolder}/build_${variant:platform}",
-    "cmake.configureOnOpen": false
-}

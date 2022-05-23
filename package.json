@@ -11,17 +11,15 @@
     "libultra"
   ],
   "scripts": {
+    "configure-environment-n64-modernsdk": "node scripts/ConfigureEnvironment.js n64-modernsdk",
     "create-game": "node scripts/CreateGame.js",
-    "prepare-n64-assets": "node pipeline/Pipeline.js -f assets/manifest.json n64 build_n64/bin/assets",
-    "prepare-desktop-assets": "node pipeline/Pipeline.js -f assets/manifest.json desktop build_desktop/bin/assets",
-    "prepare-desktop-shaders": "node scripts/PrepareDesktopShaders.js src/desktop/glsl build_desktop/bin/glsl",
-    "prepare-windows-dlls": "node scripts/PrepareWindowsDlls.js build_desktop"
+    "prepare-example-assets": "node scripts/PrepareExampleAssets.js"
   },
   "author": "Matthew LaRocca",
   "license": "MIT",
   "homepage": "https://github.com/matthewcpp/framework64#readme",
   "dependencies": {
-    "canvas": "^2.9.0",
+    "canvas": "^2.9.1",
     "commander": "^9.0.0",
     "fs-extra": "^10.0.1",
     "gl-matrix": "^3.4.3",

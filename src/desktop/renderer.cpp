@@ -427,7 +427,7 @@ void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw
 }
 
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {
-    renderer->sprite_batch.drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
+    renderer->drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y) {

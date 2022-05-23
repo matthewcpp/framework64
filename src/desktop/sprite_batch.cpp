@@ -32,6 +32,7 @@ namespace framework64 {
     void SpriteBatch::start() {
         glDisable(GL_DEPTH_TEST);
         sprite_material.texture = nullptr;
+        sprite_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
 
         auto* sprite_shader = sprite_material.shader;
 
@@ -64,6 +65,8 @@ namespace framework64 {
 
         drawSpriteVertices(vertex_buffer.data(), vertex_buffer.size(), sprite_material);
         vertex_buffer.clear();
+        sprite_material.texture = nullptr;
+        sprite_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
     }
 
     void SpriteBatch::drawSpriteVertices(SpriteVertex const* vertices, size_t vertex_count, fw64Material& material) {

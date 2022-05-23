@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 
-const fs = require("fs");
+const fse = require("fs-extra");
 const path = require("path");
 
 const Util = require("../Util")
@@ -26,10 +26,14 @@ class Bundle {
         this._initDatabase(outputDirectory);
         this._initHeaderFile(outputDirectory);
     }
+    
 
     _initHeaderFile(outputDirectory) {
-        const headerPath = path.join(outputDirectory, "include", "assets.h");
-        this._headerFile = fs.openSync(headerPath, "w");
+        const headerDir = path.join(outputDirectory, "include");
+        const headerPath = path.join(headerDir, "assets.h");
+        
+        fse.ensureDirSync(headerDir);
+        this._headerFile = fse.openSync(headerPath, "w");
     }
 
     _initDatabase(outputDirectory) {
@@ -72,7 +76,7 @@ class Bundle {
         this._animationDataStmt.run(assetId, animationDataPath);
         this._rawFileStmt.run(assetId, animationDataPath, 0);
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_animation_data_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_animation_data_${assetName} ${assetId}\n`);
 
         return assetId;
     }
@@ -83,7 +87,7 @@ class Bundle {
 
         this._imageStmt.run(assetId, imagePath, hslices, vslices);
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_image_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_image_${assetName} ${assetId}\n`);
 
         return assetId;
     }
@@ -93,7 +97,7 @@ class Bundle {
 
         this._fontStmt.run(assetId, fontPath, font.size, font.tileWidth, font.tileHeight, font.glyphs.length, font.desktopGlyphBuffer);
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_font_${font.name} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_font_${font.name} ${assetId}\n`);
 
         return assetId;
     }
@@ -104,7 +108,7 @@ class Bundle {
 
         this._meshStmt.run(assetId, assetPath, jointMap ? JSON.stringify(jointMap): null);
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_mesh_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_mesh_${assetName} ${assetId}\n`);
 
         return assetId;
     }
@@ -115,7 +119,7 @@ class Bundle {
 
         this._soundBankStmt.run(assetId, assetName, files.length);
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_soundbank_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_soundbank_${assetName} ${assetId}\n`);
 
         return assetId;
     }
@@ -126,7 +130,7 @@ class Bundle {
 
         this._musicBankStmt.run(assetId, assetName, files.length);
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_musicbank_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_musicbank_${assetName} ${assetId}\n`);
 
         return assetId;
     }
@@ -135,7 +139,7 @@ class Bundle {
         const assetId = this._nextAssetId++;
         const assetName = path.basename(rawPath, path.extname(rawPath));
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_raw_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_raw_${assetName} ${assetId}\n`);
 
         this._rawFileStmt.run(assetId, rawPath, size);
 
@@ -160,7 +164,7 @@ class Bundle {
         const assetId = this._nextAssetId++;
         const assetName = Util.safeDefineName(name);
 
-        fs.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
 
         this._sceneStmt.run(assetId, assetPath, index, typeMap, layerMap);
 
@@ -182,8 +186,8 @@ class Bundle {
         this._db.close();
 
         const assetCount = this._nextAssetId - 1;
-        fs.writeSync(this._headerFile, `#define FW64_ASSET_COUNT ${assetCount}\n\n`);
-        fs.closeSync(this._headerFile);
+        fse.writeSync(this._headerFile, `#define FW64_ASSET_COUNT ${assetCount}\n\n`);
+        fse.closeSync(this._headerFile);
     }
 }
 

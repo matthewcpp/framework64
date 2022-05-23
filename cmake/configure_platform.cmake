@@ -1,4 +1,4 @@
-if(EXISTS "${CMAKE_SOURCE_DIR}/pipeline/Prepare.js")  # running from within the framework64 source directory
+if(EXISTS "${CMAKE_SOURCE_DIR}/pipeline/Pipeline.js")  # running from within the framework64 source directory
     set(FW64_ROOT_DIR ${CMAKE_SOURCE_DIR} CACHE INTERNAL "FW64_ROOT_DIR")
 else()
     set(FW64_ROOT_DIR ${CMAKE_SOURCE_DIR}/lib/framework64 CACHE INTERNAL "FW64_ROOT_DIR")

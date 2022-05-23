@@ -1,0 +1,46 @@
+{
+    "fonts": [
+        {
+            "src": "basicLAZER.otf",
+            "size": 12,
+            "name": "basicLAZER",
+            "sourceString": "ELAPSED TIME:0123456789.",
+            "imageFormat": "rgba32"
+        },
+        {
+            "image": {
+                "frameDir": "image_font",
+                "hslices": 10,
+                "vslices": 4,
+                "frameSize": "16x16",
+                "name": "Mario64FontImage"
+            },
+            "name": "Mario64",
+            "sourceString": " \"'0123456789?abcdefghijklmnopqrstuvwxyz"
+        }
+    ],
+    "images": [
+        {
+            "src": "ken.png",
+            "resize": "192x64",
+            "hslices": 6,
+            "vslices": 2
+        },
+        {
+            "src": "overlay.png",
+            "hslices": 1,
+            "vslices": 1,
+            "format": "rgba32"
+        },
+        {
+            "src": "nintendo_seal.png",
+            "hslices": 1,
+            "vslices": 1
+        },
+        {
+            "src": "n64_logo.png",
+            "hslices": 2,
+            "vslices": 2
+        }
+    ]
+}

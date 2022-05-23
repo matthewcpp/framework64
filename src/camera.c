@@ -8,7 +8,7 @@ void fw64_camera_init(fw64Camera* camera) {
     fw64_transform_init(&camera->transform);
 
     camera->near = 0.1f;
-    camera->far = 1000.0f;
+    camera->far = 500.0f;
     camera->fovy = 45.0f;
     camera->aspect = 1.33f;
     camera->transform.position.z = 5.0f;

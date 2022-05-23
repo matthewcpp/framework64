@@ -1,0 +1,28 @@
+{
+    "images": [
+        {
+            "name": "fire_sprite",
+            "frameDir": "fire_sprite",
+            "hslices": 10,
+            "vslices": 1,
+            "frameSize": "128x128",
+            "resize": "320x32",
+            "format": "rgba32"
+        },
+        {
+            "src": "grass.png",
+            "hslices": 1,
+            "vslices": 1
+        },
+        {
+            "src": "moon.png",
+            "hslices": 1,
+            "vslices": 1
+        }
+    ],
+    "meshes": [
+        {
+            "src": "campfire/campfire.gltf"
+        }
+    ]
+}
