@@ -13,7 +13,7 @@ function writeSoundBankHeader(soundBankDir, outputDir) {
 
 function writeHeader(typePrefix, namePrefix, sourceDir, outputDir) {
     const includeFileName = Util.safeDefineName(`${typePrefix}_${namePrefix}`) + ".h";
-    const includeFilePath = path.join(outputDir, "include", includeFileName);
+    const includeFilePath = path.join(outputDir, includeFileName);
 
     const headerFile = fs.openSync(includeFilePath, "w");
     fs.writeSync(headerFile, "#pragma once\n\n");

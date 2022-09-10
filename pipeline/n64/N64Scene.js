@@ -5,6 +5,7 @@ class N64Scene {
     meshes = [];
     colliderCount = 0;
     collisionMeshes = [];
+    customBoundingBoxes = [];
     meshResources = null;
 }
 

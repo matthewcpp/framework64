@@ -10,6 +10,8 @@
 #define QUAT_KEYFRAME(buffer, index) (Quat*)VEC_KEYFRAME(buffer, index, 4)
 #define FLOAT_MATRIX(matrices, index) ((matrices) + ((index) * 16));
 
+#define INVALID_KEYFRAME_BUFFER_INDEX UINT16_MAX
+
 static void initialize_matrices(fw64AnimationController* controller);
 static void update_skin(fw64AnimationController* controller);
 static void update_joint(fw64AnimationController* controller, uint32_t joint_index, float* parent_matirx);
@@ -70,6 +72,10 @@ void fw64_animation_controller_update(fw64AnimationController* controller, float
     }
     else {
         next_time = fw64_clamp(next_time, 0.0f, controller->current_animation->total_time);
+
+        if (next_time >= controller->current_animation->total_time) { // did we just reach the end of the animation?
+            controller->state = FW64_ANIMATION_STATE_STOPPED;
+        }
     }
 
     controller->current_time = next_time;
@@ -84,15 +90,24 @@ void fw64_animation_controller_set_time(fw64AnimationController* controller, flo
 void update_skin(fw64AnimationController* controller) {
     fw64AnimationJoint* root_joint = controller->animation_data->skin.joints;
     uint16_t* root_children = controller->animation_data->skin.hierarchy + root_joint->children_index;
+    fw64AnimationTrack* root_track = controller->animation_data->tracks + (controller->current_animation->tracks_index);
 
 
     fw64Matrix* root_matrix = controller->matrices;
     float local_matrix[16];
+    matrix_set_identity(&local_matrix[0]);
+
+    // in this case the Armature itself has animation applied to it.
+    // we need to compute the TRS for this node and set it as the root matrix
+    // in either case this matrix is fed into the function which calcualtes child joint matrices
+    if (root_track->translation != INVALID_KEYFRAME_BUFFER_INDEX) {
+        compute_local_matrix(controller, 0, &local_matrix[0]);
+    }
 
     #ifdef PLATFORM_N64
-        guMtxL2F((float (*)[4])local_matrix, root_matrix);
+        guMtxF2L((float (*)[4])local_matrix, root_matrix);
     #else
-        memcpy(local_matrix, &root_matrix->m[0], sizeof(float) * 16);
+        memcpy(&root_matrix->m[0], &local_matrix[0], sizeof(float) * 16);
     #endif
     
     for (uint16_t i = 0; i < root_joint->children_count; i++) {

@@ -13,11 +13,13 @@ function processGlbFile(mesh, bundle, manifestDirectory, outputDirectory) {
 
 // gltf file should be converted to GLB for export
 function processGltfFile(mesh, bundle, manifestDirectory, outputDirectory) {
-    const destName = path.basename(mesh.src, ".gltf") + ".glb";
     const srcPath = path.join(manifestDirectory, mesh.src);
+    const meshName = mesh.hasOwnProperty("name") ? mesh.name : path.basename(mesh.src, path.extname(mesh.src));
+    const destName = meshName + ".glb";
+    
     const destPath = path.join(outputDirectory, destName);
     ConvertGltfToGLB(srcPath, destPath);
-    bundle.addMesh(mesh, destName);
+    bundle.addMesh(meshName, destName);
 }
 
 async function processMesh(mesh, bundle, manifestDirectory, outputDirectory) {

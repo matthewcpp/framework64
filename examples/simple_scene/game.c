@@ -1,7 +1,7 @@
 #include "game.h"
 
-#include "assets.h"
-#include "scene_playground.h"
+#include "assets/assets.h"
+#include "assets/scene_playground.h"
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;

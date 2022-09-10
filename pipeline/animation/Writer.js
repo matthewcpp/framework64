@@ -4,6 +4,8 @@ const fs = require("fs");
 
 const WriteInterface = require("../WriteInterface");
 
+const InvalidKeyframeBufferIndex = 65535;
+
 class AnimationInfo {
     jointCount = 0;
     jointHierarchySize = 0
@@ -40,17 +42,17 @@ function jointHierarchyArray(animationData) {
 }
 
 class Writer {
-    writeBigEndian(name, animationData, assetDir) {
-        this._write(name, animationData, assetDir, WriteInterface.bigEndian());
+    writeBigEndian(name, animationData, assetDir, includeDir) {
+        this._write(name, animationData, assetDir, includeDir, WriteInterface.bigEndian());
     }
 
-    writeLittleEndian(name, animationData, assetDir) {
-        this._write(name, animationData, assetDir, WriteInterface.littleEndian());
+    writeLittleEndian(name, animationData, assetDir, includeDir) {
+        this._write(name, animationData, assetDir, includeDir, WriteInterface.littleEndian());
     }
 
-    _write(name, animationData, assetDir, writeInterface) {
+    _write(name, animationData, assetDir, includeDir, writeInterface) {
         const safeName = Util.safeDefineName(name);
-        this._writeHeader(safeName, animationData, assetDir);
+        this._writeHeader(safeName, animationData, includeDir);
 
         const dataPath = path.join(assetDir, safeName + ".animation");
         const file = fs.openSync(dataPath, "w");
@@ -72,7 +74,7 @@ class Writer {
 
         this._writeAnimations(file, animationData, writeInterface);
         this._writeTrackData(file, animationData, writeInterface)
-        this._writeKeyframeData(file, animationData, writeInterface, assetDir);
+        this._writeKeyframeData(file, animationData, writeInterface);
 
 
         fs.closeSync(file);
@@ -96,18 +98,24 @@ class Writer {
     _writeTrackData(file, animationData, writeInterface) {
         const trackBuffer = Buffer.alloc(6);
         // Note: the indices for each track specify the byteOffset into the keyframe data array.
-        // We are going to write the index into that array interpreted as floats (i.e divide by 4)
+        // We are going to write the index into that array as if it was of type float[] (i.e divide the byte index by 4)
+        // This is will make accessing the data easier in the animation controller
         for (const animation of animationData.animations) {
             for (const track of animation.tracks) {
                 let translationIndex = 0;
                 let rotationIndex = 0;
                 let scaleIndex = 0;
 
-                // note parse validates this will work when animation data is read
+                // node parse validates this will work when animation data is read
                 if (animationData.keyframeBuffers[track.translation]) {
                     translationIndex = animationData.keyframeBuffers[track.translation].index / 4;
                     rotationIndex = animationData.keyframeBuffers[track.rotation].index / 4;
                     scaleIndex = animationData.keyframeBuffers[track.scale].index / 4;
+                }
+                else {
+                    translationIndex = InvalidKeyframeBufferIndex;
+                    rotationIndex = InvalidKeyframeBufferIndex;
+                    scaleIndex = InvalidKeyframeBufferIndex;
                 }
 
                 writeInterface.writeUInt16(trackBuffer, translationIndex, 0);
@@ -119,15 +127,15 @@ class Writer {
         }
     }
 
-    _writeKeyframeData(file, animationData, writeInterface, assetDir) {
+    _writeKeyframeData(file, animationData, writeInterface) {
         for (const keyframeDataSlice of animationData.keyframeDataSlices) {
             fs.writeSync(file, writeInterface.floatBufferToNative(keyframeDataSlice));
         }
     }
 
-    _writeHeader(name, animationData, assetDir) {
-        const safeSkinnedMeshString = `${name}_animation`;
-        const includeFilePath = path.join(assetDir, "include", safeSkinnedMeshString + ".h");
+    _writeHeader(name, animationData, includeDir) {
+        const safeSkinnedMeshString = Util.safeDefineName(`${name}_animation`);
+        const includeFilePath = path.join(includeDir, safeSkinnedMeshString + ".h");
 
         const animations = animationData.animations;
 

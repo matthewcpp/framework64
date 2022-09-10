@@ -5,8 +5,8 @@ void fw64_node_init(fw64Node* node) {
     fw64_transform_init(&node->transform);
     node->mesh = NULL;
     node->collider = NULL;
-    node->type = FW64_NODE_UNSPECIFIED_TYPE;
     node->layer_mask = 1U;
+    node->data = NULL;
 }
 
 void fw64_node_update(fw64Node* node) {

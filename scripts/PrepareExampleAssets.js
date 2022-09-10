@@ -20,6 +20,30 @@ program
 program.parse();
 
 async function prepareExampleAssets(example, platform) {
+    if (example === "all")
+        return prepareAllExampleAssets(platform);
+    else
+        return prepareExample(example, platform);
+}
+
+async function prepareAllExampleAssets(platform) {
+    const examplesDirectory = path.resolve(__dirname, "..", "examples");
+    const dirContents = fse.readdirSync(examplesDirectory, {withFileTypes: true});
+
+    for(const item of dirContents) {
+        if (!item.isDirectory)
+            continue;
+        
+        // check if the folder is an example by looking for assets.json
+        const assetsFile = path.join(examplesDirectory, item.name, "assets.json");
+        if (fse.existsSync(assetsFile)) {
+            await prepareExample(item.name, platform);
+        }
+    };
+}
+
+async function prepareExample(example, platform) {
+    console.log("Preparing assets for example: ", example);
     const exampleDirectory = path.resolve(__dirname, "..", "examples", example);
     if (!fse.existsSync(exampleDirectory)) {
         console.error(`Unable to locate example: ${example}.  Expected path: ${exampleDirectory}`);

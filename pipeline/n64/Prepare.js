@@ -3,14 +3,18 @@ const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
 const FontConvert = require("./ProcessFont");
 const AudioConvert = require("./AudioConvert");
-const processScene = require("./ProcessScene");
 const processLevel = require("./ProcessLevel");
+const processLayers = require("../Layers");
 const Archive = require("./Archive");
+const Util = require("../Util");
 
 const path = require("path");
 
 async function prepare(manifest, assetDirectory, outputDirectory) {
-    const archive = new Archive(outputDirectory);
+    const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
+    const archive = new Archive(outputDirectory, includeDirectory);
+
+    const layerMap = processLayers(manifest.layers, Util.assetIncludeDirectory(outputDirectory));
 
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
@@ -23,7 +27,7 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory);
+            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
@@ -51,49 +55,14 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
         }
     }
 
-    if (manifest.soundBanks) {
-        for (const soundBank of manifest.soundBanks) {
-            checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
-
-            const sourceDir = path.join(assetDirectory, soundBank.dir);
-            await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, archive);
-        }
-    }
-
-    if (manifest.musicBanks) {
-        for (const musicBank of manifest.musicBanks) {
-            checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
-
-            const sourceDir = path.join(assetDirectory, musicBank.dir);
-            await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, archive);
-        }
-    }
-
-    if (manifest.scenes) {
-        const requiredFields = ["src", "typeMap", "layerMap"];
-
-        for (const scene of manifest.scenes) {
-            console.log(`Processing Scene: ${scene.src}`);
-            checkRequiredFields("scene", scene, requiredFields);
-
-            const typeMap = manifest.typeMaps[scene.typeMap];
-            const layerMap = manifest.layerMaps[scene.layerMap];
-
-            await processScene(scene, typeMap, layerMap, archive, assetDirectory, outputDirectory);
-        }
-    }
-
     if (manifest.levels) {
-        const requiredFields = ["src", "typeMap", "layerMap"];
+        const requiredFields = ["src"];
 
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            const typeMap = manifest.typeMaps[level.typeMap];
-            const layerMap = manifest.layerMaps[level.layerMap];
-
-            await processLevel(level, typeMap, layerMap, archive, assetDirectory, outputDirectory);
+            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
@@ -102,6 +71,24 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
             console.log(`Processing Raw File: ${item}`);
             const sourceFile = path.join(assetDirectory, item);
             await archive.add(sourceFile, "raw");
+        }
+    }
+
+    if (manifest.soundBanks) {
+        for (const soundBank of manifest.soundBanks) {
+            checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
+
+            const sourceDir = path.join(assetDirectory, soundBank.dir);
+            await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, includeDirectory, archive);
+        }
+    }
+
+    if (manifest.musicBanks) {
+        for (const musicBank of manifest.musicBanks) {
+            checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
+
+            const sourceDir = path.join(assetDirectory, musicBank.dir);
+            await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, includeDirectory, archive);
         }
     }
 

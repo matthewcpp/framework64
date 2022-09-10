@@ -3,6 +3,7 @@
 #include "framework64/n64/filesystem.h"
 
 #define FW64_N64_NODE_NO_MESH UINT32_MAX
+#define FW64_N64_BOX_COLLIDER_USE_MESH_BOUNDING 256
 #define FW64_N64_NODE_NO_COLLIDER UINT32_MAX
 
 fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* allocator) {
@@ -28,7 +29,9 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* 
         scene->meshes = allocator->malloc(allocator, scene->info.mesh_count * sizeof(fw64Mesh));
 
         for (uint32_t i = 0; i < scene->info.mesh_count; i++) {
-            fw64_n64_loader_load_mesh(&loader, scene->meshes + i, handle, allocator);
+            fw64Mesh* mesh = scene->meshes + i;
+            fw64_n64_loader_load_mesh(&loader, mesh, handle, allocator);
+            mesh->resources = NULL; // scene will hold reference to all resources and free them during delete
         }
     }
     else {
@@ -71,6 +74,12 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* 
         scene->nodes = allocator->memalign(allocator, 8, scene->info.node_count * sizeof(fw64Node));
         fw64_filesystem_read(scene->nodes, sizeof(fw64Node), scene->info.node_count, handle);
 
+        Box* custom_bounding_boxes = NULL;
+        if (scene->info.custom_bounding_box_count) {
+            custom_bounding_boxes = allocator->malloc(allocator, sizeof(Box) * scene->info.custom_bounding_box_count);
+            fw64_filesystem_read(custom_bounding_boxes, sizeof(Box), scene->info.custom_bounding_box_count, handle);
+        }
+
         uint32_t collider_index = 0;
 
         for (uint32_t i = 0; i < scene->info.node_count; i++) {
@@ -81,29 +90,36 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* 
             uint32_t mesh_index = (uint32_t)node->mesh;
             node->mesh = NULL;
 
+            if (mesh_index != FW64_N64_NODE_NO_MESH) {
+                fw64_node_set_mesh(node, scene->meshes + mesh_index);
+            }
+
             // read the collider info written to the node
             uint32_t collider_value = (uint32_t)node->collider;
             uint32_t collider_type = collider_value & 0xFFFF;
             uint32_t collision_mesh_index = collider_value >> 16;
             node->collider = NULL;
-
-            if (mesh_index != FW64_N64_NODE_NO_MESH) {
-                fw64_node_set_mesh(node, scene->meshes + mesh_index);
-            }
             
             if (collider_value != FW64_N64_NODE_NO_COLLIDER) {
+                fw64_node_set_collider(node, scene->colliders + collider_index);
+
                 if (collider_type == FW64_COLLIDER_BOX) {
-                    fw64_node_set_box_collider(node, scene->colliders + collider_index);
+                    if (collision_mesh_index == FW64_N64_BOX_COLLIDER_USE_MESH_BOUNDING)
+                        fw64_collider_set_type_box(node->collider, &node->mesh->info.bounding_box);
+                    else
+                        fw64_collider_set_type_box(node->collider, custom_bounding_boxes + collision_mesh_index);
                 }
-                
                 else if (collider_type == FW64_COLLIDER_MESH) {
-                    fw64_node_set_collider(node, scene->colliders + collider_index);
                     fw64_collider_set_type_mesh(node->collider, scene->collision_meshes + collision_mesh_index);
                 }
 
                 collider_index += 1;
                 box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
             }
+        }
+
+        if (custom_bounding_boxes) {
+            allocator->free(allocator, custom_bounding_boxes);
         }
     }
     else {

@@ -1,7 +1,7 @@
 #include "game.h"
 
-#include "assets.h"
-#include "catherine_animation.h"
+#include "assets/assets.h"
+#include "assets/catherine_animation.h"
 
 #include "framework64/n64/controller_button.h"
 

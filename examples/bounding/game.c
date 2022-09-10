@@ -1,5 +1,5 @@
 #include "game.h"
-#include "assets.h"
+#include "assets/assets.h"
 
 #include "framework64/matrix.h"
 #include "framework64/n64/controller_button.h"

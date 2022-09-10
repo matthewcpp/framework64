@@ -15,16 +15,18 @@ class SceneInfo {
         this.meshCount = scene.meshes.length;
         this.colliderCount = scene.colliderCount;
         this.collisionMeshCount = scene.collisionMeshes.length;
+        this.customBoundingBoxCount = scene.customBoundingBoxes.length;
     }
 
     get buffer() {
-        const buff = Buffer.alloc(16);
+        const buff = Buffer.alloc(20);
         let index = 0;
 
         index = buff.writeUInt32BE(this.nodeCount, index);
         index = buff.writeUInt32BE(this.meshCount, index);
         index = buff.writeUInt32BE(this.colliderCount, index);
         index = buff.writeUInt32BE(this.collisionMeshCount, index);
+        index = buff.writeUInt32BE(this.customBoundingBoxCount, index);
 
         return buff;
     }
@@ -53,8 +55,8 @@ function writeNodes(scene, file) {
         // write properties data // needs to line up with node.h
         index = propertiesBuffer.writeUInt32BE(node.collider, index);
         index = propertiesBuffer.writeUInt32BE(node.mesh, index);
-        index = propertiesBuffer.writeUInt32BE(node.type, index);
         index = propertiesBuffer.writeUInt32BE(node.layerMask, index);
+        index = propertiesBuffer.writeUInt32BE(0, index); // this slot occupies the user data
 
         fs.writeSync(file, transformBuffer);
         fs.writeSync(file, n64MatrixBuffer);
@@ -99,6 +101,15 @@ function writeCollisionMeshes(scene, file) {
     }
 }
 
+function writeCustomBoundingBoxes(scene, file) {
+    const boundingBuffer = Buffer.allocUnsafe(Bounding.SizeOf);
+
+    for (const customBoundingBox of scene.customBoundingBoxes) {
+        customBoundingBox.writeToBuffer(boundingBuffer, 0);
+        fs.writeSync(file, boundingBuffer);
+    }
+}
+
 async function write(n64Scene, outputDirectory, archive) {
     const destFile = path.join(outputDirectory, n64Scene.name + ".scene");
     const sceneInfo = new SceneInfo(n64Scene);
@@ -114,6 +125,7 @@ async function write(n64Scene, outputDirectory, archive) {
 
     writeCollisionMeshes(n64Scene, file);
     writeNodes(n64Scene, file);
+    writeCustomBoundingBoxes(n64Scene, file); // note these are written after the nodes so that memory can be reclaimed after processing for bump allocator
 
     fs.closeSync(file);
     await archive.add(destFile, "scene");

@@ -6,11 +6,12 @@ const Util = require("../Util");
 
 const {ConvertGltfToGLB} = require('gltf-import-export');
 
-async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory) {
+async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory) {
     const srcPath = path.join(manifestDirectory, skinnedMesh.src);
-    const destName = path.basename(skinnedMesh.src, ".gltf") + ".glb";
+    const meshName = skinnedMesh.hasOwnProperty("name") ? skinnedMesh.name : path.basename(skinnedMesh.src, path.extname(skinnedMesh.src));
+    const destName = meshName + ".glb";
     const destPath = path.join(outputDirectory, destName);
-    ConvertGltfToGLB(srcPath, destPath);
+    
 
     const gltf = JSON.parse(fs.readFileSync(srcPath, {encoding: "utf8"}));
 
@@ -22,11 +23,15 @@ async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, output
     const animationData = parser.parse(gltf, buffer, skinnedMesh);
 
     const writer = new Animation.Writer();
-    const meshName = path.basename(srcPath, ".gltf");
-    writer.writeLittleEndian(meshName, animationData, outputDirectory);
+    writer.writeLittleEndian(meshName, animationData, outputDirectory, includeDirectory);
 
-    bundle.addMesh(skinnedMesh, destName, Object.fromEntries(animationData.jointIdMap));
-    bundle.addAnimationData(path.basename(skinnedMesh.src, ".gltf") + ".animation");
+    let animationOnly = skinnedMesh.hasOwnProperty("animationOnly") ? skinnedMesh.animationOnly : false;
+    if (!animationOnly) {
+        ConvertGltfToGLB(srcPath, destPath);
+        bundle.addMesh(meshName, destName, Object.fromEntries(animationData.jointIdMap));
+    }
+    
+    bundle.addAnimationData(meshName + ".animation");
 }
 
 module.exports = processSkinnedMesh;

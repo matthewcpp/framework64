@@ -1,9 +1,16 @@
+const glMatrix = require("gl-matrix");
+
 class Bounding {
     static SizeOf = 24;
 
     constructor() {
         this.min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
         this.max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+    }
+
+    setFromCenterAndExtents(center, extents) {
+        glMatrix.vec3.subtract(this.min, center, extents);
+        glMatrix.vec3.add(this.max, center, extents);
     }
 
     encapsulatePoint(point) {

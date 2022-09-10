@@ -7,17 +7,6 @@ namespace framework64{
 template <typename T>
 std::unordered_map<std::string, T> parseMapJson(std::string const& json_str);
 
-TypeMap load_type_map(fw64AssetDatabase* database, int index) {
-    sqlite3_reset(database->select_typemap_statement);
-    sqlite3_bind_int(database->select_typemap_statement, 1, index);
-
-    if(sqlite3_step(database->select_typemap_statement) != SQLITE_ROW)
-        return {};
-
-    std::string typemapStr = reinterpret_cast<const char *>(sqlite3_column_text(database->select_typemap_statement, 0));
-    return parseMapJson<uint32_t>(typemapStr);
-}
-
 LayerMap load_layer_map(fw64AssetDatabase* database, int index) {
     sqlite3_reset(database->select_layermap_statement);
     sqlite3_bind_int(database->select_layermap_statement, 1, index);

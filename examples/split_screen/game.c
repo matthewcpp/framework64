@@ -1,8 +1,8 @@
 #include "game.h"
-#include "assets.h"
+#include "assets/assets.h"
 
 #include "framework64/n64/controller_button.h"
-#include "scene_splitscreen.h"
+#include "assets/scene_splitscreen.h"
 
 static void init_weapon(Game* game);
 static void init_player(Game* player, int index, int node_id, float view_x, float view_y, float rot_y);

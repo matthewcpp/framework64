@@ -1,7 +1,7 @@
 #include "flame.h"
 #include "framework64/util/quad.h"
 
-#include "assets.h"
+#include "assets/assets.h"
 
 #define FLAME_UPDATE_TIME 1.0f / 15.0f
 

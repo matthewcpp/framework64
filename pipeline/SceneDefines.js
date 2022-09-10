@@ -7,6 +7,7 @@ function writeSceneDefines(gltf, name, sceneNode, destFile) {
     const file = fs.openSync(destFile, "w");
 
     fs.writeSync(file, "#pragma once\n\n");
+    const sceneName = Util.safeDefineName(name);
 
     if (sceneNode.children) {
         for (let i = 0; i < sceneNode.children.length; i++) {
@@ -17,7 +18,7 @@ function writeSceneDefines(gltf, name, sceneNode, destFile) {
                 continue;
 
             const nodeName = Util.safeDefineName(node.name);
-            fs.writeSync(file, `#define FW64_scene_${name}_node_${nodeName} ${i}\n`);
+            fs.writeSync(file, `#define FW64_scene_${sceneName}_node_${nodeName} ${i}\n`);
         }
     }
 

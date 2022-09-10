@@ -1,5 +1,5 @@
 #include "game.h"
-#include "assets.h"
+#include "assets/assets.h"
 
 #include "framework64/node.h"
 #include "framework64/util/quad.h"

@@ -17,6 +17,7 @@
 
 static void fw64_n64_renderer_update_lighting_data(fw64Renderer* renderer);
 static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer);
+static void fw64_n64_setup_fog(fw64Renderer* renderer);
 static void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame);
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
@@ -113,8 +114,6 @@ void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPo
 }
 
 void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask* gfxTaskPtr) {
-    renderer->starting_new_frame = 1;
-
     if (renderer->post_draw_func == NULL)
         return;
 
@@ -237,14 +236,18 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw6
     }
 
     if (fw64_renderer_get_fog_enabled(renderer)) {
-        gDPSetCycleType(renderer->display_list++, G_CYC_2CYCLE);
-        gDPSetFogColor(renderer->display_list++, renderer->fog_color.r, renderer->fog_color.g, renderer->fog_color.b, renderer->fog_color.a);
-        gSPFogPosition(renderer->display_list++, renderer->fog_min, renderer->fog_max);
-        gSPSetGeometryMode(renderer->display_list++, G_FOG);
+        fw64_n64_setup_fog(renderer);
     }
     else {
         gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
     }
+}
+
+void fw64_n64_setup_fog(fw64Renderer* renderer) {
+    gDPSetCycleType(renderer->display_list++, G_CYC_2CYCLE);
+    gDPSetFogColor(renderer->display_list++, renderer->fog_color.r, renderer->fog_color.g, renderer->fog_color.b, renderer->fog_color.a);
+    gSPFogPosition(renderer->display_list++, renderer->fog_min, renderer->fog_max);
+    gSPSetGeometryMode(renderer->display_list++, G_FOG);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
@@ -567,10 +570,22 @@ void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r,
 }
 
 void fw64_renderer_set_fog_enabled(fw64Renderer* renderer, int enabled) {
-    if (enabled) 
-        renderer->enabled_features |= N64_RENDERER_FEATURE_FOG;
-    else 
-        renderer->enabled_features &= ~N64_RENDERER_FEATURE_FOG;
+    int fog_currently_enabled = fw64_renderer_get_fog_enabled(renderer);
+
+    if (fog_currently_enabled == enabled)
+        return;
+
+    set_shading_feature(renderer, N64_RENDERER_FEATURE_FOG, enabled);
+
+    if (renderer->render_mode == FW64_RENDERER_MODE_UNSET)
+        return;
+
+    if (enabled)
+        fw64_n64_setup_fog(renderer);
+    else { // turning fog off...need to reset the cycle count or else things go haywire
+        gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
+        gSPClearGeometryMode(renderer->display_list++, G_FOG);
+    }
 }
 
 int fw64_renderer_get_fog_enabled(fw64Renderer* renderer) {

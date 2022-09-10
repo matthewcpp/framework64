@@ -1,4 +1,5 @@
 const Bundle = require("./Bundle");
+const Util = require("../Util");
 
 const processFont = require("./ProcessFont");
 const processImage = require("./ProcessImage");
@@ -7,13 +8,18 @@ const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processLevel = require("./ProcessLevel")
+const processLayers = require("../Layers");
 
 const processRaw = require("./ProcessRaw");
 
 const path = require("path");
 
 async function prepare(manifest, assetDirectory, outputDirectory) {
-    const bundle = new Bundle(outputDirectory);
+    const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
+    const bundle = new Bundle(outputDirectory, includeDirectory);
+    const layerMap = processLayers(manifest.layers, includeDirectory);
+
+    bundle.addLayerMap(layerMap, 0);
 
     if (manifest.images) {
         for (const image of manifest.images) {
@@ -47,21 +53,21 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory);
+            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
             console.log(`Processing Sound Bank: ${soundBank.name}`);
-            await processSoundBank(soundBank, bundle, assetDirectory, outputDirectory);
+            await processSoundBank(soundBank, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
     if (manifest.musicBanks) {
         for (const musicBank of manifest.musicBanks) {
             console.log(`Processing Music Bank: ${musicBank.name}`);
-            await processMusicBank(musicBank, bundle, assetDirectory, outputDirectory);
+            await processMusicBank(musicBank, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
@@ -72,28 +78,11 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
         }
     }
 
-    if (manifest.typeMaps) {
-        let index = 0;
-        for (const typeMap of manifest.typeMaps) {
-            bundle.addTypeMap(typeMap, index++);
-        }
-    }
-
-    if (manifest.layerMaps) {
-        let index = 0;
-        for (const layerMap of manifest.layerMaps) {
-            bundle.addLayerMap(layerMap, index++);
-        }
-    }
-
     if (manifest.levels) {
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
 
-            const typemap = level.hasOwnProperty("typemap") ? manifest.typemaps[level.typemap] : {};
-            const layermap = level.hasOwnProperty("layermap") ? manifest.layermaps[level.layermap] : {};
-
-            await processLevel(level, typemap, layermap, bundle, assetDirectory, outputDirectory);
+            await processLevel(level, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
