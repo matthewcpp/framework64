@@ -18,21 +18,17 @@ class Bundle {
     _musicBankStmt = null;
     _rawFileStmt = null;
     _terrainStmt = null;
-    _typemapStmt = null;
     _layermapStmt = null;
     _sceneStmt = null;
 
-    constructor(outputDirectory) {
+    constructor(outputDirectory, includeDirectory) {
         this._initDatabase(outputDirectory);
-        this._initHeaderFile(outputDirectory);
+        this._initHeaderFile(includeDirectory);
     }
     
 
-    _initHeaderFile(outputDirectory) {
-        const headerDir = path.join(outputDirectory, "include");
-        const headerPath = path.join(headerDir, "assets.h");
-        
-        fse.ensureDirSync(headerDir);
+    _initHeaderFile(includeDirectory) {
+        const headerPath = path.join(includeDirectory, "assets.h");
         this._headerFile = fse.openSync(headerPath, "w");
     }
 
@@ -49,9 +45,8 @@ class Bundle {
             db.run("CREATE TABLE musicBanks (assetId INTEGER PRIMARY KEY, path TEXT, count INTEGER)");
             db.run("CREATE TABLE rawFiles (assetId INTEGER PRIMARY KEY, path TEXT, size INTEGER)");
             db.run("CREATE TABLE terrains (assetId INTEGER PRIMARY KEY, path TEXT, dimx INTEGER, dimz INTEGER)");
-            db.run("CREATE TABLE typeMaps (assetId INTEGER PRIMARY KEY, jsonIndex INTEGER, jsonStr TEXT)");
             db.run("CREATE TABLE layerMaps (assetId INTEGER PRIMARY KEY, jsonIndex INTEGER, jsonStr TEXT)");
-            db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, sceneIndex INTEGER, typeMap INTEGER, layerMap INTEGER)");
+            db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, sceneIndex INTEGER, layerMap INTEGER)");
         });
 
         this._animationDataStmt = db.prepare("INSERT INTO animationData VALUES (?, ?)");
@@ -62,9 +57,8 @@ class Bundle {
         this._musicBankStmt = db.prepare("INSERT INTO musicBanks VALUES (?, ?, ?)");
         this._rawFileStmt = db.prepare("INSERT INTO rawFiles VALUES (?, ?, ?)");
         this._terrainStmt = db.prepare("INSERT INTO terrains VALUES (?, ?, ?, ?)");
-        this._typemapStmt = db.prepare("INSERT INTO typeMaps VALUES (?, ?, ?)");
         this._layermapStmt = db.prepare("INSERT INTO layerMaps VALUES (?, ?, ?)");
-        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?, ?, ?)");
+        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?, ?)");
 
         this._db = db;
     }
@@ -102,9 +96,9 @@ class Bundle {
         return assetId;
     }
 
-    addMesh(mesh, assetPath, jointMap) {
+    addMesh(meshName, assetPath, jointMap) {
         const assetId = this._nextAssetId++;
-        const assetName = path.basename(mesh.src, path.extname(mesh.src));
+        const assetName = meshName;
 
         this._meshStmt.run(assetId, assetPath, jointMap ? JSON.stringify(jointMap): null);
 
@@ -146,27 +140,20 @@ class Bundle {
         return assetId;
     }
 
-    addTypeMap(typemap, index) {
-        const assetId = this._nextAssetId++;
-        this._typemapStmt.run(assetId, index, JSON.stringify(typemap));
-
-        return assetId;
-    }
-
     addLayerMap(layermap, index) {
         const assetId = this._nextAssetId++;
-        this._layermapStmt.run(assetId, index, JSON.stringify(layermap));
+        this._layermapStmt.run(assetId, index, JSON.stringify(Object.fromEntries(layermap)));
 
         return assetId;
     }
 
-    addScene(name, index, typeMap, layerMap, assetPath) {
+    addScene(name, index, layerMap, assetPath) {
         const assetId = this._nextAssetId++;
         const assetName = Util.safeDefineName(name);
 
         fse.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
 
-        this._sceneStmt.run(assetId, assetPath, index, typeMap, layerMap);
+        this._sceneStmt.run(assetId, assetPath, index, layerMap);
 
         return assetId;
     }
@@ -180,7 +167,6 @@ class Bundle {
         this._musicBankStmt.finalize();
         this._rawFileStmt.finalize();
         this._terrainStmt.finalize();
-        this._typemapStmt.finalize();
         this._layermapStmt.finalize();
         this._sceneStmt.finalize();
         this._db.close();

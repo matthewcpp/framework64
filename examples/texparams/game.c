@@ -1,9 +1,9 @@
 #include "game.h"
-#include "assets.h"
+#include "assets/assets.h"
 #include "framework64/util/quad.h"
 #include "framework64/n64/controller_button.h"
 
-#include "assets.h"
+#include "assets/assets.h"
 
 static void set_texture_mode(Game* game, Mode mode);
 

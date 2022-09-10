@@ -227,14 +227,26 @@ class Parser {
 
                 if (animation.input === null)
                     animation.input = inputChunk;
-                else if (animation.input !== inputChunk)
-                    throw new Error("This will be fixed in a later version");
+                else if (animation.input !== inputChunk){
+                    // note: The animation importer is meant to work where animation is sampled regularly and all keys
+                    // have the same input (key time)  if we get here that means this is not the case, and this particular channel
+                    // has key times which do not correspond to the rest of the animation.  For now we will just ignore it,
+                    // however it is possible that the source file may need some modification.
+                    
+                    console.log(`time difference ${gltfAnimation.name} node: ${channel.target.node}`);
+                    continue;
+                }
 
                 const outputChunk = this.getBufferChunk(sampler.output);
 
-                const joint = this.nodeIndexToJointMap.get(channel.target.node);
+                let joint = this.nodeIndexToJointMap.get(channel.target.node);
                 if (!joint) {
-                    throw new Error("unable to locate joint");
+                    joint = this.data.joints[0];
+                    // if we get here it means that there is an animation channel setup for a node which is not listed as a
+                    // joint in the skeleton.  This could mean that there is animated channels on the armature itself.
+                    
+                    //console.log(`node not found ${gltfAnimation.name} node: ${channel.target.node}`);
+                    //continue;
                 }
 
                 const track = animation.tracks[joint.id];

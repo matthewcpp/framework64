@@ -1,3 +1,5 @@
+const path = require("path");
+
 //https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
 function nextPowerOf2(v) {
     v--;
@@ -27,9 +29,15 @@ function mat4IdentityBuffer() {
     return b;
 }
 
+/** Returns the asset include directory given the base asset output directory. */
+function assetIncludeDirectory(outputDirectory) {
+    return path.join(outputDirectory, "include", "assets");
+}
+
 module.exports = {
     nextPowerOf2: nextPowerOf2,
     isPowerOf2: isPowerOf2,
     safeDefineName: safeDefineName,
-    mat4IdentityBuffer: mat4IdentityBuffer
+    mat4IdentityBuffer: mat4IdentityBuffer,
+    assetIncludeDirectory: assetIncludeDirectory
 }

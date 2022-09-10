@@ -30,18 +30,9 @@
             "src": "penguin/penguin.gltf"
         }
     ],
-    "typeMaps": [
-        {
-            "start": 0,
-            "nextlevel": 1,
-            "key": 2
-        }
-    ],
-    "layerMaps": [
-        {
-            "default": 1,
-            "ground": 2,
-            "wall": 4
-        }
-    ]
+    "layers": {
+        "default": 1,
+        "ground": 2,
+        "wall": 4
+    }
 }

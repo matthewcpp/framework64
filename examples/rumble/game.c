@@ -1,5 +1,5 @@
 #include "game.h"
-#include "assets.h"
+#include "assets/assets.h"
 
 #include "framework64/math.h"
 #include "framework64/random.h"

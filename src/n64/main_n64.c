@@ -1,7 +1,7 @@
 #include "game.h"
 #include "framework64/n64/engine.h"
 
-#include "assets.h"
+#include "assets/assets.h"
 
 #include <nusys.h>
 

@@ -2,8 +2,9 @@ const AudioHeader = require("../AudioHeader")
 
 const fs = require("fs");
 const path = require("path");
+const Util = require("../Util");
 
-async function processSoundBank(soundBank, bundle, baseDirectory, outputDirectory) {
+async function processSoundBank(soundBank, bundle, baseDirectory, outputDirectory, includeDirectory) {
     const sourceDir = path.join(baseDirectory, soundBank.dir);
     const destDir = path.join(outputDirectory, soundBank.name);
 
@@ -19,7 +20,7 @@ async function processSoundBank(soundBank, bundle, baseDirectory, outputDirector
     }
 
     bundle.addSoundBank(soundBank, files)
-    AudioHeader.writeSoundBankHeader(sourceDir, outputDirectory);
+    AudioHeader.writeSoundBankHeader(sourceDir, includeDirectory);
 }
 
 module.exports = processSoundBank;

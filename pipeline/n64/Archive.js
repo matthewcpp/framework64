@@ -23,13 +23,11 @@ class Archive {
     entryHashes = new Map();
     fileName = "assets"
     outputDirectory;
+    includeDirectory;
 
-    constructor(outputDirectory) {
+    constructor(outputDirectory, includeDirectory) {
         this.outputDirectory = outputDirectory;
-        const headerDir = path.join(this.outputDirectory, "include");
-
-        if (!fs.existsSync(headerDir))
-            fs.mkdirSync(headerDir);
+        this.includeDirectory = includeDirectory;
     }
 
     async add(path, type) {
@@ -66,8 +64,7 @@ class Archive {
     }
 
     write() {
-        const headerDir = path.join(this.outputDirectory, "include");
-        const headerPath = path.join(headerDir, `${this.fileName}.h`);
+        const headerPath = path.join(this.includeDirectory, `${this.fileName}.h`);
         const archivePath = path.join(this.outputDirectory, `${this.fileName}.dat`);
         const manifestPath = path.join(this.outputDirectory, `${this.fileName}.manifest.json`);
 

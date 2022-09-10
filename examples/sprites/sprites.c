@@ -1,6 +1,6 @@
 #include "sprites.h"
 
-#include "assets.h"
+#include "assets/assets.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -9,17 +9,18 @@ const rimraf = require("rimraf");
 async function prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, gameName) {
 	const gameBinDirectory = path.join(platformBuildDir,  "bin", gameName);
 	const assetOutputDirectory = path.join(gameBinDirectory, "assets");
+    const assetIncludeDirectory = path.join(assetOutputDirectory, "include", "assets");
 
     if (fse.existsSync(assetOutputDirectory)) {
         rimraf.sync(assetOutputDirectory);
     }
 
-    fse.ensureDirSync(assetOutputDirectory);
+    fse.ensureDirSync(assetIncludeDirectory);
 
     await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, assetOutputDirectory);
 
     const shouldPrepareShaders = platform.toLowerCase() === "desktop";
-    const shouldPrepareDlls = process.platform === "win32" && platform.toLowerCase() === "desktop";
+    
 
     if (shouldPrepareShaders) {
         const shaderDestDir = path.join(gameBinDirectory, "glsl");
@@ -33,9 +34,6 @@ async function prepareAssets(assetManifest, assetDirectory, platform, platformBu
         prepareWindowsDlls(platformBuildDir, gameBinDirectory);
     }
     */
-    if (shouldPrepareDlls) {
-        prepareWindowsDlls(platformBuildDir, gameBinDirectory);
-    }
 }
 
 module.exports = prepareAssets;
