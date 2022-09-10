@@ -66,6 +66,7 @@ void fw64_sparse_set_uninit(fw64SparseSet* sparse_set);
 /**
  * Allocates a new object in the set.
  * @param pointer which will receive the handle for this new item.
+ * @param handle pointer which will received handle data to access this item in future calls.
  * @return pointer to new object.  Be sure to cast this pointer to that of the actual struct contained in the set and initialize it.
  */
 void* fw64_sparse_set_alloc(fw64SparseSet* sparse_set, fw64SparseSetHandle* handle);
