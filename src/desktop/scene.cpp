@@ -4,6 +4,7 @@
 #include "framework64/desktop/glb_parser.h"
 #include "framework64/desktop/json_map.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <unordered_map>
 #include <string>
@@ -20,14 +21,12 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index, fw64Allocator
     const std::string scene_path = database->asset_dir + asset_path;
 
     int scene_index = sqlite3_column_int(database->select_scene_statement, 1);
-    int type_map_index = sqlite3_column_int(database->select_scene_statement, 2);
-    int layer_map_index = sqlite3_column_int(database->select_scene_statement, 3);
+    int layer_map_index = sqlite3_column_int(database->select_scene_statement, 2);
 
-    auto type_map = framework64::load_type_map(database, type_map_index);
     auto layer_map = framework64::load_layer_map(database, layer_map_index);
 
     framework64::GlbParser glb(database->shader_cache);
-    auto* scene = glb.loadScene(scene_path, scene_index, type_map, layer_map);
+    auto* scene = glb.loadScene(scene_path, scene_index, layer_map);
     scene->calculateBounding();
 
     scene->allocator = allocator;

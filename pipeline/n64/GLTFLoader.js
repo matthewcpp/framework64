@@ -12,6 +12,7 @@ const glMatrix = require("gl-matrix");
 
 const fs = require("fs");
 const path = require("path");
+const Bounding = require("./Bounding");
 
 const GltfComponentType = {
     Byte: 5120,
@@ -37,9 +38,13 @@ class GLTFLoader {
     collisionMeshMap = new Map();
 
     static InvalidNodeIndex = -1;
-    /** this holds the index into the nodes array of the root scene node.
-     * Not to be confused with the GLTF scene node index. */
+
+    /** Indicates that a node should use its attached mesh for bounding*/
+    static BoxColliderUseMeshBounding = (256 << 16);
+    /** this holds the index into the nodes array of the root scene node. Not to be confused with the GLTF scene node index. */
     _sceneNodeIndex = GLTFLoader.InvalidNodeIndex;
+
+    /** This holds the index of the current mesh collider node that is being parsed. i.e. scene node / Colliders / <this node> */
     _meshColliderNodeIndex = GLTFLoader.InvalidNodeIndex;
 
     constructor(options) {
@@ -66,14 +71,14 @@ class GLTFLoader {
         return this.mesh;
     }
 
-    async loadScene(gltfPath, typeMap, layerMap) {
+    async loadScene(gltfPath, layerMap) {
         this._loadFile(gltfPath);
 
         const sceneRootNodeIndex = this.gltf.scene;
-        return this._parseScene(sceneRootNodeIndex, typeMap, layerMap);
+        return this._parseScene(sceneRootNodeIndex, layerMap);
     }
 
-    async loadLevel(gltfPath, typeMap, layerMap) {
+    async loadLevel(gltfPath, layerMap) {
         this._loadFile(gltfPath);
 
         const rootNode = this.gltf.scenes[this.gltf.scene];
@@ -81,7 +86,7 @@ class GLTFLoader {
         const scenes = [];
 
         for (const sceneIndex of rootNode.nodes) {
-            const scene = await this._parseScene(sceneIndex, typeMap, layerMap);
+            const scene = await this._parseScene(sceneIndex, layerMap);
             if (scene)
                 scenes.push(scene);
         }
@@ -100,7 +105,34 @@ class GLTFLoader {
             node.scale = gltfNode.scale.slice();
     }
 
-    async _parseScene(sceneRootNodeIndex, typeMap, layerMap) {
+    /** Precondition: node has its trasnform values set and gltfNode has children  */
+    _getCustomBoundingBoxForNode(scene, gltfNode, node) {
+        for (const childIndex of gltfNode.children) {
+            const childNode = this.gltf.nodes[childIndex];
+
+            if (childNode.name.indexOf("Box") === -1)
+                continue;
+
+            const parentInvScale = node.scale.map(v => v != 0 ? 1.0 / v : 0);
+            const localScale = childNode.scale.slice();
+
+            const center = childNode.hasOwnProperty("translation") ? childNode.translation.slice() : [0.0, 0.0, 0.0];
+            const extents = [0.0, 0.0, 0.0];
+            for (let i = 0; i < 3; i++)
+                extents[i] = (parentInvScale[i] * localScale[i]);
+            
+            const box = new Bounding();
+            box.setFromCenterAndExtents(center, extents);
+
+            const boundingBoxIndex = scene.customBoundingBoxes.length;
+            scene.customBoundingBoxes.push(box);
+            node.collider = N64Node.ColliderType.Box | (boundingBoxIndex << 16)
+
+            break;
+        }
+    }
+
+    async _parseScene(sceneRootNodeIndex, layerMap) {
         this._parseSceneNode(sceneRootNodeIndex);
 
         // the passed in `sceneRootNodeIndex` was not a valid scene root
@@ -123,9 +155,12 @@ class GLTFLoader {
             const node = new N64Node();
 
             const hasMesh = gltfNode.hasOwnProperty("mesh");
-            const hasExtras = gltfNode.hasOwnProperty("extras");
 
             this._extractNodeTransform(gltfNode, node);
+
+            if (gltfNode.hasOwnProperty("children")) {
+                this._getCustomBoundingBoxForNode(scene, gltfNode, node);
+            }
 
             if (hasMesh) {
                 // if we already loaded this mesh then grab the index of it in the scene mesh array
@@ -140,26 +175,18 @@ class GLTFLoader {
                     this.meshMap.set(gltfNode.mesh, node.mesh);
                 }
 
-                node.collider = N64Node.ColliderType.Box;
+                if (node.collider === N64Node.NoCollider)
+                    node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
             }
 
-            if (hasExtras) {
-                if (gltfNode.extras.hasOwnProperty("type")) {
-                    const typeName = gltfNode.extras.type;
-
-                    if (!typeMap.has(typeName))
-                        throw new Error(`No id value found for type: ${typeName}`);
-
-                    node.type = typeMap.get(typeName);
-                }
-
+            if (gltfNode.hasOwnProperty("extras")) {
                 if (gltfNode.extras.hasOwnProperty("layers")) {
                     const layerNames = gltfNode.extras.layers.split(' ');
                     let layerMask = 0;
 
                     for (const layerName of layerNames) {
                         if (!layerMap.has(layerName))
-                            throw new Error(`No layer mask value found for layer: ${layerName}`);
+                            throw new Error(`Node ${gltfNode.name}: No layer map value found for layer: ${layerName}`);
 
                         layerMask |= layerMap.get(layerName);
                     }
@@ -291,7 +318,7 @@ class GLTFLoader {
             }
 
             if (gltfPrimitive.attributes.TEXCOORD_0)
-                this._readTexCoords(gltfPrimitive, primitive);
+                this._readTexCoords(gltfPrimitive, primitive, gltfMesh.name);
 
             if (gltfPrimitive.attributes.JOINTS_0)
                 this._readJointIndices(gltfPrimitive, primitive);
@@ -355,18 +382,19 @@ class GLTFLoader {
         const gltfDir = path.dirname(this.gltfPath);
 
         const gltfImage = this.gltf.images[gltfIndex];
-        const imagePath = path.join(gltfDir, gltfImage.uri);
+        const imageURI = decodeURI(gltfImage.uri);
+        const imagePath = path.join(gltfDir, imageURI);
 
 
         //TODO: This should probably be more robust: e.g. image.something.ext will break asset macro name
-        const imageName = path.basename(gltfImage.uri, path.extname(gltfImage.uri));
+        const imageName = Util.safeDefineName(path.basename(imageURI, path.extname(imageURI)));
         const image = new N64Image(imageName, N64Image.Format.RGBA16);
         await image.load(imagePath);
 
-        if (this.options.resizeImages.hasOwnProperty(gltfImage.uri)) {
-            const dimensions = this.options.resizeImages[gltfImage.uri].split("x");
+        if (this.options.resizeImages.hasOwnProperty(imageURI)) {
+            const dimensions = this.options.resizeImages[imageURI].split("x");
             image.data.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
-            console.log(`Resize image: ${gltfImage.uri} to ${dimensions[0]}x${dimensions[1]}`);
+            console.log(`Resize image: ${imageURI} to ${dimensions[0]}x${dimensions[1]}`);
         }
 
         this.resources.images.push(image);
@@ -430,7 +458,7 @@ class GLTFLoader {
             ];
 
             const vertex = [
-                parseInt(position[0]), parseInt(position[1]), parseInt(position[2]),
+                Math.round(position[0]), Math.round(position[1]), Math.round(position[2]),
                 0, /* unused flag*/
                 0, 0, /* texcords */
                 0, 0, 0, 0 /* color or normal */
@@ -580,7 +608,7 @@ class GLTFLoader {
         return val >= -32768 && val <= 32767;
     }
 
-    _readTexCoords(gltfPrimitive, primitive) {
+    _readTexCoords(gltfPrimitive, primitive, meshName) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.TEXCOORD_0];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
@@ -615,7 +643,7 @@ class GLTFLoader {
             vertex[5] = Math.round(t * (1 << 5));
 
             if (!GLTFLoader._validateTexCoord(vertex[4]) || !GLTFLoader._validateTexCoord(vertex[5])) {
-                throw new Error(`Detected a tex coord value outside of S10.5 format range.  Check model source data.`);
+                throw new Error(`Mesh ${meshName}: Detected a tex coord value outside of S10.5 format range.  Check model source data.`);
             }
 
             offset += byteStride;

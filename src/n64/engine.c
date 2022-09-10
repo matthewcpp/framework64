@@ -73,7 +73,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     nuContRmbMgrInit();
     nuEepromMgrInit();
 
-    nuGfxSwapCfbFuncSet(fw64_n64_swap_func);
+    //nuGfxSwapCfbFuncSet(fw64_n64_swap_func);
 
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_n64_input_init(engine->input, engine->time);
@@ -91,4 +91,6 @@ void fw64_n64_engine_update(fw64Engine* engine) {
     fw64_n64_engine_update_time(engine);
     fw64_n64_input_update(engine->input);
     fw64_n64_audio_update(engine->audio);
+
+    engine->renderer->starting_new_frame = 1;
 }

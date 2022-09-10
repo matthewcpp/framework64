@@ -75,18 +75,28 @@ int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint
     return result->count;
 }
 
-int fw64_scene_find_nodes_with_type(fw64Scene* scene, int type, fw64Node** results, int results_size) {
+int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocity, uint32_t mask, fw64IntersectMovingBoxQuery* result) {
+    Vec3 static_vel = {0.0f, 0.0f, 0.0f};
+    result->count = 0;
+    IntersectMovingBoxResult* box_intersect = &result->results[0];
+
     uint32_t node_count = fw64_scene_get_node_count(scene);
 
-    int found_count = 0;
-
-    for (uint32_t i = 0; i < node_count && found_count < results_size; i++) {
+    for (int i = 0; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
-        if (node->type == type) {
-            results[found_count++] = node;
+        if (!node->collider || !(node->layer_mask & mask))
+            continue;
+
+        if (fw64_collision_test_moving_boxes(&node->collider->bounding, &static_vel, box, velocity, &box_intersect->tfirst, &box_intersect->tlast)) {
+            box_intersect->node = node;
+            box_intersect = &result->results[++result->count];
         }
+
+        // temp
+        if (result->count == 5)
+            break;
     }
 
-    return found_count;
+    return result->count;
 }

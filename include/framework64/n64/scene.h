@@ -9,6 +9,7 @@ typedef struct {
     uint32_t mesh_count;
     uint32_t collider_count;
     uint32_t collision_mesh_count;
+    uint32_t custom_bounding_box_count;
 } fw64SceneInfo;
 
 struct fw64Scene {

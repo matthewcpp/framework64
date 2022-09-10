@@ -71,7 +71,33 @@ void GlbParser::parseSceneNode(int rootNodeIndex) {
     }
 }
 
-fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map) {
+// Precondition: fw64 node has already had its TRS extracted from the JSON node and json_node has children
+void GlbParser::getCustomBoundingBoxForNode(nlohmann::json const & json_node, fw64Node* node) {
+    for (auto const & child_index : json_node["children"]) {
+        auto const & child_node = json_doc["nodes"][child_index.get<int>()];
+        std::string name = child_node["name"].get<std::string>();
+
+        if (name.find("Box") == -1)
+            continue;
+
+        Vec3 inv_scale = {1.0f / node->transform.scale.x, 1.0f / node->transform.scale.y, 1.0f / node->transform.scale.z};
+        Vec3 localTranslation, localScale;
+        Quat localRotation;
+
+        extractTransformFromNode(child_node, localTranslation, localRotation, localScale);
+        
+        Vec3 extents = { inv_scale.x * localScale.x, inv_scale.y * localScale.y, inv_scale.z * localScale.z };
+
+        Box custom_bounding;
+        box_set_center_extents(&custom_bounding, &localTranslation, & extents);
+        fw64_node_set_collider(node, scene->createCollider());
+        fw64_collider_set_type_box(node->collider, &custom_bounding);
+
+        break;
+    }
+}
+
+fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, LayerMap const & layer_map) {
     if (path != file_path) {
         if (!openFile(path))
             return nullptr;
@@ -86,7 +112,7 @@ fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, Typ
     parseSceneNode(rootNodeIndex);
     assert(scene_node_index != GLTF_INVALID_INDEX);
 
-    // this node corresponds to the top level node in the scene of which all scene nodes are children
+    // this node corresponds to the top level node in the level scene / chunk of which all scene nodes are children
     // not to be confused with a scene object in gltf
     auto const & scene_node = json_doc["nodes"][scene_node_index];
     if (!scene_node.contains("children")) // empty scene
@@ -97,31 +123,15 @@ fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, Typ
 
         std::string name = node["name"].get<std::string>();
 
-        bool has_mesh = node.contains("mesh");
-        bool has_extras = node.contains("extras");
-
         auto* n = scene->createNode();
         fw64_node_init(n);
 
-        fw64Mesh* mesh = nullptr;
-        fw64CollisionMesh * collision_mesh = nullptr;
-        fw64ColliderType collider_type = FW64_COLLIDER_BOX;
+        extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
-        if (has_mesh) {
-            size_t mesh_index = node["mesh"].get<size_t>();
-            mesh = getStaticMesh(mesh_index);
-        }
+        bool skip_mesh_collider = false;
 
         if (node.contains("extras")) {
             auto& extras = node["extras"];
-
-            if (extras.contains("type")) {
-                auto type_name = extras["type"].get<std::string>();
-                auto result = type_map.find(type_name);
-
-                assert (result != type_map.end());
-                n->type = result->second;
-            }
 
             if (extras.contains("layers")) {
                 auto layers_str = extras["layers"].get<std::string>();
@@ -142,29 +152,29 @@ fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, Typ
                 std::string collision_mesh_name = extras["collider"].get<std::string>();
 
                 if (collision_mesh_name == "none") {
-                    collider_type = FW64_COLLIDER_NONE;
-                } else {
-                    collision_mesh = getCollisionMesh(collision_mesh_name);
-                    collider_type = FW64_COLLIDER_MESH;
+                    skip_mesh_collider = true; // prevent the creation of any collider
                 }
-                    
+                else {
+                    auto* collision_mesh = getCollisionMesh(collision_mesh_name);
+                    fw64_node_set_collider(n, scene->createCollider());
+                    fw64_collider_set_type_mesh(n->collider, collision_mesh);
+                }
             }
         }
 
-        extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
+        if (node.contains("children")&& !skip_mesh_collider) {
+            getCustomBoundingBoxForNode(node, n);
+        }
 
-        if (mesh) {
+        if (node.contains("mesh")) {
+            size_t mesh_index = node["mesh"].get<size_t>();
+            auto* mesh = getStaticMesh(mesh_index);
             fw64_node_set_mesh(n, mesh);
-        }
-        else {
-            collider_type = FW64_COLLIDER_NONE;
-        }
 
-        if (collider_type == FW64_COLLIDER_MESH && collision_mesh) {
-            fw64_node_set_mesh_collider(n, scene->createCollider(), collision_mesh);
-        }
-        else if (collider_type == FW64_COLLIDER_BOX){
-            fw64_node_set_box_collider(n, scene->createCollider());
+            if (!n->collider && !skip_mesh_collider) {
+                fw64_node_set_collider(n, scene->createCollider());
+                fw64_collider_set_type_box(n->collider, &mesh->bounding_box);
+            }
         }
 
         fw64_node_update(n);

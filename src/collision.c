@@ -1,5 +1,6 @@
 #include "framework64/collision.h"
 
+#include "framework64/math.h"
 #include "framework64/types.h"
 
 static inline void swapf(float* a, float* b) {
@@ -170,4 +171,55 @@ int fw64_collision_test_ray_triangle(Vec3* origin, Vec3* direction, Vec3* vertex
     }
     else // This means that there is a line intersection but not a ray intersection.
         return 0;
+}
+
+// Real Time Collision Detection 5.5.8
+// note function modified: https://gamedev.stackexchange.com/questions/144854/intersectmovingaabbaabb-weird-behavior
+int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* t_first, float* t_last) {
+    // Exit early if a and b initially overlapping
+    if (box_intersection(a, b)) {
+        *t_first = 0.0f;
+        *t_last = 0.0f;
+        return 1;
+    }
+
+    // Use relative velocity; effectively treating 'a' as stationary
+    Vec3 v;
+    vec3_subtract(&v, vb, va);
+
+    // Initialize times of first and last contact
+    float tfirst = 0.0f;
+    float tlast = 1.0f;
+
+    // For each axis, determine times of first and last contact, if any
+    for (int i = 0; i < 3; i++) {
+        if (v.el[i] < 0.0f) {
+            if (b->max.el[i] < a->min.el[i])
+                return 0; // Nonintersecting and moving apart
+            if (a->max.el[i] < b->min.el[i])
+                tfirst = fw64_maxf((a->max.el[i] - b->min.el[i]) / v.el[i], tfirst);
+            if (b->max.el[i] > a->min.el[i])
+                tlast  = fw64_minf((a->min.el[i] - b->max.el[i]) / v.el[i], tlast);
+        }
+        else if (v.el[i] > 0.0f) {
+            if (b->min.el[i] > a->max.el[i])
+                return 0; // Nonintersecting and moving apart
+            if (b->max.el[i] < a->min.el[i])
+                tfirst = fw64_maxf((a->min.el[i] - b->max.el[i]) / v.el[i], tfirst);
+            if (a->max.el[i] > b->min.el[i])
+                tlast = fw64_minf((a->max.el[i] - b->min.el[i]) / v.el[i], tlast);
+        }
+        else {
+            if (b->max.el[i] < a->min.el[i] || a->max.el[i] < b->min.el[i])
+                return 0;
+        }
+
+        // No overlap possible if time of first contact occurs after time of last contact
+        if (tfirst > tlast) return 0;
+    }
+
+    *t_first = tfirst;
+    *t_last = tlast;
+
+    return 1;
 }
