@@ -6,12 +6,14 @@ function (configure_core_library)
     find_package(GLEW REQUIRED)
     find_package(nlohmann_json CONFIG REQUIRED)
     find_package(SDL2 CONFIG REQUIRED)
-    find_package(sdl2-mixer CONFIG REQUIRED)
+    find_package(sdl2_mixer CONFIG REQUIRED)
     find_package(sdl2-image CONFIG REQUIRED)
     find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
     target_link_libraries(framework64 PUBLIC GLEW::GLEW)
-    target_link_libraries(framework64 PUBLIC SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image SDL2::SDL2_mixer)
+    # mac SDL mixer?: SDL2_mixer::SDL2_mixer-static
+    target_link_libraries(framework64 PUBLIC SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image)
+    target_link_libraries(framework64 PUBLIC $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>)
     target_link_libraries(framework64 PUBLIC unofficial::sqlite3::sqlite3)
 
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

@@ -26,6 +26,13 @@ async function prepareAssets(assetManifest, assetDirectory, platform, platformBu
         prepareDesktopShaders(shaderDestDir);
     }
 
+    // It seems this is no longer necessary with VCPKG f688b2e29676bfa3a02ead4b7096c589f8af8180 (AUG 30, 2022)
+    /*
+    const shouldPrepareDlls = process.platform === "win32" && platform.toLowerCase() === "desktop";
+    if (shouldPrepareDlls) {
+        prepareWindowsDlls(platformBuildDir, gameBinDirectory);
+    }
+    */
     if (shouldPrepareDlls) {
         prepareWindowsDlls(platformBuildDir, gameBinDirectory);
     }
