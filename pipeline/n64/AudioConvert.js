@@ -28,7 +28,7 @@ function checkOutputPaths(paths) {
     }
 }
 
-async function convertSoundBank(sourceDir, name, outputDir, archive) {
+async function convertSoundBank(sourceDir, name, outputDir, includeDir, archive) {
     if (!fs.existsSync(sourceDir)) {
         throw new Error(`Source directory: ${sourceDir} does not exist`);
     }
@@ -58,7 +58,7 @@ async function convertSoundBank(sourceDir, name, outputDir, archive) {
         const soundBankPath = path.join(outputDir, name + ".soundbank");
         writeSoundBankFile(soundBankPath, ctrlFilePath, tblFilePath, output.length);
         await archive.add(soundBankPath, "soundbank");
-        AudioHeader.writeSoundBankHeader(sourceDir, outputDir);
+        AudioHeader.writeSoundBankHeader(sourceDir, includeDir);
     }
     catch (e) {
         console.log(e);
@@ -70,7 +70,7 @@ async function convertSoundBank(sourceDir, name, outputDir, archive) {
     }
 }
 
-async function convertMusicBank(sourceDir, name, outputDir, archive) {
+async function convertMusicBank(sourceDir, name, outputDir, includeDir, archive) {
     if (!fs.existsSync(sourceDir)) {
         throw new Error(`Source directory: ${sourceDir} does not exist`);
     }
@@ -115,7 +115,7 @@ async function convertMusicBank(sourceDir, name, outputDir, archive) {
         fs.writeSync(musicBankFile, fs.readFileSync(sbkFilePath));
         fs.closeSync(musicBankFile);
 
-        AudioHeader.writeMusicBankHeader(sourceDir, outputDir);
+        AudioHeader.writeMusicBankHeader(sourceDir, includeDir);
 
         await archive.add(musicBankPath, "musicbank");
     }

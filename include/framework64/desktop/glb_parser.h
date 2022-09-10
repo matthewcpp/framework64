@@ -33,7 +33,7 @@ public:
 public:
     /** Extracts a single, static mesh from the GLB file. */
     fw64Mesh* loadStaticMesh(std::string const & path, JointMap const & joint_map);
-    fw64Scene* loadScene(std::string const & path, int rootNodeIndex, TypeMap const & type_map, LayerMap const & layer_map);
+    fw64Scene* loadScene(std::string const & path, int rootNodeIndex, LayerMap const & layer_map);
 
 private:
     bool parseHeader();
@@ -60,6 +60,8 @@ private:
     fw64CollisionMesh * getCollisionMesh(std::string const & name);
     int findCollisionMeshIndex(std::string const& name);
     framework64::CollisionMesh* parseCollisionMesh(nlohmann::json const & mesh_node);
+
+    void getCustomBoundingBoxForNode(nlohmann::json const & json_node, fw64Node* node);
 
     template <typename T>
     std::vector<T> readBufferViewData(size_t bufferViewIndex);

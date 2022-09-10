@@ -14,8 +14,8 @@ typedef struct {
     fw64Transform transform;
     fw64Collider* collider;
     fw64Mesh* mesh;
-    uint32_t type;
     uint32_t layer_mask;
+    void* data;
 } fw64Node;
 
 #define FW64_NODE_UNSPECIFIED_TYPE UINT32_MAX
