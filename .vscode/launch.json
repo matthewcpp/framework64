@@ -3,23 +3,23 @@
     "configurations": [
         {
             "name": "Debug N64 Asset Pipeline",
-            "program": "${workspaceFolder}/pipeline/Pipeline.js",
+            "program": "${workspaceFolder}/scripts/PrepareExampleAssets.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node",
-            "args":["-f", "${workspaceFolder}/assets/manifest.json", "N64", "${workspaceFolder}/build_n64/bin/assets"]
+            "type": "node",
+            "args":["character_animation", "n64"]
         },
         {
             "name": "Debug Desktop Asset Pipeline",
-            "program": "${workspaceFolder}/pipeline/Pipeline.js",
+            "program": "${workspaceFolder}/scripts/PrepareExampleAssets.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "type": "pwa-node",
-            "args":["-f", "${workspaceFolder}/assets/manifest.json", "desktop", "${workspaceFolder}/build_desktop/bin/assets"]
+            "type": "node",
+            "args":["character_animation", "desktop"]
         },
         {
             "type": "by-gdb",
