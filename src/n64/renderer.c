@@ -142,6 +142,7 @@ static Gfx _rdp_init_static_dl[] = {
 };
 
 void fw64_renderer_init_rdp(fw64Renderer* renderer) {
+    gDPPipelineMode(renderer->display_list++, G_PM_NPRIMITIVE); // experimental for increased RDP fill rate, default is G_PM_1PRIMITIVE
     gDPSetCycleType(renderer->display_list++, G_CYC_1CYCLE);
     gDPSetScissor(renderer->display_list++,G_SC_NON_INTERLACE, 0, 0, renderer->screen_size.x, renderer->screen_size.y);
     gSPDisplayList(renderer->display_list++, _rdp_init_static_dl);
