@@ -17,22 +17,18 @@ public:
     ShaderCache(std::string shader_dir_path): shader_dir(shader_dir_path) {}
 
 public:
-    void setShaderProgram(fw64Primitive & primitive);
-
-    ShaderProgram* getSpriteShaderProgram();
+    ShaderProgram* getShaderProgram(fw64ShadingMode shading_mode);
 
     inline std::string shaderDir() const { return shader_dir; }
 
 private:
-    void setProgram(fw64Primitive & primitive, Shader* shader, uint64_t program_hash);
-    uint64_t programHash(fw64Primitive const & primitive) const;
     Shader* getShader(fw64Primitive const & primitive);
 
 private:
     GouraudShader gouraud_shader;
     LineShader line_shader;
     SpriteShader sprite_shader;
-    UnlitShader vertex_color_shader;
+    UnlitShader unlit_shader;
 
     std::unordered_multimap<Shader*, std::unique_ptr<ShaderProgram>> shader_programs;
 
