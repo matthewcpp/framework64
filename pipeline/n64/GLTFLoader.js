@@ -385,6 +385,16 @@ class GLTFLoader {
             material.texture = await this._getTexture(pbr.baseColorTexture.index);
         }
 
+        // Applies a specific shading mode to this material.  In this case mode will not be determined later.
+        if (gltfMaterial.extras && gltfMaterial.extras.shadingMode) {
+            if (N64Material.ShadingMode.hasOwnProperty(gltfMaterial.extras.shadingMode)) {
+                material.shadingMode = N64Material.ShadingMode[gltfMaterial.extras.shadingMode];
+            }
+            else {
+                throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${gltfMaterial.extras.shadingMode}`);
+            }
+        }
+
         this.resources.materials.push(material)
         this.materialMap.set(index, materialIndex);
 

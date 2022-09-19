@@ -1,15 +1,18 @@
 class N64Material {
     static NoTexture = 0xFFFF;
 
+    /** this needs to match up with fw64ShadingMode */
     static ShadingMode  = {
         Unset: 0,
-        UnlitVertexColors: 1,
+        VertexColors: 1,
+        VertexColorsTextured: 2,
         Gouraud: 3,
-        GouraudTextured: 4
+        GouraudTextured: 4,
+        UnlitTextured: 5
     }
 
     constructor() {
-        this.color = [125, 125, 125, 255];
+        this.color = [255, 255, 255, 255];
         this.texture = N64Material.NoTexture; // index into the mesh's texture array
         this.textureFrame = 0;
         this.shadingMode = N64Material.ShadingMode.Unset;
