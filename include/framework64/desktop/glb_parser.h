@@ -61,6 +61,7 @@ private:
     int findCollisionMeshIndex(std::string const& name);
     framework64::CollisionMesh* parseCollisionMesh(nlohmann::json const & mesh_node);
 
+    void determineShadingMode(fw64Primitive& primitive);
     void getCustomBoundingBoxForNode(nlohmann::json const & json_node, fw64Node* node);
 
     template <typename T>

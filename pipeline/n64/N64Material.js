@@ -15,19 +15,6 @@ class N64Material {
         this.shadingMode = N64Material.ShadingMode.Unset;
     }
 
-    setShadingMode(primitive) {
-        if (primitive.hasNormals) {
-            this.shadingMode = this.texture !== N64Material.NoTexture ?
-                N64Material.ShadingMode.GouraudTextured: N64Material.ShadingMode.Gouraud;
-        }
-        else if (primitive.hasVertexColors) {
-            this.shadingMode = N64Material.ShadingMode.UnlitVertexColors;
-        }
-        else {
-            throw new Error("Could not determine shading mode for primitive");
-        }
-    }
-
     get buffer() {
         const buff = Buffer.alloc(16)
 
@@ -43,6 +30,10 @@ class N64Material {
         index = buff.writeUInt32BE(this.shadingMode, index);
 
         return buff;
+    }
+
+    get hasTexture() {
+        return this.texture !== N64Material.NoTexture;
     }
 }
 

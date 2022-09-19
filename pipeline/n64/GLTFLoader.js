@@ -327,11 +327,29 @@ class GLTFLoader {
 
             const material = this.resources.materials[primitive.material];
             if (material.shadingMode === N64Material.ShadingMode.Unset) {
-                material.setShadingMode(primitive);
+                material.shadingMode = this._determineShadingMode(primitive, material);
             }
         }
 
         this.mesh.prunePrimitiveVertices();
+    }
+
+    _determineShadingMode(primitive, material) {
+        if (primitive.hasVertexColors) {
+            if (material.hasTexture)
+                return N64Material.ShadingMode.VertexColorsTextured;
+            else
+                return N64Material.ShadingMode.VertexColors;
+        }
+
+        if (primitive.hasNormals) {
+            if (material.hasTexture)
+                return N64Material.ShadingMode.GouraudTextured;
+            else
+                return N64Material.ShadingMode.Gouraud;
+        }
+
+        throw new Error("Could not determine shading mode for primitive");
     }
 
     /** Gets the correct index for the GLTF material.  I
@@ -648,6 +666,8 @@ class GLTFLoader {
 
             offset += byteStride;
         }
+
+        primitive.hasTexCoords = true;
     }
 
     static _readElementList(buffer, byteOffset, count, size, componentType, mesh) {
