@@ -4,9 +4,13 @@
 
 #include "framework64/n64/controller_button.h"
 
+
 #define ENTITY_N64_LOGO 0
-#define ENTITY_SUZANNE 1
-#define ENTITY_PENGUIN 2
+#define ENTITY_CONTROLLER_CUBE 1
+#define ENTITY_SUZANNE 2
+#define ENTITY_PENGUIN 3
+#define ENTITY_N64BREW_LOGO 4
+
 
 #define SWITCH_MODEL_TEXT "Switch Model"
 #define ORBIT_CAMERA_TEXT "Orbit"
@@ -19,9 +23,12 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_arcball_init(&game->arcball, engine->input);
 
-    game->meshes[0] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo, NULL);
-    game->meshes[1] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_suzanne, NULL);
-    game->meshes[2] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin, NULL);
+    game->meshes[ENTITY_N64_LOGO] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo, NULL);
+    game->meshes[ENTITY_CONTROLLER_CUBE] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_controller_cube, NULL);
+    game->meshes[ENTITY_SUZANNE] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_suzanne, NULL);
+    game->meshes[ENTITY_PENGUIN] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin, NULL);
+    game->meshes[ENTITY_N64BREW_LOGO] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_brew_logo, NULL);
+    
 
     fw64_node_init(&game->node);
 
@@ -35,7 +42,7 @@ void game_init(Game* game, fw64Engine* engine) {
     IVec2 text_measurement = fw64_font_measure_text(game->consolas, SWITCH_MODEL_TEXT);
     game->switch_model_text_width = text_measurement.x;
 
-    set_current_mesh(game, 0);
+    set_current_mesh(game, ENTITY_N64BREW_LOGO);
 }
 
 static void set_current_mesh(Game* game, int index) {
