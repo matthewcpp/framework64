@@ -35,7 +35,7 @@ async function prepareGameAssets(platform, target) {
     console.log(assetManifest, assetDirectory, platform, platformBuildDir, target);
 
     if (platform.toLowerCase() === "n64") {
-        purgeAssetDataAssemblyFile(platformBuildDir, target)
+        purgeCompiledAssetData(platformBuildDir, target)
     }
 
     await prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, target);
@@ -43,14 +43,12 @@ async function prepareGameAssets(platform, target) {
 
 /** 
  * This function is needed because the compiler will need to regenerate the packed asset data when there is a change. 
- * Touching this file does not seem to case the data to be regenerated, therefore we just nuke it when the assets are updated
- * This results in the need for the cmake configure step to be re-ran but in general that is quick.
 */
-function purgeAssetDataAssemblyFile(platformBuildDir) {
-    const assetDataAsm = path.join(platformBuildDir, "src", "asm", "asset_data.s");
-
-    if (fse.existsSync(assetDataAsm)) {
-        console.log(`Purging existing asset data assembly file: ${assetDataAsm}`);
-        fse.unlinkSync(assetDataAsm)
+function purgeCompiledAssetData(platformBuildDir, targetName){
+    const compiledDataPath = path.join(platformBuildDir, "src", "CMakeFiles", `${targetName}.dir`, "asm", "asset_data.s.obj");
+    
+    if (fse.existsSync(compiledDataPath)) {
+        console.log(`Purging compiled asset data file: ${compiledDataPath}`);
+        fse.unlinkSync(compiledDataPath)
     }
 }
