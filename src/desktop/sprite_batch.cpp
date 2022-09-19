@@ -23,7 +23,7 @@ namespace framework64 {
         glBindVertexArray(0);
 
         sprite_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
-        sprite_material.shader = shader_cache.getSpriteShaderProgram();
+        sprite_material.shader = shader_cache.getShaderProgram(FW64_SHADING_MODE_SPRITE);
         sprite_transform_uniform_block.create();
 
         return true;
@@ -55,7 +55,8 @@ namespace framework64 {
         glUniformBlockBinding(sprite_material.shader->handle, sprite_shader->mesh_transform_uniform_block_index, sprite_transform_uniform_block.binding_index);
         sprite_transform_uniform_block.update();
 
-        pixel_texture.material.shader->shader->setUniforms(pixel_texture.material);
+        auto* shader = pixel_texture.material.shader->shader;
+        shader->setUniforms(pixel_texture.material.shader, pixel_texture.material);
         drawSpriteVertices(pixel_texture.sprite_vertices.data(), pixel_texture.sprite_vertices.size(), pixel_texture.material);
     }
 
@@ -85,7 +86,7 @@ namespace framework64 {
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_buffer_size_in_bytes, vertices);
         }
 
-        material.shader->shader->setUniforms(material);
+        material.shader->shader->setUniforms(material.shader, material);
 
         glBindVertexArray(gl_vertex_array_object);
         glDrawArrays(GL_TRIANGLES, 0, vertex_count);

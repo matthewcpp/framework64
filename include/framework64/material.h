@@ -13,14 +13,27 @@ extern "C" {
 
 typedef enum {
     FW64_SHADING_MODE_UNSET,
-    FW64_SHADING_MODE_UNLIT_VERTEX_COLORS,
-    FW64_SHADING_MODE_UNLIT_TEXTURED,
+
+    /** Vertex color * material color */
+    FW64_SHADING_MODE_VERTEX_COLOR,
+
+    /** Vertex color * material color */
+    FW64_SHADING_MODE_VERTEX_COLOR_TEXTURED,
+
+    /** Gouraud Shaded: Untextured */
     FW64_SHADING_MODE_GOURAUD,
+
+    /** Gouraud Shaded: Textured */
     FW64_SHADING_MODE_GOURAUD_TEXTURED,
-    FW64_SHADING_MODE_SPRITE,
+
+    /** Vertex color * Texture color */
+    FW64_SHADING_MODE_UNLIT_TEXTURED,
+
     FW64_SHADING_MODE_DECAL_TEXTURE,
+    FW64_SHADING_MODE_SPRITE,
     FW64_SHADING_MODE_FILL,
     FW64_SHADING_MODE_TEXT,
+    FW64_SHADING_MODE_LINE,
     Fw64_SHADING_MODE_COUNT
 } fw64ShadingMode;
 

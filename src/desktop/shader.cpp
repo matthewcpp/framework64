@@ -90,4 +90,29 @@ GLuint Shader::compile(std::string const& vertex, std::string const& fragment) {
     return program;
 }
 
+void Shader::setupShaderProgram(ShaderProgram* program) {
+    program->lighting_data_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64LightingData");
+    program->mesh_transform_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64MeshTransformData");
+    program->fog_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64FogData");
+    program->diffuse_color_location = glGetUniformLocation(program->handle, "diffuse_color");
+    program->diffuse_texture_location = glGetUniformLocation(program->handle, "diffuse_texture_sampler");
+
+    program->texture_info_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64TextureFrameData");
+
+    if (program->texture_info_uniform_block_index != GL_INVALID_INDEX)
+        program->texture_info.uniform_block.create();
+}
+
+void Shader::bindMaterialTexture(ShaderProgram* program, fw64Material const & material) {
+    program->texture_info.setUniformData(material);
+    program->texture_info.uniform_block.update();
+    glUniformBlockBinding(material.shader->handle, program->texture_info_uniform_block_index, program->texture_info.uniform_block.binding_index);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, material.texture->image->gl_handle);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, material.texture->wrap_s);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, material.texture->wrap_t);
+    glUniform1i(material.shader->diffuse_texture_location, 0);
+}
+
 }

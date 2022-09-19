@@ -9,6 +9,7 @@
 
 namespace framework64 {
 class ShaderProgram;
+class ShaderCache;
 }
 
 #define FW64_DESKTOP_ENTIRE_TEXTURE_FRAME (-1)
@@ -23,8 +24,12 @@ struct fw64Material {
     fw64Texture* texture = nullptr;
     int texture_frame = 0;
     framework64::ShaderProgram* shader = nullptr;
+    framework64::ShaderCache* shader_cache;
+    fw64ShadingMode shading_mode = FW64_SHADING_MODE_UNSET;
 
     [[nodiscard]] uint32_t featureMask() const {
         return texture != nullptr ? Features::DiffuseTexture : Features::None;
     }
+
+    void updateShader();
 };

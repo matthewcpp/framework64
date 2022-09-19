@@ -26,7 +26,7 @@ ShaderProgram* LineShader::create(uint32_t primitive_attributes, uint32_t materi
     return program.release();
 }
 
-void LineShader::setUniforms(fw64Material const & material) {
+void LineShader::setUniforms(ShaderProgram* program, fw64Material const & material) {
     glUniform4fv(material.shader->diffuse_color_location, 1, material.color.data());
 }
 
