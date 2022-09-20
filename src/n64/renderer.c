@@ -154,7 +154,7 @@ void fw64_renderer_init_rdp(fw64Renderer* renderer) {
 void fw64_renderer_init_rsp(fw64Renderer* renderer) {
     gSPClearGeometryMode(renderer->display_list++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
     gSPTexture(renderer->display_list++, 0, 0, 0, 0, G_OFF);
-    gSPSetGeometryMode(renderer->display_list++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH);
+    gSPSetGeometryMode(renderer->display_list++, G_ZBUFFER | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK);
 }
 
 /** Note: This function assumes that the render mode is set to G_RM_OPA_SURF / G_RM_OPA_SURF2 
