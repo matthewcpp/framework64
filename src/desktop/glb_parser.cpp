@@ -434,7 +434,33 @@ void GlbParser::createPrimitive(fw64Mesh* mesh, nlohmann::json const & primitive
     GLMeshInfo gl_info = mesh_data.createGlMesh();
     gl_info.setPrimitiveValues(primitive);
     mesh_data.moveMeshDataToPrimitive(primitive);
-    shader_cache.setShaderProgram(primitive);
+    determineShadingMode(primitive);
+    primitive.material.shader = shader_cache.getShaderProgram(primitive.material.shading_mode);
+}
+
+// note that authoring vertex colors in the model gives priority over normals
+void GlbParser::determineShadingMode(fw64Primitive& primitive) {
+    if (primitive.material.shading_mode != FW64_SHADING_MODE_UNSET) // in this case the shading mode was explictly specified on material
+        return;
+
+    if (primitive.mode == fw64Primitive::Mode::Lines) {
+        primitive.material.shading_mode = FW64_SHADING_MODE_LINE;
+        return;
+    }
+
+    if (primitive.attributes & fw64Primitive::Attributes::VertexColors) {
+        if (primitive.attributes & fw64Primitive::Attributes::TexCoords)
+            primitive.material.shading_mode = FW64_SHADING_MODE_VERTEX_COLOR_TEXTURED;
+        else
+            primitive.material.shading_mode = FW64_SHADING_MODE_VERTEX_COLOR;
+        
+        return;
+    }
+
+    if (primitive.attributes & fw64Primitive::Attributes::Normals) {
+        primitive.material.shading_mode = primitive.material.texture ? FW64_SHADING_MODE_GOURAUD_TEXTURED : FW64_SHADING_MODE_GOURAUD;
+        return;
+    }
 }
 
 MeshData GlbParser::readPrimitiveMeshData(nlohmann::json const & primitive_node) {
@@ -464,6 +490,24 @@ MeshData GlbParser::readPrimitiveMeshData(nlohmann::json const & primitive_node)
     return mesh_data;
 }
 
+static std::unordered_map<std::string, fw64ShadingMode> shading_mode_name_map = 
+{
+    {"UnlitTextured", FW64_SHADING_MODE_UNLIT_TEXTURED}
+};
+
+static fw64ShadingMode parseMaterialShadingMode(nlohmann::json const & material_extras_node) {
+    if (!material_extras_node.contains("shadingMode"))
+        return FW64_SHADING_MODE_UNSET;
+
+    auto shading_mode_str = material_extras_node["shadingMode"].get<std::string>();
+    auto shading_mode_lookup = shading_mode_name_map.find(shading_mode_str);
+
+    if (shading_mode_lookup != shading_mode_name_map.end())
+        return shading_mode_lookup->second;
+
+    return FW64_SHADING_MODE_UNSET;
+}
+
 void GlbParser::parseMaterial(fw64Material& material, size_t material_index) {
     auto const & material_node = json_doc["materials"][material_index];
     auto const & pbr = material_node["pbrMetallicRoughness"];
@@ -479,6 +523,11 @@ void GlbParser::parseMaterial(fw64Material& material, size_t material_index) {
     if (pbr.contains("baseColorTexture")) {
         auto texture_index = pbr["baseColorTexture"]["index"].get<size_t>();
         material.texture = getTexture(texture_index);
+    }
+
+    if (material_node.contains("extras")) {
+        auto extras = material_node["extras"];
+        material.shading_mode = parseMaterialShadingMode(extras);
     }
 }
 

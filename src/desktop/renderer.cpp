@@ -23,7 +23,7 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
     framebuffer_write_texture.texture.init();
     setScreenSize(width, height);
 
-    framebuffer_write_texture.texture.material.shader = shader_cache.getSpriteShaderProgram();
+    framebuffer_write_texture.texture.material.shader = shader_cache.getShaderProgram(FW64_SHADING_MODE_SPRITE);
 
     screen_overlay.init(shader_cache);
 
@@ -212,7 +212,7 @@ void fw64Renderer::updateMeshTransformBlock(fw64Matrix & matrix) {
 
 void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
     setActiveShader(primitive.material.shader);
-    active_shader->shader->setUniforms(primitive.material);
+    active_shader->shader->setUniforms(active_shader, primitive.material);
     glBindVertexArray(primitive.gl_vertex_array_object);
 
     glDrawElements(primitive.mode, primitive.element_count, primitive.element_type, 0);

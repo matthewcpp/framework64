@@ -2,6 +2,6 @@ set(src_files
     game.h game.c)
 
 create_game(
-    TARGET rendermodes
+    TARGET shading_modes
     SOURCES ${src_files}
     EXTRA_LIBS example_common)

@@ -47,6 +47,12 @@
         },
         {
             "src": "penguin/penguin.gltf"
+        },
+        {
+            "src": "controller_cube/controller_cube.gltf"
+        },
+        {
+            "src": "n64_brew_logo/n64_brew_logo.gltf"
         }
     ]
 }

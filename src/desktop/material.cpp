@@ -1,5 +1,10 @@
 #include "framework64/desktop/material.h"
+#include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
+
+void fw64Material::updateShader() {
+
+}
 
 // C Interface
 
@@ -21,8 +26,10 @@ int fw64_material_get_texture_frame(fw64Material* material) {
 }
 
 void fw64_material_set_shading_mode(fw64Material* material, fw64ShadingMode mode) {
-    return; //n64-required api change. stubbed on desktop for now.
+    material->shading_mode = mode;
+    material->updateShader();
 }
+
 
 void fw64_material_set_color(fw64Material* material, uint8_t r, uint8_t g, uint8_t b) {
     material->color[0] = static_cast<float>(r) / 255.0f;

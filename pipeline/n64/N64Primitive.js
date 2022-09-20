@@ -16,6 +16,7 @@ class N64Primitive {
     material = 0;
     hasNormals = false;
     hasVertexColors = false;
+    hasTexCoords = false;
 
     bounding = new Bounding();
 

@@ -15,9 +15,10 @@ ShaderProgram* UnlitShader::create(uint32_t primitive_attributes, uint32_t mater
     if (primitive_attributes & fw64Primitive::Attributes::VertexColors) {
         preprocessor_statements.emplace_back("#define FW64_VERTEX_COLORS");
     }
-    else {
-        preprocessor_statements.emplace_back("#define FW64_DIFFUSE_COLOR");
-    }
+
+    bool has_diffuse_texture = material_features & fw64Material::Features::DiffuseTexture;
+    if (has_diffuse_texture)
+        preprocessor_statements.emplace_back("#define FW64_DIFFUSE_TEXTURE");
 
     GLuint handle = Shader::createFromPaths(vertex_path, frag_path, preprocessor_statements);
 
@@ -28,8 +29,7 @@ ShaderProgram* UnlitShader::create(uint32_t primitive_attributes, uint32_t mater
     program->shader = this;
     program->handle = handle;
 
-    program->mesh_transform_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64MeshTransformData");
-    program->diffuse_color_location = glGetUniformLocation(program->handle, "diffuse_color");
+    setupShaderProgram(program.get());
 
     if (program->mesh_transform_uniform_block_index == GL_INVALID_INDEX)
         return nullptr;
@@ -37,9 +37,11 @@ ShaderProgram* UnlitShader::create(uint32_t primitive_attributes, uint32_t mater
     return program.release();
 }
 
-void UnlitShader::setUniforms(fw64Material const & material) {
-    if (material.shader->diffuse_color_location != -1)
-        glUniform4fv(material.shader->diffuse_color_location, 1, material.color.data());
+void UnlitShader::setUniforms(ShaderProgram* program, fw64Material const & material) {
+    glUniform4fv(material.shader->diffuse_color_location, 1, material.color.data());
+    if (material.texture) {
+        bindMaterialTexture(program, material);
+    }
 }
 
 }

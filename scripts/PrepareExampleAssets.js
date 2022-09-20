@@ -59,5 +59,21 @@ async function prepareExample(example, platform) {
     const assetDirectory = path.resolve(__dirname, "..", "assets");
     const platformBuildDir = path.resolve(__dirname, "..", `build_${platform}`);
 
+    if (platform.toLowerCase() === "n64") {
+        purgeCompiledAssetData(platformBuildDir, example)
+    }
+
     await prepareAssets(exampleManifestFile, assetDirectory, platform, platformBuildDir, example);
+}
+
+/** 
+ * This function is needed because the compiler will need to regenerate the packed asset data when there is a change. 
+*/
+function purgeCompiledAssetData(platformBuildDir, targetName){
+    const compiledDataPath = path.join(platformBuildDir, "examples", targetName, "CMakeFiles", `${targetName}.dir`, "asm", "asset_data.s.obj");
+    
+    if (fse.existsSync(compiledDataPath)) {
+        console.log(`Purging compiled asset data file: ${compiledDataPath}`);
+        fse.unlinkSync(compiledDataPath)
+    }
 }

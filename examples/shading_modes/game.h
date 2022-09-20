@@ -6,7 +6,7 @@
 
 #include "common/arcball_camera.h"
 
-#define MESH_COUNT 3
+#define MESH_COUNT 5
 
 typedef struct {
     fw64Engine* engine;
