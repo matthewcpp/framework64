@@ -18,12 +18,14 @@ INPUT             =     ../README.md \
                         ../include/framework64/frustum.h \
                         ../include/framework64/image.h \
                         ../include/framework64/input.h \
+                        ../include/framework64/level.h \
                         ../include/framework64/material.h \
                         ../include/framework64/matrix.h \
                         ../include/framework64/mesh.h \
                         ../include/framework64/node.h \
                         ../include/framework64/plane.h \
                         ../include/framework64/quat.h \
+                        ../include/framework64/query.h \
                         ../include/framework64/random.h \
                         ../include/framework64/renderer.h \
                         ../include/framework64/save_file.h \

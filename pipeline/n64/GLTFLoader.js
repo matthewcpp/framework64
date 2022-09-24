@@ -71,11 +71,14 @@ class GLTFLoader {
         return this.mesh;
     }
 
-    async loadScene(gltfPath, layerMap) {
-        this._loadFile(gltfPath);
-
-        const sceneRootNodeIndex = this.gltf.scene;
-        return this._parseScene(sceneRootNodeIndex, layerMap);
+    _resetMaps() {
+        this.resources = new N64MeshResources();
+        this.loadedBuffers.clear();
+        this.imageMap.clear();
+        this.textureMap.clear();
+        this.materialMap.clear();
+        this.meshMap.clear();
+        this.collisionMeshMap.clear();
     }
 
     async loadLevel(gltfPath, layerMap) {
@@ -133,6 +136,7 @@ class GLTFLoader {
     }
 
     async _parseScene(sceneRootNodeIndex, layerMap) {
+        this._resetMaps();
         this._parseSceneNode(sceneRootNodeIndex);
 
         // the passed in `sceneRootNodeIndex` was not a valid scene root
@@ -282,13 +286,7 @@ class GLTFLoader {
         this.gltfPath = gltfPath;
         this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
 
-        this.resources = new N64MeshResources();
-        this.loadedBuffers.clear();
-        this.imageMap.clear();
-        this.textureMap.clear();
-        this.materialMap.clear();
-        this.meshMap.clear();
-        this.collisionMeshMap.clear();
+        this._resetMaps();
     }
 
     async _loadMesh(gltfMesh) {

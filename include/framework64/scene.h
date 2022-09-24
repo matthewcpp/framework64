@@ -6,37 +6,10 @@
 #include "framework64/mesh.h"
 #include "framework64/node.h"
 #include "framework64/quat.h"
+#include "framework64/query.h"
 #include "framework64/collision.h"
 #include "framework64/renderer.h"
 #include "framework64/vec3.h"
-
-typedef struct {
-    fw64Node* node;
-    Vec3 point;
-    float distance;
-} fw64RaycastHit;
-
-
-typedef struct {
-    fw64Node* node;
-    Vec3 point;
-} fw64OverlapSphereResult;
-
-typedef struct {
-    fw64OverlapSphereResult results[5];
-    int count;
-} fw64OverlapSphereQueryResult;
-
-typedef struct {
-    fw64Node* node;
-    float tfirst;
-    float tlast;
-} IntersectMovingBoxResult;
-
-typedef struct {
-    IntersectMovingBoxResult results[5];
-    int count;
-} fw64IntersectMovingBoxQuery;
 
 typedef struct fw64Scene fw64Scene;
 
@@ -44,10 +17,15 @@ typedef struct fw64Scene fw64Scene;
 extern "C" {
 #endif
 
-/** Gets the original bounding box for the scene as it was authored. 
+/** 
+ * Gets the original bounding box for the scene as it was authored. 
  * This result may be inaccurate if nodes are transformed from their initial state
  * */
 Box* fw64_scene_get_initial_bounds(fw64Scene* scene);
+
+/**
+ * Recalculates the scene's bounding based on the transform of all child nodes.
+ */
 void fw64_scene_update_bounding(fw64Scene* scene);
 
 fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int handle, fw64Allocator* allocator);

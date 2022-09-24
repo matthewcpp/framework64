@@ -1,0 +1,12 @@
+{
+    "levels":
+    [
+        {
+            "src": "tiles_test/tiles_test.gltf"
+        }
+    ],
+    "layers": {
+        "ground": 1,
+        "obstacles": 2
+    }
+}

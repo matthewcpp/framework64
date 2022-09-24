@@ -17,12 +17,14 @@ set(common_source_files
         ../include/framework64/frustum.h frustum.c
         ../include/framework64/image.h
         ../include/framework64/input.h
+        ../include/framework64/level.h level.c
         ../include/framework64/math.h math.c
         ../include/framework64/matrix.h matrix.c
         ../include/framework64/mesh.h
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
         ../include/framework64/quat.h quat.c
+        ../include/framework64/query.h query.c
         ../include/framework64/random.h random.c
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
