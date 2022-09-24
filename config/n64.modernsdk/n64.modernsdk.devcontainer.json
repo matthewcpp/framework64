@@ -1,5 +1,5 @@
 {
-    "image": "matthewcpp/framework64-n64-modernsdk",
+    "image": "matthewcpp/n64-modern-sdk",
     "runArgs": [
         "--net=host"
     ],
