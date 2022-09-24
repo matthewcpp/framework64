@@ -17,6 +17,7 @@ set(common_source_files
         ../include/framework64/frustum.h frustum.c
         ../include/framework64/image.h
         ../include/framework64/input.h
+        ../include/framework64/level.h level.c
         ../include/framework64/math.h math.c
         ../include/framework64/matrix.h matrix.c
         ../include/framework64/mesh.h
