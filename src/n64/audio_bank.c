@@ -60,7 +60,7 @@ fw64MusicBank* fw64_music_bank_load(fw64AssetDatabase* assets, uint32_t asset_id
 
     fw64MusicHeader music_header;
     fw64_filesystem_read(&music_header, sizeof(fw64MusicHeader), 1, handle);
-    fw64_filesystem_close(asset_id);
+    fw64_filesystem_close(handle);
 
     // get the rom address of the sequence file which contains the compressed midi files
     uint32_t rom_address = fw64_n64_filesystem_get_rom_address(asset_id);
