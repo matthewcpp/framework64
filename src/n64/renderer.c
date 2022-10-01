@@ -25,6 +25,7 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->screen_size.y = screen_height;
 
     renderer->display_list = NULL;
+    renderer->active_texture = NULL;
     renderer->render_mode = FW64_RENDERER_MODE_UNSET;
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
     renderer->flags = FW64_RENDERER_FLAG_NONE;
@@ -220,6 +221,7 @@ void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
 
 void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw64RendererFlags flags) {
     renderer->render_mode = render_mode;
+    renderer->active_texture = NULL;
     
     renderer->flags = flags;
 
@@ -557,6 +559,9 @@ void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw
 }
 
 void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {
+    if (texture == renderer->active_texture && frame == renderer->active_texture_frame)
+        return;
+
     fw64Image* image = texture->image;
     int slice_width = fw64_texture_slice_width(texture);
     int slice_height = fw64_texture_slice_height(texture);
@@ -565,22 +570,25 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
     switch (image->info.format)
     {
     case FW64_N64_IMAGE_FORMAT_RGBA16:
-    gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
-        G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
-        texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
-        break;
+        gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
+            G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
+            texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+            break;
 
     case FW64_N64_IMAGE_FORMAT_RGBA32:
-    gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
-        G_IM_FMT_RGBA, G_IM_SIZ_32b,  slice_width, slice_height, 0,
-        texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
-        break;
+        gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
+            G_IM_FMT_RGBA, G_IM_SIZ_32b,  slice_width, slice_height, 0,
+            texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+            break;
     
     default:
         break;
     }
 
     gDPLoadSync(renderer->display_list++);
+
+    renderer->active_texture = texture;
+    renderer->active_texture_frame = frame;
 }
 
 // TODO: handle no active lights correctly...first light should be set to all black

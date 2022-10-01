@@ -46,6 +46,8 @@ struct fw64Renderer{
 
     fw64RendererPostDrawFunc post_draw_func;
     void* post_draw_func_arg;
+    fw64Texture* active_texture;
+    int active_texture_frame;
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
