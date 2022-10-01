@@ -223,3 +223,26 @@ int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* 
 
     return 1;
 }
+
+// Real Time Collision Detection 5.5.5, Intersecting Moving Sphere Against Sphere
+int fw64_collision_test_moving_spheres(Vec3* ca, float ra, Vec3* va, Vec3* cb, float rb, Vec3* vb, float* t)
+{
+    Vec3 s, v;
+    vec3_subtract(&s, cb, ca);      // vector between the center of the 2 spheres
+    vec3_subtract(&v, vb, va);      // relative motion of sphere b with respect to stationary sphere a
+    float r = rb + ra;              // the sum of all spheres (radii)
+    float c = vec3_dot(&s, &s) - (r * r);
+    if (c < 0.0f) { // if spheres overlap already, without any motion
+        *t = 0.0f; 
+        return 1;
+    }
+    float a = vec3_dot(&v, &v);
+    if (a < EPSILON) return 0; // not moving relative each other
+    float b = vec3_dot(&v, &s);
+    if (b >= 0.0f) return 0;   // not moving towards each other
+    float d = b * b - a * c;
+    if (d < 0.0f) return 0;    // quadratic function has no real roots, therefore no intersection
+
+    *t = (-b - fw64_sqrtf(d)) / a;
+    return 1;
+}

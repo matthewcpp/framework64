@@ -40,6 +40,13 @@ int fw64_collision_test_ray_box(Vec3* origin, Vec3* direction, Box* box, Vec3* p
  */
 int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* tfirst, float* tlast);
 
+/**
+ * Intersect spheres a (center ca and radius ra) and b (center cb and radius rb) with constant velocities va and vb.
+ * Returns non-zero if an intersection exists, or zero if none
+ * Time of first intersection (if any) is stored in t. If no intersection, t is undefined
+ */
+int fw64_collision_test_moving_spheres(Vec3* ca, float ra, Vec3* va, Vec3* cb, float rb, Vec3* vb, float* t);
+
 #ifdef __cplusplus
 }
 #endif
