@@ -43,6 +43,28 @@ int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_poi
     return 1;
 }
 
+// Real Time Collision Detection 5.3.2
+int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, float radius, Vec3* point, float* t) {
+    Vec3 m;
+    vec3_subtract(&m, origin, center);
+    float b = vec3_dot(&m, direction);
+    float c = vec3_dat(&m, &m) - (radius * radius);
+    // exit early. ray origin outside sphere, and direction points away from sphere
+    if (c > 0.0f && b > 0.0f) return 0;
+    
+    float discr = (b*b) - c;
+    // discriminant <0 means ray misses
+    if (discr < 0.0f) return 0;
+    
+    // ray intersect sphere, find smallest t value of intersection
+    *t = -b - fw64_sqrtf(discr);
+    // t < 0, ray started inside sphere. set t = 0
+    if (*t < 0.0f) *t = 0.0f;
+    // output point of first collision
+    vec3_add_and_scale(point, origin, direction, *t);
+    return 1;
+}
+
 // Real Time Collision Detection 5.2.5
 int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p) {
     box_closest_point(box, center, p);
@@ -240,7 +262,7 @@ int fw64_collision_test_moving_spheres(Vec3* ca, float ra, Vec3* va, Vec3* cb, f
     if (a < EPSILON) return 0; // not moving relative each other
     float b = vec3_dot(&v, &s);
     if (b >= 0.0f) return 0;   // not moving towards each other
-    float d = b * b - a * c;
+    float d = (b * b) - (a * c);
     if (d < 0.0f) return 0;    // quadratic function has no real roots, therefore no intersection
 
     *t = (-b - fw64_sqrtf(d)) / a;

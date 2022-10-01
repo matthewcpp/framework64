@@ -34,6 +34,13 @@ int fw64_collision_test_ray_triangle(Vec3* origin, Vec3* direction, Vec3* a, Vec
 int fw64_collision_test_ray_box(Vec3* origin, Vec3* direction, Box* box, Vec3* point, float* t);
 
 /**
+ * Returns nonzero value if the ray intersects the sphere, otherwise 0
+ * Additionally computes the intersection point (point) and distance (t) from ray origin of the intersection
+ * If no intersection, point and t are undefined
+ */
+int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, float radius, Vec3* point, float* t);
+
+/**
  * Intersect AABBs a and b moving with constant velocities va and vb.
  * On intersection, return time of first and last contact in tfirst and tlast
  * Note: The implementation, as taken from Ericson's RT Collision detection will return true if va == vb
