@@ -171,11 +171,11 @@ void fw64_level_draw_camera(fw64Level* level, fw64Camera* camera) {
         if (!fw64_frustum_intersects_box(&frustum, fw64_scene_get_initial_bounds(ref->scene)))
             continue;
 
-        fw64_scene_draw_frustrum(ref->scene, renderer, &frustum);
-
         if (ref->info.draw_func) {
             ref->info.draw_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
         }
+
+        fw64_scene_draw_frustrum(ref->scene, renderer, &frustum);
     }
 }
 
