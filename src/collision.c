@@ -65,6 +65,55 @@ int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, 
     return 1;
 }
 
+// https://iquilezles.org/articles/intersectors/
+int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, // ray
+                                    Vec3* point_a, Vec3* point_b, float radius, // capsule
+                                    Vec3* out_point, float* out_t) { //output
+    Vec3  ba;
+    vec3_subtract(&ba, point_b, point_a);
+    Vec3  oa;
+    vec3_subtract(&oa, origin, point_a);
+    float baba = vec3_dot(&ba, &ba);
+    float bard = vec3_dot(&ba, direction);
+    float baoa = vec3_dot(&ba,&oa);
+    float rdoa = vec3_dot(direction, &oa);
+    float oaoa = vec3_dot(&oa, &oa);
+    float a = baba      - bard*bard;
+    float b = baba*rdoa - baoa*bard;
+    float c = baba*oaoa - baoa*baoa - radius*radius*baba;
+    float h = b*b - a*c;
+    
+    if( h >= 0.0 )
+    {
+        float t = (-b-sqrt(h))/a;
+        float y = baoa + t*bard;
+        // body
+        if( y>0.0 && y<baba ) {
+            *out_t = t;
+            vec3_add_and_scale(out_point, origin, direction, *out_t);  
+            return 1;
+        }
+        // caps
+        Vec3 oc;
+        if (y <= 0.0) {
+            vec3_copy(&oc, &oa);
+        } else {
+            vec3_subtract(&oc, origin, point_b);
+        } 
+        b = vec3_dot(direction,&oc);
+        c = vec3_dot(&oc,&oc) - (radius*radius);
+        h = b*b - c;
+        if( h>0.0 ) {
+            *out_t = -b - fw64_sqrtf(h);
+            vec3_add_and_scale(out_point, origin, direction, *out_t);
+            return 1;
+        }
+    }
+    // no real roots, no intersection
+    return 0;
+
+}
+
 // Real Time Collision Detection 5.2.5
 int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p) {
     box_closest_point(box, center, p);
