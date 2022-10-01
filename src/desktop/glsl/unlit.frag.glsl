@@ -25,4 +25,7 @@ void main() {
 #else
     final_color = unlit_color;
 #endif
+
+    if (final_color.a == 0.0)
+        discard;
 }

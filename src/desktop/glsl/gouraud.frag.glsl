@@ -48,4 +48,7 @@ void main() {
 
     float fragment_distance_to_camera =  gl_FragCoord.z / gl_FragCoord.w;
     final_color = mix(final_color, fw64_fog_color, fw64_get_fog_factor(fragment_distance_to_camera));
+
+    if (final_color.a == 0.0)
+        discard;
 }
