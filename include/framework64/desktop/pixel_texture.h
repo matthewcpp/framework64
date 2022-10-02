@@ -18,6 +18,7 @@ namespace framework64 {
 struct SpriteVertex {
     float x, y, z;
     float u, v;
+    float r, g, b, a;
 };
 
 class PixelTexture {

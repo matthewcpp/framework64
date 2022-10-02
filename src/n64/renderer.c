@@ -30,7 +30,7 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
     renderer->flags = FW64_RENDERER_FLAG_NONE;
 
-    renderer->fill_color = GPACK_RGBA5551(255, 255, 255, 1);
+    n64_fill_rect_init(&renderer->fill_rect);
     renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
 
     fw64_renderer_set_depth_testing_enabled(renderer, 1);
@@ -139,6 +139,7 @@ static Gfx _rdp_init_static_dl[] = {
     gsDPSetAlphaCompare(G_AC_NONE),
     gsDPSetRenderMode(G_RM_OPA_SURF, G_RM_OPA_SURF2),
     gsDPSetColorDither(G_CD_DISABLE),
+    gsDPSetPrimColor(0xFFFF, 0xFFFF, 255, 255, 255, 255),
     gsSPEndDisplayList()
 };
 
@@ -365,7 +366,7 @@ static void n64_renderer_configure_shading_mode_decal_texture(fw64Renderer* rend
     if (renderer->shading_mode == FW64_SHADING_MODE_DECAL_TEXTURE)
         return;
 
-    gDPSetRenderMode(renderer->display_list++, G_RM_ZB_XLU_DECAL, G_RM_ZB_XLU_DECAL);
+    gDPSetRenderMode(renderer->display_list++, G_RM_ZB_XLU_DECAL, G_RM_ZB_XLU_DECAL2);
     gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
     gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
     gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
@@ -378,26 +379,31 @@ static void n64_renderer_configure_shading_mode_sprite(fw64Renderer* renderer) {
         return;
 
     fw64_n64_disable_fog_for_2d(renderer);
-    gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
-    gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
+    gDPSetRenderMode(renderer->display_list++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIDECALA_PRIM, G_CC_MODULATEIDECALA_PRIM); // sprite
     gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
     gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
+    gDPPipeSync(renderer->display_list++);
 
     renderer->shading_mode = FW64_SHADING_MODE_SPRITE;
 }
 
-static void n64_renderer_configure_shading_mode_text(fw64Renderer* renderer) {
-    if (renderer->shading_mode == FW64_SHADING_MODE_TEXT)
+static void n64_renderer_configure_shading_mode_fill(fw64Renderer* renderer) {
+    if (renderer->shading_mode == FW64_SHADING_MODE_FILL)
         return;
 
     fw64_n64_disable_fog_for_2d(renderer);
-    gDPSetRenderMode(renderer->display_list++, FW64_RM_TRANSLUCENT_SPRITE(renderer), FW64_RM_TRANSLUCENT_SPRITE2(renderer));
-    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIA_PRIM, G_CC_MODULATEIA_PRIM);
+    gDPSetRenderMode(renderer->display_list++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATERGB_PRIM, G_CC_MODULATERGB_PRIM);
     gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
     gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
-    gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, 255, 255, 255, 255); // TODO: provide API to set text color
-    
-    renderer->shading_mode = FW64_SHADING_MODE_TEXT;
+    gDPPipeSync(renderer->display_list++);
+
+    renderer->shading_mode = FW64_SHADING_MODE_FILL;
+}
+
+void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, r, g, b, a);
 }
 
 static void n64_renderer_configure_mesh_shading_mode(fw64Renderer* renderer, fw64Material* material) {
@@ -452,6 +458,11 @@ static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite,
     gDPPipeSync(renderer->display_list++);
 }
 
+void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height) {
+    n64_renderer_configure_shading_mode_fill(renderer);
+    _fw64_draw_sprite_slice(renderer, &renderer->fill_rect.texture, 0, x, y, width, height);
+}
+
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y) {
     n64_renderer_configure_shading_mode_sprite(renderer);
     _fw64_draw_sprite_slice(renderer, sprite, frame, x, y, fw64_texture_slice_width(sprite), fw64_texture_slice_height(sprite));
@@ -488,7 +499,7 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
     if (!text || text[0] == 0) return;
-    n64_renderer_configure_shading_mode_text(renderer);
+    n64_renderer_configure_shading_mode_sprite(renderer);
 
     x = renderer->viewport_screen_pos.x + x;
     y = renderer->viewport_screen_pos.y + y;
@@ -563,6 +574,7 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
         return;
 
     fw64Image* image = texture->image;
+    uint8_t* image_data = fw64_n64_image_get_data(image, frame);
     int slice_width = fw64_texture_slice_width(texture);
     int slice_height = fw64_texture_slice_height(texture);
 
@@ -570,13 +582,13 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
     switch (image->info.format)
     {
     case FW64_N64_IMAGE_FORMAT_RGBA16:
-        gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
+        gDPLoadTextureBlock(renderer->display_list++, image_data,
             G_IM_FMT_RGBA, G_IM_SIZ_16b,  slice_width, slice_height, 0,
             texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
             break;
 
     case FW64_N64_IMAGE_FORMAT_RGBA32:
-        gDPLoadTextureBlock(renderer->display_list++, fw64_n64_image_get_data(image, frame),
+        gDPLoadTextureBlock(renderer->display_list++, image_data,
             G_IM_FMT_RGBA, G_IM_SIZ_32b,  slice_width, slice_height, 0,
             texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
             break;

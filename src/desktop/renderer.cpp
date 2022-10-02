@@ -251,6 +251,11 @@ void fw64Renderer::drawSprite(fw64Texture* texture, float x, float y){
     sprite_batch.drawSprite(texture, x, y);
 }
 
+void fw64Renderer::drawFilledRect(float x, float y, float width, float height) {
+    setDrawingMode(DrawingMode::Rect);
+    sprite_batch.drawFilledRect(x, y, width, height);
+}
+
 void fw64Renderer::drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y) {
     setDrawingMode(DrawingMode::Rect);
     sprite_batch.drawSpriteFrame(texture, frame, x, y, scale_x, scale_y);
@@ -445,6 +450,14 @@ void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int 
 
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
     renderer->drawText(font, static_cast<float>(x), static_cast<float>(y), text, count);
+}
+
+void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height) {
+    renderer->drawFilledRect(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height));
+}
+
+void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
+    renderer->sprite_batch.setFillColor(r, g, b, a);
 }
 
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {

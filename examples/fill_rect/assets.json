@@ -1,0 +1,18 @@
+{
+    "images": [
+        {
+            "src": "n64_logo.png",
+            "hslices": 2,
+            "vslices": 2
+        }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12",
+            "sourceString": "0123456789%",
+            "imageFormat": "rgba32"
+        }
+    ]
+}

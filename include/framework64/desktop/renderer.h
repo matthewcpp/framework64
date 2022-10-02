@@ -47,6 +47,7 @@ public:
     void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
 public:
+    void drawFilledRect(float x, float y, float width, float height);
     void drawSprite(fw64Texture* texture, float x, float y);
     void drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y);
     void drawText(fw64Font* font, float x, float y, const char* text, uint32_t count);

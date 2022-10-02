@@ -8,6 +8,7 @@ set(platform_source_files
     ${n64_include_dir}/controller_button.h
     ${n64_include_dir}/engine.h n64/engine.c
     ${n64_include_dir}/filesystem.h n64/filesystem.c
+    ${n64_include_dir}/fill_rect.h n64/fill_rect.c
     ${n64_include_dir}/framebuffer.h n64/framebuffer.c
     ${n64_include_dir}/font.h n64/font.c
     ${n64_include_dir}/image.h n64/image.c
