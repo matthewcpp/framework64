@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/desktop/fill_shader.h"
 #include "framework64/desktop/gouraud_shader.h"
 #include "framework64/desktop/line_shader.h"
 #include "framework64/desktop/sprite_shader.h"
@@ -29,6 +30,7 @@ private:
     LineShader line_shader;
     SpriteShader sprite_shader;
     UnlitShader unlit_shader;
+    FillShader fill_shader;
 
     std::unordered_multimap<Shader*, std::unique_ptr<ShaderProgram>> shader_programs;
 

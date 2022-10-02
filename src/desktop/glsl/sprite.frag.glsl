@@ -8,6 +8,8 @@ layout(std140) uniform fw64TextureFrameData {
 in vec2 tex_coords;
 uniform sampler2D diffuse_texture_sampler;
 
+in vec4 vertex_color;
+
 out vec4 final_color;
 
 void main() {
@@ -16,7 +18,7 @@ void main() {
         fw64_texture_slice_top + (tex_coords.y * fw64_texture_slice_height)
     );
 
-    final_color = texture(diffuse_texture_sampler, sample_coords);
+    final_color = vertex_color * texture(diffuse_texture_sampler, sample_coords);
 
     if (final_color.a < 0.1)
         discard;

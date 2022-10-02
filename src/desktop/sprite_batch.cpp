@@ -11,8 +11,9 @@ namespace framework64 {
         glGenVertexArrays(1, &gl_vertex_array_object);
         glBindVertexArray(gl_vertex_array_object);
 
-        // enable positions in VAO
         glBindBuffer(GL_ARRAY_BUFFER, gl_vertex_buffer);
+
+        // enable positions in VAO
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SpriteVertex), (void*)0);
 
@@ -20,10 +21,20 @@ namespace framework64 {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(SpriteVertex), (void*)12);
 
+        // enable vertex colors in VAO
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(SpriteVertex), (void*)20);
+
         glBindVertexArray(0);
 
         sprite_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
         sprite_material.shader = shader_cache.getShaderProgram(FW64_SHADING_MODE_SPRITE);
+        sprite_material.shading_mode = FW64_SHADING_MODE_SPRITE;
+
+        fill_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
+        fill_material.shader = shader_cache.getShaderProgram(FW64_SHADING_MODE_FILL);
+        fill_material.shading_mode = FW64_SHADING_MODE_FILL;
+
         sprite_transform_uniform_block.create();
 
         return true;
@@ -33,12 +44,7 @@ namespace framework64 {
         glDisable(GL_DEPTH_TEST);
         sprite_material.texture = nullptr;
         sprite_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
-
-        auto* sprite_shader = sprite_material.shader;
-
-        // activate the sprite shader and set the matrix
-        glUseProgram(sprite_shader->handle);
-        glUniformBlockBinding(sprite_material.shader->handle, sprite_shader->mesh_transform_uniform_block_index, sprite_transform_uniform_block.binding_index);
+        current_shader_handle = 0;
     }
 
     void SpriteBatch::flush() {
@@ -61,13 +67,14 @@ namespace framework64 {
     }
 
     void SpriteBatch::submitCurrentBatch() {
-        if (vertex_buffer.size() == 0)
+        if (vertex_buffer.size() == 0 || current_material == nullptr)
             return;
 
-        drawSpriteVertices(vertex_buffer.data(), vertex_buffer.size(), sprite_material);
+        drawSpriteVertices(vertex_buffer.data(), vertex_buffer.size(), *current_material);
         vertex_buffer.clear();
-        sprite_material.texture = nullptr;
-        sprite_material.texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
+        current_material->texture = nullptr;
+        current_material->texture_frame = FW64_DESKTOP_ENTIRE_TEXTURE_FRAME;
+        current_material = nullptr;
     }
 
     void SpriteBatch::drawSpriteVertices(SpriteVertex const* vertices, size_t vertex_count, fw64Material& material) {
@@ -86,6 +93,14 @@ namespace framework64 {
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_buffer_size_in_bytes, vertices);
         }
 
+        auto* current_shader = current_material->shader;
+        if (current_shader->handle != current_shader_handle) {
+            // activate the specific shader and set the matrix
+            glUseProgram(current_shader->handle);
+            glUniformBlockBinding(current_shader->handle, current_shader->mesh_transform_uniform_block_index, sprite_transform_uniform_block.binding_index);
+            current_shader_handle = current_shader->handle;
+        }
+
         material.shader->shader->setUniforms(material.shader, material);
 
         glBindVertexArray(gl_vertex_array_object);
@@ -94,28 +109,37 @@ namespace framework64 {
     }
 
     void SpriteBatch::setCurrentTexture(fw64Texture* texture) {
-        if (texture != sprite_material.texture) {
-            if (sprite_material.texture != nullptr)
-                submitCurrentBatch();
+        if (!current_material || current_material->texture != texture) {
+            submitCurrentBatch();
+            current_material = &sprite_material;
+            current_material->texture = texture;
+            return;
+        }        
+    }
 
-            sprite_material.texture = texture;
-        }
+    void SpriteBatch::createQuad(float xf, float yf, float wf, float hf, std::array<float, 4> const & color) {
+        SpriteVertex a = {xf, yf, 0.0f, 0.0, 0.0, color[0], color[1], color[2], color[3]};
+        SpriteVertex b = {xf + wf, yf, 0.0f, 1.0f, 0.0f, color[0], color[1], color[2], color[3]};
+        SpriteVertex c = {xf + wf, yf + hf, 0.0f, 1.0f, 1.0f, color[0], color[1], color[2], color[3]};
+        SpriteVertex d = {xf, yf + hf, 0.0f, 0.0f, 1.0f, color[0], color[1], color[2], color[3]};
+
+        addQuad(a, b, c, d);
     }
 
     void SpriteBatch::drawSprite(fw64Texture* texture, float x, float y) {
         setCurrentTexture(texture);
+        createQuad(x, y, static_cast<float>(texture->image->width), static_cast<float>(texture->image->height), fill_color);
+    }
 
-        auto xf = static_cast<float>(x);
-        auto yf = static_cast<float>(y);
-        auto wf = static_cast<float>(texture->image->width);
-        auto hf = static_cast<float>(texture->image->height);
+    void SpriteBatch::drawFilledRect(float x, float y, float width, float height) {
+        if (current_material == &sprite_material) {
+            submitCurrentBatch();
+        }
+        if (!current_material) {
+            current_material = &fill_material;
+        }
 
-        SpriteVertex a = {xf, yf, 0.0f, 0.0, 0.0};
-        SpriteVertex b = {xf + wf, yf, 0.0f, 1.0f, 0.0f};
-        SpriteVertex c = {xf + wf, yf + hf, 0.0f, 1.0f, 1.0f};
-        SpriteVertex d = {xf, yf + hf, 0.0f, 0.0f, 1.0f};
-
-        addQuad(a, b, c, d);
+        createQuad(x, y, width, height, fill_color);
     }
 
     void SpriteBatch::drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y) {
@@ -134,10 +158,10 @@ namespace framework64 {
         hf *= scale_y;
 
         // note y tex-coord is flipped based on SDL loading
-        SpriteVertex a = {x, y, 0.0f, tc_x, 1.0f - tc_y};
-        SpriteVertex b = {x + wf, y, 0.0f, tc_x + tc_width, 1.0f - tc_y};
-        SpriteVertex c = {x + wf, y + hf, 0.0f, tc_x + tc_width, 1.0f - (tc_y - tc_height)};
-        SpriteVertex d = {x, y + hf, 0.0f, tc_x, 1.0f - (tc_y - tc_height)};
+        SpriteVertex a = {x, y, 0.0f, tc_x, 1.0f - tc_y, fill_color[0], fill_color[1], fill_color[2], fill_color[3]};
+        SpriteVertex b = {x + wf, y, 0.0f, tc_x + tc_width, 1.0f - tc_y, fill_color[0], fill_color[1], fill_color[2], fill_color[3]};
+        SpriteVertex c = {x + wf, y + hf, 0.0f, tc_x + tc_width, 1.0f - (tc_y - tc_height), fill_color[0], fill_color[1], fill_color[2], fill_color[3]};
+        SpriteVertex d = {x, y + hf, 0.0f, tc_x, 1.0f - (tc_y - tc_height), fill_color[0], fill_color[1], fill_color[2], fill_color[3]};
 
         addQuad(a, b, c, d);
     }
@@ -175,5 +199,12 @@ namespace framework64 {
         vertex_buffer.push_back(a);
         vertex_buffer.push_back(c);
         vertex_buffer.push_back(d);
+    }
+
+    void SpriteBatch::setFillColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+        fill_color[0] = static_cast<float>(r) / 255.0f;
+        fill_color[1] = static_cast<float>(g) / 255.0f;
+        fill_color[2] = static_cast<float>(b) / 255.0f;
+        fill_color[3] = static_cast<float>(a) / 255.0f;
     }
 }

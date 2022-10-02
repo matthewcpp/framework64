@@ -8,6 +8,7 @@ ${desktop_include_directory}/audio_bank.h desktop/audio_bank.cpp
 ${desktop_include_directory}/collider.h
 ${desktop_include_directory}/engine.h desktop/engine.cpp
 ${desktop_include_directory}/filesystem.h desktop/filesystem.cpp
+${desktop_include_directory}/fill_shader.h desktop/fill_shader.cpp
 ${desktop_include_directory}/font.h desktop/font.cpp
 ${desktop_include_directory}/glb_parser.h desktop/glb_parser.cpp
 ${desktop_include_directory}/gouraud_shader.h desktop/gouraud_shader.cpp
