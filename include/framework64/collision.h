@@ -46,7 +46,19 @@ int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, 
  * Computes the intersection point and distance (t) from ray origin to intersection.
  * If no intersection, out_point and t are undefined
  */
-int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, Vec3* point_a, Vec3* point_b, float radius, Vec3* out_point, float* out_t);
+int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction,
+									Vec3* point_a, Vec3* point_b, float radius,
+									Vec3* out_point, float* out_t);
+
+/**
+ * Returns nonzero value if the moving sphere (given by center, radius, and direction) intersects the AABB (b)
+ * Returns 0 if no intersection found
+ * Computes the intersection point (out_point) and time (out_t).
+ * If no intersection, out_point and out_t are undefined
+ */
+int fw64_collision_test_moving_sphere_box(Vec3* center, float radius, Vec3* direction,
+										  Box* b,
+										  Vec3* out_point, float* out_t);
 
 /**
  * Intersect AABBs a and b moving with constant velocities va and vb.
