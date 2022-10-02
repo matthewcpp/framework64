@@ -2,8 +2,11 @@
 
 #include "framework64/renderer.h"
 #include "framework64/color.h"
+#include "framework64/n64/fill_rect.h"
 
 #include <nusys.h>
+
+
 
 /* The maximum length of the display list of one task  */
 #define GFX_DLIST_LEN     2048
@@ -25,7 +28,6 @@ struct fw64Renderer{
 
     fw64Camera* camera;
 
-    u16 fill_color;
     u16 clear_color;
 
     u32 enabled_features;
@@ -48,6 +50,7 @@ struct fw64Renderer{
     void* post_draw_func_arg;
     fw64Texture* active_texture;
     int active_texture_frame;
+    N64FillRect fill_rect;
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
