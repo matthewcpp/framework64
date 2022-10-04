@@ -40,6 +40,8 @@ public:
 
     void drawPixelTexture(PixelTexture& pixel_texture);
 
+    void newFrame();
+
 private:
     void drawSpriteVertices(SpriteVertex const * vertices, size_t vertex_count, fw64Material& material);
     void setCurrentTexture(fw64Texture* texture);

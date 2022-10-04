@@ -47,6 +47,10 @@ namespace framework64 {
         current_shader_handle = 0;
     }
 
+    void SpriteBatch::newFrame() {
+        std::fill(fill_color.begin(), fill_color.end(), 1.0f);
+    }
+
     void SpriteBatch::flush() {
         submitCurrentBatch();
     }

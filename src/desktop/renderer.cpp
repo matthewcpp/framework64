@@ -102,6 +102,8 @@ void fw64Renderer::begin(fw64RenderMode new_render_mode, fw64RendererFlags flags
         default:
             break;
     }
+
+    sprite_batch.newFrame();
 }
 
 fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Camera* camera) const {
