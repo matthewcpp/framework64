@@ -220,9 +220,9 @@ void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
     glDrawElements(primitive.mode, primitive.element_count, primitive.element_type, 0);
 }
 
-void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
+void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Matrix& matrix) {
     setDrawingMode(DrawingMode::Mesh);
-    updateMeshTransformBlock(transform->matrix);
+    updateMeshTransformBlock(matrix);
 
     for (auto const & primitive : mesh->primitives) {
         if (primitive.mode != primitive_type)
@@ -241,7 +241,7 @@ void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* con
 
         // should this be done in the shader?
         fw64Matrix transform_matrix;
-        matrix_multiply(&transform_matrix.m[0], &transform->matrix.m[0], &controller->matrices[primitive.joint_index].m[0]);
+        matrix_multiply(&transform_matrix.m[0], &transform->matrix.m[0], &controller->final_matrices[primitive.joint_index].m[0]);
         updateMeshTransformBlock(transform_matrix);
 
         drawPrimitive(primitive);
@@ -425,7 +425,12 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
     assert(renderer->primitive_type == fw64Primitive::Mode::Triangles || renderer->primitive_type == fw64Primitive::Mode::Lines);
-    renderer->drawStaticMesh(mesh, transform);
+    renderer->drawStaticMesh(mesh, transform->matrix);
+}
+
+void fw64_renderer_draw_static_mesh_matrix(fw64Renderer* renderer, fw64Matrix* matrix, fw64Mesh* mesh) {
+    assert(renderer->primitive_type == fw64Primitive::Mode::Triangles || renderer->primitive_type == fw64Primitive::Mode::Lines);
+    renderer->drawStaticMesh(mesh, *matrix);
 }
 
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {

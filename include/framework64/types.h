@@ -8,7 +8,7 @@
 
 #include "framework64/n64/compat.h"
 
-typedef Mtx fw64Matrix;
+
 
 #ifndef M_PI
     #define M_PI FVAL_PI
@@ -29,9 +29,7 @@ typedef Mtx fw64Matrix;
 #define fw64_free free
 
 #else
-typedef struct {
-    float m[16];
-} fw64Matrix;
+
 
 
 #include <float.h>

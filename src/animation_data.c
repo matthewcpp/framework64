@@ -59,3 +59,7 @@ void fw64_animation_data_delete(fw64AnimationData* data, fw64Allocator* allocato
     allocator->free(allocator, data->keyframe_data);
     allocator->free(allocator, data);
 }
+
+float* fw64_animation_data_get_inv_bind_matrix(fw64AnimationData* animation_data, int index) {
+    return animation_data->skin.inverse_bind_matrices + (index * 16);
+}

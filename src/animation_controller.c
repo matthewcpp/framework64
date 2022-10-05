@@ -22,7 +22,8 @@ void fw64_animation_controller_init(fw64AnimationController* controller, fw64Ani
     if (allocator == NULL) allocator = fw64_default_allocator();
 
     controller->animation_data = animation_data;
-    controller->matrices = allocator->memalign(allocator, 8, sizeof(fw64Matrix) * animation_data->skin.joint_count);
+    controller->final_matrices = allocator->memalign(allocator, 8, sizeof(fw64Matrix) * animation_data->skin.joint_count);
+    controller->world_matrices = allocator->memalign(allocator, 8, sizeof(float) * 16 * animation_data->skin.joint_count);
     controller->speed = 1.0f;
     controller->loop = 1;
     controller->state = FW64_ANIMATION_STATE_STOPPED;
@@ -36,7 +37,8 @@ void fw64_animation_controller_init(fw64AnimationController* controller, fw64Ani
 }
 
 void fw64_animation_controller_uninit(fw64AnimationController* controller, fw64Allocator* allocator) {
-    allocator->free(allocator, controller->matrices);
+    allocator->free(allocator, controller->final_matrices);
+    allocator->free(allocator, controller->world_matrices);
 }
 
 void fw64_animation_controller_play(fw64AnimationController* controller) {
@@ -55,6 +57,10 @@ void fw64_animation_controller_stop(fw64AnimationController* controller) {
 void fw64_animation_controller_set_animation(fw64AnimationController* controller, int index) {
     controller->current_animation = controller->animation_data->animations + index;
     fw64_animation_controller_set_time(controller, 0.0f);
+}
+
+float* fw64_animation_controller_get_world_matrix(fw64AnimationController* controller, uint32_t joint_index) {
+    return FLOAT_MATRIX(controller->world_matrices, joint_index);
 }
 
 void fw64_animation_controller_update(fw64AnimationController* controller, float time_delta) {
@@ -92,23 +98,21 @@ void update_skin(fw64AnimationController* controller) {
     uint16_t* root_children = controller->animation_data->skin.hierarchy + root_joint->children_index;
     fw64AnimationTrack* root_track = controller->animation_data->tracks + (controller->current_animation->tracks_index);
 
+    fw64Matrix* root_final_matrix = controller->final_matrices;
+    float* root_world_matrix = controller->world_matrices;
 
-    fw64Matrix* root_matrix = controller->matrices;
     float local_matrix[16];
     matrix_set_identity(&local_matrix[0]);
 
     // in this case the Armature itself has animation applied to it.
     // we need to compute the TRS for this node and set it as the root matrix
-    // in either case this matrix is fed into the function which calcualtes child joint matrices
+    // in either case this matrix is fed into the function which calcualtes child joint final_matrices
     if (root_track->translation != INVALID_KEYFRAME_BUFFER_INDEX) {
         compute_local_matrix(controller, 0, &local_matrix[0]);
     }
 
-    #ifdef PLATFORM_N64
-        guMtxF2L((float (*)[4])local_matrix, root_matrix);
-    #else
-        memcpy(&root_matrix->m[0], &local_matrix[0], sizeof(float) * 16);
-    #endif
+    fw64_matrix_set_from_array(root_final_matrix, local_matrix);
+    memcpy(root_world_matrix, &local_matrix[0], sizeof(float) * 16);
     
     for (uint16_t i = 0; i < root_joint->children_count; i++) {
         update_joint(controller, root_children[i], &local_matrix[0]);
@@ -123,11 +127,6 @@ uint32_t get_keyframe_index(float* input_buffer, uint32_t key_count, float time)
 
     return key_count;
 }
-
-#define VEC_KEYFRAME(buffer, index, count) ((buffer) + ((index) * (count)))
-#define VEC3_KEYFRAME(buffer, index) (Vec3*)VEC_KEYFRAME(buffer, index, 3)
-#define QUAT_KEYFRAME(buffer, index) (Quat*)VEC_KEYFRAME(buffer, index, 4)
-#define FLOAT_MATRIX(matrices, index) ((matrices) + ((index) * 16));
 
 void compute_local_matrix(fw64AnimationController* controller, uint32_t joint_index, float* local_matrix) {
     float* keyframe_data = controller->animation_data->keyframe_data;
@@ -173,25 +172,25 @@ void update_joint(fw64AnimationController* controller, uint32_t joint_index, flo
     uint16_t* joint_children = controller->animation_data->skin.hierarchy + joint->children_index;
 
     float local_matrix[16];
-    float world_matrix[16];
+    float* world_matrix = FLOAT_MATRIX(controller->world_matrices, joint_index);
     float* inv_bind_matrix = FLOAT_MATRIX(controller->animation_data->skin.inverse_bind_matrices, joint_index);
 
     compute_local_matrix(controller, joint_index, &local_matrix[0]);
-    matrix_multiply(&world_matrix[0], parent_matrix, &local_matrix[0] );
+    matrix_multiply(world_matrix, parent_matrix, &local_matrix[0]);
 
-    fw64Matrix* joint_matrix = controller->matrices + joint_index;
+    fw64Matrix* joint_matrix = controller->final_matrices + joint_index;
     
 
 #ifdef PLATFORM_N64
     float temp[16];
-    matrix_multiply(&temp[0], &world_matrix[0], inv_bind_matrix);
+    matrix_multiply(&temp[0], world_matrix, inv_bind_matrix);
     guMtxF2L((float (*)[4])temp, joint_matrix);
 #else
-    matrix_multiply(&joint_matrix->m[0], &world_matrix[0], inv_bind_matrix);
+    matrix_multiply(&joint_matrix->m[0], world_matrix, inv_bind_matrix);
 #endif
 
     for (uint16_t i = 0; i < joint->children_count; i++) {
-        update_joint(controller, joint_children[i], &world_matrix[0]);
+        update_joint(controller, joint_children[i], world_matrix);
     }
 }
 
@@ -200,7 +199,7 @@ void update_joint(fw64AnimationController* controller, uint32_t joint_index, flo
 
 void initialize_matrices(fw64AnimationController* controller) {
     for (uint32_t i = 0; i < controller->animation_data->skin.joint_count; i++) {
-        guMtxIdent(controller->matrices + i);
+        guMtxIdent(controller->final_matrices + i);
     }
 }
 
@@ -208,7 +207,7 @@ void initialize_matrices(fw64AnimationController* controller) {
 
 void initialize_matrices(fw64AnimationController* controller) {
     for (uint32_t i = 0; i < controller->animation_data->skin.joint_count; i++) {
-        matrix_set_identity(&controller->matrices[i].m[0]);
+        matrix_set_identity(&controller->final_matrices[i].m[0]);
     }
 }
 

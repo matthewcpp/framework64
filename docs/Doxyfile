@@ -34,6 +34,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/transform.h \
                         ../include/framework64/vec2.h \
                         ../include/framework64/vec3.h \
+                        ../include/framework64/util/animated_mesh_attachment.h \
                         ../include/framework64/util/bump_allocator.h \
                         ../include/framework64/util/mesh_data_itr.h \
                         ../include/framework64/util/quad.h \

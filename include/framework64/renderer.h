@@ -57,6 +57,7 @@ int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
 
 /** Draws a mesh with the supplied transform. */
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
+void fw64_renderer_draw_static_mesh_matrix(fw64Renderer* renderer, fw64Matrix* matrix, fw64Mesh* mesh);
 
 /** Draws an animated mesh with the supplied transform and animation state. */
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);

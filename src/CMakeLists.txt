@@ -35,6 +35,7 @@ set(common_source_files
         ../include/framework64/vec2.h vec2.c
         ../include/framework64/vec3.h vec3.c
 
+        ../include/framework64/util/animated_mesh_attachment.h util/animated_mesh_attachment.c
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/mesh_data_itr.h
         ../include/framework64/util/quad.h util/quad.c

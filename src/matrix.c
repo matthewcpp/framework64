@@ -2,6 +2,8 @@
 
 #include "framework64/types.h"
 
+#include <string.h>
+
 void matrix_set_identity(float* matrix) {
     matrix[0] = 1.0f;
     matrix[1] = 0.0f;
@@ -507,4 +509,20 @@ void mat2_transform_vec2(const float* mat, Vec2* vec) {
 
     vec->x = in.x * mat[0] + in.y * mat[2];
     vec->y = in.x * mat[1] + in.y * mat[3];
+}
+
+void fw64_matrix_multiply(fw64Matrix* a, fw64Matrix* b, fw64Matrix* out) {
+#ifdef PLATFORM_N64
+    guMtxCatL(a, b, out);
+#else
+    matrix_multiply(&out->m[0], &a->m[0], &b->m[0]);
+#endif
+}
+
+void fw64_matrix_set_from_array(fw64Matrix* matrix, float* arr) {
+    #ifdef PLATFORM_N64
+        guMtxF2L((float (*)[4])arr, matrix);
+    #else
+        memcpy(&matrix->m[0], arr, sizeof(float) * 16);
+    #endif
 }

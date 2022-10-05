@@ -3,6 +3,8 @@
 #include "framework64/collision.h"
 #include "framework64/matrix.h"
 
+#include <float.h>
+
 static void fw64_collider_update_box(fw64Collider* collider);
 static void fw64_collider_update_mesh(fw64Collider* collider);
 

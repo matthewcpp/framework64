@@ -1,0 +1,18 @@
+{
+    "skinnedMeshes": [
+        {
+            "src": "animation_attach/figure.gltf",
+            "animations": [
+                "Attack"
+            ]
+        }
+    ],
+    "meshes": [
+        {
+            "src": "animation_attach/sword.gltf"
+        },
+        {
+            "src": "animation_attach/mace.gltf"
+        }
+    ]
+}

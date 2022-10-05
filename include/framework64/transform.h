@@ -3,8 +3,8 @@
 /** \file transform.h */
 
 #include "framework64/box.h"
+#include "framework64/matrix.h"
 #include "framework64/quat.h"
-#include "framework64/types.h"
 #include "framework64/vec3.h"
 
 #ifdef __cplusplus

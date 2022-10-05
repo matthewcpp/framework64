@@ -4,6 +4,10 @@
 
 #include "animation_data.h"
 
+#ifndef FW64_JOINT_ATTACHMENT_COUNT
+#define FW64_JOINT_ATTACHMENT_COUNT 2
+#endif
+
 typedef enum {
     FW64_ANIMATION_STATE_STOPPED,
     FW64_ANIMATION_STATE_PLAYING,
@@ -12,7 +16,8 @@ typedef enum {
 
 typedef struct {
     fw64AnimationData* animation_data;
-    fw64Matrix* matrices;
+    fw64Matrix* final_matrices;
+    float* world_matrices;
     fw64Animation* current_animation;
     float current_time;
 
@@ -57,6 +62,8 @@ void fw64_animation_controller_pause(fw64AnimationController* controller);
 
 /** stops animation playback and resets the current animation time to 0 */
 void fw64_animation_controller_stop(fw64AnimationController* controller);
+
+float* fw64_animation_controller_get_world_matrix(fw64AnimationController* controller, uint32_t joint_index);
 
 #ifdef __cplusplus
 }

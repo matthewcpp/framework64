@@ -6,6 +6,15 @@
 #include "framework64/vec3.h"
 #include "framework64/quat.h"
 
+#ifdef PLATFORM_N64
+    #include <nusys.h>
+    typedef Mtx fw64Matrix;
+#else
+    typedef struct {
+    float m[16];
+} fw64Matrix;
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,6 +39,9 @@ void mat2_set_rotation(float* mat, float rad);
 
 /** Transforms the vector according to the matrix */
 void mat2_transform_vec2(const float* mat, Vec2* vec);
+
+void fw64_matrix_multiply(fw64Matrix* a, fw64Matrix* b, fw64Matrix* out);
+void fw64_matrix_set_from_array(fw64Matrix* mtx, float* arr);
 
 #ifdef __cplusplus
 }

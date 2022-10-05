@@ -1,7 +1,7 @@
 #include "game.h"
 
 #include "assets/assets.h"
-#include "assets/catherine_animation.h"
+#include "assets/skinned_mesh_catherine.h"
 
 #include "framework64/n64/controller_button.h"
 
@@ -65,7 +65,7 @@ static void set_animation(Game* game, int animation) {
     fw64_animation_controller_set_animation(&game->animation_state, game->current_animation);
 
     // note that the idle animation is sped up to reduce frame counts when exported from blender
-    if (game->current_animation == catherine_animation_Idle)
+    if (game->current_animation == skinned_mesh_catherine_animation_Idle)
         game->animation_state.speed = 0.1f;
     else
         game->animation_state.speed = 1.0f;

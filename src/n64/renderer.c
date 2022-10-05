@@ -537,8 +537,8 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
     }
 }
 
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+void fw64_renderer_draw_static_mesh_matrix(fw64Renderer* renderer, fw64Matrix* matrix, fw64Mesh* mesh) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
@@ -551,13 +551,17 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
+    fw64_renderer_draw_static_mesh_matrix(renderer, &transform->matrix, mesh);
+}
+
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
 
-        gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+        gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->final_matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
         
         n64_renderer_configure_mesh_shading_mode(renderer, primitive->material);
         gSPDisplayList(renderer->display_list++, primitive->display_list);
