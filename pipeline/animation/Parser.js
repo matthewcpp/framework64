@@ -76,6 +76,9 @@ class Parser {
     options = null;
 
     animationFilter = null;
+
+    // holds regular expressions that are used to filter joints from the skeleton.
+    jointFilters = [];
     buffers = new BufferInfo();
 
     // maps an index into the gltf node array to a Joint object
@@ -88,11 +91,21 @@ class Parser {
 
         this.data = new AnimationData();
         this._setupAnimationFilter();
+        this._setupJointFilters();
 
         this.parseSkin();
         this.parseAnimations();
 
         return this.data;
+    }
+
+    _setupJointFilters(options) {
+        if (!this.options.excludeJoints)
+            return;
+
+        for (const info of this.options.excludeJoints) {
+            this.jointFilters.push(new RegExp(info.exp, info.flags));
+        }
     }
 
     _setupAnimationFilter() {
@@ -114,7 +127,7 @@ class Parser {
 
         //we will use a singular root node for the skin
         // todo: this is not necessary if the skin contains a 'skeleton' property
-        const rootJoint = new Joint("Skeleton Root", 0, 255);
+        const rootJoint = new Joint("root", 0, 255);
         rootJoint.inverseBindMatrix = Util.mat4IdentityBuffer();
         this.data.jointIdMap.set(this.data.joints.length, 255);
         this.data.joints.push(rootJoint);
@@ -122,8 +135,13 @@ class Parser {
         // create a object for each joint and add it to map
         // this will map the original index of the joint to the filterd joint array
         for (let i = 0; i < skin.joints.length; i++) {
-            // todo: filter out unnecessary joints from the array
             const jointNode = this.gltf.nodes[skin.joints[i]];
+
+            if (this._shouldFilterJoint(jointNode.name)) {
+                console.log("Skip Joint: " + jointNode.name);
+                continue;
+            }
+
             const joint = new Joint(jointNode.name, this.data.joints.length, i);
 
             const matrixIndex = ibmBufferView.byteOffset + (i * sizeOfMatrix);
@@ -147,6 +165,11 @@ class Parser {
 
             for (const childNodeIndex of jointNode.children) {
                 const childJoint = this.nodeIndexToJointMap.get(childNodeIndex);
+
+                // in this case the node has been filtered (see above)
+                if (!childJoint)
+                    continue;
+
                 childJoint.parent = jointNode.id;
                 joint.children.push(childJoint.id);
             }
@@ -201,6 +224,15 @@ class Parser {
             return true;
         else
             return this.animationFilter.has(animation);
+    }
+
+    _shouldFilterJoint(jointName) {
+        for(const regex of this.jointFilters) {
+            if (regex.test(jointName))
+                return true;
+        }
+
+        return false;
     }
 
     _createAnimationTracks(animation) {

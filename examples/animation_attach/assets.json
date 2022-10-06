@@ -4,6 +4,11 @@
             "src": "animation_attach/figure.gltf",
             "animations": [
                 "Attack"
+            ],
+            "excludeJoints":[
+                {
+                    "exp": "_end$"
+                }
             ]
         }
     ],
