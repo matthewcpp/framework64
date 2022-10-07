@@ -278,10 +278,16 @@ static void n64_renderer_configure_shading_mode_unlit_textured(fw64Renderer* ren
 
     // todo: opaque vs transparent?
 
+if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_FOG)){
+    gDPSetRenderMode(renderer->display_list++, G_RM_FOG_SHADE_A, G_RM_AA_ZB_XLU_SURF2);
+    gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_PASS2);
+}
+else{
     gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_XLU_SURF, G_RM_AA_ZB_XLU_SURF);
     gDPSetCombineMode(renderer->display_list++, G_CC_DECALRGBA, G_CC_DECALRGBA);
-
-    gSPClearGeometryMode(renderer->display_list++, G_LIGHTING );
+}
+    gSPClearGeometryMode(renderer->display_list++, G_LIGHTING);
+    gSPSetGeometryMode(renderer->display_list++, G_SHADE | G_SHADING_SMOOTH);
     gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
     gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
 
