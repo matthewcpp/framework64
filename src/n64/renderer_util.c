@@ -10,7 +10,8 @@ static Vtx fullscreen_overlay_triangle[] = {
 };
 
 static Gfx fullscreen_overlay_dl[] = {
-    gsDPSetRenderMode(G_RM_XLU_SURF, G_RM_XLU_SURF2),
+    gsDPSetRenderMode(G_RM_XLU_SURF, G_RM_XLU_SURF),
+    gsSPClearGeometryMode(G_CULL_BACK),
     gsDPSetCombineMode(G_CC_PRIMITIVE,G_CC_PRIMITIVE),
     gsSPForceMatrix(OS_K0_TO_PHYSICAL(&(overlay_matrix))),
     gsSPVertex(&fullscreen_overlay_triangle[0], 4, 0),
