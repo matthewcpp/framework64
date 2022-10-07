@@ -30,7 +30,7 @@ struct fw64Renderer{
 
     u16 clear_color;
 
-    u32 enabled_features;
+    fw64N64RendererFeature enabled_features;
 
     s32 fog_min;
     s32 fog_max;
@@ -58,38 +58,3 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
 void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask* gfxTaskPtr);
 
 void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int width, int height, fw64RendererFlags flags);
-
-#define FW64_N64_OPA_ZB_FLAGS(renderer) (((renderer)->enabled_features & N64_RENDERER_FEATURE_DEPTH_TEST) ? Z_CMP | Z_UPD : 0)
-#define FW64_N64_OPA_AA_FLAGS(renderer) (((renderer)->enabled_features & N64_RENDERER_FEATURE_AA) ? AA_EN : 0)
-
-/** based on G_RM_[AA]_[ZB]_OPA_SURF macro definition. */
-#define FW64_RENDER_MODE_3D_OPAQUE_SHADED(renderer, cycle) \
-	FW64_N64_OPA_AA_FLAGS((renderer)) | FW64_N64_OPA_ZB_FLAGS((renderer)) | CVG_DST_CLAMP |		\
-	ZMODE_OPA | ALPHA_CVG_SEL |				\
-	GBL_c##cycle(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_A_MEM)
-
-#define FW64_RM_3D_OPAQUE_SHADED(renderer) \
-    ((renderer)->enabled_features & N64_RENDERER_FEATURE_FOG) ? (G_RM_FOG_SHADE_A) : (FW64_RENDER_MODE_3D_OPAQUE_SHADED(renderer, 1))
-#define FW64_RM_3D_OPAQUE_SHADED2(renderer) FW64_RENDER_MODE_3D_OPAQUE_SHADED(renderer, 2)
-
-/** based on G_RM_[AA]_XLU_SURF macro definition. */
-
-#define FW64_N64_XLU_AA_FLAGS(renderer) (((renderer)->enabled_features & N64_RENDERER_FEATURE_AA) ? (AA_EN | CVG_DST_WRAP | CLR_ON_CVG) : CVG_DST_FULL)
-
-#define FW64_RENDER_MODE_TRANSLUCENT_SPRITE(renderer, cycle) \
-	FW64_N64_XLU_AA_FLAGS(renderer) | IM_RD  | FORCE_BL |	ZMODE_OPA |		\
-	GBL_c##cycle(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_1MA)
-
-#define FW64_RM_TRANSLUCENT_SPRITE(renderer) FW64_RENDER_MODE_TRANSLUCENT_SPRITE(renderer, 1)
-#define FW64_RM_TRANSLUCENT_SPRITE2(renderer) FW64_RENDER_MODE_TRANSLUCENT_SPRITE(renderer, 2)
-
-
-/** based on G_RM_[AA]_[ZB]_TEX_EDGE macro definition. */
-#define FW64_RENDER_MODE_3D_TEXTURED(renderer, cycle) \
-	FW64_N64_OPA_AA_FLAGS((renderer)) | FW64_N64_OPA_ZB_FLAGS((renderer)) | CVG_DST_CLAMP |		\
-	CVG_X_ALPHA | ALPHA_CVG_SEL | ZMODE_OPA | TEX_EDGE |	\
-	GBL_c##cycle(G_BL_CLR_IN, G_BL_A_IN, G_BL_CLR_MEM, G_BL_A_MEM)
-
-#define FW64_RM_3D_TEXTURED(renderer) \
-    ((renderer)->enabled_features & N64_RENDERER_FEATURE_FOG) ? (G_RM_FOG_SHADE_A) : (FW64_RENDER_MODE_3D_TEXTURED(renderer, 1))
-#define FW64_RM_3D_TEXTURED2(renderer) FW64_RENDER_MODE_3D_TEXTURED(renderer, 2)
