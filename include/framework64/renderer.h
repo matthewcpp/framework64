@@ -84,6 +84,15 @@ void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Textu
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count);
 
+/**
+ * Sets the fill color to use for immediate mode rendering functions: sprites, text, and filled rectangles.
+ * For sprite / text final color is computed by multiplying fill * texture color
+ * For filled rectangles this color is used directly.
+ * Note this value is cleared in ever fall to \ref fw64_renderer_begin
+ */
+void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height);
+
 void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
 IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera);
 fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);

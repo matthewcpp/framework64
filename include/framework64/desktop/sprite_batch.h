@@ -35,12 +35,18 @@ public:
     void drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y);
     void drawText(fw64Font* font, float x, float y, const char* text, uint32_t count);
 
+    void setFillColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+    void drawFilledRect(float x, float y, float width, float height);
+
     void drawPixelTexture(PixelTexture& pixel_texture);
+
+    void newFrame();
 
 private:
     void drawSpriteVertices(SpriteVertex const * vertices, size_t vertex_count, fw64Material& material);
     void setCurrentTexture(fw64Texture* texture);
     void submitCurrentBatch();
+    void createQuad(float xf, float yf, float wf, float hf, std::array<float, 4> const & color);
     void addQuad(SpriteVertex const & a, SpriteVertex const & b, SpriteVertex const & c, SpriteVertex const & d);
 
 private:
@@ -50,13 +56,16 @@ private:
     std::vector<SpriteVertex> vertex_buffer;
 
     fw64Material sprite_material;
+    fw64Material fill_material;
+    fw64Material* current_material = nullptr;
+    GLuint current_shader_handle;
 
     struct SpriteTransformData{
         std::array<float, 16> mvp_matrix;
     };
 
     UniformBlock<SpriteTransformData> sprite_transform_uniform_block;
-
+    std::array<float, 4> fill_color = {1.0f, 1.0f, 1.0f, 1.0f};
 };
 
 }
