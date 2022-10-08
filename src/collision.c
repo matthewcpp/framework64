@@ -48,7 +48,7 @@ int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, 
     Vec3 m;
     vec3_subtract(&m, origin, center);
     float b = vec3_dot(&m, direction);
-    float c = vec3_dat(&m, &m) - (radius * radius);
+    float c = vec3_dot(&m, &m) - (radius * radius);
     // exit early. ray origin outside sphere, and direction points away from sphere
     if (c > 0.0f && b > 0.0f) return 0;
     
@@ -404,4 +404,20 @@ int fw64_collision_test_moving_sphere_box(Vec3* center, float radius, Vec3* dire
     return fw64_collision_test_ray_capsule(center, direction,
                                         &vert_a, &vert_b, radius,
                                         out_point, out_t);
+}
+
+void fw64_collision_get_normal_box_point(Vec3* point, Box* box, Vec3* out_normal) {   
+    if(point->x > box->min.x && point->x < box->max.x) {
+        if(point->z <= box->min.z) { // NORTH FACE
+            out_normal->z = -1.0f;
+        } else if (point->z >= box->max.z) { // SOUTH FACE
+            out_normal->z = 1.0f;
+        }
+    } else if(point->z > box->min.z && point->z < box->max.z) {
+        if(point->x <= box->min.x) { // WEST FACE
+            out_normal->x = -1.0f;
+        } else if (point->x >= box->max.x) { // EAST FACE
+            out_normal->x = 1.0f;
+        }
+    }
 }

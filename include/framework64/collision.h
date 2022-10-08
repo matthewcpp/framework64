@@ -74,6 +74,8 @@ int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* 
  */
 int fw64_collision_test_moving_spheres(Vec3* ca, float ra, Vec3* va, Vec3* cb, float rb, Vec3* vb, float* t);
 
+void fw64_collision_get_normal_box_point(Vec3* point, Box* box, Vec3* out_normal);
+
 #ifdef __cplusplus
 }
 #endif
