@@ -43,6 +43,76 @@ int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_poi
     return 1;
 }
 
+// Real Time Collision Detection 5.3.2
+int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, float radius, Vec3* point, float* t) {
+    Vec3 m;
+    vec3_subtract(&m, origin, center);
+    float b = vec3_dot(&m, direction);
+    float c = vec3_dot(&m, &m) - (radius * radius);
+    // exit early. ray origin outside sphere, and direction points away from sphere
+    if (c > 0.0f && b > 0.0f) return 0;
+    
+    float discr = (b*b) - c;
+    // discriminant <0 means ray misses
+    if (discr < 0.0f) return 0;
+    
+    // ray intersect sphere, find smallest t value of intersection
+    *t = -b - fw64_sqrtf(discr);
+    // t < 0, ray started inside sphere. set t = 0
+    if (*t < 0.0f) *t = 0.0f;
+    // output point of first collision
+    vec3_add_and_scale(point, origin, direction, *t);
+    return 1;
+}
+
+// https://iquilezles.org/articles/intersectors/
+int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, // ray
+                                    Vec3* point_a, Vec3* point_b, float radius, // capsule
+                                    Vec3* out_point, float* out_t) { //output
+    Vec3  ba;
+    vec3_subtract(&ba, point_b, point_a);
+    Vec3  oa;
+    vec3_subtract(&oa, origin, point_a);
+    float baba = vec3_dot(&ba, &ba);
+    float bard = vec3_dot(&ba, direction);
+    float baoa = vec3_dot(&ba,&oa);
+    float rdoa = vec3_dot(direction, &oa);
+    float oaoa = vec3_dot(&oa, &oa);
+    float a = baba      - bard*bard;
+    float b = baba*rdoa - baoa*bard;
+    float c = baba*oaoa - baoa*baoa - radius*radius*baba;
+    float h = b*b - a*c;
+    
+    if( h >= 0.0 )
+    {
+        float t = (-b-sqrt(h))/a;
+        float y = baoa + t*bard;
+        // body
+        if( y>0.0 && y<baba ) {
+            *out_t = t;
+            vec3_add_and_scale(out_point, origin, direction, *out_t);  
+            return 1;
+        }
+        // caps
+        Vec3 oc;
+        if (y <= 0.0) {
+            vec3_copy(&oc, &oa);
+        } else {
+            vec3_subtract(&oc, origin, point_b);
+        } 
+        b = vec3_dot(direction,&oc);
+        c = vec3_dot(&oc,&oc) - (radius*radius);
+        h = b*b - c;
+        if( h>0.0 ) {
+            *out_t = -b - fw64_sqrtf(h);
+            vec3_add_and_scale(out_point, origin, direction, *out_t);
+            return 1;
+        }
+    }
+    // no real roots, no intersection
+    return 0;
+}
+
 // Real Time Collision Detection 5.2.5
 int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p) {
     box_closest_point(box, center, p);
@@ -222,4 +292,132 @@ int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* 
     *t_last = tlast;
 
     return 1;
+}
+
+// Real Time Collision Detection 5.5.5, Intersecting Moving Sphere Against Sphere
+int fw64_collision_test_moving_spheres(Vec3* ca, float ra, Vec3* va, Vec3* cb, float rb, Vec3* vb, float* t)
+{
+    Vec3 s, v;
+    vec3_subtract(&s, cb, ca);      // vector between the center of the 2 spheres
+    vec3_subtract(&v, vb, va);      // relative motion of sphere b with respect to stationary sphere a
+    float r = rb + ra;              // the sum of all spheres (radii)
+    float c = vec3_dot(&s, &s) - (r * r);
+    if (c < 0.0f) { // if spheres overlap already, without any motion
+        *t = 0.0f; 
+        return 1;
+    }
+    float a = vec3_dot(&v, &v);
+    if (a < EPSILON) return 0; // not moving relative each other
+    float b = vec3_dot(&v, &s);
+    if (b >= 0.0f) return 0;   // not moving towards each other
+    float d = (b * b) - (a * c);
+    if (d < 0.0f) return 0;    // quadratic function has no real roots, therefore no intersection
+
+    *t = (-b - fw64_sqrtf(d)) / a;
+    return 1;
+}
+
+// Support function for moving sphere box test.
+// get the AABB vertex with index n
+static void get_vertex(Box* b, int n, Vec3* out_vertex)
+{
+    vec3_set(out_vertex,
+             ((n & 1) ? b->max.x : b->min.x),
+             ((n & 2) ? b->max.y : b->min.y),
+             ((n & 4) ? b->max.z : b->min.z));
+}
+
+// Real Time Collision Detection 5.5.7
+int fw64_collision_test_moving_sphere_box(Vec3* center, float radius, Vec3* direction, Box* b, Vec3* out_point, float* out_t) {
+    // find an expanded box, start with a duplicate of b, expand by radius in all directions
+    // this is an expanded AABB with the same lengths along the primary axes as the minkowski sum
+    // but it is *not* the minkowski sum (it doesn't have quarter-sphere edges) and is just a first-pass test
+    Box e;
+    vec3_copy(&e.max, &b->max);
+    vec3_copy(&e.min, &b->min);
+    e.min.x -= radius; e.min.y -= radius; e.min.z -= radius;
+    e.max.x += radius; e.max.y += radius; e.max.z += radius;
+
+    // Intersect ray against expanded AABB e.
+    //if ray misses e, no intersection possible. Exit early
+    //else continue and get intersection point p and time t as result
+    *out_t = FLT_MAX;
+    if(!fw64_collision_test_ray_box(center, direction, &e, out_point, out_t) || *out_t > 1.0) {
+        return 0;
+    }
+
+    // Compute which min and max faces of b the intersection point p lies
+    // outside of. Note, u and v cannot have the same bits set and
+    // they must have at least one bit set amongst them
+    int u = 0, v = 0;
+    if (out_point->x < b->min.x) u |= 1;
+    if (out_point->x > b->max.x) v |= 1;
+    if (out_point->y < b->min.y) u |= 2;
+    if (out_point->y > b->max.y) v |= 2;
+    if (out_point->z < b->min.z) u |= 4;
+    if (out_point->z > b->max.z) v |= 4;
+
+    // ‘Or’ all set bits together into a bit mask
+    int m = u | v;
+
+    // If only one bit set in m, then p is in a face region
+    if ((m & (m - 1)) == 0) {
+        // Do nothing. Time t from intersection with
+        // expanded box is correct intersection time
+        return 1;
+    }
+
+    float tmin = FLT_MAX;
+    Vec3 vert_a, vert_b;
+
+    // all 3 bits set (m == 7), p is in a vertex region
+    if(m==7) {
+        
+        
+        get_vertex(b, v, &vert_a); get_vertex(b, v ^ 1, &vert_b);
+        if(fw64_collision_test_ray_capsule(center, direction,
+                                           &vert_a, &vert_b, radius,
+                                           out_point, out_t)) {
+            tmin = fw64_minf(*out_t, tmin);
+        }
+        get_vertex(b, v ^ 2, &vert_b);
+        if(fw64_collision_test_ray_capsule(center, direction,
+                                           &vert_a, &vert_b, radius,
+                                           out_point, out_t)) {
+            tmin = fw64_minf(*out_t, tmin);
+        }
+        get_vertex(b, v ^ 4, &vert_b);
+        if(fw64_collision_test_ray_capsule(center, direction,
+                                           &vert_a, &vert_b, radius,
+                                           out_point, out_t)) {
+            tmin = fw64_minf(*out_t, tmin);
+        }
+        if(tmin == FLT_MAX) return 0; // no intersection found
+
+        *out_t = tmin; // intersection found at t==tmin
+        return 1;
+    }
+
+    // p is in an edge region. Intersect against the capsule at the edge
+    get_vertex(b, u ^ 7, &vert_a);
+    get_vertex(b, v, &vert_b);
+    return fw64_collision_test_ray_capsule(center, direction,
+                                        &vert_a, &vert_b, radius,
+                                        out_point, out_t);
+}
+
+void fw64_collision_get_normal_box_point(Vec3* point, Box* box, Vec3* out_normal) {   
+    if(point->x > box->min.x && point->x < box->max.x) {
+        if(point->z <= box->min.z) { // NORTH FACE
+            out_normal->z = -1.0f;
+        } else if (point->z >= box->max.z) { // SOUTH FACE
+            out_normal->z = 1.0f;
+        }
+    } else if(point->z > box->min.z && point->z < box->max.z) {
+        if(point->x <= box->min.x) { // WEST FACE
+            out_normal->x = -1.0f;
+        } else if (point->x >= box->max.x) { // EAST FACE
+            out_normal->x = 1.0f;
+        }
+    }
 }

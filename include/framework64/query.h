@@ -28,6 +28,17 @@ typedef struct {
 
 typedef struct {
     fw64Node* node;
+    Vec3 point;
+    float distance;
+} IntersectMovingSphereResult;
+
+typedef struct {
+    IntersectMovingSphereResult results[Fw64_COLLISION_QUERY_RESULT_SIZE];
+    int count;
+} fw64IntersectMovingSphereQuery;
+
+typedef struct {
+    fw64Node* node;
     float tfirst;
     float tlast;
 } IntersectMovingBoxResult;
@@ -38,3 +49,4 @@ typedef struct {
 } fw64IntersectMovingBoxQuery;
 
 void fw64_intersect_moving_box_query_init(fw64IntersectMovingBoxQuery* query);
+void fw64_intersect_moving_sphere_query_init(fw64IntersectMovingSphereQuery* query);

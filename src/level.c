@@ -1,4 +1,5 @@
 #include "framework64/level.h"
+#include "framework64/math.h"
 
 #include <limits.h>
 #include <string.h>
@@ -159,6 +160,66 @@ int fw64_level_moving_box_intersection(fw64Level* level, Box* box, Vec3* velocit
 
     return did_hit;
 }
+
+int fw64_level_moving_sphere_intersection(fw64Level* level, Vec3* center, float radius, Vec3* velocity, uint32_t mask, fw64IntersectMovingSphereQuery* result) {
+    fw64_intersect_moving_sphere_query_init(result);
+    int did_hit = 0;
+
+    for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
+        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        Vec3 out_point;
+        float out_t;
+
+        // rapid rejection test against bounding box of entire scene
+        if(!fw64_collision_test_moving_sphere_box(center, radius, velocity, fw64_scene_get_initial_bounds(ref->scene), &out_point, &out_t))
+            continue;
+
+        did_hit |= fw64_scene_moving_sphere_intersection(ref->scene, center, radius, velocity, mask, result);
+
+        if (result->count == Fw64_COLLISION_QUERY_RESULT_SIZE)
+            break;
+    }
+
+    return did_hit;
+}
+
+int fw64_level_moving_spheres_dynamic_intersection(fw64Level* level, Vec3* center, float radius, Vec3* velocity, uint32_t mask, fw64IntersectMovingSphereQuery* result) {
+    fw64_intersect_moving_sphere_query_init(result);
+    int did_hit = 0;
+    int node_count = fw64_level_get_dynamic_node_count(level);
+    for (uint32_t i = 0; i < node_count; i++) {
+        fw64Node* dynamic_node = fw64_level_get_dynamic_node(level, i);
+        float out_t = FLT_MAX;
+
+        // ignore nodes not in layer mask
+        if (!(dynamic_node->layer_mask & mask))
+            continue;
+        
+        Vec3 node_center;
+        vec3_copy(&node_center, &dynamic_node->collider->transform->position);
+        Vec3 node_extents;
+        box_extents(&dynamic_node->collider->bounding, &node_extents);
+        float node_radius = fw64_minf(node_extents.x, node_extents.z); // todo: implement sphere colliders
+        Vec3 node_vel = {0.0f, 0.0f, 0.0f}; // todo: possibly store this instead of assuming 0
+        IntersectMovingSphereResult* sphere_intersect = &result->results[result->count];
+        if(fw64_collision_test_moving_spheres(center, radius, velocity, &node_center, node_radius, &node_vel, &out_t)) {
+            did_hit |= 1;
+            sphere_intersect->node = dynamic_node;
+            sphere_intersect->distance = out_t;
+            Vec3 vel_norm;
+            vec3_copy(&vel_norm, velocity);
+            vec3_normalize(&vel_norm);
+            vec3_add_and_scale(&sphere_intersect->point, center, &vel_norm, out_t);
+            ++result->count;
+        }
+
+        if (result->count == Fw64_COLLISION_QUERY_RESULT_SIZE)
+            break;
+    }
+
+    return did_hit;
+}
+
 
 void fw64_level_draw_camera(fw64Level* level, fw64Camera* camera) {
     fw64Renderer* renderer = level->engine->renderer;

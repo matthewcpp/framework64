@@ -79,6 +79,31 @@ int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint
     return result->count;
 }
 
+int fw64_scene_moving_sphere_intersection(fw64Scene* scene, Vec3* center, float radius, Vec3* velocity,
+                                          uint32_t mask, fw64IntersectMovingSphereQuery* result) {
+    IntersectMovingSphereResult* sphere_intersect = &result->results[result->count];
+
+    uint32_t node_count = fw64_scene_get_node_count(scene);
+
+    for (int i = 0; i < node_count; i++) {
+        fw64Node* node = fw64_scene_get_node(scene, i);
+
+        if (!node->collider || !(node->layer_mask & mask))
+            continue;
+
+        if(fw64_collision_test_moving_sphere_box(center, radius, velocity, &node->collider->bounding,
+                                                 &sphere_intersect->point, &sphere_intersect->distance)) {
+            sphere_intersect->node = node;
+            sphere_intersect = &result->results[++result->count];
+        }
+
+        if (result->count >= Fw64_COLLISION_QUERY_RESULT_SIZE)
+            break;
+    }
+
+    return result->count;
+}
+
 int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocity, uint32_t mask, fw64IntersectMovingBoxQuery* result) {
     Vec3 static_vel = {0.0f, 0.0f, 0.0f};
     IntersectMovingBoxResult* box_intersect = &result->results[result->count];
