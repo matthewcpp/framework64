@@ -10,11 +10,13 @@ const Util = require("../Util");
 
 const path = require("path");
 
-async function prepare(manifest, assetDirectory, outputDirectory) {
+async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new Archive(outputDirectory, includeDirectory);
 
     const layerMap = processLayers(manifest.layers, Util.assetIncludeDirectory(outputDirectory));
+
+    plugins.initialize(archive, assetDirectory, outputDirectory, includeDirectory);
 
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
@@ -62,7 +64,7 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory);
+            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory, plugins);
         }
     }
 

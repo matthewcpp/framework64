@@ -30,6 +30,18 @@ class Archive {
         this.includeDirectory = includeDirectory;
     }
 
+    // note this is temporary pending asset bundle refactor
+    addRaw(rawPath, size) {
+        return this.addSync(rawPath, this._hashFileSync(rawPath), "raw");
+    }
+
+    _hashFileSync(path) {
+        const data = fs.readFileSync(path);
+        const hash = crypto.createHash('sha1');
+        hash.update(data);
+        return hash.digest('hex');
+    }
+
     async add(path, type) {
         if (this.entries.has(path))
             throw new Error(`Duplicate key in archive: ${path}`);
@@ -40,6 +52,10 @@ class Archive {
 
         const hash = await this._hashFile(path);
 
+        return this.addSync(path, hash, type);
+    }
+
+    addSync(path, hash, type) {
         let entry = this.entryHashes.get(hash);
         if (entry) {
             return entry;
@@ -53,6 +69,7 @@ class Archive {
         return entry;
     }
 
+    
     async _hashFile(path) {
         return new Promise((resolve, reject) => {
             const hash = crypto.createHash('sha1')
@@ -62,6 +79,7 @@ class Archive {
             rs.on('end', () => resolve(hash.digest('hex')))
         })
     }
+    
 
     write() {
         const headerPath = path.join(this.includeDirectory, `${this.fileName}.h`);
