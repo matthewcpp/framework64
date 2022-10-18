@@ -1,5 +1,7 @@
 class N64Scene {
     name = "scene";
+
+    /** this is the root GLTF node representing the scene. */
     rootNode = null;
     nodes = [];
     meshes = [];

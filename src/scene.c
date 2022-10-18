@@ -128,3 +128,22 @@ int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocit
 
     return result->count;
 }
+
+uint32_t fw64_scene_find_nodes_with_layer_mask(fw64Scene* scene, uint32_t layer_mask, fw64Node** node_buffer, uint32_t buffer_size) {
+    uint32_t buffer_index = 0;
+
+        uint32_t node_count = fw64_scene_get_node_count(scene);
+
+    for (int i = 0; i < node_count; i++) {
+        fw64Node* node = fw64_scene_get_node(scene, i);
+
+        if (node->layer_mask & layer_mask) {
+            node_buffer[buffer_index++] = node;
+
+            if (buffer_index == buffer_size)
+                return buffer_index;
+        }
+    }
+
+    return buffer_index;
+}

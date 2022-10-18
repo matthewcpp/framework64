@@ -3,6 +3,7 @@ class WriteInterface {
     writeUInt32;
     floatBufferToNative;
     int16ArrayToBuffer;
+    floatArrayToBuffer;
 
     static bigEndian() {
         const i = new WriteInterface();
@@ -23,6 +24,13 @@ class WriteInterface {
                 offset = bufferBE.writeUInt16BE(val, offset);
             return bufferBE;
         }
+        i.floatArrayToBuffer = (array) => {
+            const bufferBE = Buffer.alloc(array.length * 4);
+            let offset = 0;
+            for (const val of array)
+                offset = bufferBE.writeFloatBE(val, offset);
+            return bufferBE;
+        }
 
         return i;
     }
@@ -38,6 +46,13 @@ class WriteInterface {
             let offset = 0;
             for (const val of array)
                 offset = bufferLE.writeUInt16LE(val, offset);
+            return bufferLE;
+        }
+        i.floatArrayToBuffer = (array) => {
+            const bufferLE = Buffer.alloc(array.length * 4);
+            let offset = 0;
+            for (const val of array)
+                offset = bufferLE.writeFloatLE(val, offset);
             return bufferLE;
         }
 

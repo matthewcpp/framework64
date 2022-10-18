@@ -14,10 +14,12 @@ const processRaw = require("./ProcessRaw");
 
 const path = require("path");
 
-async function prepare(manifest, assetDirectory, outputDirectory) {
+async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const bundle = new Bundle(outputDirectory, includeDirectory);
     const layerMap = processLayers(manifest.layers, includeDirectory);
+
+    plugins.initialize(bundle, assetDirectory, outputDirectory, includeDirectory);
 
     bundle.addLayerMap(layerMap, 0);
 
@@ -57,6 +59,14 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
         }
     }
 
+    if (manifest.levels) {
+        for (const level of manifest.levels) {
+            console.log(`Processing Level: ${level.src}`);
+
+            await processLevel(level, bundle, assetDirectory, outputDirectory, includeDirectory, plugins);
+        }
+    }
+
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
             console.log(`Processing Sound Bank: ${soundBank.name}`);
@@ -75,14 +85,6 @@ async function prepare(manifest, assetDirectory, outputDirectory) {
         for (const rawFile of manifest.raw) {
             console.log(`Processing Raw File: ${rawFile}`);
             processRaw(rawFile, bundle, assetDirectory, outputDirectory);
-        }
-    }
-
-    if (manifest.levels) {
-        for (const level of manifest.levels) {
-            console.log(`Processing Level: ${level.src}`);
-
-            await processLevel(level, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 

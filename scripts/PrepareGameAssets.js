@@ -11,6 +11,9 @@ program
     .description("Prepares assets for a framework64 Example");
 
 program
+    .option("-p, --plugin <path>", "path to plugin configuration script");
+
+program
     .argument("<platform>")
     .argument("[target]")
     .action(prepareGameAssets);
@@ -22,7 +25,8 @@ async function prepareGameAssets(platform, target) {
     const assetDirectory = path.join(gameDirectory, "assets");
     const assetManifest = path.join(assetDirectory, "assets.json");
     const platformBuildDir = path.join(gameDirectory, `build_${platform}`);
-
+    const options = program.opts();
+    const pluginPath = (!!options.plugin) ? path.join(gameDirectory, options.plugin) : null;
 
     // read game name from package manifest if not specified
     if (!target) {
@@ -32,13 +36,11 @@ async function prepareGameAssets(platform, target) {
         console.log(`No target specified. using default target: ${packageJson.name}`);
     }
 
-    console.log(assetManifest, assetDirectory, platform, platformBuildDir, target);
-
     if (platform.toLowerCase() === "n64") {
         purgeCompiledAssetData(platformBuildDir, target)
     }
 
-    await prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, target);
+    await prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, target, pluginPath);
 }
 
 /** 

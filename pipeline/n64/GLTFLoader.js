@@ -149,7 +149,7 @@ class GLTFLoader {
         const scene = new N64Scene();
         scene.name = Util.safeDefineName(rootNode.name.toLowerCase());
         scene.meshResources = this.resources;
-        scene.rootNode = sceneNode;
+        scene.rootNode = rootNode;
 
         if (!sceneNode.children) // empty scene
             return scene;

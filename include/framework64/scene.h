@@ -42,6 +42,8 @@ uint32_t fw64_scene_get_node_count(fw64Scene* scene);
 
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene);
 
+uint32_t fw64_scene_find_nodes_with_layer_mask(fw64Scene* scene, uint32_t layer_mask, fw64Node** node_buffer, uint32_t buffer_size);
+
 int fw64_scene_raycast(fw64Scene* scene, Vec3* origin, Vec3* direction, uint32_t mask, fw64RaycastHit* hit);
 int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint32_t mask, fw64OverlapSphereQueryResult* result);
 int fw64_scene_moving_sphere_intersection(fw64Scene* scene, Vec3* center, float radius, Vec3* velocity, uint32_t mask, fw64IntersectMovingSphereQuery* result);
