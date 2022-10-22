@@ -135,6 +135,38 @@ class GLTFLoader {
         }
     }
 
+    _nodeMeshIsIgnored(gltfNode) {
+        if ((!!gltfNode.extras) && (!!gltfNode.extras.mesh)) {
+            if (gltfNode.extras.mesh === "ignore")
+                return true;
+        }
+        
+        return false;
+    }
+
+    async _setNodeMesh(scene, gltfNode, node) {
+        // if the mesh is ignored just set an empty collider
+        if (this._nodeMeshIsIgnored(gltfNode)) {
+            node.collider = N64Node.ColliderType.None;
+            return;
+        }
+
+        // if we already loaded this mesh then grab the index of it in the scene mesh array
+        if (this.meshMap.has(gltfNode.mesh)) {
+            node.mesh = this.meshMap.get(gltfNode.mesh);
+        }
+        else { // load mesh we haven't seen before
+            this.mesh = new N64Mesh(gltfNode.name);
+            await this._loadMesh(this.gltf.meshes[gltfNode.mesh]);
+            node.mesh = scene.meshes.length;
+            scene.meshes.push(this.mesh);
+            this.meshMap.set(gltfNode.mesh, node.mesh);
+        }
+
+        if (node.collider === N64Node.NoCollider)
+            node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
+    }
+
     async _parseScene(sceneRootNodeIndex, layerMap) {
         this._resetMaps();
         this._parseSceneNode(sceneRootNodeIndex);
@@ -158,7 +190,7 @@ class GLTFLoader {
             const gltfNode = this.gltf.nodes[child_index];
             const node = new N64Node();
 
-            const hasMesh = gltfNode.hasOwnProperty("mesh");
+            const hasMesh = !!gltfNode.mesh;
 
             this._extractNodeTransform(gltfNode, node);
 
@@ -167,20 +199,7 @@ class GLTFLoader {
             }
 
             if (hasMesh) {
-                // if we already loaded this mesh then grab the index of it in the scene mesh array
-                if (this.meshMap.has(gltfNode.mesh)) {
-                    node.mesh = this.meshMap.get(gltfNode.mesh);
-                }
-                else { // load mesh we haven't seen before
-                    this.mesh = new N64Mesh(gltfNode.name);
-                    await this._loadMesh(this.gltf.meshes[gltfNode.mesh]);
-                    node.mesh = scene.meshes.length;
-                    scene.meshes.push(this.mesh);
-                    this.meshMap.set(gltfNode.mesh, node.mesh);
-                }
-
-                if (node.collider === N64Node.NoCollider)
-                    node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
+                await this._setNodeMesh(scene, gltfNode, node);
             }
 
             if (gltfNode.hasOwnProperty("extras")) {
@@ -196,6 +215,16 @@ class GLTFLoader {
                     }
 
                     node.layerMask = layerMask;
+                }
+
+                if (gltfNode.extras.data) {
+                    const dataValue = parseInt(gltfNode.extras.data);
+                    
+                    if (isNaN(dataValue)) {
+                        throw new Error(`Unable to parse data value for node: ${node.name}`);
+                    }
+
+                    node.data = dataValue;
                 }
 
                 if (gltfNode.extras.hasOwnProperty("collider")) {
@@ -222,7 +251,7 @@ class GLTFLoader {
                 }
             }
 
-            if (node.collider != N64Node.ColliderType.None) {
+            if (node.collider != N64Node.NoCollider) {
                 scene.colliderCount += 1;
             }
 

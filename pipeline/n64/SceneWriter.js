@@ -56,7 +56,7 @@ function writeNodes(scene, file) {
         index = propertiesBuffer.writeUInt32BE(node.collider, index);
         index = propertiesBuffer.writeUInt32BE(node.mesh, index);
         index = propertiesBuffer.writeUInt32BE(node.layerMask, index);
-        index = propertiesBuffer.writeUInt32BE(0, index); // this slot occupies the user data
+        index = propertiesBuffer.writeUInt32BE(node.data, index);
 
         fs.writeSync(file, transformBuffer);
         fs.writeSync(file, n64MatrixBuffer);
