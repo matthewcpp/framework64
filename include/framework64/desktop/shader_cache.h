@@ -5,7 +5,6 @@
 #include "framework64/desktop/line_shader.h"
 #include "framework64/desktop/sprite_shader.h"
 #include "framework64/desktop/unlit_shader.h"
-#include "framework64/desktop/mesh.h"
 
 #include <memory>
 #include <string>
@@ -21,9 +20,6 @@ public:
     ShaderProgram* getShaderProgram(fw64ShadingMode shading_mode);
 
     inline std::string shaderDir() const { return shader_dir; }
-
-private:
-    Shader* getShader(fw64Primitive const & primitive);
 
 private:
     GouraudShader gouraud_shader;

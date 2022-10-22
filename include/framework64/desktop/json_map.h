@@ -1,9 +1,10 @@
 #pragma once
 
-#include "framework64/desktop/asset_database.h"
 
 #include <unordered_map>
 #include <string>
+
+struct fw64AssetDatabase;
 
 namespace framework64 {
 typedef std::unordered_map<std::string, uint32_t> LayerMap;

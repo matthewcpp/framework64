@@ -1,7 +1,6 @@
 #include "framework64/desktop/scene.h"
 
 #include "framework64/desktop/asset_database.h"
-#include "framework64/desktop/glb_parser.h"
 #include "framework64/desktop/json_map.h"
 
 #include <algorithm>
@@ -25,8 +24,7 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* database, int index, fw64Allocator
 
     auto layer_map = framework64::load_layer_map(database, layer_map_index);
 
-    framework64::GlbParser glb(database->shader_cache);
-    auto* scene = glb.loadScene(scene_path, scene_index, layer_map);
+    auto* scene = database->glb_parser.loadScene(scene_path, scene_index, layer_map);
     scene->calculateBounding();
 
     scene->allocator = allocator;

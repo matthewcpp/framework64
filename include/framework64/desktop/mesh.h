@@ -1,6 +1,5 @@
 #pragma once
 
-#include "framework64/asset_database.h"
 #include "framework64/mesh.h"
 #include "framework64/desktop/material.h"
 #include "framework64/desktop/texture.h"
@@ -15,6 +14,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+struct fw64AssetDatabase;
 
 namespace framework64 {
 

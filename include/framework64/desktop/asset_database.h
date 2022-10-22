@@ -10,11 +10,13 @@
 #include <string>
 #include <unordered_map>
 
+#include "glb_parser.h"
+
 
 class fw64AssetDatabase {
 public:
     fw64AssetDatabase(std::string const & dir, framework64::ShaderCache& sc)
-        : asset_dir(dir), shader_cache(sc) {}
+        : asset_dir(dir), shader_cache(sc), glb_parser(sc) {}
 
     bool init(std::string const & database_path);
 
@@ -31,5 +33,7 @@ public:
     sqlite3_stmt* select_terrain_statement = nullptr;
     sqlite3_stmt* select_layermap_statement = nullptr;
     sqlite3_stmt* select_scene_statement = nullptr;
+
+    framework64::GlbParser glb_parser;
 };
 

@@ -240,7 +240,26 @@ void fw64_level_draw_camera(fw64Level* level, fw64Camera* camera) {
     }
 }
 
-void fw64_level_add_dyanmic_node(fw64Level* level, fw64Node* node) {
+void fw64_level_draw_camera_all(fw64Level* level, fw64Camera* camera) {
+    fw64Renderer* renderer = level->engine->renderer;
+    fw64Frustum frustum;
+    fw64_camera_extract_frustum_planes(camera, &frustum);
+
+    for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
+        fw64LevelChuckRef* ref = level->chunk_refs + i;
+
+        if (!fw64_frustum_intersects_box(&frustum, fw64_scene_get_initial_bounds(ref->scene)))
+            continue;
+
+        if (ref->info.draw_func) {
+            ref->info.draw_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
+        }
+
+        fw64_scene_draw_all(ref->scene, renderer);
+    }
+}
+
+void fw64_level_add_dynamic_node(fw64Level* level, fw64Node* node) {
     if (level->dynamic_node_count == FW64_LEVEL_DYNAMIC_NODE_COUNT)
         return;
 

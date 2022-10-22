@@ -10,14 +10,13 @@ class N64Node {
 
     static NoMesh = 0xFFFFFFFF;
     static NoCollider = 0xFFFFFFFF;
-    static NoType = 0xFFFFFFFF
 
     position = [0.0, 0.0, 0.0];
     rotation = [0.0, 0.0, 0.0, 1.0]
     scale = [1.0, 1.0, 1.0];
     mesh = N64Node.NoMesh;
     collider = N64Node.NoCollider;
-    type = N64Node.NoType;
+    data = 0;
     layerMask = 1;
 }
 

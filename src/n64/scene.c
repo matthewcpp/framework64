@@ -112,9 +112,14 @@ fw64Scene* fw64_scene_load(fw64AssetDatabase* assets, int index, fw64Allocator* 
                 else if (collider_type == FW64_COLLIDER_MESH) {
                     fw64_collider_set_type_mesh(node->collider, scene->collision_meshes + collision_mesh_index);
                 }
+                else if (collider_type == FW64_COLLIDER_NONE) {
+                    fw64_collider_set_type_none(node->collider);
+                }
 
                 collider_index += 1;
-                box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
+
+                if (collider_type != FW64_COLLIDER_NONE)
+                    box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
             }
         }
 

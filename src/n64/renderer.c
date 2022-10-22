@@ -44,11 +44,11 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     fw64_renderer_set_fog_positions(renderer, 0.4f, 0.8f);
     fw64_renderer_set_fog_color(renderer, 85, 85, 85);
 
-    // set default lighting state - single white light
+    // set default lighting state
     Lights2 lights = gdSPDefLights2(
-        25, 25, 25,
-        255, 255, 255, 40, 40,40,
-        255, 255, 255, -40, -40, 40
+        85 , 85, 85,
+        200, 200, 200, 40, 40, 40,
+        200, 200, 200, -40, -40, -40
     );
     renderer->lights = lights;
     renderer->active_light_mask = 1;
@@ -166,10 +166,11 @@ void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     renderer->viewport_screen_pos.x = (int)(renderer->screen_size.x * camera->viewport_pos.x);
     renderer->viewport_screen_pos.y = (int)(renderer->screen_size.y * camera->viewport_pos.y);
 
-    // sets the view projection matrices
+    // sets the view projection matrices  This is slightly counter intuitive
+    // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
     gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
     gSPPerspNormalize(renderer->display_list++, camera->_persp_norm);
-    gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
 }
 
 void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw64RendererFlags flags) {
@@ -520,7 +521,7 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
@@ -530,11 +531,12 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
         gDPPipeSync(renderer->display_list++);
     }
 
-    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+    // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix see note above in set_camera
+    //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
@@ -548,7 +550,8 @@ void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw
         gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     }
 
-    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+    // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix see note above in set_camera
+    //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
 void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {
