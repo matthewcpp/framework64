@@ -1,4 +1,5 @@
 #include "framework64/desktop/json_map.h"
+#include "framework64/desktop/asset_database.h"
 
 #include <nlohmann/json.hpp>
 

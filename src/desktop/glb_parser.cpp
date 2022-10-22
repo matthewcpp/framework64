@@ -129,6 +129,7 @@ fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, Lay
         extractTransformFromNode(node, n->transform.position, n->transform.rotation, n->transform.scale);
 
         bool skip_mesh_collider = false;
+        bool mesh_is_ignored = false;
 
         if (node.contains("extras")) {
             auto& extras = node["extras"];
@@ -146,6 +147,22 @@ fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, Lay
                 }
 
                 n->layer_mask = layer_mask;
+            }
+
+            if (extras.contains("data")) {
+                auto& data_prop = extras["data"];
+
+                if (data_prop.is_string()) {
+                    n->data = reinterpret_cast<void*>(std::stoi(data_prop.get<std::string>()));
+                }
+                else {
+                    n->data = reinterpret_cast<void*>(data_prop.get<int>());
+                }
+            }
+
+            if (extras.contains("mesh")) {
+                auto value = extras["mesh"].get<std::string>();
+                mesh_is_ignored = (value == "ignore");
             }
 
             if (extras.contains("collider")) {
@@ -167,13 +184,19 @@ fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, Lay
         }
 
         if (node.contains("mesh")) {
-            size_t mesh_index = node["mesh"].get<size_t>();
-            auto* mesh = getStaticMesh(mesh_index);
-            fw64_node_set_mesh(n, mesh);
-
-            if (!n->collider && !skip_mesh_collider) {
+            if (mesh_is_ignored) {
                 fw64_node_set_collider(n, scene->createCollider());
-                fw64_collider_set_type_box(n->collider, &mesh->bounding_box);
+                fw64_collider_set_type_none(n->collider);
+            }
+            else {
+                size_t mesh_index = node["mesh"].get<size_t>();
+                auto* mesh = getStaticMesh(mesh_index);
+                fw64_node_set_mesh(n, mesh);
+
+                if (!n->collider && !skip_mesh_collider) {
+                    fw64_node_set_collider(n, scene->createCollider());
+                    fw64_collider_set_type_box(n->collider, &mesh->bounding_box);
+                }
             }
         }
 
@@ -251,6 +274,9 @@ framework64::CollisionMesh* GlbParser::parseCollisionMesh(nlohmann::json const &
 }
 
 bool GlbParser::openFile(std::string const& path) {
+    if (glb_file.is_open())
+        glb_file.close();
+        
     glb_file.open(path, std::ios::binary);
 
     if (!glb_file)

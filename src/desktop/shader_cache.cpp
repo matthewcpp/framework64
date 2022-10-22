@@ -1,4 +1,5 @@
 #include "framework64/desktop/shader_cache.h"
+#include "framework64/desktop/mesh.h"
 
 #include <limits>
 
