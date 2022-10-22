@@ -259,7 +259,7 @@ void fw64_level_draw_camera_all(fw64Level* level, fw64Camera* camera) {
     }
 }
 
-void fw64_level_add_dyanmic_node(fw64Level* level, fw64Node* node) {
+void fw64_level_add_dynamic_node(fw64Level* level, fw64Node* node) {
     if (level->dynamic_node_count == FW64_LEVEL_DYNAMIC_NODE_COUNT)
         return;
 

@@ -113,7 +113,7 @@ int fw64_level_moving_sphere_intersection(fw64Level* level, Vec3* center, float 
 
 int fw64_level_moving_spheres_dynamic_intersection(fw64Level* level, Vec3* center, float radius, Vec3* velocity, uint32_t mask, fw64IntersectMovingSphereQuery* result);
 
-void fw64_level_add_dyanmic_node(fw64Level* level, fw64Node* node);
+void fw64_level_add_dynamic_node(fw64Level* level, fw64Node* node);
 void fw64_level_remove_dynamic_node(fw64Level* level, fw64Node* node);
 uint32_t fw64_level_get_dynamic_node_count(fw64Level* level);
 fw64Node* fw64_level_get_dynamic_node(fw64Level* level, uint32_t index);
