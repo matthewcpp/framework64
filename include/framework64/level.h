@@ -105,6 +105,7 @@ void fw64_level_update(fw64Level* level);
  * If the test passes will call the assoicated draw function.
  */
 void fw64_level_draw_camera(fw64Level* level, fw64Camera* camera);
+void fw64_level_draw_camera_all(fw64Level* level, fw64Camera* camera);
 
 int fw64_level_raycast(fw64Level* level, Vec3* origin, Vec3* direction, uint32_t mask, fw64RaycastHit* hit);
 int fw64_level_moving_box_intersection(fw64Level* level, Box* box, Vec3* velocity, uint32_t mask, fw64IntersectMovingBoxQuery* result);
