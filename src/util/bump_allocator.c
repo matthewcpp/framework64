@@ -7,6 +7,11 @@
 
 #define ALIGN_SIZE 8
 
+typedef enum {
+    BUMP_ALLOCATOR_FLAG_NONE,
+    BUMP_ALLOCATOR_FLAG_OWNS_BUFFER
+} BumpAllocatorFlags;
+
 static void* fw64_bump_allocator_malloc(fw64Allocator* allocator, size_t size) {
     fw64BumpAllocator* bump = (fw64BumpAllocator*)allocator;
 
@@ -62,16 +67,27 @@ static void* fw64_bump_allocator_realloc(fw64Allocator* allocator, void* ptr, si
     }
 }
 
-void fw64_bump_allocator_init(fw64BumpAllocator* bump, size_t size) {
+static void setup_bump_allocator(fw64BumpAllocator* bump, char* buffer, size_t size) {
     bump->interface.malloc = fw64_bump_allocator_malloc;
     bump->interface.memalign = fw64_bump_allocator_memalign;
     bump->interface.free = fw64_bump_allocator_free;
     bump->interface.realloc = fw64_bump_allocator_realloc;
 
     bump->size = size;
-    bump->start = fw64_memalign(8, size);
+    bump->start = buffer;
     bump->next = bump->start;
     bump->previous = bump->start;
+}
+
+void fw64_bump_allocator_init(fw64BumpAllocator* bump, size_t size) {
+    char* buffer = fw64_memalign(8, size);
+    setup_bump_allocator(bump, buffer, size);
+    bump->flags = BUMP_ALLOCATOR_FLAG_OWNS_BUFFER;
+}
+
+void fw64_bump_allocator_init_from_buffer(fw64BumpAllocator* bump, char* buffer, size_t size) {
+    setup_bump_allocator(bump, buffer, size);
+    bump->flags = BUMP_ALLOCATOR_FLAG_NONE;
 }
 
 void fw64_bump_allocator_reset(fw64BumpAllocator* bump) {
@@ -80,5 +96,6 @@ void fw64_bump_allocator_reset(fw64BumpAllocator* bump) {
 }
 
 void fw64_bump_allocator_uninit(fw64BumpAllocator* bump) {
-    fw64_free(bump->start);
+    if (bump->flags & BUMP_ALLOCATOR_FLAG_OWNS_BUFFER)
+        fw64_free(bump->start);
 }
