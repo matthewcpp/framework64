@@ -131,3 +131,7 @@ fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint3
 void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator) {
     delete image;
 }
+
+void fw64_image_load_frame(fw64Image* image, uint32_t frame) {
+    // this is a no-op on desktop
+}

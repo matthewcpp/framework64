@@ -71,7 +71,6 @@ void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int
 /**
  * Draws a single sprite frame.
  * The x, y position specifies the top left position of the sprite.
- * Note: the rotation value is currently ignored.
  */
 void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y);
 

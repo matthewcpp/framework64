@@ -47,7 +47,7 @@ int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_
     if (options & FW64_IMAGE_FLAG_DMA_MODE) {
         image->rom_addr = fw64_n64_filesystem_get_rom_address(asset_index) + sizeof(fw64N64ImageInfo);
         image->data = allocator->memalign(allocator, 8, fw64_n64_image_get_frame_size(image));
-        fw64_n64_image_load_frame(image, 0);
+        fw64_image_load_frame(image, 0);
     }
     else {
         int data_size = image->info.width * image->info.height * image->info.bpp;
@@ -80,7 +80,7 @@ uint8_t* fw64_n64_image_get_data(fw64Image* image, int frame) {
     
 }
 
-void fw64_n64_image_load_frame(fw64Image* image, int frame) {
+void fw64_image_load_frame(fw64Image* image, uint32_t frame) {
     if (!IMAGE_IS_DMA_MODE(image))
         return;
 

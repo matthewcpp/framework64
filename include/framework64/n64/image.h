@@ -24,4 +24,3 @@ struct fw64Image {
 int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t assetIndex, uint32_t options, fw64Allocator* allocator);
 
 uint8_t* fw64_n64_image_get_data(fw64Image* image, int frame);
-void fw64_n64_image_load_frame(fw64Image* image, int frame);

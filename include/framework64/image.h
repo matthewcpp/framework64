@@ -40,6 +40,12 @@ fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t asset_ind
 fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint32_t asset_index, uint32_t options, fw64Allocator* allocator);
 
 /**
+ * Loads the specified frame into from ROM.
+ * This method is a no-op if the image was not loaded with FW64_IMAGE_FLAG_DMA_MODE.
+ */
+void fw64_image_load_frame(fw64Image* image, uint32_t frame);
+
+/**
  * Deletes the image and frees all assocated resources for an image created with \ref fw64_image_load
  **/
 void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator);
