@@ -1,6 +1,8 @@
 const N64Image = require("./N64Image")
 const N64ImageWriter = require("./N64ImageWriter");
 
+const ImageAtlasDefines = require("../ImageAtlasDefines");
+
 const Jimp = require("jimp");
 
 const fs = require("fs");
@@ -104,6 +106,7 @@ async function processImage(manifestDirectory, outputDirectory, image, archive) 
         return convertSprite(manifestDirectory, outputDirectory, image, archive);
     }
     else if (image.frames || image.frameDir){
+        ImageAtlasDefines.writeHeaderFile(image, outputDirectory);
         return assembleSprite(manifestDirectory, outputDirectory, image, archive);
     }
 }

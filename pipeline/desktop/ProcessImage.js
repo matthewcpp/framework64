@@ -1,4 +1,5 @@
 const Image = require("../Image");
+const ImageAtlasDefines = require("../ImageAtlasDefines");
 
 const fs = require("fs");
 const path = require("path");
@@ -57,6 +58,7 @@ async function buildAtlasFromFrames(imageJson, bundle, baseDirectory, outputDire
 
 async function processImage(imageJson, bundle, baseDirectory, outputDirectory) {
     if (imageJson.frames || imageJson.frameDir) {
+        ImageAtlasDefines.writeHeaderFile(imageJson, outputDirectory);
         return buildAtlasFromFrames(imageJson, bundle, baseDirectory, outputDirectory);
     }
 
