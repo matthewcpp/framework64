@@ -20,7 +20,6 @@
 #define GET_RENDERER_FEATURE(renderer, feature) ((renderer)->enabled_features & (feature))
 
 static void fw64_n64_renderer_update_lighting_data(fw64Renderer* renderer);
-static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer);
 
 static void fw64_n64_configure_fog(fw64Renderer* renderer, int enabled);
 
@@ -587,25 +586,6 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
     renderer->active_texture = texture;
     renderer->active_texture_frame = frame;
 }
-
-// TODO: handle no active lights correctly...first light should be set to all black
-static void fw64_n64_renderer_set_lighting_data(fw64Renderer* renderer) {
-    int light_num = 1;
-    int light_count = 0;
-    if (renderer->active_light_mask & (1 << 0)) {
-        gSPLight(renderer->display_list++, &renderer->lights.l[0], light_num++);
-        light_count += 1;
-    }
-
-    if (renderer->active_light_mask & (1 << 1)) { 
-        gSPLight(renderer->display_list++, &renderer->lights.l[1], light_num++);
-        light_count += 1;
-    }
-
-    gSPLight(renderer->display_list++, &renderer->lights.a, light_num);
-    gSPNumLights(renderer->display_list++, light_count);
-}
-
 
 void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
     renderer->lights.a.l.col[0] = r;
