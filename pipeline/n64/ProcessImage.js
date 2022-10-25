@@ -106,7 +106,7 @@ async function processImage(manifestDirectory, outputDirectory, image, archive) 
         return convertSprite(manifestDirectory, outputDirectory, image, archive);
     }
     else if (image.frames || image.frameDir){
-        ImageAtlasDefines.writeHeaderFile(image, outputDirectory);
+        ImageAtlasDefines.writeHeaderFile(image, manifestDirectory, outputDirectory);
         return assembleSprite(manifestDirectory, outputDirectory, image, archive);
     }
 }
