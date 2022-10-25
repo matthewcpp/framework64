@@ -90,7 +90,7 @@ void game_draw(Game* game) {
     fw64_camera_extract_frustum_planes(&game->fps_camera.camera, &view_frustum);
 
     fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 1);
-    fw64_renderer_begin(game->engine->renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_set_camera(game->engine->renderer, &game->fps_camera.camera);
 
     fw64_scene_draw_frustrum(game->scene, game->engine->renderer, &view_frustum);

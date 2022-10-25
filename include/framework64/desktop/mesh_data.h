@@ -19,7 +19,7 @@ struct GLMeshInfo {
     uint32_t gl_element_buffer_object = 0;
 
     uint32_t attributes = 0;
-    GLenum element_type = 0;
+    GLenum primitive_mode = 0;
     uint32_t element_count = 0;
 
     void setPrimitiveValues(fw64Primitive& primitive);

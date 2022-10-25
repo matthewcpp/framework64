@@ -48,7 +48,7 @@ void game_update(Game* game) {
 
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
-    fw64_renderer_begin(renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_set_camera(renderer, &game->arcball.camera);
     fw64_renderer_draw_animated_mesh(renderer, game->mesh, &game->animation_state, &game->node.transform);
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);

@@ -38,7 +38,7 @@ struct fw64Renderer{
 
     IVec2 screen_size;
     IVec2 viewport_screen_pos;
-    fw64RenderMode render_mode;
+    fw64PrimitiveMode primitive_mode;
     fw64ShadingMode shading_mode;
     fw64RendererFlags flags;
 
@@ -54,6 +54,8 @@ struct fw64Renderer{
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
+
+void fw64_n64_configure_fog(fw64Renderer* renderer, int enabled);
 
 void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask* gfxTaskPtr);
 

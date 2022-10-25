@@ -12,10 +12,10 @@
 #include "vec2.h"
 
 typedef enum {
-    FW64_RENDERER_MODE_UNSET,
-    FW64_RENDERER_MODE_TRIANGLES,
-    FW64_RENDERER_MODE_LINES
-} fw64RenderMode;
+    FW64_PRIMITIVE_MODE_UNSET,
+    FW64_PRIMITIVE_MODE_TRIANGLES,
+    FW64_PRIMITIVE_MODE_LINES
+} fw64PrimitiveMode;
 
 typedef enum {
     FW64_RENDERER_FLAG_NONE = 0,
@@ -38,7 +38,7 @@ typedef void(*fw64RendererPostDrawFunc)(fw64Framebuffer*, void*);
 extern "C" {
 #endif
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw64RendererFlags flags);
+void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64RendererFlags flags);
 
 /** 
  * Sets the currently active camera and the associated viewport.

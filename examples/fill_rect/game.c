@@ -107,7 +107,7 @@ void game_draw(Game* game) {
     IVec2 screen_size;
     fw64_renderer_get_screen_size(renderer, &screen_size);
 
-    fw64_renderer_begin(renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_set_camera(renderer, &game->camera);
     draw_background(game, &screen_size);
     draw_progress_bar(game);
