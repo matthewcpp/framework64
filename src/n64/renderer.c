@@ -357,8 +357,10 @@ static void n64_renderer_configure_shading_mode_sprite(fw64Renderer* renderer) {
     if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_FOG))
         fw64_n64_configure_fog(renderer, 0);
 
+#define	FwW64_N64_CC_SPRITE	TEXEL0, 0, PRIMITIVE, 0, TEXEL0, 0, PRIMITIVE, 0
+
     gDPSetRenderMode(renderer->display_list++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
-    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIDECALA_PRIM, G_CC_MODULATEIDECALA_PRIM); // sprite
+    gDPSetCombineMode(renderer->display_list++, FwW64_N64_CC_SPRITE, FwW64_N64_CC_SPRITE); // sprite
     gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
     gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
     gDPPipeSync(renderer->display_list++);
