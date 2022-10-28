@@ -20,8 +20,9 @@ async function convertMidiToOgg(sourceDir, sourceFile, destDir, destFile) {
 }
 
 async function processMusicBank(musicBank, bundle, baseDirectory, outputDirectory, includeDirectory) {
+    const musicBankName = (!!musicBank.name) ? musicBank.name : path.basename(musicBank.dir);
     const sourceDir = path.join(baseDirectory, musicBank.dir);
-    const destDir = path.join(outputDirectory, musicBank.name);
+    const destDir = path.join(outputDirectory, musicBankName);
 
     fs.mkdirSync(destDir);
 
@@ -45,7 +46,7 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
     }
 
     bundle.addMusicBank(musicBank, files);
-    AudioHeader.writeMusicBankHeader(sourceDir, includeDirectory);
+    AudioHeader.writeMusicBankHeader(sourceDir, musicBankName, includeDirectory);
 }
 
 module.exports = processMusicBank;

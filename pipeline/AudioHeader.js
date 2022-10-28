@@ -3,12 +3,12 @@ const Util = require("./Util");
 const fs = require("fs");
 const path = require("path");
 
-function writeMusicBankHeader(musicBankDir, outputDir) {
-    writeHeader("music_bank", path.basename(musicBankDir), musicBankDir, outputDir);
+function writeMusicBankHeader(musicBankDir, name, outputDir) {
+    writeHeader("music_bank", name, musicBankDir, outputDir);
 }
 
-function writeSoundBankHeader(soundBankDir, outputDir) {
-    writeHeader("sound_bank", path.basename(soundBankDir), soundBankDir, outputDir);
+function writeSoundBankHeader(soundBankDir, name, outputDir) {
+    writeHeader("sound_bank", name, soundBankDir, outputDir);
 }
 
 function writeHeader(typePrefix, namePrefix, sourceDir, outputDir) {
