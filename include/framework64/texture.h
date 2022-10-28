@@ -52,6 +52,12 @@ void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s
 
 fw64Image* fw64_texture_get_image(fw64Texture* texture);
 
+/** 
+ * Sets the image associated with this this texture.
+ * Note, calling this method on a texture which already has an image will NOT free th resources associated with that image.
+*/
+void fw64_texture_set_image(fw64Texture* texture, fw64Image* image);
+
 #ifdef __cplusplus
 }
 #endif
