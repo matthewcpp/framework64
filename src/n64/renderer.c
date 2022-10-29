@@ -436,8 +436,6 @@ static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite,
             G_TX_RENDERTILE, 
             0 << 5, 0 << 5, 
             1 << 10, 1 << 10);
-
-    gDPPipeSync(renderer->display_list++);
 }
 
 void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height) {
@@ -580,8 +578,6 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
     default:
         break;
     }
-
-    gDPLoadSync(renderer->display_list++);
 
     renderer->active_texture = texture;
     renderer->active_texture_frame = frame;
