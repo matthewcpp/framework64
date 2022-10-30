@@ -30,6 +30,7 @@ class Bundle {
     _initHeaderFile(includeDirectory) {
         const headerPath = path.join(includeDirectory, "assets.h");
         this._headerFile = fse.openSync(headerPath, "w");
+        fse.writeSync(this._headerFile, "#pragma once\n\n");
     }
 
     _initDatabase(outputDirectory) {
