@@ -9,7 +9,7 @@
 
 
 /* The maximum length of the display list of one task  */
-#define GFX_DLIST_LEN     2048
+#define GFX_DLIST_LEN 4096
 
 typedef enum {
     N64_RENDERER_FEATURE_NONE = 0,
