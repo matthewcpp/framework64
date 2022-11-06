@@ -11,6 +11,10 @@
         {
             "src": "image_types/rgba32.png",
             "format": "RGBA32"
+        },
+        {
+            "src": "image_types/i8.png",
+            "format": "I8"
         }
     ],
     "fonts": [
@@ -18,7 +22,7 @@
             "name": "header",
             "src": "Consolas.ttf",
             "size": "14",
-            "sourceString": "Format: IA8 IA4 RGBA32 RGBA16"
+            "sourceString": "Format: IA8 IA4 I8 I4 RGBA32 RGBA16"
         }
     ]
 }

@@ -37,6 +37,7 @@ uint32_t fw64_n64_image_get_data_size(fw64Image* image) {
         return image->info.width * image->info.height * 4;
 
     case FW64_N64_IMAGE_FORMAT_IA8:
+    case FW64_N64_IMAGE_FORMAT_I8:
         return image->info.width * image->info.height;
 
     case FW64_N64_IMAGE_FORMAT_IA4:

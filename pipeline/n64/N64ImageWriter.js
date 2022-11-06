@@ -15,6 +15,7 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
     switch (image.format) {
         case N64Image.Format.IA8:
         case N64Image.Format.IA4:
+        case N64Image.Format.I8:
             bufferOffset = headerBuffer.writeUInt16BE(1, bufferOffset);
             break;
 
@@ -56,7 +57,13 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
 
         case N64Image.Format.RGBA32:
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeRGBA32Slice(slice));
+                fs.writeSync(file, encodeRGBA32Slice(slice, sliceWidth, sliceHeight));
+            }
+            break;
+
+        case N64Image.Format.I8:
+            for (const slice of slices.images) {
+                fs.writeSync(file, encodeI8Slice(slice, sliceWidth, sliceHeight));
             }
             break;
     }
@@ -89,8 +96,8 @@ function encode16bppSlice(data, width, height) {
     return buffer;
 }
 
-function encodeRGBA32Slice(data) {
-    const buffer = Buffer.alloc(data.length);
+function encodeRGBA32Slice(data, sliceWidth, sliceHeight) {
+    const buffer = Buffer.alloc(sliceWidth * sliceHeight * 4);
 
     for (let i = 0; i < data.length; i++) {
         buffer.writeUInt8(data[i], i);
@@ -131,6 +138,18 @@ function encodeIA4Slice(data, sliceWidth, sliceHieght) {
         const value = (value1 << 4) | value2;
 
         buffer.writeUInt8(value, i);
+    }
+
+    return buffer;
+}
+
+function encodeI8Slice(data, sliceWidth, sliceHieght) {
+    const textelCount = sliceWidth * sliceHieght;
+    const buffer = Buffer.alloc(textelCount);
+
+    for(let i = 0; i < textelCount; i++) {
+        const index = i * 4;
+        buffer.writeUInt8(data[index], i);
     }
 
     return buffer;

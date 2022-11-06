@@ -78,6 +78,11 @@ void set_image(Game* game, ImageFormat image_format) {
             fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ia4, fw64_default_allocator()));
             break;
 
+        case IMAGE_FORMAT_I8:
+            format_name = "I8";
+            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_i8, fw64_default_allocator()));
+            break;
+
         case IMAGE_FORMAT_RGBA32:
             fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_rgba32, fw64_default_allocator()));
             format_name = "RGBA32";
