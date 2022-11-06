@@ -13,6 +13,10 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
     bufferOffset = headerBuffer.writeUInt16BE(image.format, bufferOffset);
 
     switch (image.format) {
+        case N64Image.Format.IA8:
+            bufferOffset = headerBuffer.writeUInt16BE(1, bufferOffset);
+            break;
+
         case N64Image.Format.RGBA16:
             bufferOffset = headerBuffer.writeUInt16BE(2, bufferOffset);
             break;
@@ -31,20 +35,76 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
     fs.writeSync(file, headerBuffer);
 
     switch (image.format) {
+        case N64Image.Format.IA8:
+            for (const slice of slices.images) {
+                fs.writeSync(file, encodeIA8Slice(slice, sliceWidth, sliceHeight));
+            }
+            break;
+
         case N64Image.Format.RGBA16:
             for (const slice of slices.images) {
-                fs.writeSync(file, N64Image.encode16bpp(slice, sliceWidth, sliceHeight));
+                fs.writeSync(file, encode16bppSlice(slice, sliceWidth, sliceHeight));
             }
             break;
 
         case N64Image.Format.RGBA32:
             for (const slice of slices.images) {
-                fs.writeSync(file, N64Image.encodeRGBA32(slice));
+                fs.writeSync(file, encodeRGBA32Slice(slice));
             }
             break;
     }
 
     fs.closeSync(file);
+}
+
+function encode16bppSlice(data, width, height) {
+    const pixelCount = width * height;
+
+    // rgba data (2 bytes per pixel)
+    const bufferSize = pixelCount * 2;
+
+    const buffer = Buffer.alloc(bufferSize);
+    let offset = 0;
+
+    for (let i = 0; i < pixelCount; i++) {
+        let index = i * 4;
+
+        // note the pixel data format is 5r 5g 5b 1a
+        const r = data[index] >> 3;
+        const g = data[index + 1] >> 3;
+        const b = data[index + 2] >> 3;
+        const a = data[index + 3] === 0 ? 0 : 1;
+
+        const val = r << 11 | g << 6 | b << 1 | a;
+        offset = buffer.writeUInt16BE(val, offset);
+    }
+
+    return buffer;
+}
+
+function encodeRGBA32Slice(data) {
+    const buffer = Buffer.alloc(data.length);
+
+    for (let i = 0; i < data.length; i++) {
+        buffer.writeUInt8(data[i], i);
+    }
+
+    return buffer;
+}
+
+function encodeIA8Slice(data, sliceWidth, sliceHieght) {
+    const textelCount = sliceWidth * sliceHieght;
+    const buffer = Buffer.alloc(textelCount);
+
+    for(let i = 0; i < textelCount; i++) {
+        const index = i * 4;
+        const intensity = parseInt((data[index] / 255) * 15);
+        const alpha = parseInt((data[index + 3] / 255) * 15);
+        const value = (intensity << 4) | alpha;
+        buffer.writeUInt8(value, i);
+    }
+
+    return buffer;
 }
 
 module.exports = {

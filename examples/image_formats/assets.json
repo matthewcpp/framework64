@@ -1,0 +1,16 @@
+{
+    "images": [
+        {
+            "src": "image_types/ia8.png",
+            "format": "IA8"
+        }
+    ],
+    "fonts": [
+        {
+            "name": "header",
+            "src": "Consolas.ttf",
+            "size": "14",
+            "sourceString": "Format: IA8"
+        }
+    ]
+}

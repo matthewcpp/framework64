@@ -5,9 +5,11 @@ class N64Image {
     format;
     _data = null;
 
+    /** This should align with include/n64/image.h */
     static Format = {
         RGBA16: 0,
-        RGBA32: 1
+        RGBA32: 1,
+        IA8: 2
     };
 
     constructor(name, format) {
@@ -59,45 +61,6 @@ class N64Image {
 
     get data() {
         return this._data.bitmap.data;
-    }
-
-    get buffer16bpp() {
-        return N64Image.encode16bpp(this.data, this.width, this.height)
-    }
-
-    static encode16bpp(data, width, height) {
-        const pixelCount = width * height;
-
-        // rgba data (2 bytes per pixel)
-        const bufferSize = pixelCount * 2;
-
-        const buffer = Buffer.alloc(bufferSize);
-        let offset = 0;
-
-        for (let i = 0; i < pixelCount; i++) {
-            let index = i * 4;
-
-            // note the pixel data format is 5r 5g 5b 1a
-            const r = data[index] >> 3;
-            const g = data[index + 1] >> 3;
-            const b = data[index + 2] >> 3;
-            const a = data[index + 3] === 0 ? 0 : 1;
-
-            const val = r << 11 | g << 6 | b << 1 | a;
-            offset = buffer.writeUInt16BE(val, offset);
-        }
-
-        return buffer;
-    }
-
-    static encodeRGBA32(data) {
-        const buffer = Buffer.alloc(data.length);
-
-        for (let i = 0; i < data.length; i++) {
-            buffer.writeUInt8(data[i], i);
-        }
-
-        return buffer;
     }
 
     resize(width, height) {
