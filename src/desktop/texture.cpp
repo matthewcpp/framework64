@@ -22,6 +22,10 @@ fw64Image* fw64_texture_get_image(fw64Texture* texture) {
     return texture->image;
 }
 
+void fw64_texture_set_image(fw64Texture* texture, fw64Image* image) {
+    texture->image = image;
+}
+
 int fw64_texture_slice_width(fw64Texture* texture) {
     return texture->slice_width();
 }

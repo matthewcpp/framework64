@@ -21,8 +21,6 @@
 
 static void fw64_n64_renderer_update_lighting_data(fw64Renderer* renderer);
 
-static void fw64_n64_configure_fog(fw64Renderer* renderer, int enabled);
-
 static void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture, int frame);
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
@@ -31,7 +29,7 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
 
     renderer->display_list = NULL;
     renderer->active_texture = NULL;
-    renderer->render_mode = FW64_RENDERER_MODE_UNSET;
+    renderer->primitive_mode = FW64_PRIMITIVE_MODE_UNSET;
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
     renderer->flags = FW64_RENDERER_FLAG_NONE;
 
@@ -172,8 +170,8 @@ void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&(camera->view)), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode render_mode, fw64RendererFlags flags) {
-    renderer->render_mode = render_mode;
+void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64RendererFlags flags) {
+    renderer->primitive_mode = primitive_mode;
     renderer->active_texture = NULL;
     
     renderer->flags = flags;
@@ -218,7 +216,7 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
 
     nuGfxTaskStart(renderer->display_list_start, 
         (s32)(renderer->display_list - renderer->display_list_start) * sizeof (Gfx), 
-        (renderer->render_mode == FW64_RENDERER_MODE_LINES) ? NU_GFX_UCODE_L3DEX2 : NU_GFX_UCODE_F3DEX, 
+        (renderer->primitive_mode == FW64_PRIMITIVE_MODE_LINES) ? NU_GFX_UCODE_L3DEX2 : NU_GFX_UCODE_F3DEX, 
         (flags & FW64_RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }
 
@@ -359,8 +357,10 @@ static void n64_renderer_configure_shading_mode_sprite(fw64Renderer* renderer) {
     if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_FOG))
         fw64_n64_configure_fog(renderer, 0);
 
+#define	FwW64_N64_CC_SPRITE	TEXEL0, 0, PRIMITIVE, 0, TEXEL0, 0, PRIMITIVE, 0
+
     gDPSetRenderMode(renderer->display_list++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
-    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIDECALA_PRIM, G_CC_MODULATEIDECALA_PRIM); // sprite
+    gDPSetCombineMode(renderer->display_list++, FwW64_N64_CC_SPRITE, FwW64_N64_CC_SPRITE); // sprite
     gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
     gDPSetTexturePersp(renderer->display_list++, G_TP_NONE);
     gDPPipeSync(renderer->display_list++);
@@ -436,8 +436,6 @@ static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite,
             G_TX_RENDERTILE, 
             0 << 5, 0 << 5, 
             1 << 10, 1 << 10);
-
-    gDPPipeSync(renderer->display_list++);
 }
 
 void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height) {
@@ -581,8 +579,6 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
         break;
     }
 
-    gDPLoadSync(renderer->display_list++);
-
     renderer->active_texture = texture;
     renderer->active_texture_frame = frame;
 }
@@ -632,7 +628,7 @@ void fw64_renderer_set_fog_enabled(fw64Renderer* renderer, int enabled) {
     else
         UNSET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_FOG);
 
-    if (renderer->render_mode != FW64_RENDERER_MODE_UNSET)
+    if (renderer->primitive_mode != FW64_PRIMITIVE_MODE_UNSET)
         fw64_n64_configure_fog(renderer, enabled);
 }
 

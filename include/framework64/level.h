@@ -58,12 +58,12 @@ typedef struct {
     fw64LevelChunkInfo info;
     fw64Scene* scene;
     uint32_t handle;
-} fw64LevelChuckRef;
+} fw64LevelChunckRef;
 
 typedef struct {
     fw64Engine* engine;
     fw64Allocator* allocator;
-    fw64LevelChuckRef chunk_refs[FW64_LEVEL_CHUNK_COUNT];
+    fw64LevelChunckRef chunk_refs[FW64_LEVEL_CHUNK_COUNT];
     uint32_t chunk_ref_count;
     fw64Node* dynamic_nodes[FW64_LEVEL_DYNAMIC_NODE_COUNT];
     uint32_t dynamic_node_count;
@@ -78,13 +78,13 @@ void fw64_level_uninit(fw64Level* level);
  * If the scene is sucessfully loaded the associated init method will be called
  * @returns a handle identifier to this chunk or FW64_LEVEL_INVALID_CHUNK_HANDLE if loading failed
  */
-uint32_t fw64_level_load_chunk(fw64Level* level, fw64LevelChunkInfo* info);
+fw64LevelChunckRef* fw64_level_load_chunk(fw64Level* level, fw64LevelChunkInfo* info);
 
 /**
  * Loads a scene level chunk as in \ref fw64_level_load_chunk and additionally applies a translation offset to each node in the scene
  * @returns a handle identifier to this chunk or FW64_LEVEL_INVALID_CHUNK_HANDLE if loading failed
  */
-uint32_t fw64_level_load_chunk_at_pos(fw64Level* level, fw64LevelChunkInfo* info, Vec3* pos);
+fw64LevelChunckRef* fw64_level_load_chunk_at_pos(fw64Level* level, fw64LevelChunkInfo* info, Vec3* pos);
 
 /**
  * Unloads a level chuck with the supplied handle and calls it's associated uninit method if one was specified.
@@ -94,8 +94,8 @@ uint32_t fw64_level_load_chunk_at_pos(fw64Level* level, fw64LevelChunkInfo* info
 int fw64_level_unload_chunk(fw64Level* level, uint32_t handle);
 
 uint32_t fw64_level_get_chunk_count(fw64Level* level);
-fw64Scene* fw64_level_get_chunk_by_index(fw64Level* level, uint32_t index);
-fw64Scene* fw64_level_get_chunk_by_handle(fw64Level* level, uint32_t handle);
+fw64LevelChunckRef* fw64_level_get_chunk_by_index(fw64Level* level, uint32_t index);
+fw64LevelChunckRef* fw64_level_get_chunk_by_handle(fw64Level* level, uint32_t handle);
 
 /** Will call each chunk's associated update method. */
 void fw64_level_update(fw64Level* level);

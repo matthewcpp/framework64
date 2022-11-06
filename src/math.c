@@ -8,6 +8,10 @@ float fw64_smoothstep(float a, float b, float x) {
   return x * x * (3.0f - 2.0f * x);
 }
 
+float fw64_lerp(float a, float b, float t) {
+  return a + t * (b - a);
+}
+
 float fw64_clamp(float x, float lower, float upper) {
   if (x < lower)
     x = lower;

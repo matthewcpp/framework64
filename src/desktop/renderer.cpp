@@ -76,7 +76,7 @@ void fw64Renderer::setClearColor(float r, float g, float b, float a) {
     glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
 }
 
-void fw64Renderer::begin(fw64RenderMode new_render_mode, fw64RendererFlags flags) {
+void fw64Renderer::begin(fw64PrimitiveMode mode, fw64RendererFlags flags) {
     if (lighting_dirty) {
         updateLightingBlock();
         lighting_dirty = false;
@@ -92,11 +92,11 @@ void fw64Renderer::begin(fw64RenderMode new_render_mode, fw64RendererFlags flags
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    switch(new_render_mode) {
-        case FW64_RENDERER_MODE_TRIANGLES:
+    switch(mode) {
+        case FW64_PRIMITIVE_MODE_TRIANGLES:
             primitive_type = fw64Primitive::Mode::Triangles;
             break;
-        case FW64_RENDERER_MODE_LINES:
+        case FW64_PRIMITIVE_MODE_LINES:
             primitive_type = fw64Primitive::Mode::Lines;
             break;
         default:
@@ -217,7 +217,7 @@ void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
     active_shader->shader->setUniforms(active_shader, primitive.material);
     glBindVertexArray(primitive.gl_vertex_array_object);
 
-    glDrawElements(primitive.mode, primitive.element_count, primitive.element_type, 0);
+    glDrawElements(primitive.mode, primitive.element_count, primitive.primitive_mode, 0);
 }
 
 void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
@@ -411,8 +411,8 @@ void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g,
     renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64RenderMode primitive_type, fw64RendererFlags flags) {
-    renderer->begin(primitive_type, flags);
+void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64RendererFlags flags) {
+    renderer->begin(primitive_mode, flags);
 }
 
 void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {

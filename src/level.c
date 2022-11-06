@@ -15,7 +15,7 @@ void fw64_level_init(fw64Level* level, fw64Engine* engine) {
 
 void fw64_level_uninit(fw64Level* level) {
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
 
         if (ref->info.uninit_func) {
             ref->info.uninit_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
@@ -27,7 +27,7 @@ void fw64_level_uninit(fw64Level* level) {
 
 void fw64_level_update(fw64Level* level) {
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
 
         if (ref->info.update_func) {
             ref->info.uninit_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
@@ -35,11 +35,11 @@ void fw64_level_update(fw64Level* level) {
     }
 }
 
-static fw64LevelChuckRef* fw64_level_load_scene(fw64Level* level, fw64LevelChunkInfo* info) {
+static fw64LevelChunckRef* fw64_level_load_scene(fw64Level* level, fw64LevelChunkInfo* info) {
     if (level->chunk_ref_count >= FW64_LEVEL_CHUNK_COUNT)
         return NULL;
 
-    fw64LevelChuckRef* ref = level->chunk_refs + level->chunk_ref_count;
+    fw64LevelChunckRef* ref = level->chunk_refs + level->chunk_ref_count;
     ref->scene = fw64_scene_load(level->engine->assets, info->scene_id, info->allocator);
 
     if (!ref->scene)
@@ -52,24 +52,24 @@ static fw64LevelChuckRef* fw64_level_load_scene(fw64Level* level, fw64LevelChunk
     return ref;
 }
 
-uint32_t fw64_level_load_chunk(fw64Level* level, fw64LevelChunkInfo* info) {
-    fw64LevelChuckRef* ref = fw64_level_load_scene(level, info);
+fw64LevelChunckRef* fw64_level_load_chunk(fw64Level* level, fw64LevelChunkInfo* info) {
+    fw64LevelChunckRef* ref = fw64_level_load_scene(level, info);
 
     if (ref->info.init_func) {
         ref->info.init_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
     }
 
     if (!ref)
-        return FW64_LEVEL_INVALID_CHUNK_HANDLE;
+        return NULL;
     else
-        return ref->handle;
+        return ref;
 }
 
-uint32_t fw64_level_load_chunk_at_pos(fw64Level* level, fw64LevelChunkInfo* info, Vec3* pos) {
-    fw64LevelChuckRef* ref = fw64_level_load_scene(level, info);
+fw64LevelChunckRef* fw64_level_load_chunk_at_pos(fw64Level* level, fw64LevelChunkInfo* info, Vec3* pos) {
+    fw64LevelChunckRef* ref = fw64_level_load_scene(level, info);
 
     if (!ref)
-        return FW64_LEVEL_INVALID_CHUNK_HANDLE;
+        return NULL;
 
     uint32_t node_count = fw64_scene_get_node_count(ref->scene);
     for (uint32_t i = 0; i < node_count; i++) {
@@ -85,7 +85,7 @@ uint32_t fw64_level_load_chunk_at_pos(fw64Level* level, fw64LevelChunkInfo* info
         ref->info.init_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
     }
 
-    return ref->handle;
+    return ref;
 }
 
 int fw64_level_unload_chunk(fw64Level* level, uint32_t handle) {
@@ -100,7 +100,7 @@ int fw64_level_unload_chunk(fw64Level* level, uint32_t handle) {
     if (target_index == UINT32_MAX)
         return 0;
 
-    fw64LevelChuckRef* ref = level->chunk_refs + target_index;
+    fw64LevelChunckRef* ref = level->chunk_refs + target_index;
     if (ref->info.uninit_func)
         ref->info.uninit_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
     
@@ -108,8 +108,8 @@ int fw64_level_unload_chunk(fw64Level* level, uint32_t handle) {
 
     // move last item in chunk ref array to the deleted chunk's spot
     if (target_index != level->chunk_ref_count - 1) {
-        fw64LevelChuckRef* swap_ref = level->chunk_refs + (level->chunk_ref_count - 1);
-        memcpy(ref, swap_ref, sizeof(fw64LevelChuckRef));
+        fw64LevelChunckRef* swap_ref = level->chunk_refs + (level->chunk_ref_count - 1);
+        memcpy(ref, swap_ref, sizeof(fw64LevelChunckRef));
     }
 
     level->chunk_ref_count -= 1;
@@ -122,7 +122,7 @@ int fw64_level_raycast(fw64Level* level, Vec3* origin, Vec3* direction, uint32_t
     int result = 0;
 
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
         fw64RaycastHit scene_hit;
 
         if (!fw64_collision_test_ray_box(origin, direction, fw64_scene_get_initial_bounds(ref->scene), &scene_hit.point, &scene_hit.distance))
@@ -144,7 +144,7 @@ int fw64_level_moving_box_intersection(fw64Level* level, Box* box, Vec3* velocit
     int did_hit = 0;
 
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
         Vec3 level_velocity = {0.0f, 0.0f, 0.0f};
         float first, last;
 
@@ -166,7 +166,7 @@ int fw64_level_moving_sphere_intersection(fw64Level* level, Vec3* center, float 
     int did_hit = 0;
 
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
         Vec3 out_point;
         float out_t;
 
@@ -227,7 +227,7 @@ void fw64_level_draw_camera(fw64Level* level, fw64Camera* camera) {
     fw64_camera_extract_frustum_planes(camera, &frustum);
 
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
 
         if (!fw64_frustum_intersects_box(&frustum, fw64_scene_get_initial_bounds(ref->scene)))
             continue;
@@ -246,7 +246,7 @@ void fw64_level_draw_camera_all(fw64Level* level, fw64Camera* camera) {
     fw64_camera_extract_frustum_planes(camera, &frustum);
 
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
 
         if (!fw64_frustum_intersects_box(&frustum, fw64_scene_get_initial_bounds(ref->scene)))
             continue;
@@ -289,16 +289,16 @@ uint32_t fw64_level_get_chunk_count(fw64Level* level) {
     return level->chunk_ref_count;
 }
 
-fw64Scene* fw64_level_get_chunk_by_index(fw64Level* level, uint32_t index) {
-    return level->chunk_refs[index].scene;
+fw64LevelChunckRef* fw64_level_get_chunk_by_index(fw64Level* level, uint32_t index) {
+    return &level->chunk_refs[index];
 }
 
-fw64Scene* fw64_level_get_chunk_by_handle(fw64Level* level, uint32_t handle) {
+fw64LevelChunckRef* fw64_level_get_chunk_by_handle(fw64Level* level, uint32_t handle) {
     for (uint32_t i = 0; i < level->chunk_ref_count; i++) {
-        fw64LevelChuckRef* ref = level->chunk_refs + i;
+        fw64LevelChunckRef* ref = level->chunk_refs + i;
 
         if (ref->handle == handle)
-            return ref->scene;
+            return ref;
     }
 
     return NULL;

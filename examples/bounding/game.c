@@ -82,7 +82,7 @@ void game_draw(Game* game) {
 
     fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
 
-    fw64_renderer_begin(renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_set_camera(renderer, &game->camera);
     
     fw64_renderer_draw_static_mesh(renderer, &game->penguin.transform, game->penguin.mesh);
@@ -97,7 +97,7 @@ void game_draw(Game* game) {
 
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_NOSWAP);
 
-    fw64_renderer_begin(renderer, FW64_RENDERER_MODE_LINES, FW64_RENDERER_FLAG_NOCLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_LINES, FW64_RENDERER_FLAG_NOCLEAR);
     fw64_renderer_set_camera(renderer, &game->camera);
     fw64_renderer_draw_static_mesh(renderer, &game->penguin_box.transform, game->penguin_box.mesh);
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);

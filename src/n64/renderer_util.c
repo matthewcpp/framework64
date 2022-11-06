@@ -10,13 +10,13 @@ static Vtx fullscreen_overlay_triangle[] = {
 };
 
 static Gfx fullscreen_overlay_dl[] = {
+    gsDPPipeSync(),
     gsDPSetRenderMode(G_RM_XLU_SURF, G_RM_XLU_SURF),
     gsSPClearGeometryMode(G_CULL_BACK),
     gsDPSetCombineMode(G_CC_PRIMITIVE,G_CC_PRIMITIVE),
     gsSPForceMatrix(OS_K0_TO_PHYSICAL(&(overlay_matrix))),
     gsSPVertex(&fullscreen_overlay_triangle[0], 4, 0),
     gsSP2Triangles(0, 1, 2, 0, 0, 2, 3, 0),
-    gsDPPipeSync(),
     gsSPEndDisplayList()
 };
 
@@ -32,10 +32,10 @@ void fw64_renderer_util_clear_viewport(fw64Renderer* renderer, fw64Camera* camer
     int width = (int)(renderer->screen_size.x * camera->viewport_size.x);
     int height = (int)(renderer->screen_size.y * camera->viewport_size.y);
 
-    u32 cycle_type = fw64_renderer_get_fog_enabled(renderer) ? G_CYC_2CYCLE : G_CYC_1CYCLE;
-
+    gDPPipeSync(renderer->display_list++);
     gDPSetRenderMode(renderer->display_list++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
     fw64_n64_renderer_clear_rect(renderer, x, y, width, height, flags);
-    gDPSetCycleType(renderer->display_list++, cycle_type); 
-    renderer->render_mode = FW64_RENDERER_MODE_UNSET;
+    gDPPipeSync(renderer->display_list++);
+    fw64_n64_configure_fog(renderer, fw64_renderer_get_fog_enabled(renderer));
+    renderer->shading_mode = FW64_SHADING_MODE_UNSET;
 }

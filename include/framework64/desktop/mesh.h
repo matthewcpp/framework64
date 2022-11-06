@@ -40,7 +40,7 @@ struct fw64Primitive {
     GLuint  gl_array_buffer_object = 0;
     GLuint  gl_element_buffer_object = 0;
     GLsizei element_count = 0;
-    GLenum element_type = 0;
+    GLenum primitive_mode = 0;
 
     std::vector<float> positions;
     std::vector<float> normals;

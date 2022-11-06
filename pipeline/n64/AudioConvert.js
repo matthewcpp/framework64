@@ -58,7 +58,7 @@ async function convertSoundBank(sourceDir, name, outputDir, includeDir, archive)
         const soundBankPath = path.join(outputDir, name + ".soundbank");
         writeSoundBankFile(soundBankPath, ctrlFilePath, tblFilePath, output.length);
         await archive.add(soundBankPath, "soundbank");
-        AudioHeader.writeSoundBankHeader(sourceDir, includeDir);
+        AudioHeader.writeSoundBankHeader(sourceDir, name, includeDir);
     }
     catch (e) {
         console.log(e);
@@ -115,7 +115,7 @@ async function convertMusicBank(sourceDir, name, outputDir, includeDir, archive)
         fs.writeSync(musicBankFile, fs.readFileSync(sbkFilePath));
         fs.closeSync(musicBankFile);
 
-        AudioHeader.writeMusicBankHeader(sourceDir, includeDir);
+        AudioHeader.writeMusicBankHeader(sourceDir, name, includeDir);
 
         await archive.add(musicBankPath, "musicbank");
     }

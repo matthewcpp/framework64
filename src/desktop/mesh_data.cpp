@@ -60,14 +60,14 @@ GLMeshInfo MeshData::createGlMesh() {
         glGenBuffers(1, &mesh_info.gl_element_buffer_object);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_info.gl_element_buffer_object);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_array_uint16.size() * sizeof(uint16_t), indices_array_uint16.data(), GL_STATIC_DRAW);
-        mesh_info.element_type = GL_UNSIGNED_SHORT;
+        mesh_info.primitive_mode = GL_UNSIGNED_SHORT;
         mesh_info.element_count = static_cast<GLsizei>(indices_array_uint16.size());
     }
     else if (!indices_array_uint32.empty()) {
         glGenBuffers(1, &mesh_info.gl_element_buffer_object);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_info.gl_element_buffer_object);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_array_uint32.size() * sizeof(uint32_t), indices_array_uint32.data(), GL_STATIC_DRAW);
-        mesh_info.element_type = GL_UNSIGNED_INT;
+        mesh_info.primitive_mode = GL_UNSIGNED_INT;
         mesh_info.element_count = static_cast<GLsizei>(indices_array_uint32.size());
     }
 
@@ -122,7 +122,7 @@ void GLMeshInfo::setPrimitiveValues(fw64Primitive& primitive) {
     primitive.gl_element_buffer_object = gl_element_buffer_object;
 
     primitive.attributes = attributes;
-    primitive.element_type = element_type;
+    primitive.primitive_mode = primitive_mode;
     primitive.element_count = element_count;
 }
 

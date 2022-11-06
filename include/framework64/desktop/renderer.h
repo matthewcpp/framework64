@@ -30,7 +30,7 @@ public:
     bool init(int width, int height, framework64::ShaderCache& shader_cache);
 
     void setClearColor(float r, float g, float b, float a);
-    void begin(fw64RenderMode new_render_mode, fw64RendererFlags flags);
+    void begin(fw64PrimitiveMode primitive_mode, fw64RendererFlags flags);
     void setCamera(fw64Camera* cam);
     void end(fw64RendererFlags flags);
     void setScreenSize(int width, int height);
