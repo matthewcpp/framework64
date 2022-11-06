@@ -6,6 +6,7 @@
 #define FW64_N64_IMAGE_FORMAT_RGBA16 0
 #define FW64_N64_IMAGE_FORMAT_RGBA32 1
 #define FW64_N64_IMAGE_FORMAT_IA8 2
+#define FW64_N64_IMAGE_FORMAT_IA4 3
 
 typedef struct {
     uint16_t format;
@@ -23,5 +24,8 @@ struct fw64Image {
 };
 
 int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t assetIndex, uint32_t options, fw64Allocator* allocator);
+
+uint32_t fw64_n64_image_get_data_size(fw64Image* image);
+uint32_t fw64_n64_image_get_frame_size(fw64Image* image);
 
 uint8_t* fw64_n64_image_get_data(fw64Image* image, int frame);

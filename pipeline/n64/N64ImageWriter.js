@@ -14,6 +14,7 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
 
     switch (image.format) {
         case N64Image.Format.IA8:
+        case N64Image.Format.IA4:
             bufferOffset = headerBuffer.writeUInt16BE(1, bufferOffset);
             break;
 
@@ -38,6 +39,12 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
         case N64Image.Format.IA8:
             for (const slice of slices.images) {
                 fs.writeSync(file, encodeIA8Slice(slice, sliceWidth, sliceHeight));
+            }
+            break;
+
+        case N64Image.Format.IA4:
+            for (const slice of slices.images) {
+                fs.writeSync(file, encodeIA4Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
@@ -101,6 +108,28 @@ function encodeIA8Slice(data, sliceWidth, sliceHieght) {
         const intensity = parseInt((data[index] / 255) * 15);
         const alpha = parseInt((data[index + 3] / 255) * 15);
         const value = (intensity << 4) | alpha;
+        buffer.writeUInt8(value, i);
+    }
+
+    return buffer;
+}
+
+function encodeIA4Slice(data, sliceWidth, sliceHieght) {
+    const textelCount = (sliceWidth * sliceHieght) / 2;
+    const buffer = Buffer.alloc(textelCount);
+
+    for(let i = 0; i < textelCount; i++) {
+        const index = i * 8;
+        const intensity1 = parseInt((data[index] / 255) * 7);
+        const alpha1 = data[index + 3] !== 0 ? 1 : 0;
+        const value1 = (intensity1 << 1) | alpha1;
+
+        const intensity2 = parseInt((data[index + 4] / 255) * 7);
+        const alpha2 = data[index + 7] !== 0 ? 1 : 0;
+        const value2 = (intensity2 << 1) | alpha2;
+
+        const value = (value1 << 4) | value2;
+
         buffer.writeUInt8(value, i);
     }
 

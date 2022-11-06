@@ -5,6 +5,8 @@
 typedef enum {
     IMAGE_FORMAT_NONE,
     IMAGE_FORMAT_IA8,
+    IMAGE_FORMAT_IA4,
+    IMAGE_FORMAT_RGBA32,
     IMAGE_FORMAT_COUNT
 } ImageFormat;
 

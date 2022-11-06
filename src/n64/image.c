@@ -28,8 +28,24 @@ fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint3
 
 #define IMAGE_IS_DMA_MODE(image) ((image)->rom_addr != 0)
 
-static inline uint32_t fw64_n64_image_get_frame_size(fw64Image* image) {
-    return (image->info.width / image->info.hslices) * (image->info.height / image->info.vslices) * image->info.bpp;
+uint32_t fw64_n64_image_get_data_size(fw64Image* image) {
+    switch (image->info.format) {
+    case FW64_N64_IMAGE_FORMAT_RGBA16:
+        return image->info.width * image->info.height * 2;
+
+    case FW64_N64_IMAGE_FORMAT_RGBA32:
+        return image->info.width * image->info.height * 4;
+
+    case FW64_N64_IMAGE_FORMAT_IA8:
+        return image->info.width * image->info.height;
+
+    case FW64_N64_IMAGE_FORMAT_IA4:
+        return (image->info.width * image->info.height) / 2;
+    }
+}
+
+uint32_t fw64_n64_image_get_frame_size(fw64Image* image) {
+    return fw64_n64_image_get_data_size(image) / (image->info.hslices * image->info.vslices);
 }
 
 int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_t options, fw64Allocator* allocator) {
@@ -50,7 +66,7 @@ int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_
         fw64_image_load_frame(image, 0);
     }
     else {
-        int data_size = image->info.width * image->info.height * image->info.bpp;
+        int data_size = fw64_n64_image_get_data_size(image);
         uint8_t* image_data = allocator->memalign(allocator, 8, data_size);
         bytes_read = fw64_filesystem_read(image_data, data_size, 1, handle);
 

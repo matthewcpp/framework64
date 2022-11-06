@@ -23,7 +23,14 @@ void game_init(Game* game, fw64Engine* engine) {
 }
 
 void game_update(Game* game){
-    (void)game;
+    if (    fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) || 
+            fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+        change_image(game, 1);
+    }
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT) || 
+            fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
+        change_image(game, -1);
+    }
 }
 
 void game_draw(Game* game) {
@@ -35,10 +42,14 @@ void game_draw(Game* game) {
     int x_pos = (game->screen_size.x / 2) - (game->header_size.x / 2);
     int y_pos = 20;
 
+    fw64_renderer_set_fill_color(renderer, 255, 255, 255, 255);
+
     fw64_renderer_draw_text(renderer, game->font, x_pos, y_pos, game->header_text);
     
     x_pos = (game->screen_size.x / 2) - (fw64_texture_width(game->texture) / 2);
     y_pos = (game->screen_size.y / 2) - (fw64_texture_height(game->texture) / 2);
+
+    fw64_renderer_set_fill_color(renderer, 0, 255, 0, 255);
     
     fw64_renderer_draw_sprite(renderer, game->texture, x_pos, y_pos);
 
@@ -62,6 +73,16 @@ void set_image(Game* game, ImageFormat image_format) {
             fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ia8, fw64_default_allocator()));
             break;
 
+        case IMAGE_FORMAT_IA4:
+            format_name = "IA4";
+            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ia4, fw64_default_allocator()));
+            break;
+
+        case IMAGE_FORMAT_RGBA32:
+            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_rgba32, fw64_default_allocator()));
+            format_name = "RGBA32";
+            break;
+
         case IMAGE_FORMAT_NONE:
         case IMAGE_FORMAT_COUNT:
             break;
@@ -72,5 +93,12 @@ void set_image(Game* game, ImageFormat image_format) {
 }
 
 void change_image(Game* game, int direction) {
+    ImageFormat new_format = game->image_format + direction;
 
+    if (new_format == IMAGE_FORMAT_NONE)
+        new_format = IMAGE_FORMAT_COUNT - 1;
+    else if (new_format == IMAGE_FORMAT_COUNT)
+        new_format = IMAGE_FORMAT_NONE + 1;
+
+    set_image(game, new_format);
 }

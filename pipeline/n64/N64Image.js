@@ -9,7 +9,8 @@ class N64Image {
     static Format = {
         RGBA16: 0,
         RGBA32: 1,
-        IA8: 2
+        IA8: 2,
+        IA4: 3
     };
 
     constructor(name, format) {
