@@ -14,7 +14,7 @@ function _initOptions(sourceFile, params) {
     const options = {
         sourceString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~ ",
         name: path.basename(sourceFile, path.extname(sourceFile)) + params.size.toString(),
-        imageFormat: "rgba16"
+        imageFormat: "IA8"
     }
 
     Object.assign(options, params);

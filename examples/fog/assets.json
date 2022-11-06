@@ -11,8 +11,7 @@
         {
             "src": "Consolas.ttf",
             "size": 12,
-            "name": "Consolas12",
-            "imageFormat": "rgba32"
+            "name": "Consolas12"
         }
     ],
     "levels": [
