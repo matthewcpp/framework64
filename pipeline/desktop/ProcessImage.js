@@ -1,7 +1,7 @@
 const Image = require("../Image");
 const ImageAtlasDefines = require("../ImageAtlasDefines");
 
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 
 function resizeImage(image, sprite) {
@@ -64,6 +64,7 @@ async function processImage(imageJson, bundle, baseDirectory, outputDirectory) {
 
     const srcPath = path.join(baseDirectory, imageJson.src);
     const destPath = path.join(outputDirectory, imageJson.src);
+    fs.ensureDirSync(path.dirname(destPath));
 
     const image = new Image();
     await image.load(srcPath);

@@ -3,6 +3,8 @@
 
 #include "framework64/n64/controller_button.h"
 
+#include <stdio.h>
+
 static void set_image(Game* game, ImageFormat image_format);
 static void change_image(Game* game, int direction);
 
