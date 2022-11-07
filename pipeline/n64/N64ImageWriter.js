@@ -16,6 +16,7 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
         case N64Image.Format.IA8:
         case N64Image.Format.IA4:
         case N64Image.Format.I8:
+        case N64Image.Format.I4:
             bufferOffset = headerBuffer.writeUInt16BE(1, bufferOffset);
             break;
 
@@ -64,6 +65,12 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
         case N64Image.Format.I8:
             for (const slice of slices.images) {
                 fs.writeSync(file, encodeI8Slice(slice, sliceWidth, sliceHeight));
+            }
+            break;
+
+        case N64Image.Format.I4:
+            for (const slice of slices.images) {
+                fs.writeSync(file, encodeI4Slice(slice, sliceWidth, sliceHeight));
             }
             break;
     }
@@ -150,6 +157,23 @@ function encodeI8Slice(data, sliceWidth, sliceHieght) {
     for(let i = 0; i < textelCount; i++) {
         const index = i * 4;
         buffer.writeUInt8(data[index], i);
+    }
+
+    return buffer;
+}
+
+function encodeI4Slice(data, sliceWidth, sliceHieght) {
+    const textelCount = (sliceWidth * sliceHieght) / 2;
+    const buffer = Buffer.alloc(textelCount);
+
+    for(let i = 0; i < textelCount; i++) {
+        const index = i * 8;
+        const intensity1 = parseInt((data[index] / 255) * 15);
+        const intensity2 = parseInt((data[index + 4] / 255) * 15);
+
+        const value = (intensity1 << 4) | intensity2;
+
+        buffer.writeUInt8(value, i);
     }
 
     return buffer;

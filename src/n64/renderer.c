@@ -590,6 +590,11 @@ void fw64_n64_renderer_load_texture(fw64Renderer* renderer, fw64Texture* texture
                 texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
             break;
 
+        case FW64_N64_IMAGE_FORMAT_I4:
+            gDPLoadTextureBlock_4b(renderer->display_list++, image_data, G_IM_FMT_I, slice_width, slice_height, 0,
+                texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+            break;
+
     default:
         break;
     }

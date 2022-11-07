@@ -11,7 +11,8 @@ class N64Image {
         RGBA32: 1,
         IA8: 2,
         IA4: 3,
-        I8: 4
+        I8: 4,
+        I4: 5
     };
 
     constructor(name, format) {
