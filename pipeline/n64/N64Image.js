@@ -1,9 +1,11 @@
 const Jimp = require("jimp");
+const ColorIndexImage = require("../ColorIndexImage");
 
 class N64Image {
     name;
     format;
     _data = null;
+    colorIndexImage = null;
 
     /** This should align with include/n64/image.h */
     static Format = {
@@ -12,7 +14,8 @@ class N64Image {
         IA8: 2,
         IA4: 3,
         I8: 4,
-        I4: 5
+        I4: 5,
+        CI8: 6
     };
 
     constructor(name, format) {
@@ -44,6 +47,12 @@ class N64Image {
 
     assign(jimpData) {
         this._data = jimpData;
+        this.colorIndexImage = null;
+    }
+
+    createColorIndexImage() {
+        this.colorIndexImage = new ColorIndexImage();
+        this.colorIndexImage.createfromBuffer(this.data, this.width, this.height);
     }
 
     crop(x, y, w, h) {

@@ -19,6 +19,11 @@
         {
             "src": "image_types/i4.png",
             "format": "I4"
+        },
+        {
+            "src": "image_types/ci8_r.png",
+            "format": "CI8",
+            "name": "ci8"
         }
     ],
     "fonts": [
@@ -26,7 +31,7 @@
             "name": "header",
             "src": "Consolas.ttf",
             "size": "14",
-            "sourceString": "Format: IA8 IA4 I8 I4 RGBA32 RGBA16"
+            "sourceString": "Format: IA8 IA4 I8 I4 RGBA32 RGBA16 CI8 CI4"
         }
     ]
 }

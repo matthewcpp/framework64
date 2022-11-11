@@ -42,14 +42,14 @@ void game_draw(Game* game) {
     int x_pos = (game->screen_size.x / 2) - (game->header_size.x / 2);
     int y_pos = 20;
 
-    fw64_renderer_set_fill_color(renderer, 255, 255, 255, 255);
+    //fw64_renderer_set_fill_color(renderer, 255, 255, 255, 255);
 
     fw64_renderer_draw_text(renderer, game->font, x_pos, y_pos, game->header_text);
     
     x_pos = (game->screen_size.x / 2) - (fw64_texture_width(game->texture) / 2);
     y_pos = (game->screen_size.y / 2) - (fw64_texture_height(game->texture) / 2);
 
-    fw64_renderer_set_fill_color(renderer, 0, 255, 0, 255);
+    //fw64_renderer_set_fill_color(renderer, 0, 255, 0, 255);
     
     fw64_renderer_draw_sprite(renderer, game->texture, x_pos, y_pos);
 
@@ -68,6 +68,16 @@ void set_image(Game* game, ImageFormat image_format) {
     const char* format_name;
 
     switch(game->image_format) {
+        case IMAGE_FORMAT_RGBA32:
+            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_rgba32, fw64_default_allocator()));
+            format_name = "RGBA32";
+            break;
+
+        case IMAGE_FORMAT_CI8:
+            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ci8_r, fw64_default_allocator()));
+            format_name = "CI8";
+            break;
+
         case IMAGE_FORMAT_IA8:
             format_name = "IA8";
             fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ia8, fw64_default_allocator()));
@@ -86,11 +96,6 @@ void set_image(Game* game, ImageFormat image_format) {
         case IMAGE_FORMAT_I4:
             format_name = "I4";
             fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_i4, fw64_default_allocator()));
-            break;
-
-        case IMAGE_FORMAT_RGBA32:
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_rgba32, fw64_default_allocator()));
-            format_name = "RGBA32";
             break;
 
         case IMAGE_FORMAT_NONE:

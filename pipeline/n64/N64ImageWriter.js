@@ -1,4 +1,5 @@
 const N64Image = require("./N64Image");
+const ColorIndexImage = require("../ColorIndexImage");
 
 const fs = require("fs");
 
@@ -7,33 +8,7 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
     const sliceWidth = image.width / horizontalSlices;
     const sliceHeight = image.height / verticalSlices;
 
-    const headerBuffer = Buffer.alloc(12);
-    let bufferOffset = 0;
-
-    bufferOffset = headerBuffer.writeUInt16BE(image.format, bufferOffset);
-
-    switch (image.format) {
-        case N64Image.Format.IA8:
-        case N64Image.Format.IA4:
-        case N64Image.Format.I8:
-        case N64Image.Format.I4:
-            bufferOffset = headerBuffer.writeUInt16BE(1, bufferOffset);
-            break;
-
-        case N64Image.Format.RGBA16:
-            bufferOffset = headerBuffer.writeUInt16BE(2, bufferOffset);
-            break;
-
-        case N64Image.Format.RGBA32:
-            bufferOffset = headerBuffer.writeUInt16BE(4, bufferOffset);
-            break;
-    }
-
-    bufferOffset = headerBuffer.writeUInt16BE(image.width, bufferOffset);
-    bufferOffset = headerBuffer.writeUInt16BE(image.height, bufferOffset);
-    bufferOffset = headerBuffer.writeUInt16BE(horizontalSlices, bufferOffset);
-    bufferOffset = headerBuffer.writeUInt16BE(verticalSlices, bufferOffset);
-
+    const headerBuffer = createImageHeaderBuffer(image, horizontalSlices, verticalSlices);
     const file = fs.openSync(path, "w");
     fs.writeSync(file, headerBuffer);
 
@@ -73,9 +48,38 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
                 fs.writeSync(file, encodeI4Slice(slice, sliceWidth, sliceHeight));
             }
             break;
+
+        case N64Image.Format.CI8:
+            validateCIPalette(image);
+            for (const slice of slices.images) {
+                fs.writeSync(file, encodeCI8Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
+            }
+            writePalette(image, file)
+            break;
     }
 
     fs.closeSync(file);
+}
+
+function createImageHeaderBuffer(image, horizontalSlices, verticalSlices) {
+    const headerBuffer = Buffer.alloc(14);
+    let bufferOffset = 0;
+
+    let paletteCount = 0, paletteSize = 0;
+    if (image.colorIndexImage) {
+        paletteCount = image.colorIndexImage.palettes.length;
+        paletteSize = image.colorIndexImage.primaryPalette.length;
+    }
+
+    bufferOffset = headerBuffer.writeUInt16BE(image.format, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(image.width, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(image.height, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(horizontalSlices, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(verticalSlices, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(paletteCount, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(paletteSize, bufferOffset);
+
+    return headerBuffer;
 }
 
 function encode16bppSlice(data, width, height) {
@@ -179,6 +183,63 @@ function encodeI4Slice(data, sliceWidth, sliceHieght) {
     return buffer;
 }
 
+function encodeCI8Slice(slice, sliceWidth, sliceHeight, colorIndexImage) {
+    const textelCount = sliceWidth * sliceHeight;
+    const buffer = Buffer.alloc(textelCount);
+
+    for (let i = 0; i < textelCount; i++) {
+        const index = i * 4;
+        const colorIndex = colorIndexImage.getColorIndex(slice[index], slice[index + 1], slice[index + 2], slice[index + 3]);
+
+        if (typeof(colorIndex) === "undefined") {
+            throw new Error("Error building Color index image.  Could not locate color in lookup table");
+        }
+
+        buffer.writeUInt8(colorIndex, i);
+    }
+
+    return buffer;
+}
+
+function validateCIPalette(image) {
+    const colorIndexImage = image.colorIndexImage;
+
+    let maxPaletteCount = 0;
+    if (image.format == N64Image.Format.CI8) {
+        maxPaletteCount = 256;
+    }
+
+    for (let i = 0; i < colorIndexImage.palettes; i++) {
+        if (colorIndexImage.palettes[i].length >= maxLength) {
+            throw new Error(`Palette ${i} contains ${colorIndexImage.palettes[i].length} colors (max ${maxLength})`);
+        }
+    }
+}
+
+function writePalette(image, file) {
+    const colorIndexImage = image.colorIndexImage;
+    
+    // each color in the palette is represented by a 5/5/5/1 color
+    const paletteSizeInBytes = colorIndexImage.primaryPalette.length * 2;
+    const dataBuffer = Buffer.alloc(colorIndexImage.palettes.length * paletteSizeInBytes);
+    bufferOffset = 0;
+
+    for (const palette of colorIndexImage.palettes) {
+        for (const color of palette) {
+            const r = color[0] >> 3;
+            const g = color[1] >> 3;
+            const b = color[2] >> 3;
+            const a = color[3] === 0 ? 0 : 1;
+    
+            const val = r << 11 | g << 6 | b << 1 | a;
+            bufferOffset = dataBuffer.writeUint16BE(val, bufferOffset);
+        }
+    }
+
+    fs.writeSync(file, dataBuffer);
+}
+
 module.exports = {
-    writeBinary: writeBinary
+    writeBinary: writeBinary,
+    writePalette: writePalette
 }

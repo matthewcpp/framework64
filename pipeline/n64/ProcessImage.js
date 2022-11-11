@@ -1,7 +1,9 @@
 const N64Image = require("./N64Image")
 const N64ImageWriter = require("./N64ImageWriter");
-
+const ColorIndexImage = require("../ColorIndexImage");
 const ImageAtlasDefines = require("../ImageAtlasDefines");
+
+const Util = require("../Util");
 
 const Jimp = require("jimp");
 
@@ -9,13 +11,19 @@ const fs = require("fs");
 const path = require("path");
 
 async function finalizeImage(image, outDir, options, archive) {
+    const filePath = path.join(outDir, `${image.name}.image`);
+
     if (options.resize) {
         const dimensions = options.resize.split("x");
         image.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
     }
 
-    const filePath = path.join(outDir, `${image.name}.image`);
+    if (image.format == N64Image.Format.CI8) {
+        image.createColorIndexImage();
+    }
+
     N64ImageWriter.writeBinary(image, options.hslices, options.vslices, filePath);
+
     const entry = await archive.add(filePath, "image");
 
     return {
