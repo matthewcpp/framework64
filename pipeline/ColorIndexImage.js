@@ -1,5 +1,7 @@
 const fs = require("fs");
 
+const Jimp = require("jimp");
+
 class ColorIndexImage {
     pixels;
     palettes;
@@ -41,6 +43,26 @@ class ColorIndexImage {
         }
 
         this.palettes.push(this.primaryPalette);
+    }
+
+    async addPaletteFromPath(path) {
+        const image = await Jimp.read(path);
+        await this.addPaletteFromBuffer(image.bitmap.data, image.bitmap.width, image.bitmap.height);
+    }
+
+    async addPaletteFromBuffer(buffer, width, height) {
+        if (this._primaryPaletteColorIndices.length == 0) {
+            throw new Error ("Cannot add palette: no primary palette loaded");
+        }
+
+        const palette = [];
+
+        for (let i = 0; i < this._primaryPaletteColorIndices.length; i++) {
+            const index = this._primaryPaletteColorIndices[i] * 4;
+            palette.push([buffer[index], buffer[index + 1], buffer[index + 2], buffer[index + 3]]);
+        }
+
+        this.palettes.push(palette);
     }
 
     _getColorKey(r, g, b, a) {

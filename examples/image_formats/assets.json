@@ -23,7 +23,11 @@
         {
             "src": "image_types/ci8_r.png",
             "format": "CI8",
-            "name": "ci8"
+            "name": "ci8",
+            "additionalPalettes": [
+                "image_types/ci8_g.png",
+                "image_types/ci8_b.png"
+            ]
         }
     ],
     "fonts": [

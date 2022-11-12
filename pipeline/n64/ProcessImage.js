@@ -10,7 +10,7 @@ const Jimp = require("jimp");
 const fs = require("fs");
 const path = require("path");
 
-async function finalizeImage(image, outDir, options, archive) {
+async function finalizeImage(image, assetDir, outDir, options, archive) {
     const filePath = path.join(outDir, `${image.name}.image`);
 
     if (options.resize) {
@@ -20,6 +20,13 @@ async function finalizeImage(image, outDir, options, archive) {
 
     if (image.format == N64Image.Format.CI8) {
         image.createColorIndexImage();
+
+        if (options.additionalPalettes) {
+            for (const paletteFile of options.additionalPalettes) {
+                const paletteFilePath = path.join(assetDir, paletteFile);
+                await image.colorIndexImage.addPaletteFromPath(paletteFilePath);
+            }
+        }
     }
 
     N64ImageWriter.writeBinary(image, options.hslices, options.vslices, filePath);
@@ -45,12 +52,12 @@ async function convertSprite(manifestDirectory, outDir, params, archive) {
     }
     Object.assign(options, params);
 
-    const name = path.basename(imagePath, path.extname(imagePath));
+    const name = !!params.name ? params.name : path.basename(imagePath, path.extname(imagePath));
 
     const image = new N64Image(name, N64Image.Format[options.format.toUpperCase()]);
     await image.load(imagePath);
 
-    return finalizeImage(image, outDir, options, archive, params.name)
+    return finalizeImage(image, manifestDirectory, outDir, options, archive, params.name)
 }
 
 function getDimension(params) {
@@ -106,7 +113,7 @@ async function assembleSprite(rootDir, outDir, params, archive) {
     const atlas = await buildSpriteAtlas(frames, rootDir, outDir, params, archive);
     await image.assign(atlas);
 
-    return finalizeImage(image, outDir, params, archive, params.name)
+    return finalizeImage(image, rootDir, outDir, params, archive, params.name)
 }
 
 async function processImage(manifestDirectory, outputDirectory, image, archive) {

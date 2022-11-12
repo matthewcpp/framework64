@@ -7,6 +7,7 @@
 
 static void set_image(Game* game, ImageFormat image_format);
 static void change_image(Game* game, int direction);
+static void change_palette(Game* game, int direction);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
@@ -23,13 +24,22 @@ void game_init(Game* game, fw64Engine* engine) {
 }
 
 void game_update(Game* game){
-    if (    fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) || 
+    if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) || 
             fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
         change_image(game, 1);
     }
     else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT) || 
             fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
         change_image(game, -1);
+    }
+
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP) || 
+            fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) {
+        change_palette(game, 1);
+    }
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_DOWN) || 
+            fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN)) {
+        change_palette(game, -1);
     }
 }
 
@@ -74,7 +84,7 @@ void set_image(Game* game, ImageFormat image_format) {
             break;
 
         case IMAGE_FORMAT_CI8:
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ci8_r, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ci8, fw64_default_allocator()));
             format_name = "CI8";
             break;
 
@@ -116,4 +126,24 @@ void change_image(Game* game, int direction) {
         new_format = IMAGE_FORMAT_NONE + 1;
 
     set_image(game, new_format);
+}
+
+void change_palette(Game* game, int direction) {
+    if (game->image_format != IMAGE_FORMAT_CI8)
+        return;
+
+    fw64Image* image = fw64_texture_get_image(game->texture);
+    int palette_count = (int) fw64_image_get_palette_count(image);
+    int palette_index = (int)fw64_texture_get_palette_index(game->texture);
+
+    palette_index += direction;
+
+    if (palette_index < 0) {
+        palette_index = palette_count - 1;
+    }
+    else if (palette_index >= palette_count) {
+        palette_index = 0;
+    }
+
+    fw64_texture_set_palette_index(game->texture, palette_index);
 }
