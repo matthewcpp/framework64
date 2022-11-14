@@ -18,7 +18,7 @@ async function finalizeImage(image, assetDir, outDir, options, archive) {
         image.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
     }
 
-    if (image.format == N64Image.Format.CI8) {
+    if (image.format === N64Image.Format.CI8 || image.format === N64Image.Format.CI4) {
         image.createColorIndexImage();
 
         if (options.additionalPalettes) {

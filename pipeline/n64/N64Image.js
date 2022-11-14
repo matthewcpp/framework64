@@ -15,7 +15,8 @@ class N64Image {
         IA4: 3,
         I8: 4,
         I4: 5,
-        CI8: 6
+        CI8: 6,
+        CI4: 7,
     };
 
     constructor(name, format) {

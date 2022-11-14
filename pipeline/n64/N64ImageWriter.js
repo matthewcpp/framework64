@@ -2,6 +2,7 @@ const N64Image = require("./N64Image");
 const ColorIndexImage = require("../ColorIndexImage");
 
 const fs = require("fs");
+const { getSystemErrorMap } = require("util");
 
 function writeBinary(image, horizontalSlices, verticalSlices, path) {
     const slices = image.slice(horizontalSlices, verticalSlices);
@@ -53,6 +54,14 @@ function writeBinary(image, horizontalSlices, verticalSlices, path) {
             validateCIPalette(image);
             for (const slice of slices.images) {
                 fs.writeSync(file, encodeCI8Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
+            }
+            writePalette(image, file)
+            break;
+
+        case N64Image.Format.CI4:
+            validateCIPalette(image);
+            for (const slice of slices.images) {
+                fs.writeSync(file, encodeCI4Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
             }
             writePalette(image, file)
             break;
@@ -201,12 +210,38 @@ function encodeCI8Slice(slice, sliceWidth, sliceHeight, colorIndexImage) {
     return buffer;
 }
 
+function encodeCI4Slice(slice, sliceWidth, sliceHeight, colorIndexImage) {
+    const bufferSize = (sliceWidth * sliceHeight) / 2;
+    const buffer = Buffer.alloc(bufferSize);
+
+
+    for (let i = 0; i < bufferSize; i++) {
+        const index = i * 8;
+        const colorIndex1 = colorIndexImage.getColorIndex(slice[index    ], slice[index + 1], slice[index + 2], slice[index + 3]);
+        const colorIndex2 = colorIndexImage.getColorIndex(slice[index + 4], slice[index + 5], slice[index + 6], slice[index + 7]);
+
+        if (typeof(colorIndex1) === "undefined" || typeof(colorIndex2) === "undefined") {
+            throw new Error("Error building Color index image.  Could not locate color in lookup table");
+        }
+
+        buffer.writeUInt8((colorIndex1 << 4) | colorIndex2, i);
+    }
+
+    return buffer;
+}
+
 function validateCIPalette(image) {
     const colorIndexImage = image.colorIndexImage;
 
     let maxPaletteCount = 0;
     if (image.format == N64Image.Format.CI8) {
         maxPaletteCount = 256;
+    }
+    else if (image.format == N64Image.Format.CI4) {
+        maxPaletteCount = 16;
+    }
+    else {
+        throw new Error(`Error validating CI palette: Unknown format: ${image.format}`);
     }
 
     for (let i = 0; i < colorIndexImage.palettes; i++) {

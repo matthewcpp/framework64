@@ -88,6 +88,11 @@ void set_image(Game* game, ImageFormat image_format) {
             format_name = "CI8";
             break;
 
+        case IMAGE_FORMAT_CI4:
+            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ci4, fw64_default_allocator()));
+            format_name = "CI4";
+            break;
+
         case IMAGE_FORMAT_IA8:
             format_name = "IA8";
             fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ia8, fw64_default_allocator()));
@@ -129,11 +134,12 @@ void change_image(Game* game, int direction) {
 }
 
 void change_palette(Game* game, int direction) {
-    if (game->image_format != IMAGE_FORMAT_CI8)
+    fw64Image* image = fw64_texture_get_image(game->texture);
+    int palette_count = (int)fw64_image_get_palette_count(image);
+
+    if (palette_count <= 0)
         return;
 
-    fw64Image* image = fw64_texture_get_image(game->texture);
-    int palette_count = (int) fw64_image_get_palette_count(image);
     int palette_index = (int)fw64_texture_get_palette_index(game->texture);
 
     palette_index += direction;

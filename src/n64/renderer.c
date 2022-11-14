@@ -583,6 +583,25 @@ static void fw64_n64_renderer_load_indexed_texture(fw64Renderer* renderer, fw64T
             renderer->active_texture_frame = frame;
         }
     }
+    else if (image->info.format == FW64_N64_IMAGE_FORMAT_CI4) {
+        if (load_palette) {
+            u32 palette_data = (u32)image->palettes[texture->palette_index];
+            gDPLoadTLUT_pal16(renderer->display_list++, 0, palette_data);
+            renderer->active_palette = texture->palette_index;
+        }
+
+        if (load_texture) {
+            uint8_t* image_data = fw64_n64_image_get_data(image, frame);
+            int slice_width = fw64_texture_slice_width(texture);
+            int slice_height = fw64_texture_slice_height(texture);
+
+            gDPLoadTextureBlock_4b(renderer->display_list++, image_data, G_IM_FMT_CI, slice_width, slice_height, 0,
+                texture->wrap_s, texture->wrap_t, texture->mask_s, texture->mask_t, G_TX_NOLOD, G_TX_NOLOD);
+
+            renderer->active_texture = texture;
+            renderer->active_texture_frame = frame;
+        }
+    }
 }
 
 static void fw64_n64_renderer_load_non_indexed_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {

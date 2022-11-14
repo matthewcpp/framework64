@@ -28,6 +28,15 @@
                 "image_types/ci8_g.png",
                 "image_types/ci8_b.png"
             ]
+        },
+        {
+            "src": "image_types/ci4_y.png",
+            "format": "CI4",
+            "name": "ci4",
+            "additionalPalettes": [
+                "image_types/ci4_c.png",
+                "image_types/ci4_m.png"
+            ]
         }
     ],
     "fonts": [

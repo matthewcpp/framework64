@@ -10,6 +10,7 @@
 #define FW64_N64_IMAGE_FORMAT_I8 4
 #define FW64_N64_IMAGE_FORMAT_I4 5
 #define FW64_N64_IMAGE_FORMAT_CI8 6
+#define FW64_N64_IMAGE_FORMAT_CI4 7
 
 typedef struct {
     uint16_t format;
