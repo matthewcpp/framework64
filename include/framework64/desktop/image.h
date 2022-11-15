@@ -28,13 +28,13 @@ struct fw64Image {
     GLuint gl_handle = 0;
 
     std::vector<uint8_t> pixel_data;
-
+    std::vector<GLuint> palettes;
 
 
 public:
     static fw64Image* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
 
     /** Load image file into OpenGL */
-    static fw64Image* loadImageFile(std::string const& path);
-    static fw64Image* loadImageBuffer(void* data, size_t size);
+    static fw64Image* loadImageFile(std::string const& path, bool isIndexMode);
+    static fw64Image* loadImageBuffer(void* data, size_t size, bool isIndexMode);
 };

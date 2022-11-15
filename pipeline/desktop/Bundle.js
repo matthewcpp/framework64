@@ -10,16 +10,6 @@ class Bundle {
     _headerFile = 0;
 
     _db = null;
-    _animationDataStmt = null;
-    _imageStmt = null;
-    _fontStmt = null;
-    _meshStmt = null;
-    _soundBankStmt = null;
-    _musicBankStmt = null;
-    _rawFileStmt = null;
-    _terrainStmt = null;
-    _layermapStmt = null;
-    _sceneStmt = null;
 
     constructor(outputDirectory, includeDirectory) {
         this._initDatabase(outputDirectory);
@@ -36,62 +26,48 @@ class Bundle {
     _initDatabase(outputDirectory) {
         const dbPath = path.join(outputDirectory, "assets.db");
         const db = new sqlite3.Database(dbPath);
+        this._db = db;
 
         db.serialize(() => {
-            db.run("CREATE TABLE animationData (assetId INTEGER PRIMARY KEY, path TEXT)");
-            db.run("CREATE TABLE images (assetId INTEGER PRIMARY KEY, path TEXT, hslices INTEGER, vslices INTEGER)");
+            db.run("CREATE TABLE images (assetId INTEGER PRIMARY KEY, path TEXT, hslices INTEGER, vslices INTEGER, indexMode INTEGER)");
             db.run("CREATE TABLE fonts (assetId INTEGER PRIMARY KEY, path TEXT, size INTEGER, tileWidth INTEGER, tileHeight INTEGER, glyphCount INTEGER, glyphData BLOB )");
             db.run("CREATE TABLE meshes (assetId INTEGER PRIMARY KEY, path TEXT, jointMap TEXT)");
             db.run("CREATE TABLE soundBanks (assetId INTEGER PRIMARY KEY, path TEXT, count INTEGER)");
             db.run("CREATE TABLE musicBanks (assetId INTEGER PRIMARY KEY, path TEXT, count INTEGER)");
             db.run("CREATE TABLE rawFiles (assetId INTEGER PRIMARY KEY, path TEXT, size INTEGER)");
-            db.run("CREATE TABLE terrains (assetId INTEGER PRIMARY KEY, path TEXT, dimx INTEGER, dimz INTEGER)");
             db.run("CREATE TABLE layerMaps (assetId INTEGER PRIMARY KEY, jsonIndex INTEGER, jsonStr TEXT)");
             db.run("CREATE TABLE scenes (assetId INTEGER PRIMARY KEY, path TEXT, sceneIndex INTEGER, layerMap INTEGER)");
+            db.run("CREATE TABLE palettes (id INTEGER PRIMARY KEY AUTOINCREMENT, imageId INTEGER, path TEXT)");
         });
-
-        this._animationDataStmt = db.prepare("INSERT INTO animationData VALUES (?, ?)");
-        this._imageStmt = db.prepare("INSERT INTO images VALUES (?, ?, ?, ?)");
-        this._fontStmt = db.prepare("INSERT INTO fonts VALUES (?, ?, ?, ?, ?, ?, ?)");
-        this._meshStmt = db.prepare("INSERT INTO meshes VALUES (?, ?, ?)");
-        this._soundBankStmt = db.prepare("INSERT INTO soundBanks VALUES (?, ?, ?)");
-        this._musicBankStmt = db.prepare("INSERT INTO musicBanks VALUES (?, ?, ?)");
-        this._rawFileStmt = db.prepare("INSERT INTO rawFiles VALUES (?, ?, ?)");
-        this._terrainStmt = db.prepare("INSERT INTO terrains VALUES (?, ?, ?, ?)");
-        this._layermapStmt = db.prepare("INSERT INTO layerMaps VALUES (?, ?, ?)");
-        this._sceneStmt = db.prepare("INSERT INTO scenes VALUES (?, ?, ?, ?)");
-
-        this._db = db;
     }
 
     addAnimationData(animationDataPath) {
         const assetId = this._nextAssetId++;
         const assetName = path.basename(animationDataPath, path.extname(animationDataPath));
 
-        this._animationDataStmt.run(assetId, animationDataPath);
-        this._rawFileStmt.run(assetId, animationDataPath, 0);
-
+        this._db.run("INSERT INTO rawFiles VALUES (?, ?, ?)", [assetId, animationDataPath, 0]);
         fse.writeSync(this._headerFile,`#define FW64_ASSET_animation_data_${assetName} ${assetId}\n`);
 
         return assetId;
     }
 
-    addImage(imagePath, hslices, vslices) {
+    addImage(imagePath, imageName, hslices, vslices, indexMode) {
         const assetId = this._nextAssetId++;
-        const assetName = path.basename(imagePath, path.extname(imagePath));
 
-        this._imageStmt.run(assetId, imagePath, hslices, vslices);
-
-        fse.writeSync(this._headerFile,`#define FW64_ASSET_image_${assetName} ${assetId}\n`);
+        this._db.run("INSERT INTO images VALUES (?, ?, ?, ?, ?)", [assetId, imagePath, hslices, vslices, (!!indexMode) ? 1 : 0])
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_image_${imageName} ${assetId}\n`);
 
         return assetId;
+    }
+
+    addPalette(imageId, path) {
+        this._db.run("INSERT INTO palettes (imageId, path) VALUES (?, ?)", [imageId, path]);
     }
 
     addFont(font, fontPath) {
         const assetId = this._nextAssetId++;
 
-        this._fontStmt.run(assetId, fontPath, font.size, font.tileWidth, font.tileHeight, font.glyphs.length, font.desktopGlyphBuffer);
-
+        this._db.run("INSERT INTO fonts VALUES (?, ?, ?, ?, ?, ?, ?)", [assetId, fontPath, font.size, font.tileWidth, font.tileHeight, font.glyphs.length, font.desktopGlyphBuffer]);
         fse.writeSync(this._headerFile,`#define FW64_ASSET_font_${font.name} ${assetId}\n`);
 
         return assetId;
@@ -101,8 +77,7 @@ class Bundle {
         const assetId = this._nextAssetId++;
         const assetName = meshName;
 
-        this._meshStmt.run(assetId, assetPath, jointMap ? JSON.stringify(jointMap): null);
-
+        this._db.run("INSERT INTO meshes VALUES (?, ?, ?)", [assetId, assetPath, jointMap ? JSON.stringify(jointMap): null]);
         fse.writeSync(this._headerFile,`#define FW64_ASSET_mesh_${assetName} ${assetId}\n`);
 
         return assetId;
@@ -112,8 +87,7 @@ class Bundle {
         const assetId = this._nextAssetId++;
         const assetName = soundBank.name;
 
-        this._soundBankStmt.run(assetId, assetName, files.length);
-
+        this._db.run("INSERT INTO soundBanks VALUES (?, ?, ?)", [assetId, assetName, files.length]);
         fse.writeSync(this._headerFile,`#define FW64_ASSET_soundbank_${assetName} ${assetId}\n`);
 
         return assetId;
@@ -123,8 +97,7 @@ class Bundle {
         const assetId = this._nextAssetId++;
         const assetName = musicBank.name;
 
-        this._musicBankStmt.run(assetId, assetName, files.length);
-
+        this._db.run("INSERT INTO musicBanks VALUES (?, ?, ?)", [assetId, assetName, files.length]);
         fse.writeSync(this._headerFile,`#define FW64_ASSET_musicbank_${assetName} ${assetId}\n`);
 
         return assetId;
@@ -134,16 +107,16 @@ class Bundle {
         const assetId = this._nextAssetId++;
         const assetName = path.basename(rawPath, path.extname(rawPath));
 
+        this._db.run("INSERT INTO rawFiles VALUES (?, ?, ?)", [assetId, rawPath, size]);
         fse.writeSync(this._headerFile,`#define FW64_ASSET_raw_${assetName} ${assetId}\n`);
-
-        this._rawFileStmt.run(assetId, rawPath, size);
 
         return assetId;
     }
 
     addLayerMap(layermap, index) {
         const assetId = this._nextAssetId++;
-        this._layermapStmt.run(assetId, index, JSON.stringify(Object.fromEntries(layermap)));
+
+        this._db.run("INSERT INTO layerMaps VALUES (?, ?, ?)", [assetId, index, JSON.stringify(Object.fromEntries(layermap))]);
 
         return assetId;
     }
@@ -152,24 +125,13 @@ class Bundle {
         const assetId = this._nextAssetId++;
         const assetName = Util.safeDefineName(name);
 
+        this._db.run("INSERT INTO scenes VALUES (?, ?, ?, ?)", [assetId, assetPath, index, layerMap]);
         fse.writeSync(this._headerFile,`#define FW64_ASSET_scene_${assetName} ${assetId}\n`);
-
-        this._sceneStmt.run(assetId, assetPath, index, layerMap);
 
         return assetId;
     }
 
     finalize() {
-        this._animationDataStmt.finalize();
-        this._imageStmt.finalize();
-        this._fontStmt.finalize();
-        this._meshStmt.finalize();
-        this._soundBankStmt.finalize();
-        this._musicBankStmt.finalize();
-        this._rawFileStmt.finalize();
-        this._terrainStmt.finalize();
-        this._layermapStmt.finalize();
-        this._sceneStmt.finalize();
         this._db.close();
 
         const assetCount = this._nextAssetId - 1;

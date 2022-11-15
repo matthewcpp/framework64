@@ -5,7 +5,6 @@ set(platform_source_files
 ${desktop_include_directory}/asset_database.h desktop/asset_database.cpp
 ${desktop_include_directory}/audio.h desktop/audio.cpp
 ${desktop_include_directory}/audio_bank.h desktop/audio_bank.cpp
-${desktop_include_directory}/color_palette.h desktop/color_palette.cpp
 ${desktop_include_directory}/collider.h
 ${desktop_include_directory}/engine.h desktop/engine.cpp
 ${desktop_include_directory}/filesystem.h desktop/filesystem.cpp
