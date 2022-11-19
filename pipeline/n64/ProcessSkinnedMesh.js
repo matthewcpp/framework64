@@ -7,7 +7,7 @@ const Util = require("../Util");
 
 async function processSkinnedMesh(skinnedMesh, archive, baseDirectory, outputDirectory, includeDirectory) {
     const sourceFile = path.join(baseDirectory, skinnedMesh.src);
-    const gltfLoader = new GLTFLoader({});
+    const gltfLoader = new GLTFLoader();
 
     let animationOnly = skinnedMesh.hasOwnProperty("animationOnly") ? skinnedMesh.animationOnly : false;
 

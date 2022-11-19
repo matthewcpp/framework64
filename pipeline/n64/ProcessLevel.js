@@ -8,7 +8,7 @@ const path = require("path");
 
 async function processLevel(level, layerMap, archive, baseDirectory, outputDirectory, includeDirectory, plugins) {
     const sourceFile = path.join(baseDirectory, level.src);
-    const gltfLoader = new GLTFLoader({});
+    const gltfLoader = new GLTFLoader();
 
     const scenes = await gltfLoader.loadLevel(sourceFile, layerMap);
     plugins.levelBegin(level, gltfLoader.gltf)

@@ -52,43 +52,59 @@ uint32_t fw64_n64_image_get_frame_size(fw64Image* image) {
     return fw64_n64_image_get_data_size(image) / (image->info.hslices * image->info.vslices);
 }
 
+/** Note: DMA mode is currently only supported for non-indexed images*/
+static int fw64_n64_image_init_dma_mode(fw64Image* image, uint32_t asset_index, int handle, fw64Allocator* allocator) {
+    int bytes_read = fw64_filesystem_read(&image->info, sizeof(fw64N64ImageInfo), 1, handle);
+
+    if (image->info.palette_count > 0) {
+        return 0;
+    }
+
+    uint32_t frame_size = fw64_n64_image_get_frame_size(image);
+    image->rom_addr = fw64_n64_filesystem_get_rom_address(asset_index) + sizeof(fw64N64ImageInfo);
+    image->data = allocator->memalign(allocator, 8, frame_size);
+    fw64_image_load_frame(image, 0);
+
+    return 1;
+}
+
 int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_t options, fw64Allocator* allocator) {
     int handle = fw64_filesystem_open(asset_index);
     if (handle < 0)
         return 0;
 
+    int result = 0;
+
+    if (options & FW64_IMAGE_FLAG_DMA_MODE) 
+        result = fw64_n64_image_init_dma_mode(image, asset_index, handle, allocator);
+    else
+        result = fw64_n64_image_read_data(image, handle, allocator);
+
+    fw64_filesystem_close(handle);
+
+    return result;
+}
+
+
+// todo: this method will be converted to read from a data source
+int fw64_n64_image_read_data(fw64Image* image, int handle, fw64Allocator* allocator) {
     int bytes_read = fw64_filesystem_read(&image->info, sizeof(fw64N64ImageInfo), 1, handle);
 
     if (bytes_read != sizeof(fw64N64ImageInfo)) {
-        fw64_filesystem_close(handle);
         return 0;
     }
 
-    if (options & FW64_IMAGE_FLAG_DMA_MODE) {
-        uint32_t frame_size = fw64_n64_image_get_frame_size(image);
-        image->rom_addr = fw64_n64_filesystem_get_rom_address(asset_index) + sizeof(fw64N64ImageInfo);
-        image->data = allocator->memalign(allocator, 8, frame_size);
-        fw64_image_load_frame(image, 0);
+    int data_size = fw64_n64_image_get_data_size(image);
+    uint8_t* image_data = allocator->memalign(allocator, 8, data_size);
+    bytes_read = fw64_filesystem_read(image_data, data_size, 1, handle);
 
-        // TODO: need to seek filesystem stream
-        if (image->info.palette_count > 0) {
-            uint32_t seek_amount = fw64_n64_image_get_data_size(image) - frame_size;
-
-        }
+    if (bytes_read != data_size) {
+        allocator->free(allocator, image_data);
+        return 0;
     }
-    else {
-        int data_size = fw64_n64_image_get_data_size(image);
-        uint8_t* image_data = allocator->memalign(allocator, 8, data_size);
-        bytes_read = fw64_filesystem_read(image_data, data_size, 1, handle);
 
-        if (bytes_read != data_size) {
-            allocator->free(allocator, image_data);
-            return 0;
-        }
-
-        image->data = image_data;
-        image->rom_addr = 0;
-    }
+    image->data = image_data;
+    image->rom_addr = 0;
 
     if (image->info.palette_count > 0) {
         image->palettes = allocator->malloc(allocator, sizeof(uint16_t*) * image->info.palette_count);
@@ -105,7 +121,7 @@ int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_
         image->palettes = NULL;
     }
 
-    fw64_filesystem_close(handle);
+    return 1;
 }
 
 void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator) {

@@ -41,7 +41,7 @@ async function processFontFile(manifestDirectory, outputDir, params, archive) {
     const hslices = data.image.width / data.tileWidth;
     const vslices = data.image.height / data.tileHeight;
 
-    N64ImageWriter.writeBinary(data.image, hslices, vslices, imagePath);
+    N64ImageWriter.writeFile(data.image, hslices, vslices, imagePath);
     const imageInfo = await archive.add(imagePath, "image");
 
     N64FontWriter.write(data, imageInfo.index, fontPath);

@@ -2,72 +2,82 @@ const N64Image = require("./N64Image");
 const ColorIndexImage = require("../ColorIndexImage");
 
 const fs = require("fs");
-const { getSystemErrorMap } = require("util");
 
-function writeBinary(image, horizontalSlices, verticalSlices, path) {
+function writeFile(image, horizontalSlices, verticalSlices, path) {
+    const file = fs.openSync(path, "w");
+    fs.writeSync(file, buildImageBuffer(image, horizontalSlices, verticalSlices));
+    fs.closeSync(file);
+}
+
+function writeBuffer(image, horizontalSlices, verticalSlices) {
+    return buildImageBuffer(image, horizontalSlices, verticalSlices);
+}
+
+function buildImageBuffer(image, horizontalSlices, verticalSlices) {
     const slices = image.slice(horizontalSlices, verticalSlices);
     const sliceWidth = image.width / horizontalSlices;
     const sliceHeight = image.height / verticalSlices;
 
-    const headerBuffer = createImageHeaderBuffer(image, horizontalSlices, verticalSlices);
-    const file = fs.openSync(path, "w");
-    fs.writeSync(file, headerBuffer);
+    const buffers = [];
+
+    buffers.push(createImageHeaderBuffer(image, horizontalSlices, verticalSlices));
+
 
     switch (image.format) {
         case N64Image.Format.IA8:
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeIA8Slice(slice, sliceWidth, sliceHeight));
+                buffers.push(encodeIA8Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
         case N64Image.Format.IA4:
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeIA4Slice(slice, sliceWidth, sliceHeight));
+                buffers.push(encodeIA4Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
         case N64Image.Format.RGBA16:
             for (const slice of slices.images) {
-                fs.writeSync(file, encode16bppSlice(slice, sliceWidth, sliceHeight));
+                buffers.push(encode16bppSlice(slice, sliceWidth, sliceHeight));
             }
             break;
 
         case N64Image.Format.RGBA32:
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeRGBA32Slice(slice, sliceWidth, sliceHeight));
+                buffers.push(encodeRGBA32Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
         case N64Image.Format.I8:
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeI8Slice(slice, sliceWidth, sliceHeight));
+                buffers.push(encodeI8Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
         case N64Image.Format.I4:
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeI4Slice(slice, sliceWidth, sliceHeight));
+                buffers.push(encodeI4Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
         case N64Image.Format.CI8:
             validateCIPalette(image);
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeCI8Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
+                buffers.push(encodeCI8Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
             }
-            writePalette(image, file)
+            buffers.push(buildColorIndexPalettesBuffer(image));
             break;
 
         case N64Image.Format.CI4:
             validateCIPalette(image);
             for (const slice of slices.images) {
-                fs.writeSync(file, encodeCI4Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
+                buffers.push(encodeCI4Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
             }
-            writePalette(image, file)
+            buffers.push(buildColorIndexPalettesBuffer(image));
             break;
     }
 
-    fs.closeSync(file);
+    return Buffer.concat(buffers);
 }
 
 function createImageHeaderBuffer(image, horizontalSlices, verticalSlices) {
@@ -251,7 +261,7 @@ function validateCIPalette(image) {
     }
 }
 
-function writePalette(image, file) {
+function buildColorIndexPalettesBuffer(image) {
     const colorIndexImage = image.colorIndexImage;
     
     // each color in the palette is represented by a 5/5/5/1 color
@@ -271,10 +281,10 @@ function writePalette(image, file) {
         }
     }
 
-    fs.writeSync(file, dataBuffer);
+    return dataBuffer;
 }
 
 module.exports = {
-    writeBinary: writeBinary,
-    writePalette: writePalette
+    writeFile: writeFile,
+    writeBuffer: writeBuffer,
 }

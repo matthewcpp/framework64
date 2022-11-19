@@ -10,13 +10,14 @@ class N64Texture {
     wrapT = N64Texture.WrapMode.Repeat;
     maskS = 0;
     maskT = 0;
+    paletteIndex = 0;
 
     constructor(image) {
         this.image = image;
     }
 
     get buffer() {
-        const buff = Buffer.alloc(20);
+        const buff = Buffer.alloc(24);
         let index = 0;
 
         index = buff.writeUInt32BE(this.image, index);
@@ -24,6 +25,7 @@ class N64Texture {
         index = buff.writeUInt32BE(this.wrapT, index);
         index = buff.writeUInt32BE(this.maskS, index);
         index = buff.writeUInt32BE(this.maskT, index);
+        index = buff.writeUInt32BE(this.paletteIndex, index);
 
         return buff;
     }

@@ -559,7 +559,7 @@ static void fw64_n64_renderer_load_indexed_texture(fw64Renderer* renderer, fw64T
 
     fw64Image* image = texture->image;
 
-    if (renderer->active_texture->image->info.palette_count == 0) {
+    if (renderer->active_texture == NULL|| renderer->active_texture->image->info.palette_count == 0) {
         gDPSetTextureLUT(renderer->display_list++, G_TT_RGBA16);
     }
     
