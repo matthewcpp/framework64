@@ -3,6 +3,8 @@
 #include "assets/assets.h"
 #include "assets/skinned_mesh_figure.h"
 
+#include "framework64/util/renderer_util.h"
+
 #include "framework64/n64/controller_button.h"
 
 static void setup_camera(Game* game);
@@ -29,6 +31,11 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_animated_mesh_attachment_init(&game->weapon_attachment, &game->character_node.transform, &game->animation_state, skinned_mesh_figure_joint_Hand_R);
     quat_from_euler(&game->weapon_attachment.local_rotation, 90.0f, 0.0f, 0.0f);
     vec3_set(&game->weapon_attachment.local_position, 0.0f, 13.0f, 0.0f);
+
+    fw64_animatied_mesh_configuration_init(&game->mesh_configuration, 3, fw64_default_allocator());
+    fw64_animatied_mesh_configuration_push(&game->mesh_configuration, fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_zombie_part_torso, fw64_default_allocator()), skinned_mesh_figure_joint_Chest);
+    fw64_animatied_mesh_configuration_push(&game->mesh_configuration, fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_zombie_part_head, fw64_default_allocator()), skinned_mesh_figure_joint_Neck);
+    fw64_animatied_mesh_configuration_push(&game->mesh_configuration, fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_zombie_part_neck, fw64_default_allocator()), skinned_mesh_figure_joint_Head);
 
     setup_camera(game);
 }
@@ -61,8 +68,9 @@ void game_draw(Game* game) {
 
     fw64_renderer_begin(renderer, FW64_RENDERER_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_set_camera(renderer, &game->arcball.camera);
-    fw64_renderer_draw_animated_mesh(renderer, game->character_node.mesh, &game->animation_state, &game->character_node.transform);
+    //fw64_renderer_draw_animated_mesh(renderer, game->character_node.mesh, &game->animation_state, &game->character_node.transform);
     fw64_renderer_draw_static_mesh_matrix(renderer, &game->weapon_attachment.matrix, game->current_weapon_mesh);
+    fw64_renderer_util_draw_animated_mesh_configuration(renderer, &game->mesh_configuration, &game->character_node.transform, &game->animation_state);
 
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }

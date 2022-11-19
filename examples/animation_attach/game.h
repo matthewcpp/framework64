@@ -2,6 +2,7 @@
 
 #include "framework64/animation_controller.h"
 #include "framework64/util/animated_mesh_attachment.h"
+#include "framework64/util/animated_mesh_configuration.h"
 #include "framework64/camera.h"
 #include "framework64/engine.h"
 #include "framework64/node.h"
@@ -22,6 +23,8 @@ typedef struct {
     fw64AnimationData* animation_data;
     fw64AnimationController animation_state;
     fw64AnimatedMeshAttachment weapon_attachment;
+    
+    fw64AnimatedMeshConfiguration mesh_configuration;
 } Game;
 
 #ifdef __cplusplus

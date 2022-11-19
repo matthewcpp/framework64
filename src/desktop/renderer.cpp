@@ -248,6 +248,26 @@ void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* con
     }
 }
 
+void fw64Renderer::drawAnimatedMeshConfiguration(fw64AnimatedMeshConfiguration* configuration, fw64Transform* transform, fw64AnimationController* animation_controller) {
+    setDrawingMode(DrawingMode::Mesh);
+
+    for (uint32_t i = 0; i < configuration->count; i++) {
+        // should this be done in the shader?
+        fw64Matrix transform_matrix;
+        fw64Matrix* final_matririx =  &animation_controller->final_matrices[configuration->bone_indices[i]];
+        matrix_multiply(&transform_matrix.m[0], &transform->matrix.m[0], &final_matririx->m[0]);
+        updateMeshTransformBlock(transform_matrix);
+
+        fw64Mesh* mesh = configuration->meshes[i];
+        for (auto const & primitive : mesh->primitives) {
+            if (primitive.mode != primitive_type)
+                continue;
+
+            drawPrimitive(primitive);
+        }
+    }
+}
+
 void fw64Renderer::drawSprite(fw64Texture* texture, float x, float y){
     setDrawingMode(DrawingMode::Rect);
     sprite_batch.drawSprite(texture, x, y);

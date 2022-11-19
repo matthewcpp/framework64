@@ -15,6 +15,11 @@ typedef enum {
 } fw64AnimationState;
 
 typedef struct {
+    fw64Matrix final_matrix; // used to render geometry attached to this bone
+    float world_matrix[16]; // used to attach
+} fw64JointMatrices;
+
+typedef struct {
     fw64AnimationData* animation_data;
     fw64Matrix* final_matrices;
     float* world_matrices;

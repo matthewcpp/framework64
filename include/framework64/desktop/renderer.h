@@ -8,6 +8,8 @@
 #include "framework64/desktop/sprite_batch.h"
 #include "framework64/desktop/uniform_block.h"
 
+#include "framework64/util/animated_mesh_configuration.h"
+
 #include <SDL2/SDL.h>
 
 #ifdef __linux__
@@ -45,7 +47,7 @@ private:
 public:
     void drawStaticMesh(fw64Mesh* mesh, fw64Matrix& matrix);
     void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
-
+    void drawAnimatedMeshConfiguration(fw64AnimatedMeshConfiguration* configuration, fw64Transform* transform, fw64AnimationController* animation_controller);
 public:
     void drawFilledRect(float x, float y, float width, float height);
     void drawSprite(fw64Texture* texture, float x, float y);

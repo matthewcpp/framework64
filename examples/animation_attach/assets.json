@@ -18,6 +18,15 @@
         },
         {
             "src": "animation_attach/mace.gltf"
+        },
+        {
+            "src": "zombie_parts/zombie_part_torso.gltf"
+        },
+        {
+            "src": "zombie_parts/zombie_part_head.gltf"
+        }
+        ,        {
+            "src": "zombie_parts/zombie_part_neck.gltf"
         }
     ]
 }
