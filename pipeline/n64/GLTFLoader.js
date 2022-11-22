@@ -440,7 +440,7 @@ class GLTFLoader {
         const imageURI = decodeURI(gltfImage.uri);
 
         // check if there is a specific configuration for this image
-        const imageInfo = this.imagesJson.find(i => i.src === imageURI);
+        let imageInfo = this.imagesJson.find(i => i.src === imageURI);
         if (!imageInfo) {
             imageInfo = {
                 src: imageURI,
