@@ -36,6 +36,8 @@ int fw64_mesh_get_primitive_count(fw64Mesh* mesh);
 
 fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index);
 
+fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index);
+
 #ifdef __cplusplus
 }
 #endif

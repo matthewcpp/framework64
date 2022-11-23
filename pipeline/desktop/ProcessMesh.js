@@ -22,7 +22,7 @@ function processGltfFile(mesh, bundle, manifestDirectory, outputDirectory) {
     bundle.addMesh(meshName, destName);
 }
 
-async function processMesh(mesh, bundle, manifestDirectory, outputDirectory) {
+async function processMesh(mesh, bundle, manifestDirectory, outputDirectory, plugins) {
     if (path.extname(mesh.src) === ".glb") {
         processGlbFile(mesh, bundle, manifestDirectory, outputDirectory);
     }

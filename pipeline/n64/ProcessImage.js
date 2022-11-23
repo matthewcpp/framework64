@@ -122,6 +122,7 @@ async function finalizeImage(image, assetDir, outDir, options, archive) {
     }
 
     return {
+        name: image.name,
         assetIndex: assetIndex,
         assetBuffer: assetBuffer,
         width: image.width,

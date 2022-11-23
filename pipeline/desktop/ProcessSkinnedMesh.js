@@ -6,7 +6,7 @@ const Util = require("../Util");
 
 const {ConvertGltfToGLB} = require('gltf-import-export');
 
-async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory) {
+async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory, plugins) {
     const srcPath = path.join(manifestDirectory, skinnedMesh.src);
     const meshName = skinnedMesh.hasOwnProperty("name") ? skinnedMesh.name : path.basename(skinnedMesh.src, path.extname(skinnedMesh.src));
     const destName = meshName + ".glb";

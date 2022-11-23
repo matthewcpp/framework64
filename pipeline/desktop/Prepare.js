@@ -19,7 +19,7 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
     const bundle = new Bundle(outputDirectory, includeDirectory);
     const layerMap = processLayers(manifest.layers, includeDirectory);
 
-    plugins.initialize(bundle, assetDirectory, outputDirectory, includeDirectory);
+    plugins.initialize(bundle, assetDirectory, outputDirectory, includeDirectory, "desktop");
 
     bundle.addLayerMap(layerMap, 0);
 
@@ -48,14 +48,14 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`);
-            await processMesh(mesh, bundle, assetDirectory, outputDirectory);
+            await processMesh(mesh, bundle, assetDirectory, outputDirectory, plugins);
         }
     }
 
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory);
+            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory, plugins);
         }
     }
 
