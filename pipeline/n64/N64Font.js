@@ -4,9 +4,6 @@ const Util = require("../Util")
 const opentype = require("opentype.js");
 const { createCanvas } = require("canvas");
 
-const fs = require("fs");
-const path = require("path");
-
 class N64Font {
     name;
     _font = null;
@@ -17,23 +14,6 @@ class N64Font {
 
     async load(path) {
         this._font = await opentype.load(path);
-    }
-
-    async outputToDirectory(outDir, sourceString, size, imageFormat) {
-        const data = await this.generateSpriteFont(sourceString, size, imageFormat);
-
-        const imagePath = path.join(outDir, `${this.name}.png`);
-        data.image.writeToFile(imagePath);
-
-        const glyphPath = path.join(outDir, `${this.name}.json`);
-
-
-        fs.writeFileSync(glyphPath, JSON.stringify({
-            name: data.name,
-            size: data.size,
-            image: path.basename(imagePath),
-            glyphs: data.glyphs
-        }, null, 2));
     }
 
     async generateSpriteFont(sourceString, size, imageFormat) {

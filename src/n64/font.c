@@ -1,6 +1,8 @@
 #include "framework64/n64/font.h"
 
 #include "framework64/n64/asset_database.h"
+#include "framework64/n64/image.h"
+
 #include "framework64/filesystem.h"
 #include "framework64/vec2.h"
 
@@ -26,11 +28,14 @@ fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index, fw64Alloca
     size_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
     font->glyphs = allocator->malloc(allocator, glyph_data_size);
     fw64_filesystem_read(font->glyphs, 1, glyph_data_size, handle);
-    fw64_filesystem_close(handle);
+    
 
     // load the font's image
-    fw64Image* image = fw64_image_load(database, font_info.image_asset, allocator);
+    fw64Image* image = allocator->malloc(allocator, sizeof(fw64Image));
+    fw64_n64_image_read_data(image, handle, allocator);
     fw64_n64_texture_init_with_image(&font->texture, image);
+
+    fw64_filesystem_close(handle);
     
     return font;
 }

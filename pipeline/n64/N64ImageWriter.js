@@ -22,7 +22,6 @@ function buildImageBuffer(image, horizontalSlices, verticalSlices) {
 
     buffers.push(createImageHeaderBuffer(image, horizontalSlices, verticalSlices));
 
-
     switch (image.format) {
         case N64Image.Format.IA8:
             for (const slice of slices.images) {
@@ -243,20 +242,20 @@ function encodeCI4Slice(slice, sliceWidth, sliceHeight, colorIndexImage) {
 function validateCIPalette(image) {
     const colorIndexImage = image.colorIndexImage;
 
-    let maxPaletteCount = 0;
+    let maxPaletteSize = 0;
     if (image.format == N64Image.Format.CI8) {
-        maxPaletteCount = 256;
+        maxPaletteSize = 256;
     }
     else if (image.format == N64Image.Format.CI4) {
-        maxPaletteCount = 16;
+        maxPaletteSize = 16;
     }
     else {
         throw new Error(`Error validating CI palette: Unknown format: ${image.format}`);
     }
 
-    for (let i = 0; i < colorIndexImage.palettes; i++) {
-        if (colorIndexImage.palettes[i].length >= maxLength) {
-            throw new Error(`Palette ${i} contains ${colorIndexImage.palettes[i].length} colors (max ${maxLength})`);
+    for (let i = 0; i < colorIndexImage.palettes.length; i++) {
+        if (colorIndexImage.palettes[i].length >= maxPaletteSize) {
+            throw new Error(`Palette ${i} contains ${colorIndexImage.palettes[i].length} colors (max ${maxPaletteSize})`);
         }
     }
 }

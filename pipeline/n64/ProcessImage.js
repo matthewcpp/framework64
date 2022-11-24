@@ -12,8 +12,7 @@ async function processImage(manifestDirectory, outputDirectory, image, archive) 
         return convertSprite(manifestDirectory, outputDirectory, image, archive);
     }
     else if (image.frames || image.frameDir){
-        ImageAtlasDefines.writeHeaderFile(image, manifestDirectory, outputDirectory);
-        return assembleSprite(manifestDirectory, outputDirectory, image, archive);
+        return assembleSpriteAtlas(manifestDirectory, outputDirectory, image, archive);
     }
 }
 
@@ -35,7 +34,7 @@ async function convertSprite(manifestDirectory, outDir, params, archive) {
     return finalizeImage(image, manifestDirectory, outDir, options, archive, params.name)
 }
 
-async function assembleSprite(rootDir, outDir, params, archive) {
+async function assembleSpriteAtlas(rootDir, outDir, params, archive) {
     const options = {
         format: "RGBA16"
     }
@@ -46,6 +45,10 @@ async function assembleSprite(rootDir, outDir, params, archive) {
     const frames = getFrameArray(params, rootDir);
     const atlas = await buildSpriteAtlas(frames, rootDir, params);
     await image.assign(atlas);
+
+    // if we do not have outdir then we are writing an internal image and these defines would not be needed
+    if (!!outDir)
+        ImageAtlasDefines.writeHeaderFile(image, manifestDirectory, outputDirectory);
 
     return finalizeImage(image, rootDir, outDir, params, archive, params.name)
 }
