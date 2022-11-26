@@ -67,3 +67,7 @@ fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index) {
     assert(index >= 0 && index < mesh->primitives.size());
     return &mesh->primitives[index].material;
 }
+
+fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index) {
+    return mesh->resources->textures[index].get();
+}

@@ -23,8 +23,12 @@ enum GltfComponentType {
 static void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale);
 
 fw64Mesh* GlbParser::loadStaticMesh(std::string const & path, JointMap const & joint_map) {
-    if (!openFile(path))
-        return nullptr;
+    if (path != file_path) {
+        if (!openFile(path))
+            return nullptr;
+
+        file_path = path;
+    }
 
     resetMaps();
 
@@ -274,16 +278,13 @@ framework64::CollisionMesh* GlbParser::parseCollisionMesh(nlohmann::json const &
 }
 
 bool GlbParser::openFile(std::string const& path) {
-    if (glb_file.is_open())
-        glb_file.close();
-        
-    glb_file.open(path, std::ios::binary);
+    std::ifstream gltf_file(path);
 
-    if (!glb_file)
+    if (!gltf_file)
         return false;
 
-    if (!parseHeader() || !parseJsonChunk() || !parseBinaryChunk() )
-        return false;
+    json_doc = nlohmann::json::parse(gltf_file);
+    gltfToBuffer.clear();
 
     return true;
 }
@@ -293,32 +294,6 @@ void GlbParser::resetMaps() {
     gltfToMesh.clear();
     gltfToImage.clear();
     collisionMeshes.clear();
-}
-
-bool GlbParser::parseHeader() {
-    glb_file.read(reinterpret_cast<char * >(&header), sizeof(Header));
-
-    return header.magic == HeaderMagicNumber && header.version == 2;
-}
-
-bool GlbParser::parseJsonChunk() {
-    glb_file.read(reinterpret_cast<char * >(&json_chunk_info), sizeof(ChunkInfo));
-
-    if (json_chunk_info.type != JsonChunkMagicNumber)
-        return false;
-
-    std::vector<char> json_data(json_chunk_info.length);
-    glb_file.read(json_data.data(), json_chunk_info.length);
-
-    json_doc = nlohmann::json ::parse(json_data.begin(), json_data.end());
-
-    return true;
-}
-
-bool GlbParser::parseBinaryChunk() {
-    glb_file.read(reinterpret_cast<char * >(&binary_chunk_info), sizeof(ChunkInfo));
-
-    return binary_chunk_info.type == BinaryChunkMagicNumber;
 }
 
 Box GlbParser::getBoxFromAccessor(size_t accessor_index) const {
@@ -622,12 +597,12 @@ fw64Image* GlbParser::getImage(size_t image_index) {
 
 fw64Image* GlbParser::parseImage(size_t image_index) {
     auto image_node = json_doc["images"][image_index];
+    auto image_uri = image_node["uri"].get<std::string>();
 
-    auto buffer_view_index = image_node["bufferView"].get<size_t>();
-    auto image_data = readBufferViewData<uint8_t>(buffer_view_index);
+    std::string image_path = file_path.substr(0, file_path.find_last_of('/') + 1) + image_uri;
 
     // todo: this needs to support color index palettes
-    return fw64Image::loadImageBuffer(reinterpret_cast<void *>(image_data.data()), image_data.size(), false);
+    return fw64Image::loadImageFile(image_path, false);
 }
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {
@@ -661,9 +636,27 @@ std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive
     return vertex_colors;
 }
 
-void GlbParser::seekInBinaryChunk(size_t pos) {
-    size_t binary_start = sizeof(Header) + sizeof(json_chunk_info) + json_chunk_info.length + sizeof(binary_chunk_info);
-    glb_file.seekg(binary_start + pos);
+std::ifstream* GlbParser::getBuffer(size_t gltfIndex) {
+    auto result = gltfToBuffer.find(gltfIndex);
+
+    if (result != gltfToBuffer.end()) {
+        return result->second.get();
+    }
+
+    const auto& buffer_json = json_doc["buffers"][gltfIndex];
+    const auto buffer_uri = buffer_json["uri"].get<std::string>();
+    std::string buffer_path = file_path.substr(0, file_path.find_last_of('/') + 1) + buffer_uri;
+
+    auto* buffer_stream = new std::ifstream(buffer_path, std::ios::binary);
+
+    if (!(*buffer_stream)) {
+        delete buffer_stream;
+        return nullptr;
+    }
+
+    gltfToBuffer.insert(std::make_pair(gltfIndex, std::unique_ptr<std::ifstream>(buffer_stream)));
+
+    return buffer_stream;
 }
 
 }

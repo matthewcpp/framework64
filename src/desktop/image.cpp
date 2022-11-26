@@ -84,7 +84,7 @@ GLuint createOpenGLTextureFromSurface(SDL_Surface* surface) {
 }
 
 static fw64Image* createTextureFromSurface(SDL_Surface* surface, bool isIndexedMode) {
-    auto gl_handle = createOpenGLTextureFromSurface(surface);;
+    auto gl_handle = createOpenGLTextureFromSurface(surface);
 
     auto* texture = new fw64Image();
 

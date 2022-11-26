@@ -36,10 +36,6 @@ public:
     fw64Scene* loadScene(std::string const & path, int rootNodeIndex, LayerMap const & layer_map);
 
 private:
-    bool parseHeader();
-    bool parseJsonChunk();
-    bool parseBinaryChunk();
-
     /** Parses a scene Root node in order to get indices for scene and mesh collider container nodes. */
     void parseSceneNode(int rootNodeIndex);
 
@@ -74,11 +70,11 @@ private:
     static std::vector<T> vec3ToVec4Array(std::vector<T> const & vec3_arr, T fill_val);
 
     [[nodiscard]] Box getBoxFromAccessor(size_t accessor_index) const;
-    void seekInBinaryChunk(size_t pos);
 
     bool openFile(std::string const& path);
 
     void resetMaps();
+    std::ifstream* getBuffer(size_t gltfIndex);
 
 private:
     struct Header {
@@ -96,17 +92,18 @@ private:
     ChunkInfo json_chunk_info;
     ChunkInfo binary_chunk_info;
 
-    std::ifstream glb_file;
     std::string file_path;
     nlohmann::json json_doc;
+    std::unordered_map<size_t, std::unique_ptr<std::ifstream>> gltfToBuffer;
     ShaderCache& shader_cache;
 
-    /* Map gltf resource indices to object pointers.  Useful for lookup when multiple nodes reference the same resources*/
+    // Map gltf resource indices to object pointers.  Useful for lookup when multiple nodes reference the same resources
+    // Note that most of these maps use raw pointers, this is because these resources are actually placed in the mesh struct and will be cleaned up there
     std::unordered_map<size_t, fw64Texture*> gltfToTexture;
     std::unordered_map<size_t, fw64Mesh*> gltfToMesh;
     std::unordered_map<size_t, fw64Image*> gltfToImage;
     std::unordered_map<std::string, framework64::CollisionMesh*> collisionMeshes;
-    /* --- */
+    // --- 
 
     fw64Scene* scene = nullptr;
     SharedResources* shared_resources = nullptr;
@@ -119,11 +116,13 @@ private:
         auto const & buffer_view = json_doc["bufferViews"][bufferViewIndex];
         auto const byte_length = buffer_view["byteLength"].get<size_t>();
         auto const byte_offset = buffer_view["byteOffset"].get<size_t>();
+        auto const buffer_index = buffer_view["buffer"].get<size_t>();
 
         std::vector<T> buffer_data(byte_length / sizeof(T));
 
-        seekInBinaryChunk(byte_offset);
-        glb_file.read(reinterpret_cast<char*>(buffer_data.data()), byte_length);
+        auto* buffer = getBuffer(buffer_index);
+        buffer->seekg(byte_offset);
+        buffer->read(reinterpret_cast<char*>(buffer_data.data()), byte_length);
 
         return buffer_data;
     }
