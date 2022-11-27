@@ -62,20 +62,15 @@ GLuint loadOpenGLTextureFromImageFile(std::string const& path) {
     return openGlHandle;
 }
 
+/** Precondition: Pixel format should be SDL_PIXELFORMAT_RGBA8888*/
 GLuint createOpenGLTextureFromSurface(SDL_Surface* surface) {
     GLuint handle;
 
-    GLenum textureFormat;
-    if ((surface->format->Rmask & 0xFF) == 0xFF) { // RGB
-        textureFormat = surface->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
-    }
-    else {
-        textureFormat = surface->format->BytesPerPixel == 4 ? GL_BGRA : GL_BGR;
-    }
+    assert(surface->format->format == SDL_PIXELFORMAT_RGBA32);
 
     glGenTextures(1, &handle);
     glBindTexture(GL_TEXTURE_2D, handle);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, textureFormat, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -84,7 +79,17 @@ GLuint createOpenGLTextureFromSurface(SDL_Surface* surface) {
 }
 
 static fw64Image* createTextureFromSurface(SDL_Surface* surface, bool isIndexedMode) {
-    auto gl_handle = createOpenGLTextureFromSurface(surface);
+
+    GLuint gl_handle = 0;
+
+    if (surface->format->format != SDL_PIXELFORMAT_RGBA32) {
+        SDL_Surface* converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
+        gl_handle = createOpenGLTextureFromSurface(converted_surface);
+        SDL_FreeSurface(converted_surface);
+    }
+    else {
+        gl_handle = createOpenGLTextureFromSurface(surface);
+    }
 
     auto* texture = new fw64Image();
 

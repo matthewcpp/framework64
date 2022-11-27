@@ -254,7 +254,7 @@ function validateCIPalette(image) {
     }
 
     for (let i = 0; i < colorIndexImage.palettes.length; i++) {
-        if (colorIndexImage.palettes[i].length >= maxPaletteSize) {
+        if (colorIndexImage.palettes[i].length > maxPaletteSize) {
             throw new Error(`Palette ${i} contains ${colorIndexImage.palettes[i].length} colors (max ${maxPaletteSize})`);
         }
     }
