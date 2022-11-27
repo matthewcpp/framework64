@@ -36,5 +36,6 @@ public:
 
     /** Load image file into OpenGL */
     static fw64Image* loadImageFile(std::string const& path, bool isIndexMode);
+    static bool addImagePaletteFromFile(fw64Image* image, std::string const& path);
     static fw64Image* loadImageBuffer(void* data, size_t size, bool isIndexMode);
 };

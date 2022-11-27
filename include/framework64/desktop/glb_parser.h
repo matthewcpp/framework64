@@ -72,6 +72,7 @@ private:
     [[nodiscard]] Box getBoxFromAccessor(size_t accessor_index) const;
 
     bool openFile(std::string const& path);
+    void readColorIndexPaletteInfo();
 
     void resetMaps();
     std::ifstream* getBuffer(size_t gltfIndex);
@@ -94,6 +95,7 @@ private:
 
     std::string file_path;
     nlohmann::json json_doc;
+    std::unordered_map<std::string, std::vector<std::string>> color_index_image_palettes;
     std::unordered_map<size_t, std::unique_ptr<std::ifstream>> gltfToBuffer;
     ShaderCache& shader_cache;
 

@@ -62,15 +62,20 @@ GLuint loadOpenGLTextureFromImageFile(std::string const& path) {
     return openGlHandle;
 }
 
-/** Precondition: Pixel format should be SDL_PIXELFORMAT_RGBA8888*/
 GLuint createOpenGLTextureFromSurface(SDL_Surface* surface) {
     GLuint handle;
 
-    assert(surface->format->format == SDL_PIXELFORMAT_RGBA32);
-
     glGenTextures(1, &handle);
     glBindTexture(GL_TEXTURE_2D, handle);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+
+    if (surface->format->format != SDL_PIXELFORMAT_RGBA32) {
+        SDL_Surface* converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, converted_surface->pixels);
+        SDL_FreeSurface(converted_surface);
+    }
+    else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+    }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -80,16 +85,7 @@ GLuint createOpenGLTextureFromSurface(SDL_Surface* surface) {
 
 static fw64Image* createTextureFromSurface(SDL_Surface* surface, bool isIndexedMode) {
 
-    GLuint gl_handle = 0;
-
-    if (surface->format->format != SDL_PIXELFORMAT_RGBA32) {
-        SDL_Surface* converted_surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
-        gl_handle = createOpenGLTextureFromSurface(converted_surface);
-        SDL_FreeSurface(converted_surface);
-    }
-    else {
-        gl_handle = createOpenGLTextureFromSurface(surface);
-    }
+    GLuint gl_handle = createOpenGLTextureFromSurface(surface);
 
     auto* texture = new fw64Image();
 
@@ -119,6 +115,19 @@ fw64Image* fw64Image::loadImageFile(std::string const& path, bool isIndexMode) {
     SDL_FreeSurface(surface);
 
     return texture;
+}
+
+bool fw64Image::addImagePaletteFromFile(fw64Image* image, std::string const& path) {
+    auto* surface = IMG_Load(path.c_str());
+
+    if (!surface) {
+        return false;
+    }
+
+    GLuint handle = createOpenGLTextureFromSurface(surface);
+    image->palettes.push_back(handle);
+
+    return true;
 }
 
 fw64Image* fw64Image::loadImageBuffer(void* data, size_t size, bool isIndexedMode) {

@@ -23,12 +23,8 @@ enum GltfComponentType {
 static void extractTransformFromNode(nlohmann::json const & node, Vec3& position, Quat& rotation, Vec3& scale);
 
 fw64Mesh* GlbParser::loadStaticMesh(std::string const & path, JointMap const & joint_map) {
-    if (path != file_path) {
-        if (!openFile(path))
-            return nullptr;
-
-        file_path = path;
-    }
+    if (!openFile(path))
+        return nullptr;
 
     resetMaps();
 
@@ -102,12 +98,8 @@ void GlbParser::getCustomBoundingBoxForNode(nlohmann::json const & json_node, fw
 }
 
 fw64Scene* GlbParser::loadScene(std::string const & path, int rootNodeIndex, LayerMap const & layer_map) {
-    if (path != file_path) {
-        if (!openFile(path))
-            return nullptr;
-
-        file_path = path;
-    }
+    if (!openFile(path))
+        return nullptr;
 
     scene = new fw64Scene();
     shared_resources = &scene->shared_resources;
@@ -278,15 +270,55 @@ framework64::CollisionMesh* GlbParser::parseCollisionMesh(nlohmann::json const &
 }
 
 bool GlbParser::openFile(std::string const& path) {
+    if (path == file_path)
+        return true;
+
+    file_path.clear();
     std::ifstream gltf_file(path);
 
     if (!gltf_file)
         return false;
 
+    file_path = path;
+
     json_doc = nlohmann::json::parse(gltf_file);
+    color_index_image_palettes.clear();
     gltfToBuffer.clear();
 
+    readColorIndexPaletteInfo();
+
     return true;
+}
+
+void GlbParser::readColorIndexPaletteInfo() {
+    std::string image_json_path = file_path.substr(0, file_path.find_last_of('/') + 1) + "images.json";
+    std::ifstream image_json_file(image_json_path);
+
+    if (!image_json_file)
+        return;
+
+    nlohmann::json images_doc = nlohmann::json::parse(image_json_file);
+
+    for (auto const & element : images_doc) {
+        if (!element.contains("format"))
+            continue;
+
+        std::string src_string = element["src"].get<std::string>();
+        std::string format_str = element["format"].get<std::string>();
+        std::transform(format_str.begin(), format_str.end(), format_str.begin(), ::tolower);
+        if (format_str.find("ci") != 0)
+            continue;
+
+        auto& additional_palettes_vec = color_index_image_palettes[src_string];
+
+        if (!element.contains("additionalPalettes"))
+            return;
+
+        auto const & additional_palettes = element["additionalPalettes"];
+        for (auto const & additional_palette : additional_palettes) {
+            additional_palettes_vec.push_back(additional_palette.get<std::string>());
+        }
+    }
 }
 
 void GlbParser::resetMaps() {
@@ -599,10 +631,22 @@ fw64Image* GlbParser::parseImage(size_t image_index) {
     auto image_node = json_doc["images"][image_index];
     auto image_uri = image_node["uri"].get<std::string>();
 
-    std::string image_path = file_path.substr(0, file_path.find_last_of('/') + 1) + image_uri;
+    std::string base_path = file_path.substr(0, file_path.find_last_of('/') + 1);
+    std::string image_path = base_path + image_uri;
 
-    // todo: this needs to support color index palettes
-    return fw64Image::loadImageFile(image_path, false);
+    auto const result = color_index_image_palettes.find(image_uri);
+    bool indexed_mode = result != color_index_image_palettes.end();
+    fw64Image* image = fw64Image::loadImageFile(image_path, indexed_mode);
+
+    if (!indexed_mode ||result->second.empty())
+        return image;
+
+    for (auto const & paletteUri : result->second) {
+        std::string palette_path = base_path + paletteUri;
+        fw64Image::addImagePaletteFromFile(image, palette_path);
+    }
+
+    return image;
 }
 
 std::vector<float> GlbParser::parseVertexColors(nlohmann::json const & primitive_node) {
