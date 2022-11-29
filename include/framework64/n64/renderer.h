@@ -15,7 +15,8 @@ typedef enum {
     N64_RENDERER_FEATURE_NONE = 0,
     N64_RENDERER_FEATURE_AA = 1,
     N64_RENDERER_FEATURE_DEPTH_TEST = 2,
-    N64_RENDERER_FEATURE_FOG = 4
+    N64_RENDERER_FEATURE_FOG = 4,
+    N64_RENDERER_FEATURE_COLOR_INDEX_MODE = 8
 } fw64N64RendererFeature;
 
 struct fw64Renderer{
@@ -50,6 +51,7 @@ struct fw64Renderer{
     void* post_draw_func_arg;
     fw64Texture* active_texture;
     int active_texture_frame;
+    uint32_t active_palette;
     N64FillRect fill_rect;
 };
 

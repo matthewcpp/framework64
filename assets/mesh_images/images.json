@@ -1,0 +1,10 @@
+[
+    {
+        "src": "1.png",
+        "format": "CI4",
+        "additionalPalettes": [
+            "2.png",
+            "3.png"
+        ]
+    }
+]

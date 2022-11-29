@@ -16,20 +16,20 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
 
     const layerMap = processLayers(manifest.layers, Util.assetIncludeDirectory(outputDirectory));
 
-    plugins.initialize(archive, assetDirectory, outputDirectory, includeDirectory);
+    plugins.initialize(archive, assetDirectory, outputDirectory, includeDirectory, "n64");
 
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`)
 
-            await processMesh(mesh, archive, assetDirectory, outputDirectory);
+            await processMesh(mesh, archive, assetDirectory, outputDirectory, plugins);
         }
     }
 
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory);
+            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory, plugins);
         }
     }
 

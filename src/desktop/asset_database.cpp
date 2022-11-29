@@ -7,7 +7,12 @@ bool fw64AssetDatabase::init(std::string const & database_path) {
         return false;
     }
 
-    result = sqlite3_prepare_v2(database, "SELECT path, hslices, vslices FROM images WHERE assetId = ?;", -1, &select_image_statement, nullptr);
+    result = sqlite3_prepare_v2(database, "SELECT path, hslices, vslices, indexMode FROM images WHERE assetId = ?;", -1, &select_image_statement, nullptr);
+    if (result) {
+        return false;
+    }
+
+    result = sqlite3_prepare_v2(database, "SELECT path from palettes WHERE imageId = ?;", -1, &select_palettes_statement, nullptr);
     if (result) {
         return false;
     }
@@ -33,11 +38,6 @@ bool fw64AssetDatabase::init(std::string const & database_path) {
     }
 
     result = sqlite3_prepare_v2(database, "SELECT path, size FROM rawFiles WHERE assetId = ?;", -1, &select_raw_file_statement, nullptr);
-    if (result) {
-        return false;
-    }
-
-    result = sqlite3_prepare_v2(database, "SELECT path, dimz, dimz FROM terrains WHERE assetId = ?;", -1, &select_terrain_statement, nullptr);
     if (result) {
         return false;
     }

@@ -1,19 +1,19 @@
 class Plugins {
     plugins = [];
 
-    constructor(plugin) {
-        if (!!plugin)
-            this.plugins.push(plugin);
+    constructor(plugins) {
+        if (!!plugins)
+            this.plugins.push(...plugins);
     }
 
     addPlugin(plugin) {
         this.plugins.push(plugin);
     }
 
-    initialize(assetBundle, baseDirectory, outputDirectory, assetIncludeDirectory) {
+    initialize(assetBundle, baseDirectory, outputDirectory, assetIncludeDirectory, platform) {
         for (const plugin of this.plugins) {
             if (plugin.initialize)
-                plugin.initialize(assetBundle, baseDirectory, outputDirectory, assetIncludeDirectory);
+                plugin.initialize(assetBundle, baseDirectory, outputDirectory, assetIncludeDirectory, platform);
         }
     }
 
@@ -35,6 +35,20 @@ class Plugins {
         for (const plugin of this.plugins) {
             if (plugin.processScene)
                 plugin.processScene(name, gltfSceneNode);
+        }
+    }
+
+    meshParsed(meshJson, gltfLoader) {
+        for (const plugin of this.plugins) {
+            if (plugin.meshParsed)
+                plugin.meshParsed(meshJson, gltfLoader);
+        }
+    }
+
+    skinnedMeshParsed(meshJson, gltfLoader, animationData) {
+        for (const plugin of this.plugins) {
+            if (plugin.skinnedMeshParsed)
+                plugin.skinnedMeshParsed(meshJson, gltfLoader);
         }
     }
 }

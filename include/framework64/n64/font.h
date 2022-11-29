@@ -14,7 +14,6 @@ typedef struct {
 typedef struct {
     uint16_t size;
     uint16_t glyph_count;
-    uint32_t image_asset;
 } fw64N64FontInfo;
 
 struct fw64Font {

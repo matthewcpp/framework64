@@ -3,9 +3,9 @@ const Util = require("./Util");
 const fs = require("fs");
 const path = require("path");
 
-function writeHeaderFile(image, assetDirectory, outputDirectory) {
+function writeHeaderFile(imageJson, assetDirectory, outputDirectory) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
-    const safeName = Util.safeDefineName(image.name);
+    const safeName = Util.safeDefineName(imageJson.name);
 
     const includeFilePath = path.join(includeDirectory, `image_atlas_${safeName}.h`);
 
@@ -13,7 +13,7 @@ function writeHeaderFile(image, assetDirectory, outputDirectory) {
     fs.writeSync(file, "#pragma once\n\n");
 
     let frameIndex = 0;
-    const frames = getFrameNames(image, assetDirectory);
+    const frames = getFrameNames(imageJson, assetDirectory);
     for(const framePath of frames) {
         const frameName = Util.safeDefineName(path.basename(framePath, path.extname(framePath)));
         fs.writeSync(file, `#define image_atlas_${safeName}_frame_${frameName} ${frameIndex}\n`);
@@ -25,12 +25,12 @@ function writeHeaderFile(image, assetDirectory, outputDirectory) {
     fs.closeSync(file);
 }
 
-function getFrameNames(image, assetDirectory){
-    if (image.frames) {
-        return image.frames;
+function getFrameNames(imageJson, assetDirectory){
+    if (imageJson.frames) {
+        return imageJson.frames;
     } 
     else {
-        const atlasPath = path.join(assetDirectory, image.frameDir);
+        const atlasPath = path.join(assetDirectory, imageJson.frameDir);
         return fs.readdirSync(atlasPath);
     }
 }

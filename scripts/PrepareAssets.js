@@ -6,7 +6,7 @@ const fse = require("fs-extra");
 const path = require("path");
 const rimraf = require("rimraf");
 
-async function prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, gameName, pluginPath) {
+async function prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, gameName, pluginDirPath) {
 	const gameBinDirectory = path.join(platformBuildDir,  "bin", gameName);
 	const assetOutputDirectory = path.join(gameBinDirectory, "assets");
     const assetIncludeDirectory = path.join(assetOutputDirectory, "include", "assets");
@@ -17,7 +17,7 @@ async function prepareAssets(assetManifest, assetDirectory, platform, platformBu
 
     fse.ensureDirSync(assetIncludeDirectory);
 
-    await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, assetOutputDirectory, pluginPath);
+    await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, assetOutputDirectory, pluginDirPath);
 
     const shouldPrepareShaders = platform.toLowerCase() === "desktop";
     

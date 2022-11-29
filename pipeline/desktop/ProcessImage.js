@@ -1,8 +1,9 @@
 const Image = require("../Image");
 const ImageAtlasDefines = require("../ImageAtlasDefines");
 
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
+const { debug } = require("console");
 
 function resizeImage(image, sprite) {
     const dimensions = sprite.resize.split("x");
@@ -24,6 +25,8 @@ function getFrameArray(imageJson, baseDirectory) {
     }
 }
 
+const imageIndexModes = new Set(["CI8", "CI4"]);
+
 // todo: validate sprite params
 async function buildAtlasFromFrames(imageJson, bundle, baseDirectory, outputDirectory) {
     if (!imageJson.name) {
@@ -44,7 +47,8 @@ async function buildAtlasFromFrames(imageJson, bundle, baseDirectory, outputDire
     const outputPath = path.join(outputDirectory, atlasName);
 
     await image.writeToFile(outputPath);
-    const assetId = bundle.addImage(atlasName, imageJson.hslices, imageJson.vslices);
+    const indexMode = imageIndexModes.has(imageJson.format);
+    const assetId = bundle.addImage(atlasName, imageJson.name, imageJson.hslices, imageJson.vslices, indexMode);
 
     return {
         assetId: assetId,
@@ -64,6 +68,7 @@ async function processImage(imageJson, bundle, baseDirectory, outputDirectory) {
 
     const srcPath = path.join(baseDirectory, imageJson.src);
     const destPath = path.join(outputDirectory, imageJson.src);
+    fs.ensureDirSync(path.dirname(destPath));
 
     const image = new Image();
     await image.load(srcPath);
@@ -76,7 +81,26 @@ async function processImage(imageJson, bundle, baseDirectory, outputDirectory) {
         fs.copyFileSync(srcPath, destPath);
     }
 
-    const assetId = bundle.addImage(imageJson.src, imageJson.hslices, imageJson.vslices);
+    const imageName = (!!imageJson.name) ? imageJson.name : path.basename(imageJson.src, path.extname(imageJson.src));
+
+    const indexMode = imageIndexModes.has(imageJson.format);
+    const hslices = (!!imageJson.hslices) ? imageJson.hslices : 1;
+    const vslices = (!!imageJson.vslices) ? imageJson.vslices : 1;
+
+    const assetId = bundle.addImage(imageJson.src, imageName, hslices, vslices, indexMode);
+
+    if (indexMode && (!!imageJson.additionalPalettes)) {
+        for (const palettePath of imageJson.additionalPalettes) {
+
+            const paletteImageSrcPath = path.join(baseDirectory, palettePath);
+            const paletteImageDestPath = path.join(outputDirectory, palettePath);
+
+            fs.ensureDirSync(path.dirname(paletteImageDestPath));
+            fs.copyFileSync(paletteImageSrcPath, paletteImageDestPath);
+
+            bundle.addPalette(assetId, palettePath);
+        }
+    }
 
     return {
         assetId: assetId,

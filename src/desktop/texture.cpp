@@ -7,6 +7,15 @@ fw64Texture::fw64Texture(fw64Image* img) {
     image = img;
 }
 
+GLuint fw64Texture::getGlImageHandle() const {
+    if (image->palettes.empty()) {
+        return image->gl_handle;
+    }
+    else {
+        return image->palettes[palette_index];
+    }
+}
+
 // C Interface
 
 fw64Texture* fw64_texture_create_from_image(fw64Image* image, fw64Allocator* allocator) {
@@ -24,6 +33,7 @@ fw64Image* fw64_texture_get_image(fw64Texture* texture) {
 
 void fw64_texture_set_image(fw64Texture* texture, fw64Image* image) {
     texture->image = image;
+    texture->palette_index = 0;
 }
 
 int fw64_texture_slice_width(fw64Texture* texture) {
@@ -55,3 +65,10 @@ void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s
     texture->wrap_t = wrap_t;
 }
 
+void fw64_texture_set_palette_index(fw64Texture* texture, uint32_t index) {
+    texture->palette_index = index;
+}
+
+uint32_t fw64_texture_get_palette_index(fw64Texture* texture) {
+    return texture->palette_index;
+}

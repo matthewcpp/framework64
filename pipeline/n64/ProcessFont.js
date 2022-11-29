@@ -1,12 +1,9 @@
 const Util = require("../Util");
-const N64Image = require("./N64Image");
 const N64Font = require("./N64Font");
 const Font = require("../Font");
 const N64FontWriter = require("./N64FontWriter");
 const N64ImageWriter = require("./N64ImageWriter");
 const processImage = require("./ProcessImage");
-
-
 
 const path = require("path")
 
@@ -14,7 +11,7 @@ function _initOptions(sourceFile, params) {
     const options = {
         sourceString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~ ",
         name: path.basename(sourceFile, path.extname(sourceFile)) + params.size.toString(),
-        imageFormat: "rgba16"
+        imageFormat: "IA8"
     }
 
     Object.assign(options, params);
@@ -22,105 +19,68 @@ function _initOptions(sourceFile, params) {
     return options;
 }
 
-async function processFontFile(manifestDirectory, outputDir, params, archive) {
-    if (!params.size) {
+async function processFontFile(manifestDirectory, outputDir, fontJson, archive) {
+    if (!fontJson.size) {
         throw new Error("Font elements must have a size specified.");
     }
 
-    const sourceFile = path.join(manifestDirectory, params.src);
-
-    const options = _initOptions(sourceFile, params);
+    const sourceFile = path.join(manifestDirectory, fontJson.src);
+    const options = _initOptions(sourceFile, fontJson);
 
     const font = new N64Font(options.name);
     await font.load(sourceFile);
 
-    const data = await font.generateSpriteFont(options.sourceString, options.size, options.imageFormat);
-    const fontPath = path.join(outputDir, `${font.name}.font`);
-    const imagePath = path.join(outputDir, `${font.name}_image.image`);
+    const fontData = await font.generateSpriteFont(options.sourceString, options.size, options.imageFormat);
+    const hslices = fontData.image.width / fontData.tileWidth;
+    const vslices = fontData.image.height / fontData.tileHeight;
+    const imageBuffer = N64ImageWriter.writeBuffer(fontData.image, hslices, vslices);
 
-    const hslices = data.image.width / data.tileWidth;
-    const vslices = data.image.height / data.tileHeight;
+    const fontFileName = Util.safeDefineName(font.name) + ".font";
+    const fontPath = path.join(outputDir, fontFileName);
+    N64FontWriter.write(fontData, imageBuffer, fontPath);
 
-    N64ImageWriter.writeBinary(data.image, hslices, vslices, imagePath);
-    const imageInfo = await archive.add(imagePath, "image");
-
-    N64FontWriter.write(data, imageInfo.index, fontPath);
     await archive.add(fontPath, "font");
 }
 
-async function processImageFont(manifestDirectory, outputDir, font, archive) {
-    if (!font.sourceString) {
+async function processImageFont(manifestDirectory, outputDir, fontJson, archive) {
+    if (!fontJson.sourceString) {
         throw new Error("image fonts must specify a sourceString");
     }
 
-    const imageInfo = await processImage(manifestDirectory, outputDir, font.image, archive);
+    const imageInfo = await processImage(manifestDirectory, null, fontJson.image, null);
 
     const frameCount = imageInfo.hslices * imageInfo.vslices;
-    if (frameCount !== font.sourceString.length) {
-        throw new Error(`Font image contains ${frameCount} frames but source string is of length: ${font.sourceString.length}`);
+    if (frameCount !== fontJson.sourceString.length) {
+        throw new Error(`Font image contains ${frameCount} frames but source string is of length: ${fontJson.sourceString.length}`);
     }
 
     const tileWidth = imageInfo.width / imageInfo.hslices;
     const tileHeight = imageInfo.height / imageInfo.vslices;
 
     const f = new Font();
-    f.loadImageFontGlyphs(font.name, font.sourceString, tileWidth, tileHeight);
+    f.loadImageFontGlyphs(fontJson.name, fontJson.sourceString, tileWidth, tileHeight);
 
-    const fontPath = path.join(outputDir, Util.safeDefineName(font.name) + ".font");
-    N64FontWriter.write(f, imageInfo.assetIndex, fontPath);
+    const fontName = Util.safeDefineName(fontJson.name) + ".font";
+    const fontPath = path.join(outputDir, fontName);
+    N64FontWriter.write(f, imageInfo.assetBuffer, fontPath);
 
     await archive.add(fontPath, "font");
 }
 
-async function convertFont(manifestDirectory, outputDir, font, archive) {
-    if (font.sourceFile) {
-        const sourceFilePath = path.join(manifestDirectory, font.sourceFile);
-        font.sourceString = Font.sourceStringFromFile(sourceFilePath);
+async function convertFont(manifestDirectory, outputDir, fontJson, archive) {
+    if (fontJson.sourceFile) {
+        const sourceFilePath = path.join(manifestDirectory, fontJson.sourceFile);
+        fontJson.sourceString = Font.sourceStringFromFile(sourceFilePath);
     }
 
-    if (font.src) {
-        await processFontFile(manifestDirectory, outputDir, font, archive);
+    if (fontJson.src) {
+        await processFontFile(manifestDirectory, outputDir, fontJson, archive);
     }
     else {
-        await processImageFont(manifestDirectory, outputDir, font, archive)
+        await processImageFont(manifestDirectory, outputDir, fontJson, archive)
     }
 }
 
 module.exports = {
     convertFont: convertFont
-}
-
-const paramKeys = ["size", "sourceString"];
-
-function _buildParams(program) {
-    const params = {};
-
-    for (const key of paramKeys) {
-        if (program.hasOwnProperty(key))
-            params[key] = program[key];
-    }
-
-    return params;
-}
-
-async function main() {
-    const { program } = require('commander');
-
-    program.version("0.0.1");
-    program.requiredOption("-f, --file <path>", "input file");
-    program.requiredOption("--size <value>", "font size");
-    program.requiredOption("-o, --out-dir <dir>", "output directory");
-    program.option("--source-string <value>", "String to collect glyphs from")
-
-    program.parse(process.argv);
-
-    const options = _initOptions(program.file, _buildParams(program));
-
-    const font = new N64Font(options.name);
-    await font.load(program.file);
-    await font.outputToDirectory(program.outDir, options.sourceString, options.size, N64Image.Format.RGBA32);
-}
-
-if (require.main === module) {
-    main();
 }

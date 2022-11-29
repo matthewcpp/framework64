@@ -14,7 +14,7 @@ fw64Font* fw64Font::loadFromDatabase(fw64AssetDatabase* database, uint32_t index
 
     std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_font_statement, 0));
     const std::string texture_path = database->asset_dir + asset_path;
-    auto image =  fw64Image::loadImageFile(texture_path);
+    auto image = fw64Image::loadImageFile(texture_path, false);
 
     if (!image)
         return nullptr;

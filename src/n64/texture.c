@@ -1,4 +1,5 @@
 #include "framework64/n64/texture.h"
+
 #include "framework64/n64/image.h"
 
 #include <stdlib.h>
@@ -19,6 +20,7 @@ void fw64_n64_texture_init_with_image(fw64Texture* texture, fw64Image* image) {
     texture->wrap_t = G_TX_CLAMP;
     texture->mask_s = G_TX_NOMASK;
     texture->mask_t = G_TX_NOMASK;
+    texture->palette_index = 0;
 }
 
 fw64Image* fw64_texture_get_image(fw64Texture* texture) {
@@ -27,6 +29,7 @@ fw64Image* fw64_texture_get_image(fw64Texture* texture) {
 
 void fw64_texture_set_image(fw64Texture* texture, fw64Image* image) {
     texture->image = image;
+    texture->palette_index = 0;
 }
 
 void fw64_texture_delete(fw64Texture* texture, fw64Allocator* allocator) {
@@ -64,4 +67,12 @@ void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s
 
     texture->wrap_t = wrap_t;
     texture->mask_t = (wrap_t == FW64_TEXTURE_WRAP_CLAMP) ? 0 : 4;
+}
+
+void fw64_texture_set_palette_index(fw64Texture* texture, uint32_t index) {
+    texture->palette_index = index;
+}
+
+uint32_t fw64_texture_get_palette_index(fw64Texture* texture) {
+    return texture->palette_index;
 }

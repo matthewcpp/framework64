@@ -1,0 +1,50 @@
+{
+    "images": [
+        {
+            "src": "image_types/rgba32.png",
+            "format": "RGBA32"
+        },
+        {
+            "src": "image_types/ia8.png",
+            "format": "IA8"
+        },
+        {
+            "src": "image_types/ia4.png",
+            "format": "IA4"
+        },
+        {
+            "src": "image_types/i8.png",
+            "format": "I8"
+        },
+        {
+            "src": "image_types/i4.png",
+            "format": "I4"
+        },
+        {
+            "src": "image_types/ci8_r.png",
+            "format": "CI8",
+            "name": "ci8",
+            "additionalPalettes": [
+                "image_types/ci8_g.png",
+                "image_types/ci8_b.png"
+            ]
+        },
+        {
+            "src": "image_types/ci4_y.png",
+            "format": "CI4",
+            "name": "ci4",
+            "additionalPalettes": [
+                "image_types/ci4_c.png",
+                "image_types/ci4_m.png"
+            ]
+        }
+    ],
+    "fonts": [
+        {
+            "name": "header",
+            "src": "Consolas.ttf",
+            "size": "14",
+            "sourceString": "Format: IA8 IA4 I8 I4 RGBA32 RGBA16 CI8 CI4"
+        }
+    ]
+}

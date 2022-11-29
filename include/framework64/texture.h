@@ -54,9 +54,16 @@ fw64Image* fw64_texture_get_image(fw64Texture* texture);
 
 /** 
  * Sets the image associated with this this texture.
- * Note, calling this method on a texture which already has an image will NOT free th resources associated with that image.
+ * This will also reset the teture's palette index to 0 (default)
+ * Note, calling this method on a texture which already has an image will NOT free the resources associated with that image.
 */
 void fw64_texture_set_image(fw64Texture* texture, fw64Image* image);
+
+/** Sets the palette index to use for a color index texture. */
+void fw64_texture_set_palette_index(fw64Texture* texture, uint32_t index);
+
+/** Gets the palette index to use for a color index texture. */
+uint32_t fw64_texture_get_palette_index(fw64Texture* texture);
 
 #ifdef __cplusplus
 }

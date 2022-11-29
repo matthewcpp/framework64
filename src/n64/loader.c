@@ -17,17 +17,11 @@ void fw64_n64_loader_load_mesh_resources(fw64N64Loader* loader, int handle, fw64
     resources->flags = 0;
 
     if (resources->image_count > 0) {
-        // read the asset ID's and then load the images
-        // TODO: get rid of this allocation when adding a small read optimization in the filesystem
-        uint32_t* asset_index_data = allocator->malloc(allocator, resources->image_count * sizeof(uint32_t));
-        fw64_filesystem_read(asset_index_data, sizeof(uint32_t), resources->image_count, handle);
         resources->images = allocator->malloc(allocator, sizeof(fw64Image) * resources->image_count);
 
         for (uint32_t i = 0; i < resources->image_count; i++) {
-            fw64_n64_image_init_from_rom(resources->images + i, asset_index_data[i], FW64_IMAGE_FLAG_NONE, allocator);
+            fw64_n64_image_read_data(resources->images + i, handle, allocator);
         }
-
-        allocator->free(allocator, asset_index_data);
     }
     else {
         resources->images = NULL;

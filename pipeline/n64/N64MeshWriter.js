@@ -81,49 +81,22 @@ class ResourcesInfo {
     }
 }
 
-/**
- * Textures are written out as individual assets into the archive.
- * This function will return a buffer of the asset indices which corresponds to the image array of the mesh.
- */
-async function prepareTextures(resources, outputDir, archive) {
-    const textureAssetIndicesBuffer = Buffer.alloc(resources.images.length * 4);
-    let bufferIndex = 0;
-
-    for (const image of resources.images) {
-        const texturePath = path.join(outputDir, `${image.name}.image`);
-        let entry = archive.entries.get(texturePath);
-
-        if (!entry){
-            N64ImageWriter.writeBinary(image, 1, 1, texturePath);
-            entry = await archive.add(texturePath, "image");
-        }
-
-        bufferIndex = textureAssetIndicesBuffer.writeUInt32BE(entry.index, bufferIndex);
-    }
-
-    return textureAssetIndicesBuffer;
-}
-
-async function writeMeshResources(resources, file, outputDir, archive) {
-    let bytesWritten = 0;
+async function writeMeshResources(resources, file) {
     const resourceInfo = new ResourcesInfo(resources);
 
-    bytesWritten += fs.writeSync(file, resourceInfo.buffer);
+    fs.writeSync(file, resourceInfo.buffer);
 
-    if (resources.images.length > 0) {
-        const textureAssetIndices = await prepareTextures(resources, outputDir, archive);
-        bytesWritten += fs.writeSync(file, textureAssetIndices);
+    for (const image of resources.images) {
+        fs.writeSync(file, image.assetBuffer);
     }
 
     for (const texture of resources.textures) {
-        bytesWritten += fs.writeSync(file, texture.buffer);
+        fs.writeSync(file, texture.buffer);
     }
 
     for (const material of resources.materials) {
-        bytesWritten += fs.writeSync(file, material.buffer);
+        fs.writeSync(file, material.buffer);
     }
-
-    return bytesWritten;
 }
 
 async function writeStaticMesh(mesh, outputDir, archive) {
@@ -132,7 +105,7 @@ async function writeStaticMesh(mesh, outputDir, archive) {
     const file = fs.openSync(destPath, "w");
 
     if (mesh.resources) {
-        await writeMeshResources(mesh.resources, file, outputDir, archive);
+        await writeMeshResources(mesh.resources, file);
     }
 
     writeStaticMeshData(mesh, file);
@@ -181,24 +154,22 @@ function writeStaticMeshData(mesh, file) {
         displayListBuffers.push(displayList);
         vertexPointerBuffers.push(vertexPointers);
     }
-    let bytesWritten = 0;
-    bytesWritten += fs.writeSync(file, meshInfo.buffer);
+
+    fs.writeSync(file, meshInfo.buffer);
 
     for (const buffer of vertexBuffers)
-        bytesWritten += fs.writeSync(file, buffer);
+        fs.writeSync(file, buffer);
 
     for (const buffer of displayListBuffers)
-        bytesWritten += fs.writeSync(file, buffer);
+        fs.writeSync(file, buffer);
 
     for (const primitiveInfo of primitiveInfos) {
-        bytesWritten += fs.writeSync(file, primitiveInfo.buffer)
+        fs.writeSync(file, primitiveInfo.buffer)
     }
 
-    bytesWritten += fs.writeSync(file, vertexPointerCountBuffer);
+    fs.writeSync(file, vertexPointerCountBuffer);
     for (const buffer of vertexPointerBuffers)
-        bytesWritten += fs.writeSync(file, buffer);
-
-    return bytesWritten;
+        fs.writeSync(file, buffer);
 }
 
 module.exports = {

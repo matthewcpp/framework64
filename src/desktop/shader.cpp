@@ -109,7 +109,7 @@ void Shader::bindMaterialTexture(ShaderProgram* program, fw64Material const & ma
     glUniformBlockBinding(material.shader->handle, program->texture_info_uniform_block_index, program->texture_info.uniform_block.binding_index);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, material.texture->image->gl_handle);
+    glBindTexture(GL_TEXTURE_2D, material.texture->getGlImageHandle());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, material.texture->wrap_s);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, material.texture->wrap_t);
     glUniform1i(material.shader->diffuse_texture_location, 0);

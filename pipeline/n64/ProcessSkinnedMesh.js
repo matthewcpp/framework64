@@ -5,9 +5,9 @@ const MeshWriter = require("./N64MeshWriter");
 const Animation = require("../Animation");
 const Util = require("../Util");
 
-async function processSkinnedMesh(skinnedMesh, archive, baseDirectory, outputDirectory, includeDirectory) {
+async function processSkinnedMesh(skinnedMesh, archive, baseDirectory, outputDirectory, includeDirectory, plugins) {
     const sourceFile = path.join(baseDirectory, skinnedMesh.src);
-    const gltfLoader = new GLTFLoader({});
+    const gltfLoader = new GLTFLoader();
 
     let animationOnly = skinnedMesh.hasOwnProperty("animationOnly") ? skinnedMesh.animationOnly : false;
 
@@ -21,11 +21,12 @@ async function processSkinnedMesh(skinnedMesh, archive, baseDirectory, outputDir
     mesh.splitPrimitivesForSkinning();
     mesh.remapJointIndices(animationData.jointIdMap);
 
+    plugins.skinnedMeshParsed(skinnedMesh, gltfLoader, animationData);
+
     if (!animationOnly) {
         await MeshWriter.writeStaticMesh(mesh, outputDirectory, archive);
     }
 
-    
     const writer = new Animation.Writer();
     writer.writeBigEndian(meshName, animationData, outputDirectory, includeDirectory);
 

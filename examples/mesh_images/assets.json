@@ -1,0 +1,15 @@
+{
+    "meshes": [
+        {
+            "src": "mesh_images/number_cube.gltf"
+        }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "name": "Consolas",
+            "size": 16,
+            "sourceString": "TopBottomLeftRightFrontBack: 0123456789"
+        }
+    ]
+}

@@ -46,6 +46,12 @@ fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint3
 void fw64_image_load_frame(fw64Image* image, uint32_t frame);
 
 /**
+ * Gets the number of indexed color palettes this image has.
+ * All index colored images will have at least 1 color palette
+*/
+uint16_t fw64_image_get_palette_count(fw64Image* image);
+
+/**
  * Deletes the image and frees all assocated resources for an image created with \ref fw64_image_load
  **/
 void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator);

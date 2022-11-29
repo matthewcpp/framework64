@@ -7,11 +7,11 @@ const fs = require("fs");
 const path = require("path");
 const Plugins = require("./Plugins");
 
-async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginScript) {
+async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginDirPath) {
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     platform = platform.toLowerCase();
 
-    const plugins = new Plugins(loadPlugin(pluginScript, platform));
+    const plugins = new Plugins(loadPlugins(pluginDirPath, platform));
 
     switch (platform) {
         case "n64":
@@ -29,27 +29,32 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     }
 }
 
-function loadPlugin(pluginScript, platform) {
-    if (!pluginScript) {
+function loadPlugins(pluginDir, platform) {
+    if (!pluginDir) {
         return null;
     }
 
-    if (!fs.existsSync(pluginScript)) {
-        throw new Error(`Unable to load plugin script at: ${pluginScript}`);
+    if (!fs.existsSync(pluginDir)) {
+        throw new Error(`Plugin directory does not exist: ${pluginDir}`);
     }
 
-    const pluginCreateFunc = require(pluginScript);
-    if (typeof(pluginCreateFunc) !== "function") {
-        throw new Error("Plugin script should export a single function");
+    const plugins = [];
+    const entries = fs.readdirSync(pluginDir, {withFileTypes: true});
+    for (const entry of entries) {
+        if (!entry.isFile)
+            continue;
+        
+        const pluginPath = path.join(pluginDir, entry.name);
+        const pluginClass = require(pluginPath);
+
+        if (typeof(pluginClass) !== "function") {
+            throw new Error("Plugin script should export a single class");
+        }
+
+        plugins.push(new pluginClass());
     }
 
-    const pluginObject = pluginCreateFunc(platform);
-
-    if (typeof(pluginObject) !== "object") {
-        throw new Error("Plugin function should return a single plugin object");
-    }
-
-    return pluginObject;
+    return plugins;
 }
 
 module.exports = {

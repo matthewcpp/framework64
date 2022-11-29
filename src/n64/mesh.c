@@ -90,3 +90,7 @@ void fw64_n64_mesh_resources_delete(fw64MeshResources* resources, fw64Allocator*
 
     allocator->free(allocator, resources);
 }
+
+fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index) {
+    return mesh->resources->textures + index;
+}

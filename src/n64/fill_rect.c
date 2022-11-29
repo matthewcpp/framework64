@@ -7,7 +7,6 @@
 uint8_t fill_rect_mem[FW64_N64_FILL_RECT_IMAGE_SIZE] __attribute__ ((aligned (8)));
 
 void n64_fill_rect_init(N64FillRect* fill_rect) {
-    fill_rect->image.info.bpp = 4;
     fill_rect->image.info.format = FW64_N64_IMAGE_FORMAT_RGBA32;
     fill_rect->image.info.width = 2;
     fill_rect->image.info.height = 1;

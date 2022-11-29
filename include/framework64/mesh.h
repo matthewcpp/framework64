@@ -36,6 +36,12 @@ int fw64_mesh_get_primitive_count(fw64Mesh* mesh);
 
 fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index);
 
+/**
+ * Returns a texture by index from this mesh's resources
+ * Note: This method will only work for meshes loaded via /ref fw64_mesh_load 
+ * */
+fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index);
+
 #ifdef __cplusplus
 }
 #endif

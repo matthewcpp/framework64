@@ -4,8 +4,7 @@
             "src": "basicLAZER.otf",
             "size": 12,
             "name": "basicLAZER",
-            "sourceString": "ELAPSED TIME:0123456789.",
-            "imageFormat": "rgba32"
+            "sourceString": "ELAPSED TIME:0123456789."
         },
         {
             "image": {

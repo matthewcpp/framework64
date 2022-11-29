@@ -1,6 +1,5 @@
 const N64Image = require("./N64Image")
 const N64ImageWriter = require("./N64ImageWriter");
-
 const ImageAtlasDefines = require("../ImageAtlasDefines");
 
 const Jimp = require("jimp");
@@ -8,45 +7,54 @@ const Jimp = require("jimp");
 const fs = require("fs");
 const path = require("path");
 
-async function finalizeImage(image, outDir, options, archive) {
-    if (options.resize) {
-        const dimensions = options.resize.split("x");
-        image.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
+async function processImage(manifestDirectory, outputDirectory, imageJson, archive) {
+    if (imageJson.src) {
+        return convertSprite(manifestDirectory, outputDirectory, imageJson, archive);
     }
-
-    const filePath = path.join(outDir, `${image.name}.image`);
-    N64ImageWriter.writeBinary(image, options.hslices, options.vslices, filePath);
-    const entry = await archive.add(filePath, "image");
-
-    return {
-        assetIndex: entry.index,
-        width: image.width,
-        height: image.height,
-        hslices: options.hslices,
-        vslices: options.vslices
-    };
+    else if (imageJson.frames || imageJson.frameDir){
+        return assembleSpriteAtlas(manifestDirectory, outputDirectory, imageJson, archive);
+    }
 }
 
-async function convertSprite(manifestDirectory, outDir, params, archive) {
-    const imagePath = path.join(manifestDirectory, params.src);
+async function convertSprite(manifestDirectory, outDir, imageJson, archive) {
+    const imagePath = path.join(manifestDirectory, imageJson.src);
 
     const options = {
         hslices: 1,
         vslices: 1,
         format: "RGBA16"
     }
-    Object.assign(options, params);
+    Object.assign(options, imageJson);
 
-    const name = path.basename(imagePath, path.extname(imagePath));
+    const name = !!imageJson.name ? imageJson.name : path.basename(imagePath, path.extname(imagePath));
 
     const image = new N64Image(name, N64Image.Format[options.format.toUpperCase()]);
     await image.load(imagePath);
 
-    return finalizeImage(image, outDir, options, archive, params.name)
+    return finalizeImage(image, manifestDirectory, outDir, options, archive, imageJson.name)
 }
 
-function getDimension(params) {
-    const frameSize = params.frameSize.split('x');
+async function assembleSpriteAtlas(rootDir, outDir, imageJson, archive) {
+    const options = {
+        format: "RGBA16"
+    }
+    Object.assign(options, imageJson);
+
+    const image = new N64Image(imageJson.name, N64Image.Format[options.format.toUpperCase()]);
+
+    const frames = getFrameArray(imageJson, rootDir);
+    const atlas = await buildSpriteAtlas(frames, rootDir, imageJson);
+    await image.assign(atlas);
+
+    // if we do not have outdir then we are writing an internal image and these defines would not be needed
+    if (!!outDir)
+        ImageAtlasDefines.writeHeaderFile(imageJson, rootDir, outDir);
+
+    return finalizeImage(image, rootDir, outDir, imageJson, archive, imageJson.name)
+}
+
+function getDimension(imageJson) {
+    const frameSize = imageJson.frameSize.split('x');
     return [parseInt(frameSize[0]), parseInt(frameSize[1])];
 }
 
@@ -58,14 +66,14 @@ function createNewImage(width, height) {
     });
 }
 
-async function buildSpriteAtlas(frames, rootDir, outDir, params, archive) {
-    const [frameWidth, frameHeight] = getDimension(params);
+async function buildSpriteAtlas(frames, rootDir, imagejson) {
+    const [frameWidth, frameHeight] = getDimension(imagejson);
 
-    const atlas = await createNewImage(params.hslices * frameWidth, params.vslices * frameHeight);
+    const atlas = await createNewImage(imagejson.hslices * frameWidth, imagejson.vslices * frameHeight);
 
-    for (let y = 0; y < params.vslices; y++) {
-        for (let x = 0; x < params.hslices; x++) {
-            const framePath = path.join(rootDir, frames[y * params.hslices + x]);
+    for (let y = 0; y < imagejson.vslices; y++) {
+        for (let x = 0; x < imagejson.hslices; x++) {
+            const framePath = path.join(rootDir, frames[y * imagejson.hslices + x]);
             const frame = await Jimp.read(framePath);
 
             atlas.blit(frame, x * frameWidth, y * frameHeight);
@@ -75,40 +83,56 @@ async function buildSpriteAtlas(frames, rootDir, outDir, params, archive) {
     return atlas
 }
 
-function getFrameArray(params, rootDir) {
-    if (params.frames) {
-        return params.frames;
+function getFrameArray(imageJson, rootDir) {
+    if (imageJson.frames) {
+        return imageJson.frames;
     }
     else {
-        const frameSrcDir = path.join(rootDir, params.frameDir);
+        const frameSrcDir = path.join(rootDir, imageJson.frameDir);
         const files = fs.readdirSync(frameSrcDir);
-        return files.map(file => path.join(params.frameDir, file));
+        return files.map(file => path.join(imageJson.frameDir, file));
     }
 }
 
-async function assembleSprite(rootDir, outDir, params, archive) {
-    const options = {
-        format: "RGBA16"
+async function finalizeImage(image, assetDir, outDir, imageJson, archive) {
+    if (imageJson.resize) {
+        const dimensions = imageJson.resize.split("x");
+        image.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
     }
-    Object.assign(options, params);
 
-    const image = new N64Image(params.name, N64Image.Format[options.format.toUpperCase()]);
+    if (image.format === N64Image.Format.CI8 || image.format === N64Image.Format.CI4) {
+        image.createColorIndexImage();
 
-    const frames = getFrameArray(params, rootDir);
-    const atlas = await buildSpriteAtlas(frames, rootDir, outDir, params, archive);
-    await image.assign(atlas);
-
-    return finalizeImage(image, outDir, params, archive, params.name)
-}
-
-async function processImage(manifestDirectory, outputDirectory, image, archive) {
-    if (image.src) {
-        return convertSprite(manifestDirectory, outputDirectory, image, archive);
+        if (imageJson.additionalPalettes) {
+            for (const paletteFile of imageJson.additionalPalettes) {
+                const paletteFilePath = path.join(assetDir, paletteFile);
+                await image.colorIndexImage.addPaletteFromPath(paletteFilePath);
+            }
+        }
     }
-    else if (image.frames || image.frameDir){
-        ImageAtlasDefines.writeHeaderFile(image, manifestDirectory, outputDirectory);
-        return assembleSprite(manifestDirectory, outputDirectory, image, archive);
+
+    let assetIndex = -1;
+    let assetBuffer = null;
+
+    if (archive) {
+        const filePath = path.join(outDir, `${image.name}.image`);
+        N64ImageWriter.writeFile(image, imageJson.hslices, imageJson.vslices, filePath);
+        const entry = await archive.add(filePath, "image");
+        assetIndex = entry.index;
     }
+    else {
+        assetBuffer = N64ImageWriter.writeBuffer(image, imageJson.hslices, imageJson.vslices);
+    }
+
+    return {
+        name: image.name,
+        assetIndex: assetIndex,
+        assetBuffer: assetBuffer,
+        width: image.width,
+        height: image.height,
+        hslices: imageJson.hslices,
+        vslices: imageJson.vslices,
+    };
 }
 
 module.exports = processImage;

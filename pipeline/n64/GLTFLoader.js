@@ -8,6 +8,8 @@ const N64Texture = require("./N64Texture");
 const N64Scene = require("./N64Scene")
 const Util = require("../Util")
 
+const processImage = require("./ProcessImage");
+
 const glMatrix = require("gl-matrix");
 
 const fs = require("fs");
@@ -29,6 +31,7 @@ class GLTFLoader {
     gltf = null;
     mesh = null;
     resources = null;
+    imagesJson = null;
 
     // these maps provide a way to convert from the GLTF file level indices to the currently loaded mesh's indices
     imageMap = new Map();
@@ -46,14 +49,6 @@ class GLTFLoader {
 
     /** This holds the index of the current mesh collider node that is being parsed. i.e. scene node / Colliders / <this node> */
     _meshColliderNodeIndex = GLTFLoader.InvalidNodeIndex;
-
-    constructor(options) {
-        this.options =  {
-            resizeImages: {}
-        };
-
-        Object.assign(this.options, options);
-    }
 
     /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
     async loadStaticMesh(gltfPath) {
@@ -316,6 +311,12 @@ class GLTFLoader {
         this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
 
         this._resetMaps();
+
+        const imageJsonPath = path.join(path.dirname(gltfPath), "images.json");
+        if (fs.existsSync(imageJsonPath))
+            this.imagesJson = JSON.parse(fs.readFileSync(imageJsonPath, {encoding: "utf8"}));
+        else
+            this.imagesJson = [];
     }
 
     async _loadMesh(gltfMesh) {
@@ -435,22 +436,21 @@ class GLTFLoader {
 
         const imageIndex = this.resources.images.length;
         const gltfDir = path.dirname(this.gltfPath);
-
         const gltfImage = this.gltf.images[gltfIndex];
         const imageURI = decodeURI(gltfImage.uri);
-        const imagePath = path.join(gltfDir, imageURI);
 
-
-        //TODO: This should probably be more robust: e.g. image.something.ext will break asset macro name
-        const imageName = Util.safeDefineName(path.basename(imageURI, path.extname(imageURI)));
-        const image = new N64Image(imageName, N64Image.Format.RGBA16);
-        await image.load(imagePath);
-
-        if (this.options.resizeImages.hasOwnProperty(imageURI)) {
-            const dimensions = this.options.resizeImages[imageURI].split("x");
-            image.data.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
-            console.log(`Resize image: ${imageURI} to ${dimensions[0]}x${dimensions[1]}`);
+        // check if there is a specific configuration for this image
+        let imageInfo = this.imagesJson.find(i => i.src === imageURI);
+        if (!imageInfo) {
+            imageInfo = {
+                src: imageURI,
+                hslices: 1,
+                vslices: 1,
+                format: "RGBA16"
+            }
         }
+
+        const image = await processImage(gltfDir, null, imageInfo, null);
 
         this.resources.images.push(image);
         this.imageMap.set(gltfIndex, imageIndex);
