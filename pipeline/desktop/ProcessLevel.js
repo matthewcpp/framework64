@@ -1,34 +1,38 @@
-const {ConvertGltfToGLB} = require('gltf-import-export');
+const GLTFLoader = require("../n64/GLTFLoader");
 
-const fs = require("fs");
+const fse = require("fs-extra");
 const path = require("path");
 
 const SceneDefines = require("../SceneDefines");
 const Util = require("../Util");
 const GLTFUtil = require("../GLTFUtil");
 
-async function processLevel(level, bundle, baseDirectory, outputDirectory, includeDirectory, plugins) {
-    const destName = path.basename(level.src, ".gltf") + ".glb";
+async function processLevel(level, layerMap, bundle, baseDirectory, outputDirectory, includeDirectory, plugins) {
     const srcPath = path.join(baseDirectory, level.src);
-    const destPath = path.join(outputDirectory, destName);
-    ConvertGltfToGLB(srcPath, destPath);
 
-    const gltf = JSON.parse(fs.readFileSync(srcPath, {encoding: "utf8"}));
-    plugins.levelBegin(level, gltf);
+    // temporary until desktop asset rework
+    const gltfDirName = path.dirname(level.src);
+    const gltfSrcDir = path.join(baseDirectory, gltfDirName);
+    const gltfDestDir = path.join(outputDirectory, gltfDirName);
+    fse.copySync(gltfSrcDir, gltfDestDir);
 
-    const topLevelSceneNodeindices = GLTFUtil.extractTopLevelSceneNodeIndices(gltf);
+    const gltfLoader = new GLTFLoader();
+    await gltfLoader.loadLevel(srcPath, layerMap);
+
+    plugins.levelBegin(level, gltfLoader.gltf);
+
+    const topLevelSceneNodeindices = GLTFUtil.extractTopLevelSceneNodeIndices(gltfLoader.gltf);
 
     for (const sceneNodeIndex of topLevelSceneNodeindices) {
-        const sceneRootNode = gltf.nodes[sceneNodeIndex];
+        const sceneRootNode = gltfLoader.gltf.nodes[sceneNodeIndex];
         const sceneName = sceneRootNode.name.toLowerCase();
         const safeSceneName = Util.safeDefineName(sceneName);
         const sceneIncludeFileName = `scene_${safeSceneName}.h`
 
-        // todo index wont be needed when scene file type added for desktop
-        bundle.addScene(sceneName, sceneNodeIndex, 0, destName); // there is only a single layer map at index 0. todo: remove this?
+        bundle.addScene(sceneName, sceneNodeIndex, 0, level.src); // there is only a single layer map at index 0. todo: remove this?
 
         const sceneDefineFile = path.join(includeDirectory, sceneIncludeFileName)
-        SceneDefines.writeToFile(gltf, sceneName, GLTFUtil.getSceneRootNode(gltf, sceneRootNode), sceneDefineFile);
+        SceneDefines.writeToFile(gltfLoader.gltf, sceneName, GLTFUtil.getSceneRootNode(gltfLoader.gltf, sceneRootNode), sceneDefineFile);
 
         plugins.processScene(safeSceneName, sceneRootNode);
     }

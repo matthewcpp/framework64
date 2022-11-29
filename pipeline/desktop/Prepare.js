@@ -21,7 +21,7 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
 
     plugins.initialize(bundle, assetDirectory, outputDirectory, includeDirectory, "desktop");
 
-    bundle.addLayerMap(layerMap, 0);
+    bundle.addLayerMap(layerMap, 0); // this should be removed during desktop asset rework
 
     if (manifest.images) {
         for (const image of manifest.images) {
@@ -63,7 +63,7 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
 
-            await processLevel(level, bundle, assetDirectory, outputDirectory, includeDirectory, plugins);
+            await processLevel(level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory, plugins);
         }
     }
 

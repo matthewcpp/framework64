@@ -8,6 +8,8 @@
 #include <exception>
 #include <sstream>
 
+#include <curl/curl.h>
+
 namespace framework64 {
 
 constexpr uint32_t HeaderMagicNumber = 0x46546C67;
@@ -630,6 +632,12 @@ fw64Image* GlbParser::getImage(size_t image_index) {
 fw64Image* GlbParser::parseImage(size_t image_index) {
     auto image_node = json_doc["images"][image_index];
     auto image_uri = image_node["uri"].get<std::string>();
+
+    // this is temporary until the asset rework is complete
+    int decoded_uri_length;
+    char* decoded_uri = curl_easy_unescape(nullptr, image_uri.c_str(), static_cast<int>(image_uri.length()), &decoded_uri_length);
+    image_uri = decoded_uri;
+    curl_free(decoded_uri);
 
     std::string base_path = file_path.substr(0, file_path.find_last_of('/') + 1);
     std::string image_path = base_path + image_uri;
