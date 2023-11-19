@@ -1,22 +1,15 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
 
-typedef enum {
-    DEMO_TYPE_PLASMA,
-    DEMO_TYPE_MOIRE,
-    
-    NUM_DEMO_TYPES
-} DemoType;
+#include "file_downloader/file_downloader.h"
+#include "asset_viewer/asset_viewer.h"
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
-    fw64Node node;
-    fw64Mesh* quad;
-    int line_num;
-    float rotation;
+    fw64Font* consolas;
+    fw64AssetViewer file_viewer;
+    fw64FileDownloader file_downloader;
 } Game;
 
 #ifdef __cplusplus
