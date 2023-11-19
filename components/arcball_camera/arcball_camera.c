@@ -1,4 +1,4 @@
-#include "common/arcball_camera.h"
+#include "arcball_camera/arcball_camera.h"
 
 #include "framework64/n64/controller_button.h"
 

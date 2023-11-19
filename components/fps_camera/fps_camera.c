@@ -1,4 +1,4 @@
-#include "common/fps_camera.h"
+#include "fps_camera/fps_camera.h"
 
 #include "framework64/n64/controller_button.h"
 
