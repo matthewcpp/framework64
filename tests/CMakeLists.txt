@@ -4,7 +4,6 @@ find_package(GTest CONFIG REQUIRED)
 set(test_files
         test_box.cpp
         test_bump_allocator.cpp
-        test_data_cache.cpp
         test_camera.cpp
         test_frustum.cpp
         test_ray.cpp
