@@ -1,22 +1,18 @@
 const Util = require("./Util");
 
 const fs = require("fs");
-const path = require("path");
 
-function writeSceneDefines(gltf, name, sceneNode, destFile) {
+function writeSceneDefines(scene, destFile) {
     const file = fs.openSync(destFile, "w");
 
     fs.writeSync(file, "#pragma once\n\n");
-    const sceneName = Util.safeDefineName(name);
+    const sceneName = Util.safeDefineName(scene.name);
 
-    if (sceneNode.children) {
-        for (let i = 0; i < sceneNode.children.length; i++) {
-            const childIndex = sceneNode.children[i];
-            const node = gltf.nodes[childIndex];
 
-            if (!node.hasOwnProperty("name"))
-                continue;
+    for (let i = 0; i < scene.nodes.length; i++) {
+        const node = scene.nodes[i];
 
+        if (node.hasOwnProperty("name")){
             const nodeName = Util.safeDefineName(node.name);
             fs.writeSync(file, `#define FW64_scene_${sceneName}_node_${nodeName} ${i}\n`);
         }

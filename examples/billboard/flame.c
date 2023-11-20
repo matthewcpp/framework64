@@ -6,13 +6,14 @@
 #define FLAME_UPDATE_TIME 1.0f / 15.0f
 
 void flame_init(Flame* flame, fw64Engine* engine){
-    fw64Image* flame_image = fw64_image_load_with_options(engine->assets, FW64_ASSET_image_fire_sprite, FW64_IMAGE_FLAG_DMA_MODE, NULL);
+    fw64Allocator* allocator = fw64_default_allocator();
+    fw64Image* flame_image = fw64_assets_load_image_dma(engine->assets, FW64_ASSET_image_fire_sprite, allocator);
 
     fw64TexturedQuadParams params;
     fw64_textured_quad_params_init(&params);
     params.image = flame_image;
     params.is_animated = 1;
-    fw64Mesh* quad = fw64_textured_quad_create_with_params(engine, &params, NULL);
+    fw64Mesh* quad = fw64_textured_quad_create_with_params(engine, &params, allocator);
 
     fw64_node_init(&flame->entity);
     fw64_node_set_mesh(&flame->entity, quad);

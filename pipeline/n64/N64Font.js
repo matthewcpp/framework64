@@ -56,7 +56,7 @@ class N64Font {
         const imageWidth = tileWidth;
         const imageHeight = codepoints.length * tileHeight;
         const canvas = createCanvas(tileWidth, imageHeight);
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
 
         for (let i = 0; i < glyphData.length; i++) {
             const glyphInfo = glyphData[i];
@@ -72,6 +72,7 @@ class N64Font {
         const imageBuffer = canvas.toBuffer("raw");
         const image = new N64Image(this.name, imageFormat); // TODO: This can probably change to use IA Tex
         await image.loadBuffer(imageBuffer, imageWidth, imageHeight);
+        this.undoPreMultipliedAlpha(image);
 
         return  {
             name: this.name,
@@ -81,6 +82,17 @@ class N64Font {
             tileWidth: tileWidth,
             tileHeight: tileHeight
         };
+    }
+
+    undoPreMultipliedAlpha(image) {
+        const pixelCount = image.width * image.height;
+
+        for (let i = 0; i < pixelCount; i++) {
+            const index = i * 4;
+            image.data[index] = 255;
+            image.data[index + 1] = 255;
+            image.data[index + 2] = 255;
+        }
     }
 }
 

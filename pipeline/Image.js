@@ -2,7 +2,14 @@ const Jimp = require("jimp");
 const path = require("path");
 
 class Image {
-    constructor() {
+    name;
+    hslices = 1;
+    vslices = 1;
+    isIndexed = false;
+    additionalPalettes = [];
+
+    constructor(name) {
+        this.name = name;
         this._data = null;
     }
 
@@ -51,6 +58,10 @@ class Image {
         await this._data.writeAsync(path);
     }
 
+    async getPrimaryFileBuffer() {
+        return await this._data.getBufferAsync(Jimp.MIME_PNG);
+    }
+
     get width() {
         return this._data.bitmap.width;
     }
@@ -65,6 +76,11 @@ class Image {
 
     resize(width, height) {
         this._data.resize(width, height);
+    }
+
+    setSliceCounts(hslices, vslices) {
+        this.hslices = hslices;
+        this.vslices = vslices;
     }
 }
 

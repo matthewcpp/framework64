@@ -7,7 +7,7 @@ const Jimp = require("jimp");
 const fs = require("fs");
 const path = require("path");
 
-async function processImage(manifestDirectory, outputDirectory, imageJson, archive) {
+async function processImage(imageJson, archive, manifestDirectory, outputDirectory) {
     if (imageJson.src) {
         return convertSprite(manifestDirectory, outputDirectory, imageJson, archive);
     }

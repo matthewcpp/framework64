@@ -19,7 +19,7 @@
         }
     },
     "platform": {
-        "default": "desktop",
+        "default": "Desktop",
         "choices": {
             "desktop": {
                 "short": "Desktop",
@@ -27,7 +27,8 @@
                 "settings": {
                     "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake",
                     "Fw64_BUILD_TESTS": "ON",
-                    "FW64_BUILD_EXAMPLES": "ON"
+                    "FW64_BUILD_EXAMPLES": "ON",
+                    "FW64_BUILD_TOOLS": "ON"
                 }
             },
             "n64": {
@@ -35,7 +36,8 @@
                 "long": "N64-libultra",
                 "settings": {
                     "FW64_PLATFORM_N64": "ON",
-                    "FW64_BUILD_EXAMPLES": "ON"
+                    "FW64_BUILD_EXAMPLES": "ON",
+                    "FW64_BUILD_TOOLS": "ON"
                 }
             }
         }

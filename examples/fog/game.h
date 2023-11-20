@@ -2,7 +2,7 @@
 
 #include "framework64/engine.h"
 #include "framework64/scene.h"
-#include "common/fps_camera.h"
+#include "fps_camera/fps_camera.h"
 
 typedef enum {
     GAME_MODE_PLAYING,

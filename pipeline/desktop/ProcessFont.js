@@ -1,5 +1,6 @@
 const Font = require("../Font");
-
+const FontWriter = require("./FontWriter");
+const Util = require("../Util")
 const processImage = require("./ProcessImage");
 
 const path = require("path");
@@ -7,39 +8,48 @@ const path = require("path");
 const defaultSourceString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~ ";
 
 async function processFontFile(fontInfo, bundle, baseDirectory, outputDirectory) {
-    const fontName = fontInfo.name + ".png";
+    const fontName = determineFontName(fontInfo);
+
     const srcPath = path.join(baseDirectory, fontInfo.src);
-    const destPath = path.join(outputDirectory, fontName);
+
     const sourceString = fontInfo.sourceString ? fontInfo.sourceString : defaultSourceString;
 
-    const font = new Font();
-    await font.loadGlyphs(fontInfo.name, srcPath, sourceString, fontInfo.size);
+    const font = new Font(fontName);
+    await font.loadGlyphs(srcPath, sourceString, fontInfo.size);
     await font.createGlImage();
 
-    await font.image.writeToFile(destPath);
-    bundle.addFont(font, fontName);
+    const fontFileName = fontName + ".font";
+    const destPath = path.join(outputDirectory, fontFileName);
+    FontWriter.writeFile(font, destPath);
+    bundle.addFont(font.name, fontFileName);
 }
 
 async function processImageFont(fontInfo, bundle, baseDirectory, outputDirectory) {
     if (!fontInfo.sourceString) {
-        throw new Error("image fonts must specify a sourceString");
+        throw new Error("image fonts must specify an explicit sourceString");
     }
 
-    const imageInfo = await processImage(fontInfo.image, bundle, baseDirectory, outputDirectory);
+    if (!fontInfo.name) {
+        throw new Error("image fonts must specify an explicit name");
+    }
 
-    const frameCount = imageInfo.hslices * imageInfo.vslices;
+    const image = await processImage(fontInfo.image, null, baseDirectory, outputDirectory);
+
+    const frameCount = image.hslices * image.vslices;
     if (frameCount !== fontInfo.sourceString.length) {
         throw new Error(`Font image contains ${frameCount} frames but source string is of length: ${fontInfo.sourceString.length}`);
     }
 
-    const tileWidth = imageInfo.width / imageInfo.hslices;
-    const tileHeight = imageInfo.height / imageInfo.vslices;
+    const font = new Font(Util.safeDefineName(fontInfo.name));
+    const tileWidth = image.width / image.hslices;
+    const tileHeight = image.height / image.vslices;
+    font.image = image;
+    font.loadImageFontGlyphs(fontInfo.name, fontInfo.sourceString, tileWidth, tileHeight);
 
-    const f = new Font();
-    f.loadImageFontGlyphs(fontInfo.name, fontInfo.sourceString, tileWidth, tileHeight);
-
-    const fontName = path.basename(imageInfo.path);
-    bundle.addFont(f, fontName);
+    const fontFileName = font.name + ".font";
+    const destPath = path.join(outputDirectory, fontFileName);
+    FontWriter.writeFile(font, destPath)
+    bundle.addFont(font.name, fontFileName);
 }
 
 async function processFont(fontInfo, bundle, baseDirectory, outputDirectory) {
@@ -54,6 +64,14 @@ async function processFont(fontInfo, bundle, baseDirectory, outputDirectory) {
     else {
         await processImageFont(fontInfo, bundle, baseDirectory, outputDirectory);
     }
+}
+
+function determineFontName(fontInfo) {
+    if (fontInfo.name)
+        return Util.safeDefineName(fontInfo.name);
+
+    const basename = path.basename(fontInfo.src, path.extname(fontInfo.src));
+    return Util.safeDefineName(basename + fontInfo.size.toString());
 }
 
 module.exports = processFont;

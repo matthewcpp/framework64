@@ -15,7 +15,6 @@ struct Controller {
 
 class InputInterface {
 public:
-public:
     virtual bool buttonPressed(Controller const & current, Controller const & previous, int button) = 0;
     virtual bool buttonReleased(Controller const & current, Controller const & previous, int button) = 0;
     virtual bool buttonDown(Controller const & current, int button) = 0;
@@ -23,4 +22,5 @@ public:
 
     virtual void updateControllerFromKeyboard(Controller & controller, uint8_t const * sdl_keyboard_state) = 0;
 };
+
 }

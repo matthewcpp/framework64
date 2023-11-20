@@ -1,40 +1,27 @@
 #pragma once
 
 #include "framework64/asset_database.h"
-#include "framework64/desktop/audio_bank.h"
+#include "framework64/desktop/file_datasource.h"
 #include "framework64/desktop/shader_cache.h"
 
-#include <sqlite3.h>
-
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <unordered_map>
 
-#include "glb_parser.h"
-
-
 class fw64AssetDatabase {
 public:
     fw64AssetDatabase(std::string const & dir, framework64::ShaderCache& sc)
-        : asset_dir(dir), shader_cache(sc), glb_parser(sc) {}
+        : asset_dir(dir), asset_directory(dir), shader_cache(sc){}
 
-    bool init(std::string const & database_path);
+    bool init();
+    std::filesystem::path getAssetPath(fw64AssetId asset_id) const;
+    bool openAssetFile(fw64AssetId asset_id, framework64::FileDataSource & datasource) const;
 
     std::string asset_dir;
+    std::filesystem::path asset_directory;
     framework64::ShaderCache& shader_cache;
 
-    sqlite3* database = nullptr;
-    sqlite3_stmt* select_font_statement = nullptr;
-    sqlite3_stmt* select_image_statement = nullptr;
-    sqlite3_stmt* select_palettes_statement = nullptr;
-    sqlite3_stmt* select_mesh_statement = nullptr;
-    sqlite3_stmt* select_music_bank_statement = nullptr;
-    sqlite3_stmt* select_raw_file_statement = nullptr;
-    sqlite3_stmt* select_sound_bank_statement = nullptr;
-    sqlite3_stmt* select_terrain_statement = nullptr;
-    sqlite3_stmt* select_layermap_statement = nullptr;
-    sqlite3_stmt* select_scene_statement = nullptr;
-
-    framework64::GlbParser glb_parser;
+    std::unordered_map<fw64AssetId, std::string> asset_bundle;
 };
 

@@ -5,36 +5,45 @@
 #include <SDL2/SDL_image.h>
 
 #include <cassert>
+#include <vector>
 
 static GLuint createOpenGLTextureFromSurface(SDL_Surface* surface);
 static GLuint loadOpenGLTextureFromImageFile(std::string const& path);
+static GLuint loadOpenGLTextureFromBuffer(uint8_t* data, size_t size);
 
-fw64Image* fw64Image::loadFromDatabase(fw64AssetDatabase* database, uint32_t index) {
-    sqlite3_reset(database->select_image_statement);
-    sqlite3_bind_int(database->select_image_statement, 1, index);
+/** This class corresponds to ImageHeader in pipeline/desktop/ImageWriter.js */
+struct ImageHeader {
+    uint32_t hslices;
+    uint32_t vslices;
+    uint32_t indexed_mode;
+    uint32_t primary_data_size;
+    uint32_t additional_palette_count;
+};
 
-    if(sqlite3_step(database->select_image_statement) != SQLITE_ROW)
-        return nullptr;
+fw64Image* fw64Image::loadFromDatasource(fw64DataSource* data_source, fw64Allocator* allocator) {
+    ImageHeader header;
+    fw64_data_source_read(data_source, &header, sizeof(ImageHeader), 1);
 
-    std::string image_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_image_statement, 0));
-    std::string asset_path = database->asset_dir + image_path;
-    int indexMode = sqlite3_column_int(database->select_image_statement, 3);
+    std::vector<uint8_t> image_buffer(header.primary_data_size);
+    fw64_data_source_read(data_source, image_buffer.data(), 1, header.primary_data_size);
+    auto* image = fw64Image::loadImageBuffer(image_buffer.data(), image_buffer.size(), static_cast<bool>(header.indexed_mode));
+    
+    image->hslices = header.hslices;
+    image->vslices = header.vslices;
 
-    fw64Image* image = fw64Image::loadImageFile(asset_path, static_cast<bool>(indexMode));
-
-    if (indexMode) {
-        sqlite3_reset(database->select_palettes_statement);
-        sqlite3_bind_int(database->select_palettes_statement, 1, index);
-
-        while (sqlite3_step(database->select_palettes_statement) == SQLITE_ROW) {
-            image_path = reinterpret_cast<const char *>(sqlite3_column_text(database->select_palettes_statement, 0));
-            asset_path = database->asset_dir + image_path;
-            image->palettes.push_back(loadOpenGLTextureFromImageFile(asset_path));
-        }
-    } 
-
-    image->hslices = sqlite3_column_int(database->select_image_statement, 1);
-    image->vslices = sqlite3_column_int(database->select_image_statement, 2);
+    if (header.additional_palette_count == 0) {
+        return image;
+    }
+    
+    std::vector<uint32_t> image_sizes(header.additional_palette_count);
+    fw64_data_source_read(data_source, image_sizes.data(), sizeof(uint32_t), header.additional_palette_count);
+    
+    for (uint32_t i = 0; i < header.additional_palette_count; i++) {
+        auto const image_data_size = image_sizes[i];
+        image_buffer.resize(image_data_size);
+        fw64_data_source_read(data_source, image_buffer.data(), 1, image_data_size);
+        image->palettes.push_back(loadOpenGLTextureFromBuffer(image_buffer.data(), image_data_size));
+    }
 
     return image;
 }
@@ -54,6 +63,21 @@ GLuint loadOpenGLTextureFromImageFile(std::string const& path) {
     if (!surface) {
         return 0;
     }
+
+    auto openGlHandle = createOpenGLTextureFromSurface(surface);
+
+    SDL_FreeSurface(surface);
+
+    return openGlHandle;
+}
+
+static GLuint loadOpenGLTextureFromBuffer(uint8_t* data, size_t size) {
+    auto* data_stream = SDL_RWFromMem(data, static_cast<int>(size));
+    auto* surface = IMG_Load_RW(data_stream, 1);
+
+    if (!surface) {
+        return 0;
+    }   
 
     auto openGlHandle = createOpenGLTextureFromSurface(surface);
 
@@ -184,12 +208,9 @@ void fw64Image::clear() {
 
 
 // C API
-fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
-    return fw64Image::loadFromDatabase(asset_database, asset_index);
-}
-
-fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint32_t asset_index, uint32_t options, fw64Allocator* allocator) {
-    return fw64Image::loadFromDatabase(asset_database, asset_index);
+fw64Image* fw64_image_load_from_datasource(fw64DataSource* data_source, fw64Allocator* allocator) {
+    assert(allocator != nullptr);
+    return fw64Image::loadFromDatasource(data_source, allocator);
 }
 
 void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator) {

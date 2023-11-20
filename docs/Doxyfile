@@ -4,23 +4,27 @@ INPUT             =     ../README.md \
                         ../include/framework64/animation_controller.h \
                         ../include/framework64/animation_data.h \
                         ../include/framework64/audio.h \
-                        ../include/framework64/audio_bank.h \
+                        ../include/framework64/asset_database.h \
                         ../include/framework64/box.h \
                         ../include/framework64/bump_allocator.h \
                         ../include/framework64/camera.h \
                         ../include/framework64/collision.h \
                         ../include/framework64/collider.h \
                         ../include/framework64/color.h \
+                        ../include/framework64/data_io.h \
+                        ../include/framework64/data_link.h \
                         ../include/framework64/engine.h \
                         ../include/framework64/filesystem.h \
                         ../include/framework64/font.h \
-                        ../include/framework64/framebuffer.h \
                         ../include/framework64/frustum.h \
                         ../include/framework64/image.h \
                         ../include/framework64/input.h \
                         ../include/framework64/level.h \
+                        ../include/framework64/log.h \
                         ../include/framework64/material.h \
+                        ../include/framework64/material_bundle.h \
                         ../include/framework64/matrix.h \
+                        ../include/framework64/media.h \
                         ../include/framework64/mesh.h \
                         ../include/framework64/node.h \
                         ../include/framework64/plane.h \
@@ -29,6 +33,8 @@ INPUT             =     ../README.md \
                         ../include/framework64/random.h \
                         ../include/framework64/renderer.h \
                         ../include/framework64/save_file.h \
+                        ../include/framework64/scene.h \
+                        ../include/framework64/skinned_mesh.h \
                         ../include/framework64/texture.h \
                         ../include/framework64/time.h \
                         ../include/framework64/transform.h \
@@ -37,8 +43,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/util/bump_allocator.h \
                         ../include/framework64/util/mesh_data_itr.h \
                         ../include/framework64/util/quad.h \
-                        ../include/framework64/util/renderer_util.h \
-                        ../include/framework64/util/sparse_set.h
+                        ../include/framework64/util/renderer_util.h 
 USE_MDFILE_AS_MAINPAGE = ../README.md
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO
@@ -47,7 +52,7 @@ CASE_SENSE_NAMES  = NO
 GENERATE_HTML     = YES
 OUTPUT_DIRECTORY  = _build
 HTML_OUTPUT       = doxygen
-QUIET             = YES
+QUIET             = NO
 WARN_IF_UNDOCUMENTED = NO
 HAVE_DOT          = NO
 SOURCE_BROWSER    = NO

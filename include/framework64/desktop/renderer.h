@@ -3,7 +3,6 @@
 #include "framework64/renderer.h"
 
 #include "framework64/desktop/shader_cache.h"
-#include "framework64/desktop/pixel_texture.h"
 #include "framework64/desktop/screen_overlay.h"
 #include "framework64/desktop/sprite_batch.h"
 #include "framework64/desktop/uniform_block.h"
@@ -20,10 +19,6 @@
 #include <limits>
 #include <string>
 #include <vector>
-
-struct fw64Framebuffer {
-    framework64::PixelTexture texture;
-};
 
 struct fw64Renderer {
 public:
@@ -147,12 +142,9 @@ public:
     // Note: This is not currently implemented for desktop rendering
     bool anti_aliasing_enabled = true;
 
-    fw64Framebuffer framebuffer_write_texture;
-    fw64RendererPostDrawFunc post_draw_callback = nullptr;
-    void* post_draw_callback_arg = nullptr;
-
     fw64Camera* current_camera = nullptr;
 
+    bool sprite_scissor_enabled = false;
 private:
     SDL_Window* window;
     SDL_GLContext gl_context;

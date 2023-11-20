@@ -4,7 +4,7 @@
 #include "framework64/engine.h"
 #include "framework64/node.h"
 
-#include "common/arcball_camera.h"
+#include "arcball_camera/arcball_camera.h"
 
 #define MESH_COUNT 5
 

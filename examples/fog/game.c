@@ -16,6 +16,7 @@ static void draw_fog_settings(Game* GAME_MODE_PLAYING);
 static void set_camera_ypos(Game* game);
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
     game->mode = GAME_MODE_PLAYING;
     fw64_fps_camera_init(&game->fps_camera, engine->input);
@@ -26,9 +27,9 @@ void game_init(Game* game, fw64Engine* engine) {
     game->fps_camera.camera.far = 500.0f;
     fw64_camera_update_projection_matrix(&game->fps_camera.camera);
 
-    game->scene = fw64_scene_load(engine->assets, FW64_ASSET_scene_fogworld, NULL);
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
-    game->overlay = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_overlay, NULL), NULL);
+    game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_Fogworld, allocator);
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
+    game->overlay = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_overlay, allocator), allocator);
 
     fw64_renderer_set_clear_color(engine->renderer, 51, 187, 255);
 

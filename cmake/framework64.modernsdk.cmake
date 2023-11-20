@@ -76,7 +76,6 @@ function(create_game)
 	)
 
     add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/n64/main_n64.c ${asm_files})
-    target_link_libraries(${target_name} PUBLIC framework64)
 
     # Include the game specific asset directory
     target_include_directories(${target_name} PUBLIC ${game_asset_dir}/include)
@@ -85,6 +84,8 @@ function(create_game)
     if (DEFINED N64_ROM_EXTRA_LIBS)
         target_link_libraries(${target_name} PUBLIC ${N64_ROM_EXTRA_LIBS})
     endif()
+
+    target_link_libraries(${target_name} PUBLIC framework64)
 
     set(elf_output_name ${target_name}.elf)
     set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${elf_output_name})

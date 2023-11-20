@@ -14,12 +14,14 @@ typedef struct {
     fw64Transform transform;
     fw64Collider* collider;
     fw64Mesh* mesh;
-    uint32_t layer_mask;
     void* data;
+    uint32_t layer_mask;
+
+    #ifdef FW64_PLATFORM_IS_64_BIT
+    uint32_t _align;
+    #endif
+
 } fw64Node;
-
-#define FW64_NODE_UNSPECIFIED_TYPE UINT32_MAX
-
 
 #ifdef __cplusplus
 extern "C" {

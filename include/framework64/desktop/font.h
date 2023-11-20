@@ -39,4 +39,6 @@ struct fw64Font {
      * @return pointer to the string after the next codepoint has been consumed
      */
     const char* getNextGlyphIndex(const char* text, uint32_t& glyph_index) const;
+
+    static fw64Font* loadFromDatasource(fw64DataSource* data_source, fw64Allocator* allocator);
 };

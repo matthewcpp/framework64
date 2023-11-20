@@ -32,13 +32,15 @@ void game_init(Game* game, fw64Engine* engine) {
     game->music_bank = -1;
     change_music_bank(game, 1);
 
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
-    game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
+    fw64Allocator* allocator = fw64_default_allocator();
+
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
+    game->buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
 
     game->sound_id = 0;
 
     fw64_node_init(&game->n64_logo);
-    fw64_node_set_mesh(&game->n64_logo, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, NULL));
+    fw64_node_set_mesh(&game->n64_logo, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, allocator));
 
     game->rotation = 0.0f;
 }
@@ -158,7 +160,7 @@ void change_sound_bank(Game* game, int delta) {
     if (game->sound_bank >= SOUND_BANK_COUNT)
         game->sound_bank = SOUND_BANK_COUNT - 1;
 
-    fw64_audio_set_sound_bank(game->engine->audio, fw64_sound_bank_load(game->engine->assets, sound_banks[game->sound_bank], NULL));
+    fw64_audio_load_soundbank_asset(game->engine->audio, game->engine->assets, sound_banks[game->sound_bank]);
 
     game->sound_num = 0;
 }
@@ -183,7 +185,7 @@ void change_music_bank(Game* game, int delta) {
     if (game->music_bank >= MUSIC_BANK_COUNT)
         game->music_bank = MUSIC_BANK_COUNT - 1;
 
-    fw64_audio_set_music_bank(game->engine->audio,  fw64_music_bank_load(game->engine->assets, music_banks[game->music_bank], NULL));
+    fw64_audio_load_musicbank_asset(game->engine->audio, game->engine->assets,  music_banks[game->music_bank]);
 
     game->music_track = 0;
 }

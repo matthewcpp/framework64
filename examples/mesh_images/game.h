@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/node.h"
 
-#include "common/arcball_camera.h"
+#include "arcball_camera/arcball_camera.h"
 
 typedef struct {
     fw64Engine* engine;

@@ -1,19 +1,20 @@
 #include "framework64/n64/audio.h"
 #include "framework64/n64/filesystem.h"
-#include "framework64/n64/audio_bank.h"
 
 #include <string.h>
 
 #define FW64_N64_MAX_VOL 0x7fff
 
 void fw64_n64_audio_init(fw64Audio* audio) {
-    memset(audio, 0, sizeof(audio));
+    
     audio->music_volume = 1.0f;
-    audio->sound_bank = NULL;
-    audio->music_bank = NULL;
-    audio->music_status = FW64_AUDIO_STOPPED;
+
+    memset(&audio->sound_bank, 0, sizeof(fw64SoundBank));
+    memset(&audio->music_bank, 0, sizeof(fw64MusicBank));
+
     audio->default_music_tempo = 0;
     audio->music_playback_speed = 1.0f;
+    audio->music_status = FW64_AUDIO_STOPPED;
 }
 
 void fw64_n64_audio_update(fw64Audio* audio) {
@@ -34,9 +35,46 @@ void fw64_n64_audio_update(fw64Audio* audio) {
     }
 }
 
-void fw64_audio_set_sound_bank(fw64Audio* audio, fw64SoundBank* sound_bank) {
+typedef struct {
+    uint32_t song_count;
+    uint32_t ctrl_file_size;
+} fw64SoundbankHeader;
+
+typedef struct {
+    uint32_t track_count;
+    uint32_t bank_asset_id;
+    uint32_t sequence_bank_size; // this is currently unused
+} fw64MusicHeader;
+
+int fw64_audio_load_soundbank_asset(fw64Audio* audio, fw64AssetDatabase* asset_database, fw64AssetId asset_id) {
+    int handle = fw64_filesystem_open(asset_id);
+
+    if (handle < 0) {
+        return 0;
+    }
+
+    fw64SoundbankHeader header;
+    fw64_filesystem_read(&header, sizeof(fw64SoundbankHeader), 1, handle);
+    fw64_filesystem_close(handle);
+
+    uint32_t rom_address = fw64_n64_filesystem_get_rom_address(asset_id);
+    uint32_t ctrl_file_address = rom_address + sizeof(fw64SoundbankHeader);
+    uint32_t tbl_file_address = ctrl_file_address + header.ctrl_file_size;
+
+    fw64SoundBank* sound_bank = &audio->sound_bank;
+
+    sound_bank->song_count = header.song_count;
+    sound_bank->ctrl_file_size = header.ctrl_file_size;
+    sound_bank->ctrl_file_address = ctrl_file_address;
+    sound_bank->tbl_file_address = tbl_file_address;
+        
     nuAuSndPlayerBankSet((u8*)sound_bank->ctrl_file_address, sound_bank->ctrl_file_size, (u8*)sound_bank->tbl_file_address);
-    audio->sound_bank = sound_bank;
+    
+    return 1;
+}
+
+void fw64_audio_unload_soundbank(fw64Audio* audio) {
+    audio->sound_bank.song_count = 0;
 }
 
 int fw64_audio_play_sound(fw64Audio* audio, uint32_t sound_num) {
@@ -62,19 +100,56 @@ fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle) {
 }
 
 int fw64_audio_sound_count(fw64Audio* audio) {
-    if (audio->sound_bank)
-        return audio->sound_bank->song_count;
-    else
-        return 0;
+    return audio->sound_bank.song_count;
+
 }
 
-void fw64_audio_set_music_bank(fw64Audio* audio, fw64MusicBank* music_bank) {
-    fw64_audio_stop_music(audio);
+int fw64_audio_load_musicbank_asset(fw64Audio* audio, fw64AssetDatabase* asset_database, fw64AssetId asset_id) {
+    // load the music bank header which contains sequence info and also the asset ID of the sound bank
+    int handle = fw64_filesystem_open(asset_id);
 
+    if (handle < 0)
+        return 0;
+
+    fw64MusicHeader music_header;
+    fw64_filesystem_read(&music_header, sizeof(fw64MusicHeader), 1, handle);
+    fw64_filesystem_close(handle);
+
+    // get the rom address of the sequence file which contains the compressed midi files
+    uint32_t rom_address = fw64_n64_filesystem_get_rom_address(asset_id);
+    uint32_t seq_file_address = rom_address + sizeof(fw64MusicHeader);
+
+    // read the associated Sound bank headerfor the music
+    handle = fw64_filesystem_open(music_header.bank_asset_id);
+
+    if (handle < 0)
+        return 0;
+
+    fw64SoundbankHeader soundbank_header;
+    fw64_filesystem_read(&soundbank_header, sizeof(fw64SoundbankHeader), 1, handle);
+    fw64_filesystem_close(handle);
+
+    // calculate the offsets for the ctrl & table file which hold the MIDI note / sample data
+    rom_address = fw64_n64_filesystem_get_rom_address(music_header.bank_asset_id);
+    uint32_t ctrl_file_address = rom_address + sizeof(fw64SoundbankHeader);
+    uint32_t tbl_file_address = ctrl_file_address + soundbank_header.ctrl_file_size;
+
+    fw64MusicBank* music_bank = &audio->music_bank;
+    music_bank->track_count = music_header.track_count;
+    music_bank->seq_file_address = seq_file_address;
+
+    music_bank->ctrl_file_address = ctrl_file_address;
+    music_bank->ctrl_file_size = soundbank_header.ctrl_file_size;
+    music_bank->tbl_file_address = tbl_file_address;
+
+    fw64_audio_stop_music(audio);
     nuAuSeqPlayerBankSet((u8*)music_bank->ctrl_file_address, music_bank->ctrl_file_size, (u8*)music_bank->tbl_file_address);
     nuAuSeqPlayerSeqSet((u8*)music_bank->seq_file_address);
+}
 
-    audio->music_bank = music_bank;
+void fw64_audio_unload_musicbank(fw64Audio* audio) {
+    fw64_audio_stop_music(audio);
+    audio->music_bank.track_count = 0;
 }
 
 int fw64_audio_play_music(fw64Audio* audio, uint32_t track_num) {
@@ -106,10 +181,7 @@ fw64AudioStatus fw64_audio_get_music_status(fw64Audio* audio) {
 }
 
 int fw64_audio_music_track_count(fw64Audio* audio) {
-    if (audio->music_bank)
-        return audio->music_bank->track_count;
-    else
-        return 0;
+    return audio->music_bank.track_count;
 }
 
 float fw64_audio_get_playback_speed(fw64Audio* audio) {

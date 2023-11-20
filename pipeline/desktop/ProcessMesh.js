@@ -1,23 +1,32 @@
-const path = require("path");
-const fse = require("fs-extra");
-
+const MaterialBundle = require("../MaterialBundle");
 const GLTFLoader = require("../n64/GLTFLoader");
+const MeshWriter = require("./MeshWriter");
 
-async function processMesh(mesh, bundle, manifestDirectory, outputDirectory, plugins) {
-    const srcPath = path.join(manifestDirectory, mesh.src);
-    const meshName = mesh.hasOwnProperty("name") ? mesh.name : path.basename(mesh.src, path.extname(mesh.src));
+const path = require("path");
 
-    // temporary until desktop asset rework
-    const gltfDirName = path.dirname(mesh.src);
-    const gltfSrcDir = path.join(manifestDirectory, gltfDirName);
-    const gltfDestDir = path.join(outputDirectory, gltfDirName);
-    fse.copySync(gltfSrcDir, gltfDestDir);
-
+async function processMesh(meshJson, bundle, manifestDirectory, outputDirectory, plugins) {
+    const srcPath = path.join(manifestDirectory, meshJson.src);
     const gltfLoader = new GLTFLoader();
-    await gltfLoader.loadStaticMesh(srcPath);
-    plugins.meshParsed(mesh, gltfLoader);
+    await gltfLoader.loadFile(srcPath);
+
+    if (!gltfLoader.gltf.meshes || gltfLoader.gltf.meshes.length === 0) {
+        throw new Error(`glTF File: ${gltfPath} contains no meshes`);
+    }
+
+    const staticMesh = gltfLoader.meshes[0];
+    const meshName = !!meshJson.name ? meshJson.name : path.basename(meshJson.src, path.extname(meshJson.src));
+    staticMesh.name = meshName;
+
+    staticMesh.materialBundle = new MaterialBundle(gltfLoader);
+    staticMesh.materialBundle.bundleMeshMaterials(0);
+
+    plugins.meshParsed(staticMesh, gltfLoader);
     
-    bundle.addMesh(meshName, mesh.src);
+    const assetFileName = staticMesh.name + ".mesh";
+    const destPath = path.join(outputDirectory, assetFileName);
+    await MeshWriter.writeStaticMesh(staticMesh, destPath);
+    
+    bundle.addMesh(meshName, assetFileName);
 }
 
 module.exports = processMesh;

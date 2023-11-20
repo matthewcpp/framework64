@@ -32,7 +32,7 @@ struct fw64Image {
 
 
 public:
-    static fw64Image* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
+    static fw64Image* loadFromDatasource(fw64DataSource* data_source, fw64Allocator* allocator);
 
     /** Load image file into OpenGL */
     static fw64Image* loadImageFile(std::string const& path, bool isIndexMode);

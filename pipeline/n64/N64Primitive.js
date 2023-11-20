@@ -8,12 +8,18 @@ class N64Primitive {
 
     static NoMaterial = 0xFFFF;
     static NoJoint = 0xFFFF;
+    static InvalidMaterialIndex = -1;
 
     vertices = [];
     jointIndices = null;
     elements = [];
+
+    /// This should be renamed to primitive mode
     elementType;
+
+    /** index of the material for this primitive */
     material = 0;
+    hasPositions = false;
     hasNormals = false;
     hasVertexColors = false;
     hasTexCoords = false;

@@ -25,22 +25,18 @@ int Filesystem::open(int asset_index) {
     if (file_handle_index < 0)
         return file_handle_index;
 
-    sqlite3_reset(database.select_raw_file_statement);
-    sqlite3_bind_int(database.select_raw_file_statement, 1, asset_index);
-
-    if(sqlite3_step(database.select_raw_file_statement) != SQLITE_ROW)
+    auto asset_path = instance->database.getAssetPath(asset_index);
+    if (asset_path.empty()) {
         return FW64_FILESYSTEM_INVALID_HANDLE;
+    }
 
-    std::string asset_path = reinterpret_cast<const char *>(sqlite3_column_text(database.select_raw_file_statement, 0));
-    std::string full_path = base_path + asset_path;
-
-    file_handles[file_handle_index].open(full_path.c_str(), std::ios::binary);
+    file_handles[file_handle_index].open(asset_path.c_str(), std::ios::binary);
 
     if (!file_handles[file_handle_index].good()) {
         return FW64_FILESYSTEM_MISSING;
     }
 
-    file_sizes[file_handle_index] = sqlite3_column_int(database.select_raw_file_statement, 1);
+    file_sizes[file_handle_index] = std::filesystem::file_size(asset_path);
 
     return file_handle_index;
 }

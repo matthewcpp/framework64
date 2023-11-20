@@ -4,4 +4,4 @@ set(src_files
 create_game(
     TARGET character_animation
     SOURCES ${src_files}
-    EXTRA_LIBS example_common)
+    EXTRA_LIBS fw64_components)

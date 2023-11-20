@@ -1,38 +1,52 @@
 const path = require("path");
-const GLTFLoader = require("./GLTFLoader");
-const MeshWriter = require("./N64MeshWriter");
 
-const Animation = require("../Animation");
+const AnimationParser = require("../animation/Parser");
+const GLTFLoader = require("../n64/GLTFLoader");
+const MaterialBundle = require("../MaterialBundle");
+const SkinnedMeshWriter = require("./SkinnedMeshWriter");
 const Util = require("../Util");
 
-async function processSkinnedMesh(skinnedMesh, archive, baseDirectory, outputDirectory, includeDirectory, plugins) {
-    const sourceFile = path.join(baseDirectory, skinnedMesh.src);
+async function processSkinnedMesh(skinnedMesh, archive, manifestDirectory, outputDirectory, includeDirectory, plugins) {
+    const srcPath = path.join(manifestDirectory, skinnedMesh.src);
+
     const gltfLoader = new GLTFLoader();
+    await gltfLoader.loadFile(srcPath);
 
-    let animationOnly = skinnedMesh.hasOwnProperty("animationOnly") ? skinnedMesh.animationOnly : false;
+    if (gltfLoader.meshes.length === 0) {
+        throw new Error(`glTF File: ${srcPath} contains no meshes`);
+    }
 
-    const meshName = skinnedMesh.hasOwnProperty("name") ? skinnedMesh.name : path.basename(sourceFile, ".gltf");
-    const mesh = await gltfLoader.loadStaticMesh(sourceFile);
-    mesh.name = meshName; // not totally ideal
-
-    const parser = new Animation.Parser();
+    const parser = new AnimationParser();
     const animationData = parser.parse(gltfLoader.gltf, gltfLoader.loadedBuffers.get(0), skinnedMesh);
 
+    const meshName = Util.safeDefineName(
+        Object.hasOwn(skinnedMesh, "name") ? 
+        skinnedMesh.name : 
+        path.basename(skinnedMesh.src, path.extname(skinnedMesh.src)));
+
+    const mesh = gltfLoader.meshes[0];
+    mesh.name = meshName;
     mesh.splitPrimitivesForSkinning();
     mesh.remapJointIndices(animationData.jointIdMap);
+    mesh.materialBundle = new MaterialBundle(gltfLoader);
+    mesh.materialBundle.bundleMeshMaterials(0);
 
     plugins.skinnedMeshParsed(skinnedMesh, gltfLoader, animationData);
 
-    if (!animationOnly) {
-        await MeshWriter.writeStaticMesh(mesh, outputDirectory, archive);
+    const animationOnly = Object.hasOwn(skinnedMesh, "animationOnly") ? skinnedMesh.animationOnly : false;
+    const includeFilePath = path.join(includeDirectory, meshName + "_animation.h");
+
+    if (animationOnly) {
+        const destFilePath = path.join(outputDirectory, meshName + ".animation");
+        SkinnedMeshWriter.writeAimationData(animationData, meshName, destFilePath, includeFilePath);
+        bundle.addAnimationData(meshName, destFilePath);
+        await archive.add(destFilePath, "animation");
     }
-
-    const writer = new Animation.Writer();
-    writer.writeBigEndian(meshName, animationData, outputDirectory, includeDirectory);
-
-    const safeName = Util.safeDefineName(meshName);
-    const destPath = path.join(outputDirectory, safeName + ".animation");
-    await archive.add(destPath, "animation_data");
+    else {
+        const destFilePath = path.join(outputDirectory, meshName + ".skinnedmesh");
+        await SkinnedMeshWriter.write(mesh, animationData, destFilePath, includeFilePath);
+        await archive.add(destFilePath, "skinnedmesh");
+    }
 }
 
 module.exports = processSkinnedMesh;

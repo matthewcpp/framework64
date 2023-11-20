@@ -21,7 +21,7 @@ function _initOptions(sourceFile, params) {
 
 async function processFontFile(manifestDirectory, outputDir, fontJson, archive) {
     if (!fontJson.size) {
-        throw new Error("Font elements must have a size specified.");
+        throw new Error("Font elements must have specify a size > 0.");
     }
 
     const sourceFile = path.join(manifestDirectory, fontJson.src);
@@ -47,7 +47,7 @@ async function processImageFont(manifestDirectory, outputDir, fontJson, archive)
         throw new Error("image fonts must specify a sourceString");
     }
 
-    const imageInfo = await processImage(manifestDirectory, null, fontJson.image, null);
+    const imageInfo = await processImage(fontJson.image, null, manifestDirectory, null);
 
     const frameCount = imageInfo.hslices * imageInfo.vslices;
     if (frameCount !== fontJson.sourceString.length) {

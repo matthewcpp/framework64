@@ -1,16 +1,11 @@
-const N64Image = require("./N64Image");
 const N64Material = require("./N64Material");
 const N64Mesh = require("./N64Mesh");
 const N64Node = require("./N64Node");
-const N64MeshResources = require("./N64MeshResources");
 const N64Primitive = require("./N64Primitive");
 const N64Texture = require("./N64Texture");
 const N64Scene = require("./N64Scene")
 const Util = require("../Util")
-
-const processImage = require("./ProcessImage");
-
-const glMatrix = require("gl-matrix");
+const GLTFVertexIndex = require("../GLTFVertexIndex")
 
 const fs = require("fs");
 const path = require("path");
@@ -29,16 +24,19 @@ class GLTFLoader {
     loadedBuffers = new Map();
     gltfPath = null;
     gltf = null;
-    mesh = null;
-    resources = null;
+
+    /** This holds the _parsed_ JSON data from the accompanying images.json file */
     imagesJson = null;
 
-    // these maps provide a way to convert from the GLTF file level indices to the currently loaded mesh's indices
-    imageMap = new Map();
-    textureMap = new Map();
-    materialMap = new Map();
-    meshMap = new Map();
-    collisionMeshMap = new Map();
+    images = [];
+    textures = [];
+    materials = [];
+    meshes = [];
+
+    static SupportedPrimitiveModes = new Set(Object.values(N64Primitive.ElementType));
+
+    static InvalidIndex = -1;
+    defaultMaterialIndex = GLTFLoader.InvalidIndex;
 
     static InvalidNodeIndex = -1;
 
@@ -50,433 +48,183 @@ class GLTFLoader {
     /** This holds the index of the current mesh collider node that is being parsed. i.e. scene node / Colliders / <this node> */
     _meshColliderNodeIndex = GLTFLoader.InvalidNodeIndex;
 
-    /** Loads the first mesh found in the 'meshes' array of a GLTF File. */
-    async loadStaticMesh(gltfPath) {
-        this._loadFile(gltfPath);
-
-        if (!this.gltf.meshes || this.gltf.meshes.length === 0) {
-            throw new Error(`GLTF File: ${gltfPath} contains no meshes`);
-        }
-
-        const modelName = path.basename(gltfPath, ".gltf");
-        this.mesh = new N64Mesh(modelName);
-        this.mesh.resources = this.resources;
-        await this._loadMesh(this.gltf.meshes[0]);
-
-        return this.mesh;
-    }
-
-    _resetMaps() {
-        this.resources = new N64MeshResources();
-        this.loadedBuffers.clear();
-        this.imageMap.clear();
-        this.textureMap.clear();
-        this.materialMap.clear();
-        this.meshMap.clear();
-        this.collisionMeshMap.clear();
-    }
-
-    async loadLevel(gltfPath, layerMap) {
-        this._loadFile(gltfPath);
-
-        const rootNode = this.gltf.scenes[this.gltf.scene];
-
-        const scenes = [];
-
-        for (const sceneIndex of rootNode.nodes) {
-            const scene = await this._parseScene(sceneIndex, layerMap);
-            if (scene)
-                scenes.push(scene);
-        }
-
-        return scenes;
-    }
-
-    _extractNodeTransform(gltfNode, node) {
-        if (gltfNode.translation)
-            node.position = gltfNode.translation.slice();
-
-        if (gltfNode.rotation)
-            node.rotation = gltfNode.rotation.slice();
-
-        if (gltfNode.scale)
-            node.scale = gltfNode.scale.slice();
-    }
-
-    /** Precondition: node has its trasnform values set and gltfNode has children  */
-    _getCustomBoundingBoxForNode(scene, gltfNode, node) {
-        for (const childIndex of gltfNode.children) {
-            const childNode = this.gltf.nodes[childIndex];
-
-            if (childNode.name.indexOf("Box") === -1)
-                continue;
-
-            const parentInvScale = node.scale.map(v => v != 0 ? 1.0 / v : 0);
-            const localScale = childNode.scale.slice();
-
-            const center = childNode.hasOwnProperty("translation") ? childNode.translation.slice() : [0.0, 0.0, 0.0];
-            const extents = [0.0, 0.0, 0.0];
-            for (let i = 0; i < 3; i++)
-                extents[i] = (parentInvScale[i] * localScale[i]);
-            
-            const box = new Bounding();
-            box.setFromCenterAndExtents(center, extents);
-
-            const boundingBoxIndex = scene.customBoundingBoxes.length;
-            scene.customBoundingBoxes.push(box);
-            node.collider = N64Node.ColliderType.Box | (boundingBoxIndex << 16)
-
-            break;
-        }
-    }
-
-    _nodeMeshIsIgnored(gltfNode) {
-        if ((!!gltfNode.extras) && (!!gltfNode.extras.mesh)) {
-            if (gltfNode.extras.mesh === "ignore")
-                return true;
-        }
-        
-        return false;
-    }
-
-    async _setNodeMesh(scene, gltfNode, node) {
-        // if the mesh is ignored just set an empty collider
-        if (this._nodeMeshIsIgnored(gltfNode)) {
-            node.collider = N64Node.ColliderType.None;
-            return;
-        }
-
-        // if we already loaded this mesh then grab the index of it in the scene mesh array
-        if (this.meshMap.has(gltfNode.mesh)) {
-            node.mesh = this.meshMap.get(gltfNode.mesh);
-        }
-        else { // load mesh we haven't seen before
-            this.mesh = new N64Mesh(gltfNode.name);
-            await this._loadMesh(this.gltf.meshes[gltfNode.mesh]);
-            node.mesh = scene.meshes.length;
-            scene.meshes.push(this.mesh);
-            this.meshMap.set(gltfNode.mesh, node.mesh);
-        }
-
-        if (node.collider === N64Node.NoCollider)
-            node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
-    }
-
-    async _parseScene(sceneRootNodeIndex, layerMap) {
-        this._resetMaps();
-        this._parseSceneNode(sceneRootNodeIndex);
-
-        // the passed in `sceneRootNodeIndex` was not a valid scene root
-        if (this._sceneNodeIndex === GLTFLoader.InvalidNodeIndex)
-            return null;
-
-        const rootNode = this.gltf.nodes[sceneRootNodeIndex];
-        const sceneNode = this.gltf.nodes[this._sceneNodeIndex];
-
-        const scene = new N64Scene();
-        scene.name = Util.safeDefineName(rootNode.name.toLowerCase());
-        scene.meshResources = this.resources;
-        scene.rootNode = rootNode;
-
-        if (!sceneNode.children) // empty scene
-            return scene;
-
-        for (const child_index of sceneNode.children) {
-            const gltfNode = this.gltf.nodes[child_index];
-            const node = new N64Node();
-
-            const hasMesh = !!gltfNode.mesh;
-
-            this._extractNodeTransform(gltfNode, node);
-
-            if (gltfNode.hasOwnProperty("children")) {
-                this._getCustomBoundingBoxForNode(scene, gltfNode, node);
-            }
-
-            if (hasMesh) {
-                await this._setNodeMesh(scene, gltfNode, node);
-            }
-
-            if (gltfNode.hasOwnProperty("extras")) {
-                if (gltfNode.extras.hasOwnProperty("layers")) {
-                    const layerNames = gltfNode.extras.layers.split(' ');
-                    let layerMask = 0;
-
-                    for (const layerName of layerNames) {
-                        if (!layerMap.has(layerName))
-                            throw new Error(`Node ${gltfNode.name}: No layer map value found for layer: ${layerName}`);
-
-                        layerMask |= layerMap.get(layerName);
-                    }
-
-                    node.layerMask = layerMask;
-                }
-
-                if (gltfNode.extras.data) {
-                    const dataValue = parseInt(gltfNode.extras.data);
-                    
-                    if (isNaN(dataValue)) {
-                        throw new Error(`Unable to parse data value for node: ${node.name}`);
-                    }
-
-                    node.data = dataValue;
-                }
-
-                if (gltfNode.extras.hasOwnProperty("collider")) {
-                    const colliderName = gltfNode.extras.collider;
-
-                    if (colliderName === "none") {
-                        node.collider = N64Node.NoCollider;
-                    }
-                    else {
-                        let meshColliderIndex;
-
-                        if (this.collisionMeshMap.has(colliderName)) {
-                            meshColliderIndex = this.collisionMeshMap.get(colliderName);
-                        }
-                        else {
-                            meshColliderIndex = scene.collisionMeshes.length;
-                            await this._parseCollisionMap(colliderName);
-                            scene.collisionMeshes.push(this.mesh);
-                            this.collisionMeshMap.set(colliderName, meshColliderIndex);
-                        }
-    
-                        node.collider = N64Node.ColliderType.Mesh | (meshColliderIndex << 16);
-                    }
-                }
-            }
-
-            if (node.collider != N64Node.NoCollider) {
-                scene.colliderCount += 1;
-            }
-
-            scene.nodes.push(node);
-        }
-
-        return scene;
-    }
-
-    async _parseCollisionMap(name) {
-        if (this._meshColliderNodeIndex === -1)
-            throw new Error("No collision mesh root node present in scene.");
-
-        const collisionMeshParentNode = this.gltf.nodes[this._meshColliderNodeIndex];
-        let collisionMeshIndex = -1;
-
-        for (const child of collisionMeshParentNode.children) {
-            const node = this.gltf.nodes[child];
-
-            if (node.name !== name)
-                continue;
-
-            if (node.hasOwnProperty("mesh"))
-                collisionMeshIndex = node.mesh;
-        }
-
-        if (collisionMeshIndex === -1)
-            throw new Error(`Unable to locate collision mesh with name: ${name}`)
-
-        this.mesh = new N64Mesh(name);
-        await this._loadMesh(this.gltf.meshes[collisionMeshIndex]);
-    }
-
-    /** Parses the scene node from the glTF JSON to determine the root nodes for the scene and mesh colliders. */
-    _parseSceneNode(sceneIndex) {
-        this._sceneNodeIndex = GLTFLoader.InvalidNodeIndex;
-        this._meshColliderNodeIndex = GLTFLoader.InvalidNodeIndex;
-
-        const sceneNode = this.gltf.nodes[sceneIndex];
-
-        if (!sceneNode.children)
-            return;
-
-        for (const nodeIndex of sceneNode.children) {
-            const node = this.gltf.nodes[nodeIndex];
-
-            if (!node.hasOwnProperty("name"))
-                continue;
-
-            if (node.name.startsWith("Scene")) {
-                this._sceneNodeIndex = nodeIndex;
-            }
-
-            if (node.name.startsWith("Colliders")) {
-                this._meshColliderNodeIndex = nodeIndex;
-            }
-        }
-    }
-
-    _loadFile(gltfPath) {
+    loadFile(gltfPath) {
         this.gltfPath = gltfPath;
         this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
 
-        this._resetMaps();
+        this._reset();
 
         const imageJsonPath = path.join(path.dirname(gltfPath), "images.json");
         if (fs.existsSync(imageJsonPath))
             this.imagesJson = JSON.parse(fs.readFileSync(imageJsonPath, {encoding: "utf8"}));
         else
             this.imagesJson = [];
+
+        this._parseImages();
+        this._parseTextures();
+        this._parseMaterials();
+        this._parseMeshes();
     }
 
-    async _loadMesh(gltfMesh) {
-        const supportedPrimitiveModes = new Set(Object.values(N64Primitive.ElementType));
+    _reset() {
+        if (this.gltfPath === null)
+            return;
 
-        for (const gltfPrimitive of gltfMesh.primitives) {
-            // only support triangles for now
-            const mode = gltfPrimitive.hasOwnProperty("mode") ? gltfPrimitive.mode : N64Primitive.ElementType.Triangles;
+        this.images = [];
+        this.textures = [];
+        this.materials = [];
+        this.meshes = [];
+    }
 
-            if (!supportedPrimitiveModes.has(mode)) {
-                console.log(`Skipping primitive with mode: ${mode}`);
-                continue;
+    _parseImages() {
+        if (!this.gltf.images)
+            return;
+
+        for (const gltfImage of this.gltf.images) {
+            const imageIndex = this.images.length;
+            const imageURI = decodeURI(gltfImage.uri);
+
+            // check if there is a specific configuration for this image
+            let imageInfo = this.imagesJson.find(i => i.src === imageURI);
+            if (!imageInfo) {
+                imageInfo = {
+                    src: imageURI,
+                    hslices: 1,
+                    vslices: 1,
+                    format: "RGBA16"
+                }
             }
 
-            const primitive = new N64Primitive(mode);
-            this.mesh.primitives.push(primitive);
+            this.images.push(imageInfo);
+        }
+    }
 
-            primitive.material = await this._getMaterial(gltfPrimitive.hasOwnProperty("material") ? gltfPrimitive.material : -1);
+    _parseTextures() {
+        if (!this.gltf.textures)
+            return;
 
-            this._readPositions(gltfPrimitive, primitive);
+        for (const gltfTexture of this.gltf.textures) {
+            const texture = new N64Texture(gltfTexture.source);
+            // TODO: Get sampler info (repeat, etc)
 
-            if (gltfPrimitive.attributes.COLOR_0) {
-                this._readVertexColors(gltfPrimitive, primitive);
+            this.textures.push(texture);
+        }
+    }
+
+    _parseMaterials() {
+        if (!this.gltf.materials)
+            return;
+
+        for (const gltfMaterial of this.gltf.materials) {
+            const material = new N64Material();
+
+            const pbr = gltfMaterial.pbrMetallicRoughness;
+
+            if (pbr.baseColorFactor) {
+                material.setColorFromFloatArray(pbr.baseColorFactor);
             }
-            else if (gltfPrimitive.attributes.NORMAL) {
-                this._readNormals(gltfPrimitive, primitive);
+
+            if (pbr.baseColorTexture) {
+                material.texture = pbr.baseColorTexture.index;
             }
 
-            if (gltfPrimitive.attributes.TEXCOORD_0)
-                this._readTexCoords(gltfPrimitive, primitive, gltfMesh.name);
+            // Applies a specific shading mode to this material.  In this case mode will not be determined later.
+            if (gltfMaterial.extras && gltfMaterial.extras.shadingMode) {
+                const extras = gltfMaterial.extras;
 
-            if (gltfPrimitive.attributes.JOINTS_0)
-                this._readJointIndices(gltfPrimitive, primitive);
+                if (extras.shadingMode) {
+                    if (N64Material.ShadingMode.hasOwnProperty(gltfMaterial.extras.shadingMode)) {
+                        material.shadingMode = N64Material.ShadingMode[gltfMaterial.extras.shadingMode];
+                    }
+                    else {
+                        throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${gltfMaterial.extras.shadingMode}`);
+                    }
+                }
 
-            this._readIndices(gltfPrimitive, primitive);
-
-            const material = this.resources.materials[primitive.material];
-            if (material.shadingMode === N64Material.ShadingMode.Unset) {
-                material.shadingMode = this._determineShadingMode(primitive, material);
+                if (extras.baseColorFactor) {
+                    material.setColorFromFloatArray(extras.baseColorFactor);
+                }
             }
+
+            this.materials.push(material);
+        }
+    }
+
+    _parseMeshes() {
+        if (!this.gltf.meshes)
+            return;
+
+        for (const gltfMesh of this.gltf.meshes) {
+            const mesh = new N64Mesh(gltfMesh.name);
+
+            for (const gltfPrimitive of gltfMesh.primitives) {
+
+                const mode = ("mode" in gltfPrimitive) ? gltfPrimitive.mode : N64Primitive.ElementType.Triangles;
+    
+                if (!GLTFLoader.SupportedPrimitiveModes.has(mode)) {
+                    console.log(`Skipping primitive with mode: ${mode}`);
+                    continue;
+                }
+    
+                const primitive = new N64Primitive(mode);
+                mesh.primitives.push(primitive);
+    
+                primitive.material = ("material" in gltfPrimitive) ? gltfPrimitive.material : this._getDefaultMaterialIndex();
+    
+                this._readPositions(gltfPrimitive, primitive);
+    
+                if (gltfPrimitive.attributes.COLOR_0) {
+                    this._readVertexColors(gltfPrimitive, primitive);
+                }
+                else if (gltfPrimitive.attributes.NORMAL) {
+                    this._readNormals(gltfPrimitive, primitive);
+                }
+    
+                if (gltfPrimitive.attributes.TEXCOORD_0)
+                    this._readTexCoords(gltfPrimitive, primitive, gltfMesh.name);
+    
+                if (gltfPrimitive.attributes.JOINTS_0)
+                    this._readJointIndices(gltfPrimitive, primitive);
+    
+                this._readIndices(gltfPrimitive, primitive);
+    
+                const material = this.materials[primitive.material];
+                if (material.shadingMode === N64Material.ShadingMode.Unset) {
+                    material.shadingMode = this._determineShadingMode(primitive, material);
+                }
+            }
+    
+            mesh.prunePrimitiveVertices();
+            this.meshes.push(mesh);
+        }
+    }
+
+    /** Precondition: This method should only be called after all materials have been parsed. */
+    _getDefaultMaterialIndex() {
+        if (this.defaultMaterialIndex == GLTFLoader.InvalidIndex) {
+            this.defaultMaterialIndex = this.materials.length;
+            this.materials.push(new N64Material(this.defaultMaterialIndex));
         }
 
-        this.mesh.prunePrimitiveVertices();
+        return this.defaultMaterialIndex;
     }
 
     _determineShadingMode(primitive, material) {
         if (primitive.hasVertexColors) {
-            if (material.hasTexture)
+            if (material.hasTexture())
                 return N64Material.ShadingMode.VertexColorsTextured;
             else
                 return N64Material.ShadingMode.VertexColors;
         }
 
         if (primitive.hasNormals) {
-            if (material.hasTexture)
+            if (material.hasTexture())
                 return N64Material.ShadingMode.GouraudTextured;
             else
                 return N64Material.ShadingMode.Gouraud;
         }
 
         throw new Error("Could not determine shading mode for primitive");
-    }
-
-    /** Gets the correct index for the GLTF material.  I
-     * If a negative index is passed in, a default material will be used. **/
-    async _getMaterial(index) {
-        if (index < 0) {
-            const materialIndex = this.resources.materials.length;
-            this.resources.materials.push(new N64Material());
-            return materialIndex;
-        }
-
-        // we have already parsed this material
-        if (this.materialMap.has(index)) {
-            return this.materialMap.get(index);
-        }
-
-        // new material
-        const materialIndex = this.resources.materials.length;
-        const material = new N64Material();
-
-        const gltfMaterial = this.gltf.materials[index];
-        const pbr = gltfMaterial.pbrMetallicRoughness;
-
-        if (pbr.baseColorFactor) {
-            const baseColor = pbr.baseColorFactor;
-            material.color[0] = Math.round(baseColor[0] * 255);
-            material.color[1] = Math.round(baseColor[1] * 255);
-            material.color[2] = Math.round(baseColor[2] * 255);
-            material.color[3] = Math.round(baseColor[3] * 255);
-        }
-
-        if (pbr.baseColorTexture) {
-            material.texture = await this._getTexture(pbr.baseColorTexture.index);
-        }
-
-        // Applies a specific shading mode to this material.  In this case mode will not be determined later.
-        if (gltfMaterial.extras && gltfMaterial.extras.shadingMode) {
-            if (N64Material.ShadingMode.hasOwnProperty(gltfMaterial.extras.shadingMode)) {
-                material.shadingMode = N64Material.ShadingMode[gltfMaterial.extras.shadingMode];
-            }
-            else {
-                throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${gltfMaterial.extras.shadingMode}`);
-            }
-        }
-
-        this.resources.materials.push(material)
-        this.materialMap.set(index, materialIndex);
-
-        return materialIndex;
-    }
-
-    async _getImage(gltfIndex) {
-        if (this.imageMap.has(gltfIndex)) {
-            return this.imageMap.get(gltfIndex);
-        }
-
-        const imageIndex = this.resources.images.length;
-        const gltfDir = path.dirname(this.gltfPath);
-        const gltfImage = this.gltf.images[gltfIndex];
-        const imageURI = decodeURI(gltfImage.uri);
-
-        // check if there is a specific configuration for this image
-        let imageInfo = this.imagesJson.find(i => i.src === imageURI);
-        if (!imageInfo) {
-            imageInfo = {
-                src: imageURI,
-                hslices: 1,
-                vslices: 1,
-                format: "RGBA16"
-            }
-        }
-
-        const image = await processImage(gltfDir, null, imageInfo, null);
-
-        this.resources.images.push(image);
-        this.imageMap.set(gltfIndex, imageIndex);
-
-        return imageIndex;
-    }
-
-    async _getTexture(gltfIndex) {
-        if (this.textureMap.has(gltfIndex)) {
-            return this.textureMap.get(gltfIndex);
-        }
-
-        const textureIndex = this.resources.textures.length;
-        const gltfTexture = this.gltf.textures[gltfIndex];
-
-        const sourceImage = await this._getImage(gltfTexture.source);
-        const texture = new N64Texture(sourceImage);
-        this.resources.textures.push(texture);
-
-        // TODO: Get sampler info (repeat, etc)
-        const image = this.resources.images[sourceImage];
-        texture.maskS = Math.log2(image.width);
-        texture.maskT = Math.log2(image.height);
-
-        this.textureMap.set(gltfIndex, textureIndex);
-        return textureIndex;
     }
 
     _getBuffer(bufferIndex) {
@@ -522,6 +270,8 @@ class GLTFLoader {
             primitive.vertices.push(vertex);
             primitive.bounding.encapsulatePoint(position);
             offset += byteStride;
+
+            primitive.hasPositions = true;
         }
     }
 
@@ -603,24 +353,22 @@ class GLTFLoader {
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
         let offset = bufferView.byteOffset;
 
+        // TODO: does this need to be extended to handle 4 component vectors?
         let parseVertexColor = null;
         if (accessor.componentType === GltfComponentType.Float){
             parseVertexColor = (vertex, buffer, offset) => {
-                vertex[6] = Math.round(buffer.readFloatLE(offset) * 255);
-                vertex[7] = Math.round(buffer.readFloatLE(offset + 4) * 255);
-                vertex[8] = Math.round(buffer.readFloatLE(offset + 8) * 255);
-                vertex[9] = 255;
+                vertex[GLTFVertexIndex.ColorR] = buffer.readFloatLE(offset);
+                vertex[GLTFVertexIndex.ColorG] = buffer.readFloatLE(offset + 4);
+                vertex[GLTFVertexIndex.ColorB] = buffer.readFloatLE(offset + 8);
+                vertex[GLTFVertexIndex.ColorA] = 1.0;
             };
         }
         else if (accessor.componentType === GltfComponentType.UnsignedShort) { // these values need to be normalized to 0 - 255
             parseVertexColor = (vertex, buffer, offset) => {
-                let r = buffer.readUInt16LE(offset);
-                let g = buffer.readUInt16LE(offset + 2);
-                let b = buffer.readUInt16LE(offset + 4);
-                vertex[6] = Math.round( (r / 65535.0) * 255);
-                vertex[7] = Math.round( (g / 65535.0) * 255);
-                vertex[8] = Math.round( (b / 65535.0) * 255);
-                vertex[9] = 255;
+                vertex[GLTFVertexIndex.ColorR] = buffer.readUInt16LE(offset) / 65535.0;
+                vertex[GLTFVertexIndex.ColorG] = buffer.readUInt16LE(offset + 2) / 65535.0;
+                vertex[GLTFVertexIndex.ColorB] = buffer.readUInt16LE(offset + 4) / 65535.0;
+                vertex[GLTFVertexIndex.ColorA] = 1.0;
             };
         }
         else {
@@ -646,11 +394,10 @@ class GLTFLoader {
         for (let i = 0; i < accessor.count; i++) {
             const vertex = primitive.vertices[i];
 
-            // the normals are treated as 8-bit signed values (-128 to 127).
-            vertex[6] = Math.min(Math.round(buffer.readFloatLE(offset) * 128), 127);
-            vertex[7] = Math.min(Math.round(buffer.readFloatLE(offset + 4) * 128), 127);
-            vertex[8] = Math.min(Math.round(buffer.readFloatLE(offset + 8) * 128), 127);
-            vertex[9] = 255
+            vertex[6] = buffer.readFloatLE(offset);
+            vertex[7] = buffer.readFloatLE(offset + 4);
+            vertex[8] = buffer.readFloatLE(offset + 8);
+            vertex[9] = 1.0
 
             offset += byteStride;
         }
@@ -658,28 +405,10 @@ class GLTFLoader {
         primitive.hasNormals = true;
     }
 
-    // ensure that the tex coord value will sit in a signed 16 bit integer
-    static _validateTexCoord(val) {
-        return val >= -32768 && val <= 32767;
-    }
-
     _readTexCoords(gltfPrimitive, primitive, meshName) {
         const accessor = this.gltf.accessors[gltfPrimitive.attributes.TEXCOORD_0];
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
-
-        const material = this.resources.materials[this.materialMap.get(gltfPrimitive.material)];
-
-        if (material.texture === N64Material.NoTexture) {
-            return;
-        }
-
-        const texture = this.resources.textures[material.texture];
-        const image = this.resources.images[texture.image];
-
-        if (!Util.isPowerOf2(image.width) || !Util.isPowerOf2(image.height)) {
-            throw new Error(`image: ${image.name} has non power of 2 dimensions: ${image.width}x${image.height}`);
-        }
 
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
 
@@ -687,19 +416,8 @@ class GLTFLoader {
         for (let i = 0; i < accessor.count; i++) {
             const vertex = primitive.vertices[i];
 
-            let s = buffer.readFloatLE(offset);
-            let t = buffer.readFloatLE(offset + 4);
-
-            s *= image.width * 2;
-            t *= image.height * 2;
-
-            // Note that the texture coordinates (s,t) are encoded in S10.5 format.
-            vertex[4] = Math.round(s * (1 << 5));
-            vertex[5] = Math.round(t * (1 << 5));
-
-            if (!GLTFLoader._validateTexCoord(vertex[4]) || !GLTFLoader._validateTexCoord(vertex[5])) {
-                throw new Error(`Mesh ${meshName}: Detected a tex coord value outside of S10.5 format range.  Check model source data.`);
-            }
+            vertex[4] = buffer.readFloatLE(offset);
+            vertex[5] = buffer.readFloatLE(offset + 4);
 
             offset += byteStride;
         }

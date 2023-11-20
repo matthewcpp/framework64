@@ -39,7 +39,7 @@ void box_invalidate(Box* box) {
     box->max.z = -FLT_MAX;
 }
 
-void box_encapsulate_point(Box* box, Vec3* pt) {
+void box_encapsulate_point(Box* box, const Vec3* pt) {
     if (pt->x < box->min.x)
          box->min.x = pt->x;
     if (pt->y < box->min.y)
@@ -55,7 +55,7 @@ void box_encapsulate_point(Box* box, Vec3* pt) {
         box->max.z = pt->z;
 }
 
-void box_encapsulate_box(Box* box, Box* to_encapsulate) {
+void box_encapsulate_box(Box* box, const Box* to_encapsulate) {
     box_encapsulate_point(box, &to_encapsulate->min);
     box_encapsulate_point(box, &to_encapsulate->max);
 }

@@ -2,7 +2,20 @@
     "configurations": [
         {
             "name": "N64",
-            "configurationProvider": "ms-vscode.cmake-tools"
+            "includePath": [
+                "/usr/include/n64",
+                "/usr/include/n64/nusys",
+                "/usr/include/n64/nustd",
+                "${workspaceFolder}/include/**",
+                "${workspaceFolder}/components",
+                "${workspaceFolder}/lib/libcart/include",
+                "${workspaceFolder}/lib/libcart/ff"
+            ],
+            "defines": [
+                "_LANGUAGE_C",
+                "PLATFORM_N64"
+            ],
+            "compileCommands": "${workspaceFolder}/build_n64/compile_commands.json"
         },
         {
             "name": "Desktop",

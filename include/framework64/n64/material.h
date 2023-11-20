@@ -7,6 +7,8 @@
 
 #include <stdint.h>
 
+#define FW64_MATERIAL_NO_TEXTURE UINT32_MAX
+
 struct fw64Material {
     fw64ColorRGBA8 color;
     fw64Texture* texture;

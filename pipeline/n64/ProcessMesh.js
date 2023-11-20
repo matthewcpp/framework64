@@ -1,16 +1,31 @@
 const GLTFLoader = require("./GLTFLoader");
-const MeshWriter = require("./N64MeshWriter")
+const MaterialBundle = require("../MaterialBundle");
+const MeshWriter = require("./N64MeshWriter");
 
 const path = require("path");
 
-async function processMesh(mesh, archive, baseDirectory, outputDirectory, plugins) {
-    const sourceFile = path.join(baseDirectory, mesh.src);
+async function processMesh(meshJson, archive, baseDirectory, outputDirectory, plugins) {
+    const sourceFile = path.join(baseDirectory, meshJson.src);
     const gltfLoader = new GLTFLoader();
-    const staticMesh = await gltfLoader.loadStaticMesh(sourceFile);
+    gltfLoader.loadFile(sourceFile);
 
-    plugins.meshParsed(mesh, gltfLoader);
+    if (!gltfLoader.gltf.meshes || gltfLoader.gltf.meshes.length === 0) {
+        throw new Error(`glTF File: ${gltfPath} contains no meshes`);
+    }
 
-    await MeshWriter.writeStaticMesh(staticMesh, outputDirectory, archive);
+    const staticMesh = gltfLoader.meshes[0];
+    const meshName = !!meshJson.name ? meshJson.name : path.basename(meshJson.src, path.extname(meshJson.src));
+    staticMesh.name = meshName;
+
+    staticMesh.materialBundle = new MaterialBundle(gltfLoader);
+    staticMesh.materialBundle.bundleMeshMaterials(0);
+
+    plugins.meshParsed(staticMesh, gltfLoader);
+
+    const destPath = path.join(outputDirectory, `${staticMesh.name}.mesh`);
+    await MeshWriter.writeStaticMesh(staticMesh, destPath);
+
+    await archive.add(destPath, "mesh");
 }
 
 module.exports = processMesh;

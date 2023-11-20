@@ -16,8 +16,7 @@ void fw64_node_update(fw64Node* node) {
 }
 
 static void setup_box_collider(fw64Node* node) {
-    Box box;
-    fw64_mesh_get_bounding_box(node->mesh, &box);
+    Box box = fw64_mesh_get_bounding_box(node->mesh);
     fw64_collider_set_type_box(node->collider, &box);
 }
 

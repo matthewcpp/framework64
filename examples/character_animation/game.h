@@ -5,7 +5,7 @@
 #include "framework64/engine.h"
 #include "framework64/node.h"
 
-#include "common/arcball_camera.h"
+#include "arcball_camera/arcball_camera.h"
 
 typedef struct {
     fw64Engine* engine;
@@ -15,8 +15,7 @@ typedef struct {
     fw64Texture* button_sprite;
 
     fw64Node node;
-    fw64Mesh* mesh;
-    fw64AnimationData* animation_data;
+    fw64SkinnedMesh* skinned_mesh;
     fw64AnimationController animation_state;
     int current_animation;
     float current_speed;

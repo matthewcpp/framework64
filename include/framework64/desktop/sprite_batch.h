@@ -4,7 +4,6 @@
 
 #include "framework64/desktop/font.h"
 #include "framework64/desktop/material.h"
-#include "framework64/desktop/pixel_texture.h"
 #include "framework64/desktop/shader_cache.h"
 #include "framework64/desktop/texture.h"
 #include "framework64/desktop/uniform_block.h"
@@ -20,6 +19,12 @@
 #include <vector>
 
 namespace framework64 {
+
+struct SpriteVertex {
+    float x, y, z;
+    float u, v;
+    float r, g, b, a;
+};
 
 class SpriteBatch {
 public:
@@ -37,8 +42,6 @@ public:
 
     void setFillColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
     void drawFilledRect(float x, float y, float width, float height);
-
-    void drawPixelTexture(PixelTexture& pixel_texture);
 
     void newFrame();
 

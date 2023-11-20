@@ -10,8 +10,12 @@ function rebuildPrimitives(sourcePrimitive, jointElementMap) {
 
         primitive.elementType = sourcePrimitive.elementType;
         primitive.material = sourcePrimitive.material;
+
+        primitive.hasPositions = sourcePrimitive.hasPositions;
         primitive.hasNormals = sourcePrimitive.hasNormals;
+        primitive.hasTexCoords = sourcePrimitive.hasTexCoords;
         primitive.hasVertexColors = sourcePrimitive.hasVertexColors;
+
         primitive.jointIndices = [];
 
         // add all the vertices for this joint to a new primitive

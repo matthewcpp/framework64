@@ -5,4 +5,4 @@ set(src_files
 create_game(
     TARGET split_screen
     SOURCES ${src_files}
-    EXTRA_LIBS example_common)
+    EXTRA_LIBS fw64_components)

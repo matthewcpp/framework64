@@ -27,15 +27,16 @@ static const char* shading_mode_text[] = {
 static void set_current_mesh(Game* game, int index);
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
 
     fw64_arcball_init(&game->arcball, engine->input);
 
-    game->meshes[ENTITY_N64_LOGO] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo, NULL);
-    game->meshes[ENTITY_CONTROLLER_CUBE] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_controller_cube, NULL);
-    game->meshes[ENTITY_SUZANNE] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_suzanne, NULL);
-    game->meshes[ENTITY_PENGUIN] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_penguin, NULL);
-    game->meshes[ENTITY_N64BREW_LOGO] = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_brew_logo, NULL);
+    game->meshes[ENTITY_N64_LOGO] = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_n64_logo, allocator);
+    game->meshes[ENTITY_CONTROLLER_CUBE] = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_controller_cube, allocator);
+    game->meshes[ENTITY_SUZANNE] = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_suzanne, allocator);
+    game->meshes[ENTITY_PENGUIN] = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_penguin, allocator);
+    game->meshes[ENTITY_N64BREW_LOGO] = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_n64_brew_logo, allocator);
     
 
     fw64_node_init(&game->node);
@@ -44,8 +45,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->arcball.camera.far = 1000.0f;
     fw64_camera_update_projection_matrix(&game->arcball.camera);
 
-    game->consolas = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
-    game->button_sprite = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
+    game->consolas = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
+    game->button_sprite = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
 
     IVec2 text_measurement = fw64_font_measure_text(game->consolas, SWITCH_MODEL_TEXT);
     game->switch_model_text_width = text_measurement.x;
@@ -57,12 +58,9 @@ static void set_current_mesh(Game* game, int index) {
     game->current_mesh = index;
 
     fw64Mesh* mesh = game->meshes[game->current_mesh];
+    Box bounding_box = fw64_mesh_get_bounding_box(mesh);
 
     fw64_node_set_mesh(&game->node, mesh);
-
-    Box bounding_box;
-    fw64_mesh_get_bounding_box(mesh, &bounding_box);
-
     fw64_arcball_set_initial(&game->arcball, &bounding_box);
 }
 
@@ -81,8 +79,7 @@ void game_update(Game* game) {
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
-    IVec2 screen_size;
-    fw64_renderer_get_screen_size(renderer, &screen_size);
+    IVec2 screen_size = fw64_renderer_get_screen_size(renderer);
 
     fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
 

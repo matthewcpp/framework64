@@ -1,6 +1,7 @@
 class WriteInterface {
     writeFloat;
     writeUInt32;
+    writeUint64;
     floatBufferToNative;
     int16ArrayToBuffer;
     floatArrayToBuffer;
@@ -10,6 +11,8 @@ class WriteInterface {
         i.writeFloat = (buffer, val, offset) => { return buffer.writeFloatBE(val, offset); };
         i.writeUInt16 = (buffer, val, offset) => { return buffer.writeUInt16BE(val, offset); };
         i.writeUInt32 = (buffer, val, offset) => { return buffer.writeUInt32BE(val, offset); };
+        i.writeUInt64 = (buffer, val, offset) => { return buffer.writeBigUInt64BE(BigInt(val), offset); };
+        
         i.floatBufferToNative = (buffer) => {
             const bufferBE = Buffer.alloc(buffer.length);
             for (let i = 0; i < buffer.length; i += 4) {
@@ -40,6 +43,8 @@ class WriteInterface {
         i.writeFloat = (buffer, val, offset) => { return buffer.writeFloatLE(val, offset); };
         i.writeUInt16 = (buffer, val, offset) => { return buffer.writeUInt16LE(val, offset); };
         i.writeUInt32 = (buffer, val, offset) => { return buffer.writeUInt32LE(val, offset); };
+        i.writeUInt64 = (buffer, val, offset) => { return buffer.writeBigUInt64LE(BigInt(val), offset); };
+        
         i.floatBufferToNative = (buffer) => { return buffer; }
         i.int16ArrayToBuffer = (array) => {
             const bufferLE = Buffer.alloc(array.length * 2);

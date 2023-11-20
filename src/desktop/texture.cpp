@@ -1,7 +1,9 @@
-#include "framework64/texture.h"
 #include "framework64/desktop/texture.h"
 
 #include <SDL2/SDL_image.h>
+
+#include <cassert>
+#include <utility>
 
 fw64Texture::fw64Texture(fw64Image* img) {
     image = img;
@@ -20,10 +22,12 @@ GLuint fw64Texture::getGlImageHandle() const {
 
 fw64Texture* fw64_texture_create_from_image(fw64Image* image, fw64Allocator* allocator) {
     // TODO: fix this...
+    assert(allocator != nullptr);
     return new fw64Texture(image);
 }
 
 void fw64_texture_delete(fw64Texture* texture, fw64Allocator* allocator) {
+    assert(allocator != nullptr);
     delete (texture);
 }
 

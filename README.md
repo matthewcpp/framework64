@@ -14,13 +14,16 @@ This framework consists of an asset pipeline and minimal C library providing a q
 ### Features
 This library aims to make game development on N64 easy by providing easy yet flexible methods for:
 - 3D data import / loading.
-- Character animation
+- 3D Character animation
 - Controller Input
 - Music and sound effects
 - Save files
 - Fog
 - Rumble
 - Picking and collision routines
+- SD card read / write access
+- USB communication (read/write)
+- Blender plugin supporting live in-engine console preview
 - [Cen64](https://github.com/n64dev/cen64) debugging support
 
 ### Building and Getting Started
@@ -28,6 +31,6 @@ The [Quickstart Guide](https://github.com/matthewcpp/framework64/wiki/Quickstart
 
 Instructions on building the framework are available for [N64](https://github.com/matthewcpp/framework64/wiki/Building-for-N64) or [Desktop](https://github.com/matthewcpp/framework64/wiki/Building-For-Desktop)
 
-API documentation can be found [here](https://framework64.readthedocs.io/en/latest/index.html).
+API documentation can be found [here](https://framework64.readthedocs.io/en/latest/files.html).
 
 Additional Information can be found on the [Wiki](https://github.com/matthewcpp/framework64/wiki)

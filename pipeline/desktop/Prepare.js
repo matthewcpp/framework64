@@ -21,8 +21,6 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
 
     plugins.initialize(bundle, assetDirectory, outputDirectory, includeDirectory, "desktop");
 
-    bundle.addLayerMap(layerMap, 0); // this should be removed during desktop asset rework
-
     if (manifest.images) {
         for (const image of manifest.images) {
             if (image.src)
@@ -81,12 +79,14 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
         }
     }
 
+/*
     if (manifest.raw) {
         for (const rawFile of manifest.raw) {
             console.log(`Processing Raw File: ${rawFile}`);
             processRaw(rawFile, bundle, assetDirectory, outputDirectory);
         }
     }
+*/
 
     bundle.finalize();
 }

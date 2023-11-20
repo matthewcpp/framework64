@@ -16,17 +16,15 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_arcball_init(&game->arcball, engine->input);
     fw64_node_init(&game->node);
-    game->mesh = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_catherine, NULL);
+    game->skinned_mesh = fw64_assets_load_skinned_mesh(engine->assets, FW64_ASSET_skinnedmesh_catherine, fw64_default_allocator());
 
-    Box bounding_box;
-    fw64_mesh_get_bounding_box(game->mesh, &bounding_box);
+    Box bounding_box = fw64_mesh_get_bounding_box(game->skinned_mesh->mesh);
     fw64_arcball_set_initial(&game->arcball, &bounding_box);
     game->arcball.camera.near = 150.0f;
     game->arcball.camera.far = 750.0f;
     fw64_camera_update_projection_matrix(&game->arcball.camera);
 
-    game->animation_data = fw64_animation_data_load(engine->assets, FW64_ASSET_animation_data_catherine, NULL);
-    fw64_animation_controller_init(&game->animation_state, game->animation_data, game->current_animation, NULL);
+    fw64_animation_controller_init(&game->animation_state, game->skinned_mesh->animation_data, game->current_animation, NULL);
     fw64_animation_controller_play(&game->animation_state);
 
     //game->consolas = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
@@ -50,17 +48,17 @@ void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_set_camera(renderer, &game->arcball.camera);
-    fw64_renderer_draw_animated_mesh(renderer, game->mesh, &game->animation_state, &game->node.transform);
+    fw64_renderer_draw_animated_mesh(renderer, game->skinned_mesh->mesh, &game->animation_state, &game->node.transform);
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 static void set_animation(Game* game, int animation) {
     game->current_animation = animation;
 
-    if (game->current_animation >= game->animation_data->animation_count)
+    if (game->current_animation >= game->skinned_mesh->animation_data->animation_count)
         game->current_animation = 0;
     else if (game->current_animation < 0)
-        game->current_animation = game->animation_data->animation_count - 1;
+        game->current_animation = game->skinned_mesh->animation_data->animation_count - 1;
 
     fw64_animation_controller_set_animation(&game->animation_state, game->current_animation);
 

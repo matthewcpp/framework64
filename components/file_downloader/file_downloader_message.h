@@ -1,0 +1,11 @@
+#pragma once
+
+#include <stdint.h>
+
+typedef enum {
+    Fw64_FILE_DOWNLOADER_MESSAGE_UNKNOWN = 0,
+    Fw64_FILE_DOWNLOADER_MESSAGE_BEGIN = 1,
+    Fw64_FILE_DOWNLOADER_MESSAGE_DATA = 2
+} MessageType;
+
+#define FW64_FILE_DOWNLOADER_MAX_FILE_SIZE 32

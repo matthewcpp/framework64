@@ -3,8 +3,8 @@
 /** \file mesh.h */
 
 #include "framework64/allocator.h"
-#include "framework64/asset_database.h"
 #include "framework64/box.h"
+#include "framework64/data_io.h"
 #include "framework64/material.h"
 #include "framework64/texture.h"
 
@@ -13,6 +13,8 @@
 
 #define FW64_JOINT_INDEX_NONE UINT32_MAX
 
+typedef struct fw64AssetDatabase fw64AssetDatabase;
+typedef struct fw64MaterialBundle fw64MaterialBundle;
 typedef struct fw64Mesh fw64Mesh;
 typedef struct fw64Primitive fw64Primitive;
 
@@ -20,27 +22,16 @@ typedef struct fw64Primitive fw64Primitive;
 extern "C" {
 #endif
 
-/**
-Loads a mesh and all dependant assets from the asset bundle.
-@param asset_index the mesh asset index.  Refer to the generated assets.h file.
-*/
-fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index, fw64Allocator* allocator);
+fw64Mesh* fw64_mesh_load_from_datasource(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64Allocator* allocator);
+fw64Mesh* fw64_mesh_load_from_datasource_with_bundle(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64MaterialBundle* material_bundle, fw64Allocator* allocator);
 
-/**
-Cleans up a mesh that was manually constructed after calling \ref mesh_init
-*/
-void fw64_mesh_delete(fw64AssetDatabase* assets, fw64Mesh* mesh, fw64Allocator* allocator);
+/** Cleans up a mesh that was manually constructed after calling \ref mesh_init */
+void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* assets, fw64Allocator* allocator);
 
-void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box);
+Box fw64_mesh_get_bounding_box(fw64Mesh* mesh);
 int fw64_mesh_get_primitive_count(fw64Mesh* mesh);
 
 fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index);
-
-/**
- * Returns a texture by index from this mesh's resources
- * Note: This method will only work for meshes loaded via /ref fw64_mesh_load 
- * */
-fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index);
 
 #ifdef __cplusplus
 }

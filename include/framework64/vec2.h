@@ -16,7 +16,8 @@ typedef struct {
     int x, y;
 } IVec2;
 
-void ivec2_add(IVec2 *out, IVec2 *a, IVec2 *b);
+void ivec2_set(IVec2* vec, int x, int y);
+void ivec2_add(IVec2* out, IVec2 *a, IVec2 *b);
 
 #ifdef __cplusplus
 }

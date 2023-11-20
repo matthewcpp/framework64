@@ -3,8 +3,8 @@ import subprocess
 subprocess.call('doxygen', shell=True)
 
 html_theme = "alabaster"
-project = 'cutil'
-copyright = '2019, Matthew LaRocca'
+project = 'framework64'
+copyright = '2023, Matthew LaRocca'
 author = 'Matthew LaRocca'
 
 

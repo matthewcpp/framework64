@@ -16,7 +16,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_update_view_matrix(&game->camera);
 
     fw64_node_init(&game->node);
-    fw64_node_set_mesh(&game->node, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_n64_logo, NULL));
+    fw64_node_set_mesh(&game->node, fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_n64_logo, fw64_default_allocator()));
     vec3_set_all(&game->node.transform.scale, 0.1f);
 
     game->rotation = 0.0f;

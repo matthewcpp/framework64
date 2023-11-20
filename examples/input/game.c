@@ -9,6 +9,7 @@ static void init_controller_info(Game* game, int index, float viewport_x, float 
 static void display_controller_info(Game* game, int index);
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
 
     init_controller_info(game, 0, 0.0f, 0.0f);
@@ -18,8 +19,8 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
 
-    game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
+    game->buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     game->not_connected_text_dimensions = fw64_font_measure_text(game->font, "Not Connected");
 }
 

@@ -1,15 +1,17 @@
 #include "game.h"
 
 #include "assets/assets.h"
-#include "assets/scene_playground.h"
+#include "assets/scene_Playground.h"
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     chase_camera_init(&game->chase_cam, engine);
 
-    game->scene = fw64_scene_load(game->engine->assets, FW64_ASSET_scene_playground, NULL);
+    fw64Allocator* allocator = fw64_default_allocator();
 
-    fw64Node *node = fw64_scene_get_node(game->scene, FW64_scene_playground_node_Player_Start);
+    game->scene = fw64_assets_load_scene(game->engine->assets, FW64_ASSET_scene_Playground, allocator);
+
+    fw64Node *node = fw64_scene_get_node(game->scene, FW64_scene_Playground_node_Player_Start);
 
     game->respawn_node = node;
     player_init(&game->player, game->engine, game->scene, FW64_ASSET_mesh_penguin, NULL);

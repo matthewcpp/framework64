@@ -1,29 +1,59 @@
 #include "framework64/n64/image.h"
 
 #include "framework64/n64/asset_database.h"
+#include "framework64/data_io.h"
 #include "framework64/n64/filesystem.h"
-
 #include <stdlib.h>
 #include <stddef.h>
 
-fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
-    return fw64_image_load_with_options(asset_database, asset_index, FW64_IMAGE_FLAG_NONE, allocator);
+
+// TODO: expose this?
+typedef enum {
+    /**
+     * The default mode for images.
+     * In this case the entire image will be loaded into memory.
+     * Useful if you need to draw multiple frames of the image in a single render pass
+     * */
+    FW64_IMAGE_FLAG_NONE = 0,
+
+    /**
+     * Loads only a single frame of the image at a time.
+     * This mode will save memory but you will not be able to draw multiple parts of the image in a single render pass.
+     * This mode is ignored on non N64 platforms.
+     */
+    FW64_IMAGE_FLAG_DMA_MODE = 1
+} fw64ImageFlag;
+
+fw64Image* fw64_image_load_from_datasource(fw64DataSource* data_source, fw64Allocator* allocator)
+{
+    fw64Image* image = allocator->malloc(allocator, sizeof(fw64Image));
+    int result = fw64_n64_image_read_data(image, data_source, allocator);
+
+    if (!result) {
+        allocator->free(allocator, image);
+        image = NULL;
+    }
+
+    return image;
 }
 
+// going away
+fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+    if (allocator == NULL)
+        allocator = fw64_default_allocator();
+
+    return (fw64Image*)fw64_assets_load_image(asset_database, asset_index, allocator);
+}
+
+// going away
 fw64Image* fw64_image_load_with_options(fw64AssetDatabase* asset_database, uint32_t asset_index, uint32_t options, fw64Allocator* allocator) {
     (void)asset_database;
     if (!allocator) allocator = fw64_default_allocator();
-    
-    fw64Image img;
-    if (fw64_n64_image_init_from_rom(&img, asset_index, options, allocator)) {
-        fw64Image* image = allocator->malloc(allocator, sizeof(fw64Image));
-        *image = img;
 
-        return image;
-    }
-    else {
-        return NULL;
-    }
+    if (options & FW64_IMAGE_FLAG_DMA_MODE)
+        return (fw64Image*)fw64_assets_load_image_dma(asset_database, asset_index, allocator);
+    else 
+        return (fw64Image*)fw64_assets_load_image(asset_database, asset_index, allocator);
 }
 
 #define IMAGE_IS_DMA_MODE(image) ((image)->rom_addr != 0)
@@ -52,8 +82,7 @@ uint32_t fw64_n64_image_get_frame_size(fw64Image* image) {
     return fw64_n64_image_get_data_size(image) / (image->info.hslices * image->info.vslices);
 }
 
-/** Note: DMA mode is currently only supported for non-indexed images*/
-static int fw64_n64_image_init_dma_mode(fw64Image* image, uint32_t asset_index, int handle, fw64Allocator* allocator) {
+int fw64_n64_image_init_dma_mode(fw64Image* image, int handle, uint32_t rom_address, fw64Allocator* allocator) {
     int bytes_read = fw64_filesystem_read(&image->info, sizeof(fw64N64ImageInfo), 1, handle);
 
     if (image->info.palette_count > 0) {
@@ -61,34 +90,16 @@ static int fw64_n64_image_init_dma_mode(fw64Image* image, uint32_t asset_index, 
     }
 
     uint32_t frame_size = fw64_n64_image_get_frame_size(image);
-    image->rom_addr = fw64_n64_filesystem_get_rom_address(asset_index) + sizeof(fw64N64ImageInfo);
+    image->rom_addr = rom_address + sizeof(fw64N64ImageInfo);
     image->data = allocator->memalign(allocator, 8, frame_size);
     fw64_image_load_frame(image, 0);
 
     return 1;
 }
 
-int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t asset_index, uint32_t options, fw64Allocator* allocator) {
-    int handle = fw64_filesystem_open(asset_index);
-    if (handle < 0)
-        return 0;
 
-    int result = 0;
-
-    if (options & FW64_IMAGE_FLAG_DMA_MODE) 
-        result = fw64_n64_image_init_dma_mode(image, asset_index, handle, allocator);
-    else
-        result = fw64_n64_image_read_data(image, handle, allocator);
-
-    fw64_filesystem_close(handle);
-
-    return result;
-}
-
-
-// todo: this method will be converted to read from a data source
-int fw64_n64_image_read_data(fw64Image* image, int handle, fw64Allocator* allocator) {
-    int bytes_read = fw64_filesystem_read(&image->info, sizeof(fw64N64ImageInfo), 1, handle);
+int fw64_n64_image_read_data(fw64Image* image, fw64DataSource* data_source, fw64Allocator* allocator) {
+    int bytes_read = fw64_data_source_read(data_source, &image->info, sizeof(fw64N64ImageInfo), 1);
 
     if (bytes_read != sizeof(fw64N64ImageInfo)) {
         return 0;
@@ -96,7 +107,7 @@ int fw64_n64_image_read_data(fw64Image* image, int handle, fw64Allocator* alloca
 
     int data_size = fw64_n64_image_get_data_size(image);
     uint8_t* image_data = allocator->memalign(allocator, 8, data_size);
-    bytes_read = fw64_filesystem_read(image_data, data_size, 1, handle);
+    bytes_read = fw64_data_source_read(data_source, image_data, data_size, 1);
 
     if (bytes_read != data_size) {
         allocator->free(allocator, image_data);
@@ -112,7 +123,7 @@ int fw64_n64_image_read_data(fw64Image* image, int handle, fw64Allocator* alloca
 
         for (uint16_t i = 0; i < image->info.palette_count; i++) {
             uint16_t* color_data = allocator->memalign(allocator, 8, palette_data_size);
-            fw64_filesystem_read(color_data, palette_data_size, 1, handle);
+            fw64_data_source_read(data_source, color_data, palette_data_size, 1);
 
             image->palettes[i] = color_data;
         }

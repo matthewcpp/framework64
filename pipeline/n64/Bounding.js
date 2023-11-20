@@ -44,6 +44,29 @@ class Bounding {
 
         return index;
     }
+
+    writeToBufferLE(buffer, index) {
+        index = buffer.writeFloatLE(this.min[0], index);
+        index = buffer.writeFloatLE(this.min[1], index);
+        index = buffer.writeFloatLE(this.min[2], index);
+        index = buffer.writeFloatLE(this.max[0], index);
+        index = buffer.writeFloatLE(this.max[1], index);
+        index = buffer.writeFloatLE(this.max[2], index);
+
+        return index;
+    }
+
+    write(writer, buffer, index){
+        index = writer.writeFloat(buffer, this.min[0], index);
+        index = writer.writeFloat(buffer, this.min[1], index);
+        index = writer.writeFloat(buffer, this.min[2], index);
+
+        index = writer.writeFloat(buffer, this.max[0], index);
+        index = writer.writeFloat(buffer, this.max[1], index);
+        index = writer.writeFloat(buffer, this.max[2], index);
+
+        return index;
+    }
 }
 
 module.exports = Bounding;

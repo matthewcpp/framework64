@@ -14,8 +14,8 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderer_set_clear_color(engine->renderer, 39, 58, 93);
     game->mode = MODE_DEFAULT;
 
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
-    game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, fw64_default_allocator());
+    game->buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, fw64_default_allocator()), fw64_default_allocator());
 
     fw64_node_init(&game->quad);
     set_texture_mode(game, MODE_DEFAULT);
@@ -38,8 +38,7 @@ void game_draw(Game* game) {
     fw64_renderer_set_camera(renderer, &game->camera);
     fw64_renderer_draw_static_mesh(renderer, &game->quad.transform, game->quad.mesh);
 
-    IVec2 screen_size;
-    fw64_renderer_get_screen_size(renderer, &screen_size);
+    IVec2 screen_size = fw64_renderer_get_screen_size(renderer);
     IVec2 measurement = fw64_font_measure_text(game->font, game->mode_name);
     int slice_width = fw64_texture_slice_width(game->buttons);
     int x_pos = screen_size.x / 2 - measurement.x / 2;
@@ -98,9 +97,9 @@ void set_texture_mode(Game* game, Mode mode) {
     }
 
     if (game->quad.mesh)
-        fw64_mesh_delete(game->engine->assets, game->quad.mesh, NULL);
+        fw64_mesh_delete(game->quad.mesh, game->engine->assets,  fw64_default_allocator());
 
-    fw64_node_set_mesh(&game->quad, fw64_textured_quad_create_with_params(game->engine, &params, NULL));
+    fw64_node_set_mesh(&game->quad, fw64_textured_quad_create_with_params(game->engine, &params, fw64_default_allocator()));
     fw64Texture* texture = fw64_material_get_texture(fw64_mesh_get_material_for_primitive(game->quad.mesh, 0));
     fw64_texture_set_wrap_mode(texture, wrap_mode, wrap_mode);
 }

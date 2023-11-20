@@ -2,7 +2,7 @@
 #include "assets/assets.h"
 
 #include "framework64/n64/controller_button.h"
-#include "assets/scene_splitscreen.h"
+#include "assets/scene_SplitScreen.h"
 
 static void init_weapon(Game* game);
 static void init_player(Game* player, int index, int node_id, float view_x, float view_y, float rot_y);
@@ -12,14 +12,14 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_renderer_set_clear_color(engine->renderer, 100, 149, 237);
 
-    game->scene = fw64_scene_load(engine->assets, FW64_ASSET_scene_splitscreen, NULL);
+    game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_SplitScreen, fw64_default_allocator());
 
     init_weapon(game);
 
-    init_player(game, 0, FW64_scene_splitscreen_node_Player1, 0.0f, 0.0f, 270.0f);
-    init_player(game, 1, FW64_scene_splitscreen_node_Player2, 0.5f, 0.0f, 90.0f);
-    init_player(game, 2, FW64_scene_splitscreen_node_Player3, 0.0f, 0.5f, 180.0f);
-    init_player(game, 3, FW64_scene_splitscreen_node_Player4, 0.5f, 0.5f, 0.0f);
+    init_player(game, 0, FW64_scene_SplitScreen_node_Player1, 0.0f, 0.0f, 270.0f);
+    init_player(game, 1, FW64_scene_SplitScreen_node_Player2, 0.5f, 0.0f, 90.0f);
+    init_player(game, 2, FW64_scene_SplitScreen_node_Player3, 0.0f, 0.5f, 180.0f);
+    init_player(game, 3, FW64_scene_SplitScreen_node_Player4, 0.5f, 0.5f, 0.0f);
 
     for (int i = 0; i < 4; i++)
         game->players[i].active = 1;
@@ -56,7 +56,7 @@ void init_player(Game* game, int index, int node_id, float view_x, float view_y,
 void init_weapon(Game* game) {
     Weapon* weapon = &game->us_ar33;
 
-    weapon->mesh = fw64_mesh_load(game->engine->assets, FW64_ASSET_mesh_us_ar33, NULL);
+    weapon->mesh = fw64_assets_load_mesh(game->engine->assets, FW64_ASSET_mesh_us_ar33, fw64_default_allocator());
     vec3_set(&weapon->position, 2.58f, -3.01f, -6.74f);
     vec3_set_all(&weapon->scale, 0.1f);
     quat_ident(&weapon->rotation);

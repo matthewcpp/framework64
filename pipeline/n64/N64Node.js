@@ -9,8 +9,10 @@ class N64Node {
     };
 
     static NoMesh = 0xFFFFFFFF;
+    static MeshIgnored = 0xFFFFFFFE;
     static NoCollider = 0xFFFFFFFF;
 
+    name;
     position = [0.0, 0.0, 0.0];
     rotation = [0.0, 0.0, 0.0, 1.0]
     scale = [1.0, 1.0, 1.0];

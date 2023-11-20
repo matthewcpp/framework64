@@ -19,8 +19,8 @@ void box_center(Box* box, Vec3* out);
 void box_size(Box* box, Vec3* out);
 void box_extents(Box* box, Vec3* out);
 void box_invalidate(Box* box);
-void box_encapsulate_point(Box* box, Vec3* pt);
-void box_encapsulate_box(Box* box, Box* to_encapsulate);
+void box_encapsulate_point(Box* box, const Vec3* pt);
+void box_encapsulate_box(Box* box, const Box* to_encapsulate);
 int box_intersection(Box* a, Box* b);
 int box_contains_point(Box* box, Vec3* pt);
 /**

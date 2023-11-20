@@ -1,5 +1,6 @@
 #include "game.h"
 #include "assets/assets.h"
+#include "assets/music_bank_musicbank.h"
 
 #include "framework64/node.h"
 #include "framework64/util/quad.h"
@@ -10,19 +11,20 @@
 #define ROTATION_SPEED -M_PI / 4.0f
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
     fw64_camera_init(&game->camera);
 
     fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
 
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
-    game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
-    game->music_bank = fw64_music_bank_load(engine->assets, FW64_ASSET_musicbank_musicbank2, NULL);
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
+    game->buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
+    
     fw64_node_init(&game->n64_logo);
-    fw64_node_set_mesh(&game->n64_logo, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, NULL));
+    fw64_node_set_mesh(&game->n64_logo, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, allocator));
 
-    fw64_audio_set_music_bank(engine->audio, game->music_bank);
-    fw64_audio_play_music(engine->audio, 2);
+    fw64_audio_load_musicbank_asset(engine->audio, engine->assets, FW64_ASSET_musicbank_musicbank);
+    fw64_audio_play_music(engine->audio, music_bank_musicbank_wakening);
     game->music_playback_speed = 1.0f;
 
     game->rotation = 0.0f;
@@ -47,7 +49,7 @@ void game_update(Game* game){
     }
 
     if (music_status == FW64_AUDIO_STOPPED) {
-            fw64_audio_play_music(game->engine->audio, 2);
+        fw64_audio_play_music(game->engine->audio, music_bank_musicbank_wakening);
     }
 
     sprintf(game->tempo_text, "Playback Speed: %.1f", fw64_audio_get_playback_speed(game->engine->audio));
