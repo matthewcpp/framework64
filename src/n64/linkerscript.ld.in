@@ -57,6 +57,7 @@ SECTIONS
       *c.obj(.text);
 
       */libframework64.a:*.o(.text);
+      */libframework64.a:*.obj(.text); /* note: libcart's assembly file is linked in and had extension .obj */
 
       */libultra_rom.a:*.o(.text);
       */libnusys.a:*.o(.text);

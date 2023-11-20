@@ -29,8 +29,14 @@ struct fw64Image {
     uint16_t** palettes;
 };
 
-int fw64_n64_image_init_from_rom(fw64Image* image, uint32_t assetIndex, uint32_t options, fw64Allocator* allocator);
-int fw64_n64_image_read_data(fw64Image* image, int handle, fw64Allocator* allocator);
+/** This is the general purpose method for reading non-dma mode images from a generic data source.*/
+int fw64_n64_image_read_data(fw64Image* image, fw64DataSource* data_source, fw64Allocator* allocator);
+
+/** 
+ * This is the general purpose method for reading dma mode images from a filesystem handle.
+ * Note: DMA mode is currently only supported for non-indexed images
+ * */
+int fw64_n64_image_init_dma_mode(fw64Image* image, int handle, uint32_t rom_address, fw64Allocator* allocator);
 
 uint32_t fw64_n64_image_get_data_size(fw64Image* image);
 uint32_t fw64_n64_image_get_frame_size(fw64Image* image);
