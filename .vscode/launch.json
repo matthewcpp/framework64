@@ -2,23 +2,63 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug N64 Asset Pipeline",
-            "program": "${workspaceFolder}/scripts/PrepareExampleAssets.js",
+            "name": "Data Link Sample Client - MacOS",
+            "type": "cppdbg",
             "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "node",
-            "args":["character_animation", "n64"]
+            "program": "${workspaceFolder}/build_desktop/tools/data_link_client/data_link_example_client",
+            "args": ["desktop"],
+            // "args": ["n64", "${workspaceFolder}/build_n64/bin/data_link.z64"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
         },
         {
-            "name": "Debug Desktop Asset Pipeline",
+            "name": "Data Link Sample Client - Windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build_desktop/tools/data_link_client/Debug/data_link_example_client.exe",
+            //"args": ["desktop"],
+            "args": ["n64", "${workspaceFolder}/build_n64/bin/data_link.z64"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "Data Link Asset Service - MacOS",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build_desktop/tools/asset_transfer_webservice/data_link_asset_service",
+            "args": ["--framework64-dir", "${workspaceFolder}", "desktop"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
+            "name": "Data Link Asset Service - Windows",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build_desktop/tools/asset_transfer_webservice/Debug/data_link_asset_service.exe",
+            // "args": ["--framework64-dir", "${workspaceFolder}", "desktop"],
+            "args": ["--framework64-dir", "${workspaceFolder}", "n64", "${workspaceFolder}/build_n64/bin/data_link_asset_viewer.z64"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "Asset Pipeline",
             "program": "${workspaceFolder}/scripts/PrepareExampleAssets.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "type": "node",
+            // "args":["shading_modes", "n64"]
             "args":["character_animation", "desktop"]
         },
         {
