@@ -1,42 +1,125 @@
 #include "framework64/n64/mesh.h"
 
 #include "framework64/n64/asset_database.h"
-#include "framework64/n64/loader.h"
 #include "framework64/filesystem.h"
 
 #include <malloc.h>
 #include <string.h>
 
-fw64Mesh* fw64_mesh_load(fw64AssetDatabase* assets, uint32_t index, fw64Allocator* allocator) {
-    if (!allocator) allocator = fw64_default_allocator();
-    fw64N64Loader loader;
-    fw64_n64_loader_init(&loader);
+static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, fw64DataSource* data_source, fw64Allocator* allocator);
+static void fixup_mesh_primitive_material_pointers(fw64MaterialBundle* material_bundle, fw64Mesh* mesh);
+static fw64Mesh* load_mesh_data(fw64DataSource* data_source, fw64MeshInfo* mesh_info, fw64MaterialBundle* material_bundle, fw64Allocator* allocator);
 
-    int handle = fw64_filesystem_open(index);
-    if (handle < 0)
+fw64Mesh* fw64_mesh_load_from_datasource(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64Allocator* allocator) {
+    fw64MeshInfo mesh_info;
+    fw64_data_source_read(data_source, &mesh_info, sizeof(fw64MeshInfo), 1);
+
+    if (mesh_info._material_bundle_count != 1) {
         return NULL;
+    }
 
-    fw64_n64_loader_load_mesh_resources(&loader, handle, allocator);
-    fw64Mesh* mesh = allocator->malloc(allocator, sizeof(fw64Mesh));
-    fw64_n64_loader_load_mesh(&loader, mesh, handle, allocator);
-    mesh->resources = loader.resources;
+    fw64MaterialBundle* material_bundle = fw64_material_bundle_load_from_datasource(data_source, assets, allocator);
 
-    fw64_filesystem_close(handle);
+    if (!material_bundle) {
+        return NULL;
+    }
 
-    fw64_n64_loader_uninit(&loader);
+    fw64Mesh* mesh = load_mesh_data(data_source, &mesh_info, material_bundle, allocator);
+
+    if (!mesh) {
+        fw64_material_bundle_delete(material_bundle, allocator);
+    }
+
+    mesh->material_bundle = material_bundle;
 
     return mesh;
 }
 
-void fw64_mesh_delete(fw64AssetDatabase* database, fw64Mesh* mesh, fw64Allocator* allocator) {
+fw64Mesh* fw64_mesh_load_from_datasource_with_bundle(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64MaterialBundle* material_bundle, fw64Allocator* allocator) {
+    fw64MeshInfo mesh_info;
+    fw64_data_source_read(data_source, &mesh_info, sizeof(fw64MeshInfo), 1);
+
+    return load_mesh_data(data_source, &mesh_info, material_bundle, allocator);
+}
+
+fw64Mesh* load_mesh_data(fw64DataSource* data_source, fw64MeshInfo* mesh_info, fw64MaterialBundle* material_bundle, fw64Allocator* allocator) {
+    fw64Mesh* mesh = allocator->malloc(allocator, sizeof(fw64Mesh));
+    memcpy(&mesh->info, mesh_info, sizeof(fw64MeshInfo));
+    
+    mesh->vertex_buffer = allocator->memalign(allocator, 8, sizeof(Vtx) * mesh->info.vertex_count );
+    fw64_data_source_read(data_source, mesh->vertex_buffer, sizeof(Vtx),  mesh->info.vertex_count);
+
+    mesh->display_list = allocator->memalign(allocator, 8, sizeof(Gfx) * mesh->info.display_list_count);
+    fw64_data_source_read(data_source, mesh->display_list, sizeof(Gfx), mesh->info.display_list_count);
+
+    mesh->primitives = allocator->malloc(allocator, sizeof(fw64Primitive) * mesh->info.primitive_count);
+    fw64_data_source_read(data_source, mesh->primitives, sizeof(fw64Primitive), mesh->info.primitive_count);
+    
+    fixup_mesh_vertex_pointers(mesh, data_source, allocator);
+    fixup_mesh_primitive_material_pointers(material_bundle, mesh);
+
+    return mesh;
+}
+
+static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, fw64DataSource* data_source, fw64Allocator* allocator) {
+    //TODO: Get rid of this allocation when filesystem has a small read optimization
+    uint32_t* vertex_pointer_data = allocator->malloc(allocator, mesh->info._vertex_pointer_data_size);
+    fw64_data_source_read(data_source, vertex_pointer_data, 1, mesh->info._vertex_pointer_data_size);
+
+    uint32_t* vertex_pointer_counts = vertex_pointer_data;
+    uint32_t* vertex_pointer_offsets = vertex_pointer_data + mesh->info.primitive_count;
+
+    uint32_t offset_index = 0;
+
+    for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh->primitives + i;
+
+        uint32_t vertices_index = (uint32_t)primitive->vertices;
+        uint32_t display_list_index = (uint32_t)primitive->display_list;
+
+        Vtx* vertex_buffer = mesh->vertex_buffer + vertices_index;
+        Gfx* display_list = mesh->display_list + display_list_index;
+
+        for (uint32_t j = 0; j < vertex_pointer_counts[i]; j++) {
+            // updates the memory location of the vertex cache relative to the start of the vertex buffer for this primitive
+            Gfx* vertex_ptr = display_list + vertex_pointer_offsets[offset_index++];
+            vertex_ptr->words.w1 += (uint32_t)vertex_buffer;
+        }
+
+        primitive->vertices = mesh->vertex_buffer + vertices_index;
+        primitive->display_list = mesh->display_list + display_list_index;
+    }
+
+    allocator->free(allocator, vertex_pointer_data);
+}
+
+/** When the mesh info is loaded from ROM, the value in material and texture pointers represents an index into top level mesh arrays.
+ * After the textures are loaded, we need to convert each index into an actual pointer to the correct object type.
+*/
+static void fixup_mesh_primitive_material_pointers(fw64MaterialBundle* material_bundle, fw64Mesh* mesh) {
+    // fixup material pointers for primitives
+    for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh->primitives + i;
+
+        uint32_t primitive_material_index = (uint32_t)primitive->material;
+        // TODO: Investigate this further.  This indicates that this primitive contains lines
+        if (primitive_material_index == FW64_PRIMITIVE_NO_MATERIAL)
+            primitive->material == NULL;
+        else
+            primitive->material = material_bundle->materials + primitive_material_index;
+    }
+}
+
+
+void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* database, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
 
     fw64_n64_mesh_uninit(mesh, allocator);
     allocator->free(allocator, mesh);
 }
 
-void fw64_mesh_get_bounding_box(fw64Mesh* mesh, Box* box) {
-    *box = mesh->info.bounding_box;
+Box fw64_mesh_get_bounding_box(fw64Mesh* mesh) {
+    return mesh->info.bounding_box;
 }
 
 void fw64_n64_mesh_init(fw64Mesh* mesh) {
@@ -53,8 +136,8 @@ void fw64_n64_mesh_uninit(fw64Mesh* mesh, fw64Allocator* allocator) {
     if (mesh->primitives)
         allocator->free(allocator, mesh->primitives);
 
-    if (mesh->resources) {
-        fw64_n64_mesh_resources_delete(mesh->resources, allocator);
+    if (mesh->material_bundle) {
+        fw64_material_bundle_delete(mesh->material_bundle, allocator);
     }
 }
 
@@ -66,31 +149,4 @@ fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index) {
     fw64Primitive* primitive = mesh->primitives + index;
 
     return primitive->material;
-}
-
-void fw64_n64_mesh_resources_delete(fw64MeshResources* resources, fw64Allocator* allocator) {
-    if (resources->material_count > 0) {
-        allocator->free(allocator, resources->materials);
-    }
-
-    if (resources->texture_count > 0) {
-        allocator->free(allocator, resources->textures);
-    }
-
-    int delete_images = !(resources->flags & FW64_MESH_FLAGS_IMAGES_ARE_SHARED);
-
-    if (delete_images && resources->image_count > 0) {
-        for (uint32_t i = 0; i < resources->image_count; i++) {
-            fw64Image* image = resources->images + i;
-            allocator->free(allocator, image->data);
-        }
-        
-        allocator->free(allocator, resources->images);
-    }
-
-    allocator->free(allocator, resources);
-}
-
-fw64Texture* fw64_mesh_get_texture(fw64Mesh* mesh, int index) {
-    return mesh->resources->textures + index;
 }

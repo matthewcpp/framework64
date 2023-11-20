@@ -1,8 +1,14 @@
 #pragma once
 
 #include "framework64/mesh.h"
+
+#include "framework64/allocator.h"
+#include "framework64/data_io.h"
+
 #include "framework64/desktop/material.h"
-#include "framework64/desktop/texture.h"
+#include "framework64/desktop/material_bundle.h"
+
+#include "framework64/desktop/primitive_data.h"
 
 #ifdef __linux__
 #include <GL/glew.h>
@@ -15,48 +21,46 @@
 #include <string>
 #include <vector>
 
-struct fw64AssetDatabase;
-
-namespace framework64 {
-
-struct SharedResources {
-    std::vector<std::unique_ptr<fw64Texture>> textures;
-    std::vector<std::unique_ptr<fw64Image>> images;
+namespace framework64{
+    class ShaderCache;
 };
 
-}
-
 struct fw64Primitive {
-    enum Mode { Triangles = GL_TRIANGLES, Lines = GL_LINES, Unknown = 0};
-    enum Attributes { Positions = 1, Normals = 2, TexCoords = 4, VertexColors = 8 };
+    enum Mode { 
+        Unknown = 0,
+        Triangles = GL_TRIANGLES, 
+        Lines = GL_LINES 
+    };
 
-    fw64Material material;
+    // note this should be kept in sync with pipeline/desktop/MeshWriter.js
+    enum Attributes { 
+        Positions = 1, 
+        Normals = 2, 
+        TexCoords = 4, 
+        VertexColors = 8 
+    };
+
+    fw64Material* material = nullptr;
     Mode mode = Mode::Unknown;
-    uint32_t attributes = 0;
     uint32_t joint_index = FW64_JOINT_INDEX_NONE;
     Box bounding_box;
 
-    GLuint  gl_vertex_array_object = 0;
-    GLuint  gl_array_buffer_object = 0;
-    GLuint  gl_element_buffer_object = 0;
-    GLsizei element_count = 0;
-    GLenum primitive_mode = 0;
-
-    std::vector<float> positions;
-    std::vector<float> normals;
-    std::vector<float> tex_coords;
-    std::vector<float> colors;
-    std::vector<uint16_t> indices;
+    framework64::PrimitiveData primitive_data;
+    framework64::GLMeshInfo gl_info;
 };
 
 struct fw64Mesh {
     fw64Mesh();
     ~fw64Mesh();
 
+    std::unique_ptr<fw64MaterialBundle> material_bundle;
+    std::vector<std::unique_ptr<fw64Primitive>> primitives;
     Box bounding_box;
 
-    std::vector<fw64Primitive> primitives;
-    std::unique_ptr<framework64::SharedResources> resources;
+    /// *moves* pdata into the new primitive and creates the GL objects
+    /// TODO: joint index
+    fw64Primitive* createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode, Box const & primitive_bounding);
+    fw64Primitive* createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode);
 
-    static fw64Mesh* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
+    static fw64Mesh* loadFromDatasource(fw64DataSource* data_source, fw64MaterialBundle* material_bundle, framework64::ShaderCache& shader_cache, fw64Allocator* allocator);
 };

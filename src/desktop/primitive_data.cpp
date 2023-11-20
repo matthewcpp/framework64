@@ -1,12 +1,26 @@
-#include "framework64/desktop/mesh_data.h"
+#include "framework64/desktop/primitive_data.h"
+#include "framework64/desktop/mesh.h"
 
 #include <algorithm>
+#include <assert.h>
 #include <iterator>
 #include <unordered_map>
 
 namespace framework64 {
 
-GLMeshInfo MeshData::createGlMesh() {
+PrimitiveData& PrimitiveData::operator=(PrimitiveData&& other) {
+    positions = std::move(other.positions);
+    normals = std::move(other.normals);
+    tex_coords = std::move(other.tex_coords);
+    colors = std::move(other.colors);
+    joint_indices = std::move(other.joint_indices);
+    indices_array_uint16 = std::move(other.indices_array_uint16);
+    indices_array_uint32 = std::move(other.indices_array_uint32);
+
+    return *this;
+}
+
+GLMeshInfo PrimitiveData::createGlMesh() {
     GLMeshInfo mesh_info;
 
     GLuint array_buffer_size = (positions.size() + normals.size() + tex_coords.size() + colors.size()) * sizeof(float);
@@ -64,6 +78,9 @@ GLMeshInfo MeshData::createGlMesh() {
         mesh_info.element_count = static_cast<GLsizei>(indices_array_uint16.size());
     }
     else if (!indices_array_uint32.empty()) {
+        // NOTE: this should not be used at the moment
+        assert(false);
+
         glGenBuffers(1, &mesh_info.gl_element_buffer_object);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh_info.gl_element_buffer_object);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_array_uint32.size() * sizeof(uint32_t), indices_array_uint32.data(), GL_STATIC_DRAW);
@@ -71,59 +88,20 @@ GLMeshInfo MeshData::createGlMesh() {
         mesh_info.element_count = static_cast<GLsizei>(indices_array_uint32.size());
     }
 
-
     glBindVertexArray(0);
 
     return mesh_info;
 }
 
-bool MeshData::hasMultipleJointIndices() {
-    if (joint_indices.empty())
-        return false;
+Box PrimitiveData::computeBoundingBox() const {
+    Box box;
+    box_invalidate(&box);
 
-    uint8_t joint = joint_indices[0];
-    // note: these are read in as VEC4 with type unsigned byte...current implementation supports only a single joint
-    for (size_t i = 4; i < joint_indices.size(); i += 4) {
-        if (joint_indices[i] != joint)
-            return true;
+    for (size_t i = 0; i < positions.size(); i += 3) {
+        box_encapsulate_point(&box, reinterpret_cast<const Vec3*>(positions.data() + i));
     }
 
-    return false;
-}
-
-void MeshData::moveMeshDataToPrimitive(fw64Primitive& primitive) {
-    primitive.positions = std::move(positions);
-    primitive.normals = std::move(normals);
-    primitive.tex_coords = std::move(tex_coords);
-    primitive.colors = std::move(colors);
-
-    if (!indices_array_uint16.empty()) {
-        primitive.indices = std::move(indices_array_uint16);
-    }
-    else if (!indices_array_uint32.empty()) {
-        std::transform(
-            indices_array_uint32.begin(), indices_array_uint32.end(), 
-            std::back_inserter(primitive.indices),
-            [](uint32_t index) -> uint16_t {
-                return static_cast<uint16_t>(index);
-            });
-    }
-}
-
-std::vector<MeshData> MeshData::splitByJointIndex() {
-    std::vector<MeshData> split_data;
-
-    return split_data;
-}
-
-void GLMeshInfo::setPrimitiveValues(fw64Primitive& primitive) {
-    primitive.gl_array_buffer_object = gl_array_buffer_object;
-    primitive.gl_vertex_array_object = gl_vertex_array_object;
-    primitive.gl_element_buffer_object = gl_element_buffer_object;
-
-    primitive.attributes = attributes;
-    primitive.primitive_mode = primitive_mode;
-    primitive.element_count = element_count;
+    return box;
 }
 
 }

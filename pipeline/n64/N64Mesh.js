@@ -1,12 +1,13 @@
 const Bounding = require("./Bounding");
-
 const Splitter = require("./N64Splitter");
 
 class N64Mesh {
+    name;
+    primitives = [];
+    materialBundle = null;
+
     constructor(name) {
         this.name = name;
-        this.primitives = [];
-        this.resources = null;
     }
 
     get bounding() {
@@ -25,6 +26,10 @@ class N64Mesh {
                 return true;
         }
         return false;
+    }
+
+    get hasMaterialBundle() {
+        return this.materialBundle != null;
     }
 
     prunePrimitiveVertices() {
@@ -52,11 +57,11 @@ class N64Mesh {
 
     remapJointIndices(jointMap) {
         for (const primitive of this.primitives) {
-            const jointIndex = jointMap.get(primitive.jointIndices[0]);
-
-            if (typeof(jointIndex) === "undefined") {
+            if (!jointMap.has(primitive.jointIndices[0])) {
                 throw new Error("Unable map to all animation joints");
             }
+
+            const jointIndex = jointMap.get(primitive.jointIndices[0]);
 
             primitive.jointIndices[0] = jointIndex;
         }
