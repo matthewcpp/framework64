@@ -141,3 +141,37 @@ int fw64_filesystem_get_open_handle_count() {
 
     return 0;
 }
+
+static size_t fw64_n64_filesystem_datasource_read(fw64DataSource* interface, void* buffer, size_t size, size_t count) {
+    fw64N64FilesystemDataSource* data_source = (fw64N64FilesystemDataSource*) interface;
+
+    return fw64_filesystem_read(buffer, size, count, data_source->file_handle);
+}
+
+static size_t fw64_n64_filesystem_datasource_size(fw64DataSource* interface) {
+    fw64N64FilesystemDataSource* data_source = (fw64N64FilesystemDataSource*) interface;
+
+    return fw64_filesystem_size(data_source->file_handle);
+}
+
+
+void fw64_n64_filesystem_datasource_init(fw64N64FilesystemDataSource* data_source, int file_handle) {
+    data_source->file_handle = file_handle;
+    data_source->interface.read = fw64_n64_filesystem_datasource_read;
+    data_source->interface.size = fw64_n64_filesystem_datasource_size;
+}
+
+int fw64_n64_filesystem_open_datasource(fw64N64FilesystemDataSource* data_source, int file_handle) {
+    int result = fw64_filesystem_open(file_handle);
+
+    if (result >= 0) {
+        fw64_n64_filesystem_datasource_init(data_source, result);
+        return 1;
+    }
+
+    return 0;
+}
+
+int fw64_n64_filesystem_close_datasource(fw64N64FilesystemDataSource* data_source) {
+    return fw64_filesystem_close(data_source->file_handle);
+}
