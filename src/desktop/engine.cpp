@@ -2,8 +2,10 @@
 
 #include "framework64/desktop/asset_database.h"
 #include "framework64/desktop/audio.h"
+#include "framework64/desktop/data_link.h"
 #include "framework64/desktop/filesystem.h"
 #include "framework64/desktop/input.h"
+#include "framework64/desktop/media.h"
 #include "framework64/desktop/renderer.h"
 
 #include <SDL2/SDL_image.h>
@@ -12,19 +14,19 @@
 #include <iostream>
 
 namespace framework64 {
-bool Engine::init(std::string const & name, fw64SaveFile::SaveFileType save_file_type, int screen_width, int screen_height) {
-    application_name = name;
+bool Engine::init(Settings const & settings) {
+    application_name = settings.application_name;
 
-    if (save_file_type == fw64SaveFile::SaveFileType::Unknown) {
+    if (settings.save_file_type == fw64SaveFile::SaveFileType::Unknown) {
         std::cout << "`Unknown` is not a valid save file type for engine initialization." << std::endl;
         return false;
     }
 
     const std::string base_path = SDL_GetBasePath();
     const std::string asset_dir_path = base_path + "assets/";
-    const std::string database_path = asset_dir_path + "assets.db";
     const std::string shader_dir_path = base_path + "glsl/";
     const std::string save_file_path = base_path + application_name + ".save";
+    const std::string media_dir = base_path + settings.media_dir_name;
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
 
@@ -58,22 +60,34 @@ bool Engine::init(std::string const & name, fw64SaveFile::SaveFileType save_file
     assets = new fw64AssetDatabase(asset_dir_path, *shader_cache);
     audio = new fw64Audio();
     input = new fw64Input();
+    media = new fw64Media();
+    data_link = new fw64DataLink();
 
     time = new fw64Time();
     memset(time, 0, sizeof(fw64Time));
 
-    if (!assets->init(database_path)) {
+    if (!assets->init()) {
         std::cout << "Failed to initialize Asset Database" << std::endl;
         return false;
     }
 
-    if (!renderer->init(screen_width, screen_height, *shader_cache)) {
+    if (!renderer->init(settings.screen_width, settings.screen_height, *shader_cache)) {
         std::cout << "Failed to initialize renderer" << std::endl;
         return false;
     }
 
     input->init(*n64_input_interface, *time);
-    save_file->init(save_file_path, save_file_type);
+    save_file->init(save_file_path, settings.save_file_type);
+
+    if (!media->init(media_dir)) {
+        std::cout << "Failed to initialize media" << std::endl;
+        return false;
+    }
+
+    if (!data_link->initialize(settings.data_link_port)) {
+        std::cout << "Failed to initialize websocket datalink" << std::endl;
+        return false;
+    }
 
     Filesystem::init(asset_dir_path, *assets);
 
@@ -82,6 +96,7 @@ bool Engine::init(std::string const & name, fw64SaveFile::SaveFileType save_file
 
 void Engine::update(float time_delta) {
     input->update();
+    data_link->update();
     time->time_delta = time_delta;
     time->total_time += time_delta;
 

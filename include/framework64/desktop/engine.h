@@ -10,9 +10,19 @@
 namespace framework64 {
 class Engine: public fw64Engine {
 public:
+    struct Settings {
+        int screen_width = 320;
+        int screen_height = 240;
+        int data_link_port = 55662;
+        std::string application_name = "framework64";
+        std::string media_dir_name = "media";
+        fw64SaveFile::SaveFileType save_file_type = fw64SaveFile::SaveFileType::N64Eeprom4k;
+    };
+
+public:
     Engine() = default;
 
-    bool init(std::string const & name, fw64SaveFile::SaveFileType save_file_type, int screen_width, int screen_height);
+    bool init(Settings const & settings);
     void update(float time_delta);
 
 public:

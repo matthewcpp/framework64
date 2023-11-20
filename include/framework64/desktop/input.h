@@ -19,7 +19,7 @@ public:
     bool buttonDown(int controller, int button);
     Vec2 stick(int controller, int stick_index);
 
-    framework64::InputInterface* interface = nullptr;
+    framework64::InputInterface* input_interface = nullptr;
 
     [[nodiscard]] bool controllerIsConnected(int index) const;
     [[nodiscard]] bool controllerHasRumble(int index) const;

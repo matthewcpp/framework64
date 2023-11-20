@@ -6,7 +6,7 @@
 #include <iostream>
 
 void fw64Input::init(framework64::InputInterface& interface_, fw64Time& time_) {
-    interface = &interface_;
+    input_interface = &interface_;
     time = &time_;
 
     int joystick_count = SDL_NumJoysticks();
@@ -72,7 +72,7 @@ void fw64Input::update() {
             updateControllerState(i);
         }
         else if (i == 0) {
-            interface->updateControllerFromKeyboard(current_controller_states[i], SDL_GetKeyboardState(nullptr));
+            input_interface->updateControllerFromKeyboard(current_controller_states[i], SDL_GetKeyboardState(nullptr));
         }
 
         if (controller_rumble_durations[i] > 0.0f) {
@@ -109,25 +109,25 @@ bool fw64Input::controllerIsConnected(int index) const {
 
 bool fw64Input::buttonPressed(int controller, int button) {
     if (controllerIsConnected(controller))
-        return interface->buttonPressed(current_controller_states[controller], previous_controller_states[controller], button);
+        return input_interface->buttonPressed(current_controller_states[controller], previous_controller_states[controller], button);
     else
         return false;
 }
 bool fw64Input::buttonReleased(int controller, int button) {
     if (controllerIsConnected(controller))
-        return interface->buttonReleased(current_controller_states[controller], previous_controller_states[controller], button);
+        return input_interface->buttonReleased(current_controller_states[controller], previous_controller_states[controller], button);
     else
         return false;
 }
 bool fw64Input::buttonDown(int controller, int button) {
     if (controllerIsConnected(controller))
-        return interface->buttonDown(current_controller_states[controller], button);
+        return input_interface->buttonDown(current_controller_states[controller], button);
     else
         return false;
 }
 Vec2 fw64Input::stick(int controller, int stick_index) {
     if (controllerIsConnected(controller))
-        return interface->stick(current_controller_states[controller], stick_index);
+        return input_interface->stick(current_controller_states[controller], stick_index);
     else
         return {0.0f, 0.0f};
 }

@@ -11,7 +11,7 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
 
     glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     mesh_transform_uniform_block.create();
     fog_data_uniform_block.create();
@@ -20,10 +20,7 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
 
     if (!sprite_batch.init(shader_cache)) return false;
 
-    framebuffer_write_texture.texture.init();
     setScreenSize(width, height);
-
-    framebuffer_write_texture.texture.material.shader = shader_cache.getShaderProgram(FW64_SHADING_MODE_SPRITE);
 
     screen_overlay.init(shader_cache);
 
@@ -177,13 +174,6 @@ void fw64Renderer::setGlDepthTestingState() {
 void fw64Renderer::end(fw64RendererFlags flags) {
     setDrawingMode(DrawingMode::None);
 
-    if (post_draw_callback) {
-        framebuffer_write_texture.texture.image.clear();
-        post_draw_callback(&framebuffer_write_texture, post_draw_callback_arg);
-        framebuffer_write_texture.texture.image.updateGlImage();
-        sprite_batch.drawPixelTexture(framebuffer_write_texture.texture);
-    }
-
     if ((flags & FW64_RENDERER_FLAG_SWAP) == FW64_RENDERER_FLAG_SWAP){
         SDL_GL_SwapWindow(window);
     }
@@ -198,7 +188,6 @@ void fw64Renderer::setScreenSize(int width, int height) {
     screen_height = height;
 
     sprite_batch.setScreenSize(width, height);
-    framebuffer_write_texture.texture.setSize(width, height);
 }
 
 void fw64Renderer::updateMeshTransformBlock(fw64Matrix & matrix) {
@@ -213,11 +202,11 @@ void fw64Renderer::updateMeshTransformBlock(fw64Matrix & matrix) {
 }
 
 void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
-    setActiveShader(primitive.material.shader);
-    active_shader->shader->setUniforms(active_shader, primitive.material);
-    glBindVertexArray(primitive.gl_vertex_array_object);
+    setActiveShader(primitive.material->shader);
+    active_shader->shader->setUniforms(active_shader, *primitive.material);
+    glBindVertexArray(primitive.gl_info.gl_vertex_array_object);
 
-    glDrawElements(primitive.mode, primitive.element_count, primitive.primitive_mode, 0);
+    glDrawElements(primitive.mode, primitive.gl_info.element_count, primitive.gl_info.primitive_mode, 0);
 }
 
 void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
@@ -225,10 +214,10 @@ void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
     updateMeshTransformBlock(transform->matrix);
 
     for (auto const & primitive : mesh->primitives) {
-        if (primitive.mode != primitive_type)
+        if (primitive->mode != primitive_type)
             continue;
 
-        drawPrimitive(primitive);
+        drawPrimitive(*primitive);
     }
 }
 
@@ -236,15 +225,15 @@ void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* con
     setDrawingMode(DrawingMode::Mesh);
 
     for (auto const & primitive : mesh->primitives) {
-        if (primitive.mode != primitive_type)
+        if (primitive->mode != primitive_type)
             continue;
 
         // should this be done in the shader?
         fw64Matrix transform_matrix;
-        matrix_multiply(&transform_matrix.m[0], &transform->matrix.m[0], &controller->matrices[primitive.joint_index].m[0]);
+        matrix_multiply(&transform_matrix.m[0], &transform->matrix.m[0], &controller->matrices[primitive->joint_index].m[0]);
         updateMeshTransformBlock(transform_matrix);
 
-        drawPrimitive(primitive);
+        drawPrimitive(*primitive);
     }
 }
 
@@ -342,10 +331,10 @@ void fw64Renderer::setLightColor(int index, uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void fw64Renderer::renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    screen_overlay.primitive.material.color[0] = static_cast<float>(r) / 255.0f;
-    screen_overlay.primitive.material.color[1] = static_cast<float>(g) / 255.0f;
-    screen_overlay.primitive.material.color[2] = static_cast<float>(b) / 255.0f;
-    screen_overlay.primitive.material.color[3] = static_cast<float>(a) / 255.0f;
+    screen_overlay.primitive.material->color[0] = static_cast<float>(r) / 255.0f;
+    screen_overlay.primitive.material->color[1] = static_cast<float>(g) / 255.0f;
+    screen_overlay.primitive.material->color[2] = static_cast<float>(b) / 255.0f;
+    screen_overlay.primitive.material->color[3] = static_cast<float>(a) / 255.0f;
 
     matrix_set_identity(mesh_transform_uniform_block.data.normal_matrix.data());
     matrix_set_identity(mesh_transform_uniform_block.data.mvp_matrix.data());
@@ -446,6 +435,14 @@ void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Textu
     renderer->drawSpriteFrame(texture, frame, static_cast<float>(x), static_cast<float>(y), scale_x, scale_y);
 }
 
+void fw64_renderer_set_sprite_scissoring_enabled(fw64Renderer* renderer, int enabled) {
+    renderer->sprite_scissor_enabled = static_cast<bool>(enabled);
+}
+
+int fw64_renderer_get_sprite_scissoring_enabled(fw64Renderer* renderer) {
+    return static_cast<int>(renderer->sprite_scissor_enabled);
+}
+
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
     renderer->drawText(font, static_cast<float>(x), static_cast<float>(y), text, std::numeric_limits<uint32_t>::max());
 }
@@ -462,9 +459,10 @@ void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, 
     renderer->sprite_batch.setFillColor(r, g, b, a);
 }
 
-void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size) {
-    screen_size->x = renderer->screen_width;
-    screen_size->y = renderer->screen_height;
+IVec2 fw64_renderer_get_screen_size(fw64Renderer* renderer) {
+    IVec2 screen_size = {renderer->screen_width, renderer->screen_height};
+
+    return screen_size;
 }
 
 IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera) {
@@ -505,15 +503,6 @@ void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled
 
 int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
     return static_cast<int>(renderer->anti_aliasing_enabled);
-}
-
-void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPostDrawFunc func, void* arg) {
-    renderer->post_draw_callback = func;
-    renderer->post_draw_callback_arg = arg;
-}
-
-void fw64_framebuffer_set_pixel(fw64Framebuffer* framebuffer, int x, int y, uint8_t r, uint8_t g, uint8_t b) {
-    framebuffer->texture.image.setPixel(x, y, r, g, b);
 }
 
 void fw64_renderer_set_fog_enabled(fw64Renderer* renderer, int enabled) {

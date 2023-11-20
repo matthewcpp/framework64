@@ -66,6 +66,12 @@ ShaderProgram* ShaderCache::getShaderProgram(fw64ShadingMode shading_mode) {
             shader = &fill_shader;
             break;
         }
+
+        case FW64_SHADING_MODE_DECAL_TEXTURE:
+            // TODO: This needs to be implemented
+        case FW64_SHADING_MODE_UNSET:
+        case FW64_SHADING_MODE_COUNT:
+            break;
     }
 
     uint64_t program_hash = programHash(primitive_attributes, material_features);

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "framework64/desktop/mesh.h"
-
 #ifdef __linux__
 #include <GL/glew.h>
 #else
@@ -10,6 +8,8 @@
 
 #include <cstdint>
 #include <vector>
+
+#include "framework64/box.h"
 
 namespace framework64 {
 
@@ -21,11 +21,13 @@ struct GLMeshInfo {
     uint32_t attributes = 0;
     GLenum primitive_mode = 0;
     uint32_t element_count = 0;
-
-    void setPrimitiveValues(fw64Primitive& primitive);
 };
 
-struct MeshData {
+struct PrimitiveData {
+    PrimitiveData() = default;
+    PrimitiveData(const PrimitiveData&) = default;
+    PrimitiveData& operator=(PrimitiveData&&);
+
     std::vector<float> positions;
     std::vector<float> normals;
     std::vector<float> tex_coords;
@@ -36,10 +38,8 @@ struct MeshData {
     std::vector<uint32_t> indices_array_uint32;
 
     GLMeshInfo createGlMesh();
-    void moveMeshDataToPrimitive(fw64Primitive& primitive);
-    bool hasMultipleJointIndices();
 
-    std::vector<MeshData> splitByJointIndex();
+    Box computeBoundingBox() const;
 };
 
 

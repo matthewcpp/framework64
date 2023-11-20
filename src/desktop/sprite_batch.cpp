@@ -55,21 +55,6 @@ namespace framework64 {
         submitCurrentBatch();
     }
 
-    void SpriteBatch::drawPixelTexture(PixelTexture& pixel_texture) {
-        glDisable(GL_DEPTH_TEST);
-
-        auto* sprite_shader = sprite_material.shader;
-        glUseProgram(sprite_shader->handle);
-
-        matrix_set_identity(sprite_transform_uniform_block.data.mvp_matrix.data());
-        glUniformBlockBinding(sprite_material.shader->handle, sprite_shader->mesh_transform_uniform_block_index, sprite_transform_uniform_block.binding_index);
-        sprite_transform_uniform_block.update();
-
-        auto* shader = pixel_texture.material.shader->shader;
-        shader->setUniforms(pixel_texture.material.shader, pixel_texture.material);
-        drawSpriteVertices(pixel_texture.sprite_vertices.data(), pixel_texture.sprite_vertices.size(), pixel_texture.material);
-    }
-
     void SpriteBatch::submitCurrentBatch() {
         if (vertex_buffer.size() == 0 || current_material == nullptr)
             return;
@@ -171,7 +156,9 @@ namespace framework64 {
     }
 
     void SpriteBatch::drawText(fw64Font* font, float x, float y, const char* text, uint32_t count){
-        if (!text || text[0] == 0) return;
+        if (!text || text[0] == 0){
+            return;
+        }
 
         uint32_t glyph_index;
         text = font->getNextGlyphIndex(text, glyph_index);
@@ -183,8 +170,9 @@ namespace framework64 {
             drawSpriteFrame(font->texture.get(), glyph_index, x + glyph.left, y + glyph.top, 1.0f, 1.0f);
             x += glyph.advance;
 
-            if (text[0] == 0)
+            if (text[0] == 0) {
                 break;
+            }
 
             text = font->getNextGlyphIndex(text, glyph_index);
         }

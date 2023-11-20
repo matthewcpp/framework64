@@ -2,17 +2,26 @@
 #include "framework64/desktop/engine.h"
 #include "framework64/desktop/input.h"
 
+#include <CLI/CLI.hpp>
 #include <SDL2/SDL.h>
 
 #include <iostream>
 #include <string>
 
-fw64SaveFile::SaveFileType getSaveFileType(std::string const & type_name);
+framework64::Engine::Settings parse_settings(int argc, char** argv);
 
 int main(int argc, char** argv) {
     framework64::Engine engine;
+    framework64::Engine::Settings settings;
 
-    if (!engine.init(FW64_APPLICATION_NAME, getSaveFileType(FW64_SAVE_FILE_TYPE), 320, 240)) {
+#ifdef FW64_MEDIA_DIR_NAME
+    settings.media_dir_name = FW64_MEDIA_DIR_NAME;
+#endif
+
+    CLI::App app("framework64");
+    CLI11_PARSE(app, argc, argv);
+
+    if (!engine.init(settings)) {
         std::cout << "Failed to initialize engine." << std::endl;
         return 1;
     }
