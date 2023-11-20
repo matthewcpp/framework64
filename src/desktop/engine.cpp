@@ -30,6 +30,10 @@ bool Engine::init(Settings const & settings) {
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO);
 
+    if (!display.init(settings)) {
+        return false;
+    }
+
     int result = IMG_Init(IMG_INIT_PNG);
 
     if ((result & IMG_INIT_PNG) != IMG_INIT_PNG) {
@@ -55,7 +59,7 @@ bool Engine::init(Settings const & settings) {
     n64_input_interface = std::make_unique<N64InputInterface>();
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
 
-    renderer = new fw64Renderer();
+    renderer = new fw64Renderer(display);
     save_file = new fw64SaveFile();
     assets = new fw64AssetDatabase(asset_dir_path, *shader_cache);
     audio = new fw64Audio();

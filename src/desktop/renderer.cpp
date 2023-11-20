@@ -6,7 +6,7 @@
 #include <iostream>
 
 bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_cache) {
-    if (!initDisplay(width, height))
+    if (!initFramebuffer(width, height))
         return false;
 
     glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
@@ -27,30 +27,11 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
     return true;
 }
 
-bool fw64Renderer::initDisplay(int width, int height) {
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-    window = SDL_CreateWindow("framework64", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-    
-    if (window == nullptr) {
-        std::cout << "Could not create SDL window: " << SDL_GetError() << std::endl;
+bool fw64Renderer::initFramebuffer(int width, int height) {
+    if (!framebuffer.initialize(width, height)) {
+        std::cout << "Failed to initialize framebuffer" << std::endl;
         return false;
     }
-
-    gl_context = SDL_GL_CreateContext(window);
-
-    GLenum err = glewInit();
-
-    if (err != GLEW_OK) {
-        return false;
-    }
-
-    std::cout << "Created OpenGL context: " << glGetString(GL_VERSION) << std::endl;
-
     return true;
 }
 
@@ -71,6 +52,23 @@ void fw64Renderer::initLighting() {
 void fw64Renderer::setClearColor(float r, float g, float b, float a) {
     clear_color = {r, g, b, a};
     glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
+}
+
+void fw64Renderer::beginFrame() {
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.framebuffer_handle);
+}
+
+void fw64Renderer::endFrame() {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer.framebuffer_handle);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    glBlitFramebuffer(  0, 0, framebuffer.width, framebuffer.height,
+                        0, 0, display.width(), display.height(),
+                        GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    display.swap();
 }
 
 void fw64Renderer::begin(fw64PrimitiveMode mode, fw64RendererFlags flags) {
@@ -120,7 +118,6 @@ IVec2 fw64Renderer::getViewportSize(fw64Camera* camera) {
         static_cast<int>(camera->viewport_size.y * screen_height)
     };
 }
-
 
 void fw64Renderer::setCamera(fw64Camera* camera) {
     if (camera == current_camera)
@@ -173,10 +170,6 @@ void fw64Renderer::setGlDepthTestingState() {
 
 void fw64Renderer::end(fw64RendererFlags flags) {
     setDrawingMode(DrawingMode::None);
-
-    if ((flags & FW64_RENDERER_FLAG_SWAP) == FW64_RENDERER_FLAG_SWAP){
-        SDL_GL_SwapWindow(window);
-    }
 
     current_camera = nullptr;
     active_shader = nullptr;
