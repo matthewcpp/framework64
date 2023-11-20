@@ -2,6 +2,7 @@
 
 #include "framework64/desktop/engine.hpp"
 #include "framework64/desktop/input.hpp"
+#include "framework64/desktop/renderer.hpp"
 
 #include <CLI/CLI.hpp>
 #include <SDL2/SDL.h>
@@ -9,14 +10,16 @@
 #include <iostream>
 #include <string>
 
-framework64::Engine::Settings parse_settings(int argc, char** argv);
-
 int main(int argc, char** argv) {
     framework64::Engine engine;
-    framework64::Engine::Settings settings;
+    framework64::Settings settings;
 
 #ifdef FW64_MEDIA_DIR_NAME
     settings.media_dir_name = FW64_MEDIA_DIR_NAME;
+#endif
+
+#ifdef FW64_APPLICATION_NAME
+    settings.application_name = FW64_APPLICATION_NAME;
 #endif
 
     CLI::App app("framework64");
@@ -63,7 +66,10 @@ int main(int argc, char** argv) {
         if (time_delta >= 32) {
             engine.update(static_cast<float>(time_delta) / 1000.0f);
             game_update(&game);
+
+            engine.renderer->beginFrame();
             game_draw(&game);
+            engine.renderer->endFrame();
 
             last_update = now;
         }

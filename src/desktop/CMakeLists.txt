@@ -5,11 +5,13 @@ set(platform_source_files
 ${desktop_include_directory}/asset_database.hpp asset_database.cpp
 ${desktop_include_directory}/audio.hpp audio.cpp
 ${desktop_include_directory}/data_link.hpp data_link.cpp
+${desktop_include_directory}/display.hpp display.cpp
 ${desktop_include_directory}/engine.hpp engine.cpp
 ${desktop_include_directory}/filesystem.hpp filesystem.cpp
 ${desktop_include_directory}/file_datasource.hpp file_datasource.cpp
 ${desktop_include_directory}/fill_shader.hpp fill_shader.cpp
 ${desktop_include_directory}/font.hpp font.cpp
+${desktop_include_directory}/framebuffer.hpp framebuffer.cpp
 ${desktop_include_directory}/gouraud_shader.hpp gouraud_shader.cpp
 ${desktop_include_directory}/input.hpp input.cpp
 ${desktop_include_directory}/image.hpp image.cpp
@@ -27,6 +29,7 @@ quad.cpp
 ${desktop_include_directory}/renderer.hpp renderer.cpp
 render_util.cpp
 ${desktop_include_directory}/save_file.hpp save_file.cpp
+${desktop_include_directory}/settings.hpp
 ${desktop_include_directory}/screen_overlay.hpp screen_overlay.cpp
 ${desktop_include_directory}/shader.hpp shader.cpp
 ${desktop_include_directory}/shader_cache.hpp shader_cache.cpp

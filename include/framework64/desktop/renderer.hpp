@@ -2,10 +2,12 @@
 
 #include "framework64/renderer.h"
 
+#include "framework64/desktop/display.hpp"
 #include "framework64/desktop/shader_cache.hpp"
 #include "framework64/desktop/screen_overlay.hpp"
 #include "framework64/desktop/sprite_batch.hpp"
 #include "framework64/desktop/uniform_block.hpp"
+#include "framework64/desktop/framebuffer.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -21,6 +23,10 @@
 #include <vector>
 
 struct fw64Renderer {
+public: 
+    fw64Renderer(framework64::Display& display)
+        : display(display) {}
+
 public:
     bool init(int width, int height, framework64::ShaderCache& shader_cache);
 
@@ -33,10 +39,13 @@ public:
     void clearViewport(fw64Camera* camera, fw64RendererFlags flags);
     IVec2 getViewportSize(fw64Camera* camera);
 
+    void beginFrame();
+    void endFrame();
+
 private:
     bool initDisplay(int width, int height);
     void initLighting();
-
+    bool initFramebuffer(int width, int height);
 public:
     void drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform);
     void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
@@ -135,8 +144,8 @@ public:
     framework64::SpriteBatch sprite_batch;
     fw64Primitive::Mode primitive_type;
     DrawingMode drawing_mode = DrawingMode::None;
-    int screen_width;
-    int screen_height;
+    int screen_width, screen_height; // size of the main render texture
+    
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
 
     // Note: This is not currently implemented for desktop rendering
@@ -145,7 +154,8 @@ public:
     fw64Camera* current_camera = nullptr;
 
     bool sprite_scissor_enabled = false;
+
 private:
-    SDL_Window* window;
-    SDL_GLContext gl_context;
+    framework64::Display& display;
+    framework64::Framebuffer framebuffer;
 };
