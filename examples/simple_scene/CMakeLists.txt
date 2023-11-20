@@ -7,4 +7,5 @@ set(src_files
 
     create_game(
         TARGET simple_scene
-        SOURCES ${src_files})
+        SOURCES ${src_files}
+        EXTRA_LIBS fw64_components)

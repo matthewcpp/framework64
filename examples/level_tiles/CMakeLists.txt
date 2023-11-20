@@ -4,5 +4,5 @@ set(src_files
 create_game(
     TARGET level_tiles
     SOURCES ${src_files}
-    EXTRA_LIBS example_common
+    EXTRA_LIBS fw64_components
 )

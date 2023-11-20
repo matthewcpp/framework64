@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
     fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 255);
 
@@ -11,23 +12,22 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 0);
 
-    n64_logo_sprite_init(&game->n64logo, fw64_image_load(game->engine->assets, FW64_ASSET_image_n64_logo, NULL));
+    n64_logo_sprite_init(&game->n64logo, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_n64_logo, allocator));
     game->n64logo.position.x = 10;
     game->n64logo.position.y = 10;
 
-    ken_sprite_init(&game->ken_sprite, fw64_image_load(game->engine->assets, FW64_ASSET_image_ken, NULL));
+    ken_sprite_init(&game->ken_sprite, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_ken, allocator));
 
-    IVec2 screen_size;
-    fw64_renderer_get_screen_size(game->engine->renderer, &screen_size);
+    IVec2 screen_size = fw64_renderer_get_screen_size(game->engine->renderer);
     game->ken_sprite.position.x = 10;
     game->ken_sprite.position.y = screen_size.y - 10 - fw64_texture_height(game->ken_sprite.sprite);
 
-    elapsed_time_init(&game->elapsed_time, fw64_font_load(engine->assets, FW64_ASSET_font_basicLAZER, NULL));
-    fw64Font* sm64_font = fw64_font_load(engine->assets, FW64_ASSET_font_Mario64, NULL);
+    elapsed_time_init(&game->elapsed_time, fw64_assets_load_font(engine->assets, FW64_ASSET_font_basicLAZER, allocator));
+    fw64Font* sm64_font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Mario64, allocator);
     typewriter_text_init(&game->typewriter_text, "super mario 64", sm64_font);
 
-    game->nintendo_seal = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_nintendo_seal, NULL), NULL);
-    game->overlay = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_overlay, NULL), NULL);
+    game->nintendo_seal = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_nintendo_seal, allocator), allocator);
+    game->overlay = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_overlay, allocator), allocator);
 }
 
 void game_update(Game* game){

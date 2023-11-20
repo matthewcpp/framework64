@@ -13,6 +13,7 @@ static void shake_quad(Game* game);
 static void set_shake_speed(Game* game);
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
     fw64_camera_init(&game->camera);
 
@@ -20,10 +21,10 @@ void game_init(Game* game, fw64Engine* engine) {
     game->rumble_duration = 2.0f;
 
     fw64_node_init(&game->node);
-    fw64_node_set_mesh(&game->node, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, NULL));
+    fw64_node_set_mesh(&game->node, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, allocator));
 
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
-    game->buttons = fw64_texture_create_from_image(fw64_image_load(engine->assets, FW64_ASSET_image_buttons, NULL), NULL);
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
+    game->buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
 
     set_shake_speed(game);
     game->shake_time = 0.0f;
@@ -73,7 +74,6 @@ void game_draw(Game* game) {
     char text[32];
     IVec2 viewport_size = fw64_renderer_get_viewport_size(renderer, &game->camera);
 
-
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
 
     fw64_renderer_set_camera(renderer, &game->camera);
@@ -96,7 +96,6 @@ void game_draw(Game* game) {
     draw_x += fw64_texture_slice_width(game->buttons) + 5;
     sprintf(text, "frequency: %.2f", game->rumble_frequency);
     fw64_renderer_draw_text(renderer, game->font, draw_x, draw_y, text);
-    
 
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }

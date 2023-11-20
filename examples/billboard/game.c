@@ -9,6 +9,7 @@
 static void create_ground_plane(Game* game);
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
 
     fw64_renderer_set_clear_color(engine->renderer, 0, 17, 51);
@@ -27,14 +28,14 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_node_update(&game->flame.entity);
 
     fw64_node_init(&game->campfire);
-    fw64_node_set_mesh(&game->campfire, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_campfire, NULL));
+    fw64_node_set_mesh(&game->campfire, fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_campfire, allocator));
     vec3_set(&game->campfire.transform.scale, 0.5f, 0.5f, 0.5f);
     fw64_node_update(&game->campfire);
 
     create_ground_plane(game);
 
     fw64_node_init(&game->moon);
-    fw64_node_set_mesh(&game->moon, fw64_textured_quad_create(engine, FW64_ASSET_image_moon, NULL));
+    fw64_node_set_mesh(&game->moon, fw64_textured_quad_create(engine, FW64_ASSET_image_moon, allocator));
     vec3_set(&game->moon.transform.scale, 5.0f, 5.0f, 5.0f);
     vec3_set(&game->moon.transform.position, -100.0f, 50.0f, -100.0f);
     fw64_node_update(&game->moon);
@@ -48,7 +49,7 @@ void create_ground_plane(Game* game) {
     params.max_t = 4.0f;
 
     fw64_node_init(&game->ground);
-    fw64_node_set_mesh(&game->ground, fw64_textured_quad_create_with_params(game->engine, &params, NULL));
+    fw64_node_set_mesh(&game->ground, fw64_textured_quad_create_with_params(game->engine, &params, fw64_default_allocator()));
     fw64Texture* texture = fw64_material_get_texture(fw64_mesh_get_material_for_primitive(game->ground.mesh, 0));
     fw64_texture_set_wrap_mode(texture, FW64_TEXTURE_WRAP_REPEAT, FW64_TEXTURE_WRAP_REPEAT);
     quat_from_euler(&game->ground.transform.rotation, 90.0f, 0.0f, 0.0f);

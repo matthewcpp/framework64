@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/node.h"
 #include "framework64/scene.h"
-#include "common/fps_camera.h"
+#include "fps_camera/fps_camera.h"
 
 typedef struct {
     fw64Mesh* mesh;

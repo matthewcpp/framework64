@@ -7,7 +7,7 @@
 
 #include "framework64/util/quad.h"
 
-#include "common/fps_camera.h"
+#include "fps_camera/fps_camera.h"
 
 typedef struct {
     fw64Engine* engine;

@@ -3,6 +3,8 @@
 
 #include "framework64/n64/controller_button.h"
 
+#include <stdio.h>
+
 static void draw_ui_state(Game* game);
 static void change_selection(Game* game, int direction);
 static void change_palette(Game* game, int direction);
@@ -10,14 +12,13 @@ static void change_palette(Game* game, int direction);
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas, fw64_default_allocator());
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas, fw64_default_allocator());
     
-    fw64Mesh* mesh = fw64_mesh_load(engine->assets, FW64_ASSET_mesh_number_cube, fw64_default_allocator());
+    fw64Mesh* mesh = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_number_cube, fw64_default_allocator());
     fw64_node_init(&game->node);
     fw64_node_set_mesh(&game->node, mesh);
 
-    Box bounding_box;
-    fw64_mesh_get_bounding_box(mesh, &bounding_box);
+    Box bounding_box = fw64_mesh_get_bounding_box(mesh);
     fw64_arcball_init(&game->arcball, engine->input);
     fw64_arcball_set_initial(&game->arcball, &bounding_box);
     game->arcball.camera.near = 1.0f;

@@ -15,12 +15,12 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_renderer_set_clear_color(engine->renderer, 100, 100, 100);
 
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_header, fw64_default_allocator());
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_header, fw64_default_allocator());
     game->image_format = IMAGE_FORMAT_NONE;
     game->texture = fw64_texture_create_from_image(NULL, fw64_default_allocator());
     set_image(game, IMAGE_FORMAT_NONE + 1);
 
-    fw64_renderer_get_screen_size(engine->renderer, &game->screen_size);
+    game->screen_size = fw64_renderer_get_screen_size(engine->renderer);
 }
 
 void game_update(Game* game){
@@ -79,38 +79,38 @@ void set_image(Game* game, ImageFormat image_format) {
 
     switch(game->image_format) {
         case IMAGE_FORMAT_RGBA32:
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_rgba32, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_rgba32, fw64_default_allocator()));
             format_name = "RGBA32";
             break;
 
         case IMAGE_FORMAT_CI8:
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ci8, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_ci8, fw64_default_allocator()));
             format_name = "CI8";
             break;
 
         case IMAGE_FORMAT_CI4:
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ci4, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_ci4, fw64_default_allocator()));
             format_name = "CI4";
             break;
 
         case IMAGE_FORMAT_IA8:
             format_name = "IA8";
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ia8, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_ia8, fw64_default_allocator()));
             break;
 
         case IMAGE_FORMAT_IA4:
             format_name = "IA4";
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_ia4, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_ia4, fw64_default_allocator()));
             break;
 
         case IMAGE_FORMAT_I8:
             format_name = "I8";
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_i8, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_i8, fw64_default_allocator()));
             break;
 
         case IMAGE_FORMAT_I4:
             format_name = "I4";
-            fw64_texture_set_image(game->texture, fw64_image_load(game->engine->assets, FW64_ASSET_image_i4, fw64_default_allocator()));
+            fw64_texture_set_image(game->texture, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_i4, fw64_default_allocator()));
             break;
 
         case IMAGE_FORMAT_NONE:

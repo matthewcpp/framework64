@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/level.h"
 #include "framework64/util/bump_allocator.h"
-#include "common/fps_camera.h"
+#include "fps_camera/fps_camera.h"
 
 #define ACTIVE_TILE_COUNT 6
 

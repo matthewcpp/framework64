@@ -12,15 +12,16 @@ static void draw_ui(Game* game);
 static void read_data(Game* game);
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
     memset(&game->save_data, 0, sizeof(SaveData));
 
     fw64_camera_init(&game->camera);
 
     fw64_node_init(&game->solid_cube);
-    fw64_node_set_mesh(&game->solid_cube, fw64_mesh_load(engine->assets, FW64_ASSET_mesh_blue_cube, NULL));
+    fw64_node_set_mesh(&game->solid_cube, fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_blue_cube, allocator));
     
-    game->font = fw64_font_load(engine->assets, FW64_ASSET_font_Consolas12, NULL);
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
 
     game->rotation = 0.0f;
     game->loaded = 0;
