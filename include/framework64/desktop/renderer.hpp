@@ -2,10 +2,10 @@
 
 #include "framework64/renderer.h"
 
-#include "framework64/desktop/shader_cache.h"
-#include "framework64/desktop/screen_overlay.h"
-#include "framework64/desktop/sprite_batch.h"
-#include "framework64/desktop/uniform_block.h"
+#include "framework64/desktop/shader_cache.hpp"
+#include "framework64/desktop/screen_overlay.hpp"
+#include "framework64/desktop/sprite_batch.hpp"
+#include "framework64/desktop/uniform_block.hpp"
 
 #include <SDL2/SDL.h>
 

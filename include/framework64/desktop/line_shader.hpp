@@ -1,6 +1,6 @@
 #pragma once
 
-#include "framework64/desktop/shader.h"
+#include "framework64/desktop/shader.hpp"
 
 namespace framework64 {
 

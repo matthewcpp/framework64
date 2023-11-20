@@ -1,4 +1,4 @@
-#include "framework64/desktop/n64_input_interface.h"
+#include "framework64/desktop/n64_input_interface.hpp"
 
 #include "framework64/n64/controller_button.h"
 

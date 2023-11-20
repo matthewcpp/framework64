@@ -1,10 +1,10 @@
 #pragma once
 
-#include "framework64/desktop/fill_shader.h"
-#include "framework64/desktop/gouraud_shader.h"
-#include "framework64/desktop/line_shader.h"
-#include "framework64/desktop/sprite_shader.h"
-#include "framework64/desktop/unlit_shader.h"
+#include "framework64/desktop/fill_shader.hpp"
+#include "framework64/desktop/gouraud_shader.hpp"
+#include "framework64/desktop/line_shader.hpp"
+#include "framework64/desktop/sprite_shader.hpp"
+#include "framework64/desktop/unlit_shader.hpp"
 
 #include <memory>
 #include <string>

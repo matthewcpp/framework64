@@ -1,6 +1,6 @@
 #pragma once
 
-#include "framework64/desktop/input_interface.h"
+#include "framework64/desktop/input_interface.hpp"
 
 namespace framework64 {
 

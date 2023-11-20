@@ -1,4 +1,4 @@
-#include "test_sparse_set.h"
+#include "test_sparse_set.hpp"
 
 TEST_F(SparseSetTest, AllocItems) {
     fw64SparseSetHandle handles[4];

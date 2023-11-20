@@ -1,8 +1,8 @@
-#include "framework64/desktop/material_bundle.h"
+#include "framework64/desktop/material_bundle.hpp"
 
-#include "framework64/desktop/asset_database.h"
-#include "framework64/desktop/image.h"
-#include "framework64/desktop/material.h"
+#include "framework64/desktop/asset_database.hpp"
+#include "framework64/desktop/image.hpp"
+#include "framework64/desktop/material.hpp"
 
 #include <cassert>
 #include <limits>

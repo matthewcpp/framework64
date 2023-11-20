@@ -1,5 +1,5 @@
-#include "framework64/desktop/gouraud_shader.h"
-#include "framework64/desktop/texture.h"
+#include "framework64/desktop/gouraud_shader.hpp"
+#include "framework64/desktop/texture.hpp"
 
 #include <memory>
 

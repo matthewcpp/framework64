@@ -1,4 +1,4 @@
-#include "framework64/desktop/texture.h"
+#include "framework64/desktop/texture.hpp"
 
 #include <SDL2/SDL_image.h>
 

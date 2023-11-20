@@ -2,7 +2,7 @@
 
 #include "framework64/font.h"
 #include "framework64/vec2.h"
-#include "framework64/desktop/texture.h"
+#include "framework64/desktop/texture.hpp"
 
 #include <limits>
 #include <memory>

@@ -5,10 +5,10 @@
 #include "framework64/allocator.h"
 #include "framework64/data_io.h"
 
-#include "framework64/desktop/material.h"
-#include "framework64/desktop/material_bundle.h"
+#include "framework64/desktop/material.hpp"
+#include "framework64/desktop/material_bundle.hpp"
 
-#include "framework64/desktop/primitive_data.h"
+#include "framework64/desktop/primitive_data.hpp"
 
 #ifdef __linux__
 #include <GL/glew.h>

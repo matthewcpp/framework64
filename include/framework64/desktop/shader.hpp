@@ -1,7 +1,7 @@
 #pragma once
 
-#include "framework64/desktop/material.h"
-#include "framework64/desktop/texture_info_uniform.h"
+#include "framework64/desktop/material.hpp"
+#include "framework64/desktop/texture_info_uniform.hpp"
 
 #ifdef __linux__
 #include <GL/glew.h>
