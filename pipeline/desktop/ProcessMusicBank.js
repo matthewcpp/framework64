@@ -1,4 +1,5 @@
 const AudioHeader = require("../AudioHeader");
+const Util = require("../Util");
 
 const fs = require("fs");
 const path = require("path");
@@ -22,7 +23,8 @@ async function convertMidiToOgg(sourceDir, sourceFile, destDir, destFile) {
 async function processMusicBank(musicBank, bundle, baseDirectory, outputDirectory, includeDirectory) {
     const musicBankName = (!!musicBank.name) ? musicBank.name : path.basename(musicBank.dir);
     const sourceDir = path.join(baseDirectory, musicBank.dir);
-    const destDir = path.join(outputDirectory, musicBankName);
+    const destDirName = Util.safeDefineName(musicBankName);
+    const destDir = path.join(outputDirectory, destDirName);
 
     fs.mkdirSync(destDir);
 
@@ -43,9 +45,19 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
 
             fs.copyFileSync(sourceFilePath, destFilePath);
         }
+        else {
+            throw new Error("Music files should be in either midi or ogg format.");
+        }
     }
 
-    bundle.addMusicBank(musicBank, files);
+    const infoBuffer = Buffer.alloc(4);
+    infoBuffer.writeUint32LE(files.length, 0);
+    const infoFilePath = path.join(destDir, "info.musicbank");
+    const infoFile = fs.openSync(infoFilePath, "w");
+    fs.writeSync(infoFile, infoBuffer);
+    fs.closeSync(infoFile)
+
+    bundle.addMusicBank(musicBankName, destDirName);
     AudioHeader.writeMusicBankHeader(sourceDir, musicBankName, includeDirectory);
 }
 

@@ -45,7 +45,7 @@
     ],
     "musicBanks": [
         {
-            "name": "musicbank2",
+            "name": "musicbank",
             "dir": "music/bank2"
         }
     ]

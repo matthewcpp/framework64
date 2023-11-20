@@ -8,7 +8,6 @@ typedef struct {
     fw64Camera camera;
     fw64Texture* buttons;
     fw64Font* font;
-    fw64MusicBank* music_bank;
     fw64Node n64_logo;
     float music_playback_speed;
     float rotation;
