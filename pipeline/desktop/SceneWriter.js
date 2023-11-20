@@ -1,27 +1,25 @@
-const MeshWriter = require("./N64MeshWriter");
 const SceneDataWriter = require("../SceneDataWriter");
 const MaterialBundleWriter = require("./MaterialBundleWriter");
-
-const fs = require("fs");
-const path = require("path");
-
+const MeshWriter = require("./MeshWriter")
 const WriteInterface = require("../WriteInterface");
 
+const fs = require("fs");
+
 async function write(scene, gltfData, destPath) {
-    const writer = WriteInterface.bigEndian();
-    const images = await MeshWriter.createN64Images(gltfData);
+    const writer = WriteInterface.littleEndian();
+    const images = await MaterialBundleWriter.createDesktopImages(gltfData);
     const materialBundle = scene.materialBundle;
 
     const file = fs.openSync(destPath, "w");
 
     SceneDataWriter.writeSceneInfo(scene, file, writer);
     if (scene.materialBundle) {
-        MaterialBundleWriter.write(materialBundle.gltfData, materialBundle, images, file);
+        await MaterialBundleWriter.write(scene.materialBundle, images, gltfData, file);
     }
 
     for (const gltfMeshIndex of scene.meshBundle) {
         const mesh = gltfData.meshes[gltfMeshIndex];
-        await MeshWriter.writeStaticMeshData(mesh, materialBundle, images, file);
+        await MeshWriter.writeMeshData(mesh, materialBundle, file);
     }
 
     // The order in which these are written out needs to align with scene.c reading
@@ -33,5 +31,5 @@ async function write(scene, gltfData, destPath) {
 }
 
 module.exports = {
-    write: write
+    write : write
 }
