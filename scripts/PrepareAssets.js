@@ -1,4 +1,5 @@
 const Pipeline = require("../pipeline/Pipeline");
+const BuildInfo = require("../pipeline/BuildInfo");
 const prepareDesktopShaders = require("./PrepareDesktopShaders");
 const prepareWindowsDlls = require("./PrepareWindowsDlls");
 
@@ -9,20 +10,33 @@ const rimraf = require("rimraf");
 async function prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, gameName, pluginDirPath) {
 	const gameBinDirectory = path.join(platformBuildDir,  "bin", gameName);
 	const assetOutputDirectory = path.join(gameBinDirectory, "assets");
-    const assetIncludeDirectory = path.join(assetOutputDirectory, "include", "assets");
 
     if (fse.existsSync(assetOutputDirectory)) {
         rimraf.sync(assetOutputDirectory);
     }
 
-    fse.ensureDirSync(assetIncludeDirectory);
+    platform = platform.toLowerCase();
+
+    switch(platform) {
+        case "desktop": {
+            BuildInfo.initDesktop(platformBuildDir);
+            break;
+        }
+
+        case "n64": {
+            BuildInfo.initN64();
+            break;
+        }
+
+        default: {
+            throw new Error(`Build Info not configured for: ${platform}`);
+        }
+    }
+    
 
     await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, assetOutputDirectory, pluginDirPath);
 
-    const shouldPrepareShaders = platform.toLowerCase() === "desktop";
-    
-
-    if (shouldPrepareShaders) {
+    if (platform === "desktop") {
         const shaderDestDir = path.join(gameBinDirectory, "glsl");
         prepareDesktopShaders(shaderDestDir);
     }
