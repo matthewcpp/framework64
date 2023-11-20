@@ -1,6 +1,6 @@
-#include "framework64/desktop/audio.h"
+#include "framework64/desktop/audio.hpp"
 
-#include "framework64/desktop/asset_database.h"
+#include "framework64/desktop/asset_database.hpp"
 
 #include <SDL2/SDL_mixer.h>
 

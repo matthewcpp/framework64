@@ -1,6 +1,6 @@
-#include "framework64/desktop/font.h"
+#include "framework64/desktop/font.hpp"
 
-#include "framework64/desktop/asset_database.h"
+#include "framework64/desktop/asset_database.hpp"
 
 #include <algorithm>
 #include <cassert>

@@ -1,11 +1,11 @@
-#include "framework64/desktop/asset_database.h"
-
-#include "framework64/skinned_mesh.h"
-#include "framework64/desktop/image.h"
-#include "framework64/desktop/font.h"
-#include "framework64/desktop/mesh.h"
+#include "framework64/desktop/asset_database.hpp"
 
 #include "framework64/scene.h"
+#include "framework64/skinned_mesh.h"
+
+#include "framework64/desktop/image.hpp"
+#include "framework64/desktop/font.hpp"
+#include "framework64/desktop/mesh.hpp"
 
 #include <iostream>
 

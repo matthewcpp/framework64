@@ -2,11 +2,11 @@
 
 #include "framework64/camera.h"
 
-#include "framework64/desktop/font.h"
-#include "framework64/desktop/material.h"
-#include "framework64/desktop/shader_cache.h"
-#include "framework64/desktop/texture.h"
-#include "framework64/desktop/uniform_block.h"
+#include "framework64/desktop/font.hpp"
+#include "framework64/desktop/material.hpp"
+#include "framework64/desktop/shader_cache.hpp"
+#include "framework64/desktop/texture.hpp"
+#include "framework64/desktop/uniform_block.hpp"
 
 #ifdef __linux__
 #include <GL/glew.h>

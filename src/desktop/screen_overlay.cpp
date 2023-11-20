@@ -1,6 +1,6 @@
-#include "framework64/desktop/screen_overlay.h"
+#include "framework64/desktop/screen_overlay.hpp"
 
-#include "framework64/desktop/primitive_data.h"
+#include "framework64/desktop/primitive_data.hpp"
 
 namespace framework64 {
 

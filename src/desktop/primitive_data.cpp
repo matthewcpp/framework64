@@ -1,5 +1,5 @@
-#include "framework64/desktop/primitive_data.h"
-#include "framework64/desktop/mesh.h"
+#include "framework64/desktop/primitive_data.hpp"
+#include "framework64/desktop/mesh.hpp"
 
 #include <algorithm>
 #include <assert.h>

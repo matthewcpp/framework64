@@ -1,6 +1,6 @@
-#include "framework64/desktop/material.h"
-#include "framework64/desktop/shader_cache.h"
-#include "framework64/desktop/texture.h"
+#include "framework64/desktop/material.hpp"
+#include "framework64/desktop/shader_cache.hpp"
+#include "framework64/desktop/texture.hpp"
 
 void fw64Material::updateShader() {
 

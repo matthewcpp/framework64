@@ -1,8 +1,8 @@
 #pragma once
 
 #include "framework64/asset_database.h"
-#include "framework64/desktop/file_datasource.h"
-#include "framework64/desktop/shader_cache.h"
+#include "framework64/desktop/file_datasource.hpp"
+#include "framework64/desktop/shader_cache.hpp"
 
 #include <filesystem>
 #include <memory>

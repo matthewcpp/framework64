@@ -1,8 +1,7 @@
 #pragma once
 
-#include "framework64/desktop/image.h"
 #include "framework64/texture.h"
-
+#include "framework64/desktop/image.hpp"
 #include <cstdint>
 #include <string>
 

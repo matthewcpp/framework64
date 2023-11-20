@@ -1,12 +1,12 @@
-#include "framework64/desktop/engine.h"
+#include "framework64/desktop/engine.hpp"
 
-#include "framework64/desktop/asset_database.h"
-#include "framework64/desktop/audio.h"
-#include "framework64/desktop/data_link.h"
-#include "framework64/desktop/filesystem.h"
-#include "framework64/desktop/input.h"
-#include "framework64/desktop/media.h"
-#include "framework64/desktop/renderer.h"
+#include "framework64/desktop/asset_database.hpp"
+#include "framework64/desktop/audio.hpp"
+#include "framework64/desktop/data_link.hpp"
+#include "framework64/desktop/filesystem.hpp"
+#include "framework64/desktop/input.hpp"
+#include "framework64/desktop/media.hpp"
+#include "framework64/desktop/renderer.hpp"
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>

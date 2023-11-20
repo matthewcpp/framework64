@@ -1,8 +1,8 @@
-#include "framework64/desktop/mesh.h"
+#include "framework64/desktop/mesh.hpp"
 
-#include "framework64/desktop/asset_database.h"
-#include "framework64/desktop/primitive_data.h"
-#include "framework64/desktop/shader_cache.h"
+#include "framework64/desktop/asset_database.hpp"
+#include "framework64/desktop/primitive_data.hpp"
+#include "framework64/desktop/shader_cache.hpp"
 
 #include <cassert>
 

@@ -1,8 +1,8 @@
-#include "framework64/desktop/sprite_batch.h"
+#include "framework64/desktop/sprite_batch.hpp"
 
 #include "framework64/matrix.h"
 
-#include "framework64/desktop/shader.h"
+#include "framework64/desktop/shader.hpp"
 
 namespace framework64 {
     bool SpriteBatch::init(ShaderCache& shader_cache) {

@@ -1,6 +1,7 @@
 #include "game.h"
-#include "framework64/desktop/engine.h"
-#include "framework64/desktop/input.h"
+
+#include "framework64/desktop/engine.hpp"
+#include "framework64/desktop/input.hpp"
 
 #include <CLI/CLI.hpp>
 #include <SDL2/SDL.h>

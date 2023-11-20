@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/filesystem.h"
-#include "framework64/desktop/asset_database.h"
+#include "framework64/desktop/asset_database.hpp"
 
 #include <array>
 #include <fstream>

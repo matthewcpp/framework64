@@ -1,7 +1,7 @@
 #include "framework64/util/quad.h"
 
-#include "framework64/desktop/engine.h"
-#include "framework64/desktop/mesh.h"
+#include "framework64/desktop/engine.hpp"
+#include "framework64/desktop/mesh.hpp"
 
 #include <cassert>
 #include <memory>

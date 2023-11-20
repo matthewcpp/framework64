@@ -1,8 +1,8 @@
 #pragma once
 
-#include "framework64/desktop/uniform_block.h"
-#include "framework64/desktop/material.h"
-#include "framework64/desktop/texture.h"
+#include "framework64/desktop/uniform_block.hpp"
+#include "framework64/desktop/material.hpp"
+#include "framework64/desktop/texture.hpp"
 
 namespace framework64 {
 

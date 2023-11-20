@@ -1,9 +1,9 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/desktop/save_file.h"
-#include "framework64/desktop/shader_cache.h"
-#include "framework64/desktop/n64_input_interface.h"
+#include "framework64/desktop/save_file.hpp"
+#include "framework64/desktop/shader_cache.hpp"
+#include "framework64/desktop/n64_input_interface.hpp"
 
 #include <memory>
 

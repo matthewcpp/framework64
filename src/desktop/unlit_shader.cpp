@@ -1,6 +1,6 @@
-#include "framework64/desktop/unlit_shader.h"
+#include "framework64/desktop/unlit_shader.hpp"
 
-#include <framework64/desktop/mesh.h>
+#include "framework64/desktop/mesh.hpp"
 
 #include <memory>
 
