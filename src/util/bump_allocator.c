@@ -12,9 +12,7 @@ typedef enum {
     BUMP_ALLOCATOR_FLAG_OWNS_BUFFER
 } BumpAllocatorFlags;
 
-static void* fw64_bump_allocator_malloc(fw64Allocator* allocator, size_t size) {
-    fw64BumpAllocator* bump = (fw64BumpAllocator*)allocator;
-
+void* fw64_bump_allocator_malloc(fw64BumpAllocator* bump, size_t size) {
     size_t allocated_size = size + ALIGN_SIZE - 1;
     allocated_size -= (allocated_size % ALIGN_SIZE);
 
@@ -27,30 +25,18 @@ static void* fw64_bump_allocator_malloc(fw64Allocator* allocator, size_t size) {
     return bump->previous;
 }
 
-static void* fw64_bump_allocator_memalign(fw64Allocator* allocator, size_t align, size_t size) {
-    fw64BumpAllocator* bump = (fw64BumpAllocator*)allocator;
-
+void* fw64_bump_allocator_memalign(fw64BumpAllocator* bump, size_t align, size_t size) {
     uintptr_t aligned = ((uintptr_t)bump->next + (align - 1)) & ~(align - 1);
     bump->next = (char*)aligned;
 
-    return fw64_bump_allocator_malloc(allocator, size);
-}
-
-static void fw64_bump_allocator_free(fw64Allocator* allocator, void* ptr) {
-    fw64BumpAllocator* bump = (fw64BumpAllocator*)allocator;
-
-    if (ptr == bump->previous) {
-        bump->next = bump->previous;
-    }
+    return fw64_bump_allocator_malloc(bump, size);
 }
 
 // if the buffer to grow was the last chunk allocated then we can just increase the pointer
 // otherwise need to allocate a whole new buffer
-static void* fw64_bump_allocator_realloc(fw64Allocator* allocator, void* ptr, size_t size) {
+void* fw64_bump_allocator_realloc(fw64BumpAllocator* bump, void* ptr, size_t size) {
     if (size == 0)
-        fw64_bump_allocator_free(allocator, ptr);
-
-    fw64BumpAllocator* bump = (fw64BumpAllocator*)allocator;
+        fw64_bump_allocator_free(bump, ptr);
 
     if (ptr == bump->previous) {
         size_t previous_size = bump->next - bump->previous;
@@ -61,17 +47,39 @@ static void* fw64_bump_allocator_realloc(fw64Allocator* allocator, void* ptr, si
         return ptr;
     }
     else {
-        void* data = fw64_bump_allocator_malloc(allocator, size);
+        void* data = fw64_bump_allocator_malloc(bump, size);
         memcpy(data, ptr, size);
         return data;
     }
 }
 
+void fw64_bump_allocator_free(fw64BumpAllocator* bump, void* ptr) {
+    if (ptr == bump->previous) {
+        bump->next = bump->previous;
+    }
+}
+
+static void* fw64_bump_allocator_malloc_interface(fw64Allocator* allocator, size_t size) {
+    return fw64_bump_allocator_malloc((fw64BumpAllocator*)allocator, size);
+}
+
+static void* fw64_bump_allocator_memalign_interface(fw64Allocator* allocator, size_t align, size_t size) {
+    return fw64_bump_allocator_memalign((fw64BumpAllocator*)allocator, align, size);
+}
+
+static void* fw64_bump_allocator_realloc_interface(fw64Allocator* allocator, void* ptr, size_t size) {
+    return fw64_bump_allocator_realloc((fw64BumpAllocator*)allocator, ptr, size);
+}
+
+static void fw64_bump_allocator_free_interface(fw64Allocator* allocator, void* ptr) {
+    fw64_bump_allocator_free((fw64BumpAllocator*)allocator, ptr);
+}
+
 static void setup_bump_allocator(fw64BumpAllocator* bump, char* buffer, size_t size) {
-    bump->interface.malloc = fw64_bump_allocator_malloc;
-    bump->interface.memalign = fw64_bump_allocator_memalign;
-    bump->interface.free = fw64_bump_allocator_free;
-    bump->interface.realloc = fw64_bump_allocator_realloc;
+    bump->interface.malloc = fw64_bump_allocator_malloc_interface;
+    bump->interface.memalign = fw64_bump_allocator_memalign_interface;
+    bump->interface.free = fw64_bump_allocator_free_interface;
+    bump->interface.realloc = fw64_bump_allocator_realloc_interface;
 
     bump->size = size;
     bump->start = buffer;
@@ -98,4 +106,8 @@ void fw64_bump_allocator_reset(fw64BumpAllocator* bump) {
 void fw64_bump_allocator_uninit(fw64BumpAllocator* bump) {
     if (bump->flags & BUMP_ALLOCATOR_FLAG_OWNS_BUFFER)
         fw64_free(bump->start);
+}
+
+uint32_t fw64_bump_allocator_committed(fw64BumpAllocator* bump) {
+    return (uint32_t)(bump->next - bump->start);
 }
