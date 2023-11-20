@@ -3,8 +3,10 @@
 /** \file font.h */
 
 #include "framework64/allocator.h"
-#include "framework64/asset_database.h"
+#include "framework64/data_io.h"
 #include "framework64/vec2.h"
+
+#include "framework64/asset_database.h"
 
 #include <stdint.h>
 
@@ -14,8 +16,8 @@ typedef struct fw64Font fw64Font;
 extern "C" {
 #endif
 
-/** Loads a font with the given index from the asset database. */
-fw64Font* fw64_font_load(fw64AssetDatabase* assets, uint32_t index, fw64Allocator* allocator);
+/** loads a font from a generic datasource. */
+fw64Font* fw64_font_load_from_datasource(fw64DataSource* data_source, fw64Allocator* allocator);
 
 /** Frees all resources used by and deletes a font loaded with \ref fw64_font_load. */
 void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator);

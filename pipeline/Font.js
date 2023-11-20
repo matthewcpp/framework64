@@ -18,10 +18,12 @@ class Font {
     scale = 0;
     ascender = 0;
 
-
-    async loadGlyphs(name, path, sourceString, size) {
-        this._font = await opentype.load(path);
+    constructor(name) {
         this.name = name;
+    }
+
+    async loadGlyphs(path, sourceString, size) {
+        this._font = await opentype.load(path);
         this.size = size;
 
         this.scale = 1.0 / this._font.unitsPerEm * size;
@@ -113,8 +115,9 @@ class Font {
 
         // note this actualy dumps image in BRGA but since we write everything as 255 white no swapping is needed
         const imageBuffer = canvas.toBuffer("raw");
-        const image = new Image();
+        const image = new Image(this.name);
         await image.loadBuffer(imageBuffer, imageWidth, imageHeight);
+        image.setSliceCounts(imageWidth / this.tileWidth, imageHeight / this.tileHeight);
 
         this.image = image;
     }

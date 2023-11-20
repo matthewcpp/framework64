@@ -10,16 +10,9 @@
 #include <malloc.h>
 #include <string.h>
 
-fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index, fw64Allocator* allocator) {
-    if (!allocator) allocator = fw64_default_allocator();
-    int handle = fw64_filesystem_open(index);
-
-    if (handle == FW64_FILESYSTEM_INVALID_HANDLE) {
-        return NULL;
-    }
-
+fw64Font* fw64_font_load_from_datasource(fw64DataSource* data_source, fw64Allocator* allocator) {
     fw64N64FontInfo font_info;
-    fw64_filesystem_read(&font_info, sizeof(fw64N64FontInfo), 1, handle);
+    fw64_data_source_read(data_source, &font_info, sizeof(fw64N64FontInfo), 1);
 
     fw64Font* font = allocator->malloc(allocator, sizeof(fw64Font));
     font->glyph_count = font_info.glyph_count;
@@ -27,16 +20,14 @@ fw64Font* fw64_font_load(fw64AssetDatabase* database, uint32_t index, fw64Alloca
 
     size_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
     font->glyphs = allocator->malloc(allocator, glyph_data_size);
-    fw64_filesystem_read(font->glyphs, 1, glyph_data_size, handle);
+    fw64_data_source_read(data_source, font->glyphs, 1, glyph_data_size);
     
 
     // load the font's image
     fw64Image* image = allocator->malloc(allocator, sizeof(fw64Image));
-    fw64_n64_image_read_data(image, handle, allocator);
+    fw64_n64_image_read_data(image, data_source, allocator);
     fw64_n64_texture_init_with_image(&font->texture, image);
 
-    fw64_filesystem_close(handle);
-    
     return font;
 }
 
