@@ -6,7 +6,6 @@
 #include "camera.h"
 #include "color.h"
 #include "font.h"
-#include "framebuffer.h"
 #include "mesh.h"
 #include "texture.h"
 #include "vec2.h"
@@ -31,8 +30,6 @@ typedef enum {
 #define FW64_RENDERER_MAX_LIGHT_COUNT 2
 
 typedef struct fw64Renderer fw64Renderer;
-
-typedef void(*fw64RendererPostDrawFunc)(fw64Framebuffer*, void*);
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +57,14 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* trans
 
 /** Draws an animated mesh with the supplied transform and animation state. */
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
+
+/**
+ * Enables sprite scissoring.
+ * If you are targeting N64 and need to draw sprites that have negative x / y values enable this ortherwise the sprites will not show up.
+ * By default this is off.
+*/
+void fw64_renderer_set_sprite_scissoring_enabled(fw64Renderer* renderer, int enabled);
+int fw64_renderer_get_sprite_scissoring_enabled(fw64Renderer* renderer);
 
 /**
  * Draws all frames of a sprite.
@@ -92,7 +97,7 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
 void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height);
 
-void fw64_renderer_get_screen_size(fw64Renderer* renderer, IVec2* screen_size);
+IVec2 fw64_renderer_get_screen_size(fw64Renderer* renderer);
 IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera);
 fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);
 
@@ -111,8 +116,6 @@ int fw64_renderer_get_fog_enabled(fw64Renderer* renderer);
  */ 
 void fw64_renderer_set_fog_positions(fw64Renderer* renderer, float fog_min, float fog_max);
 void fw64_renderer_set_fog_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
-
-void fw64_renderer_set_post_draw_callback(fw64Renderer* renderer, fw64RendererPostDrawFunc func, void* arg);
 
 #ifdef __cplusplus
 }

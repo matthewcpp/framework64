@@ -32,9 +32,8 @@ typedef enum {
     FW64_SHADING_MODE_DECAL_TEXTURE,
     FW64_SHADING_MODE_SPRITE,
     FW64_SHADING_MODE_FILL,
-    FW64_SHADING_MODE_TEXT,
     FW64_SHADING_MODE_LINE,
-    Fw64_SHADING_MODE_COUNT
+    FW64_SHADING_MODE_COUNT
 } fw64ShadingMode;
 
 void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, int initial_frame);
