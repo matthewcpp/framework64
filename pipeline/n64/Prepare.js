@@ -42,7 +42,7 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
                 console.log(`Processing Image Atlas: ${image.name}`);
             }
 
-            await processImage(assetDirectory, outputDirectory, image, archive);
+            await processImage(image, archive, assetDirectory, outputDirectory);
         }
     }
 

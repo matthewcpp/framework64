@@ -5,6 +5,7 @@ class N64Texture {
         Clamp: 2
     };
 
+    // index into GLTF data `images` array
     image;
     wrapS = N64Texture.WrapMode.Repeat;
     wrapT = N64Texture.WrapMode.Repeat;
@@ -14,20 +15,6 @@ class N64Texture {
 
     constructor(image) {
         this.image = image;
-    }
-
-    get buffer() {
-        const buff = Buffer.alloc(24);
-        let index = 0;
-
-        index = buff.writeUInt32BE(this.image, index);
-        index = buff.writeUInt32BE(this.wrapS, index);
-        index = buff.writeUInt32BE(this.wrapT, index);
-        index = buff.writeUInt32BE(this.maskS, index);
-        index = buff.writeUInt32BE(this.maskT, index);
-        index = buff.writeUInt32BE(this.paletteIndex, index);
-
-        return buff;
     }
 }
 

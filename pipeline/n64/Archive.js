@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require('crypto');
 
+const Util = require("../Util");
+
 class ArchiveEntry {
     path
     type
@@ -119,8 +121,8 @@ class Archive {
             headerBufferOffset = headerBuffer.writeUInt32BE(archiveOffset, headerBufferOffset);
 
             // define the asset index in the header file
-            const name = path.basename(entry.path, path.extname(entry.path));
-            fs.writeSync(header, `#define ${entry.assetId} ${entry.index}\n`);
+            const name = Util.safeDefineName(entry.assetId);
+            fs.writeSync(header, `#define ${name} ${entry.index}\n`);
 
             const data = fs.readFileSync(entry.path);
 

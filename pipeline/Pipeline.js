@@ -3,7 +3,7 @@
 const { program } = require('commander');
 const rimraf = require("rimraf");
 
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 const Plugins = require("./Plugins");
 
@@ -12,6 +12,9 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     platform = platform.toLowerCase();
 
     const plugins = new Plugins(loadPlugins(pluginDirPath, platform));
+
+    const assetIncludeDirectory = path.join(outputDirectory, "include", "assets");
+    fs.ensureDirSync(assetIncludeDirectory);
 
     switch (platform) {
         case "n64":
@@ -62,6 +65,6 @@ module.exports = {
 };
 
 if (require.main === module) {
-    require("./Main")();
+    require("../scripts/RunPipeline")();
     main();
 }

@@ -1,42 +1,33 @@
 class N64Material {
-    static NoTexture = 0xFFFF;
+    static NoTexture = 0xFFFFFFFF;
 
-    /** this needs to match up with fw64ShadingMode */
+    /** this needs to match up with fw64ShadingMode defined in material.h*/
     static ShadingMode  = {
         Unset: 0,
         VertexColors: 1,
         VertexColorsTextured: 2,
         Gouraud: 3,
         GouraudTextured: 4,
-        UnlitTextured: 5
+        UnlitTextured: 5,
+        DecalTexture: 6
     }
 
-    constructor() {
-        this.color = [255, 255, 255, 255];
-        this.texture = N64Material.NoTexture; // index into the mesh's texture array
-        this.textureFrame = 0;
-        this.shadingMode = N64Material.ShadingMode.Unset;
-    }
+    color = [255, 255, 255, 255];
 
-    get buffer() {
-        const buff = Buffer.alloc(16)
+    /** index into the mesh's texture array */
+    texture = N64Material.NoTexture;
+    textureFrame = 0;
+    shadingMode = N64Material.ShadingMode.Unset;
 
-        let index = 0;
-
-        index = buff.writeUInt8(this.color[0], index);
-        index = buff.writeUInt8(this.color[1], index);
-        index = buff.writeUInt8(this.color[2], index);
-        index = buff.writeUInt8(this.color[3], index);
-
-        index = buff.writeUInt32BE(this.texture, index);
-        index = buff.writeUInt32BE(this.textureFrame, index);
-        index = buff.writeUInt32BE(this.shadingMode, index);
-
-        return buff;
-    }
-
-    get hasTexture() {
+    hasTexture() {
         return this.texture !== N64Material.NoTexture;
+    }
+
+    setColorFromFloatArray(baseColor) {
+        this.color[0] = Math.round(baseColor[0] * 255);
+        this.color[1] = Math.round(baseColor[1] * 255);
+        this.color[2] = Math.round(baseColor[2] * 255);
+        this.color[3] = Math.round(baseColor[3] * 255);
     }
 }
 
