@@ -3,28 +3,34 @@ set(CMAKE_CXX_STANDARD 17)
 
 # performs platform specific configuration of the framework 64 library
 function (configure_core_library)
+    find_package(CLI11 CONFIG REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(nlohmann_json CONFIG REQUIRED)
     find_package(SDL2 CONFIG REQUIRED)
-    find_package(sdl2_mixer CONFIG REQUIRED)
-    find_package(sdl2-image CONFIG REQUIRED)
-    find_package(unofficial-sqlite3 CONFIG REQUIRED)
+    find_package(SDL2_mixer CONFIG REQUIRED)
+    find_package(SDL2_image CONFIG REQUIRED)
     find_package(CURL CONFIG REQUIRED)
+    find_package(websocketpp CONFIG REQUIRED)
 
     target_link_libraries(framework64 PUBLIC GLEW::GLEW)
     # mac SDL mixer?: SDL2_mixer::SDL2_mixer-static
-    target_link_libraries(framework64 PUBLIC SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image)
+    target_link_libraries(framework64 PUBLIC SDL2::SDL2 SDL2::SDL2main)
+    target_link_libraries(framework64 PUBLIC $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
     target_link_libraries(framework64 PUBLIC $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>)
-    target_link_libraries(framework64 PUBLIC unofficial::sqlite3::sqlite3)
     target_link_libraries(framework64 PUBLIC CURL::libcurl)
+    target_link_libraries(framework64 PUBLIC websocketpp::websocketpp)
+    target_link_libraries(framework64 PUBLIC CLI11::CLI11)
 
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
 
-    # this is used on windows for the DLL utility copying script
-    if (WIN32)
-        file(WRITE ${CMAKE_BINARY_DIR}/build_info.json "{\"target\":\"${VCPKG_TARGET_TRIPLET}\",\"type\":\"${CMAKE_BUILD_TYPE}\"}")
+    file(WRITE ${CMAKE_BINARY_DIR}/build_info.json "{\"target\":\"${VCPKG_TARGET_TRIPLET}\",\"type\":\"${CMAKE_BUILD_TYPE}\"}")
+
+    target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_DESKTOP)
+
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_IS_64_BIT)
     endif()
 endfunction()
 

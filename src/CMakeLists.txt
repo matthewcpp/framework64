@@ -4,13 +4,13 @@ set(common_source_files
         ../include/framework64/animation_data.h animation_data.c
         ../include/framework64/asset_database.h
         ../include/framework64/audio.h
-        ../include/framework64/audio_bank.h
         ../include/framework64/box.h box.c
         ../include/framework64/camera.h camera.c
         ../include/framework64/collision.h collision.c
         ../include/framework64/collider.h collider.c
         ../include/framework64/color.h color.c
-        ../include/framework64/internal/data_cache.h data_cache.c
+        ../include/framework64/data_io.h data_io.c
+        ../include/framework64/data_link.h
         ../include/framework64/engine.h
         ../include/framework64/filesystem.h
         ../include/framework64/font.h
@@ -18,8 +18,10 @@ set(common_source_files
         ../include/framework64/image.h
         ../include/framework64/input.h
         ../include/framework64/level.h level.c
+        ../include/framework64/material_bundle.h
         ../include/framework64/math.h math.c
         ../include/framework64/matrix.h matrix.c
+        ../include/framework64/media.h
         ../include/framework64/mesh.h
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
@@ -28,6 +30,7 @@ set(common_source_files
         ../include/framework64/random.h random.c
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
+        ../include/framework64/skinned_mesh.h skinned_mesh.c
         ../include/framework64/texture.h
         ../include/framework64/transform.h transform.c
         ../include/framework64/types.h
@@ -42,12 +45,24 @@ set(common_source_files
         ../include/framework64/util/sparse_set.h util/sparse_set.c
         )
 
+add_library(framework64 STATIC ${common_source_files})
+target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+
 if (FW64_PLATFORM_DESKTOP)
     add_subdirectory(desktop)
 elseif(FW64_PLATFORM_N64)
     add_subdirectory(n64)
 endif()
 
-add_library(framework64 STATIC ${common_source_files} ${platform_source_files})
-target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 configure_core_library()
+
+if (FW64_MEDIA_ENABLED)
+    target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)
+    
+    if(FW64_PLATFORM_N64)
+        include(n64/libcart.cmake)
+    endif()
+
+else()
+    message("Building without media support")
+endif()
