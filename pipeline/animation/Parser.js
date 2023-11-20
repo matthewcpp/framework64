@@ -46,7 +46,7 @@ class Joint {
 
 class AnimationData {
     animations = [];
-    jointIdMap = new Map();  // maps the joint node id to the the array index
+    jointIdMap = new Map();  // maps the joint node id to the joint array index
     joints = [];
 
     keyframeBuffers = [];
@@ -81,6 +81,7 @@ class Parser {
     // maps an index into the gltf node array to a Joint object
     nodeIndexToJointMap = new Map();
 
+    /// TODO: this should be able to support gltf files /w multiple buffers and even glb files
     parse(gltf, buffer, options) {
         this.gltf = gltf;
         this.buffer = buffer;

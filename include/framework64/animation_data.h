@@ -3,7 +3,7 @@
 /** \file animation_data.h */
 
 #include "framework64/allocator.h"
-#include "framework64/asset_database.h"
+#include "framework64/data_io.h"
 #include "framework64/types.h"
 
 #include <stdint.h>
@@ -47,12 +47,10 @@ typedef struct {
 extern "C" {
 #endif
 
-fw64AnimationData* fw64_animation_data_load(fw64AssetDatabase* database, uint32_t index, fw64Allocator* allocator);
+fw64AnimationData* fw64_animation_data_load_from_datasource(fw64DataSource* data_source, fw64Allocator* allocator);
 void fw64_animation_data_delete(fw64AnimationData* animation_data, fw64Allocator* allocator);
 fw64Animation* fw64_animation_data_get_animation(fw64AnimationData* animation_data, int index);
-
 
 #ifdef __cplusplus
 }
 #endif
-
