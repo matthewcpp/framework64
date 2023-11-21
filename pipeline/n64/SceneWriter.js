@@ -1,4 +1,4 @@
-const MeshWriter = require("./N64MeshWriter");
+const MeshWriter = require("./MeshWriter");
 const SceneDataWriter = require("../SceneDataWriter");
 const MaterialBundleWriter = require("./MaterialBundleWriter");
 

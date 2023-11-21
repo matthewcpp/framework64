@@ -1,4 +1,4 @@
-const Bounding = require("./n64/Bounding")
+const Bounding = require("./gltf/Bounding")
 const BuildInfo = require("./BuildInfo")
 
 const fs = require("fs");

@@ -1,7 +1,7 @@
-const GLTFLoader = require("./n64/GLTFLoader");
-const MaterialBundle = require("./MaterialBundle");
-const N64Node = require("./n64/N64Node");
-const N64Scene = require("./n64/N64Scene");
+const GLTFLoader = require("./gltf/GLTFLoader");
+const MaterialBundle = require("./gltf/MaterialBundle");
+const N64Node = require("./gltf/Node");
+const Scene = require("./gltf/Scene");
 
 class LevelParser {
     gltfData = null;
@@ -79,7 +79,7 @@ class LevelParser {
         const gltf = this.gltfData.gltf;
         const gltfRootNode = gltf.nodes[sceneRootNodeIndex];
 
-        const scene = new N64Scene();
+        const scene = new Scene();
         scene.name = Object.hasOwn(gltfRootNode, "name") ? gltfRootNode.name : `scene_${sceneRootNodeIndex}`;
         scene.materialBundle = new MaterialBundle(this.gltfData);
 

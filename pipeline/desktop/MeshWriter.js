@@ -1,13 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 
-const MaterialBundle = require("../MaterialBundle");
+const MaterialBundle = require("../gltf/MaterialBundle");
 
 const MaterialBundleWriter = require("./MaterialBundleWriter");
 
-const Bounding = require("../n64/Bounding");
-const N64Primitive = require("../n64/N64Primitive");
-const GLTFVertexIndex = require("../GLTFVertexIndex");
+const Bounding = require("../gltf/Bounding");
+const Primitive = require("../gltf/Primitive");
+const GLTFVertexIndex = require("../gltf/GLTFVertexIndex");
 
 /** Writes a self contained static mesh to file.
  *  Precondition: this gltf data should contain at least 1 mesh.
@@ -79,7 +79,7 @@ async function _writeMeshToFile(mesh, materialBundle, file) {
             fs.writeSync(file, buffer);
         }
 
-        const elementCount = primitive.elementType ==  N64Primitive.ElementType.Triangles ?  3 : 2;
+        const elementCount = primitive.elementType ==  Primitive.ElementType.Triangles ?  3 : 2;
         const elementBuffer = Buffer.alloc(primitive.elements.length * 2 * elementCount);
         let elementBufferIndex = 0;
         for (const element of primitive.elements) {
@@ -150,9 +150,9 @@ class PrimitiveInfo {
     vertexCount = 0;
     vertexAttributes = VertexAttributes.None;
     elementCount = 0;
-    mode = N64Primitive.ElementType.Triangles;
-    materialIndex = N64Primitive.NoMaterial;
-    jointIndex = N64Primitive.NoJoint
+    mode = Primitive.ElementType.Triangles;
+    materialIndex = Primitive.NoMaterial;
+    jointIndex = Primitive.NoJoint
 
     constructor(primitive, materialBundle) {
         this.primitive = primitive;
@@ -161,7 +161,7 @@ class PrimitiveInfo {
         this.elementCount = primitive.elements.length;
         this.mode = primitive.elementType;
         this.materialIndex = materialBundle.getBundledMaterialIndex(primitive.material);
-        this.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : N64Primitive.NoJoint;
+        this.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : Primitive.NoJoint;
 
         if (primitive.hasNormals) {
             this.vertexAttributes |= VertexAttributes.Normals;

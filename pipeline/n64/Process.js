@@ -10,7 +10,7 @@ const Util = require("../Util");
 
 const path = require("path");
 
-async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
+async function processN64(manifest, assetDirectory, outputDirectory, plugins) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new Archive(outputDirectory, includeDirectory);
 
@@ -104,4 +104,4 @@ function checkRequiredFields(type, obj, fields) {
     }
 }
 
-module.exports = prepare;
+module.exports = processN64;

@@ -1,10 +1,10 @@
-const N64Image = require("./N64Image")
+const Image = require("./Image")
 const Util = require("../Util")
 
 const opentype = require("opentype.js");
 const { createCanvas } = require("canvas");
 
-class N64Font {
+class Font {
     name;
     _font = null;
 
@@ -70,7 +70,7 @@ class N64Font {
 
         // note this actualy dumps image in BRGA but since we write everything as 255 white no swapping is needed
         const imageBuffer = canvas.toBuffer("raw");
-        const image = new N64Image(this.name, imageFormat); // TODO: This can probably change to use IA Tex
+        const image = new Image(this.name, imageFormat); // TODO: This can probably change to use IA Tex
         await image.loadBuffer(imageBuffer, imageWidth, imageHeight);
         this.undoPreMultipliedAlpha(image);
 
@@ -96,4 +96,4 @@ class N64Font {
     }
 }
 
-module.exports = N64Font;
+module.exports = Font;

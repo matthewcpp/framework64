@@ -1,5 +1,5 @@
-const N64Image = require("./N64Image")
-const N64ImageWriter = require("./N64ImageWriter");
+const Image = require("./Image")
+const ImageWriter = require("./ImageWriter");
 const ImageAtlasDefines = require("../ImageAtlasDefines");
 
 const Jimp = require("jimp");
@@ -28,7 +28,7 @@ async function convertSprite(manifestDirectory, outDir, imageJson, archive) {
 
     const name = !!imageJson.name ? imageJson.name : path.basename(imagePath, path.extname(imagePath));
 
-    const image = new N64Image(name, N64Image.Format[options.format.toUpperCase()]);
+    const image = new Image(name, Image.Format[options.format.toUpperCase()]);
     await image.load(imagePath);
 
     return finalizeImage(image, manifestDirectory, outDir, options, archive, imageJson.name)
@@ -40,7 +40,7 @@ async function assembleSpriteAtlas(rootDir, outDir, imageJson, archive) {
     }
     Object.assign(options, imageJson);
 
-    const image = new N64Image(imageJson.name, N64Image.Format[options.format.toUpperCase()]);
+    const image = new Image(imageJson.name, Image.Format[options.format.toUpperCase()]);
 
     const frames = getFrameArray(imageJson, rootDir);
     const atlas = await buildSpriteAtlas(frames, rootDir, imageJson);
@@ -100,7 +100,7 @@ async function finalizeImage(image, assetDir, outDir, imageJson, archive) {
         image.resize(parseInt(dimensions[0]), parseInt(dimensions[1]));
     }
 
-    if (image.format === N64Image.Format.CI8 || image.format === N64Image.Format.CI4) {
+    if (image.format === Image.Format.CI8 || image.format === Image.Format.CI4) {
         image.createColorIndexImage();
 
         if (imageJson.additionalPalettes) {
@@ -116,12 +116,12 @@ async function finalizeImage(image, assetDir, outDir, imageJson, archive) {
 
     if (archive) {
         const filePath = path.join(outDir, `${image.name}.image`);
-        N64ImageWriter.writeFile(image, imageJson.hslices, imageJson.vslices, filePath);
+        ImageWriter.writeFile(image, imageJson.hslices, imageJson.vslices, filePath);
         const entry = await archive.add(filePath, "image");
         assetIndex = entry.index;
     }
     else {
-        assetBuffer = N64ImageWriter.writeBuffer(image, imageJson.hslices, imageJson.vslices);
+        assetBuffer = ImageWriter.writeBuffer(image, imageJson.hslices, imageJson.vslices);
     }
 
     return {

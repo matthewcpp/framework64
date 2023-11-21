@@ -1,4 +1,4 @@
-const Image = require("../Image");
+const Image = require("./Image");
 const ImageAtlasDefines = require("../ImageAtlasDefines");
 
 const fs = require("fs-extra");

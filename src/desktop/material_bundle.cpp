@@ -13,7 +13,7 @@ struct MaterialBundleInfo {
     uint32_t material_count;
 };
 
-/// Note this needs to correspond to N64Material.js NoTexture define
+/// Note this needs to correspond to Material.js NoTexture define
 #define MATERIAL_BUNDLE_INVALID_INDEX std::numeric_limits<uint32_t>::max()
 
 fw64MaterialBundle* fw64MaterialBundle::loadFromDatasource(fw64DataSource* data_source, framework64::ShaderCache& shader_cache, fw64Allocator* allocator) {

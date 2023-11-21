@@ -1,15 +1,16 @@
 const DisplayList = require("./DisplayList");
-const N64Material = require("./N64Material");
-const N64Primitive = require("./N64Primitive");
 const N64Defs = require("./N64Defs");
-const N64Slicer = require("./N64Slicer");
 const VertexBuffer = require("./VertexBuffer");
-const Bounding = require("./Bounding");
-const Util = require("../Util");
-const GLTFVertexIndex = require("../GLTFVertexIndex")
 const MaterialBundleWriter = require("./MaterialBundleWriter");
-
 const processImage = require("./ProcessImage");
+
+const Util = require("../Util");
+const N64Slicer = require("./Slicer");
+
+const Material = require("../gltf/Material");
+const Primitive = require("../gltf/Primitive");
+const Bounding = require("../gltf/Bounding");
+const GLTFVertexIndex = require("../gltf/GLTFVertexIndex")
 
 const path  = require("path");
 const fs = require("fs");
@@ -66,7 +67,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
         primitiveInfo.verticesBufferIndex = meshInfo.vertexCount; // the index for this primitive is set to the total size of the mesh's vertices buffer added thus far
         primitiveInfo.displayListBufferIndex = meshInfo.displayListCount; // the index for this primitive is set to the total size of the mesh's display list buffer this far
         primitiveInfo.material = materialBundle.getBundledMaterialIndex(primitive.material);
-        primitiveInfo.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : N64Primitive.NoJoint; // used for skinning, refer to N64Mesh.splitPrimitivesForSkinning
+        primitiveInfo.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : Primitive.NoJoint; // used for skinning, refer to Mesh.splitPrimitivesForSkinning
         primitiveInfos.push(primitiveInfo);
 
         // slice the vertices into chunks that can fit into N64 vertex cache
@@ -74,7 +75,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
 
         // generate the display list for rendering the primitive geometry
         const vertexBuffer = VertexBuffer.createVertexBuffer(slices, primitive.hasNormals);
-        const {displayList, vertexPointers, vertexCommandIndices} = primitive.elementType === N64Primitive.ElementType.Triangles ?
+        const {displayList, vertexPointers, vertexCommandIndices} = primitive.elementType === Primitive.ElementType.Triangles ?
             DisplayList.createTriangleDisplayListBuffer(slices) : DisplayList.createLineDisplayListBuffer(slices);
 
         // update the mesh info totals
@@ -189,7 +190,7 @@ function adjustN64TexCoordinates(mesh, gltfData, n64Images) {
             continue;
 
         const material = gltfData.materials[primitive.material];
-        if (material.texture === N64Material.NoTexture)
+        if (material.texture === Material.NoTexture)
             continue;
         
         const texture = gltfData.textures[material.texture];

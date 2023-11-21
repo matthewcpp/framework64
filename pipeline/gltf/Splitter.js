@@ -1,4 +1,4 @@
-const N64Primitive = require("./N64Primitive");
+const Primitive = require("./Primitive");
 
 function rebuildPrimitives(sourcePrimitive, jointElementMap) {
     const primitives = [];
@@ -6,7 +6,7 @@ function rebuildPrimitives(sourcePrimitive, jointElementMap) {
     jointElementMap.forEach((elements, jointIndex) => {
         const vertexMap = new Map();
 
-        const primitive = new N64Primitive();
+        const primitive = new Primitive();
 
         primitive.elementType = sourcePrimitive.elementType;
         primitive.material = sourcePrimitive.material;

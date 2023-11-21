@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const MeshWriter = require("./N64MeshWriter");
+const MeshWriter = require("./MeshWriter");
 const AnimationWriter = require("../animation/Writer");
 const WriteInterface = require("../WriteInterface");
 

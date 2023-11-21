@@ -1,7 +1,7 @@
 const Bounding = require("./Bounding");
-const Splitter = require("./N64Splitter");
+const Splitter = require("./Splitter");
 
-class N64Mesh {
+class Mesh {
     name;
     primitives = [];
     materialBundle = null;
@@ -68,4 +68,4 @@ class N64Mesh {
     }
 }
 
-module.exports = N64Mesh;
+module.exports = Mesh;

@@ -1,6 +1,7 @@
 const ImageWriter = require("./ImageWriter");
-const N64Material = require("../n64/N64Material");
 const processImage = require("./ProcessImage");
+
+const Material = require("../gltf/Material");
 
 const fs = require("fs");
 const path = require("path");
@@ -32,7 +33,7 @@ function writeBundleMaterials(gltfData, materialBundle, file) {
 
     for (const materialIndex of materialBundle.materials) {
         const material = gltfData.materials[materialIndex]
-        const bundledTextureIndex = material.hasTexture() ? materialBundle.getBundledTextureIndex(material.texture) : N64Material.NoTexture;
+        const bundledTextureIndex = material.hasTexture() ? materialBundle.getBundledTextureIndex(material.texture) : Material.NoTexture;
 
         let index = 0;
         index = materialBuffer.writeUInt32LE(bundledTextureIndex, index);

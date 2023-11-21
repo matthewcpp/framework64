@@ -1,4 +1,4 @@
-const N64Image = require("./N64Image");
+const Image = require("./Image");
 const ColorIndexImage = require("../ColorIndexImage");
 
 const fs = require("fs");
@@ -23,43 +23,43 @@ function buildImageBuffer(image, horizontalSlices, verticalSlices) {
     buffers.push(createImageHeaderBuffer(image, horizontalSlices, verticalSlices));
 
     switch (image.format) {
-        case N64Image.Format.IA8:
+        case Image.Format.IA8:
             for (const slice of slices.images) {
                 buffers.push(encodeIA8Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
-        case N64Image.Format.IA4:
+        case Image.Format.IA4:
             for (const slice of slices.images) {
                 buffers.push(encodeIA4Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
-        case N64Image.Format.RGBA16:
+        case Image.Format.RGBA16:
             for (const slice of slices.images) {
                 buffers.push(encode16bppSlice(slice, sliceWidth, sliceHeight));
             }
             break;
 
-        case N64Image.Format.RGBA32:
+        case Image.Format.RGBA32:
             for (const slice of slices.images) {
                 buffers.push(encodeRGBA32Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
-        case N64Image.Format.I8:
+        case Image.Format.I8:
             for (const slice of slices.images) {
                 buffers.push(encodeI8Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
-        case N64Image.Format.I4:
+        case Image.Format.I4:
             for (const slice of slices.images) {
                 buffers.push(encodeI4Slice(slice, sliceWidth, sliceHeight));
             }
             break;
 
-        case N64Image.Format.CI8:
+        case Image.Format.CI8:
             validateCIPalette(image);
             for (const slice of slices.images) {
                 buffers.push(encodeCI8Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
@@ -67,7 +67,7 @@ function buildImageBuffer(image, horizontalSlices, verticalSlices) {
             buffers.push(buildColorIndexPalettesBuffer(image));
             break;
 
-        case N64Image.Format.CI4:
+        case Image.Format.CI4:
             validateCIPalette(image);
             for (const slice of slices.images) {
                 buffers.push(encodeCI4Slice(slice, sliceWidth, sliceHeight, image.colorIndexImage));
@@ -243,10 +243,10 @@ function validateCIPalette(image) {
     const colorIndexImage = image.colorIndexImage;
 
     let maxPaletteSize = 0;
-    if (image.format == N64Image.Format.CI8) {
+    if (image.format == Image.Format.CI8) {
         maxPaletteSize = 256;
     }
-    else if (image.format == N64Image.Format.CI4) {
+    else if (image.format == Image.Format.CI4) {
         maxPaletteSize = 16;
     }
     else {

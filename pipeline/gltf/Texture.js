@@ -1,4 +1,4 @@
-class N64Texture {
+class Texture {
     static WrapMode = {
         Repeat: 0,
         Mirror: 1,
@@ -7,8 +7,8 @@ class N64Texture {
 
     // index into GLTF data `images` array
     image;
-    wrapS = N64Texture.WrapMode.Repeat;
-    wrapT = N64Texture.WrapMode.Repeat;
+    wrapS = Texture.WrapMode.Repeat;
+    wrapT = Texture.WrapMode.Repeat;
     maskS = 0;
     maskT = 0;
     paletteIndex = 0;
@@ -18,4 +18,4 @@ class N64Texture {
     }
 }
 
-module.exports = N64Texture;
+module.exports = Texture;

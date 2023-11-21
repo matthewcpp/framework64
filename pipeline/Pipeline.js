@@ -18,13 +18,13 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
 
     switch (platform) {
         case "n64":
-            const prepareN64 = require("./n64/Prepare");
-            await prepareN64(manifest, assetDirectory, outputDirectory, plugins);
+            const processN64 = require("./n64/Process");
+            await processN64(manifest, assetDirectory, outputDirectory, plugins);
             break;
 
         case "desktop":
-            const prepareDesktop = require("./desktop/Prepare");
-            await prepareDesktop(manifest, assetDirectory, outputDirectory, plugins);
+            const processDesktop = require("./desktop/Process");
+            await processDesktop(manifest, assetDirectory, outputDirectory, plugins);
             break;
 
         default:

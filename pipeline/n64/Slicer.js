@@ -1,6 +1,6 @@
 const N64Defs = require("./N64Defs");
 
-class N64PrimitiveSlice {
+class PrimitiveSlice {
     vertices;
     elements;
 
@@ -87,7 +87,7 @@ function createSlicesFromPartitions(primitive, partitions) {
             elementList.push(triangle.map((val) => partition.vertexIndices.get(val)));
         }
 
-        processed.push(new N64PrimitiveSlice(vertexList, elementList));
+        processed.push(new PrimitiveSlice(vertexList, elementList));
     }
 
     return processed;
@@ -95,7 +95,7 @@ function createSlicesFromPartitions(primitive, partitions) {
 
 function slice(primitive) {
     if (primitive.vertices.length < N64Defs.vertexSliceSize) {
-        return [new N64PrimitiveSlice(primitive.vertices, primitive.elements)];
+        return [new PrimitiveSlice(primitive.vertices, primitive.elements)];
     }
     else {
         return createSlicesFromPartitions(primitive, partitionVertices(primitive));
