@@ -1,15 +1,11 @@
-const N64Material = require("./N64Material");
-const N64Mesh = require("./N64Mesh");
-const N64Node = require("./N64Node");
-const N64Primitive = require("./N64Primitive");
-const N64Texture = require("./N64Texture");
-const N64Scene = require("./N64Scene")
-const Util = require("../Util")
-const GLTFVertexIndex = require("../GLTFVertexIndex")
+const Material = require("./Material");
+const Mesh = require("./Mesh");
+const Primitive = require("./Primitive");
+const Texture = require("./Texture");
+const GLTFVertexIndex = require("./GLTFVertexIndex")
 
 const fs = require("fs");
 const path = require("path");
-const Bounding = require("./Bounding");
 
 const GltfComponentType = {
     Byte: 5120,
@@ -33,7 +29,7 @@ class GLTFLoader {
     materials = [];
     meshes = [];
 
-    static SupportedPrimitiveModes = new Set(Object.values(N64Primitive.ElementType));
+    static SupportedPrimitiveModes = new Set(Object.values(Primitive.ElementType));
 
     static InvalidIndex = -1;
     defaultMaterialIndex = GLTFLoader.InvalidIndex;
@@ -104,7 +100,7 @@ class GLTFLoader {
             return;
 
         for (const gltfTexture of this.gltf.textures) {
-            const texture = new N64Texture(gltfTexture.source);
+            const texture = new Texture(gltfTexture.source);
             // TODO: Get sampler info (repeat, etc)
 
             this.textures.push(texture);
@@ -116,7 +112,7 @@ class GLTFLoader {
             return;
 
         for (const gltfMaterial of this.gltf.materials) {
-            const material = new N64Material();
+            const material = new Material();
 
             const pbr = gltfMaterial.pbrMetallicRoughness;
 
@@ -133,8 +129,8 @@ class GLTFLoader {
                 const extras = gltfMaterial.extras;
 
                 if (extras.shadingMode) {
-                    if (N64Material.ShadingMode.hasOwnProperty(gltfMaterial.extras.shadingMode)) {
-                        material.shadingMode = N64Material.ShadingMode[gltfMaterial.extras.shadingMode];
+                    if (Material.ShadingMode.hasOwnProperty(gltfMaterial.extras.shadingMode)) {
+                        material.shadingMode = Material.ShadingMode[gltfMaterial.extras.shadingMode];
                     }
                     else {
                         throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${gltfMaterial.extras.shadingMode}`);
@@ -155,18 +151,18 @@ class GLTFLoader {
             return;
 
         for (const gltfMesh of this.gltf.meshes) {
-            const mesh = new N64Mesh(gltfMesh.name);
+            const mesh = new Mesh(gltfMesh.name);
 
             for (const gltfPrimitive of gltfMesh.primitives) {
 
-                const mode = ("mode" in gltfPrimitive) ? gltfPrimitive.mode : N64Primitive.ElementType.Triangles;
+                const mode = ("mode" in gltfPrimitive) ? gltfPrimitive.mode : Primitive.ElementType.Triangles;
     
                 if (!GLTFLoader.SupportedPrimitiveModes.has(mode)) {
                     console.log(`Skipping primitive with mode: ${mode}`);
                     continue;
                 }
     
-                const primitive = new N64Primitive(mode);
+                const primitive = new Primitive(mode);
                 mesh.primitives.push(primitive);
     
                 primitive.material = ("material" in gltfPrimitive) ? gltfPrimitive.material : this._getDefaultMaterialIndex();
@@ -189,7 +185,7 @@ class GLTFLoader {
                 this._readIndices(gltfPrimitive, primitive);
     
                 const material = this.materials[primitive.material];
-                if (material.shadingMode === N64Material.ShadingMode.Unset) {
+                if (material.shadingMode === Material.ShadingMode.Unset) {
                     material.shadingMode = this._determineShadingMode(primitive, material);
                 }
             }
@@ -203,7 +199,7 @@ class GLTFLoader {
     _getDefaultMaterialIndex() {
         if (this.defaultMaterialIndex == GLTFLoader.InvalidIndex) {
             this.defaultMaterialIndex = this.materials.length;
-            this.materials.push(new N64Material(this.defaultMaterialIndex));
+            this.materials.push(new Material(this.defaultMaterialIndex));
         }
 
         return this.defaultMaterialIndex;
@@ -212,16 +208,16 @@ class GLTFLoader {
     _determineShadingMode(primitive, material) {
         if (primitive.hasVertexColors) {
             if (material.hasTexture())
-                return N64Material.ShadingMode.VertexColorsTextured;
+                return Material.ShadingMode.VertexColorsTextured;
             else
-                return N64Material.ShadingMode.VertexColors;
+                return Material.ShadingMode.VertexColors;
         }
 
         if (primitive.hasNormals) {
             if (material.hasTexture())
-                return N64Material.ShadingMode.GouraudTextured;
+                return Material.ShadingMode.GouraudTextured;
             else
-                return N64Material.ShadingMode.Gouraud;
+                return Material.ShadingMode.Gouraud;
         }
 
         throw new Error("Could not determine shading mode for primitive");
@@ -459,7 +455,7 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
-        const elementSize = primitive.elementType === N64Primitive.ElementType.Triangles ? 3 : 2;
+        const elementSize = primitive.elementType === Primitive.ElementType.Triangles ? 3 : 2;
 
         GLTFLoader._readElementList(buffer, bufferView.byteOffset, accessor.count, elementSize, accessor.componentType, primitive);
     }

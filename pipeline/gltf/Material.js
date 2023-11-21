@@ -1,4 +1,4 @@
-class N64Material {
+class Material {
     static NoTexture = 0xFFFFFFFF;
 
     /** this needs to match up with fw64ShadingMode defined in material.h*/
@@ -15,12 +15,12 @@ class N64Material {
     color = [255, 255, 255, 255];
 
     /** index into the mesh's texture array */
-    texture = N64Material.NoTexture;
+    texture = Material.NoTexture;
     textureFrame = 0;
-    shadingMode = N64Material.ShadingMode.Unset;
+    shadingMode = Material.ShadingMode.Unset;
 
     hasTexture() {
-        return this.texture !== N64Material.NoTexture;
+        return this.texture !== Material.NoTexture;
     }
 
     setColorFromFloatArray(baseColor) {
@@ -31,4 +31,4 @@ class N64Material {
     }
 }
 
-module.exports = N64Material;
+module.exports = Material;

@@ -1,7 +1,7 @@
-const MaterialBundle = require("../MaterialBundle");
+const MaterialBundle = require("./MaterialBundle");
 
 /** This is a platform independant container for scene data */
-class N64Scene {
+class Scene {
     name = "scene"
     nodes = [];
     colliderCount = 0;
@@ -32,4 +32,4 @@ class N64Scene {
     }
 }
 
-module.exports = N64Scene;
+module.exports = Scene;

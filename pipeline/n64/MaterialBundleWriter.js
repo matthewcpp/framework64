@@ -1,5 +1,5 @@
 const fs = require("fs");
-const N64Material = require("./N64Material");
+const Material = require("../gltf/Material");
 
 function write(gltfData, materialBundle, n64Images, file) {
     computeN64TextureMasks(materialBundle, gltfData, n64Images);
@@ -31,7 +31,7 @@ function write(gltfData, materialBundle, n64Images, file) {
     const materialBuffer = Buffer.alloc(16)
     for (const materialIndex of materialBundle.materials) {
         const material = gltfData.materials[materialIndex];
-        const bundledTextureIndex = material.hasTexture() ? materialBundle.getBundledTextureIndex(material.texture) : N64Material.NoTexture;
+        const bundledTextureIndex = material.hasTexture() ? materialBundle.getBundledTextureIndex(material.texture) : Material.NoTexture;
         
         let index = 0;
 

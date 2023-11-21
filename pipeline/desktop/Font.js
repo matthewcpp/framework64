@@ -1,5 +1,5 @@
 const Image = require("./Image");
-const Util = require("./Util");
+const Util = require("../Util");
 
 const opentype = require("opentype.js");
 const { createCanvas } = require("canvas");

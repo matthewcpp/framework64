@@ -1,6 +1,6 @@
 const Bounding = require("./Bounding");
 
-class N64Primitive {
+class Primitive {
     static ElementType = {
         Lines: 1,
         Triangles: 4
@@ -80,4 +80,4 @@ class N64Primitive {
     }
 }
 
-module.exports = N64Primitive;
+module.exports = Primitive;

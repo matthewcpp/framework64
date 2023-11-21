@@ -1,10 +1,10 @@
-const path = require("path");
-
 const AnimationParser = require("../animation/Parser");
-const GLTFLoader = require("../n64/GLTFLoader");
-const MaterialBundle = require("../MaterialBundle");
+const GLTFLoader = require("../gltf/GLTFLoader");
+const MaterialBundle = require("../gltf/MaterialBundle");
 const SkinnedMeshWriter = require("./SkinnedMeshWriter");
 const Util = require("../Util");
+
+const path = require("path");
 
 async function processSkinnedMesh(skinnedMesh, archive, manifestDirectory, outputDirectory, includeDirectory, plugins) {
     const srcPath = path.join(manifestDirectory, skinnedMesh.src);

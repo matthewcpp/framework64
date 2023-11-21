@@ -1,6 +1,6 @@
 const Util = require("../Util");
 const N64Font = require("./N64Font");
-const Font = require("../Font");
+const Font = require("../desktop/Font");
 const N64FontWriter = require("./N64FontWriter");
 const N64ImageWriter = require("./N64ImageWriter");
 const processImage = require("./ProcessImage");

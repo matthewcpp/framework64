@@ -1,6 +1,6 @@
-const GLTFLoader = require("./GLTFLoader");
-const MaterialBundle = require("../MaterialBundle");
-const MeshWriter = require("./N64MeshWriter");
+const GLTFLoader = require("../gltf/GLTFLoader");
+const MaterialBundle = require("../gltf/MaterialBundle");
+const MeshWriter = require("./MeshWriter");
 
 const path = require("path");
 

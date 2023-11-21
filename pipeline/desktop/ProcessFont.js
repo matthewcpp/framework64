@@ -1,4 +1,4 @@
-const Font = require("../Font");
+const Font = require("./Font");
 const FontWriter = require("./FontWriter");
 const Util = require("../Util")
 const processImage = require("./ProcessImage");
