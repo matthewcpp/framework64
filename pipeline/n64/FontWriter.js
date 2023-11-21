@@ -1,5 +1,3 @@
-const N64Image = require("./N64Image");
-
 const fs = require("fs");
 
 const SizeOfFontHeader = 4;

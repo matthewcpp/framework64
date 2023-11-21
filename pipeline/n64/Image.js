@@ -1,7 +1,7 @@
 const Jimp = require("jimp");
 const ColorIndexImage = require("../ColorIndexImage");
 
-class N64Image {
+class Image {
     name;
     format;
     _data = null;
@@ -23,7 +23,7 @@ class N64Image {
         this.name = name;
 
         if (typeof(format) === "string") {
-            format = N64Image.Format[format.toUpperCase()];
+            format = Image.Format[format.toUpperCase()];
         }
 
         if (format === null || format === undefined) {
@@ -121,4 +121,4 @@ class N64Image {
     }
 }
 
-module.exports = N64Image;
+module.exports = Image;
