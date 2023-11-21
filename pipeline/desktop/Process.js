@@ -14,7 +14,7 @@ const processRaw = require("./ProcessRaw");
 
 const path = require("path");
 
-async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
+async function processDesktop(manifest, assetDirectory, outputDirectory, plugins) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const bundle = new Bundle(outputDirectory, includeDirectory);
     const layerMap = processLayers(manifest.layers, includeDirectory);
@@ -91,4 +91,4 @@ async function prepare(manifest, assetDirectory, outputDirectory, plugins) {
     bundle.finalize();
 }
 
-module.exports = prepare;
+module.exports = processDesktop;
