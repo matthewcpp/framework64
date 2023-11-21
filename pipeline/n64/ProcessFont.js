@@ -1,5 +1,6 @@
 const Util = require("../Util");
 const Font = require("./Font");
+const FontUtils = require("../FontUtils");
 const DesktopFont = require("../desktop/Font");
 const FontWriter = require("./FontWriter");
 const ImageWriter = require("./ImageWriter");
@@ -70,7 +71,7 @@ async function processImageFont(manifestDirectory, outputDir, fontJson, archive)
 async function convertFont(manifestDirectory, outputDir, fontJson, archive) {
     if (fontJson.sourceFile) {
         const sourceFilePath = path.join(manifestDirectory, fontJson.sourceFile);
-        fontJson.sourceString = DesktopFont.sourceStringFromFile(sourceFilePath);
+        fontJson.sourceString = FontUtils.sourceStringFromFile(sourceFilePath);
     }
 
     if (fontJson.src) {

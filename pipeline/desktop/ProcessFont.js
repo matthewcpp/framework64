@@ -1,6 +1,7 @@
 const Font = require("./Font");
 const FontWriter = require("./FontWriter");
 const Util = require("../Util")
+const FontUtils = require("../FontUtils");
 const processImage = require("./ProcessImage");
 
 const path = require("path");
@@ -55,7 +56,7 @@ async function processImageFont(fontInfo, bundle, baseDirectory, outputDirectory
 async function processFont(fontInfo, bundle, baseDirectory, outputDirectory) {
     if (fontInfo.sourceFile) {
         const sourceFilePath = path.join(baseDirectory, fontInfo.sourceFile);
-        fontInfo.sourceString = Font.sourceStringFromFile(sourceFilePath);
+        fontInfo.sourceString = FontUtils.sourceStringFromFile(sourceFilePath);
     }
 
     if (fontInfo.src) {
