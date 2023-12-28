@@ -9,54 +9,54 @@
 
 #include <iostream>
 
-fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     framework64::FileDataSource file_datasource;
-    if (!asset_database->openAssetFile(asset_index, file_datasource))
+    if (!asset_database->openAssetFile(asset_id, file_datasource))
         return nullptr;
 
 
     return fw64_image_load_from_datasource(&file_datasource.interface, allocator);
 }
 
-fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
-    return fw64_assets_load_image(asset_database, asset_index, allocator);
+fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
+    return fw64_assets_load_image(asset_database, asset_id, allocator);
 }
 
-fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     framework64::FileDataSource file_datasource;
-    if (!asset_database->openAssetFile(asset_index, file_datasource))
+    if (!asset_database->openAssetFile(asset_id, file_datasource))
         return nullptr;
 
     return fw64Font::loadFromDatasource(&file_datasource.interface, allocator);
 }
 
-fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     framework64::FileDataSource file_datasource;
-    if (!asset_database->openAssetFile(asset_index, file_datasource))
+    if (!asset_database->openAssetFile(asset_id, file_datasource))
         return nullptr;
 
     return fw64Mesh::loadFromDatasource(&file_datasource.interface, nullptr, asset_database->shader_cache, allocator);
 }
 
-fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     framework64::FileDataSource file_datasource;
-    if (!asset_database->openAssetFile(asset_index, file_datasource))
+    if (!asset_database->openAssetFile(asset_id, file_datasource))
         return nullptr;
 
     return fw64_scene_load_from_datasource(&file_datasource.interface, asset_database, allocator);
 }
 
-fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     framework64::FileDataSource file_datasource;
-    if (!asset_database->openAssetFile(asset_index, file_datasource))
+    if (!asset_database->openAssetFile(asset_id, file_datasource))
         return nullptr;
 
     return fw64_animation_data_load_from_datasource(&file_datasource.interface, allocator);
 }
 
-fw64SkinnedMesh* fw64_assets_load_skinned_mesh(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64SkinnedMesh* fw64_assets_load_skinned_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     framework64::FileDataSource file_datasource;
-    if (!asset_database->openAssetFile(asset_index, file_datasource))
+    if (!asset_database->openAssetFile(asset_id, file_datasource))
         return nullptr;
 
     return fw64_skinned_mesh_load_from_datasource(&file_datasource.interface, asset_database, allocator);

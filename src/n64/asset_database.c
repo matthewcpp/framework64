@@ -8,7 +8,7 @@
 #include "framework64/n64/font.h"
 #include "framework64/n64/mesh.h"
 
-fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId asset_index, fw64Allocator* allocator) {
     fw64N64FilesystemDataSource data_source;
     if (!fw64_n64_filesystem_open_datasource(&data_source, asset_index))
         return NULL;
@@ -19,7 +19,7 @@ fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, uint32_t as
     return image;
 }
 
-fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase* asset_database, fw64AssetId asset_index, fw64Allocator* allocator) {
     int handle = fw64_filesystem_open(asset_index);
     if (handle < 0)
         return NULL;
@@ -35,7 +35,7 @@ fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase* asset_database, uint32_
     return image;
 }
 
-fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, fw64AssetId asset_index, fw64Allocator* allocator) {
     fw64N64FilesystemDataSource data_source;
     if (!fw64_n64_filesystem_open_datasource(&data_source, asset_index))
         return NULL;
@@ -47,7 +47,7 @@ fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, uint32_t asse
     return font;
 }
 
-fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_index, fw64Allocator* allocator) {
     fw64N64FilesystemDataSource data_source;
     if (!fw64_n64_filesystem_open_datasource(&data_source, asset_index))
         return NULL;
@@ -59,7 +59,7 @@ fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, uint32_t asse
     return mesh;
 }
 
-fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_index, fw64Allocator* allocator) {
     fw64N64FilesystemDataSource data_source;
     if (!fw64_n64_filesystem_open_datasource(&data_source, asset_index))
         return NULL;
@@ -71,7 +71,7 @@ fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, uint32_t as
     return scene;
 }
 
-fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_database, fw64AssetId asset_index, fw64Allocator* allocator) {
     fw64N64FilesystemDataSource data_source;
     if (!fw64_n64_filesystem_open_datasource(&data_source, asset_index))
         return NULL;
@@ -83,7 +83,7 @@ fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_data
     return animation_data;
 }
 
-fw64SkinnedMesh* fw64_assets_load_skinned_mesh(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
+fw64SkinnedMesh* fw64_assets_load_skinned_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_index, fw64Allocator* allocator) {
     fw64N64FilesystemDataSource data_source;
     if (!fw64_n64_filesystem_open_datasource(&data_source, asset_index))
         return NULL;
