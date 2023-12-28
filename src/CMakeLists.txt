@@ -53,7 +53,7 @@ target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../inc
 if (FW64_PLATFORM_DESKTOP)
     add_subdirectory(desktop)
 elseif(FW64_PLATFORM_N64_LIBULTRA)
-    add_subdirectory(n64)
+    add_subdirectory(n64_libultra)
 endif()
 
 configure_core_library()
@@ -62,7 +62,7 @@ if (FW64_MEDIA_ENABLED)
     target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)
     
     if(FW64_PLATFORM_N64_LIBULTRA)
-        include(n64/libcart.cmake)
+        include(n64_libultra/libcart.cmake)
     endif()
 
 else()
