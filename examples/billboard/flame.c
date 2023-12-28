@@ -8,10 +8,11 @@
 void flame_init(Flame* flame, fw64Engine* engine){
     fw64Allocator* allocator = fw64_default_allocator();
     fw64Image* flame_image = fw64_assets_load_image_dma(engine->assets, FW64_ASSET_image_fire_sprite, allocator);
+    flame->texture = fw64_texture_create_from_image(flame_image, allocator);
 
     fw64TexturedQuadParams params;
     fw64_textured_quad_params_init(&params);
-    params.image = flame_image;
+    params.texture = flame->texture;
     params.is_animated = 1;
     fw64Mesh* quad = fw64_textured_quad_create_with_params(engine, &params, allocator);
 
