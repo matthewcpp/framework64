@@ -22,10 +22,10 @@ ${desktop_include_directory}/material.hpp material.cpp
 ${desktop_include_directory}/material_bundle.hpp material_bundle.cpp
 ${desktop_include_directory}/media.hpp media.cpp
 ${desktop_include_directory}/mesh.hpp mesh.cpp
+${desktop_include_directory}/mesh_builder.hpp mesh_builder.cpp
 mesh_data_itr.cpp
 ${desktop_include_directory}/n64_input_interface.hpp n64_input_interface.cpp
 ${desktop_include_directory}/primitive_data.hpp primitive_data.cpp
-quad.cpp
 ${desktop_include_directory}/renderer.hpp renderer.cpp
 render_util.cpp
 ${desktop_include_directory}/save_file.hpp save_file.cpp

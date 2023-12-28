@@ -43,7 +43,7 @@ struct MeshInfo {
     Box bounding_box;
 };
 
-/// Note this should coorespond to pipeline/desktop/MeshWriter.js PrimitiveInfo class
+/// Note this should coorespond to pipeline/GLMeshWriter.js _writePimitiveInfo
 struct PrimitiveInfo {
     uint32_t vertex_count;
     uint32_t vertex_attributes;

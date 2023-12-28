@@ -5,9 +5,9 @@
 
 #include "framework64/material_bundle.h"
 
-#include "framework64/image.h"
-#include "framework64/material.h"
-#include "framework64/texture.h"
+#include "framework64/desktop/image.hpp"
+#include "framework64/desktop/material.hpp"
+#include "framework64/desktop/texture.hpp"
 
 #include <vector>
 #include <memory>
