@@ -8,9 +8,9 @@ class Image {
     isIndexed = false;
     additionalPalettes = [];
 
-    constructor(name) {
+    constructor(name, jimpImage = null) {
         this.name = name;
-        this._data = null;
+        this._data = jimpImage;
     }
 
     async load(path) {
