@@ -26,8 +26,12 @@ async function prepareAssets(assetManifest, assetDirectory, platform, platformBu
             BuildInfo.initN64Libultra();
             break;
 
+        case "n64_libdragon":
+            BuildInfo.initN64Libdragon();
+            break;
+
         default: {
-            throw new Error(`Build Info not configured for: ${platform}`);
+            throw new Error(`Pipeline: Unknown platform ${platform}`);
         }
     }
     
