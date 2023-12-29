@@ -45,12 +45,13 @@ set(common_source_files
         ../include/framework64/util/sparse_set.h util/sparse_set.c
         )
 
+
 add_library(framework64 STATIC ${common_source_files})
 target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 if (FW64_PLATFORM_DESKTOP)
     add_subdirectory(desktop)
-elseif(FW64_PLATFORM_N64)
+elseif(FW64_PLATFORM_N64_LIBULTRA)
     add_subdirectory(n64)
 endif()
 
@@ -59,7 +60,7 @@ configure_core_library()
 if (FW64_MEDIA_ENABLED)
     target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)
     
-    if(FW64_PLATFORM_N64)
+    if(FW64_PLATFORM_N64_LIBULTRA)
         include(n64/libcart.cmake)
     endif()
 

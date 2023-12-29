@@ -9,7 +9,7 @@ if (process.argv.length < 3) {
 const platform = process.argv[2].toLowerCase();
 
 switch (platform) {
-    case "n64-modernsdk":
+    case "n64_modernsdk":
         configureN64ModernSdk();
         break;
 
@@ -21,9 +21,12 @@ switch (platform) {
 function configureN64ModernSdk() {
     console.log("Configuring for: N64 Modern SDK");
 
-    const modernSdkConfigDir = path.resolve(__dirname, "..", "config", "n64.modernsdk");
-    const devcontainerSrcFile = path.join(modernSdkConfigDir, "n64.modernsdk.devcontainer.json");
-    const devcontainerDestFile = path.resolve(".devcontainer.json");
+    const configDir = path.resolve(__dirname, "..", "config", "n64.modernsdk");
+    const devcontainerSrcFile = path.join(configDir, "n64.modernsdk.devcontainer.json");
+    const devcontainerDestFile = path.join(__dirname, "..", ".devcontainer.json");
+    console.log(`Copy: ${devcontainerSrcFile} --> ${devcontainerDestFile}`);
+    fs.copyFileSync(devcontainerSrcFile, devcontainerDestFile);
+}
     console.log(`Copy: ${devcontainerSrcFile} --> ${devcontainerDestFile}`);
     fs.copyFileSync(devcontainerSrcFile, devcontainerDestFile);
 }

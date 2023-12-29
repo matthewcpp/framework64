@@ -17,24 +17,5 @@ program
 program.parse();
 
 async function prepareExampleAssets(example, platform) {
-    if (example === "all")
-        return prepareAllExampleAssets(platform);
-    else
-        return prepreBuiltinAssets("examples", example, platform);
-}
-
-async function prepareAllExampleAssets(platform) {
-    const examplesDirectory = path.resolve(__dirname, "..", "examples");
-    const dirContents = fse.readdirSync(examplesDirectory, {withFileTypes: true});
-
-    for(const item of dirContents) {
-        if (!item.isDirectory)
-            continue;
-        
-        // check if the folder is an example by looking for assets.json
-        const assetsFile = path.join(examplesDirectory, item.name, "assets.json");
-        if (fse.existsSync(assetsFile)) {
-            await prepreBuiltinAssets("examples", item.name, platform);
-        }
-    };
+    return prepreBuiltinAssets("examples", example, platform);
 }

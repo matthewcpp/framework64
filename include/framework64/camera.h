@@ -22,7 +22,7 @@ typedef struct {
     float aspect;
     Vec2 viewport_pos;
     Vec2 viewport_size;
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
     Vp _viewport;
     uint16_t _persp_norm;
 #endif

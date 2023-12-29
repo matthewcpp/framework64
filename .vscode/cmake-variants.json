@@ -25,17 +25,18 @@
                 "short": "Desktop",
                 "long": "Desktop",
                 "settings": {
+                    "FW64_PLATFORM_DESKTOP": "ON",
                     "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake",
                     "Fw64_BUILD_TESTS": "ON",
                     "FW64_BUILD_EXAMPLES": "ON",
                     "FW64_BUILD_TOOLS": "ON"
                 }
             },
-            "n64": {
-                "short": "N64-libultra",
-                "long": "N64-libultra",
+            "n64_libultra": {
+                "short": "n64_libultra",
+                "long": "n64_libultra",
                 "settings": {
-                    "FW64_PLATFORM_N64": "ON",
+                    "FW64_PLATFORM_N64_LIBULTRA": "ON",
                     "FW64_BUILD_EXAMPLES": "ON",
                     "FW64_BUILD_TOOLS": "ON"
                 }

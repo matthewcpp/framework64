@@ -13,10 +13,8 @@ else()
     add_definitions(-D_FINALROM)
 endif()
 
-add_definitions(-DF3DEX_GBI_2 -DPLATFORM_N64)
+add_definitions(-DF3DEX_GBI_2 -DFW64_PLATFORM_N64_LIBULTRA)
 
-
-set(FW64_TARGET_PLATFORM_N64)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # note: roms will be copied into this directory as post build step
 
 set(FW64_N64_ASM_SRC_DIR ${FW64_ROOT_DIR}/src/n64/asm)
@@ -59,7 +57,7 @@ function(create_game)
 
     set(target_name ${N64_ROM_TARGET})
     set(game_sources ${N64_ROM_SOURCES})
-    set(game_asset_dir ${CMAKE_SOURCE_DIR}/build_n64/bin/${target_name}/assets)
+    set(game_asset_dir ${CMAKE_SOURCE_DIR}/build_n64_libultra/bin/${target_name}/assets)
 
 	# copy the assembly files into the build dir and add them to the target
 	set(asm_dest_dir ${CMAKE_CURRENT_BINARY_DIR}/asm)

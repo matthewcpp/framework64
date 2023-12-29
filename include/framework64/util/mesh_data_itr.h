@@ -4,15 +4,14 @@
 
 #include "framework64/mesh.h"
 
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
     #include <nusys.h>
 #endif
 
 typedef struct {
     fw64Mesh* mesh;
     int triangle_index;
-#ifdef PLATFORM_N64 
-    
+#ifdef FW64_PLATFORM_N64_LIBULTRA
     Gfx* display_list;
     Vtx* vertex_cache;
 #else

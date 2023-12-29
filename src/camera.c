@@ -21,7 +21,7 @@ void fw64_camera_init(fw64Camera* camera) {
 }
 
 void fw64_camera_update_projection_matrix(fw64Camera* camera) {
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
     guPerspective(&camera->projection, &camera->_persp_norm, 
     camera->fovy, camera->aspect, camera->near, camera->far, 1.0f);
 #else
@@ -36,7 +36,7 @@ void fw64_camera_update_view_matrix(fw64Camera* camera) {
 
     vec3_add(&target, &camera->transform.position, &forward);
 
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
     guLookAt(&camera->view, 
     camera->transform.position.x, camera->transform.position.y, camera->transform.position.z,
     target.x, target.y, target.z, up.x, up.y, up.z);
@@ -48,7 +48,7 @@ void fw64_camera_update_view_matrix(fw64Camera* camera) {
 void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* frustum) {
     float projScreenMatrix[16];
 
-    #ifdef PLATFORM_N64
+    #ifdef FW64_PLATFORM_N64_LIBULTRA
     Mtx projViewMatrix;
     guMtxCatL(&camera->view, &camera->projection, &projViewMatrix);
     guMtxL2F((void*)&projScreenMatrix[0], &projViewMatrix);

@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "N64",
+            "name": "n64_libultra",
             "includePath": [
                 "/usr/include/n64",
                 "/usr/include/n64/nusys",
@@ -13,7 +13,7 @@
             ],
             "defines": [
                 "_LANGUAGE_C",
-                "PLATFORM_N64"
+                "FW64_PLATFORM_N64_LIBULTRA"
             ],
             "compileCommands": "${workspaceFolder}/build_n64/compile_commands.json"
         },
