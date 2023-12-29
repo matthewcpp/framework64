@@ -7,7 +7,7 @@
 
 typedef struct fw64Texture fw64Texture;
 
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
 #include <nusys.h>
 
 typedef enum {

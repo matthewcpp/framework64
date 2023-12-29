@@ -18,15 +18,13 @@ async function prepareAssets(assetManifest, assetDirectory, platform, platformBu
     platform = platform.toLowerCase();
 
     switch(platform) {
-        case "desktop": {
+        case "desktop":
             BuildInfo.initDesktop(platformBuildDir);
             break;
-        }
 
-        case "n64": {
-            BuildInfo.initN64();
+        case "n64_libultra":
+            BuildInfo.initN64Libultra();
             break;
-        }
 
         default: {
             throw new Error(`Build Info not configured for: ${platform}`);

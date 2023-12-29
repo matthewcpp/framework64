@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build_desktop/tools/data_link_client/data_link_example_client",
             "args": ["desktop"],
-            // "args": ["n64", "${workspaceFolder}/build_n64/bin/data_link.z64"],
+            // "args": ["n64", "${workspaceFolder}/build_n64_libultra/bin/data_link.z64"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -20,7 +20,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build_desktop/tools/data_link_client/Debug/data_link_example_client.exe",
             //"args": ["desktop"],
-            "args": ["n64", "${workspaceFolder}/build_n64/bin/data_link.z64"],
+            "args": ["n64", "${workspaceFolder}/build_n64_libultra/bin/data_link.z64"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -44,7 +44,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build_desktop/tools/asset_transfer_webservice/Debug/data_link_asset_service.exe",
             // "args": ["--framework64-dir", "${workspaceFolder}", "desktop"],
-            "args": ["--framework64-dir", "${workspaceFolder}", "n64", "${workspaceFolder}/build_n64/bin/data_link_asset_viewer.z64"],
+            "args": ["--framework64-dir", "${workspaceFolder}", "n64_libultra", "${workspaceFolder}/build_n64/bin/data_link_asset_viewer.z64"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
@@ -58,20 +58,21 @@
                 "<node_internals>/**"
             ],
             "type": "node",
-            // "args":["shading_modes", "n64"]
-            "args":["character_animation", "desktop"]
+            // "args":["shading_modes", "n64_libultra"]
+            //"args":["spin_n64", "n64_libdragon"]
+            "args":["bounding", "desktop"]
         },
         {
             "type": "by-gdb",
             "name": "CEN64 Debug ROM Windows / Mac",
             "request": "launch",
             "debuggerPath": "gdb-multiarch",
-            "program": "${workspaceFolder}/build_n64/examples/rendermodes/rendermodes.elf",
+            "program": "${workspaceFolder}/build_n64_libultra/examples/billboard/billboard.elf",
             "remote": {
                 "enabled": true,
                 "address": "host.docker.internal:8080",
                 "mode": "remote",
-                "execfile": "${workspaceFolder}/build_n64/examples/rendermodes/rendermodes.elf"
+                "execfile": "${workspaceFolder}/build_n64_libultra/examples/billboard/billboard.elf"
             },
             "commandsBeforeExec": [
                 "set arch mips:4300",
@@ -83,12 +84,12 @@
             "name": "CEN64 Debug ROM Linux",
             "request": "launch",
             "debuggerPath": "gdb-multiarch",
-            "program": "${workspaceFolder}/build_n64/examples/rendermodes/rendermodes.elf",
+            "program": "${workspaceFolder}/build_n64_libultra/examples/rendermodes/rendermodes.elf",
             "remote": {
                 "enabled": true,
                 "address": "localhost:8080",
                 "mode": "remote",
-                "execfile": "${workspaceFolder}/build_n64/examples/rendermodes/rendermodes.elf"
+                "execfile": "${workspaceFolder}/build_n64_libultra/examples/rendermodes/rendermodes.elf"
             },
             "commandsBeforeExec": [
                 "set arch mips:4300",

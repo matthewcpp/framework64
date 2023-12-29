@@ -12,6 +12,7 @@ class Material {
         DecalTexture: 6
     }
 
+    /* note: this is specified as RGBA32 */
     color = [255, 255, 255, 255];
 
     /** index into the mesh's texture array */

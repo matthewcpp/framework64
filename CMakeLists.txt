@@ -13,7 +13,7 @@ if (NOT DEFINED FW64_PLATFORM_CONFIGURED)
     include(cmake/configure_platform.cmake REQUIRED)
 endif()
 
-if (FW64_PLATFORM_N64)
+if (NOT FW64_PLATFORM_DESKTOP)
     project(framework64 C)
 else()
     project(framework64)

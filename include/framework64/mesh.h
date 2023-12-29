@@ -13,6 +13,12 @@
 
 #define FW64_JOINT_INDEX_NONE UINT32_MAX
 
+typedef enum {
+    FW64_PRIMITIVE_MODE_UNSET,
+    FW64_PRIMITIVE_MODE_TRIANGLES,
+    FW64_PRIMITIVE_MODE_LINES
+} fw64PrimitiveMode;
+
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 typedef struct fw64MaterialBundle fw64MaterialBundle;
 typedef struct fw64Mesh fw64Mesh;

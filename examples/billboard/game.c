@@ -44,7 +44,7 @@ void game_init(Game* game, fw64Engine* engine) {
 void create_ground_plane(Game* game) {
     fw64TexturedQuadParams params;
     fw64_textured_quad_params_init(&params);
-    params.image_asset_index = FW64_ASSET_image_grass;
+    params.image_asset_id = FW64_ASSET_image_grass;
     params.max_s = 4.0f;
     params.max_t = 4.0f;
 

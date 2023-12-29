@@ -5,6 +5,13 @@
 
 #include <limits.h>
 
+void fw64_n64_material_init(fw64Material* material) {
+    fw64_color_rgba8_set(&material->color, 255, 255, 255, 255);
+    material->texture = NULL;
+    material->texture_frame = 0;
+    material->shading_mode = FW64_SHADING_MODE_UNSET;
+}
+
 fw64Texture* fw64_material_get_texture(fw64Material* material) {
     return material->texture;
 }

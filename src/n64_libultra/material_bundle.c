@@ -81,3 +81,26 @@ void fw64_material_bundle_delete(fw64MaterialBundle* material_bundle, fw64Alloca
 
     allocator->free(allocator, material_bundle);
 }
+
+void fw64_n64_material_bundle_init(fw64MaterialBundle* material_bundle, uint32_t image_count, uint32_t texture_count, uint32_t material_count, fw64Allocator* allocator) {
+    material_bundle->image_count = image_count;
+    if (image_count > 0) {
+        material_bundle->images = allocator->malloc(allocator, image_count * sizeof(fw64Image));
+    } else {
+        material_bundle->images = NULL;
+    }
+
+    material_bundle->texture_count = texture_count;
+    if (texture_count > 0) {
+        material_bundle->textures = allocator->malloc(allocator, texture_count * sizeof(fw64Texture));
+    } else {
+        material_bundle->textures = NULL;
+    }
+
+    material_bundle->material_count = material_count;
+    if (material_count > 0) {
+        material_bundle->materials = allocator->malloc(allocator, material_count * sizeof(fw64Material));
+    } else {
+        material_bundle->materials = NULL;
+    }
+}

@@ -1,4 +1,9 @@
+# Build with: docker build -t matthewcpp/framework64-n64-libultra .
+# On Apple silicon: docker build -t matthewcpp/framework64-n64-libultra --platform linux/amd64 .
+
 from ubuntu:jammy
+
+ENV FW64_N64_LIBULTRA_DOCKER_CONTAINER=1
 
 ENV PATH=/opt/crashsdk/bin:/etc/n64/usr/sbin:${PATH}
 ENV N64_LIBGCCDIR=/opt/crashsdk/lib/gcc/mips64-elf/11.2.0

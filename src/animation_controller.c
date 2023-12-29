@@ -104,7 +104,7 @@ void update_skin(fw64AnimationController* controller) {
         compute_local_matrix(controller, 0, &local_matrix[0]);
     }
 
-    #ifdef PLATFORM_N64
+    #ifdef FW64_PLATFORM_N64_LIBULTRA
         guMtxF2L((float (*)[4])local_matrix, root_matrix);
     #else
         memcpy(&root_matrix->m[0], &local_matrix[0], sizeof(float) * 16);
@@ -182,7 +182,7 @@ void update_joint(fw64AnimationController* controller, uint32_t joint_index, flo
     fw64Matrix* joint_matrix = controller->matrices + joint_index;
     
 
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
     float temp[16];
     matrix_multiply(&temp[0], &world_matrix[0], inv_bind_matrix);
     guMtxF2L((float (*)[4])temp, joint_matrix);
@@ -195,7 +195,7 @@ void update_joint(fw64AnimationController* controller, uint32_t joint_index, flo
     }
 }
 
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
 #include <nusys.h>
 
 void initialize_matrices(fw64AnimationController* controller) {

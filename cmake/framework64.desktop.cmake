@@ -25,7 +25,7 @@ function (configure_core_library)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
 
-    file(WRITE ${CMAKE_BINARY_DIR}/build_info.json "{\"target\":\"${VCPKG_TARGET_TRIPLET}\",\"type\":\"${CMAKE_BUILD_TYPE}\"}")
+    file(WRITE ${CMAKE_BINARY_DIR}/build_info.json "{\"target\":\"desktop\",\"config\":\"${VCPKG_TARGET_TRIPLET}\",\"type\":\"${CMAKE_BUILD_TYPE}\"}")
 
     target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_DESKTOP)
 

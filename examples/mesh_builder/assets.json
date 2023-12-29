@@ -1,0 +1,20 @@
+{
+    "images": [
+        {
+            "name": "letter_texture",
+            "atlas": {
+                "rows": [
+                    ["image_font/048.png", "image_font/049.png"],
+                    ["image_font/050.png", "image_font/051.png"]
+                ],
+                "frameSize": "16x16"
+            }
+        },
+        {
+
+            "name": "fw64_image",
+            "src": "mesh_images/1.png",
+            "format": "CI4"
+        }
+    ]
+}

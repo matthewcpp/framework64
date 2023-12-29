@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
 #include <nusys.h>
 
 #include <malloc.h>

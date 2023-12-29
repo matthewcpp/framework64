@@ -6,6 +6,7 @@ const rimraf = require("rimraf");
 const fs = require("fs-extra");
 const path = require("path");
 const Plugins = require("./Plugins");
+const Util = require("./Util")
 
 async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginDirPath) {
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
@@ -13,11 +14,12 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
 
     const plugins = new Plugins(loadPlugins(pluginDirPath, platform));
 
-    const assetIncludeDirectory = path.join(outputDirectory, "include", "assets");
+    // ensure that required asset folders are setup for downstream processors
+    const assetIncludeDirectory = Util.assetIncludeDirectory(outputDirectory);
     fs.ensureDirSync(assetIncludeDirectory);
 
     switch (platform) {
-        case "n64":
+        case "n64_libultra":
             const processN64 = require("./n64/Process");
             await processN64(manifest, assetDirectory, outputDirectory, plugins);
             break;

@@ -15,3 +15,5 @@ struct fw64MaterialBundle {
     fw64Texture* textures;
     fw64Material* materials;
 };
+
+void fw64_n64_material_bundle_init(fw64MaterialBundle* material_bundle, uint32_t image_count, uint32_t texture_count, uint32_t material_count, fw64Allocator* allocator);

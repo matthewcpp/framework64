@@ -3,10 +3,6 @@
 
 #include "framework64/n64/controller_button.h"
 
-#ifdef PLATFORM_N64
-#include <malloc.h>
-#endif
-
 #include <stdio.h>
 #include <string.h>
 

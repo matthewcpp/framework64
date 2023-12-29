@@ -39,19 +39,21 @@ set(common_source_files
         ../include/framework64/vec3.h vec3.c
 
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
+        ../include/framework64/util/mesh_builder.h
         ../include/framework64/util/mesh_data_itr.h
         ../include/framework64/util/quad.h util/quad.c
         ../include/framework64/util/renderer_util.h
         ../include/framework64/util/sparse_set.h util/sparse_set.c
         )
 
+
 add_library(framework64 STATIC ${common_source_files})
 target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 if (FW64_PLATFORM_DESKTOP)
     add_subdirectory(desktop)
-elseif(FW64_PLATFORM_N64)
-    add_subdirectory(n64)
+elseif(FW64_PLATFORM_N64_LIBULTRA)
+    add_subdirectory(n64_libultra)
 endif()
 
 configure_core_library()
@@ -59,8 +61,8 @@ configure_core_library()
 if (FW64_MEDIA_ENABLED)
     target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)
     
-    if(FW64_PLATFORM_N64)
-        include(n64/libcart.cmake)
+    if(FW64_PLATFORM_N64_LIBULTRA)
+        include(n64_libultra/libcart.cmake)
     endif()
 
 else()

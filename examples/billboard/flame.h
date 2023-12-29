@@ -7,6 +7,7 @@
 typedef struct {
     fw64Node entity;
     float update_time_remaining;
+    fw64Texture* texture;
 } Flame;
 
 #ifdef __cplusplus

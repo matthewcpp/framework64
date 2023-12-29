@@ -1,7 +1,7 @@
 #ifndef FW64_N64_CONTROLLER_BUTTON
 #define FW64_N64_CONTROLLER_BUTTON
 
-#ifdef PLATFORM_N64
+#ifdef FW64_PLATFORM_N64_LIBULTRA
 
 #include <nusys.h>
 

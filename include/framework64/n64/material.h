@@ -15,3 +15,5 @@ struct fw64Material {
     uint32_t texture_frame;
     uint32_t shading_mode;
 };
+
+void fw64_n64_material_init(fw64Material* material);
