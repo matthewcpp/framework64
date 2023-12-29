@@ -7,7 +7,7 @@
 
 typedef struct fw64Texture fw64Texture;
 
-#ifdef FW64_PLATFORM_N64_LIBULTRA
+#if defined(FW64_PLATFORM_N64_LIBULTRA)
 #include <nusys.h>
 
 typedef enum {
@@ -15,7 +15,18 @@ typedef enum {
     FW64_TEXTURE_WRAP_REPEAT = G_TX_WRAP,
     FW64_TEXTURE_WRAP_MIRROR = G_TX_MIRROR
 } fw64TextureWrapMode;
-#else
+
+#elif defined(FW64_PLATFORM_N64_LIBDRAGON)
+
+#include <GL/gl.h>
+
+typedef enum {
+    FW64_TEXTURE_WRAP_CLAMP = GL_CLAMP,
+    FW64_TEXTURE_WRAP_REPEAT = GL_REPEAT,
+    FW64_TEXTURE_WRAP_MIRROR = GL_MIRRORED_REPEAT_ARB
+} fw64TextureWrapMode;
+
+#elif defined(FW64_PLATFORM_DESKTOP)
 #ifdef __linux__
 #include <GL/glew.h>
 #else

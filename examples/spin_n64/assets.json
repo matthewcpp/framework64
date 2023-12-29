@@ -2,6 +2,9 @@
     "meshes": [
         {
             "src": "n64_logo_model/n64_logo.gltf"
+        },
+        {
+            "src": "penguin/penguin.gltf"
         }
     ]
 }

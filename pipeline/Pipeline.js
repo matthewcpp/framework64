@@ -24,6 +24,11 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
             await processN64(manifest, assetDirectory, outputDirectory, plugins);
             break;
 
+        case "n64_libdragon":
+            const processN64Libdragon = require("./n64_libdragon/Process");
+            await processN64Libdragon(manifest, assetDirectory, outputDirectory, plugins);
+            break;
+
         case "desktop":
             const processDesktop = require("./desktop/Process");
             await processDesktop(manifest, assetDirectory, outputDirectory, plugins);

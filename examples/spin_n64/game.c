@@ -9,14 +9,16 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
     fw64_camera_init(&game->camera);
-    vec3_set(&game->camera.transform.position, 0.0f, 7.5f, 18.0f);
-    Vec3 target = {0.0f, 0.0f, 0.0f};
+    //vec3_set(&game->camera.transform.position, 0.0f, 7.5f, 18.0f);
+    vec3_set(&game->camera.transform.position, 0.0f, 15.0f, 40.0f);
+    Vec3 target = {0.0f, 10.0f, 0.0f};
     Vec3 up = {0.0f, 1.0f, 0.0f};
     fw64_transform_look_at(&game->camera.transform, &target, &up);
     fw64_camera_update_view_matrix(&game->camera);
 
     fw64_node_init(&game->node);
-    fw64_node_set_mesh(&game->node, fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_n64_logo, fw64_default_allocator()));
+    //fw64_node_set_mesh(&game->node, fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_n64_logo, fw64_default_allocator()));
+    fw64_node_set_mesh(&game->node, fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_penguin, fw64_default_allocator()));
     vec3_set_all(&game->node.transform.scale, 0.1f);
 
     game->rotation = 0.0f;

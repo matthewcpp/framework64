@@ -1,0 +1,10 @@
+{
+    "image": "matthewcpp/framework64-n64-libdragon",
+    "runArgs": [
+        "--net=host"
+    ],
+    "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools"
+    ]
+}

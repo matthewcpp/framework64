@@ -54,6 +54,8 @@ if (FW64_PLATFORM_DESKTOP)
     add_subdirectory(desktop)
 elseif(FW64_PLATFORM_N64_LIBULTRA)
     add_subdirectory(n64_libultra)
+elseif(FW64_PLATFORM_N64_LIBDRAGON)
+    add_subdirectory(n64_libdragon)
 endif()
 
 configure_core_library()
