@@ -24,6 +24,7 @@ ${desktop_include_directory}/media.hpp media.cpp
 ${desktop_include_directory}/mesh.hpp mesh.cpp
 ${desktop_include_directory}/mesh_builder.hpp mesh_builder.cpp
 mesh_data_itr.cpp
+mesh_editor.cpp
 ${desktop_include_directory}/n64_input_interface.hpp n64_input_interface.cpp
 ${desktop_include_directory}/primitive_data.hpp primitive_data.cpp
 ${desktop_include_directory}/renderer.hpp renderer.cpp

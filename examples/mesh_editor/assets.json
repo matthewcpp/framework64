@@ -1,0 +1,8 @@
+{
+    "meshes": [
+        {
+            "src": "minesweeper_tile/minesweeper_tile.gltf",
+            "format": "CI4"
+        }
+    ]
+}

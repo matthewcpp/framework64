@@ -18,6 +18,7 @@ set(platform_source_files
     ${n64_include_dir}/mesh.h mesh.c
     ${n64_include_dir}/mesh_builder.h mesh_builder.c
     mesh_data_itr.c
+    mesh_editor.c
     ${n64_include_dir}/renderer.h renderer.c
     renderer_util.c
     ${n64_include_dir}/save_file.h save_file.c
