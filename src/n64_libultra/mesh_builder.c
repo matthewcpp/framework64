@@ -86,7 +86,7 @@ fw64Material* fw64_mesh_builder_get_material(fw64MeshBuilder* mesh_builder, size
     return mesh_builder->material_bundle->materials + index;
 }
 
-int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder, size_t index, fw64MeshBuilderVertexAttributes vertex_attributes, size_t count) {
+int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder, size_t index, fw64VertexAttributes vertex_attributes, size_t count) {
     fw64Allocator* allocator = mesh_builder->allocator;
 
     // TODO: check if already allocated and reset
@@ -127,7 +127,7 @@ int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder
     return 1;
 }
 
-int fw64_mesh_builder_allocate_primitive_data(fw64MeshBuilder* mesh_builder, size_t index, fw64PrimitiveMode mode, fw64MeshBuilderVertexAttributes vertex_attributes, size_t vertex_count, size_t element_count) {
+int fw64_mesh_builder_allocate_primitive_data(fw64MeshBuilder* mesh_builder, size_t index, fw64PrimitiveMode mode, fw64VertexAttributes vertex_attributes, size_t vertex_count, size_t element_count) {
     if (vertex_count > 32) {
         return 0;
     }

@@ -36,7 +36,7 @@ fw64Mesh* fw64_textured_quad_create_with_params(fw64Engine* engine, fw64Textured
     fw64_material_set_shading_mode(material, FW64_SHADING_MODE_UNLIT_TEXTURED);
     fw64_material_set_texture(material, texture, 0);
 
-    fw64MeshBuilderVertexAttributes attributes = FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_POSITION | FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_TEXCOORD;
+    fw64VertexAttributes attributes = FW64_VERTEX_ATTRIBUTE_POSITION | FW64_VERTEX_ATTRIBUTE_TEXCOORD;
     fw64_mesh_builder_allocate_primitive_quad_data(mesh_builder, 0, attributes, 1);
     fw64_mesh_builder_set_active_primitive(mesh_builder, 0);
 

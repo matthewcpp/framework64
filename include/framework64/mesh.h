@@ -19,6 +19,14 @@ typedef enum {
     FW64_PRIMITIVE_MODE_LINES
 } fw64PrimitiveMode;
 
+typedef enum {
+    FW64_VERTEX_ATTRIBUTE_UNSPECIFIED = 0,
+    FW64_VERTEX_ATTRIBUTE_POSITION = (1 << 0),
+    FW64_VERTEX_ATTRIBUTE_NORMAL = (1 << 1),
+    FW64_VERTEX_ATTRIBUTE_TEXCOORD = (1 << 2),
+    FW64_VERTEX_ATTRIBUTE_COLOR = (1 << 3)
+} fw64VertexAttributes;
+
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 typedef struct fw64MaterialBundle fw64MaterialBundle;
 typedef struct fw64Mesh fw64Mesh;

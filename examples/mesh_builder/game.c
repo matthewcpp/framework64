@@ -8,7 +8,7 @@
 static fw64Mesh* build_rgb_triangle(Game* game) {
     fw64MeshBuilder* mesh_builder = fw64_mesh_builder_create(game->engine->assets, 1, 0, &game->allocator.interface);
 
-    fw64MeshBuilderVertexAttributes attributes = FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_POSITION | FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_COLOR;
+    fw64VertexAttributes attributes = FW64_VERTEX_ATTRIBUTE_POSITION | FW64_VERTEX_ATTRIBUTE_COLOR;
     fw64_mesh_builder_allocate_primitive_data(mesh_builder, 0, FW64_PRIMITIVE_MODE_TRIANGLES, attributes, 3, 1);
     fw64_mesh_builder_set_active_primitive(mesh_builder, 0);
 
@@ -43,7 +43,7 @@ static fw64Mesh* build_textured_quad(Game* game) {
     fw64_material_set_shading_mode(material, FW64_SHADING_MODE_UNLIT_TEXTURED);
     fw64_material_set_texture(material, texture, 0);
 
-    fw64MeshBuilderVertexAttributes attributes = FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_POSITION | FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_TEXCOORD;
+    fw64VertexAttributes attributes = FW64_VERTEX_ATTRIBUTE_POSITION | FW64_VERTEX_ATTRIBUTE_TEXCOORD;
     fw64_mesh_builder_allocate_primitive_quad_data(mesh_builder, 0, attributes, 16);
     fw64_mesh_builder_set_active_primitive(mesh_builder, 0);
 
@@ -86,7 +86,7 @@ static fw64Mesh* build_textured_quad(Game* game) {
 static fw64Mesh* build_wire_pyramid(Game* game) {
     fw64MeshBuilder* mesh_builder = fw64_mesh_builder_create(game->engine->assets, 1, 0, &game->allocator.interface);
 
-    fw64MeshBuilderVertexAttributes attributes = FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_POSITION | FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_COLOR;
+    fw64VertexAttributes attributes = FW64_VERTEX_ATTRIBUTE_POSITION | FW64_VERTEX_ATTRIBUTE_COLOR;
     fw64_mesh_builder_allocate_primitive_data(mesh_builder, 0, FW64_PRIMITIVE_MODE_LINES, attributes, 5, 8);
     fw64_mesh_builder_set_active_primitive(mesh_builder, 0);
     fw64_material_set_shading_mode(fw64_mesh_builder_get_material(mesh_builder, 0), FW64_SHADING_MODE_LINE);

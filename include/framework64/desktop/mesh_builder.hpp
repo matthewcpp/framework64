@@ -15,14 +15,14 @@ public:
     struct PrimitiveInfo {
         framework64::PrimitiveData primitive_data;
         fw64Primitive::Mode mode;
-        fw64MeshBuilderVertexAttributes vertex_attributes;
+        fw64VertexAttributes vertex_attributes;
     };
 
 public:
     fw64MeshBuilder(fw64AssetDatabase* assets, fw64Allocator* allocator);
     bool setActivePrimitive(size_t index);
-    bool allocatePrimitiveQuadData(size_t index, fw64MeshBuilderVertexAttributes vertex_attributes, size_t count);
-    bool allocatePrimitiveData(size_t index, fw64Primitive::Mode mode, fw64MeshBuilderVertexAttributes vertex_attributes, size_t vertex_count, size_t element_count);
+    bool allocatePrimitiveQuadData(size_t index, fw64VertexAttributes vertex_attributes, size_t count);
+    bool allocatePrimitiveData(size_t index, fw64Primitive::Mode mode, fw64VertexAttributes vertex_attributes, size_t vertex_count, size_t element_count);
     fw64Texture* loadImage(fw64AssetId id);
 
     void reset(size_t primitive_count, size_t image_count);
