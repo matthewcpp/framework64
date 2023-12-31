@@ -23,6 +23,7 @@ set(platform_source_files
     renderer_util.c
     ${n64_include_dir}/save_file.h save_file.c
     ${n64_include_dir}/texture.h texture.c
+    ${n64_include_dir}/vertex.h vertex.c
 
     usb/usb.h usb/usb.c
 )

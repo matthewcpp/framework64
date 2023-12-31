@@ -1,6 +1,7 @@
 #include "framework64/n64/mesh_builder.h"
 #include "framework64/n64/mesh.h"
 #include "framework64/n64/filesystem.h"
+#include "framework64/n64/vertex.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -170,53 +171,23 @@ int fw64_mesh_builder_set_active_primitive(fw64MeshBuilder* mesh_builder, size_t
 
 void fw64_mesh_builder_set_vertex_position_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z) {
     fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
-    Vtx* vertex = active_primitive_info->vertices + index;
-    
-    vertex->v.ob[0] = (short)x;
-    vertex->v.ob[1] = (short)y;
-    vertex->v.ob[2] = (short)z;
-    vertex->v.flag = 0;
+    fw64_n64_vertex_set_position_f(active_primitive_info->vertices + index, x, y, z);
 }
 
 void fw64_mesh_builder_set_vertex_normal_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z) {
     fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
-    Vtx* vertex = active_primitive_info->vertices + index;
-
-    x = x * 128.0f;
-    x = x < 127.0f ? x : 127.0f;
-
-    y = y * 128.0f;
-    y = x < 127.0f ? y : 127.0f;
-
-    z = z * 128.0f;
-    z = z < 127.0f ? z : 127.0f;
-
-    vertex->n.n[0] = (signed char)x;
-    vertex->n.n[1] = (signed char)y;
-    vertex->n.n[2] = (signed char)z;
+    fw64_n64_vertex_set_normal_f(active_primitive_info->vertices + index, x, y, z);
 }
 
 void fw64_mesh_builder_set_vertex_color_rgba8(fw64MeshBuilder* mesh_builder, size_t index, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
-    Vtx* vertex = active_primitive_info->vertices + index;
-
-    vertex->v.cn[0] = r;
-    vertex->v.cn[1] = g;
-    vertex->v.cn[2] = b;
-    vertex->v.cn[3] = a;
+    fw64_n64_vertex_set_color_rgba8(active_primitive_info->vertices + index, r, g, b, a);
 }
 
 void fw64_mesh_builder_set_vertex_texcoords_f(fw64MeshBuilder* mesh_builder, size_t index, float s, float t) {
     fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
-    Vtx* vertex = active_primitive_info->vertices + index;
     fw64Material* material = mesh_builder->material_bundle->materials + mesh_builder->active_primitive_index;
-
-    s *= (float)fw64_texture_slice_width(material->texture) * 2.0f;
-    t *= (float)fw64_texture_slice_height(material->texture) * 2.0f;
-
-    // Note that the texture coordinates (s,t) are encoded in S10.5 format.
-    vertex->v.tc[0] =  (short)(s * 32.0f);
-    vertex->v.tc[1] =  (short)(t * 32.0f);
+    fw64_n64_vertex_set_texcoords_f(active_primitive_info->vertices + index, material, s, t);
 }
 
 void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, Box* bounding) {
