@@ -12,6 +12,9 @@
 #include "framework64/renderer.h"
 #include "framework64/vec3.h"
 
+#include "framework64/util/sparse_set.h"
+
+typedef fw64SparseSetHandle fw64DynamicNodeHandle;
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
 typedef struct {
@@ -31,6 +34,7 @@ struct fw64Scene {
     fw64CollisionMesh* collision_meshes;
     fw64MaterialBundle* material_bundle;
     fw64Allocator* allocator;
+    fw64AssetDatabase* assets;
     Box bounding_box;
 };
 
@@ -39,7 +43,11 @@ extern "C" {
 #endif
 
 fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase* assets, fw64Allocator* allocator);
-void fw64_scene_delete(fw64Scene* scene, fw64AssetDatabase* assets, fw64Allocator* allocator);
+void fw64_scene_uninit(fw64Scene* scene);
+void fw64_scene_delete(fw64Scene* scene);
+
+void fw64_scene_info_init(fw64SceneInfo* info);
+void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* assets, fw64Allocator* allocator);
 
 /** 
  * Gets the original bounding box for the scene as it was authored. 
@@ -60,6 +68,10 @@ uint32_t fw64_scene_get_mesh_count(fw64Scene* scene);
 
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
+
+
+fw64Node* fw64_scene_create_dynamic_node(fw64Scene* scene, fw64DynamicNodeHandle* handle);
+fw64Node* fw64_scene_get_dynamic_node(fw64Scene* scene, fw64DynamicNodeHandle handle);
 
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene);
 

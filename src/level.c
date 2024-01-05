@@ -21,7 +21,7 @@ void fw64_level_uninit(fw64Level* level) {
             ref->info.uninit_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
         }
 
-        fw64_scene_delete(ref->scene, level->engine->assets, fw64_scene_get_allocator(ref->scene));
+        fw64_scene_delete(ref->scene);
     }
 }
 
@@ -104,7 +104,7 @@ int fw64_level_unload_chunk(fw64Level* level, uint32_t handle) {
     if (ref->info.uninit_func)
         ref->info.uninit_func(ref->handle, ref->info.scene_id, ref->scene, ref->info.callback_arg);
     
-    fw64_scene_delete(ref->scene, level->engine->assets, fw64_scene_get_allocator(ref->scene));
+    fw64_scene_delete(ref->scene);
 
     // move last item in chunk ref array to the deleted chunk's spot
     if (target_index != level->chunk_ref_count - 1) {
