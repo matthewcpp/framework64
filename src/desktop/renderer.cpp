@@ -142,6 +142,7 @@ void fw64Renderer::clearViewport(fw64Camera* camera, fw64RendererFlags flags) {
 
     auto viewport_rect = getViewportRect(camera);
     glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
+    glScissor(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
 
     GLbitfield clear_flags = 0;
     if (flags & FW64_RENDERER_FLAG_CLEAR_COLOR)
@@ -156,7 +157,7 @@ void fw64Renderer::clearViewport(fw64Camera* camera, fw64RendererFlags flags) {
 
     // restore the camera viewport if necessary
     if (camera != current_camera) {
-        viewport_rect = getViewportRect(camera);
+        viewport_rect = getViewportRect(current_camera);
         glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
     }
 }
