@@ -45,6 +45,7 @@ set(common_source_files
         ../include/framework64/util/quad.h util/quad.c
         ../include/framework64/util/renderer_util.h
         ../include/framework64/util/sparse_set.h util/sparse_set.c
+        ../include/framework64/util/texture_util.h util/texture_util.c
         )
 
 
