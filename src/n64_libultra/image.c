@@ -1,6 +1,5 @@
 #include "framework64/n64/image.h"
 
-#include "framework64/n64/asset_database.h"
 #include "framework64/data_io.h"
 #include "framework64/n64/filesystem.h"
 #include <stdlib.h>
@@ -35,14 +34,6 @@ fw64Image* fw64_image_load_from_datasource(fw64DataSource* data_source, fw64Allo
     }
 
     return image;
-}
-
-// going away
-fw64Image* fw64_image_load(fw64AssetDatabase* asset_database, uint32_t asset_index, fw64Allocator* allocator) {
-    if (allocator == NULL)
-        allocator = fw64_default_allocator();
-
-    return (fw64Image*)fw64_assets_load_image(asset_database, asset_index, allocator);
 }
 
 // going away
