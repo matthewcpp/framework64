@@ -174,6 +174,15 @@ void fw64_mesh_builder_set_vertex_position_f(fw64MeshBuilder* mesh_builder, size
     fw64_n64_vertex_set_position_f(active_primitive_info->vertices + index, x, y, z);
 }
 
+void fw64_mesh_builder_set_vertex_position_int16(fw64MeshBuilder* mesh_builder, size_t index, int16_t x, int16_t y, int16_t z) {
+    fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
+    Vtx* vertex = active_primitive_info->vertices + index;
+    vertex->v.ob[0] = x;
+    vertex->v.ob[1] = y;
+    vertex->v.ob[2] = z;
+    vertex->v.flag = 0;
+}
+
 void fw64_mesh_builder_set_vertex_normal_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z) {
     fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
     fw64_n64_vertex_set_normal_f(active_primitive_info->vertices + index, x, y, z);

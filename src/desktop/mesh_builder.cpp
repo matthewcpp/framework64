@@ -204,6 +204,15 @@ void fw64_mesh_builder_set_vertex_position_f(fw64MeshBuilder* mesh_builder, size
     active_prim.primitive_data.positions[pos_index++] = z;
 }
 
+void fw64_mesh_builder_set_vertex_position_int16(fw64MeshBuilder* mesh_builder, size_t index, int16_t x, int16_t y, int16_t z) {
+    auto & active_prim = mesh_builder->primitive_info_vec[mesh_builder->active_mesh_index];
+    size_t pos_index = index * 3;
+
+    active_prim.primitive_data.positions[pos_index++] = static_cast<float>(x);
+    active_prim.primitive_data.positions[pos_index++] = static_cast<float>(y);
+    active_prim.primitive_data.positions[pos_index++] = static_cast<float>(z);
+}
+
 void fw64_mesh_builder_set_vertex_normal_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z) {
     auto & active_prim = mesh_builder->primitive_info_vec[mesh_builder->active_mesh_index];
     size_t pos_index = index * 3;
