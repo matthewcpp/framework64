@@ -28,10 +28,5 @@
         {
             "src": "penguin/penguin.gltf"
         }
-    ],
-    "layers": {
-        "default": 1,
-        "ground": 2,
-        "wall": 4
-    }
+    ]
 }

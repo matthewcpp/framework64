@@ -8,7 +8,7 @@ const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processLevel = require("./ProcessLevel")
-const processLayers = require("../Layers");
+const processLayers = require("../ProcessLayers");
 
 const processRaw = require("./ProcessRaw");
 
@@ -17,7 +17,7 @@ const path = require("path");
 async function processDesktop(manifest, assetDirectory, outputDirectory, plugins) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const bundle = new Bundle(outputDirectory, includeDirectory);
-    const layerMap = processLayers(manifest.layers, includeDirectory);
+    const layerMap = processLayers(assetDirectory, includeDirectory);
 
     plugins.initialize(bundle, assetDirectory, outputDirectory, includeDirectory, "desktop");
 

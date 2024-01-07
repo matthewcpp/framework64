@@ -2,15 +2,25 @@ const Util = require("./Util");
 const path = require("path");
 const fs = require("fs");
 
-function processLayers(layers, outputDirectory) {
-    layers = layers ?? {}; // if null or undefined just assume empty layer map
+function processLayers(manifestDirectory, outputDirectory) {
+    const layersFilePath = path.join(manifestDirectory, "layers.json");
 
+    if (fs.existsSync(layersFilePath)) {
+        console.log(`Processing Layers: layers.json`);
+        const layersJson = JSON.parse(fs.readFileSync(layersFilePath, {encoding: "utf-8"}));
+        return _processLayerObject(layersJson, outputDirectory)
+    } else {
+        return _processLayerObject({}, outputDirectory);
+    }
+}
+
+function _processLayerObject(layers, outputDirectory) {
     var mapping = new Map();
 
     var keys = Object.keys(layers);
     for (const key of keys) {
         const safeName = Util.safeDefineName(key);
-        const value = layers[key];
+        const value = parseInt(layers[key]);
 
         if (key !== safeName)
             throw new Error(`Layer parsing error: ${key}: Layer names should not spaces or special characters.`);

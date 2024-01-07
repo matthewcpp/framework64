@@ -12,9 +12,6 @@
 #include "framework64/renderer.h"
 #include "framework64/vec3.h"
 
-#include "framework64/util/sparse_set.h"
-
-typedef fw64SparseSetHandle fw64DynamicNodeHandle;
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
 typedef struct {
@@ -68,10 +65,6 @@ uint32_t fw64_scene_get_mesh_count(fw64Scene* scene);
 
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
-
-
-fw64Node* fw64_scene_create_dynamic_node(fw64Scene* scene, fw64DynamicNodeHandle* handle);
-fw64Node* fw64_scene_get_dynamic_node(fw64Scene* scene, fw64DynamicNodeHandle handle);
 
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene);
 

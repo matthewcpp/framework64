@@ -4,7 +4,7 @@ const processImage = require("./ProcessImage");
 const FontConvert = require("./ProcessFont");
 const AudioConvert = require("./AudioConvert");
 const processLevel = require("./ProcessLevel");
-const processLayers = require("../Layers");
+const processLayers = require("../ProcessLayers");
 const Archive = require("./Archive");
 const Util = require("../Util");
 
@@ -14,7 +14,7 @@ async function processN64(manifest, assetDirectory, outputDirectory, plugins) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new Archive(outputDirectory, includeDirectory);
 
-    const layerMap = processLayers(manifest.layers, Util.assetIncludeDirectory(outputDirectory));
+    const layerMap = processLayers(assetDirectory, Util.assetIncludeDirectory(outputDirectory));
 
     plugins.initialize(archive, assetDirectory, outputDirectory, includeDirectory, "n64");
 
