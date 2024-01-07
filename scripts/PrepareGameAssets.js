@@ -36,7 +36,7 @@ async function prepareGameAssets(platform, target) {
         console.log(`No target specified. using default target: ${packageJson.name}`);
     }
 
-    if (platform.toLowerCase() === "n64") {
+    if (platform.toLowerCase() === "n64_libultra") {
         purgeCompiledAssetData(platformBuildDir, target)
     }
 
