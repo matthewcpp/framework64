@@ -11,6 +11,8 @@ float fw64_clamp(float x, float lower, float upper);
 float fw64_maxf(float a, float b);
 float fw64_minf(float a, float b);
 
+float fw64_map_value_in_numeric_range(float value, float input_start, float input_end, float output_start, float output_end);
+
 #ifdef __cplusplus
 }
 #endif
