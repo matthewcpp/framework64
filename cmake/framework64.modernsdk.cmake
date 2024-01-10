@@ -101,11 +101,11 @@ function(create_game)
 
     # set assembly file paths to configure linkerscript
     # Note: cmake is passing the paths to these files relative to the current binary directory.  The paths we configure should match the path on the linker command line
-    set(obj_folder_root CMakeFiles/${target_name}.dir)
+    set(obj_folder_root ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${target_name}.dir)
     set(entry_path ${obj_folder_root}/asm/entry.s.obj)
     set(rom_header_path ${obj_folder_root}/asm/rom_header.s.obj)
     set(asset_data_path ${obj_folder_root}/asm/asset_data.s.obj)
-    set(bootcode_path boot.6102.o)
+    set(bootcode_path ${bootcode_dest})
 
     # create the linkerscript file containing the paths to the built obects
     set(main_obj_dir ${obj_folder_root})

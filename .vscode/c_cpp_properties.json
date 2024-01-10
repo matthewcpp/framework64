@@ -2,20 +2,7 @@
     "configurations": [
         {
             "name": "n64_libultra",
-            "includePath": [
-                "/usr/include/n64",
-                "/usr/include/n64/nusys",
-                "/usr/include/n64/nustd",
-                "${workspaceFolder}/include/**",
-                "${workspaceFolder}/components",
-                "${workspaceFolder}/lib/libcart/include",
-                "${workspaceFolder}/lib/libcart/ff"
-            ],
-            "defines": [
-                "_LANGUAGE_C",
-                "FW64_PLATFORM_N64_LIBULTRA"
-            ],
-            "compileCommands": "${workspaceFolder}/build_n64/compile_commands.json"
+            "configurationProvider": "ms-vscode.cmake-tools"
         },
         {
             "name": "Desktop",
