@@ -11,7 +11,7 @@ program
     .description("Prepares assets for a framework64 Game");
 
 program
-    .option("-p, --plugins <path>", "path to pipeline plugin directory");
+    .option("-p, --plugins <path>", "path to pipeline plugin manifest");
 
 program
     .argument("<platform>")
@@ -26,7 +26,7 @@ async function prepareGameAssets(platform, target) {
     const assetManifest = path.join(assetDirectory, "assets.json");
     const platformBuildDir = path.join(gameDirectory, `build_${platform}`);
     const options = program.opts();
-    const pluginDir = (!!options.plugins) ? path.join(gameDirectory, options.plugins) : null;
+    const pluginManifest = Object.hasOwn(options, "plugins") ? options.plugins : null;
 
     // read game name from package manifest if not specified
     if (!target) {
@@ -40,7 +40,7 @@ async function prepareGameAssets(platform, target) {
         purgeCompiledAssetData(platformBuildDir, target)
     }
 
-    await prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, target, pluginDir);
+    await prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, target, pluginManifest);
 }
 
 /** 
