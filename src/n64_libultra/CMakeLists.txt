@@ -27,3 +27,7 @@ set(platform_source_files
 )
 
 target_sources(framework64 PRIVATE ${platform_source_files})
+
+#if enable vorbis audio
+target_include_directories(framework64 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../lib)
+target_sources(framework64 PRIVATE ${n64_include_dir}/vorbis_audio.h vorbis_audio.c)
