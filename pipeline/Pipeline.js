@@ -82,6 +82,8 @@ function loadPlugins(pluginManifestPath) {
 
             pluginMap.set(extension, pluginInstance);
         }
+
+        console.log(`Loaded plugin: ${plugInfo.src}`);
     }
 
     return pluginMap;
