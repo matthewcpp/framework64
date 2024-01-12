@@ -16,11 +16,13 @@ public:
 
     bool init();
     std::filesystem::path getAssetPath(fw64AssetId asset_id) const;
-    bool openAssetFile(fw64AssetId asset_id, framework64::FileDataSource & datasource) const;
+    framework64::FileDataSource* openAssetFile(fw64AssetId asset_id);
 
     std::string asset_dir;
     std::filesystem::path asset_directory;
     framework64::ShaderCache& shader_cache;
+
+    framework64::FileDataSource data_sources[FW64_ASSETS_MAX_OPEN_DATASOURCES];
 
     std::unordered_map<fw64AssetId, std::string> asset_bundle;
 };

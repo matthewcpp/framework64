@@ -5,12 +5,10 @@ const Util = require("../Util");
 
 const path = require("path");
 
-async function processLevel(level, layerMap, archive, baseDirectory, outputDirectory, includeDirectory, plugins) {
+async function processLevel(level, layerMap, archive, baseDirectory, outputDirectory, includeDirectory) {
     const srcPath = path.join(baseDirectory, level.src);
     const levelParser = new LevelParser();
     levelParser.parse(srcPath, layerMap);
-
-    plugins.levelBegin(level, levelParser)
 
     for (const scene of levelParser.scenes) {
         const safeSceneName =  Util.safeDefineName(scene.name);
@@ -24,10 +22,7 @@ async function processLevel(level, layerMap, archive, baseDirectory, outputDirec
         const sceneIncludeFileName =`scene_${safeSceneName}.h`;
         const sceneDefineFile = path.join(includeDirectory, sceneIncludeFileName)
         SceneDefines.writeToFile(scene, sceneDefineFile);
-        plugins.processScene(scene.name, scene.rootNode);
     }
-
-    plugins.levelEnd();
 }
 
 module.exports = processLevel;

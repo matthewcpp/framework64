@@ -11,7 +11,7 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     platform = platform.toLowerCase();
 
-    const pluginMap = loadPlugins(pluginManifest);
+    const pluginMap = loadPlugins(path.resolve(pluginManifest));
 
     // ensure that required asset folders are setup for downstream processors
     const assetIncludeDirectory = Util.assetIncludeDirectory(outputDirectory);
@@ -20,12 +20,12 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     switch (platform) {
         case "n64_libultra":
             const processN64 = require("./n64/Process");
-            await processN64(manifest, assetDirectory, outputDirectory, plugins);
+            await processN64(manifest, assetDirectory, outputDirectory, pluginMap);
             break;
 
         case "desktop":
             const processDesktop = require("./desktop/Process");
-            await processDesktop(manifest, assetDirectory, outputDirectory, plugins);
+            await processDesktop(manifest, assetDirectory, outputDirectory, pluginMap);
             break;
 
         default:

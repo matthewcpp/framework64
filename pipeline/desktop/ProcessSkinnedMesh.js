@@ -6,7 +6,7 @@ const MaterialBundle = require("../gltf/MaterialBundle");
 const SkinnedMeshWriter = require("./SkinnedMeshWriter");
 const Util = require("../Util");
 
-async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory, plugins) {
+async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory) {
     const srcPath = path.join(manifestDirectory, skinnedMesh.src);
 
     const gltfLoader = new GLTFLoader();
@@ -30,8 +30,6 @@ async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, output
     mesh.remapJointIndices(animationData.jointIdMap);
     mesh.materialBundle = new MaterialBundle(gltfLoader);
     mesh.materialBundle.bundleMeshMaterials(0);
-
-    plugins.skinnedMeshParsed(skinnedMesh, gltfLoader, animationData);
 
     const animationOnly = Object.hasOwn(skinnedMesh, "animationOnly") ? skinnedMesh.animationOnly : false;
     const includeFilePath = path.join(includeDirectory, meshName + "_animation.h");

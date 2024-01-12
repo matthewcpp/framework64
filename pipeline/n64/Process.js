@@ -10,26 +10,24 @@ const Util = require("../Util");
 
 const path = require("path");
 
-async function processN64(manifest, assetDirectory, outputDirectory, plugins) {
+async function processN64(manifest, assetDirectory, outputDirectory, pluginMap) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new Archive(outputDirectory, includeDirectory);
 
     const layerMap = processLayers(assetDirectory, Util.assetIncludeDirectory(outputDirectory));
 
-    plugins.initialize(archive, assetDirectory, outputDirectory, includeDirectory, "n64");
-
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`)
 
-            await processMesh(mesh, archive, assetDirectory, outputDirectory, plugins);
+            await processMesh(mesh, archive, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory, plugins);
+            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
@@ -64,7 +62,7 @@ async function processN64(manifest, assetDirectory, outputDirectory, plugins) {
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory, plugins);
+            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 

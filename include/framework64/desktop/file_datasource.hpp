@@ -12,6 +12,7 @@ struct FileDataSource {
     FileDataSource();
 
     bool open(std::filesystem::path const & filesystem_path);
+    void close();
 
     fw64DataSource interface;
     std::ifstream file;
@@ -28,6 +29,7 @@ struct FileDataWriter {
     std::ofstream file;
 
     bool open(std::filesystem::path const & filesystem_path);
+    void close();
 
     static size_t writeFunc(fw64DataWriter* data_writer, const char* buffer, size_t size, size_t count);
 };

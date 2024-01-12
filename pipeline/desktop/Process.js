@@ -1,5 +1,6 @@
 const Bundle = require("./Bundle");
 const Util = require("../Util");
+const Environment = require("../Environment");
 
 const processFont = require("./ProcessFont");
 const processImage = require("./ProcessImage");
@@ -9,17 +10,15 @@ const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processLevel = require("./ProcessLevel")
 const processLayers = require("../ProcessLayers");
-
-const processRaw = require("./ProcessRaw");
+const processFile = require("./ProcessFile");
 
 const path = require("path");
 
-async function processDesktop(manifest, assetDirectory, outputDirectory, plugins) {
+async function processDesktop(manifest, assetDirectory, outputDirectory, pluginMap) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const bundle = new Bundle(outputDirectory, includeDirectory);
     const layerMap = processLayers(assetDirectory, includeDirectory);
-
-    plugins.initialize(bundle, assetDirectory, outputDirectory, includeDirectory, "desktop");
+    const environment = new Environment();
 
     if (manifest.images) {
         for (const image of manifest.images) {
@@ -46,14 +45,14 @@ async function processDesktop(manifest, assetDirectory, outputDirectory, plugins
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`);
-            await processMesh(mesh, bundle, assetDirectory, outputDirectory, plugins);
+            await processMesh(mesh, bundle, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory, plugins);
+            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
@@ -61,7 +60,7 @@ async function processDesktop(manifest, assetDirectory, outputDirectory, plugins
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
 
-            await processLevel(level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory, plugins);
+            await processLevel(level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
@@ -79,14 +78,12 @@ async function processDesktop(manifest, assetDirectory, outputDirectory, plugins
         }
     }
 
-/*
-    if (manifest.raw) {
-        for (const rawFile of manifest.raw) {
-            console.log(`Processing Raw File: ${rawFile}`);
-            processRaw(rawFile, bundle, assetDirectory, outputDirectory);
+    if (manifest.files) {
+        for (const file of manifest.files) {
+            console.log(`Processing File: ${file.src}`);
+            await processFile(file, bundle, assetDirectory, outputDirectory, includeDirectory, pluginMap, environment);
         }
     }
-*/
 
     bundle.finalize();
 }
