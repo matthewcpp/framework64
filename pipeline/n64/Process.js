@@ -66,11 +66,10 @@ async function processN64(manifest, assetDirectory, outputDirectory, pluginMap) 
         }
     }
 
-    if (manifest.raw) {
-        for (const item of manifest.raw) {
-            console.log(`Processing Raw File: ${item}`);
-            const sourceFile = path.join(assetDirectory, item);
-            await archive.add(sourceFile, "raw");
+    if (manifest.files) {
+        for (const file of manifest.file) {
+            console.log(`Processing File: ${item}`);
+            
         }
     }
 
