@@ -55,6 +55,11 @@ fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_data
 
 fw64SkinnedMesh* fw64_assets_load_skinned_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
 
+/** 
+ * Opens a datasource for an asset with the supplied asset_id or NULL if opening failed.
+ * Note the pointer returned from this function is managed by the library and should not be freed by the user.
+ * When you no longer need the datasource call \ref fw64_assets_close_datasource
+ */
 fw64DataSource* fw64_assets_open_datasource(fw64AssetDatabase* asset_database, fw64AssetId asset_id);
 void fw64_assets_close_datasource(fw64AssetDatabase* asset_database, fw64DataSource* datasource);
 

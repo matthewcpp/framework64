@@ -72,6 +72,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     nuContRmbMgrInit();
     nuEepromMgrInit();
 
+    fw64_n64_asset_database_init(engine->assets);
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_n64_input_init(engine->input, engine->time);
     memset(engine->time, 0, sizeof(fw64Time));

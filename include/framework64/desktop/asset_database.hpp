@@ -4,6 +4,7 @@
 #include "framework64/desktop/file_datasource.hpp"
 #include "framework64/desktop/shader_cache.hpp"
 
+#include <array>
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -22,7 +23,7 @@ public:
     std::filesystem::path asset_directory;
     framework64::ShaderCache& shader_cache;
 
-    framework64::FileDataSource data_sources[FW64_ASSETS_MAX_OPEN_DATASOURCES];
+    std::array<framework64::FileDataSource, FW64_ASSETS_MAX_OPEN_DATASOURCES> data_sources;
 
     std::unordered_map<fw64AssetId, std::string> asset_bundle;
 };

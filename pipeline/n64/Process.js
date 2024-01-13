@@ -1,6 +1,7 @@
 const processMesh = require("./ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
+const processFile = require("./ProcessFile");
 const FontConvert = require("./ProcessFont");
 const AudioConvert = require("./AudioConvert");
 const processLevel = require("./ProcessLevel");
@@ -9,10 +10,12 @@ const Archive = require("./Archive");
 const Util = require("../Util");
 
 const path = require("path");
+const Environment = require("../Environment");
 
 async function processN64(manifest, assetDirectory, outputDirectory, pluginMap) {
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new Archive(outputDirectory, includeDirectory);
+    const environment = new Environment();
 
     const layerMap = processLayers(assetDirectory, Util.assetIncludeDirectory(outputDirectory));
 
@@ -67,9 +70,9 @@ async function processN64(manifest, assetDirectory, outputDirectory, pluginMap) 
     }
 
     if (manifest.files) {
-        for (const file of manifest.file) {
-            console.log(`Processing File: ${item}`);
-            
+        for (const file of manifest.files) {
+            console.log(`Processing File: ${file.src}`);
+            await processFile(file, archive, assetDirectory, outputDirectory, includeDirectory, pluginMap, environment);
         }
     }
 
