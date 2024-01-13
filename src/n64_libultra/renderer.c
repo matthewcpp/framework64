@@ -559,7 +559,7 @@ void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw
 }
 
 static void fw64_n64_renderer_load_indexed_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {
-    int load_texture = texture != renderer->active_texture || frame == renderer->active_texture_frame;
+    int load_texture = texture != renderer->active_texture || frame != renderer->active_texture_frame;
     int load_palette = load_texture || (texture->palette_index != renderer->active_palette);
 
     fw64Image* image = texture->image;
