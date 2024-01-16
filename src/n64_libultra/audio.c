@@ -96,7 +96,7 @@ void fw64_audio_stop_sound(fw64Audio* audio, int handle) {
 fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle) {
     (void)audio;
     nuAuSndPlayerSetSound(handle);
-    return (fw64AudioStatus)nuAuSndPlayerGetState();
+    return nuAuSndPlayerGetState() == AL_PLAYING ? FW64_AUDIO_PLAYING : FW64_AUDIO_STOPPED;
 }
 
 int fw64_audio_sound_count(fw64Audio* audio) {
