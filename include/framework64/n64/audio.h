@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#define N64_LIBULTRA_MAX_ACTIVE_SOUND_COUNT 8
+
 typedef struct {
     uint32_t ctrl_file_address;
     uint32_t ctrl_file_size;
@@ -30,8 +32,10 @@ struct fw64Audio {
     float music_volume;
 
     fw64SoundBank sound_bank;
-    fw64MusicBank music_bank;
+    ALSndId active_sound_channels[N64_LIBULTRA_MAX_ACTIVE_SOUND_COUNT];
+    int active_sound_channel_count;
 
+    fw64MusicBank music_bank;
     int default_music_tempo;
     float music_playback_speed;
     fw64AudioStatus music_status;
