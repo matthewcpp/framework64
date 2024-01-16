@@ -38,9 +38,10 @@ void fw64_n64_audio_update(fw64Audio* audio) {
     for (int i = 0; i < audio->active_sound_channel_count; i++) {
         nuAuSndPlayerSetSound(audio->active_sound_channels[i]);
         s32 state =  nuAuSndPlayerGetState();
-        if (state == FW64_AUDIO_STOPPED) {
+        if (state != AL_PLAYING) {
             audio->active_sound_channels[i] = audio->active_sound_channel_count - 1;
             audio->active_sound_channel_count -=1;
+            i -= 1;
         }
     }
 }
@@ -88,7 +89,7 @@ void fw64_audio_unload_soundbank(fw64Audio* audio) {
 }
 
 int fw64_audio_play_sound(fw64Audio* audio, uint32_t sound_num) {
-    if (sound_num < fw64_audio_sound_count(audio) && audio->active_sound_channel_count < N64_LIBULTRA_MAX_ACTIVE_SOUND_COUNT> ) {
+    if (sound_num < fw64_audio_sound_count(audio) && audio->active_sound_channel_count < N64_LIBULTRA_MAX_ACTIVE_SOUND_COUNT) {
         ALSndId sound_id = nuAuSndPlayerPlay(sound_num);
         // this is not totally ideal, however sounds do not seem to go into a playing state immediately after calling nuAuSndPlayerPlay
         audio->active_sound_channels[audio->active_sound_channel_count++] = sound_id;
@@ -115,7 +116,7 @@ void fw64_audio_stop_sound(fw64Audio* audio, int handle) {
 
 fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle) {
     for (int i = 0; i < audio->active_sound_channel_count; i++) {
-        if (audio->active_sound_channel_count == handle){
+        if (audio->active_sound_channels[i] == handle){
             return FW64_AUDIO_PLAYING;
         }
     }
