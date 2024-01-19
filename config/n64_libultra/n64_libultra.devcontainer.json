@@ -3,9 +3,13 @@
     "runArgs": [
         "--net=host"
     ],
-    "extensions": [
-        "ms-vscode.cpptools",
-        "coolchyni.beyond-debug",
-        "ms-vscode.cmake-tools"
-    ]
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "coolchyni.beyond-debug",
+                "ms-vscode.cmake-tools"
+            ]
+        }
+    }
 }
