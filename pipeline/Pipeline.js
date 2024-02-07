@@ -8,10 +8,9 @@ const path = require("path");
 const Util = require("./Util")
 
 async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest) {
-    const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     platform = platform.toLowerCase();
 
-    const pluginMap = loadPlugins(path.resolve(pluginManifest));
+    const pluginMap = loadPlugins(pluginManifest);
 
     // ensure that required asset folders are setup for downstream processors
     const assetIncludeDirectory = Util.assetIncludeDirectory(outputDirectory);
@@ -20,12 +19,12 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     switch (platform) {
         case "n64_libultra":
             const processN64 = require("./n64/Process");
-            await processN64(manifest, assetDirectory, outputDirectory, pluginMap);
+            await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
 
         case "desktop":
             const processDesktop = require("./desktop/Process");
-            await processDesktop(manifest, assetDirectory, outputDirectory, pluginMap);
+            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
 
         default:
@@ -39,6 +38,8 @@ function loadPlugins(pluginManifestPath) {
     if (!pluginManifestPath) {
         return pluginMap;
     }
+
+    pluginManifestPath = path.resolve(pluginManifestPath);
 
     if (!fs.existsSync(pluginManifestPath)) {
         throw new Error(`Plugin manifest does not exist: ${pluginManifestPath}`);

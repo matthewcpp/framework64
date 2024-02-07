@@ -3,8 +3,7 @@ const Util = require("./Util");
 const fs = require("fs");
 const path = require("path");
 
-function writeMusicBankHeader(musicBankDir, name, outputDir) {
-    const files = fs.readdirSync(musicBankDir);
+function writeMusicBankHeader(files, name, outputDir) {
     writeHeader("music_bank_" + name, files, outputDir);
 }
 

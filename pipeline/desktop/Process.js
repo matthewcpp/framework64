@@ -12,12 +12,14 @@ const processLevel = require("./ProcessLevel")
 const processLayers = require("../ProcessLayers");
 const processFile = require("./ProcessFile");
 
+const fs = require("fs")
 const path = require("path");
 
-async function processDesktop(manifest, assetDirectory, outputDirectory, pluginMap) {
+async function processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap) {
+    const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const bundle = new Bundle(outputDirectory, includeDirectory);
-    const layerMap = processLayers(assetDirectory, includeDirectory);
+    const layerMap = processLayers(path.dirname(manifestFile), includeDirectory);
     const environment = new Environment();
 
     if (manifest.images) {

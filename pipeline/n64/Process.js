@@ -9,15 +9,17 @@ const processLayers = require("../ProcessLayers");
 const Archive = require("./Archive");
 const Util = require("../Util");
 
+const fs = require("fs")
 const path = require("path");
 const Environment = require("../Environment");
 
-async function processN64(manifest, assetDirectory, outputDirectory, pluginMap) {
+async function processN64(manifestFile, assetDirectory, outputDirectory, pluginMap) {
+    const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new Archive(outputDirectory, includeDirectory);
     const environment = new Environment();
 
-    const layerMap = processLayers(assetDirectory, Util.assetIncludeDirectory(outputDirectory));
+    const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
 
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {

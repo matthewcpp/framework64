@@ -153,6 +153,10 @@ void next_game_state(Game* game, int direction) {
         case GAME_STATE_LINES:
             mesh = build_wire_pyramid(game);
             break;
+
+        case GAME_STATE_NONE:
+        case GAME_STATE_COUNT:
+            break;
     }
 
     fw64_node_set_mesh(&game->node, mesh);
