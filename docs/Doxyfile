@@ -28,6 +28,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/mesh.h \
                         ../include/framework64/node.h \
                         ../include/framework64/plane.h \
+                        ../include/framework64/project.h \
                         ../include/framework64/quat.h \
                         ../include/framework64/query.h \
                         ../include/framework64/random.h \
@@ -40,6 +41,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/transform.h \
                         ../include/framework64/vec2.h \
                         ../include/framework64/vec3.h \
+                        ../include/framework64/vec4.h \
                         ../include/framework64/util/bump_allocator.h \
                         ../include/framework64/util/mesh_builder.h \
                         ../include/framework64/util/mesh_data_itr.h \

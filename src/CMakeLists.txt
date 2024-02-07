@@ -25,6 +25,7 @@ set(common_source_files
         ../include/framework64/mesh.h
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
+        ../include/framework64/project.h project.c
         ../include/framework64/quat.h quat.c
         ../include/framework64/query.h query.c
         ../include/framework64/random.h random.c
@@ -37,6 +38,7 @@ set(common_source_files
         ../include/framework64/time.h
         ../include/framework64/vec2.h vec2.c
         ../include/framework64/vec3.h vec3.c
+        ../include/framework64/vec4.h vec4.c
 
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/mesh_builder.h
