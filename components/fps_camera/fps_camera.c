@@ -6,6 +6,9 @@
 #define DEFAULT_TURN_SPEED 90.0f
 #define STICK_THRESHOLD 0.15
 
+#define MAX_ROTATION_X 89.0f
+#define MIN_ROTATION_X -89.0f
+
 void fw64_fps_camera_init(fw64FpsCamera* fps, fw64Input* input){
     fps->_input = input;
 
@@ -86,15 +89,15 @@ static void tilt_camera(fw64FpsCamera* fps, float time_delta, Vec2* stick) {
     if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
         fps->rotation.x += fps->turn_speed * time_delta;
 
-        if (fps->rotation.x > 90.0f)
-            fps->rotation.x = 90.0f;
+        if (fps->rotation.x > MAX_ROTATION_X)
+            fps->rotation.x = MAX_ROTATION_X;
     }
 
     if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
         fps->rotation.x -= fps->turn_speed * time_delta;
 
-        if (fps->rotation.x < -90.0f)
-            fps->rotation.x = -90.0f;
+        if (fps->rotation.x < -MIN_ROTATION_X)
+            fps->rotation.x = -MIN_ROTATION_X;
     }
 }
 
