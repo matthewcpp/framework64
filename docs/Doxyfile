@@ -32,6 +32,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/quat.h \
                         ../include/framework64/query.h \
                         ../include/framework64/random.h \
+                        ../include/framework64/rect.h \
                         ../include/framework64/renderer.h \
                         ../include/framework64/save_file.h \
                         ../include/framework64/scene.h \

@@ -29,6 +29,7 @@ set(common_source_files
         ../include/framework64/quat.h quat.c
         ../include/framework64/query.h query.c
         ../include/framework64/random.h random.c
+        ../include/framework64/rect.h rect.c
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
         ../include/framework64/skinned_mesh.h skinned_mesh.c

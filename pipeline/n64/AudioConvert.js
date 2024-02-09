@@ -59,7 +59,7 @@ async function convertSoundBank(sourceDir, name, outputDir, includeDir, archive)
         writeSoundBankFile(soundBankPath, ctrlFilePath, tblFilePath, output.length);
         await archive.add(soundBankPath, "soundbank");
         const files = fs.readdirSync(sourceDir);
-        AudioHeader.writeSoundBankHeader(files, name, includeDir);
+        AudioHeader.writeSoundBankHeader(output, name, includeDir);
     }
     catch (e) {
         console.log(e);
