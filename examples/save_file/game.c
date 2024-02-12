@@ -42,10 +42,10 @@ void game_update(Game* game){
     }
 
     if (game->loaded) {
-        if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+        if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) {
             game->save_data.counter += 1;
         }
-        else if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
+        else if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN)) {
             game->save_data.counter = game->save_data.counter > 0 ? game->save_data.counter - 1 : 0;
         }
         else if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_A)) {
@@ -91,7 +91,7 @@ void draw_ui(Game* game) {
     fw64_renderer_draw_text(renderer, game->font, draw_x, draw_y, text);
     draw_y += 17;
 
-    fw64_renderer_draw_text(renderer, game->font, draw_x, draw_y, "Use D-Pad to adjust counter");
+    fw64_renderer_draw_text(renderer, game->font, draw_x, draw_y, "Use D-Pad up/down to adjust counter");
     draw_y += 17;
 
     if (fw64_save_file_busy(game->engine->save_file))
