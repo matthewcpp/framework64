@@ -101,3 +101,11 @@ void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* 
 int fw64_font_size(fw64Font* font) {
     return font->size;
 }
+
+size_t fw64_font_get_glyph_count(fw64Font* font) {
+    return font->glyphs.size();
+}
+
+fw64FontCodepoint fw64_font_get_glyph_codepoint(fw64Font* font, size_t glpyh_index) {
+    return font->glyphs[glpyh_index].codepoint;
+}

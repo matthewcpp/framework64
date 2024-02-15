@@ -23,8 +23,6 @@ struct fw64Font {
     std::vector<fw64FontGlyph> glyphs;
     int size;
 
-    static fw64Font* loadFromDatabase(fw64AssetDatabase* database, uint32_t index);
-
     uint32_t getGlyphIndex(uint32_t codepoint) const;
 
     /**
