@@ -12,13 +12,15 @@ struct fw64FontGlyph{
 };
 
 typedef struct {
-    uint16_t size;
-    uint16_t glyph_count;
+    uint32_t size;
+    uint32_t glyph_count;
+    uint32_t line_height;
 } fw64N64FontInfo;
 
 struct fw64Font {
-    uint16_t size;
-    uint16_t glyph_count;
+    int size;
+    int glyph_count;
+    int line_height; 
     fw64Texture texture;
     fw64FontGlyph* glyphs;
 };

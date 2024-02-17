@@ -27,9 +27,11 @@ fw64Font* fw64_font_load_from_datasource(fw64DataSource* data_source, fw64Alloca
 void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator);
 
 /** Returns the size of the font specified during authoring time.
- * If a font was based on an image, this value will indicate the vertical frame size of the texture
+ * If a font was based on an image, this value will indicate the vertical frame size of the texture slice
  * */
 int fw64_font_size(fw64Font* font);
+
+int fw64_font_line_height(fw64Font* font);
 
 /** Determines the width and height of a string in screen pixels. Note: This function is not currently setup to work with multiline text. */
 IVec2 fw64_font_measure_text(fw64Font* font, const char* text);

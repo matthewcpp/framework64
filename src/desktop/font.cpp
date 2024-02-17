@@ -10,6 +10,7 @@
 struct FontHeader {
     uint32_t size;
     uint32_t glyph_count;
+    uint32_t line_height;
 };
 
 fw64Font* fw64Font::loadFromDatasource(fw64DataSource* data_source, fw64Allocator* allocator) {
@@ -18,7 +19,8 @@ fw64Font* fw64Font::loadFromDatasource(fw64DataSource* data_source, fw64Allocato
     fw64_data_source_read(data_source, &font_header, sizeof(FontHeader), 1);
 
     auto font = std::make_unique<fw64Font>();
-    font->size = font_header.size;
+    font->size = static_cast<int>(font_header.size);
+    font->line_height = static_cast<int>(font_header.line_height);
     font->glyphs.resize(font_header.glyph_count);
     fw64_data_source_read(data_source, font->glyphs.data(), sizeof(fw64FontGlyph), font_header.glyph_count);
 
@@ -103,6 +105,10 @@ void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* 
 
 int fw64_font_size(fw64Font* font) {
     return font->size;
+}
+
+int fw64_font_line_height(fw64Font* font) {
+    return font->line_height;
 }
 
 uint32_t fw64_font_get_glyph_count(fw64Font* font) {

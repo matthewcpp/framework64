@@ -15,8 +15,9 @@ fw64Font* fw64_font_load_from_datasource(fw64DataSource* data_source, fw64Alloca
     fw64_data_source_read(data_source, &font_info, sizeof(fw64N64FontInfo), 1);
 
     fw64Font* font = allocator->malloc(allocator, sizeof(fw64Font));
-    font->glyph_count = font_info.glyph_count;
-    font->size = font_info.size;
+    font->glyph_count = (int)font_info.glyph_count;
+    font->size = (int)font_info.size;
+    font->line_height = (int)font_info.line_height;
 
     size_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
     font->glyphs = allocator->malloc(allocator, glyph_data_size);
@@ -93,6 +94,10 @@ IVec2 fw64_font_measure_text_len(fw64Font* font, const char* text, size_t len) {
 
 int fw64_font_size(fw64Font* font) {
     return (int)font->size;
+}
+
+int fw64_font_line_height(fw64Font* font) {
+    return font->line_height;
 }
 
 uint32_t fw64_font_get_glyph_count(fw64Font* font) {

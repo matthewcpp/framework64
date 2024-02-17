@@ -20,6 +20,7 @@ struct fw64Font {
     std::unique_ptr<fw64Texture> texture;
     std::vector<fw64FontGlyph> glyphs;
     int size;
+    int line_height;
 
     uint32_t getGlyphIndex(fw64FontCodepoint codepoint) const;
 

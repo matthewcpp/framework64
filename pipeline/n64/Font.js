@@ -22,6 +22,8 @@ class Font {
         codepoints.sort();
 
         const ascender = Math.ceil(this._font.ascender * scale);
+        const descender = Math.ceil(this._font.descender * scale);
+        const lineHeight = ascender + Math.abs(descender);
 
         const glyphData = [];
 
@@ -77,6 +79,7 @@ class Font {
         return  {
             name: this.name,
             size: size,
+            lineHeight: lineHeight,
             glyphs: glyphData,
             image: image,
             tileWidth: tileWidth,

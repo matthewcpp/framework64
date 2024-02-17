@@ -1,15 +1,16 @@
 const fs = require("fs");
 
-const SizeOfFontHeader = 4;
+const SizeOfFontHeader = 12;
 const SizeOfFontGlyph = 8;
 
 function writeBinary(fontData, imageBuffer, path) {
     const headerBuffer = Buffer.alloc(SizeOfFontHeader);
     let bufferOffset = 0;
 
-    // write the header info
-    bufferOffset = headerBuffer.writeUInt16BE(fontData.size, bufferOffset);
-    bufferOffset = headerBuffer.writeUInt16BE(fontData.glyphs.length, bufferOffset);
+    // write the header info. This needs to be kept in sync with fw64N64FontInfo in n64_libultra/font.h
+    bufferOffset = headerBuffer.writeUInt32BE(fontData.size, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt32BE(fontData.glyphs.length, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt32BE(fontData.lineHeight, bufferOffset);
 
     const glyphBuffer = Buffer.alloc(SizeOfFontGlyph * fontData.glyphs.length);
     bufferOffset = 0;

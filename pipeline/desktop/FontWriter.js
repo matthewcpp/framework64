@@ -14,7 +14,7 @@ async function writeFile(font, dest_path) {
 
 // this class should correspond to FontHeader in desktop/font.cpp
 class FontHeader {
-    static BufferSize = 8;
+    static BufferSize = 12;
 
     buffer = Buffer.alloc(FontHeader.BufferSize);
 
@@ -27,6 +27,7 @@ class FontHeader {
 
         index = this.buffer.writeUint32LE(font.size, index);
         index = this.buffer.writeUint32LE(font.glyphs.length, index);
+        index = this.buffer.writeUint32LE(font.lineHeight, index);
     }
 }
 
