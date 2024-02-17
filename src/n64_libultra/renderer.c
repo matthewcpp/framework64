@@ -492,7 +492,7 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
     y = renderer->viewport_screen_pos.y + y;
     
     char ch = text[0];
-    uint16_t glyph_index = fw64_font_get_glyph_index(font, ch);
+    uint16_t glyph_index = fw64_n64_font_get_glyph_index(font, ch);
     fw64FontGlyph* glyph = font->glyphs + glyph_index;
     fw64Texture* texture = &font->texture;
     int spritefont_tile_width = fw64_texture_slice_width(texture);
@@ -501,7 +501,7 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
     int caret = x + glyph->left;
 
     for (uint32_t i = 0; i < count && ch != 0; i++) {
-        glyph_index = fw64_font_get_glyph_index(font, ch);
+        glyph_index = fw64_n64_font_get_glyph_index(font, ch);
         glyph = font->glyphs + glyph_index;
 
         int draw_pos_x = caret + glyph->left;

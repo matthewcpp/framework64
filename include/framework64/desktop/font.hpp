@@ -9,8 +9,6 @@
 #include <vector>
 
 struct fw64FontGlyph {
-    constexpr static uint32_t InvalidIndex = std::numeric_limits<uint32_t>::max();
-
     uint32_t codepoint;
     float top;
     float left;
@@ -23,12 +21,12 @@ struct fw64Font {
     std::vector<fw64FontGlyph> glyphs;
     int size;
 
-    uint32_t getGlyphIndex(uint32_t codepoint) const;
+    uint32_t getGlyphIndex(fw64FontCodepoint codepoint) const;
 
     /**
      * Measures the width and height (in screen pixels) of a text string.
      */
-    Vec2 measureString(const char* text) const;
+    Vec2 measureString(const char* text, size_t len = std::numeric_limits<size_t>::max()) const;
 
     /**
      * Gets the glyph index for the first codepoint in a string.  If there is no glyph present for the string then index 0 (MISSING CHARACTER) is returned.
