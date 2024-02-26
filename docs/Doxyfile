@@ -13,6 +13,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/color.h \
                         ../include/framework64/data_io.h \
                         ../include/framework64/data_link.h \
+                        ../include/framework64/display.h \
                         ../include/framework64/engine.h \
                         ../include/framework64/filesystem.h \
                         ../include/framework64/font.h \

@@ -122,21 +122,6 @@ IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera
 void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     renderer->camera = camera;
 
-    float x = (renderer->screen_size.x * camera->viewport_pos.x);
-    float y = (renderer->screen_size.y * camera->viewport_pos.y);
-    float width = (renderer->screen_size.x * camera->viewport_size.x);
-    float height = (renderer->screen_size.y * camera->viewport_size.y);
-
-    camera->_viewport.vp.vscale[0] = (short)width * 2;
-    camera->_viewport.vp.vscale[1] = (short)height * 2;
-    camera->_viewport.vp.vscale[2] = G_MAXZ / 2;
-    camera->_viewport.vp.vscale[3] = 0;
-
-    camera->_viewport.vp.vtrans[0] = ((short)width * 2) + ((short)x * 4);
-    camera->_viewport.vp.vtrans[1] = ((short)height * 2) + ((short)y * 4);
-    camera->_viewport.vp.vtrans[2] = G_MAXZ / 2;
-    camera->_viewport.vp.vtrans[3] = 0;
-
     gSPViewport(renderer->display_list++, &camera->_viewport);
     gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, x, y, x + width, y + height);
 

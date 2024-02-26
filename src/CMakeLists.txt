@@ -11,6 +11,7 @@ set(common_source_files
         ../include/framework64/color.h color.c
         ../include/framework64/data_io.h data_io.c
         ../include/framework64/data_link.h
+        ../include/framework64/display.h display.c
         ../include/framework64/engine.h
         ../include/framework64/filesystem.h
         ../include/framework64/font.h

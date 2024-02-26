@@ -5,6 +5,7 @@
 #include "framework64/asset_database.h"
 #include "framework64/audio.h"
 #include "framework64/data_link.h"
+#include "framework64/display.h"
 #include "framework64/input.h"
 #include "framework64/media.h"
 #include "framework64/renderer.h"
@@ -15,6 +16,7 @@ typedef struct {
     fw64AssetDatabase* assets;
     fw64Audio* audio;
     fw64DataLink* data_link;
+    fw64Displays* displays;
     fw64Input* input;
     fw64Media* media;
     fw64Renderer* renderer;
