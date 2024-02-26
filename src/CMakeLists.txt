@@ -21,11 +21,11 @@ set(common_source_files
         ../include/framework64/material_bundle.h
         ../include/framework64/math.h math.c
         ../include/framework64/matrix.h matrix.c
+        ../include/framework64/matrix_project.h matrix_project.c
         ../include/framework64/media.h
         ../include/framework64/mesh.h
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
-        ../include/framework64/project.h project.c
         ../include/framework64/quat.h quat.c
         ../include/framework64/query.h query.c
         ../include/framework64/random.h random.c

@@ -24,11 +24,11 @@ INPUT             =     ../README.md \
                         ../include/framework64/material.h \
                         ../include/framework64/material_bundle.h \
                         ../include/framework64/matrix.h \
+                        ../include/framework64/matrix_project.h \
                         ../include/framework64/media.h \
                         ../include/framework64/mesh.h \
                         ../include/framework64/node.h \
                         ../include/framework64/plane.h \
-                        ../include/framework64/project.h \
                         ../include/framework64/quat.h \
                         ../include/framework64/query.h \
                         ../include/framework64/random.h \
