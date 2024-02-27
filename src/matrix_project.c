@@ -31,21 +31,18 @@ int fw64_matrix_project(Vec3* pt, float* modelview, float* projection, IVec2* vi
     return 1;
 }
 
-int fw64_matrix_unproject(Vec3* pt, float* modelview, float* projection, IVec2* view_size, Vec3* result) {
+int fw64_matrix_unproject(Vec3* pt, float* modelview, float* projection, IVec2* view_pos, IVec2* view_size, Vec3* result) {
     float inverse[16];
-    matrix_multiply(inverse, modelview, projection);
+    matrix_multiply(inverse, projection, modelview);
 
     if (!matrix_invert(inverse, inverse)) {
         return 0;
     }
 
-    // TODO: look into this
-    Vec2 viewportPos = {0, 0};
-
     Vec4 pt4;
     // Transformation of normalized coordinates between -1 and 1
-    pt4.x = (pt->x - (float)viewportPos.x)/(float)view_size->x * 2.0f - 1.0f;
-    pt4.y = (pt->y - (float)viewportPos.y)/(float)view_size->y * 2.0f - 1.0f;
+    pt4.x = (pt->x - (float)view_pos->x)/(float)view_size->x * 2.0f - 1.0f;
+    pt4.y = (pt->y - (float)view_pos->y)/(float)view_size->y * 2.0f - 1.0f;
     pt4.z = 2.0f * pt->z - 1.0f;
     pt4.w = 1.0f;
 
