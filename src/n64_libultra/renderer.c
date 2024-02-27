@@ -123,7 +123,9 @@ void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     renderer->camera = camera;
 
     gSPViewport(renderer->display_list++, &camera->_viewport);
-    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, x, y, x + width, y + height);
+    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, 
+        camera->viewport_pos.x, camera->viewport_pos.y, 
+        camera->viewport_pos.x + camera->viewport_size.x, camera->viewport_pos.y + camera->viewport_size.y);
 
     renderer->viewport_screen_pos.x = (int)(renderer->screen_size.x * camera->viewport_pos.x);
     renderer->viewport_screen_pos.y = (int)(renderer->screen_size.y * camera->viewport_pos.y);

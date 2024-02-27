@@ -11,7 +11,7 @@ static void change_palette(Game* game, int direction);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 
     fw64_renderer_set_clear_color(engine->renderer, 100, 100, 100);
 
@@ -20,7 +20,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->texture = fw64_texture_create_from_image(NULL, fw64_default_allocator());
     set_image(game, IMAGE_FORMAT_NONE + 1);
 
-    game->screen_size = fw64_renderer_get_screen_size(engine->renderer);
+    game->screen_size = fw64_display_get_size(fw64_displays_get_primary(engine->displays));
 }
 
 void game_update(Game* game){

@@ -4,23 +4,29 @@
 
 #include <SDL2/SDL.h>
 
-namespace framework64 {
-
-class Display {
+class fw64Display {
 public:
-    bool init(const Settings& settings);
+    bool init(const framework64::Settings& settings);
+    bool initWithoutWindow(int width, int height);
     void swap();
 
 public:
-    inline int width() const { return window_width; }
-    inline int height() const { return window_height; }
+    inline int framebuffer_width() const { return _framebuffer_width; }
+    inline int framebuffer_height() const { return _framebuffer_height; }
+    inline int window_width() const { return _window_width; }
+    inline int window_height() const { return _window_height; }
 
 private:
-    int window_width, window_height;
+    int _framebuffer_width, _framebuffer_height;
+    int _window_width, _window_height;
 
 private:
     SDL_Window* window;
     SDL_GLContext gl_context;
 };
 
-}
+struct fw64Displays {
+    fw64Displays(fw64Display* primary) : primary(primary) {};
+
+    fw64Display* primary;
+};

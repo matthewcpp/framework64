@@ -20,7 +20,7 @@ public:
 public:
     std::unique_ptr<ShaderCache> shader_cache;
     std::unique_ptr<N64InputInterface> n64_input_interface;
-    Display display;
+    fw64Display display;
 
     std::string application_name;
 };

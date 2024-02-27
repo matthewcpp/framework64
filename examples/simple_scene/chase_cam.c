@@ -11,7 +11,7 @@
 #define CAMERA_ADJUST_SPEED 20.0f;
 
 void chase_camera_init(ChaseCamera* chase_cam, fw64Engine* engine) {
-    fw64_camera_init(&chase_cam->camera);
+    fw64_camera_init(&chase_cam->camera, fw64_displays_get_primary(engine->displays));
     chase_cam->camera.near = 1.0f;
     chase_cam->camera.far = 100.0f;
     fw64_camera_update_projection_matrix(&chase_cam->camera);

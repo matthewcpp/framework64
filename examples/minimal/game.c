@@ -5,7 +5,7 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 }
 
 void game_update(Game* game){
@@ -14,6 +14,5 @@ void game_update(Game* game){
 
 void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_renderer_set_clear_color(game->engine->renderer, 0, 255, 0);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

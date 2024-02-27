@@ -24,7 +24,7 @@
 
 struct fw64Renderer {
 public: 
-    fw64Renderer(framework64::Display& display)
+    fw64Renderer(fw64Display& display)
         : display(display) {}
 
 public:
@@ -34,10 +34,8 @@ public:
     void begin(fw64PrimitiveMode primitive_mode, fw64RendererFlags flags);
     void setCamera(fw64Camera* cam);
     void end(fw64RendererFlags flags);
-    void setScreenSize(int width, int height);
 
     void clearViewport(fw64Camera* camera, fw64RendererFlags flags);
-    IVec2 getViewportSize(fw64Camera* camera);
 
     void beginFrame();
     void endFrame();
@@ -144,7 +142,6 @@ public:
     framework64::SpriteBatch sprite_batch;
     fw64Primitive::Mode primitive_type;
     DrawingMode drawing_mode = DrawingMode::None;
-    int screen_width, screen_height; // size of the main render texture
     
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
 
@@ -156,6 +153,6 @@ public:
     bool sprite_scissor_enabled = false;
 
 private:
-    framework64::Display& display;
+    fw64Display& display;
     framework64::Framebuffer framebuffer;
 };

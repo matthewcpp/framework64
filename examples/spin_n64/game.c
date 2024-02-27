@@ -8,7 +8,7 @@
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
     vec3_set(&game->camera.transform.position, 0.0f, 7.5f, 18.0f);
     Vec3 target = {0.0f, 0.0f, 0.0f};
     Vec3 up = {0.0f, 1.0f, 0.0f};

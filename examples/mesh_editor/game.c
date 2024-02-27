@@ -28,7 +28,7 @@ static void set_tile_tex_coords(Game* game, size_t index) {
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
     fw64_bump_allocator_init(&game->bump_allocator, 64 * 1024);
 
     game->mesh = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_minesweeper_tile, &game->bump_allocator.interface);

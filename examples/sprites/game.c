@@ -8,7 +8,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 255);
 
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 
     fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 0);
 
@@ -18,7 +18,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     ken_sprite_init(&game->ken_sprite, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_ken, allocator));
 
-    IVec2 screen_size = fw64_renderer_get_screen_size(game->engine->renderer);
+    IVec2 screen_size = fw64_display_get_size(fw64_displays_get_primary(engine->displays));
     game->ken_sprite.position.x = 10;
     game->ken_sprite.position.y = screen_size.y - 10 - fw64_texture_height(game->ken_sprite.sprite);
 

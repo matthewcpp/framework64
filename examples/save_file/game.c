@@ -16,7 +16,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     memset(&game->save_data, 0, sizeof(SaveData));
 
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 
     fw64_node_init(&game->solid_cube);
     fw64_node_set_mesh(&game->solid_cube, fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_blue_cube, allocator));

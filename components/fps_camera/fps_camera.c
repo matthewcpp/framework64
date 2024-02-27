@@ -9,7 +9,7 @@
 #define MAX_ROTATION_X 89.0f
 #define MIN_ROTATION_X -89.0f
 
-void fw64_fps_camera_init(fw64FpsCamera* fps, fw64Input* input){
+void fw64_fps_camera_init(fw64FpsCamera* fps, fw64Input* input, fw64Display* display){
     fps->_input = input;
 
     fps->movement_speed = DEFAULT_MOVEMENT_SPEED;
@@ -17,7 +17,7 @@ void fw64_fps_camera_init(fw64FpsCamera* fps, fw64Input* input){
 
     fps->player_index = 0;
 
-    fw64_camera_init(&fps->camera);
+    fw64_camera_init(&fps->camera, display);
     vec2_set(&fps->rotation, 0.0f, 0.0f);
 }
 

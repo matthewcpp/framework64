@@ -11,10 +11,10 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int node_
     player->current_weapon = NULL;
     fw64_transform_init(&player->weapon_transform);
 
-    fw64_fps_camera_init(&player->fps_camera, engine->input);
+    fw64_fps_camera_init(&player->fps_camera, engine->input, fw64_displays_get_primary(engine->displays));
     player->fps_camera.player_index = player->player_index;
 
-    fw64_camera_init(&player->weapon_camera);
+    fw64_camera_init(&player->weapon_camera, fw64_displays_get_primary(engine->displays));
     vec3_zero(&player->weapon_camera.transform.position);
     fw64_camera_update_view_matrix(&player->weapon_camera);
 
@@ -60,9 +60,8 @@ void player_draw_view(Player* player) {
 }
 
 void player_set_viewport_rect(Player* player, float x, float y, float w, float h) {
-    vec2_set(&player->fps_camera.camera.viewport_pos, x, y);
-    vec2_set(&player->fps_camera.camera.viewport_size, w, h);
-
-    vec2_set(&player->weapon_camera.viewport_pos, x, y);
-    vec2_set(&player->weapon_camera.viewport_size, w, h);
+    Vec2 relative_pos = {x, y};
+    Vec2 relative_size = {w, h};
+    fw64_camera_set_viewport_relative(&player->fps_camera.camera, fw64_displays_get_primary(player->engine->displays), &relative_pos, &relative_size);
+    fw64_camera_set_viewport_relative(&player->weapon_camera, fw64_displays_get_primary(player->engine->displays), &relative_pos, &relative_size);
 }

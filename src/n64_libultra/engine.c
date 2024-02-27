@@ -4,6 +4,7 @@
 #include "framework64/n64/audio.h"
 #include "framework64/n64/asset_database.h"
 #include "framework64/n64/data_link.h"
+#include "framework64/n64/display.h"
 #include "framework64/n64/media.h"
 #include "framework64/n64/input.h"
 #include "framework64/n64/renderer.h"
@@ -30,6 +31,7 @@ char memory_heap[FW64_N64_HEAP_SIZE];
 
 fw64Audio audio;
 fw64AssetDatabase assets;
+fw64Displays displays;
 fw64Input input;
 fw64Renderer renderer;
 fw64Time time;
@@ -55,6 +57,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     engine->audio = &audio;
     engine->assets = &assets;
     engine->data_link = &data_link;
+    engine->displays = &displays;
     engine->input = &input;
     engine->media = &media;
     engine->renderer = &renderer;
@@ -74,6 +77,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
 
     fw64_n64_asset_database_init(engine->assets);
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
+    fw64_n64_libultra_displays_init(engine->displays, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_n64_input_init(engine->input, engine->time);
     memset(engine->time, 0, sizeof(fw64Time));
     fw64_n64_audio_init(engine->audio);

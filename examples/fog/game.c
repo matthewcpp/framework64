@@ -19,7 +19,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
     game->mode = GAME_MODE_PLAYING;
-    fw64_fps_camera_init(&game->fps_camera, engine->input);
+    fw64_fps_camera_init(&game->fps_camera, engine->input, fw64_displays_get_primary(engine->displays));
 
     vec3_set(&game->fps_camera.camera.transform.position, -164.0f, 45.0f, 0.0f);
     game->fps_camera.movement_speed = 100.0f;

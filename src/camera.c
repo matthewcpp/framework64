@@ -16,9 +16,8 @@ void fw64_camera_init(fw64Camera* camera, fw64Display* display) {
     fw64_camera_update_projection_matrix(camera);
     fw64_camera_update_view_matrix(camera);
 
-    Vec2 pos = {0.0f, 0.0f};
-    IVec2 size_i = fw64_display_get_size(display);
-    Vec2 size = {size_i.x, size_i.y};
+    IVec2 pos = {0.0f, 0.0f};
+    IVec2 size = fw64_display_get_size(display);
     fw64_camera_set_viewport(camera, &pos, &size);
 }
 
@@ -69,26 +68,28 @@ void fw64_n64_libultra_camera_update_viewport(fw64Camera* camera) {
     camera->_viewport.vp.vscale[3] = 0;
 
     camera->_viewport.vp.vtrans[0] = ((short)camera->viewport_size.x * 2) + ((short)camera->viewport_pos.x * 4);
-    camera->_viewport.vp.vtrans[1] = ((short)camera->viewport_size.y * 2) + ((short)camera->viewport_size.y * 4);
+    camera->_viewport.vp.vtrans[1] = ((short)camera->viewport_size.y * 2) + ((short)camera->viewport_pos.y * 4);
     camera->_viewport.vp.vtrans[2] = G_MAXZ / 2;
     camera->_viewport.vp.vtrans[3] = 0;
 }
 #endif
 
-void fw64_camera_set_viewport(fw64Camera* camera, Vec2* viewport_pos, Vec2* viewport_size) {
-    camera->_viewport_pos = *viewport_pos;
-    camera->_viewport_size = *viewport_size;
+void fw64_camera_set_viewport(fw64Camera* camera, IVec2* viewport_pos, IVec2* viewport_size) {
+    camera->viewport_pos = *viewport_pos;
+    camera->viewport_size = *viewport_size;
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     fw64_n64_libultra_camera_update_viewport(camera);
 #endif
 }
 
-void fw64_camera_set_viewport_screen_relative(fw64Camera* camera, IVec2* screen_size, Vec2* position, Vec2* size) {
-    camera->_viewport_pos.x = screen_size->x * position->x;
-    camera->_viewport_pos.y = screen_size->y * position->y;
-    camera->_viewport_size.x = screen_size->x * size->x;
-    camera->_viewport_size.y = screen_size->y * size->y;
+void fw64_camera_set_viewport_relative(fw64Camera* camera, fw64Display* display, Vec2* viewport_position, Vec2* viewport_size) {
+    IVec2 screen_size = fw64_display_get_size(display);
+
+    camera->viewport_pos.x = screen_size.x * viewport_position->x;
+    camera->viewport_pos.y = screen_size.y * viewport_position->y;
+    camera->viewport_size.x = screen_size.x * viewport_size->x;
+    camera->viewport_size.y = screen_size.y * viewport_size->y;
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     fw64_n64_libultra_camera_update_viewport(camera);

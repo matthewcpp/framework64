@@ -164,7 +164,7 @@ void next_game_state(Game* game, int direction) {
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 
     fw64_node_init(&game->node);
     fw64_bump_allocator_init(&game->allocator, 1024 * 100);

@@ -33,7 +33,7 @@ void game_init(Game* game, fw64Engine* engine) {
     memset(game, 0, sizeof(Game));
     game->engine = engine;
 
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
     message_list_init(game);
 
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas14, fw64_default_allocator());

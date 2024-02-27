@@ -32,7 +32,7 @@ void game_init(Game* game, fw64Engine* engine) {
         game->chunk_handles[i] = FW64_LEVEL_INVALID_CHUNK_HANDLE;
         fw64_bump_allocator_init(&game->allocators[i], BUMP_ALLOCATOR_SIZE);
     }
-    fw64_fps_camera_init(&game->fps_camera, engine->input);
+    fw64_fps_camera_init(&game->fps_camera, engine->input, fw64_displays_get_primary(engine->displays));
     game->fps_camera.movement_speed = 30.0f;
     game->fps_camera.camera.near = 1.0f;
     game->fps_camera.camera.far = 250.0f;
