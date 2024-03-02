@@ -127,9 +127,6 @@ void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
         camera->viewport_pos.x, camera->viewport_pos.y, 
         camera->viewport_pos.x + camera->viewport_size.x, camera->viewport_pos.y + camera->viewport_size.y);
 
-    renderer->viewport_screen_pos.x = (int)(renderer->screen_size.x * camera->viewport_pos.x);
-    renderer->viewport_screen_pos.y = (int)(renderer->screen_size.y * camera->viewport_pos.y);
-
     // sets the view projection matrices  This is slightly counter intuitive
     // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
     gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&(camera->projection)), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
@@ -411,8 +408,8 @@ int fw64_renderer_get_sprite_scissoring_enabled(fw64Renderer* renderer) {
 static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y, int width, int height) {
     fw64_n64_renderer_load_texture(renderer, sprite, frame);
 
-    x = renderer->viewport_screen_pos.x + x;
-    y = renderer->viewport_screen_pos.y + y;
+    x += renderer->camera->viewport_pos.x;
+    y += renderer->camera->viewport_pos.y;
 
     if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_SPRITE_SCISSOR)) {
         gSPScisTextureRectangle (renderer->display_list++, 
@@ -475,8 +472,8 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
     if (!text || text[0] == 0) return;
     n64_renderer_configure_shading_mode_sprite(renderer);
 
-    x = renderer->viewport_screen_pos.x + x;
-    y = renderer->viewport_screen_pos.y + y;
+    x += renderer->camera->viewport_pos.x;
+    y += renderer->camera->viewport_pos.y;
     
     char ch = text[0];
     uint16_t glyph_index = fw64_n64_font_get_glyph_index(font, ch);
