@@ -7,6 +7,7 @@
 
 void fw64_camera_init(fw64Camera* camera, fw64Display* display) {
     fw64_transform_init(&camera->transform);
+    camera->display = display;
 
     camera->near = 0.1f;
     camera->far = 500.0f;
@@ -97,8 +98,9 @@ void fw64_camera_set_viewport_relative(fw64Camera* camera, fw64Display* display,
 #endif
 }
 
-int fw64_camera_ray_from_display_pos(fw64Camera* camera, IVec2* display_pos, Vec3* ray_origin, Vec3* ray_direction) {
-    Vec3 viewport_pt = {display_pos->x, display_pos->y, 0.0f}, far_pt;
+int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3* ray_origin, Vec3* ray_direction) {
+    // p
+    Vec3 viewport_pt = {window_pos->x, fw64_display_get_size(camera->display).y - window_pos->y, 0.0f}, far_pt;
     float view[16], proj[16];
 
     matrix_perspective(proj, camera->fovy, camera->aspect, camera->near, camera->far);
@@ -118,4 +120,11 @@ int fw64_camera_ray_from_display_pos(fw64Camera* camera, IVec2* display_pos, Vec
     vec3_normalize(ray_direction);
 
     return 1;
+}
+
+int fw64_camera_ray_from_viewport_pos(fw64Camera* camera, IVec2* viewport_pos, Vec3* ray_origin, Vec3* ray_direction) {
+    IVec2 window_pos = *viewport_pos;
+    ivec2_add(&window_pos, &window_pos, &camera->viewport_pos);
+
+    return fw64_camera_ray_from_window_pos(camera, &window_pos, ray_origin, ray_direction);
 }
