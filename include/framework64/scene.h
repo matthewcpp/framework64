@@ -60,11 +60,15 @@ void fw64_scene_update_bounding(fw64Scene* scene);
 void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer);
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frustum* frustum);
 
+fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId, uint32_t mesh_index);
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene);
 
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
+
+fw64Collider* fw64_scene_get_collider(fw64Scene* scene, uint32_t index);
+uint32_t fw64_scene_get_collider_count(fw64Scene* scene, uint32_t index);
 
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene);
 

@@ -382,6 +382,20 @@ uint32_t fw64_scene_find_nodes_with_layer_mask(fw64Scene* scene, uint32_t layer_
     return buffer_index;
 }
 
+fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId asset_id, uint32_t mesh_index) {
+    fw64Mesh* mesh = fw64_assets_load_mesh(scene->assets, asset_id, scene->allocator);
+
+    if (mesh) {
+        if (scene->meshes[mesh_index]) {
+            fw64_mesh_delete(scene->meshes[mesh_index], scene->assets, scene->allocator);
+        }
+
+        scene->meshes[mesh_index] = mesh;
+    }
+
+    return mesh;
+}
+
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index) {
     return scene->meshes[index];
 }
@@ -396,6 +410,14 @@ fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index) {
 
 uint32_t fw64_scene_get_node_count(fw64Scene* scene) {
     return scene->info.node_count;
+}
+
+fw64Collider* fw64_scene_get_collider(fw64Scene* scene, uint32_t index) {
+    return &scene->colliders[index];
+}
+
+uint32_t fw64_scene_get_collider_count(fw64Scene* scene, uint32_t index) {
+    return scene->info.collider_count;
 }
 
 Box* fw64_scene_get_initial_bounds(fw64Scene* scene) {

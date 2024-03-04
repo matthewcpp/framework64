@@ -98,11 +98,8 @@ void fw64_camera_set_viewport_relative(fw64Camera* camera, fw64Display* display,
 #endif
 }
 
-int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3* ray_origin, Vec3* ray_direction) {
-    // p
-    Vec3 viewport_pt = {window_pos->x, fw64_display_get_size(camera->display).y - window_pos->y, 0.0f}, far_pt;
-    float view[16], proj[16];
-
+// this method will go away when matrices are fixed up on the camera
+static void _temp_camera_compute_view_projection(fw64Camera* camera, float* view, float* proj) {
     matrix_perspective(proj, camera->fovy, camera->aspect, camera->near, camera->far);
 
     Vec3 forward, up, target;
@@ -111,8 +108,15 @@ int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3*
 
     vec3_add(&target, &camera->transform.position, &forward);
     matrix_camera_look_at(view, &camera->transform.position, &target, &up);
+}
 
+int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3* ray_origin, Vec3* ray_direction) {
+    float view[16], proj[16];
+    _temp_camera_compute_view_projection(camera, view, proj);
+
+    Vec3 viewport_pt = {window_pos->x, fw64_display_get_size(camera->display).y - window_pos->y, 0.0f}, far_pt;
     fw64_matrix_unproject(&viewport_pt, view, proj, &camera->viewport_pos, &camera->viewport_size, ray_origin);
+
     viewport_pt.z = 1.0f;
     fw64_matrix_unproject(&viewport_pt, view, proj, &camera->viewport_pos, &camera->viewport_size, &far_pt);
 
@@ -127,4 +131,20 @@ int fw64_camera_ray_from_viewport_pos(fw64Camera* camera, IVec2* viewport_pos, V
     ivec2_add(&window_pos, &window_pos, &camera->viewport_pos);
 
     return fw64_camera_ray_from_window_pos(camera, &window_pos, ray_origin, ray_direction);
+}
+
+int fw64_camera_world_to_viewport_pos(fw64Camera* camera, Vec3* world_pos, IVec2* viewport_pos) {
+    float view[16], proj[16];
+    _temp_camera_compute_view_projection(camera, view, proj);
+    Vec3 result;
+
+    if (fw64_matrix_project(world_pos, view, proj, &camera->viewport_size, &result)) {
+        viewport_pos->x = (int)result.x;
+        viewport_pos->y = camera->viewport_size.y - (int)result.y;
+
+        return 1;
+    } else {
+        return 0;
+    }
+
 }

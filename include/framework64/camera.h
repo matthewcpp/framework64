@@ -50,6 +50,8 @@ void fw64_camera_set_viewport_relative(fw64Camera* camera, fw64Display* display,
 int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* display_pos, Vec3* ray_origin, Vec3* ray_direction);
 int fw64_camera_ray_from_viewport_pos(fw64Camera* camera, IVec2* viewport_pos, Vec3* ray_origin, Vec3* ray_direction);
 
+int fw64_camera_world_to_viewport_pos(fw64Camera* camera, Vec3* world_pos, IVec2* viewport_pos);
+
 #ifdef __cplusplus
 }
 #endif

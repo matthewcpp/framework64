@@ -1,0 +1,14 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12"
+        }
+    ],
+    "meshes": [
+        {
+            "src": "blue_cube/blue_cube.gltf"
+        }
+    ]
+}

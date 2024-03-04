@@ -136,6 +136,7 @@
         "controller_button.h": "c",
         "compat.h": "c",
         "camera.h": "c",
-        "input.h": "c"
+        "input.h": "c",
+        "arcball_camera.h": "c"
     }
 }
