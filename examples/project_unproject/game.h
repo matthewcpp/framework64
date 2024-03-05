@@ -7,8 +7,7 @@
 
 typedef enum {
     FLAG_NONE = 0,
-    FLAG_CROSSHAIR_ACTIVE = 1,
-    FLAG_HIT_POS_ACTIVE = 2
+    FLAG_HIT_POS_ACTIVE = 1
 } Flags;
 
 typedef struct {

@@ -31,32 +31,26 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_node_update(node);
 
     fw64_arcball_set_initial(&game->arcball_camera, &collider->bounding);
-}
 
-static void reset_crosshair_position(Game* game) {
-    game->flags &= ~FLAG_CROSSHAIR_ACTIVE;
     game->crosshair_pos = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
     game->crosshair_pos.x /= 2;
     game->crosshair_pos.y /= 2;
 }
 
-void game_update(Game* game){
-    if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_Z)) {
-        game->flags |= FLAG_CROSSHAIR_ACTIVE;
+static void move_crosshair(Game* game);
 
-        if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_A)) {
-            Vec3 ray_origin, ray_direction;
-            
-            fw64_camera_ray_from_viewport_pos(&game->arcball_camera.camera, &game->crosshair_pos, &ray_origin, &ray_direction);
-            if (fw64_scene_raycast(&game->scene, &ray_origin, &ray_direction, UINT32_MAX, &game->raycast)) {
-                game->flags |= FLAG_HIT_POS_ACTIVE;
-            } else {
-                game->flags &= ~FLAG_HIT_POS_ACTIVE;
-            }
+void game_update(Game* game){
+    move_crosshair(game);
+
+    if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_A)) {
+        Vec3 ray_origin, ray_direction;
+        
+        fw64_camera_ray_from_viewport_pos(&game->arcball_camera.camera, &game->crosshair_pos, &ray_origin, &ray_direction);
+        if (fw64_scene_raycast(&game->scene, &ray_origin, &ray_direction, UINT32_MAX, &game->raycast)) {
+            game->flags |= FLAG_HIT_POS_ACTIVE;
+        } else {
+            game->flags &= ~FLAG_HIT_POS_ACTIVE;
         }
-    }
-    else {
-        reset_crosshair_position(game);
     }
 
     fw64_arcball_update(&game->arcball_camera, game->engine->time->time_delta);
@@ -82,10 +76,28 @@ void game_draw(Game* game) {
         fw64_renderer_draw_text(game->engine->renderer, game->font, game->hit_pos.x, game->hit_pos.y, "hit");
     }
 
-    if (game->flags & FLAG_CROSSHAIR_ACTIVE) {
-        fw64_renderer_draw_sprite(game->engine->renderer, game->crosshair, 
-            game->crosshair_pos.x - fw64_texture_width(game->crosshair) / 2, game->crosshair_pos.y - fw64_texture_height(game->crosshair) / 2);
-    }
+    fw64_renderer_draw_sprite(game->engine->renderer, game->crosshair, 
+        game->crosshair_pos.x - fw64_texture_width(game->crosshair) / 2, game->crosshair_pos.y - fw64_texture_height(game->crosshair) / 2);
+
 
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
+}
+
+#define CROSSHAIR_SPEED 100.0f
+
+void move_crosshair(Game* game) {
+    Vec2 stick;
+    fw64_input_controller_stick(game->engine->input, 0, &stick);
+
+    if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
+        game->crosshair_pos.x -= CROSSHAIR_SPEED * game->engine->time->time_delta;
+    } else if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
+        game->crosshair_pos.x += CROSSHAIR_SPEED * game->engine->time->time_delta;
+    }
+
+    if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
+        game->crosshair_pos.y += CROSSHAIR_SPEED * game->engine->time->time_delta;
+    } else if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_UP)) {
+        game->crosshair_pos.y -= CROSSHAIR_SPEED * game->engine->time->time_delta;
+    }
 }
