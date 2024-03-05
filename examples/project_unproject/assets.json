@@ -3,12 +3,20 @@
         {
             "src": "Consolas.ttf",
             "size": 12,
-            "name": "Consolas12"
+            "name": "Consolas12",
+            "sourceString": "min max hit"
         }
     ],
     "meshes": [
         {
             "src": "blue_cube/blue_cube.gltf"
+        }
+    ],
+    "images": [
+        {
+            "src": "crosshair.png",
+            "format": "ci4",
+            "resize": "32x32"
         }
     ]
 }

@@ -5,11 +5,21 @@
 
 #include "arcball_camera/arcball_camera.h"
 
+typedef enum {
+    FLAG_NONE = 0,
+    FLAG_CROSSHAIR_ACTIVE = 1,
+    FLAG_HIT_POS_ACTIVE = 2
+} Flags;
+
 typedef struct {
     fw64Engine* engine;
     fw64Font* font;
     fw64ArcballCamera arcball_camera;
     fw64Scene scene;
+    uint32_t flags;
+    fw64Texture* crosshair;
+    IVec2 crosshair_pos, min_pos, max_pos, hit_pos;
+    fw64RaycastHit raycast;
 } Game;
 
 #ifdef __cplusplus
