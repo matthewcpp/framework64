@@ -15,7 +15,6 @@ typedef struct fw64Audio fw64Audio;
 typedef enum {
     FW64_AUDIO_STOPPED = 0, // AL_STOPPED
     FW64_AUDIO_PLAYING = 1, // AL_PLAYING
-    FW64_AUDIO_STOPPING = 2 // AL_STOPPING
 } fw64AudioStatus;
 
 #ifdef __cplusplus

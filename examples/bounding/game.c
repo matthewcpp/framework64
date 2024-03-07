@@ -105,7 +105,7 @@ void game_draw(Game* game) {
 }
 
 void setup_camera(Game* game) {
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(game->engine->displays));
 
     game->camera.near = 10.0f;
     game->camera.far = 500.0f;

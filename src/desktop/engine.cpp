@@ -59,6 +59,7 @@ bool Engine::init(Settings const & settings) {
     n64_input_interface = std::make_unique<N64InputInterface>();
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
 
+    displays = new fw64Displays(&display);
     renderer = new fw64Renderer(display);
     save_file = new fw64SaveFile();
     assets = new fw64AssetDatabase(asset_dir_path, *shader_cache);

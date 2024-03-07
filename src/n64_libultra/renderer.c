@@ -122,26 +122,10 @@ IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera
 void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     renderer->camera = camera;
 
-    float x = (renderer->screen_size.x * camera->viewport_pos.x);
-    float y = (renderer->screen_size.y * camera->viewport_pos.y);
-    float width = (renderer->screen_size.x * camera->viewport_size.x);
-    float height = (renderer->screen_size.y * camera->viewport_size.y);
-
-    camera->_viewport.vp.vscale[0] = (short)width * 2;
-    camera->_viewport.vp.vscale[1] = (short)height * 2;
-    camera->_viewport.vp.vscale[2] = G_MAXZ / 2;
-    camera->_viewport.vp.vscale[3] = 0;
-
-    camera->_viewport.vp.vtrans[0] = ((short)width * 2) + ((short)x * 4);
-    camera->_viewport.vp.vtrans[1] = ((short)height * 2) + ((short)y * 4);
-    camera->_viewport.vp.vtrans[2] = G_MAXZ / 2;
-    camera->_viewport.vp.vtrans[3] = 0;
-
     gSPViewport(renderer->display_list++, &camera->_viewport);
-    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, x, y, x + width, y + height);
-
-    renderer->viewport_screen_pos.x = (int)(renderer->screen_size.x * camera->viewport_pos.x);
-    renderer->viewport_screen_pos.y = (int)(renderer->screen_size.y * camera->viewport_pos.y);
+    gDPSetScissor(renderer->display_list++, G_SC_NON_INTERLACE, 
+        camera->viewport_pos.x, camera->viewport_pos.y, 
+        camera->viewport_pos.x + camera->viewport_size.x, camera->viewport_pos.y + camera->viewport_size.y);
 
     // sets the view projection matrices  This is slightly counter intuitive
     // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
@@ -424,8 +408,8 @@ int fw64_renderer_get_sprite_scissoring_enabled(fw64Renderer* renderer) {
 static void _fw64_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite, int frame, int x, int y, int width, int height) {
     fw64_n64_renderer_load_texture(renderer, sprite, frame);
 
-    x = renderer->viewport_screen_pos.x + x;
-    y = renderer->viewport_screen_pos.y + y;
+    x += renderer->camera->viewport_pos.x;
+    y += renderer->camera->viewport_pos.y;
 
     if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_SPRITE_SCISSOR)) {
         gSPScisTextureRectangle (renderer->display_list++, 
@@ -488,11 +472,11 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
     if (!text || text[0] == 0) return;
     n64_renderer_configure_shading_mode_sprite(renderer);
 
-    x = renderer->viewport_screen_pos.x + x;
-    y = renderer->viewport_screen_pos.y + y;
+    x += renderer->camera->viewport_pos.x;
+    y += renderer->camera->viewport_pos.y;
     
     char ch = text[0];
-    uint16_t glyph_index = fw64_font_get_glyph_index(font, ch);
+    uint16_t glyph_index = fw64_n64_font_get_glyph_index(font, ch);
     fw64FontGlyph* glyph = font->glyphs + glyph_index;
     fw64Texture* texture = &font->texture;
     int spritefont_tile_width = fw64_texture_slice_width(texture);
@@ -501,7 +485,7 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
     int caret = x + glyph->left;
 
     for (uint32_t i = 0; i < count && ch != 0; i++) {
-        glyph_index = fw64_font_get_glyph_index(font, ch);
+        glyph_index = fw64_n64_font_get_glyph_index(font, ch);
         glyph = font->glyphs + glyph_index;
 
         int draw_pos_x = caret + glyph->left;
@@ -559,7 +543,7 @@ void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw
 }
 
 static void fw64_n64_renderer_load_indexed_texture(fw64Renderer* renderer, fw64Texture* texture, int frame) {
-    int load_texture = texture != renderer->active_texture || frame == renderer->active_texture_frame;
+    int load_texture = texture != renderer->active_texture || frame != renderer->active_texture_frame;
     int load_palette = load_texture || (texture->palette_index != renderer->active_palette);
 
     fw64Image* image = texture->image;

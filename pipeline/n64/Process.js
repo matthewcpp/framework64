@@ -1,35 +1,38 @@
 const processMesh = require("./ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
+const processFile = require("./ProcessFile");
 const FontConvert = require("./ProcessFont");
 const AudioConvert = require("./AudioConvert");
 const processLevel = require("./ProcessLevel");
-const processLayers = require("../Layers");
+const processLayers = require("../ProcessLayers");
 const Archive = require("./Archive");
 const Util = require("../Util");
 
+const fs = require("fs")
 const path = require("path");
+const Environment = require("../Environment");
 
-async function processN64(manifest, assetDirectory, outputDirectory, plugins) {
+async function processN64(manifestFile, assetDirectory, outputDirectory, pluginMap) {
+    const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new Archive(outputDirectory, includeDirectory);
+    const environment = new Environment();
 
-    const layerMap = processLayers(manifest.layers, Util.assetIncludeDirectory(outputDirectory));
-
-    plugins.initialize(archive, assetDirectory, outputDirectory, includeDirectory, "n64");
+    const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
 
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`)
 
-            await processMesh(mesh, archive, assetDirectory, outputDirectory, plugins);
+            await processMesh(mesh, archive, assetDirectory, outputDirectory);
         }
     }
 
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory, plugins);
+            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
@@ -64,15 +67,14 @@ async function processN64(manifest, assetDirectory, outputDirectory, plugins) {
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory, plugins);
+            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
-    if (manifest.raw) {
-        for (const item of manifest.raw) {
-            console.log(`Processing Raw File: ${item}`);
-            const sourceFile = path.join(assetDirectory, item);
-            await archive.add(sourceFile, "raw");
+    if (manifest.files) {
+        for (const file of manifest.files) {
+            console.log(`Processing File: ${file.src}`);
+            await processFile(file, archive, assetDirectory, outputDirectory, includeDirectory, pluginMap, environment);
         }
     }
 

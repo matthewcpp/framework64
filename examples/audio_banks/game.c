@@ -22,7 +22,7 @@ void change_music_track(Game* game, int delta);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 
     fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
 

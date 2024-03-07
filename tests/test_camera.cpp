@@ -1,10 +1,12 @@
 #include "framework64/camera.h"
-
+#include "framework64/desktop/display.hpp"
 #include "gtest/gtest.h"
 
 TEST(Camera, PerspectiveMatrix) {
+    fw64Display display;
+    display.initWithoutWindow(32, 240);
     fw64Camera camera;
-    fw64_camera_init(&camera);
+    fw64_camera_init(&camera, &display);
 
     camera.aspect = 1.3333f;
     camera.fovy = 60.0f;
@@ -21,8 +23,11 @@ TEST(Camera, PerspectiveMatrix) {
 }
 
 TEST(Camera, ViewMatrix) {
+    fw64Display display;
+    display.initWithoutWindow(32, 240);
+
     fw64Camera camera;
-    fw64_camera_init(&camera);
+    fw64_camera_init(&camera, &display);
 
     vec3_set(&camera.transform.position, 0.0f, 0.0f, 10.0f);
     Vec3 target = {0.0f, 0.0f, 0.0f};

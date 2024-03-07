@@ -6,8 +6,9 @@
 #include <iostream>
 
 bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_cache) {
-    if (!initFramebuffer(width, height))
+    if (!initFramebuffer(width, height)) {
         return false;
+    }
 
     glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
     glEnable(GL_BLEND);
@@ -18,10 +19,11 @@ bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_
 
     initLighting();
 
-    if (!sprite_batch.init(shader_cache)) return false;
+    if (!sprite_batch.init(shader_cache)){
+        return false;
+    }
 
-    setScreenSize(width, height);
-
+    sprite_batch.setScreenSize(width, height);
     screen_overlay.init(shader_cache);
 
     return true;
@@ -63,7 +65,7 @@ void fw64Renderer::endFrame() {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
     glBlitFramebuffer(  0, 0, framebuffer.width, framebuffer.height,
-                        0, 0, display.width(), display.height(),
+                        0, 0, display.window_width(), display.window_height(),
                         GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -105,17 +107,10 @@ fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Camera* camera) con
     float bottom = camera->viewport_pos.y + camera->viewport_size.y;
 
     return {
-        static_cast<GLint>(camera->viewport_pos.x * screen_width),
-        static_cast<GLint>((1.0f - bottom) * screen_height),
-        static_cast<GLsizei>(camera->viewport_size.x * screen_width),
-        static_cast<GLsizei>(camera->viewport_size.y * screen_height)
-    };
-}
-
-IVec2 fw64Renderer::getViewportSize(fw64Camera* camera) {
-    return {
-        static_cast<int>(camera->viewport_size.x * screen_width),
-        static_cast<int>(camera->viewport_size.y * screen_height)
+        static_cast<GLint>(camera->viewport_pos.x ),
+        static_cast<GLint>((framebuffer.height - bottom)),
+        static_cast<GLsizei>(camera->viewport_size.x),
+        static_cast<GLsizei>(camera->viewport_size.y)
     };
 }
 
@@ -132,7 +127,7 @@ void fw64Renderer::setCamera(fw64Camera* camera) {
     current_camera = camera;
 
     matrix_multiply(view_projection_matrix.data(), &current_camera->projection.m[0], &current_camera->view.m[0]);
-    sprite_batch.setScreenSize(viewport_rect.width, viewport_rect.height);
+    sprite_batch.setScreenSize(camera->viewport_size.x, camera->viewport_size.y);
 
     glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
 }
@@ -142,6 +137,7 @@ void fw64Renderer::clearViewport(fw64Camera* camera, fw64RendererFlags flags) {
 
     auto viewport_rect = getViewportRect(camera);
     glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
+    glScissor(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
 
     GLbitfield clear_flags = 0;
     if (flags & FW64_RENDERER_FLAG_CLEAR_COLOR)
@@ -156,7 +152,7 @@ void fw64Renderer::clearViewport(fw64Camera* camera, fw64RendererFlags flags) {
 
     // restore the camera viewport if necessary
     if (camera != current_camera) {
-        viewport_rect = getViewportRect(camera);
+        viewport_rect = getViewportRect(current_camera);
         glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
     }
 }
@@ -174,13 +170,6 @@ void fw64Renderer::end(fw64RendererFlags flags) {
     current_camera = nullptr;
     active_shader = nullptr;
     primitive_type = primitive_type = fw64Primitive::Mode::Unknown;
-}
-
-void fw64Renderer::setScreenSize(int width, int height) {
-    screen_width = width;
-    screen_height = height;
-
-    sprite_batch.setScreenSize(width, height);
 }
 
 void fw64Renderer::updateMeshTransformBlock(fw64Matrix & matrix) {
@@ -450,16 +439,6 @@ void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int wi
 
 void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
     renderer->sprite_batch.setFillColor(r, g, b, a);
-}
-
-IVec2 fw64_renderer_get_screen_size(fw64Renderer* renderer) {
-    IVec2 screen_size = {renderer->screen_width, renderer->screen_height};
-
-    return screen_size;
-}
-
-IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera) {
-    return renderer->getViewportSize(camera);
 }
 
 fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer) {

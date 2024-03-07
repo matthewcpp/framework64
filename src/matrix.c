@@ -21,6 +21,14 @@ void matrix_set_identity(float* matrix) {
     matrix[15] = 1.0f;
 }
 
+void matrix_translate(float* matrix, Vec3* t) {
+    matrix_set_identity(matrix);
+
+    matrix[12] = t->x;
+    matrix[13] = t->y;
+    matrix[14] = t->z;
+}
+
 void matrix_from_trs(float* out, Vec3* v, Quat* q, Vec3* s) {
     float x2 = q->x + q->x;
     float y2 = q->y + q->y;
@@ -490,6 +498,18 @@ void matrix_transform_vec3(float* m, Vec3* vec) {
     vec->x = (m[0] * x + m[4] * y + m[8] * z + m[12]) / w;
     vec->y = (m[1] * x + m[5] * y + m[9] * z + m[13]) / w;
     vec->z = (m[2] * x + m[6] * y + m[10] * z + m[14]) / w;
+}
+
+void matrix_transform_vec4(float* m, Vec4* vec) {
+    float x = vec->x;
+    float y = vec->y;
+    float z = vec->z;
+    float w = vec->w;
+
+    vec->x = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+    vec->y = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+    vec->z = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+    vec->w = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
 }
 
 void mat2_set_rotation(float* mat, float rad) {

@@ -14,7 +14,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->current_animation = 0;
     game->current_speed = 1.0f;
 
-    fw64_arcball_init(&game->arcball, engine->input);
+    fw64_arcball_init(&game->arcball, engine->input, fw64_displays_get_primary(engine->displays));
     fw64_node_init(&game->node);
     game->skinned_mesh = fw64_assets_load_skinned_mesh(engine->assets, FW64_ASSET_skinnedmesh_catherine, fw64_default_allocator());
 

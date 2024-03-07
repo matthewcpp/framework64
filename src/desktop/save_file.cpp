@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <limits>
 
 #define N64_EEPROM_BLOCK_WRITE_TIME 0.016f
 
@@ -48,10 +49,11 @@ bool fw64SaveFile::init(std::string const& file_path, SaveFileType save_file_typ
         return true;
     }
 
-    // fill the eeprom with 0's
+    // fill the eeprom with 0xFF's
+    // https://n64squid.com/homebrew/libdragon/saving/eeprom/
+    const auto byte = std::numeric_limits<uint8_t>::max();
     for (uint32_t i = 0; i < file_size; i++) {
-        char zero = 0;
-        file.write(&zero, 1);
+        file.write(reinterpret_cast<const char*>(&byte), 1);
     }
 
     file.flush();

@@ -103,12 +103,12 @@ class Bundle {
         return assetId;
     }
 
-    addRaw(name, assetPath) {
+    addFile(name, assetPath) {
         const assetId = ++this._nextAssetId;
         const assetName = name;
 
         this._assets.push(new Asset(assetId, assetPath));
-        fse.writeSync(this._headerFile,`#define FW64_ASSET_raw_${assetName} ${assetId}\n`);
+        fse.writeSync(this._headerFile,`#define FW64_ASSET_file_${assetName} ${assetId}\n`);
 
         return assetId;
     }

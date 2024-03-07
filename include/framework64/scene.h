@@ -31,6 +31,7 @@ struct fw64Scene {
     fw64CollisionMesh* collision_meshes;
     fw64MaterialBundle* material_bundle;
     fw64Allocator* allocator;
+    fw64AssetDatabase* assets;
     Box bounding_box;
 };
 
@@ -39,7 +40,11 @@ extern "C" {
 #endif
 
 fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase* assets, fw64Allocator* allocator);
-void fw64_scene_delete(fw64Scene* scene, fw64AssetDatabase* assets, fw64Allocator* allocator);
+void fw64_scene_uninit(fw64Scene* scene);
+void fw64_scene_delete(fw64Scene* scene);
+
+void fw64_scene_info_init(fw64SceneInfo* info);
+void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* assets, fw64Allocator* allocator);
 
 /** 
  * Gets the original bounding box for the scene as it was authored. 
@@ -55,11 +60,15 @@ void fw64_scene_update_bounding(fw64Scene* scene);
 void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer);
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frustum* frustum);
 
+fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId, uint32_t mesh_index);
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene);
 
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
+
+fw64Collider* fw64_scene_get_collider(fw64Scene* scene, uint32_t index);
+uint32_t fw64_scene_get_collider_count(fw64Scene* scene, uint32_t index);
 
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene);
 

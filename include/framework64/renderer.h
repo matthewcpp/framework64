@@ -91,8 +91,6 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
 void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height);
 
-IVec2 fw64_renderer_get_screen_size(fw64Renderer* renderer);
-IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera);
 fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);
 
 void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);

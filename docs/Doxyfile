@@ -13,6 +13,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/color.h \
                         ../include/framework64/data_io.h \
                         ../include/framework64/data_link.h \
+                        ../include/framework64/display.h \
                         ../include/framework64/engine.h \
                         ../include/framework64/filesystem.h \
                         ../include/framework64/font.h \
@@ -24,6 +25,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/material.h \
                         ../include/framework64/material_bundle.h \
                         ../include/framework64/matrix.h \
+                        ../include/framework64/matrix_project.h \
                         ../include/framework64/media.h \
                         ../include/framework64/mesh.h \
                         ../include/framework64/node.h \
@@ -31,6 +33,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/quat.h \
                         ../include/framework64/query.h \
                         ../include/framework64/random.h \
+                        ../include/framework64/rect.h \
                         ../include/framework64/renderer.h \
                         ../include/framework64/save_file.h \
                         ../include/framework64/scene.h \
@@ -40,11 +43,14 @@ INPUT             =     ../README.md \
                         ../include/framework64/transform.h \
                         ../include/framework64/vec2.h \
                         ../include/framework64/vec3.h \
+                        ../include/framework64/vec4.h \
                         ../include/framework64/util/bump_allocator.h \
                         ../include/framework64/util/mesh_builder.h \
                         ../include/framework64/util/mesh_data_itr.h \
+                        ../include/framework64/util/mesh_editor.h \
                         ../include/framework64/util/quad.h \
                         ../include/framework64/util/renderer_util.h 
+                        ../include/framework64/util/texture_util.h 
 USE_MDFILE_AS_MAINPAGE = ../README.md
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

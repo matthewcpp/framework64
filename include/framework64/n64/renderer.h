@@ -39,7 +39,6 @@ struct fw64Renderer{
     fw64ColorRGBA8 fog_color;
 
     IVec2 screen_size;
-    IVec2 viewport_screen_pos;
     fw64PrimitiveMode primitive_mode;
     fw64ShadingMode shading_mode;
     fw64RendererFlags flags;

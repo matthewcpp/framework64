@@ -19,7 +19,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_node_set_mesh(&game->node, mesh);
 
     Box bounding_box = fw64_mesh_get_bounding_box(mesh);
-    fw64_arcball_init(&game->arcball, engine->input);
+    fw64_arcball_init(&game->arcball, engine->input, fw64_displays_get_primary(engine->displays));
     fw64_arcball_set_initial(&game->arcball, &bounding_box);
     game->arcball.camera.near = 1.0f;
     game->arcball.camera.far = 20.0f;

@@ -10,7 +10,7 @@
 void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
     game->logo_texture = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_n64_logo, allocator), allocator);
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     fw64_renderer_set_clear_color(engine->renderer, 100, 149, 237);
@@ -105,7 +105,7 @@ static void draw_progress_text(Game* game, IVec2* screen_size) {
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
-    IVec2 screen_size = fw64_renderer_get_screen_size(renderer);
+    IVec2 screen_size = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
 
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     fw64_renderer_set_camera(renderer, &game->camera);

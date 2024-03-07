@@ -15,7 +15,7 @@ static void set_shake_speed(Game* game);
 void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 
     game->rumble_frequency = 0.5f;
     game->rumble_duration = 2.0f;
@@ -72,7 +72,7 @@ void game_update(Game* game){
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
     char text[32];
-    IVec2 viewport_size = fw64_renderer_get_viewport_size(renderer, &game->camera);
+    IVec2 viewport_size = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
 
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
 

@@ -17,6 +17,8 @@ class Font {
     tileHeight = 0;
     scale = 0;
     ascender = 0;
+    descender = 0;
+    lineHeight = 0;
 
     constructor(name) {
         this.name = name;
@@ -28,6 +30,8 @@ class Font {
 
         this.scale = 1.0 / this._font.unitsPerEm * size;
         this.ascender = Math.ceil(this._font.ascender * this.scale);
+        this.descender = Math.ceil(this._font.descender * this.scale);
+        this.lineHeight = this.ascender + Math.abs(this.descender);
 
         const codepoints = [...new Set(Array.from(sourceString))];
         codepoints.sort();
@@ -50,6 +54,7 @@ class Font {
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
         this.size = tileHeight;
+        this.lineHeight = tileHeight;
 
         this.glyphs = [];
         for (let i = 0; i < sourceString.length; i++) {

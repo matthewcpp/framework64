@@ -32,11 +32,6 @@ class Archive {
         this.includeDirectory = includeDirectory;
     }
 
-    // note this is temporary pending asset bundle refactor
-    addRaw(rawPath, size) {
-        return this.addSync(rawPath, this._hashFileSync(rawPath), "raw");
-    }
-
     _hashFileSync(path) {
         const data = fs.readFileSync(path);
         const hash = crypto.createHash('sha1');

@@ -12,7 +12,7 @@ static void on_file_picked(const char* path, void* arg);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
     game->texture = 0;
 
     game->font = fw64_assets_load_font(game->engine->assets, FW64_ASSET_font_Consolas14, fw64_default_allocator());

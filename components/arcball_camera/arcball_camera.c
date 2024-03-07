@@ -12,10 +12,10 @@ static void _arcball_reset(fw64ArcballCamera* arcball) {
     arcball->_distance = arcball->_diagonal * 2.0f;
 }
 
-void fw64_arcball_init(fw64ArcballCamera* arcball, fw64Input* input) {
+void fw64_arcball_init(fw64ArcballCamera* arcball, fw64Input* input, fw64Display* display) {
     arcball->_input = input;
 
-    fw64_camera_init(&arcball->camera);
+    fw64_camera_init(&arcball->camera, display);
 
     arcball->_diagonal = 1.0f;
     _arcball_reset(arcball);

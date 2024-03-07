@@ -13,14 +13,6 @@ typedef struct fw64MeshBuilder fw64MeshBuilder;
 extern "C" {
 #endif
 
-typedef enum {
-    FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_UNSPECIFIED = 0,
-    FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_POSITION = (1 << 0),
-    FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_NORMAL = (1 << 1),
-    FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_TEXCOORD = (1 << 2),
-    FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_COLOR = (1 << 3)
-} fw64MeshBuilderVertexAttributes;
-
 /**
  * Creates a mesh builder with the supplied number of primitives and images.
  * A corresponding material is allocated for each primitive.
@@ -57,7 +49,7 @@ fw64Material* fw64_mesh_builder_get_material(fw64MeshBuilder* mesh_builder, size
  * Vertex elements are specified in a counter clockwise winding order.
  * If allocation fails, the data has already been allocated, or the index is out of range returns 0.
 */
-int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder, size_t index, fw64MeshBuilderVertexAttributes vertex_attributes, size_t count);
+int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder, size_t index, fw64VertexAttributes vertex_attributes, size_t count);
 
 /**
  * Allocates the underlying vertex data and element indices for the primitive at the given index.
@@ -66,7 +58,7 @@ int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder
  * Vertex elements are expected to be specified in a counter clockwise winding order.
  * If allocation fails, the data has already been allocated, or the index is out of range returns 0.
  */
-int fw64_mesh_builder_allocate_primitive_data(fw64MeshBuilder* mesh_builder, size_t index, fw64PrimitiveMode mode, fw64MeshBuilderVertexAttributes vertex_attributes, size_t vertex_count, size_t element_count);
+int fw64_mesh_builder_allocate_primitive_data(fw64MeshBuilder* mesh_builder, size_t index, fw64PrimitiveMode mode, fw64VertexAttributes vertex_attributes, size_t vertex_count, size_t element_count);
 
 /** 
  * Specifies the vertex indices for the triangle with the given index.
@@ -86,6 +78,7 @@ void fw64_mesh_builder_set_line_vertex_indices(fw64MeshBuilder* mesh_builder, si
 */
 int fw64_mesh_builder_set_active_primitive(fw64MeshBuilder* mesh_builder, size_t index);
 void fw64_mesh_builder_set_vertex_position_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z);
+void fw64_mesh_builder_set_vertex_position_int16(fw64MeshBuilder* mesh_builder, size_t index, int16_t x, int16_t y, int16_t z);
 void fw64_mesh_builder_set_vertex_normal_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z);
 void fw64_mesh_builder_set_vertex_color_rgba8(fw64MeshBuilder* mesh_builder, size_t index, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 

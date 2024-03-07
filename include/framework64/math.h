@@ -8,8 +8,14 @@ extern "C" {
 float fw64_smoothstep(float a, float b, float x);
 float fw64_lerp(float a, float b, float t);
 float fw64_clamp(float x, float lower, float upper);
+
 float fw64_maxf(float a, float b);
 float fw64_minf(float a, float b);
+
+int fw64_maxi(int a, int b);
+int fw64_mini(int a, int b);
+
+float fw64_map_value_in_numeric_range(float value, float input_start, float input_end, float output_start, float output_end);
 
 #ifdef __cplusplus
 }

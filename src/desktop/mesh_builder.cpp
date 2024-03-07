@@ -52,7 +52,7 @@ bool fw64MeshBuilder::setActivePrimitive(size_t index) {
     return true;
 }
 
-bool fw64MeshBuilder::allocatePrimitiveData(size_t index, fw64Primitive::Mode mode, fw64MeshBuilderVertexAttributes vertex_attributes, size_t vertex_count, size_t element_count) {
+bool fw64MeshBuilder::allocatePrimitiveData(size_t index, fw64Primitive::Mode mode, fw64VertexAttributes vertex_attributes, size_t vertex_count, size_t element_count) {
     assert(index < primitive_info_vec.size());
 
     if (index >= primitive_info_vec.size()) {
@@ -63,19 +63,19 @@ bool fw64MeshBuilder::allocatePrimitiveData(size_t index, fw64Primitive::Mode mo
     primitive_info.mode = mode;
     primitive_info.vertex_attributes = vertex_attributes;
 
-    if (vertex_attributes & FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_POSITION) {
+    if (vertex_attributes & FW64_VERTEX_ATTRIBUTE_POSITION) {
         primitive_info.primitive_data.positions.resize(3 * vertex_count);
     }
 
-    if (vertex_attributes & FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_NORMAL) {
+    if (vertex_attributes & FW64_VERTEX_ATTRIBUTE_NORMAL) {
         primitive_info.primitive_data.normals.resize(3 * vertex_count);
     }
 
-    if (vertex_attributes & FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_TEXCOORD) {
+    if (vertex_attributes & FW64_VERTEX_ATTRIBUTE_TEXCOORD) {
         primitive_info.primitive_data.tex_coords.resize(2 * vertex_count);
     }
 
-    if (vertex_attributes & FW64_MESH_BUILDER_VERTEX_ATTRIBUTE_COLOR) {
+    if (vertex_attributes & FW64_VERTEX_ATTRIBUTE_COLOR) {
         primitive_info.primitive_data.colors.resize(4 * vertex_count);
     }
 
@@ -84,7 +84,7 @@ bool fw64MeshBuilder::allocatePrimitiveData(size_t index, fw64Primitive::Mode mo
     return true;
 }
 
-bool fw64MeshBuilder::allocatePrimitiveQuadData(size_t index, fw64MeshBuilderVertexAttributes vertex_attributes, size_t count) {
+bool fw64MeshBuilder::allocatePrimitiveQuadData(size_t index, fw64VertexAttributes vertex_attributes, size_t count) {
     auto mode = fw64Primitive::Mode::Triangles;
     const size_t vertex_count = count * 4;
     const size_t element_count = count * 2;
@@ -166,11 +166,11 @@ fw64Material* fw64_mesh_builder_get_material(fw64MeshBuilder* mesh_builder, size
 }
 
 
-int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder, size_t index, fw64MeshBuilderVertexAttributes vertex_attributes, size_t count) {
+int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder, size_t index, fw64VertexAttributes vertex_attributes, size_t count) {
     return mesh_builder->allocatePrimitiveQuadData(index, vertex_attributes, count);
 }
 
-int fw64_mesh_builder_allocate_primitive_data(fw64MeshBuilder* mesh_builder, size_t index, fw64PrimitiveMode mode, fw64MeshBuilderVertexAttributes vertex_attributes, size_t vertex_count, size_t element_count) {
+int fw64_mesh_builder_allocate_primitive_data(fw64MeshBuilder* mesh_builder, size_t index, fw64PrimitiveMode mode, fw64VertexAttributes vertex_attributes, size_t vertex_count, size_t element_count) {
     auto gl_mode = mode == FW64_PRIMITIVE_MODE_TRIANGLES ? fw64Primitive::Mode::Triangles : fw64Primitive::Mode::Lines;
     return mesh_builder->allocatePrimitiveData(index, gl_mode, vertex_attributes, vertex_count, element_count);
 }
@@ -202,6 +202,15 @@ void fw64_mesh_builder_set_vertex_position_f(fw64MeshBuilder* mesh_builder, size
     active_prim.primitive_data.positions[pos_index++] = x;
     active_prim.primitive_data.positions[pos_index++] = y;
     active_prim.primitive_data.positions[pos_index++] = z;
+}
+
+void fw64_mesh_builder_set_vertex_position_int16(fw64MeshBuilder* mesh_builder, size_t index, int16_t x, int16_t y, int16_t z) {
+    auto & active_prim = mesh_builder->primitive_info_vec[mesh_builder->active_mesh_index];
+    size_t pos_index = index * 3;
+
+    active_prim.primitive_data.positions[pos_index++] = static_cast<float>(x);
+    active_prim.primitive_data.positions[pos_index++] = static_cast<float>(y);
+    active_prim.primitive_data.positions[pos_index++] = static_cast<float>(z);
 }
 
 void fw64_mesh_builder_set_vertex_normal_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z) {

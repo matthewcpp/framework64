@@ -25,5 +25,19 @@ float fw64_maxf(float a, float b) {
 }
 
 float fw64_minf(float a, float b) {
-  return a <=b ? a : b;
+  return a <= b ? a : b;
+}
+
+int fw64_maxi(int a, int b) {
+  return a >= b ? a : b;
+}
+
+int fw64_mini(int a, int b) {
+  return a <= b ? a : b;
+}
+
+// https://stackoverflow.com/questions/5731863/mapping-a-numeric-range-onto-another
+float fw64_map_value_in_numeric_range(float value, float input_start, float input_end, float output_start, float output_end) {
+  float slope = (output_end - output_start) / (input_end - input_start);
+  return output_start + slope * (value - input_start);
 }

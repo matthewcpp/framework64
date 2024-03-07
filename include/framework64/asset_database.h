@@ -4,6 +4,7 @@
 
 #include "framework64/allocator.h"
 #include "framework64/animation_data.h"
+#include "framework64/data_io.h"
 #include "framework64/skinned_mesh.h"
 
 #include <stdint.h>
@@ -18,6 +19,8 @@ typedef uint64_t fw64AssetId;
 #define FW64_INVALID_ASSET_ID UINT64_MAX
 
 typedef struct fw64AssetDatabase fw64AssetDatabase;
+
+#define FW64_ASSETS_MAX_OPEN_DATASOURCES 4
 
 
 #ifdef __cplusplus
@@ -51,6 +54,14 @@ fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId
 fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
 
 fw64SkinnedMesh* fw64_assets_load_skinned_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
+
+/** 
+ * Opens a datasource for an asset with the supplied asset_id or NULL if opening failed.
+ * Note the pointer returned from this function is managed by the library and should not be freed by the user.
+ * When you no longer need the datasource call \ref fw64_assets_close_datasource
+ */
+fw64DataSource* fw64_assets_open_datasource(fw64AssetDatabase* asset_database, fw64AssetId asset_id);
+void fw64_assets_close_datasource(fw64AssetDatabase* asset_database, fw64DataSource* datasource);
 
 #ifdef __cplusplus
 }

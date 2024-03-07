@@ -30,7 +30,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
     game->engine = engine;
 
-    fw64_arcball_init(&game->arcball, engine->input);
+    fw64_arcball_init(&game->arcball, engine->input, fw64_displays_get_primary(engine->displays));
 
     game->meshes[ENTITY_N64_LOGO] = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_n64_logo, allocator);
     game->meshes[ENTITY_CONTROLLER_CUBE] = fw64_assets_load_mesh(engine->assets, FW64_ASSET_mesh_controller_cube, allocator);
@@ -79,7 +79,7 @@ void game_update(Game* game) {
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
-    IVec2 screen_size = fw64_renderer_get_screen_size(renderer);
+    IVec2 screen_size = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
 
     fw64_renderer_set_anti_aliasing_enabled(renderer, 1);
 

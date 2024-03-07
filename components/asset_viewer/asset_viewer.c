@@ -174,7 +174,7 @@ int mesh_state_init(fw64AssetViewerMeshState* state, fw64DataSource* data_reader
     fw64_node_set_box_collider(state->node, collider);
     fw64_node_update(state->node);
 
-    fw64_arcball_init(&state->arcball, state->base.engine->input);
+    fw64_arcball_init(&state->arcball, state->base.engine->input, fw64_displays_get_primary(state->base.engine->displays));
     state->arcball.camera.near = 1.0f;
     state->arcball.camera.far = 100.0f;
     fw64_camera_update_view_matrix(&state->arcball.camera);

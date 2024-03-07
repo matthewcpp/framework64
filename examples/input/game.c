@@ -43,9 +43,11 @@ void init_controller_info(Game* game, int index, float viewport_x, float viewpor
 
     info->player_index = index;
 
-    fw64_camera_init(&info->camera);
-    vec2_set(&info->camera.viewport_pos, viewport_x, viewport_y);
-    vec2_set(&info->camera.viewport_size, 0.5f, 0.5f);
+    fw64Display* display = fw64_displays_get_primary(game->engine->displays);
+    fw64_camera_init(&info->camera, display);
+    Vec2 viewport_pos = {viewport_x, viewport_y};
+    Vec2 viewport_size = {0.5f, 0.5f};
+    fw64_camera_set_viewport_relative(&info->camera, display, &viewport_pos, &viewport_size);
 }
 
 void display_controller_info(Game* game, int index) {
@@ -55,7 +57,7 @@ void display_controller_info(Game* game, int index) {
 
     fw64_renderer_set_camera(renderer, &info->camera);
 
-    IVec2 viewport_size = fw64_renderer_get_viewport_size(renderer, &info->camera);
+    IVec2 viewport_size = info->camera.viewport_size;
 
     char text[32];
     sprintf(text, "Controller %d", info->player_index);

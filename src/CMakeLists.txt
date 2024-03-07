@@ -11,6 +11,7 @@ set(common_source_files
         ../include/framework64/color.h color.c
         ../include/framework64/data_io.h data_io.c
         ../include/framework64/data_link.h
+        ../include/framework64/display.h
         ../include/framework64/engine.h
         ../include/framework64/filesystem.h
         ../include/framework64/font.h
@@ -21,6 +22,7 @@ set(common_source_files
         ../include/framework64/material_bundle.h
         ../include/framework64/math.h math.c
         ../include/framework64/matrix.h matrix.c
+        ../include/framework64/matrix_project.h matrix_project.c
         ../include/framework64/media.h
         ../include/framework64/mesh.h
         ../include/framework64/node.h node.c
@@ -28,6 +30,7 @@ set(common_source_files
         ../include/framework64/quat.h quat.c
         ../include/framework64/query.h query.c
         ../include/framework64/random.h random.c
+        ../include/framework64/rect.h rect.c
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
         ../include/framework64/skinned_mesh.h skinned_mesh.c
@@ -37,13 +40,16 @@ set(common_source_files
         ../include/framework64/time.h
         ../include/framework64/vec2.h vec2.c
         ../include/framework64/vec3.h vec3.c
+        ../include/framework64/vec4.h vec4.c
 
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/mesh_builder.h
         ../include/framework64/util/mesh_data_itr.h
+        ../include/framework64/util/mesh_editor.h
         ../include/framework64/util/quad.h util/quad.c
         ../include/framework64/util/renderer_util.h
         ../include/framework64/util/sparse_set.h util/sparse_set.c
+        ../include/framework64/util/texture_util.h util/texture_util.c
         )
 
 

@@ -14,7 +14,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_renderer_set_clear_color(engine->renderer, 0, 17, 51);
 
-    fw64_fps_camera_init(&game->fps, engine->input);
+    fw64_fps_camera_init(&game->fps, engine->input, fw64_displays_get_primary(engine->displays));
     game->fps.movement_speed = 70.0f;
     game->fps.camera.near = 1.0f;
     game->fps.camera.far = 300.0f;

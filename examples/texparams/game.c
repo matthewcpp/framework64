@@ -9,7 +9,7 @@ static void set_texture_mode(Game* game, Mode mode);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera);
+    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 
     fw64_renderer_set_clear_color(engine->renderer, 39, 58, 93);
     game->mode = MODE_DEFAULT;
@@ -38,7 +38,7 @@ void game_draw(Game* game) {
     fw64_renderer_set_camera(renderer, &game->camera);
     fw64_renderer_draw_static_mesh(renderer, &game->quad.transform, game->quad.mesh);
 
-    IVec2 screen_size = fw64_renderer_get_screen_size(renderer);
+    IVec2 screen_size = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
     IVec2 measurement = fw64_font_measure_text(game->font, game->mode_name);
     int slice_width = fw64_texture_slice_width(game->buttons);
     int x_pos = screen_size.x / 2 - measurement.x / 2;

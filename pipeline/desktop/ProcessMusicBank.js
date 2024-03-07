@@ -29,7 +29,7 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
     fs.mkdirSync(destDir);
 
     const files = fs.readdirSync(sourceDir);
-
+    const musicBankFiles = [];
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const ext = path.extname(file);
@@ -46,19 +46,22 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
             fs.copyFileSync(sourceFilePath, destFilePath);
         }
         else {
-            throw new Error("Music files should be in either midi or ogg format.");
+            console.log(`Musicbank ${musicBankName} Warning: skipping file with unsupported extension: ${file}.`);
+            continue;
         }
+        
+        musicBankFiles.push(path.join(sourceDir, file));
     }
 
     const infoBuffer = Buffer.alloc(4);
-    infoBuffer.writeUint32LE(files.length, 0);
+    infoBuffer.writeUint32LE(musicBankFiles.length, 0);
     const infoFilePath = path.join(destDir, "info.musicbank");
     const infoFile = fs.openSync(infoFilePath, "w");
     fs.writeSync(infoFile, infoBuffer);
     fs.closeSync(infoFile)
 
     bundle.addMusicBank(musicBankName, destDirName);
-    AudioHeader.writeMusicBankHeader(sourceDir, musicBankName, includeDirectory);
+    AudioHeader.writeMusicBankHeader(musicBankFiles, musicBankName, includeDirectory);
 }
 
 module.exports = processMusicBank;

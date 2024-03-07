@@ -29,7 +29,8 @@ async function prepreBuiltinAssets(folder, name, platform) {
         purgeCompiledAssetData(folder, platformBuildDir, name)
     }
 
-    await prepareAssets(manifestFile, assetDirectory, platform, platformBuildDir, name);
+    // TODO: support plugin loading
+    await prepareAssets(manifestFile, assetDirectory, platform, platformBuildDir, name, null);
 }
 
 /** 

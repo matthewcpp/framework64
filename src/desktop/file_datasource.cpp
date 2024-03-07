@@ -23,6 +23,10 @@ bool FileDataSource::open(std::filesystem::path const & filesystem_path) {
     return true;
 }
 
+void FileDataSource::close() {
+    file.close();
+}
+
 size_t FileDataSource::sizeFunc(fw64DataSource* data_source) {
     auto* file_data_source = reinterpret_cast<FileDataSource*>(data_source);
 
@@ -50,6 +54,10 @@ bool FileDataWriter::open(std::filesystem::path const & filesystem_path) {
     }
 
     return true;
+}
+
+void FileDataWriter::close() {
+    file.close();
 }
 
 size_t FileDataWriter::writeFunc(fw64DataWriter* data_writer, const char* buffer, size_t size, size_t count) {

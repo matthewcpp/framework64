@@ -173,5 +173,8 @@ int fw64_n64_filesystem_open_datasource(fw64N64FilesystemDataSource* data_source
 }
 
 int fw64_n64_filesystem_close_datasource(fw64N64FilesystemDataSource* data_source) {
-    return fw64_filesystem_close(data_source->file_handle);
+    int handle = data_source->file_handle;
+    data_source->file_handle = FW64_FILESYSTEM_INVALID_HANDLE;
+    return fw64_filesystem_close(handle);
+    
 }
