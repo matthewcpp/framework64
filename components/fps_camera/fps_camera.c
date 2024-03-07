@@ -96,8 +96,8 @@ static void tilt_camera(fw64FpsCamera* fps, float time_delta, Vec2* stick) {
     if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
         fps->rotation.x -= fps->turn_speed * time_delta;
 
-        if (fps->rotation.x < -MIN_ROTATION_X)
-            fps->rotation.x = -MIN_ROTATION_X;
+        if (fps->rotation.x < MIN_ROTATION_X)
+            fps->rotation.x = MIN_ROTATION_X;
     }
 }
 
