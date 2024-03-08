@@ -16,15 +16,37 @@
 
 #include <array>
 #include <string>
+#include <variant>
 #include <vector>
-
-namespace framework64 {
 
 struct SpriteVertex {
     float x, y, z;
     float u, v;
     float r, g, b, a;
 };
+
+struct fw64UninitializedBatch {
+
+};
+
+struct fw64TextBatch {
+    fw64TextBatch(fw64Font* font) : font(font) {}
+    fw64Font* font;
+    std::vector<SpriteVertex> vertices;
+};
+
+using fw64SpriteBatchLayer = std::variant<fw64UninitializedBatch, fw64TextBatch>;
+
+struct fw64SpriteBatch {
+public:
+    void initLayers(int count);
+    fw64TextBatch* initTextBatch(int layer_index, fw64Font* font);
+private:
+    std::vector<fw64SpriteBatchLayer> layers;
+};
+
+
+namespace framework64 {
 
 class SpriteBatch {
 public:

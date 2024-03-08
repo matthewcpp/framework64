@@ -202,3 +202,15 @@ namespace framework64 {
         fill_color[2] = (static_cast<float>(b) / 255.0f) * fill_color[3];
     }
 }
+
+
+
+
+void fw64SpriteBatch::initLayers(int count) {
+    layers.resize(count, fw64UninitializedBatch());
+}
+
+fw64TextBatch* fw64SpriteBatch::initTextBatch(int layer_index, fw64Font* font) {
+    auto& layer = layers[layer_index].emplace<fw64TextBatch>(font);
+    return &layer;
+}

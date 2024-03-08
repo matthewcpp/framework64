@@ -1,0 +1,1 @@
+#include "framework64/n64/sprite_batch.h"
