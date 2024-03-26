@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/camera.h"
+#include "framework64/sprite_batch.h"
 
 #include "framework64/desktop/font.hpp"
 #include "framework64/desktop/material.hpp"
@@ -25,23 +26,43 @@ struct SpriteVertex {
     float r, g, b, a;
 };
 
-struct fw64UninitializedBatch {
+struct fw64UninitializedLayer {};
 
-};
+struct fw64TextLayer {
+    fw64TextLayer(fw64Font* font) : font(font) {}
 
-struct fw64TextBatch {
-    fw64TextBatch(fw64Font* font) : font(font) {}
     fw64Font* font;
     std::vector<SpriteVertex> vertices;
 };
 
-using fw64SpriteBatchLayer = std::variant<fw64UninitializedBatch, fw64TextBatch>;
+struct fw64SpriteLayer {
+    fw64SpriteLayer(fw64Texture* textures, size_t texture_count)
+        : textures(textures), texture_count(texture_count)
+    {
+        vertices.resize(texture_count);
+    }
+
+    fw64Texture* textures;
+    size_t texture_count;
+    std::vector<std::vector<SpriteVertex>> vertices;
+};
+
+struct fw64RectLayer {
+    std::vector<SpriteVertex> vertices;
+};
+
+using fw64SpriteBatchLayer = std::variant<
+    fw64UninitializedLayer, 
+    fw64TextLayer, 
+    fw64SpriteLayer,
+    fw64RectLayer>;
 
 struct fw64SpriteBatch {
-public:
-    void initLayers(int count);
-    fw64TextBatch* initTextBatch(int layer_index, fw64Font* font);
-private:
+    void allocateLayers(size_t count);
+    bool initTextLayer(size_t layer_index, fw64Font* font);
+    bool initSpriteLayer(size_t layer_index, fw64Texture* textures, size_t texture_count);
+    bool initRectLayer(size_t layer_index);
+
     std::vector<fw64SpriteBatchLayer> layers;
 };
 

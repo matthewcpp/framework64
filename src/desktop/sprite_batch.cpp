@@ -203,14 +203,54 @@ namespace framework64 {
     }
 }
 
+// new sprite batch
 
-
-
-void fw64SpriteBatch::initLayers(int count) {
-    layers.resize(count, fw64UninitializedBatch());
+void fw64SpriteBatch::allocateLayers(size_t count) {
+    layers.resize(count);
 }
 
-fw64TextBatch* fw64SpriteBatch::initTextBatch(int layer_index, fw64Font* font) {
-    auto& layer = layers[layer_index].emplace<fw64TextBatch>(font);
-    return &layer;
+bool fw64SpriteBatch::initTextLayer(size_t layer_index, fw64Font* font) {
+    if (layer_index >= layers.size()) {
+        return false;
+    }
+
+    layers[layer_index].emplace<fw64TextLayer>(font);
+    return true;
 }
+
+bool fw64SpriteBatch::initSpriteLayer(size_t layer_index, fw64Texture* textures, size_t texture_count) {
+    if (layer_index >= layers.size()) {
+        return false;
+    }
+
+    layers[layer_index].emplace<fw64SpriteLayer>(textures, texture_count);
+
+    return true;
+}
+
+ bool fw64SpriteBatch::initRectLayer(size_t layer_index) {
+    if (layer_index >= layers.size()) {
+        return false;
+    }
+
+    layers[layer_index].emplace<fw64RectLayer>();
+
+    return true;
+ }
+
+ void fw64_sprite_batch_allocate_layers(fw64SpriteBatch* sprite_batch, size_t layer_count) {
+    sprite_batch->allocateLayers(layer_count);
+ }
+
+ fw64SpriteBatchLayerType fw64_sprite_batch_get_layer_type(fw64SpriteBatch* sprite_batch, size_t layer_index) {
+    if (layer_index >= sprite_batch->layers.size()) {
+        return FW64_SPRITE_BATCH_LAYER_TYPE_UNKNOWN;
+    }
+
+    return static_cast<fw64SpriteBatchLayerType>(sprite_batch->layers[layer_index].index());
+ }
+
+ size_t fw64_sprite_batch_get_layer_count(fw64SpriteBatch* sprite_batch) {
+    return sprite_batch->layers.size();
+ }
+ 
