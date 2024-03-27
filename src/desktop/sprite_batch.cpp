@@ -4,6 +4,8 @@
 
 #include "framework64/desktop/shader.hpp"
 
+#include <cassert>
+
 namespace framework64 {
     bool SpriteBatch::init(ShaderCache& shader_cache) {
         glGenBuffers(1, &gl_vertex_buffer);
@@ -254,3 +256,11 @@ bool fw64SpriteBatch::initSpriteLayer(size_t layer_index, fw64Texture* textures,
     return sprite_batch->layers.size();
  }
  
+ fw64SpriteBatch* fw64_sprite_batch_create(fw64Allocator* allocator) {
+    assert(allocator);
+    return new fw64SpriteBatch();
+ }
+
+ void fw64_sprite_batch_delete(fw64SpriteBatch* sprite_batch) {
+    assert(sprite_batch);
+ }

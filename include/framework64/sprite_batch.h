@@ -10,12 +10,16 @@ typedef enum {
     FW64_SPRITE_BATCH_LAYER_TYPE_UNKNOWN,
     FW64_SPRITE_BATCH_LAYER_TYPE_TEXT,
     FW64_SPRITE_BATCH_LAYER_TYPE_SPRITE,
-    FW64_SPRITE_BATCH_LAYER_TYPE_FILL
+    FW64_SPRITE_BATCH_LAYER_TYPE_RECT
 } fw64SpriteBatchLayerType;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+fw64SpriteBatch* fw64_sprite_batch_create(fw64Allocator* allocator);
+void fw64_sprite_batch_delete(fw64SpriteBatch* sprite_batch);
+void fw64_sprite_batch_reset(fw64SpriteBatch* sprite_batch);
 
 /** 
  * Allocates sprite batch layers.  
