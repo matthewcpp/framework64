@@ -36,6 +36,7 @@ ${desktop_include_directory}/shader.hpp shader.cpp
 ${desktop_include_directory}/shader_cache.hpp shader_cache.cpp
 ${desktop_include_directory}/sprite_batch.hpp sprite_batch.cpp
 ${desktop_include_directory}/sprite_shader.hpp sprite_shader.cpp
+${desktop_include_directory}/sprite_vertex.hpp sprite_vertex.cpp
 ${desktop_include_directory}/texture.hpp texture.cpp
 ${desktop_include_directory}/texture_info_uniform.hpp
 ${desktop_include_directory}/uniform_block.hpp uniform_block.cpp
