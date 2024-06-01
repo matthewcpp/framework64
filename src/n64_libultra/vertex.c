@@ -7,6 +7,13 @@ void fw64_n64_vertex_set_position_f(Vtx* vertex, float x, float y, float z) {
     vertex->v.flag = 0;
 }
 
+void fw64_n64_vertex_set_position_s16(Vtx* vertex, short x, short y, short z) {
+    vertex->v.ob[0] = x;
+    vertex->v.ob[1] = y;
+    vertex->v.ob[2] = z;
+    vertex->v.flag = 0; 
+}
+
 void fw64_n64_vertex_set_normal_f(Vtx* vertex, float x, float y, float z) {
     x = x * 128.0f;
     x = x < 127.0f ? x : 127.0f;
@@ -29,9 +36,16 @@ void fw64_n64_vertex_set_color_rgba8(Vtx* vertex, uint8_t r, uint8_t g, uint8_t 
     vertex->v.cn[3] = a;
 }
 
-void fw64_n64_vertex_set_texcoords_f(Vtx* vertex, fw64Material* material, float s, float t) {
-    s *= (float)fw64_texture_slice_width(material->texture) * 2.0f;
-    t *= (float)fw64_texture_slice_height(material->texture) * 2.0f;
+void fw64_n64_vertex_set_color(Vtx* vertex, fw64ColorRGBA8 color) {
+    vertex->v.cn[0] = color.r;
+    vertex->v.cn[1] = color.g;
+    vertex->v.cn[2] = color.b;
+    vertex->v.cn[3] = color.a;
+}
+
+void fw64_n64_vertex_set_texcoords_f(Vtx* vertex, fw64Texture* texture, float s, float t) {
+    s *= (float)fw64_texture_slice_width(texture) * 2.0f;
+    t *= (float)fw64_texture_slice_height(texture) * 2.0f;
 
     // Note that the texture coordinates (s,t) are encoded in S10.5 format.
     vertex->v.tc[0] =  (short)(s * 32.0f);
