@@ -35,8 +35,10 @@ void* fw64_bump_allocator_memalign(fw64BumpAllocator* bump, size_t align, size_t
 // if the buffer to grow was the last chunk allocated then we can just increase the pointer
 // otherwise need to allocate a whole new buffer
 void* fw64_bump_allocator_realloc(fw64BumpAllocator* bump, void* ptr, size_t size) {
-    if (size == 0)
+    if (size == 0){
         fw64_bump_allocator_free(bump, ptr);
+        return NULL;
+    }
 
     if (ptr == bump->previous) {
         size_t previous_size = bump->next - bump->previous;
