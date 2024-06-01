@@ -1,14 +1,25 @@
 #include "game.h"
+
+#include "framework64/matrix.h"
+
 #include "assets/assets.h"
 
 #include <stdio.h>
 
 void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
-    game->engine = engine;
-    fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 255);
+    fw64Display* display = fw64_displays_get_primary(engine->displays);
 
-    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
+    game->engine = engine;
+    game->render_pass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), allocator);
+    IVec2 display_size = fw64_display_get_size(display);
+    float matrix[16];
+    matrix_ortho2d(matrix, 0, display_size.x, display_size.y, 0);
+    fw64_renderpass_set_projection_matrix(game->render_pass, matrix, NULL);
+
+    game->sprite_batch = fw64_spritebatch_create(2, allocator);
+
+    fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 255);
 
     fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 0);
 
@@ -38,16 +49,33 @@ void game_update(Game* game){
     typewriter_text_update(&game->typewriter_text, time_delta);
 }
 
+void draw_sprites(Game* game) {
+    fw64SpriteBatch* sprite_batch = game->sprite_batch;
+
+    fw64_spritebatch_begin(sprite_batch);
+
+    n64_logo_sprite_draw(&game->n64logo, sprite_batch);
+    ken_sprite_draw(&game->ken_sprite, sprite_batch);
+    elapsed_time_draw(&game->elapsed_time, sprite_batch);
+    typewriter_text_draw(&game->typewriter_text, sprite_batch);
+
+    fw64_spritebatch_set_active_layer(sprite_batch, 0);
+    fw64_spritebatch_draw_sprite(sprite_batch, game->nintendo_seal, 275, 200);
+
+    fw64_spritebatch_set_active_layer(sprite_batch, 1);
+    fw64_spritebatch_draw_sprite(sprite_batch, game->overlay, 275, 200);
+
+    fw64_spritebatch_end(sprite_batch);
+}
+
 void game_draw(Game* game){
     fw64Renderer* renderer = game->engine->renderer;
 
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_renderer_set_camera(renderer, &game->camera);
-    n64_logo_sprite_draw(&game->n64logo, renderer);
-    ken_sprite_draw(&game->ken_sprite, renderer);
-    elapsed_time_draw(&game->elapsed_time, renderer);
-    typewriter_text_draw(&game->typewriter_text, renderer);
-    fw64_renderer_draw_sprite(renderer, game->nintendo_seal, 275, 200);
-    fw64_renderer_draw_sprite(renderer, game->overlay, 275, 200);
+    fw64_renderpass_begin(game->render_pass);
+    draw_sprites(game);
+    fw64_renderpass_draw_sprite_batch(game->render_pass, game->sprite_batch);
+    fw64_renderpass_end(game->render_pass);
+    fw64_renderer_submit_renderpass(renderer, game->render_pass);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
