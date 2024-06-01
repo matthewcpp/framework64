@@ -34,6 +34,7 @@ set(common_source_files
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
         ../include/framework64/skinned_mesh.h skinned_mesh.c
+        ../include/framework64/sprite_batch.h
         ../include/framework64/texture.h
         ../include/framework64/transform.h transform.c
         ../include/framework64/types.h

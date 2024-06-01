@@ -37,6 +37,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/renderer.h \
                         ../include/framework64/save_file.h \
                         ../include/framework64/scene.h \
+                        ../include/framework64/sprite_batch.h \
                         ../include/framework64/skinned_mesh.h \
                         ../include/framework64/texture.h \
                         ../include/framework64/time.h \

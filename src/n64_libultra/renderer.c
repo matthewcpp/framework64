@@ -634,3 +634,26 @@ void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled
 int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
     return GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
 }
+
+static void set_shading_mode_text(fw64Renderer* renderer) {
+    gDPSetRenderMode(renderer->display_list++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
+    gSPClearGeometryMode(renderer->display_list++, G_ZBUFFER | G_LIGHTING | G_CULL_BOTH);
+    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIDECALA , G_CC_MODULATEIDECALA );
+
+    gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
+    gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
+
+    gDPPipeSync(renderer->display_list++);
+}
+
+static void fw64_renderer_draw_texture_batch(fw64Renderer* renderer, fw64N64TextureBatch* texture_batch) {
+    for (size_t l = 0; l < texture_batch->layer_count; l++) {
+        fw64TextureBatchLayer* layer = texture_batch->layers + l;
+
+        for (uint32_t i = 0; i < layer->batch_count; i++) {
+            fw64N64QuadBatch* char_batch = layer->batches[i];
+            gSPDisplayList(renderer->display_list++, char_batch->display_list);
+            gDPPipeSync(renderer->display_list++);
+        }
+    }
+}
