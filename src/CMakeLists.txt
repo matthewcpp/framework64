@@ -43,6 +43,7 @@ set(common_source_files
         ../include/framework64/vec4.h vec4.c
 
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
+        ../include/framework64/util/dynamic_vector.h util/dynamic_vector.c
         ../include/framework64/util/mesh_builder.h
         ../include/framework64/util/mesh_data_itr.h
         ../include/framework64/util/mesh_editor.h
