@@ -1,0 +1,14 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12
+        }
+    ],
+
+    "meshes": [
+        {
+            "src": "n64_logo_model/n64_logo.gltf"
+        }
+    ]
+}

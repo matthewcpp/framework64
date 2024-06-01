@@ -62,6 +62,6 @@ void player_draw_view(Player* player) {
 void player_set_viewport_rect(Player* player, float x, float y, float w, float h) {
     Vec2 relative_pos = {x, y};
     Vec2 relative_size = {w, h};
-    fw64_camera_set_viewport_relative(&player->fps_camera.camera, fw64_displays_get_primary(player->engine->displays), &relative_pos, &relative_size);
-    fw64_camera_set_viewport_relative(&player->weapon_camera, fw64_displays_get_primary(player->engine->displays), &relative_pos, &relative_size);
+    fw64_camera_set_viewport_relative(&player->fps_camera.camera, &relative_pos, &relative_size);
+    fw64_camera_set_viewport_relative(&player->weapon_camera, &relative_pos, &relative_size);
 }

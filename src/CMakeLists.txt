@@ -41,6 +41,7 @@ set(common_source_files
         ../include/framework64/vec2.h vec2.c
         ../include/framework64/vec3.h vec3.c
         ../include/framework64/vec4.h vec4.c
+        ../include/framework64/viewport.h viewport.c
 
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
         ../include/framework64/util/dynamic_vector.h util/dynamic_vector.c
