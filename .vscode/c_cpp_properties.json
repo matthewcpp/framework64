@@ -15,7 +15,7 @@
                 "_LANGUAGE_C",
                 "FW64_PLATFORM_N64_LIBULTRA"
             ],
-            "compileCommands": "${workspaceFolder}/build_n64/compile_commands.json"
+            "compileCommands": "${workspaceFolder}/build_n64_libultra/compile_commands.json"
         },
         {
             "name": "Desktop",

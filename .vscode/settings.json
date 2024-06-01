@@ -137,6 +137,11 @@
         "compat.h": "c",
         "camera.h": "c",
         "input.h": "c",
-        "arcball_camera.h": "c"
+        "arcball_camera.h": "c",
+        "text_batch.h": "c",
+        "stdint.h": "c",
+        "render_pass.h": "c",
+        "matrix.h": "c",
+        "sprite_batch.h": "c"
     }
 }
