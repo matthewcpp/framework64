@@ -1,6 +1,8 @@
+
+#include "framework64/n64/display_list.h"
+#include "framework64/n64/filesystem.h"
 #include "framework64/n64/mesh_builder.h"
 #include "framework64/n64/mesh.h"
-#include "framework64/n64/filesystem.h"
 #include "framework64/n64/vertex.h"
 
 #include <stdint.h>
@@ -95,34 +97,10 @@ int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder
     info->vertex_count = count * 4;
     info->vertices = allocator->memalign(allocator, 8, info->vertex_count * sizeof(Vtx));
 
-    // Vertex cache can hold 32 verts -> 8 quads of 4 vertices each
-    size_t total_chunk_count = count % 8 == 0 ? count / 8 : (count / 8) + 1;
-
-    // each chuck needs 9 display list entries -> gSPVertex + 8 gSP2Triangles plus a final gSPEndDisplayList
-    info->display_list_count = total_chunk_count * 9 + 1;
+    info->display_list_count = fw64_n64_compute_quad_display_list_size(count);
     info->display_list = allocator->memalign(allocator, 8, info->display_list_count * sizeof(Gfx));
 
-    Gfx* display_list = info->display_list;
-    Vtx* vertices = info->vertices;
-
-    size_t quads_remaining = count;
-    while (quads_remaining > 0) {
-        size_t chunk_quad_count = quads_remaining > 8 ? 8 : quads_remaining;
-        size_t chunk_vertices_count = chunk_quad_count * 4;
-
-        gSPVertex(display_list++, vertices, chunk_vertices_count, 0);
-
-        for (size_t i = 0; i < chunk_quad_count; i++) {
-            size_t vertex_offset = i * 4;
-            gSP2Triangles(display_list++, 
-                vertex_offset + 0, vertex_offset + 1, vertex_offset + 2, 0,
-                vertex_offset + 0, vertex_offset + 2, vertex_offset + 3, 0);
-        }
-
-        vertices += chunk_vertices_count;
-        quads_remaining -= chunk_quad_count;
-    }
-
+    Gfx* display_list = fw64_n64_create_quad_display_list(info->display_list, info->vertices, count);
     gSPEndDisplayList(display_list++);
 
     return 1;
@@ -196,7 +174,7 @@ void fw64_mesh_builder_set_vertex_color_rgba8(fw64MeshBuilder* mesh_builder, siz
 void fw64_mesh_builder_set_vertex_texcoords_f(fw64MeshBuilder* mesh_builder, size_t index, float s, float t) {
     fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
     fw64Material* material = mesh_builder->material_bundle->materials + mesh_builder->active_primitive_index;
-    fw64_n64_vertex_set_texcoords_f(active_primitive_info->vertices + index, material, s, t);
+    fw64_n64_vertex_set_texcoords_f(active_primitive_info->vertices + index, material->texture, s, t);
 }
 
 void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, Box* bounding) {

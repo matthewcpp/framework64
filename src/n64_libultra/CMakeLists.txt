@@ -7,6 +7,7 @@ set(platform_source_files
     ${n64_include_dir}/controller_button.h
     ${n64_include_dir}/data_link.h data_link.c
     ${n64_include_dir}/display.h display.c
+    ${n64_include_dir}/display_list.h display_list.c
     ${n64_include_dir}/engine.h engine.c
     ${n64_include_dir}/filesystem.h filesystem.c
     ${n64_include_dir}/fill_rect.h fill_rect.c
