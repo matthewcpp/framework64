@@ -21,13 +21,14 @@ set(platform_source_files
     ${n64_include_dir}/mesh_builder.h mesh_builder.c
     mesh_data_itr.c
     mesh_editor.c
+    ${n64_include_dir}/render_pass.h render_pass.c
+    ${n64_include_dir}/render_queue.h render_queue.c
     ${n64_include_dir}/renderer.h renderer.c
     renderer_util.c
     ${n64_include_dir}/save_file.h save_file.c
     ${n64_include_dir}/sprite_batch.h sprite_batch.c
     ${n64_include_dir}/texture.h texture.c
     ${n64_include_dir}/texture_batch.h texture_batch.c
-    ${n64_include_dir}/texture.h texture.c
     ${n64_include_dir}/vertex.h vertex.c
 
     usb/usb.h usb/usb.c

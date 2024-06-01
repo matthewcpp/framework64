@@ -7,6 +7,8 @@
 #include "color.h"
 #include "font.h"
 #include "mesh.h"
+#include "render_pass.h"
+#include "sprite_batch.h"
 #include "texture.h"
 #include "vec2.h"
 
@@ -16,6 +18,7 @@ typedef enum {
     FW64_RENDERER_FLAG_CLEAR_COLOR = 1,
     FW64_RENDERER_FLAG_CLEAR_DEPTH = 2,
     FW64_RENDERER_FLAG_CLEAR = FW64_RENDERER_FLAG_CLEAR_COLOR | FW64_RENDERER_FLAG_CLEAR_DEPTH,
+    FW64_RENDERER_FLAG_CLEAR_ALL = FW64_RENDERER_FLAG_CLEAR,
 
     FW64_RENDERER_FLAG_NOSWAP = 0,
     FW64_RENDERER_FLAG_SWAP = 4,
@@ -25,11 +28,15 @@ typedef enum {
 
 typedef struct fw64Renderer fw64Renderer;
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64RendererFlags flags);
+
+void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass);
 
 /** 
  * Sets the currently active camera and the associated viewport.
@@ -79,6 +86,7 @@ void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* textur
  * Note: the rotation value is currently ignored.
  */
 void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y, float scale_x , float scale_y, float rotation);
+
 void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
 void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count);
 
@@ -92,6 +100,13 @@ void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, 
 void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height);
 
 fw64Camera* fw64_renderer_get_camera(fw64Renderer* renderer);
+
+/** 
+ * Manualy sets the view matrices. to be used for rendering 
+ * All pointers passed into this function should remain valid until the next call to \ref fw64_renderer_end
+*/
+void fw64_renderer_set_view_matrices(fw64Renderer* renderer, fw64Matrix* projection, uint16_t* persp_norm_ptr, fw64Matrix* view);
+void fw64_renderer_set_viewport(fw64Renderer* renderer, fw64Viewport* viewport);
 
 void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
 void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled);

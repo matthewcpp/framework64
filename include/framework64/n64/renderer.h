@@ -3,27 +3,19 @@
 #include "framework64/renderer.h"
 #include "framework64/color.h"
 #include "framework64/n64/fill_rect.h"
+#include "framework64/n64/display_list.h"
+#include "framework64/n64/render_pass.h"
 
 #include <nusys.h>
 
-
-
 /* The maximum length of the display list of one task  */
 #define GFX_DLIST_LEN 4096
-
-typedef enum {
-    N64_RENDERER_FEATURE_NONE = 0,
-    N64_RENDERER_FEATURE_AA = 1 << 0,
-    N64_RENDERER_FEATURE_DEPTH_TEST = 1 << 1,
-    N64_RENDERER_FEATURE_FOG = 1 << 2,
-    N64_RENDERER_FEATURE_COLOR_INDEX_MODE = 1 << 3,
-    N64_RENDERER_FEATURE_SPRITE_SCISSOR = 1 << 4
-} fw64N64RendererFeature;
 
 struct fw64Renderer{
     // holds the current command insertion point of the display list
     Gfx* display_list;
     Gfx* display_list_start;
+    Mtx identity_matrix;
 
     // display list for drawing commands
     Gfx gfx_list[GFX_DLIST_LEN];
@@ -47,9 +39,7 @@ struct fw64Renderer{
     uint32_t active_light_mask;
     uint32_t starting_new_frame;
 
-    fw64Texture* active_texture;
-    int active_texture_frame;
-    uint32_t active_palette;
+    fw64TextureState active_texture;
     N64FillRect fill_rect;
 };
 
@@ -57,6 +47,5 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
 
 void fw64_n64_configure_fog(fw64Renderer* renderer, int enabled);
 
-void fw64_n64_renderer_swap_func(fw64Renderer* renderer, NUScTask* gfxTaskPtr);
-
-void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int width, int height, fw64RendererFlags flags);
+void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int width, int height, u16 clear_color, fw64ClearFlags flags);
+void fw64_n64_renderer_clear_viewport(fw64Renderer* renderer, fw64Viewport* viewport, u16 clear_color, fw64ClearFlags flags);
