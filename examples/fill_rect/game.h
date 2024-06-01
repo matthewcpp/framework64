@@ -8,10 +8,19 @@ typedef struct {
     float progress;
 } ProgressBar;
 
+typedef enum {
+    LAYER_LOGO_TEX,
+    LAYER_PROGRESS_BAR,
+    LAYER_PROGRESS_TEXT,
+    LAYER_COUNT
+} Layers;
+
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
     fw64Texture* logo_texture;
+    fw64Texture* fill_texture;
+    fw64RenderPass* renderpass;
+    fw64SpriteBatch* sprite_batch;
     ProgressBar progress_bar;
     fw64Font* font;
 } Game;
