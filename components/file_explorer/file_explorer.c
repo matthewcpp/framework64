@@ -1,6 +1,6 @@
 #include "file_explorer.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #include <string.h>
 #include <stdlib.h>

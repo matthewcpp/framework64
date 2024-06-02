@@ -3,8 +3,8 @@
 
 #include <framework64/math.h>
 #include "framework64/matrix.h"
-#include <framework64/util/renderer_util.h>
-#include <framework64/n64/controller_button.h>
+#include "framework64/util/renderer_util.h"
+#include "framework64/controller_mapping/n64.h"
 
 #include <stdio.h>
 

@@ -3,7 +3,7 @@
 #include "assets/assets.h"
 #include "assets/catherine_animation.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 static void set_animation(Game* game, int animation);
 

@@ -43,8 +43,6 @@ ${desktop_include_directory}/texture.hpp texture.cpp
 ${desktop_include_directory}/texture_info_uniform.hpp
 ${desktop_include_directory}/uniform_block.hpp uniform_block.cpp
 ${desktop_include_directory}/unlit_shader.hpp unlit_shader.cpp
-
-${CMAKE_CURRENT_SOURCE_DIR}/../../include/framework64/n64/controller_button.h
 )
 
 target_sources(framework64 PRIVATE ${platform_source_files})

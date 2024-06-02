@@ -3,7 +3,7 @@
 
 #include "framework64/util/mesh_builder.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 static fw64Mesh* build_rgb_triangle(Game* game) {
     fw64MeshBuilder* mesh_builder = fw64_mesh_builder_create(game->engine->assets, 1, 0, &game->allocator.interface);

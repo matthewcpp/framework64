@@ -3,7 +3,7 @@
 
 #include "framework64/random.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #define TILE_COUNT 6
 #define BUMP_ALLOCATOR_SIZE (16 * 1024)

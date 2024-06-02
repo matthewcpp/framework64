@@ -5,7 +5,7 @@
 #include "framework64/math.h"
 #include "framework64/util/mesh_data_itr.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #include <stdio.h>
 

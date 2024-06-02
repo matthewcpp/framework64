@@ -1,6 +1,6 @@
 #include "fps_camera/fps_camera.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #define DEFAULT_MOVEMENT_SPEED 8.0f
 #define DEFAULT_TURN_SPEED 90.0f

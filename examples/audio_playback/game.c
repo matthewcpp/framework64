@@ -4,7 +4,7 @@
 
 #include "framework64/node.h"
 #include "framework64/util/quad.h"
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #include <stdio.h>
 

@@ -4,7 +4,7 @@
 #include <framework64/matrix.h>
 #include <framework64/util/renderer_util.h>
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 static void init_scene(Game* game);
 static void init_views(Game* game);

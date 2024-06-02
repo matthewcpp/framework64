@@ -1,6 +1,6 @@
 #include "player.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 static void process_input(Player* player);
 static void update_position(Player* player);
