@@ -1,8 +1,8 @@
 #pragma once 
 
 #include "framework64/color.h"
-#include "framework64/n64/image.h"
-#include "framework64/n64/texture.h"
+#include "framework64/n64_libultra/image.h"
+#include "framework64/n64_libultra/texture.h"
 
 typedef struct {
     fw64Image image;

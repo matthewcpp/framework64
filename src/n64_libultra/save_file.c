@@ -1,4 +1,4 @@
-#include "framework64/n64/save_file.h"
+#include "framework64/n64_libultra/save_file.h"
 
 #include <string.h>
 

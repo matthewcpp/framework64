@@ -2,7 +2,7 @@
 
 #include "framework64/util/mesh_builder.h"
 
-#include "framework64/n64/material_bundle.h"
+#include "framework64/n64_libultra/material_bundle.h"
 
 #include <nusys.h>
 

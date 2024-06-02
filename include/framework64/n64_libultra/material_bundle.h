@@ -1,10 +1,10 @@
 #pragma once
 
-#include <framework64/material_bundle.h>
+#include "framework64/material_bundle.h"
 
-#include <framework64/n64/image.h>
-#include <framework64/n64/material.h>
-#include <framework64/n64/texture.h>
+#include "framework64/n64_libultra/image.h"
+#include "framework64/n64_libultra/material.h"
+#include "framework64/n64_libultra/texture.h"
 
 struct fw64MaterialBundle {
     uint32_t image_count;

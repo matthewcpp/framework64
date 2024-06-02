@@ -1,6 +1,6 @@
 #include "framework64/util/mesh_editor.h"
-#include "framework64/n64/mesh.h"
-#include "framework64/n64/vertex.h"
+#include "framework64/n64_libultra/mesh.h"
+#include "framework64/n64_libultra/vertex.h"
 
 void fw64_mesh_editor_init(fw64MeshEditor* mesh_editor, fw64Mesh* mesh) {
     mesh_editor->mesh = mesh;

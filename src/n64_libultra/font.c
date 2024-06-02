@@ -1,7 +1,7 @@
-#include "framework64/n64/font.h"
+#include "framework64/n64_libultra/font.h"
 
-#include "framework64/n64/asset_database.h"
-#include "framework64/n64/image.h"
+#include "framework64/n64_libultra/asset_database.h"
+#include "framework64/n64_libultra/image.h"
 
 #include "framework64/filesystem.h"
 #include "framework64/vec2.h"

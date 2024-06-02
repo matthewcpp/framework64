@@ -1,4 +1,4 @@
-#include "framework64/n64/media.h"
+#include "framework64/n64_libultra/media.h"
 
 // reference for Filesystem module: http://elm-chan.org/fsw/ff/00index_e.html
 

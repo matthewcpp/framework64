@@ -1,6 +1,6 @@
-#include "framework64/n64/display_list.h"
+#include "framework64/n64_libultra/display_list.h"
 
-#include "framework64/n64/image.h"
+#include "framework64/n64_libultra/image.h"
 
 Gfx* fw64_n64_create_quad_display_list(Gfx* display_list, Vtx* vertices, size_t count) {
     size_t quads_remaining = count;

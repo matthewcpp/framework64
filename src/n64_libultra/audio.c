@@ -1,5 +1,5 @@
-#include "framework64/n64/audio.h"
-#include "framework64/n64/filesystem.h"
+#include "framework64/n64_libultra/audio.h"
+#include "framework64/n64_libultra/filesystem.h"
 
 #include <string.h>
 

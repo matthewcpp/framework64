@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/color.h"
-#include "framework64/n64/texture.h"
+#include "framework64/n64_libultra/texture.h"
 
 #include <nusys.h>
 

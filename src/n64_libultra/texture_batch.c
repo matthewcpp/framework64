@@ -1,6 +1,6 @@
-#include "framework64/n64/texture_batch.h"
+#include "framework64/n64_libultra/texture_batch.h"
 
-#include "framework64/n64/display_list.h"
+#include "framework64/n64_libultra/display_list.h"
 
 #include <string.h>
 

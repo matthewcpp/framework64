@@ -1,7 +1,7 @@
-#include <framework64/n64/material_bundle.h>
+#include "framework64/n64_libultra/material_bundle.h"
 
-#include <framework64/n64/mesh.h>
-#include <framework64/material.h>
+#include "framework64/material.h"
+#include "framework64/n64_libultra/mesh.h"
 
 #define FW64_MESH_RESOURCES_HEADER_SIZE 3 * sizeof(uint32_t)
 

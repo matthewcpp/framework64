@@ -1,11 +1,11 @@
-#include "framework64/n64/asset_database.h"
+#include "framework64/n64_libultra/asset_database.h"
 
 #include "framework64/animation_data.h"
 #include "framework64/scene.h"
 
-#include "framework64/n64/image.h"
-#include "framework64/n64/font.h"
-#include "framework64/n64/mesh.h"
+#include "framework64/n64_libultra/image.h"
+#include "framework64/n64_libultra/font.h"
+#include "framework64/n64_libultra/mesh.h"
 
 void fw64_n64_asset_database_init(fw64AssetDatabase* assets) {
     for (size_t i = 0; i < FW64_ASSETS_MAX_OPEN_DATASOURCES; i++) {

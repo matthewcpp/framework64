@@ -1,4 +1,4 @@
-#include "framework64/n64/render_pass.h"
+#include "framework64/n64_libultra/render_pass.h"
 
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator) {
     fw64RenderPass* renderpass = allocator->malloc(allocator, sizeof(fw64RenderPass));

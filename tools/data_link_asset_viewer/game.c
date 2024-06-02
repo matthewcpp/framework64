@@ -1,9 +1,9 @@
 #include "game.h"
 #include "assets/assets.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 #include "framework64/log.h"
-#include "framework64/n64/data_link.h"
+#include "framework64/n64_libultra/data_link.h"
 
 #include "framework64/data_link.h"
 

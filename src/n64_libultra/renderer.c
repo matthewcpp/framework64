@@ -1,13 +1,13 @@
-#include "framework64/n64/renderer.h"
+#include "framework64/n64_libultra/renderer.h"
 
 #include "framework64/matrix.h"
 
-#include "framework64/n64/font.h"
-#include "framework64/n64/image.h"
+#include "framework64/n64_libultra/font.h"
+#include "framework64/n64_libultra/image.h"
 #include "framework64/math.h"
-#include "framework64/n64/mesh.h"
-#include "framework64/n64/sprite_batch.h"
-#include "framework64/n64/texture.h"
+#include "framework64/n64_libultra/mesh.h"
+#include "framework64/n64_libultra/sprite_batch.h"
+#include "framework64/n64_libultra/texture.h"
 
 #include <nusys.h>
 

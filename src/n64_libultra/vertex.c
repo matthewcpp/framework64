@@ -1,4 +1,4 @@
-#include "framework64/n64/vertex.h"
+#include "framework64/n64_libultra/vertex.h"
 
 void fw64_n64_vertex_set_position_f(Vtx* vertex, float x, float y, float z) {
     vertex->v.ob[0] = (short)x;
