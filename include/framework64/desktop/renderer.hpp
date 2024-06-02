@@ -24,18 +24,20 @@
 
 struct fw64Renderer {
 public: 
-    fw64Renderer(fw64Display& display)
-        : display(display) {}
+    fw64Renderer(fw64Display& display, framework64::ShaderCache& shader_cache)
+        : display(display), shader_cache(shader_cache) {}
 
 public:
-    bool init(int width, int height, framework64::ShaderCache& shader_cache);
+    bool init(int width, int height);
 
     void setClearColor(float r, float g, float b, float a);
     void begin(fw64PrimitiveMode primitive_mode, fw64RendererFlags flags);
     void setCamera(fw64Camera* cam);
+    void setViewMatrices(float* projection, float* view);
+    void setViewport(fw64Viewport const * viewport);
     void end(fw64RendererFlags flags);
 
-    void clearViewport(fw64Camera* camera, fw64RendererFlags flags);
+    void clearViewport(fw64Viewport const & viewport, fw64ClearFlags flags);
 
     void beginFrame();
     void endFrame();
@@ -54,6 +56,7 @@ public:
     void drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y);
     void drawText(fw64Font* font, float x, float y, const char* text, uint32_t count);
 
+    void drawRenderPass(fw64RenderPass* renderpass);
 public:
     void setDepthTestingEnabled(bool enabled);
     [[nodiscard]] inline bool depthTestingEnabled() const { return depth_testing_enabled; }
@@ -118,14 +121,14 @@ private:
 
 private:
     struct ViewportRect{ GLint x, y; GLsizei width, height; };
-    ViewportRect getViewportRect(fw64Camera* camera) const;
+    ViewportRect getViewportRect(fw64Viewport const * viewport) const;
 
 private:
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
     framework64::UniformBlock<MeshTransformData> mesh_transform_uniform_block;
     framework64::UniformBlock<FogData> fog_data_uniform_block;
 
-    std::array<float, 16> view_projection_matrix;
+    std::array<float, 16> view_matrix, projection_matrix, view_projection_matrix;
     framework64::ShaderProgram* active_shader = nullptr;
     std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
     framework64::ScreenOverlay screen_overlay;
@@ -154,5 +157,7 @@ public:
 
 private:
     fw64Display& display;
+    framework64::ShaderCache& shader_cache;
     framework64::Framebuffer framebuffer;
+    
 };

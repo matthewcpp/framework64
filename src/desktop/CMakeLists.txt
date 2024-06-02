@@ -27,6 +27,8 @@ mesh_data_itr.cpp
 mesh_editor.cpp
 ${desktop_include_directory}/n64_input_interface.hpp n64_input_interface.cpp
 ${desktop_include_directory}/primitive_data.hpp primitive_data.cpp
+${desktop_include_directory}/render_pass.hpp render_pass.cpp
+${desktop_include_directory}/render_queue.hpp
 ${desktop_include_directory}/renderer.hpp renderer.cpp
 render_util.cpp
 ${desktop_include_directory}/save_file.hpp save_file.cpp
