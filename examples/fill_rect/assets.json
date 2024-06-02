@@ -3,6 +3,9 @@
         {
             "src": "n64_logo.png",
             "format": "CI4"
+        },
+        {
+            "src": "fill.png"
         }
     ],
     "fonts": [

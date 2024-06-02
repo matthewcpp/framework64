@@ -26,6 +26,7 @@ void matrix_transform_vec4(float* matrix, Vec4* vec);
 
 void matrix_perspective(float* out, float fov_degrees, float aspect, float near, float far);
 void matrix_ortho(float* out, float left, float right, float bottom, float top, float near, float far);
+void matrix_ortho2d(float* out, float left, float right, float bottom, float top);
 void matrix_camera_look_at(float* out, Vec3* eye, Vec3* target, Vec3* up);
 
 /** Creates a rotation matrix for the supplied angle in radians. */

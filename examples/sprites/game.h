@@ -7,7 +7,8 @@
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
+    fw64RenderPass* render_pass;
+    fw64SpriteBatch* sprite_batch;
     KenSprite ken_sprite;
     N64LogoSprite n64logo;
     ElapsedTime elapsed_time;

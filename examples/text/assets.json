@@ -1,0 +1,31 @@
+{
+    "fonts": [
+        {
+            "src": "basicLAZER.otf",
+            "size": 12,
+            "name": "basicLAZER"
+        },
+        {
+            "src": "Consolas.ttf",
+            "size": 12
+        },
+        {
+            "name": "Mario64",
+            "sourceString": " \"'0123456789?abcdefghijklmnopqrstuvwxyz",
+            "image": {
+                "frameDir": "image_font",
+                "hslices": 10,
+                "vslices": 4,
+                "frameSize": "16x16",
+                "name": "Mario64FontImage"
+            }
+        }
+    ],
+    "images": [
+        {
+            "src": "pyoro64.png",
+            "hslices": 1,
+            "vslices": 1
+        }
+    ]
+}

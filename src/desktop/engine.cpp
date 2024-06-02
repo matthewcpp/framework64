@@ -60,7 +60,7 @@ bool Engine::init(Settings const & settings) {
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);
 
     displays = new fw64Displays(&display);
-    renderer = new fw64Renderer(display);
+    renderer = new fw64Renderer(display, *shader_cache);
     save_file = new fw64SaveFile();
     assets = new fw64AssetDatabase(asset_dir_path, *shader_cache);
     audio = new fw64Audio();
@@ -76,7 +76,7 @@ bool Engine::init(Settings const & settings) {
         return false;
     }
 
-    if (!renderer->init(settings.screen_width, settings.screen_height, *shader_cache)) {
+    if (!renderer->init(settings.screen_width, settings.screen_height)) {
         std::cout << "Failed to initialize renderer" << std::endl;
         return false;
     }

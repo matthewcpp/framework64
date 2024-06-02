@@ -1,11 +1,13 @@
 #include "framework64/desktop/renderer.hpp"
 
+#include "framework64/desktop/render_pass.hpp"
+
 #include "framework64/matrix.h"
 
 #include <cassert>
 #include <iostream>
 
-bool fw64Renderer::init(int width, int height, framework64::ShaderCache& shader_cache) {
+bool fw64Renderer::init(int width, int height) {
     if (!initFramebuffer(width, height)) {
         return false;
     }
@@ -85,7 +87,6 @@ void fw64Renderer::begin(fw64PrimitiveMode mode, fw64RendererFlags flags) {
     }
 
     if ((flags & FW64_RENDERER_FLAG_CLEAR) == FW64_RENDERER_FLAG_CLEAR) {
-        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
@@ -103,14 +104,14 @@ void fw64Renderer::begin(fw64PrimitiveMode mode, fw64RendererFlags flags) {
     sprite_batch.newFrame();
 }
 
-fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Camera* camera) const {
-    float bottom = camera->viewport_pos.y + camera->viewport_size.y;
+fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Viewport const * viewport) const {
+    float bottom = viewport->position.y + viewport->size.y;
 
     return {
-        static_cast<GLint>(camera->viewport_pos.x ),
+        static_cast<GLint>(viewport->position.x ),
         static_cast<GLint>((framebuffer.height - bottom)),
-        static_cast<GLsizei>(camera->viewport_size.x),
-        static_cast<GLsizei>(camera->viewport_size.y)
+        static_cast<GLsizei>(viewport->size.x),
+        static_cast<GLsizei>(viewport->size.y)
     };
 }
 
@@ -121,29 +122,37 @@ void fw64Renderer::setCamera(fw64Camera* camera) {
     mesh_transform_uniform_block.data.camera_near = camera->near;
     mesh_transform_uniform_block.data.camera_far = camera->far;
 
-    auto viewport_rect = getViewportRect(camera);
-
     sprite_batch.flush();
     current_camera = camera;
 
-    matrix_multiply(view_projection_matrix.data(), &current_camera->projection.m[0], &current_camera->view.m[0]);
-    sprite_batch.setScreenSize(camera->viewport_size.x, camera->viewport_size.y);
+    setViewport(&camera->viewport);
+    setViewMatrices(camera->projection.m, camera->view.m);
+}
 
+void fw64Renderer::setViewport(fw64Viewport const * viewport) {
+    auto viewport_rect = getViewportRect(viewport);
+    sprite_batch.setScreenSize(viewport->size.x, viewport->size.y);
     glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
 }
 
-void fw64Renderer::clearViewport(fw64Camera* camera, fw64RendererFlags flags) {
+void fw64Renderer::setViewMatrices(float* projection, float* view) {
+    std::memcpy(projection_matrix.data(), projection, sizeof(float) * 16);
+    std::memcpy(view_matrix.data(), view, sizeof(float) * 16);
+    matrix_multiply(view_projection_matrix.data(), projection, view);
+}
+
+void fw64Renderer::clearViewport(fw64Viewport const & viewport, fw64ClearFlags flags) {
     glEnable(GL_SCISSOR_TEST);
 
-    auto viewport_rect = getViewportRect(camera);
+    auto viewport_rect = getViewportRect(&viewport);
     glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
     glScissor(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
 
     GLbitfield clear_flags = 0;
-    if (flags & FW64_RENDERER_FLAG_CLEAR_COLOR)
+    if (flags & FW64_CLEAR_FLAG_COLOR)
         clear_flags |= GL_COLOR_BUFFER_BIT;
 
-    if (flags & FW64_RENDERER_FLAG_CLEAR_DEPTH)
+    if (flags & FW64_CLEAR_FLAG_DEPTH)
         clear_flags |= GL_DEPTH_BUFFER_BIT;
 
     glClear(clear_flags);
@@ -151,8 +160,8 @@ void fw64Renderer::clearViewport(fw64Camera* camera, fw64RendererFlags flags) {
     glDisable(GL_SCISSOR_TEST);
 
     // restore the camera viewport if necessary
-    if (camera != current_camera) {
-        viewport_rect = getViewportRect(current_camera);
+    if (current_camera) {
+        viewport_rect = getViewportRect(&current_camera->viewport);
         glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
     }
 }
@@ -162,6 +171,30 @@ void fw64Renderer::setGlDepthTestingState() {
         glEnable(GL_DEPTH_TEST);
     else
         glDisable(GL_DEPTH_TEST);
+}
+
+void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
+    if (renderpass->clear_flags) {
+        glClearColor(renderpass->clear_color[0], renderpass->clear_color[1], renderpass->clear_color[2], 1.0f);
+        clearViewport(renderpass->viewport, renderpass->clear_flags);
+        glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
+    }
+
+    setViewport(&renderpass->viewport);
+    setViewMatrices(renderpass->projection_matrix.data(), renderpass->view_matrix.data());
+    mesh_transform_uniform_block.data.camera_near = renderpass->camera_near;
+    mesh_transform_uniform_block.data.camera_far = renderpass->camera_far;
+
+    for (auto& mesh_instance : renderpass->render_queue.mesh_instances) {
+        drawStaticMesh(mesh_instance.mesh, mesh_instance.transform);
+    }
+
+    if (renderpass->render_queue.sprite_batches.size()) {
+        setDrawingMode(DrawingMode::Rect);
+        for (auto batch : renderpass->render_queue.sprite_batches) {
+            sprite_batch.drawSpriteBatch(batch);
+        }
+    }
 }
 
 void fw64Renderer::end(fw64RendererFlags flags) {
@@ -174,7 +207,7 @@ void fw64Renderer::end(fw64RendererFlags flags) {
 
 void fw64Renderer::updateMeshTransformBlock(fw64Matrix & matrix) {
     // compute the normal matrix: transpose(inverse(modelView))
-    matrix_multiply(mesh_transform_uniform_block.data.normal_matrix.data(), &current_camera->view.m[0], &matrix.m[0]);
+    matrix_multiply(mesh_transform_uniform_block.data.normal_matrix.data(), view_matrix.data(), &matrix.m[0]);
     matrix_invert(mesh_transform_uniform_block.data.normal_matrix.data(), mesh_transform_uniform_block.data.normal_matrix.data());
     matrix_transpose(mesh_transform_uniform_block.data.normal_matrix.data());
 
@@ -278,8 +311,8 @@ void fw64Renderer::updateLightingBlock() {
 
 void fw64Renderer::setAmbientLightColor(uint8_t r, uint8_t g, uint8_t b) {
     lighting_data_uniform_block.data.ambient_light_color[0] = static_cast<float>(r) / 255.0f;
-    lighting_data_uniform_block.data.ambient_light_color[1] = static_cast<float>(r) / 255.0f;
-    lighting_data_uniform_block.data.ambient_light_color[2] = static_cast<float>(r) / 255.0f;
+    lighting_data_uniform_block.data.ambient_light_color[1] = static_cast<float>(g) / 255.0f;
+    lighting_data_uniform_block.data.ambient_light_color[2] = static_cast<float>(b) / 255.0f;
 
     lighting_dirty = true;
 }
@@ -388,6 +421,14 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mod
 
 void fw64_renderer_set_camera(fw64Renderer* renderer, fw64Camera* camera) {
     renderer->setCamera(camera);
+}
+
+void fw64_renderer_set_view_matrices(fw64Renderer* renderer, fw64Matrix* projection, uint16_t*, fw64Matrix* view) {
+    renderer->setViewMatrices(projection->m, view->m);
+}
+
+void fw64_renderer_set_viewport(fw64Renderer* renderer, fw64Viewport* viewport) {
+    renderer->setViewport(viewport);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
@@ -499,4 +540,8 @@ void fw64_renderer_set_fog_color(fw64Renderer* renderer, uint8_t r, uint8_t g, u
         static_cast<float>(g) / 255.0f,
         static_cast<float>(b) / 255.0f
     );
+}
+
+void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
+    renderer->drawRenderPass(renderpass);
 }

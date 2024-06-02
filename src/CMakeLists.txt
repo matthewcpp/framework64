@@ -31,9 +31,11 @@ set(common_source_files
         ../include/framework64/query.h query.c
         ../include/framework64/random.h random.c
         ../include/framework64/rect.h rect.c
+        ../include/framework64/render_pass.h
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
         ../include/framework64/skinned_mesh.h skinned_mesh.c
+        ../include/framework64/sprite_batch.h
         ../include/framework64/texture.h
         ../include/framework64/transform.h transform.c
         ../include/framework64/types.h
@@ -41,8 +43,10 @@ set(common_source_files
         ../include/framework64/vec2.h vec2.c
         ../include/framework64/vec3.h vec3.c
         ../include/framework64/vec4.h vec4.c
+        ../include/framework64/viewport.h viewport.c
 
         ../include/framework64/util/bump_allocator.h util/bump_allocator.c
+        ../include/framework64/util/dynamic_vector.h util/dynamic_vector.c
         ../include/framework64/util/mesh_builder.h
         ../include/framework64/util/mesh_data_itr.h
         ../include/framework64/util/mesh_editor.h

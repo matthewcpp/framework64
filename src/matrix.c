@@ -237,6 +237,10 @@ void matrix_perspective(float* out, float fov_degrees, float aspect, float near,
     out[15] = 0;
 }
 
+void matrix_ortho2d(float* out, float left, float right, float bottom, float top) {
+    matrix_ortho(out, left, right, bottom, top, -1.0f, 1.0f);
+}
+
 void matrix_ortho(float* out, float left, float right, float bottom, float top, float near, float far) {
     float lr = 1.0f / (left - right);
     float bt = 1.0f / (bottom - top);

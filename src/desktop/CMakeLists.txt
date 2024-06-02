@@ -27,6 +27,8 @@ mesh_data_itr.cpp
 mesh_editor.cpp
 ${desktop_include_directory}/n64_input_interface.hpp n64_input_interface.cpp
 ${desktop_include_directory}/primitive_data.hpp primitive_data.cpp
+${desktop_include_directory}/render_pass.hpp render_pass.cpp
+${desktop_include_directory}/render_queue.hpp
 ${desktop_include_directory}/renderer.hpp renderer.cpp
 render_util.cpp
 ${desktop_include_directory}/save_file.hpp save_file.cpp
@@ -36,6 +38,7 @@ ${desktop_include_directory}/shader.hpp shader.cpp
 ${desktop_include_directory}/shader_cache.hpp shader_cache.cpp
 ${desktop_include_directory}/sprite_batch.hpp sprite_batch.cpp
 ${desktop_include_directory}/sprite_shader.hpp sprite_shader.cpp
+${desktop_include_directory}/sprite_vertex.hpp sprite_vertex.cpp
 ${desktop_include_directory}/texture.hpp texture.cpp
 ${desktop_include_directory}/texture_info_uniform.hpp
 ${desktop_include_directory}/uniform_block.hpp uniform_block.cpp

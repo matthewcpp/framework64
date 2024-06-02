@@ -5,6 +5,7 @@ set(test_files
         test_box.cpp
         test_bump_allocator.cpp
         test_camera.cpp
+        test_dynamic_vector.cpp
         test_frustum.cpp
         test_ray.cpp
         test_sparse_set.hpp test_sparse_set.cpp
