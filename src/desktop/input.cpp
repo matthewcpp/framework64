@@ -1,7 +1,7 @@
 #include "framework64/input.h"
 #include "framework64/desktop/input.hpp"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #include <iostream>
 

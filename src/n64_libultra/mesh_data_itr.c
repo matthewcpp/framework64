@@ -1,5 +1,5 @@
 #include "framework64/util/mesh_data_itr.h"
-#include "framework64/n64/mesh.h"
+#include "framework64/n64_libultra/mesh.h"
 
 #include <limits.h>
 

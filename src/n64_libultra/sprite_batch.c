@@ -1,9 +1,9 @@
-#include "framework64/n64/sprite_batch.h"
+#include "framework64/n64_libultra/sprite_batch.h"
 
-#include "framework64/n64/font.h"
-#include "framework64/n64/image.h"
-#include "framework64/n64/texture.h"
-#include "framework64/n64/vertex.h"
+#include "framework64/n64_libultra/font.h"
+#include "framework64/n64_libultra/image.h"
+#include "framework64/n64_libultra/texture.h"
+#include "framework64/n64_libultra/vertex.h"
 
 #include <ultra64.h> 
 #include <nusys.h>

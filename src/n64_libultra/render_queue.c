@@ -1,4 +1,4 @@
-#include "framework64/n64/render_queue.h"
+#include "framework64/n64_libultra/render_queue.h"
 
 #include <string.h>
 

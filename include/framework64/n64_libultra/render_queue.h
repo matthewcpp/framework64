@@ -2,7 +2,7 @@
 
 #include "framework64/allocator.h"
 #include "framework64/util/dynamic_vector.h"
-#include "framework64/n64/sprite_batch.h"
+#include "framework64/n64_libultra/sprite_batch.h"
 
 // this is temporary
 #include "framework64/mesh.h"

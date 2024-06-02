@@ -1,9 +1,9 @@
 
-#include "framework64/n64/display_list.h"
-#include "framework64/n64/filesystem.h"
-#include "framework64/n64/mesh_builder.h"
-#include "framework64/n64/mesh.h"
-#include "framework64/n64/vertex.h"
+#include "framework64/n64_libultra/display_list.h"
+#include "framework64/n64_libultra/filesystem.h"
+#include "framework64/n64_libultra/mesh_builder.h"
+#include "framework64/n64_libultra/mesh.h"
+#include "framework64/n64_libultra/vertex.h"
 
 #include <stdint.h>
 #include <string.h>

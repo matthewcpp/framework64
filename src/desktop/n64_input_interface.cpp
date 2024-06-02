@@ -1,6 +1,6 @@
 #include "framework64/desktop/n64_input_interface.hpp"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #define TRIGGER_THRESHOLD 0.25f
 #define AXIS_THRESHOLD 0.4f

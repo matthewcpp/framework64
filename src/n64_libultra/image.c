@@ -1,7 +1,7 @@
-#include "framework64/n64/image.h"
+#include "framework64/n64_libultra/image.h"
 
 #include "framework64/data_io.h"
-#include "framework64/n64/filesystem.h"
+#include "framework64/n64_libultra/filesystem.h"
 #include <stdlib.h>
 #include <stddef.h>
 

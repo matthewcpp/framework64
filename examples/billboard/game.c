@@ -2,7 +2,7 @@
 
 #include "assets/assets.h"
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 #include <math.h>
 

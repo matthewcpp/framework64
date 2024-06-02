@@ -6,7 +6,7 @@
 #include <malloc.h>
 #include <math.h>
 
-#include "framework64/n64/compat.h"
+#include "framework64/n64_libultra/compat.h"
 
 typedef Mtx fw64Matrix;
 

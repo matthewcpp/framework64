@@ -1,5 +1,5 @@
 #include "game.h"
-#include "framework64/n64/engine.h"
+#include "framework64/n64_libultra/engine.h"
 
 #include "assets/assets.h"
 

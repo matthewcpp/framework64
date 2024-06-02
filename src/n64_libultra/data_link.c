@@ -1,4 +1,4 @@
-#include "framework64/n64/data_link.h"
+#include "framework64/n64_libultra/data_link.h"
 
 #include "usb/usb.h"
 

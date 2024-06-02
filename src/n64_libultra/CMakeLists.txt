@@ -1,10 +1,9 @@
-set(n64_include_dir ${CMAKE_CURRENT_SOURCE_DIR}/../../include/framework64/n64)
+set(n64_include_dir ${CMAKE_CURRENT_SOURCE_DIR}/../../include/framework64/n64_libultra)
 
 set(platform_source_files
     ${n64_include_dir}/asset_database.h asset_database.c
     ${n64_include_dir}/audio.h audio.c
     ${n64_include_dir}/compat.h compat.c
-    ${n64_include_dir}/controller_button.h
     ${n64_include_dir}/data_link.h data_link.c
     ${n64_include_dir}/display.h display.c
     ${n64_include_dir}/display_list.h display_list.c

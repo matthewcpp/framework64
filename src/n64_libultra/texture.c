@@ -1,6 +1,6 @@
-#include "framework64/n64/texture.h"
+#include "framework64/n64_libultra/texture.h"
 
-#include "framework64/n64/image.h"
+#include "framework64/n64_libultra/image.h"
 
 #include <stdlib.h>
 #include <malloc.h>

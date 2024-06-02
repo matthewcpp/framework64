@@ -1,4 +1,4 @@
-#include "framework64/n64/display.h"
+#include "framework64/n64_libultra/display.h"
 
 
 fw64Display* fw64_displays_get_primary(fw64Displays* displays) {

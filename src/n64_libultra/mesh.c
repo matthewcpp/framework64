@@ -1,6 +1,6 @@
-#include "framework64/n64/mesh.h"
+#include "framework64/n64_libultra/mesh.h"
 
-#include "framework64/n64/asset_database.h"
+#include "framework64/n64_libultra/asset_database.h"
 #include "framework64/filesystem.h"
 
 #include <malloc.h>

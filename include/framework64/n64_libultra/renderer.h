@@ -2,9 +2,9 @@
 
 #include "framework64/renderer.h"
 #include "framework64/color.h"
-#include "framework64/n64/fill_rect.h"
-#include "framework64/n64/display_list.h"
-#include "framework64/n64/render_pass.h"
+#include "framework64/n64_libultra/fill_rect.h"
+#include "framework64/n64_libultra/display_list.h"
+#include "framework64/n64_libultra/render_pass.h"
 
 #include <nusys.h>
 

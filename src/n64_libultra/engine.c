@@ -1,16 +1,16 @@
 #include "framework64/engine.h"
 
 #include "framework64/allocator.h"
-#include "framework64/n64/audio.h"
-#include "framework64/n64/asset_database.h"
-#include "framework64/n64/data_link.h"
-#include "framework64/n64/display.h"
-#include "framework64/n64/media.h"
-#include "framework64/n64/input.h"
-#include "framework64/n64/renderer.h"
-#include "framework64/n64/save_file.h"
+#include "framework64/n64_libultra/audio.h"
+#include "framework64/n64_libultra/asset_database.h"
+#include "framework64/n64_libultra/data_link.h"
+#include "framework64/n64_libultra/display.h"
+#include "framework64/n64_libultra/media.h"
+#include "framework64/n64_libultra/input.h"
+#include "framework64/n64_libultra/renderer.h"
+#include "framework64/n64_libultra/save_file.h"
 
-#include "framework64/n64/filesystem.h"
+#include "framework64/n64_libultra/filesystem.h"
 
 #include <nusys.h>
 #include <ultra64.h>

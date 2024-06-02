@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "framework64/n64/controller_button.h"
+#include "framework64/controller_mapping/n64.h"
 
 static void init_controller_info(Game* game, int index, float viewport_x, float viewport_y);
 static void display_controller_info(Game* game, int index);
@@ -47,7 +47,7 @@ void init_controller_info(Game* game, int index, float viewport_x, float viewpor
     fw64_camera_init(&info->camera, display);
     Vec2 viewport_pos = {viewport_x, viewport_y};
     Vec2 viewport_size = {0.5f, 0.5f};
-    fw64_camera_set_viewport_relative(&info->camera, display, &viewport_pos, &viewport_size);
+    fw64_camera_set_viewport_relative(&info->camera, &viewport_pos, &viewport_size);
 }
 
 void display_controller_info(Game* game, int index) {
@@ -57,7 +57,7 @@ void display_controller_info(Game* game, int index) {
 
     fw64_renderer_set_camera(renderer, &info->camera);
 
-    IVec2 viewport_size = info->camera.viewport_size;
+    IVec2 viewport_size = info->camera.viewport.size;
 
     char text[32];
     sprintf(text, "Controller %d", info->player_index);

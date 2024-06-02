@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/font.h"
-#include "framework64/n64/texture.h"
+#include "framework64/n64_libultra/texture.h"
 
 struct fw64FontGlyph{
     uint32_t codepoint;
