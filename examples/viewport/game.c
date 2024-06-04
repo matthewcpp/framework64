@@ -41,7 +41,7 @@ void setup_renderpasses(Game* game) {
     fw64_renderpass_set_clear_color(game->renderpasses[RENDER_PASS_VIEW] , 55, 55, 55);
 
     game->renderpasses[RENDER_PASS_INFO] = fw64_renderpass_create(display, allocator);
-    IVec2 display_size = fw64_display_get_size(display);
+    Vec2 display_size = fw64_display_get_size_f(display);
     float projection[16];
     matrix_ortho2d(projection, 0, display_size.x, display_size.y, 0);
     fw64_renderpass_set_projection_matrix(game->renderpasses[RENDER_PASS_INFO], projection, NULL);
@@ -128,7 +128,6 @@ void game_update(Game* game){
 }
 
 void update_viewport_info(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
     fw64Viewport* vp = &game->camera.viewport;
     char viewport_info_txt[32];
     int y_pos = 10;

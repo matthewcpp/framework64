@@ -20,7 +20,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->sprite_batch = fw64_spritebatch_create(LAYER_COUNT, allocator);
 
     fw64Display* display = fw64_displays_get_primary(engine->displays);
-    IVec2 display_size = fw64_display_get_size(display);
+    Vec2 display_size = fw64_display_get_size_f(display);
     game->renderpass = fw64_renderpass_create(display, allocator);
 
     float projection[16];
@@ -64,8 +64,6 @@ static void draw_background(Game* game, IVec2* screen_size) {
 }
 
 static void draw_progress_bar(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
-
     int x = game->progress_bar.x;
     int y = game->progress_bar.y;
     int width = game->progress_bar.width;
@@ -91,7 +89,7 @@ static void draw_progress_bar(Game* game) {
     fw64_spritebatch_draw_sprite_slice_rect(game->sprite_batch, game->fill_texture, 0, x, y, width, height);
 
     // determine width / color and draw bar
-    width = (float)(width * game->progress_bar.progress);
+    width = (int)((float)width * game->progress_bar.progress);
 
     if (game->progress_bar.progress >= 0.66f)
         fw64_color_rgba8_set(&color, 0, 255, 0, 255);

@@ -75,7 +75,7 @@ void set_image(Game* game, ImageFormat image_format) {
     }
 
     game->image_format = image_format;
-    const char* format_name;
+    const char* format_name = "";
 
     switch(game->image_format) {
         case IMAGE_FORMAT_RGBA32:

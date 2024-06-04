@@ -55,7 +55,7 @@ void game_draw(Game* game) {
 static void set_animation(Game* game, int animation) {
     game->current_animation = animation;
 
-    if (game->current_animation >= game->skinned_mesh->animation_data->animation_count)
+    if (game->current_animation >= (int)game->skinned_mesh->animation_data->animation_count)
         game->current_animation = 0;
     else if (game->current_animation < 0)
         game->current_animation = game->skinned_mesh->animation_data->animation_count - 1;

@@ -75,7 +75,7 @@ void tiles_test_load_tile(Game* game, int index, Vec3* pos) {
     info.scene_id = tile_scenes[fw64_random_int_in_range(0, TILE_COUNT - 1)];
     info.allocator = &game->allocators[index].interface;
 
-    game->chunk_handles[index] = fw64_level_load_chunk_at_pos(&game->level, &info, pos);
+    game->chunk_handles[index] = fw64_level_load_chunk_at_pos(&game->level, &info, pos)->handle;
 }
 
 void game_update(Game* game){

@@ -132,12 +132,12 @@ void update_fog_settings(Game* game) {
             break;
 
         case FOG_SETTING_FOG_BEGIN: 
-            game->fog_begin = fw64_clamp(game->fog_begin + (0.1 * direction), 0.0f, game->fog_end);
+            game->fog_begin = fw64_clamp(game->fog_begin + (0.1f * direction), 0.0f, game->fog_end);
             fw64_renderer_set_fog_positions(game->engine->renderer, game->fog_begin, game->fog_end);
             break;
 
         case FOG_SETTING_FOG_END: 
-            game->fog_end = fw64_clamp(game->fog_end + (0.1 * direction), game->fog_begin, 1.0f);
+            game->fog_end = fw64_clamp(game->fog_end + (0.1f * direction), game->fog_begin, 1.0f);
             fw64_renderer_set_fog_positions(game->engine->renderer, game->fog_begin, game->fog_end);
             break;
     }

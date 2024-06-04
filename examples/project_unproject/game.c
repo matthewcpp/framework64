@@ -90,14 +90,14 @@ void move_crosshair(Game* game) {
     fw64_input_controller_stick(game->engine->input, 0, &stick);
 
     if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
-        game->crosshair_pos.x -= CROSSHAIR_SPEED * game->engine->time->time_delta;
+        game->crosshair_pos.x -= (int)(CROSSHAIR_SPEED * game->engine->time->time_delta);
     } else if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
-        game->crosshair_pos.x += CROSSHAIR_SPEED * game->engine->time->time_delta;
+        game->crosshair_pos.x += (int)(CROSSHAIR_SPEED * game->engine->time->time_delta);
     }
 
     if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
-        game->crosshair_pos.y += CROSSHAIR_SPEED * game->engine->time->time_delta;
+        game->crosshair_pos.y += (int)(CROSSHAIR_SPEED * game->engine->time->time_delta);
     } else if (fw64_input_controller_button_down(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_C_UP)) {
-        game->crosshair_pos.y -= CROSSHAIR_SPEED * game->engine->time->time_delta;
+        game->crosshair_pos.y -= (int)(CROSSHAIR_SPEED * game->engine->time->time_delta);
     }
 }
