@@ -67,6 +67,7 @@ static void on_file_download_begin(fw64FileDownloader* file_downloader, void* ar
 }
 
 static void on_file_download_progress(fw64FileDownloader* file_downloader, void* arg) {
+    (void)file_downloader;
     Game* game = (Game*)arg;
 
     fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 100);

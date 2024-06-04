@@ -13,7 +13,7 @@ namespace framework64::service {
 class WebService::Handler {
 public:
     Handler(AssetPipeline& asset_pipeline, data_link::Client & client) 
-    : asset_pipeline(asset_pipeline), client(client) {}
+    : client(client), asset_pipeline(asset_pipeline) {}
 public:
     auto processStaticMesh( const restinio::request_handle_t& req, restinio::router::route_params_t ) {
         json req_json;
@@ -66,7 +66,7 @@ void WebService::run(int port) {
     restinio::run(
             restinio::on_this_thread<my_server_traits>()
                     .address("localhost")
-                    .port(port)
+                    .port(static_cast<uint16_t>(port))
                     .request_handler(std::move(router)));
 }
 

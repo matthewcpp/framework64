@@ -32,6 +32,8 @@ add_library(fw64_datalink_client STATIC ${base_client_sources} ${n64_client_sour
 target_include_directories(fw64_datalink_client PRIVATE src src/n64/UNFLoader/)
 target_compile_definitions(fw64_datalink_client PRIVATE DIABLE_PRAGMA_COMMENT_LINKING)
 
+enable_all_warnings_as_errors(TARGET fw64_datalink_client)
+
 if (WIN32)
     set(ftd_lib_dir ${CMAKE_CURRENT_SOURCE_DIR}/src/n64/UNFLoader/Include)
 
