@@ -13,3 +13,5 @@ set(test_files
 
 add_executable(framework64_tests ${test_files} ${source_files})
 target_link_libraries(framework64_tests PRIVATE framework64 GTest::gtest GTest::gtest_main)
+
+enable_all_warnings_as_errors(TARGET framework64_tests)

@@ -59,7 +59,7 @@ TEST_F(BumpAllocatorTest, Memalign) {
 
 TEST_F(BumpAllocatorTest, Free) {
     void* data1 = allocator->malloc(allocator, 64);
-    void* data2 = allocator->malloc(allocator, 8);
+    allocator->malloc(allocator, 8);
     void* data3 = allocator->malloc(allocator, 128);
 
     // free the first allocation...nothing happens
@@ -95,7 +95,7 @@ TEST_F(BumpAllocatorTest, Realloc) {
     for (int i = 0; i < 10; i++)
         data[i] = i * 10;
 
-    void* other_data = allocator->malloc(allocator, 16);
+    allocator->malloc(allocator, 16);
     int* data2 = (int*)allocator->realloc(allocator, data, 20 * sizeof(int));
 
     ASSERT_NE(data, data2);
@@ -105,9 +105,9 @@ TEST_F(BumpAllocatorTest, Realloc) {
 }
 
 TEST_F(BumpAllocatorTest, Clear) {
-    void* data1 = allocator->malloc(allocator, 2);
-    void* data2 = allocator->malloc(allocator, 4);
-    void* data3 = allocator->malloc(allocator, 8);
+    allocator->malloc(allocator, 2);
+    allocator->malloc(allocator, 4);
+    allocator->malloc(allocator, 8);
 
     ASSERT_NE(bump_allocator.next, bump_allocator.start);
     ASSERT_NE(bump_allocator.previous, bump_allocator.start);

@@ -15,7 +15,7 @@ TEST(Camera, PerspectiveMatrix) {
 
     fw64_camera_update_projection_matrix(&camera);
 
-    float expectedProjection[16] = {1.29907048, 0, 0, 0, 0, 1.73205066, 0, 0, 0, 0, -1.0006001, -1, 0,0, -0.60018003, 0};
+    float expectedProjection[16] = {1.29907048f, 0.0f, 0.0f, 0.0f, 0.0f, 1.73205066f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0006001f, -1.0f, 0.0f, 0.0f, -0.60018003f, 0.0f};
 
     for (int i = 0; i < 16; i++) {
         ASSERT_NEAR(camera.projection.m[i], expectedProjection[i], 0.001);
