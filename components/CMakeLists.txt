@@ -8,5 +8,7 @@ set(components_source_files
 
 add_library(fw64_components STATIC ${components_source_files})
 
+enable_all_warnings_as_errors(TARGET fw64_components)
+
 target_include_directories(fw64_components PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(fw64_components PUBLIC framework64)
