@@ -24,7 +24,7 @@ void quat_set(Quat* q, float x, float y, float z, float w) {
 }
 
 void quat_set_axis_angle(Quat* out, float x, float y, float z, float rad) {
-    rad = rad * 0.5;
+    rad = rad * 0.5f;
     float s = fw64_sinf(rad);
     out->x = s * x;
     out->y = s * y;

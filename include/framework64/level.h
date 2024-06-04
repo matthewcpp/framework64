@@ -19,6 +19,10 @@
 
 #define FW64_LEVEL_INVALID_CHUNK_HANDLE UINT32_MAX
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Callback function used for level events.
  * @param chunk_id the chunk id returned from the call to \ref fw64_level_load_chunk
@@ -117,3 +121,7 @@ void fw64_level_add_dynamic_node(fw64Level* level, fw64Node* node);
 void fw64_level_remove_dynamic_node(fw64Level* level, fw64Node* node);
 uint32_t fw64_level_get_dynamic_node_count(fw64Level* level);
 fw64Node* fw64_level_get_dynamic_node(fw64Level* level, uint32_t index);
+
+#ifdef __cplusplus
+}
+#endif

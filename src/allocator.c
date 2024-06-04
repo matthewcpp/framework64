@@ -16,6 +16,8 @@ static void* fw64_allocator_realloc(fw64Allocator* allocator, void* ptr, size_t 
 
 static void* fw64_allocator_memalign(fw64Allocator* allocator, size_t alignment, size_t size) {
     (void)allocator;
+    (void)alignment;
+    // TODO: Look into this why is fw64_memalign typedef'd to malloc on desktop?
     return fw64_memalign(alignment, size);
 }
 

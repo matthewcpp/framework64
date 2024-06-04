@@ -111,8 +111,6 @@ int vec3_equals(Vec3* a, Vec3* b, float epsilon) {
     float dy = fabsf(a->y - b->y);
     float dz = fabsf(a->z - b->z);
 
-    float max_val_x = epsilon * fmaxf(1.0f, fmaxf(fabsf(a->x), fabsf(b->x)));
-
     return dx <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->x), fabsf(b->x))) &&
             dy <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->y), fabsf(b->y))) &&
             dz <= epsilon * fmaxf(1.0f, fmaxf(fabsf(a->z), fabsf(b->z)));

@@ -68,7 +68,7 @@ fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
 
 fw64Collider* fw64_scene_get_collider(fw64Scene* scene, uint32_t index);
-uint32_t fw64_scene_get_collider_count(fw64Scene* scene, uint32_t index);
+uint32_t fw64_scene_get_collider_count(fw64Scene* scene);
 
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene);
 
