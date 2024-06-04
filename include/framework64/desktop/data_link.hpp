@@ -65,7 +65,7 @@ private:
     void onMessage(websocketpp::connection_hdl, WebsocketServer::message_ptr message);
     void onClientConnect(websocketpp::connection_hdl connection_handle);
 
-    static void websocketServerThread(fw64DataLink* data_link, int port);
+    static void websocketServerThread(fw64DataLink* data_link);
 
     WebsocketServer websocket_server;
     websocketpp::connection_hdl websocket_connection_handle;

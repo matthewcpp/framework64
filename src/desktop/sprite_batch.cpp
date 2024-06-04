@@ -226,7 +226,7 @@ framework64::SpriteVertexBuffer& fw64SpriteBatch::getBuffer(fw64Texture* texture
     return vertex_buffers[buffer_index];
 }
 
-void fw64SpriteBatch::addSprite(fw64Texture* texture, int x, int y) {
+void fw64SpriteBatch::addSprite(fw64Texture* texture, float x, float y) {
     auto& vertex_buffer = getBuffer(texture);
     vertex_buffer.createQuad(x, y, static_cast<float>(texture->image->width), static_cast<float>(texture->image->height), fill_color);
 }
@@ -314,21 +314,21 @@ int fw64_spritebatch_set_active_layer(fw64SpriteBatch* sprite_batch, size_t laye
 }
 
 void fw64_spritebatch_draw_sprite(fw64SpriteBatch* sprite_batch, fw64Texture* texture, int x, int y) {
-    sprite_batch->addSprite(texture, x, y);
+    sprite_batch->addSprite(texture, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_spritebatch_draw_sprite_slice(fw64SpriteBatch* sprite_batch, fw64Texture* texture, int frame, int x, int y) {
-    sprite_batch->addSpriteSlice(texture, frame, x, y);
+    sprite_batch->addSpriteSlice(texture, frame, static_cast<float>(x), static_cast<float>(y));
 }
 
 void fw64_spritebatch_draw_sprite_slice_rect(fw64SpriteBatch* sprite_batch, fw64Texture* texture, int frame, int x, int y, int width, int height) {
-    sprite_batch->addSpriteSlice(texture, frame, x, y, width, height);
+    sprite_batch->addSpriteSlice(texture, frame, static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height));
 }
 
 void fw64_spritebatch_draw_string(fw64SpriteBatch* sprite_batch, fw64Font* font, const char* text, int x, int y) {
-    sprite_batch->addText(font, x, y, text, std::numeric_limits<uint32_t>::max());
+    sprite_batch->addText(font, static_cast<float>(x), static_cast<float>(y), text, std::numeric_limits<uint32_t>::max());
 }
 
 void fw64_spritebatch_draw_string_count(fw64SpriteBatch* sprite_batch, fw64Font* font, const char* text, uint32_t count, int x, int y) {
-    sprite_batch->addText(font, x, y, text, count);
+    sprite_batch->addText(font, static_cast<float>(x), static_cast<float>(y), text, count);
 }

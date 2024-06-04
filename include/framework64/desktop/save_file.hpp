@@ -27,7 +27,7 @@ public:
     [[nodiscard]] bool isBusy() const { return busy_time > 0.0f; }
     [[nodiscard]] uint32_t getFileSize() const;
 
-    void setEmulateAccessTime(bool enabled) { emulate_access_time = enabled; }
+    void setEmulateAccessTime(bool should_emulate_access_time) { emulate_access_time = should_emulate_access_time; }
 
 private:
     std::fstream file;

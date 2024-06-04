@@ -8,7 +8,7 @@ void fw64Material::updateShader() {
 
 // C Interface
 
-void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, int initial_frame) {
+void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, uint32_t initial_frame) {
     material->texture = texture;
     fw64_material_set_texture_frame(material, initial_frame);
 }
@@ -17,11 +17,11 @@ fw64Texture* fw64_material_get_texture(fw64Material* material) {
     return material->texture;
 }
 
-void fw64_material_set_texture_frame(fw64Material* material, int frame) {
+void fw64_material_set_texture_frame(fw64Material* material, uint32_t frame) {
     material->texture_frame = frame;
 }
 
-int fw64_material_get_texture_frame(fw64Material* material) {
+uint32_t fw64_material_get_texture_frame(fw64Material* material) {
     return material->texture_frame;
 }
 

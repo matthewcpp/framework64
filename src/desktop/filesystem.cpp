@@ -73,7 +73,7 @@ int Filesystem::fileSize(int file_handle) {
         return FW64_FILESYSTEM_INVALID_HANDLE;
 
     if (file_handles[file_handle].is_open()) {
-        return file_sizes[file_handle];
+        return static_cast<int>(file_sizes[file_handle]);
     }
     else {
         return FW64_FILESYSTEM_INVALID_HANDLE;

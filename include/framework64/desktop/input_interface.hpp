@@ -15,6 +15,8 @@ struct Controller {
 
 class InputInterface {
 public:
+    virtual ~InputInterface() {}
+
     virtual bool buttonPressed(Controller const & current, Controller const & previous, int button) = 0;
     virtual bool buttonReleased(Controller const & current, Controller const & previous, int button) = 0;
     virtual bool buttonDown(Controller const & current, int button) = 0;

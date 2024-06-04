@@ -22,7 +22,7 @@ bool fw64DataLink::initialize(int port) {
         std::cout << "Failed to start websocket server: " << e.what() << std::endl;
         status = Status::Failed;
     }
-    server_thread = std::thread(websocketServerThread, this, port);
+    server_thread = std::thread(websocketServerThread, this);
 
     std::cout << "started websocket datalink server on port: " << port << std::endl;
 
@@ -93,7 +93,7 @@ void fw64DataLink::onClientConnect(websocketpp::connection_hdl connection_handle
     should_trigger_connected_callback = true;
 }
 
-void fw64DataLink::websocketServerThread(fw64DataLink* data_link, int port) {
+void fw64DataLink::websocketServerThread(fw64DataLink* data_link) {
     try {
         data_link->websocket_server.run();
     }

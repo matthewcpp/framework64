@@ -10,7 +10,7 @@ void fw64_mesh_data_itr_init(fw64MeshDataItr* itr, fw64Mesh* mesh, uint32_t prim
     itr->triangle_index = TRIANGLE_INDEX_NONE;
 }
 
-void fw64_mesh_data_itr_uninit(fw64MeshDataItr* itr) {}
+void fw64_mesh_data_itr_uninit(fw64MeshDataItr*) {}
 
 int fw64_mesh_data_itr_has_next(fw64MeshDataItr* itr) {
     auto const & primitive_data = itr->primitive->primitive_data;

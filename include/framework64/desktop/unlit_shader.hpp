@@ -12,7 +12,7 @@ public:
 
 private:
     TextureInfoUniform texture_info;
-    GLuint texture_info_uniform_block_index = GL_INVALID_INDEX;
+    // GLuint texture_info_uniform_block_index = GL_INVALID_INDEX;
 };
 
 }

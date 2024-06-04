@@ -99,7 +99,7 @@ IVec2 fw64_font_measure_text_len(fw64Font* font, const char* text, size_t len) {
     return result;
 }
 
-void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator) {
+void fw64_font_delete(fw64AssetDatabase*, fw64Font* font, fw64Allocator*) {
     delete font;
 }
 

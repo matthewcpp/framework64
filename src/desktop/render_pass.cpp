@@ -86,6 +86,6 @@ void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* me
     renderpass->render_queue.animated_mesh_instances.emplace_back(mesh, animated_mesh_instances, transform);
 }
 
-void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled) {
-    
+void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* /*renderpass*/, int /*enabled*/) {
+    // TODO: Implement me during renderpass switchover
 }
