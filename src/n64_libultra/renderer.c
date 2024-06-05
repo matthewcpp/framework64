@@ -14,8 +14,6 @@
 #include <malloc.h>
 #include <string.h>
 
-static void fw64_n64_renderer_update_lighting_data(fw64Renderer* renderer);
-
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height) {
     renderer->screen_size.x = screen_width;
     renderer->screen_size.y = screen_height;
@@ -473,6 +471,7 @@ void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* sprite
 }
 
 void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y, float scale_x , float scale_y, float rotation) {
+    (void)rotation;
     float width = (float)fw64_texture_slice_width(texture) * scale_x;
     float height = (float)fw64_texture_slice_height(texture) * scale_y;
 

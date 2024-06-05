@@ -16,7 +16,9 @@ void fw64_mesh_data_itr_init(fw64MeshDataItr* itr, fw64Mesh* mesh, uint32_t prim
     itr->triangle_index = 0;
 }
 
-void fw64_mesh_data_itr_uninit(fw64MeshDataItr* itr) {}
+void fw64_mesh_data_itr_uninit(fw64MeshDataItr* itr) {
+    (void)itr;
+}
     
 
 

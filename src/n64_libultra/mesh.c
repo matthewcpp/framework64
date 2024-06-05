@@ -36,6 +36,7 @@ fw64Mesh* fw64_mesh_load_from_datasource(fw64AssetDatabase* assets, fw64DataSour
 }
 
 fw64Mesh* fw64_mesh_load_from_datasource_with_bundle(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64MaterialBundle* material_bundle, fw64Allocator* allocator) {
+    (void)assets;
     fw64MeshInfo mesh_info;
     fw64_data_source_read(data_source, &mesh_info, sizeof(fw64MeshInfo), 1);
 
@@ -103,15 +104,18 @@ static void fixup_mesh_primitive_material_pointers(fw64MaterialBundle* material_
 
         uint32_t primitive_material_index = (uint32_t)primitive->material;
         // TODO: Investigate this further.  This indicates that this primitive contains lines
-        if (primitive_material_index == FW64_PRIMITIVE_NO_MATERIAL)
-            primitive->material == NULL;
-        else
+        if (primitive_material_index == FW64_PRIMITIVE_NO_MATERIAL) {
+            primitive->material = NULL;
+        }
+        else {
             primitive->material = material_bundle->materials + primitive_material_index;
+        }
     }
 }
 
 
-void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* database, fw64Allocator* allocator) {
+void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* assets, fw64Allocator* allocator) {
+    (void)assets;
     if (!allocator) allocator = fw64_default_allocator();
 
     fw64_n64_mesh_uninit(mesh, allocator);
@@ -145,7 +149,7 @@ int fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
     return mesh->info.primitive_count;
 }
 
-fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index) {
+fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index) {
     fw64Primitive* primitive = mesh->primitives + index;
 
     return primitive->material;

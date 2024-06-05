@@ -23,7 +23,7 @@ fw64DataSource* fw64_assets_open_datasource(fw64AssetDatabase* assets, fw64Asset
     return NULL;
 }
 
-void fw64_assets_close_datasource(fw64AssetDatabase* asset_database, fw64DataSource* datasource) {
+void fw64_assets_close_datasource(fw64AssetDatabase*, fw64DataSource* datasource) {
     fw64N64FilesystemDataSource* filesystem_data_source = (fw64N64FilesystemDataSource*)datasource;
     fw64_n64_filesystem_close_datasource(filesystem_data_source);
 }
@@ -39,7 +39,7 @@ fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId
     return image;
 }
 
-fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
+fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase*, fw64AssetId asset_id, fw64Allocator* allocator) {
     int handle = fw64_filesystem_open(asset_id);
     if (handle < 0)
         return NULL;

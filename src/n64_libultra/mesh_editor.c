@@ -18,8 +18,9 @@ int fw64_mesh_editor_set_active_primitive(fw64MeshEditor* mesh_editor, size_t in
     return 1;
 }
 
-void fw64_mesh_editor_commit(fw64MeshEditor* mesh_editor) {
+void fw64_mesh_editor_commit(fw64MeshEditor* editor) {
     // Nothing specific needs to be done here
+    (void)editor;
 }
 
 void fw64_mesh_editor_set_vertex_positionf(fw64MeshEditor* mesh_editor, size_t index, float x, float y, float z) {
