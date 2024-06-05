@@ -34,7 +34,8 @@ fw64MediaDirItr* fw64_media_open_dir(fw64Media* media, const char* path) {
         return NULL;
 }
 
-void fw64_media_close_dir(fw64Media* media, fw64MediaDirItr*) {
+void fw64_media_close_dir(fw64Media* media, fw64MediaDirItr* itr) {
+    (void)itr;
     f_closedir(&media->itr.dir);
 }
 
@@ -60,7 +61,8 @@ fw64DataSource* fw64_media_open_data_source(fw64Media* media, const char* path) 
     return result == FR_OK ? &media->data_reader.interface : NULL;
 }
 
-void fw64_media_close_data_source(fw64Media* media, fw64DataSource*) {
+void fw64_media_close_data_source(fw64Media* media, fw64DataSource* datasource) {
+    (void)datasource;
     f_close(&media->data_reader.file);
 }
 
@@ -77,7 +79,8 @@ void fw64_media_close_data_writer(fw64Media* media, fw64DataWriter* data_writer)
     f_close(&media->data_writer.file);
 }
 
-fw64MediaItemType fw64_media_get_path_type(fw64Media*, const char* path) {
+fw64MediaItemType fw64_media_get_path_type(fw64Media* media, const char* path) {
+    (void)media;
     FRESULT result;
     FILINFO file_info;
 
@@ -99,13 +102,15 @@ fw64MediaItemType fw64_media_dir_itr_type(fw64MediaDirItr* itr) {
         return FW64_MEDIA_ITEM_FILE;
 }
 
-int fw64_media_create_directory(fw64Media*, const char* path) {
+int fw64_media_create_directory(fw64Media* media, const char* path) {
+    (void)media;
     FRESULT result = f_mkdir(path);
 
     return result == FR_OK;
 }
 
-int fw64_media_remove(fw64Media*, const char* path) {
+int fw64_media_remove(fw64Media* media, const char* path) {
+    (void)media;
     FRESULT result = f_unlink(path);
 
     return result == FR_OK;

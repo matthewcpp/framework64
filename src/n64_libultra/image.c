@@ -128,7 +128,8 @@ int fw64_n64_image_read_data(fw64Image* image, fw64DataSource* data_source, fw64
     return 1;
 }
 
-void fw64_image_delete(fw64AssetDatabase*, fw64Image* image, fw64Allocator* allocator) {
+void fw64_image_delete(fw64AssetDatabase* assets, fw64Image* image, fw64Allocator* allocator) {
+    (void)assets;
     if (!allocator) allocator = fw64_default_allocator();
     allocator->free(allocator, image->data);
 
