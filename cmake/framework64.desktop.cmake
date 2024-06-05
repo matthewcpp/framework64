@@ -1,6 +1,26 @@
 set(FW64_PLATFORM_DESKTOP ON)
 set(CMAKE_CXX_STANDARD 17)
 
+function (enable_all_warnings_as_errors)
+    set(options)
+    set(oneValueArgs TARGET)
+    set(multiValueArgs)
+    cmake_parse_arguments(ENABLE_ALL_WARNINGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+    set(target_name ${ENABLE_ALL_WARNINGS_TARGET})
+
+    set_property(TARGET ${target_name} PROPERTY COMPILE_WARNING_AS_ERROR ON)
+
+    if (MSVC)
+        # warning level 4
+        target_compile_options(${target_name} PRIVATE /W4)
+        target_compile_definitions(${target_name} PRIVATE _CRT_SECURE_NO_WARNINGS)
+    else()
+        # additional warnings
+        target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+    endif()
+endfunction()
+
 # performs platform specific configuration of the framework 64 library
 function (configure_core_library)
     find_package(CLI11 CONFIG REQUIRED)
@@ -29,6 +49,8 @@ function (configure_core_library)
 
     target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_DESKTOP)
 
+    enable_all_warnings_as_errors(TARGET framework64)
+
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_IS_64_BIT)
     endif()
@@ -36,7 +58,7 @@ endfunction()
 
 # performs platform specific configuration of a framework64 game
 function(create_game)
-    set(options)
+    set(options ALL_WARNINGS_AS_ERRORS)
     set(oneValueArgs TARGET SAVE_FILE_TYPE)
     set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -46,6 +68,10 @@ function(create_game)
 
     add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
     target_link_libraries(${target_name} PUBLIC framework64)
+
+    if (${DESKTOP_GAME_ALL_WARNINGS_AS_ERRORS})
+        enable_all_warnings_as_errors(TARGET ${target_name})
+    endif()
 
     # Configure target specific output directories
     set(output_dir ${CMAKE_BINARY_DIR}/bin/${target_name})

@@ -6,7 +6,7 @@ endif()
 
 if (FW64_PLATFORM_N64_LIBULTRA)
     message("Configuring for Platform: N64_libultra")
-    set(CMAKE_TOOLCHAIN_FILE ${FW64_ROOT_DIR}/cmake/framework64.modernsdk.cmake)
+    set(CMAKE_TOOLCHAIN_FILE ${FW64_ROOT_DIR}/cmake/framework64.libultra.cmake)
 elseif(FW64_PLATFORM_DESKTOP)
     message("Configuring for Platform: Desktop")
     set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE ${FW64_ROOT_DIR}/cmake/framework64.desktop.cmake)

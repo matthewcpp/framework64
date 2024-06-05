@@ -19,6 +19,20 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # note: roms will be
 
 set(FW64_N64_ASM_SRC_DIR ${FW64_ROOT_DIR}/src/n64_libultra/asm)
 
+function (enable_all_warnings_as_errors)
+    set(options)
+    set(oneValueArgs TARGET)
+    set(multiValueArgs)
+    cmake_parse_arguments(ENABLE_ALL_WARNINGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+    set(target_name ${ENABLE_ALL_WARNINGS_TARGET})
+
+    # Turn this on when CI is enabled
+    set_property(TARGET ${target_name} PROPERTY COMPILE_WARNING_AS_ERROR ON)
+    target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+
+endfunction()
+
 # performs platform specific configuration of the framework 64 library
 function (configure_core_library)
     if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -29,11 +43,13 @@ function (configure_core_library)
     target_include_directories(framework64 
         PUBLIC /usr/include/n64 /usr/include/n64/PR  /usr/include/n64/nusys /usr/include/n64/nustd)
 
+        enable_all_warnings_as_errors(TARGET framework64)
+
 endfunction()
 
 # performs platform specific configuration of a framework64 game
 function(create_game)
-    set(options)
+    set(options ALL_WARNINGS_AS_ERRORS)
     set(oneValueArgs TARGET SAVE_FILE_TYPE)
     set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(N64_ROM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -119,7 +135,7 @@ function(create_game)
     # configure target specific build options 
     target_include_directories(${target_name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
     target_link_directories(${target_name} PUBLIC /usr/lib/n64/nusys /usr/lib/n64)
-    target_link_libraries(${target_name} PUBLIC -lnualsgi_n -ln_audio -lnusys -lultra_rom -lnustd /opt/crashsdk/lib/gcc/mips64-elf/11.2.0/libgcc.a)
+    target_link_libraries(${target_name} PUBLIC -lnualsgi_n -ln_audio -lnusys -lultra_rom -lnustd $ENV{N64_LIBGCCDIR}/libgcc.a)
     target_link_options(${target_name} PUBLIC -T ${linkerscript_dest} -Wl,--no-check-sections ${bootcode_path} /usr/lib/n64/nusys/nusys_rom.o)
 
     # build the rom
