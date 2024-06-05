@@ -66,7 +66,11 @@ function(create_game)
     set(target_name ${DESKTOP_GAME_TARGET})
     set(game_sources ${DESKTOP_GAME_SOURCES})
 
-    add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
+    set(main_file_src ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
+    set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_desktop_${target_name}.cpp)
+    configure_file(${main_file_src} ${main_file_dest} COPYONLY)
+
+    add_executable(${target_name} ${game_sources} ${main_file_dest})
     target_link_libraries(${target_name} PUBLIC framework64)
 
     if (${DESKTOP_GAME_ALL_WARNINGS_AS_ERRORS})

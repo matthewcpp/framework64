@@ -89,7 +89,11 @@ function(create_game)
 		${asm_dest_dir}/asset_data.s
 	)
 
-    add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/n64_libultra/main_n64.c ${asm_files})
+    set(main_file_src ${FW64_ROOT_DIR}/src/n64_libultra/main_n64.c)
+    set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_n64_${target_name}.c)
+    configure_file(${main_file_src} ${main_file_dest} COPYONLY)
+    
+    add_executable(${target_name} ${game_sources} ${main_file_dest} ${asm_files})
 
     # Include the game specific asset directory
     target_include_directories(${target_name} PUBLIC ${game_asset_dir}/include)
