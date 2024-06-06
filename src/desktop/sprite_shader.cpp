@@ -9,7 +9,7 @@ struct SpriteShaderProgram : public ShaderProgram {
 
 };
 
-ShaderProgram* SpriteShader::create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) {
+ShaderProgram* SpriteShader::create(uint32_t, uint32_t, std::string const & shader_dir) {
     std::string vertex_path = shader_dir + "sprite.vert.glsl";
     std::string fragment_path = shader_dir + "sprite.frag.glsl";
 

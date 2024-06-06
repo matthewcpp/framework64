@@ -51,7 +51,7 @@ void fw64_n64_data_link_update(fw64DataLink* data_link) {
 
     
     if (incomming_message != 0) {
-        uint32_t type = USBHEADER_GETTYPE(incomming_message);
+        // uint32_t type = USBHEADER_GETTYPE(incomming_message);
         uint32_t size = USBHEADER_GETSIZE(incomming_message);
 
         fw64_n64_usb_message_stream_reset(&data_link->message_stream, size);

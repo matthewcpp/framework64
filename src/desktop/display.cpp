@@ -64,3 +64,7 @@ fw64Display* fw64_displays_get_primary(fw64Displays* displays) {
 IVec2 fw64_display_get_size(fw64Display* display) {
     return {display->framebuffer_width(), display->framebuffer_height()};
 }
+
+Vec2 fw64_display_get_size_f(fw64Display* display) {
+    return {static_cast<float>(display->framebuffer_width()), static_cast<float>(display->framebuffer_height())};
+}

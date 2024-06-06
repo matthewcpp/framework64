@@ -135,7 +135,7 @@ int fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
     return static_cast<int>(mesh->primitives.size());
 }
 
-fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index) {
-    assert(index >= 0 && index < mesh->primitives.size());
+fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index) {
+    assert(index < mesh->primitives.size());
     return mesh->primitives[index]->material;
 }

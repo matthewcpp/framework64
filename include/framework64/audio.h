@@ -24,7 +24,7 @@ extern "C" {
 int fw64_audio_load_soundbank_asset(fw64Audio* audio, fw64AssetDatabase* asset_database, fw64AssetId asset_id);
 void fw64_audio_unload_soundbank(fw64Audio* audio);
 
-int fw64_audio_sound_count(fw64Audio* audio);
+uint32_t fw64_audio_sound_count(fw64Audio* audio);
 int fw64_audio_play_sound(fw64Audio* audio, uint32_t sound_num);
 void fw64_audio_stop_sound(fw64Audio* audio, int handle);
 fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle);
@@ -44,7 +44,7 @@ void fw64_audio_unload_musicbank(fw64Audio* audio);
 int fw64_audio_play_music(fw64Audio* audio, uint32_t track_num);
 void fw64_audio_stop_music(fw64Audio* audio);
 void fw64_audio_set_music_volume(fw64Audio* audio, float volume);
-int fw64_audio_music_track_count(fw64Audio* audio);
+uint32_t fw64_audio_music_track_count(fw64Audio* audio);
 float fw64_audio_get_playback_speed(fw64Audio* audio);
 void fw64_audio_set_music_playback_speed(fw64Audio* audio, float speed);
 fw64AudioStatus fw64_audio_get_music_status(fw64Audio* audio);

@@ -37,7 +37,7 @@ size_t FileDataSource::readFunc(fw64DataSource* data_source, void* buffer, size_
     auto* file_data_source = reinterpret_cast<FileDataSource*>(data_source);
     file_data_source->file.read(reinterpret_cast<char*>(buffer), size * count);
 
-    return file_data_source->file.gcount();
+    return static_cast<size_t>(file_data_source->file.gcount());
 }
 
 

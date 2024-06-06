@@ -29,7 +29,7 @@ bool FileTransfer::execute(const std::filesystem::path& path) {
         return false;
     }
 
-    size_t file_size = std::filesystem::file_size(path);
+    size_t file_size = static_cast<size_t>(std::filesystem::file_size(path));
 
     std::cout << "Transfering file: " << path << std::endl;
 

@@ -11,20 +11,25 @@ static inline void swapf(float* a, float* b) {
 
 // Real Time Collision Detection 5.3.3
 int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_point, float* out_t) {
+    float* dir_el = (float*)(dir);
+    float* origin_el = (float*)origin;
+    float* box_min_el = (float*) &box->min;
+    float* box_max_el = (float*) &box->max;
+
     float tmin = 0.0f;          // set to -FLT_MAX to get first hit on line
     float tmax = FLT_MAX;       // set to max distance ray can travel (for segment)
 
     // For all three slabs
     for (int i = 0; i < 3; i++) {
-        if (fabsf(dir->el[i]) < EPSILON) {
+        if (fabsf(dir_el[i]) < EPSILON) {
             // Ray is parallel to slab. No hit if origin not within slab
-            if (origin->el[i] < box->min.el[i] || origin->el[i] > box->max.el[i])
+            if (origin_el[i] < box_min_el[i] || origin_el[i] > box_max_el[i])
                 return 0;
         } else {
             // Compute intersection t value of ray with near and far plane of slab
-            float ood = 1.0f / dir->el[i];
-            float t1 = (box->min.el[i] - origin->el[i]) * ood;
-            float t2 = (box->max.el[i] - origin->el[i]) * ood;
+            float ood = 1.0f / dir_el[i];
+            float t1 = (box_min_el[i] - origin_el[i]) * ood;
+            float t2 = (box_max_el[i] - origin_el[i]) * ood;
             // Make t1 be intersection with near plane, t2 with far plane
             if (t1 > t2)
                 swapf(&t1, &t2);
@@ -85,7 +90,7 @@ int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, // ray
     
     if( h >= 0.0 )
     {
-        float t = (-b-sqrt(h))/a;
+        float t = (-b-fw64_sqrtf(h))/a;
         float y = baoa + t*bard;
         // body
         if( y>0.0 && y<baba ) {
@@ -246,6 +251,11 @@ int fw64_collision_test_ray_triangle(Vec3* origin, Vec3* direction, Vec3* vertex
 // Real Time Collision Detection 5.5.8
 // note function modified: https://gamedev.stackexchange.com/questions/144854/intersectmovingaabbaabb-weird-behavior
 int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* t_first, float* t_last) {
+    float* a_max_el = (float*)&a->max;
+    float* a_min_el = (float*)&a->min;
+    float* b_max_el = (float*)&b->max;
+    float* b_min_el = (float*)&b->min;
+
     // Exit early if a and b initially overlapping
     if (box_intersection(a, b)) {
         *t_first = 0.0f;
@@ -256,31 +266,31 @@ int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* 
     // Use relative velocity; effectively treating 'a' as stationary
     Vec3 v;
     vec3_subtract(&v, vb, va);
-
+    float* v_el = (float*)&v;
     // Initialize times of first and last contact
     float tfirst = 0.0f;
     float tlast = 1.0f;
 
     // For each axis, determine times of first and last contact, if any
     for (int i = 0; i < 3; i++) {
-        if (v.el[i] < 0.0f) {
-            if (b->max.el[i] < a->min.el[i])
+        if (v_el[i] < 0.0f) {
+            if (b_max_el[i] < a_min_el[i])
                 return 0; // Nonintersecting and moving apart
-            if (a->max.el[i] < b->min.el[i])
-                tfirst = fw64_maxf((a->max.el[i] - b->min.el[i]) / v.el[i], tfirst);
-            if (b->max.el[i] > a->min.el[i])
-                tlast  = fw64_minf((a->min.el[i] - b->max.el[i]) / v.el[i], tlast);
+            if (a_max_el[i] < b_min_el[i])
+                tfirst = fw64_maxf((a_max_el[i] - b_min_el[i]) / v_el[i], tfirst);
+            if (b_max_el[i] > a_min_el[i])
+                tlast  = fw64_minf((a_min_el[i] - b_max_el[i]) / v_el[i], tlast);
         }
-        else if (v.el[i] > 0.0f) {
-            if (b->min.el[i] > a->max.el[i])
+        else if (v_el[i] > 0.0f) {
+            if (b_min_el[i] > a_max_el[i])
                 return 0; // Nonintersecting and moving apart
-            if (b->max.el[i] < a->min.el[i])
-                tfirst = fw64_maxf((a->min.el[i] - b->max.el[i]) / v.el[i], tfirst);
-            if (a->max.el[i] > b->min.el[i])
-                tlast = fw64_minf((a->max.el[i] - b->min.el[i]) / v.el[i], tlast);
+            if (b_max_el[i] < a_min_el[i])
+                tfirst = fw64_maxf((a_min_el[i] - b_max_el[i]) / v_el[i], tfirst);
+            if (a_max_el[i] > b_min_el[i])
+                tlast = fw64_minf((a_max_el[i] - b_min_el[i]) / v_el[i], tlast);
         }
         else {
-            if (b->max.el[i] < a->min.el[i] || a->max.el[i] < b->min.el[i])
+            if (b_max_el[i] < a_min_el[i] || a_max_el[i] < b_min_el[i])
                 return 0;
         }
 

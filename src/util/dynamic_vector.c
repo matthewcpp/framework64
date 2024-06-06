@@ -20,7 +20,7 @@ void fw64_dynamic_vector_uninit(fw64DynamicVector* vector) {
 
 static void fw64_dynamic_vector_grow(fw64DynamicVector* vector) {
     if (vector->_capacity > 0) {
-        size_t new_capacity = vector->_capacity * 2;
+        uint16_t new_capacity = vector->_capacity * 2;
         char* new_data = vector->_allocator->malloc(vector->_allocator, new_capacity * vector->_item_size);
         memcpy(new_data, vector->_data, vector->_capacity * vector->_item_size);
         vector->_allocator->free(vector->_allocator, vector->_data);

@@ -93,6 +93,8 @@ int fw64_input_controller_set_rumble(fw64Input* input, int controller, float val
         nuContRmbStart(controller, frequency, 10000);
         input->rumble_time[controller] = duration;
     }
+
+    return 1;
 }
 
 int fw64_input_controller_rumble_active(fw64Input* input, int controller) {

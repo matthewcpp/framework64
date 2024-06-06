@@ -10,7 +10,7 @@
 #include <string>
 #include <unordered_map>
 
-class fw64AssetDatabase {
+struct fw64AssetDatabase {
 public:
     fw64AssetDatabase(std::string const & dir, framework64::ShaderCache& sc)
         : asset_dir(dir), asset_directory(dir), shader_cache(sc){}

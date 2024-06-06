@@ -76,7 +76,7 @@ struct fw64SpriteBatch {
     void begin();
     void end();
 
-    void addSprite(fw64Texture* texture, int x, int y);
+    void addSprite(fw64Texture* texture, float x, float y);
     void addSpriteSlice(fw64Texture* texture, int frame, float x, float y);
     void addSpriteSlice(fw64Texture* texture, int frame, float x, float y, float width, float height);
     void addText(fw64Font* font, float x, float y, const char* text, uint32_t count);

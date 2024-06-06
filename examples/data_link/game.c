@@ -64,7 +64,6 @@ void game_draw(Game* game) {
 }
 
 void draw_data_link_messages(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
     char buffer[64];
 
     int y_pos = 10;

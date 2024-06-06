@@ -19,7 +19,7 @@ bool N64InputInterface::buttonDown(Controller const & current, int button) {
     return buttonIsDown(current, button);
 }
 
-Vec2 N64InputInterface::stick(Controller const & current, int stick_index) {
+Vec2 N64InputInterface::stick(Controller const & current, int) {
     Vec2 result = {0.0f, 0.0f};
 
     result.x = current.axis[SDL_CONTROLLER_AXIS_LEFTX];

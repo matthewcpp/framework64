@@ -166,7 +166,7 @@ void change_sound_bank(Game* game, int delta) {
 }
 
 void change_sound(Game* game, int delta) {
-    int sound_count = fw64_audio_sound_count(game->engine->audio);
+    int sound_count = (int)fw64_audio_sound_count(game->engine->audio);
     game->sound_num += delta;
 
     if (game->sound_num < 0)
@@ -191,7 +191,7 @@ void change_music_bank(Game* game, int delta) {
 }
 
 void change_music_track(Game* game, int delta) {
-    int music_track_count = fw64_audio_music_track_count(game->engine->audio);
+    int music_track_count = (int)fw64_audio_music_track_count(game->engine->audio);
     game->music_track += delta;
 
     if (game->music_track < 0)

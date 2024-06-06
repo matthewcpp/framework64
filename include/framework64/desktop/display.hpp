@@ -4,7 +4,7 @@
 
 #include <SDL2/SDL.h>
 
-class fw64Display {
+struct fw64Display {
 public:
     bool init(const framework64::Settings& settings);
     bool initWithoutWindow(int width, int height);

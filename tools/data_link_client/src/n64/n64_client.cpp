@@ -65,7 +65,7 @@ void N64Client::deviceThread(N64Client* client, const std::string rom_path) {
         client->signalStatus(Status::Failed);
     }
 
-    size_t file_size = std::filesystem::file_size(rom_path);
+    size_t file_size = static_cast<size_t>(std::filesystem::file_size(rom_path));
 
     std::cout << "Uploading rom to development cart..." << std::endl;
 

@@ -8,7 +8,6 @@
 #include <vector>
 
 static GLuint createOpenGLTextureFromSurface(SDL_Surface* surface);
-static GLuint loadOpenGLTextureFromImageFile(std::string const& path);
 static GLuint loadOpenGLTextureFromBuffer(uint8_t* data, size_t size);
 
 /** This class corresponds to ImageHeader in pipeline/desktop/ImageWriter.js */
@@ -20,7 +19,7 @@ struct ImageHeader {
     uint32_t additional_palette_count;
 };
 
-fw64Image* fw64Image::loadFromDatasource(fw64DataSource* data_source, fw64Allocator* allocator) {
+fw64Image* fw64Image::loadFromDatasource(fw64DataSource* data_source, fw64Allocator*) {
     ImageHeader header;
     fw64_data_source_read(data_source, &header, sizeof(ImageHeader), 1);
 
@@ -55,20 +54,6 @@ fw64Image::~fw64Image() {
     for (size_t i = 0; i < palettes.size(); i++) {
         glDeleteTextures(1, &palettes[i]);
     }
-}
-
-GLuint loadOpenGLTextureFromImageFile(std::string const& path) {
-    auto* surface = IMG_Load(path.c_str());
-
-    if (!surface) {
-        return 0;
-    }
-
-    auto openGlHandle = createOpenGLTextureFromSurface(surface);
-
-    SDL_FreeSurface(surface);
-
-    return openGlHandle;
 }
 
 static GLuint loadOpenGLTextureFromBuffer(uint8_t* data, size_t size) {
@@ -213,11 +198,11 @@ fw64Image* fw64_image_load_from_datasource(fw64DataSource* data_source, fw64Allo
     return fw64Image::loadFromDatasource(data_source, allocator);
 }
 
-void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator) {
+void fw64_image_delete(fw64AssetDatabase*, fw64Image* image, fw64Allocator*) {
     delete image;
 }
 
-void fw64_image_load_frame(fw64Image* image, uint32_t frame) {
+void fw64_image_load_frame(fw64Image*, uint32_t) {
     // this is a no-op on desktop
 }
 

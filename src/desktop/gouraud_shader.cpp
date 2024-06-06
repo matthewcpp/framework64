@@ -30,7 +30,7 @@ ShaderProgram* GouraudShader::create(uint32_t primitive_attributes, uint32_t mat
     return program.release();
 }
 
-bool GouraudShader::validateProgram(ShaderProgram* program, uint32_t primitive_attributes, uint32_t material_features) {
+bool GouraudShader::validateProgram(ShaderProgram* program, uint32_t, uint32_t material_features) {
     bool has_diffuse_texture = material_features & fw64Material::Features::DiffuseTexture;
 
     if (    program->lighting_data_uniform_block_index == GL_INVALID_INDEX ||

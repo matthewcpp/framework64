@@ -16,20 +16,20 @@ fw64Texture* fw64_material_get_texture(fw64Material* material) {
     return material->texture;
 }
 
-void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, int initial_frame) {
+void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, uint32_t initial_frame) {
     material->texture = texture;
     material->texture_frame = UINT_MAX;
     fw64_material_set_texture_frame(material, initial_frame);
 }
 
-void fw64_material_set_texture_frame(fw64Material* material, int frame) {
+void fw64_material_set_texture_frame(fw64Material* material, uint32_t frame) {
     if (material->texture && frame != material->texture_frame) {
         fw64_image_load_frame(material->texture->image, frame);
         material->texture_frame = frame;
     }
 }
 
-int fw64_material_get_texture_frame(fw64Material* material) {
+uint32_t fw64_material_get_texture_frame(fw64Material* material) {
     return material->texture_frame;
 }
 

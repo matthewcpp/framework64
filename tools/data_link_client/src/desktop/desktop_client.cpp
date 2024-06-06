@@ -112,15 +112,15 @@ void DesktopClient::onMessage(websocketpp::connection_hdl, WebsocketClient::mess
     enqueueIncomingMessage(message_type, reinterpret_cast<const uint8_t*>(msg->get_payload().c_str()), msg->get_payload().size());
 }
 
-void DesktopClient::onConnectionSuccess(websocketpp::connection_hdl connection_handle) {
-    auto connection = websocket_client.get_con_from_hdl(connection_handle);
+void DesktopClient::onConnectionSuccess(websocketpp::connection_hdl handle) {
+    auto connection = websocket_client.get_con_from_hdl(handle);
     std::cout << "Connected to: " << connection->get_host() << std::endl;
 
     setConnectionStatus(Status::Connected);
 }
 
-void DesktopClient::onConnectionFail(websocketpp::connection_hdl connection_handle) {
-    auto connection = websocket_client.get_con_from_hdl(connection_handle);
+void DesktopClient::onConnectionFail(websocketpp::connection_hdl handle) {
+    auto connection = websocket_client.get_con_from_hdl(handle);
     std::cout << "Failed to connect: " << connection->get_host() << std::endl;
 
     setConnectionStatus(Status::Failed);

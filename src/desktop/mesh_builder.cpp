@@ -84,20 +84,20 @@ bool fw64MeshBuilder::allocatePrimitiveData(size_t index, fw64Primitive::Mode mo
     return true;
 }
 
-bool fw64MeshBuilder::allocatePrimitiveQuadData(size_t index, fw64VertexAttributes vertex_attributes, size_t count) {
+bool fw64MeshBuilder::allocatePrimitiveQuadData(size_t primitive_index, fw64VertexAttributes vertex_attributes, size_t count) {
     auto mode = fw64Primitive::Mode::Triangles;
     const size_t vertex_count = count * 4;
     const size_t element_count = count * 2;
 
-    if (!allocatePrimitiveData(index, mode, vertex_attributes, vertex_count, element_count)) {
+    if (!allocatePrimitiveData(primitive_index, mode, vertex_attributes, vertex_count, element_count)) {
         return false;
     }
 
-    auto& primitive_info = primitive_info_vec[index];
+    auto& primitive_info = primitive_info_vec[primitive_index];
 
-    for (size_t i = 0; i < count; i++) {
-            size_t index = i * 6;
-            size_t vertex = i * 4;
+    for (uint16_t i = 0; i < count; i++) {
+            uint16_t index = i * 6;
+            uint16_t vertex = i * 4;
             primitive_info.primitive_data.indices_array_uint16[index++] = vertex;
             primitive_info.primitive_data.indices_array_uint16[index++] = vertex + 1;
             primitive_info.primitive_data.indices_array_uint16[index++] = vertex + 2;

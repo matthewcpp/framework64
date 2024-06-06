@@ -1,6 +1,7 @@
 set(src_files
     game.h game.c)
 
-    create_game(
-        TARGET texparams
-        SOURCES ${src_files})
+create_game(
+    TARGET texparams
+    SOURCES ${src_files}
+    ALL_WARNINGS_AS_ERRORS)

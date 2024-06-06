@@ -59,7 +59,7 @@ void game_draw(Game* game) {
 void set_texture_mode(Game* game, Mode mode) {
     game->mode = mode;
 
-    fw64TextureWrapMode wrap_mode;
+    fw64TextureWrapMode wrap_mode = FW64_TEXTURE_WRAP_CLAMP;
     fw64TexturedQuadParams params;
     fw64_textured_quad_params_init(&params);
     params.image_asset_id = FW64_ASSET_image_pyoro64;

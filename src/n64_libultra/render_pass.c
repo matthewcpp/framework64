@@ -31,7 +31,7 @@ void fw64_renderpass_begin(fw64RenderPass* renderpass) {
 }
 
 void fw64_renderpass_end(fw64RenderPass* renderpass) {
-
+    (void)renderpass;
 }
 
 void fw64_renderpass_set_view_matrix(fw64RenderPass* pass, float* view) {
@@ -71,8 +71,11 @@ void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh
     fw64_n64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh, transform);
 }
 
-void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
-
+void fw64_renderpass_draw_animated_mesh(fw64RenderPass* pass, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
+    (void)pass;
+    (void)mesh;
+    (void)controller;
+    (void)transform;
 }
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* sprite_batch) {

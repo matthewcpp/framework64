@@ -67,6 +67,8 @@ uint32_t fw64_n64_image_get_data_size(fw64Image* image) {
     case FW64_N64_IMAGE_FORMAT_CI4:
         return (image->info.width * image->info.height) / 2;
     }
+
+    return 0;
 }
 
 uint32_t fw64_n64_image_get_frame_size(fw64Image* image) {
@@ -74,7 +76,7 @@ uint32_t fw64_n64_image_get_frame_size(fw64Image* image) {
 }
 
 int fw64_n64_image_init_dma_mode(fw64Image* image, int handle, uint32_t rom_address, fw64Allocator* allocator) {
-    int bytes_read = fw64_filesystem_read(&image->info, sizeof(fw64N64ImageInfo), 1, handle);
+    fw64_filesystem_read(&image->info, sizeof(fw64N64ImageInfo), 1, handle);
 
     if (image->info.palette_count > 0) {
         return 0;
@@ -126,7 +128,7 @@ int fw64_n64_image_read_data(fw64Image* image, fw64DataSource* data_source, fw64
     return 1;
 }
 
-void fw64_image_delete(fw64AssetDatabase* asset_database, fw64Image* image, fw64Allocator* allocator) {
+void fw64_image_delete(fw64AssetDatabase*, fw64Image* image, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
     allocator->free(allocator, image->data);
 

@@ -57,7 +57,7 @@ typedef struct {
     uint32_t sequence_bank_size; // this is currently unused
 } fw64MusicHeader;
 
-int fw64_audio_load_soundbank_asset(fw64Audio* audio, fw64AssetDatabase* asset_database, fw64AssetId asset_id) {
+int fw64_audio_load_soundbank_asset(fw64Audio* audio, fw64AssetDatabase*, fw64AssetId asset_id) {
     int handle = fw64_filesystem_open(asset_id);
 
     if (handle < 0) {
@@ -124,12 +124,12 @@ fw64AudioStatus fw64_audio_get_sound_status(fw64Audio* audio, int handle) {
     return FW64_AUDIO_STOPPED;
 }
 
-int fw64_audio_sound_count(fw64Audio* audio) {
+uint32_t fw64_audio_sound_count(fw64Audio* audio) {
     return audio->sound_bank.song_count;
 
 }
 
-int fw64_audio_load_musicbank_asset(fw64Audio* audio, fw64AssetDatabase* asset_database, fw64AssetId asset_id) {
+int fw64_audio_load_musicbank_asset(fw64Audio* audio, fw64AssetDatabase*, fw64AssetId asset_id) {
     // load the music bank header which contains sequence info and also the asset ID of the sound bank
     int handle = fw64_filesystem_open(asset_id);
 
@@ -170,6 +170,8 @@ int fw64_audio_load_musicbank_asset(fw64Audio* audio, fw64AssetDatabase* asset_d
     fw64_audio_stop_music(audio);
     nuAuSeqPlayerBankSet((u8*)music_bank->ctrl_file_address, music_bank->ctrl_file_size, (u8*)music_bank->tbl_file_address);
     nuAuSeqPlayerSeqSet((u8*)music_bank->seq_file_address);
+
+    return 1;
 }
 
 void fw64_audio_unload_musicbank(fw64Audio* audio) {
@@ -205,7 +207,7 @@ fw64AudioStatus fw64_audio_get_music_status(fw64Audio* audio) {
     return audio->music_status;
 }
 
-int fw64_audio_music_track_count(fw64Audio* audio) {
+uint32_t fw64_audio_music_track_count(fw64Audio* audio) {
     return audio->music_bank.track_count;
 }
 

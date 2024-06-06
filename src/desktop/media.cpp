@@ -42,7 +42,7 @@ fw64MediaDirItr* fw64_media_open_dir(fw64Media* media, const char* path) {
     return &media->dir_itr;
 }
 
-void fw64_media_close_dir(fw64Media* media, fw64MediaDirItr* itr) {
+void fw64_media_close_dir(fw64Media* media, fw64MediaDirItr*) {
     media->dir_itr.path.clear();
 }
 
@@ -93,7 +93,7 @@ fw64DataSource* fw64_media_open_data_source(fw64Media* media, const char* path) 
     return &media->data_source.interface;
 }
 
-void fw64_media_close_data_source(fw64Media* media, fw64DataSource* data_source) {
+void fw64_media_close_data_source(fw64Media* media, fw64DataSource*) {
     media->data_source.file.close();
 }
 
@@ -115,7 +115,7 @@ fw64DataWriter* fw64_media_open_data_writer(fw64Media* media, const char* path) 
     return &media->data_writer.interface;
 }
 
-void fw64_media_close_data_writer(fw64Media* media, fw64DataWriter* data_writer) {
+void fw64_media_close_data_writer(fw64Media* media, fw64DataWriter*) {
     media->data_writer.file.close();
 }
 

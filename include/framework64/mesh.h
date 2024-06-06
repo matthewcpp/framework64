@@ -45,7 +45,7 @@ void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* assets, fw64Allocator* 
 Box fw64_mesh_get_bounding_box(fw64Mesh* mesh);
 int fw64_mesh_get_primitive_count(fw64Mesh* mesh);
 
-fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, int index);
+fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index);
 
 #ifdef __cplusplus
 }

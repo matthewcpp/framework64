@@ -16,7 +16,7 @@ void fw64_n64_usb_message_stream_reset(fw64N64UsbMessageStream* stream, uint32_t
 size_t fw64_n64_usb_message_stream_size(fw64DataSource* stream);
 size_t fw64_n64_usb_message_stream_read(fw64DataSource* stream, void* buffer, size_t size, size_t count);
 
-#define FW64_N64_DATALINK_MAX_MESSAGE_SIZE 128U
+#define FW64_N64_DATALINK_MAX_MESSAGE_SIZE 128
 #define FW64_N64_DATALINK_MAX_MESSAGE_COUNT 5
 
 typedef struct {

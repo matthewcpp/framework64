@@ -4,6 +4,7 @@
 #include "framework64/desktop/asset_database.hpp"
 
 #include <array>
+#include <cstdint>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -32,7 +33,7 @@ private:
     std::string base_path;
     fw64AssetDatabase& database;
     std::array<std::ifstream, FW64_FILESYSTEM_MAX_OPEN_FILES> file_handles;
-    std::array<int, FW64_FILESYSTEM_MAX_OPEN_FILES> file_sizes;
+    std::array<uintmax_t, FW64_FILESYSTEM_MAX_OPEN_FILES> file_sizes;
 
     static std::unique_ptr<Filesystem> instance;
 };

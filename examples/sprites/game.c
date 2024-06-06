@@ -12,7 +12,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->engine = engine;
     game->render_pass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), allocator);
-    IVec2 display_size = fw64_display_get_size(display);
+    Vec2 display_size = fw64_display_get_size_f(display);
     float matrix[16];
     matrix_ortho2d(matrix, 0, display_size.x, display_size.y, 0);
     fw64_renderpass_set_projection_matrix(game->render_pass, matrix, NULL);

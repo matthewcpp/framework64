@@ -3,9 +3,15 @@
     "runArgs": [
         "--net=host"
     ],
-    "extensions": [
-        "ms-vscode.cpptools",
-        "coolchyni.beyond-debug",
-        "ms-vscode.cmake-tools"
-    ]
+    "customizations": {
+        "vscode": {
+            "settings": {
+				"extensions.verifySignature": false
+			},
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools"
+            ]
+        }
+    }
 }

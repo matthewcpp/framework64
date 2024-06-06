@@ -4,7 +4,7 @@
 
 namespace framework64 {
 
-ShaderProgram* LineShader::create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) {
+ShaderProgram* LineShader::create(uint32_t, uint32_t, std::string const & shader_dir) {
     std::string const vertex_path = shader_dir + "line.vert.glsl";
     std::string const frag_path = shader_dir + "line.frag.glsl";
 
@@ -26,7 +26,7 @@ ShaderProgram* LineShader::create(uint32_t primitive_attributes, uint32_t materi
     return program.release();
 }
 
-void LineShader::setUniforms(ShaderProgram* program, fw64Material const & material) {
+void LineShader::setUniforms(ShaderProgram*, fw64Material const & material) {
     glUniform4fv(material.shader->diffuse_color_location, 1, material.color.data());
 }
 

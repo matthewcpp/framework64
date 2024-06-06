@@ -294,7 +294,7 @@ int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint
 
     uint32_t node_count = fw64_scene_get_node_count(scene);
 
-    for (int i = 0; i < node_count; i++) {
+    for (uint32_t i = 0; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
         if (!node->collider || !(node->layer_mask & mask))
@@ -319,7 +319,7 @@ int fw64_scene_moving_sphere_intersection(fw64Scene* scene, Vec3* center, float 
 
     uint32_t node_count = fw64_scene_get_node_count(scene);
 
-    for (int i = 0; i < node_count; i++) {
+    for (uint32_t i = 0; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
         if (!node->collider || !(node->layer_mask & mask))
@@ -344,7 +344,7 @@ int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocit
 
     uint32_t node_count = fw64_scene_get_node_count(scene);
 
-    for (int i = 0; i < node_count; i++) {
+    for (uint32_t i = 0; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
         if (!node->collider || !(node->layer_mask & mask))
@@ -368,7 +368,7 @@ uint32_t fw64_scene_find_nodes_with_layer_mask(fw64Scene* scene, uint32_t layer_
 
         uint32_t node_count = fw64_scene_get_node_count(scene);
 
-    for (int i = 0; i < node_count; i++) {
+    for (uint32_t i = 0; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
         if (node->layer_mask & layer_mask) {
@@ -416,7 +416,7 @@ fw64Collider* fw64_scene_get_collider(fw64Scene* scene, uint32_t index) {
     return &scene->colliders[index];
 }
 
-uint32_t fw64_scene_get_collider_count(fw64Scene* scene, uint32_t index) {
+uint32_t fw64_scene_get_collider_count(fw64Scene* scene) {
     return scene->info.collider_count;
 }
 

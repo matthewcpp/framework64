@@ -59,7 +59,7 @@ void init_scene(Game* game) {
     fw64Mesh* mesh = fw64_scene_load_mesh_asset(scene, FW64_ASSET_mesh_blue_cube, 0);
     float x_pos = -3.0f;
 
-    for (int i = 0; i < info.node_count; i++) {
+    for (uint32_t i = 0; i < info.node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
         fw64_node_set_mesh(node, mesh);
         vec3_set(&node->transform.position, x_pos, 0.0f, 0.0f);
@@ -102,7 +102,7 @@ void init_overlay(Game* game) {
     fw64_renderpass_set_depth_testing_enabled(game->overlay.renderpass, 0);
 
     float projection_matrix[16];
-    matrix_ortho2d(projection_matrix, 0, display_size.x, display_size.y, 0);
+    matrix_ortho2d(projection_matrix, 0, (float)display_size.x, (float)display_size.y, 0);
     fw64_renderpass_set_projection_matrix(game->overlay.renderpass, projection_matrix, NULL);
 
     fw64_renderpass_begin(game->overlay.renderpass);

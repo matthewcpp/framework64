@@ -13,7 +13,7 @@ void ui_init(UI* ui, fw64Engine* engine, Player* player) {
 
 void ui_update(UI* ui) {
     Vec3* pos = &ui->player->node.transform.position;
-    const char* status_text;
+    const char* status_text = "";
 
     switch (ui->player->state) {
         case PLAYER_STATE_ON_GROUND:

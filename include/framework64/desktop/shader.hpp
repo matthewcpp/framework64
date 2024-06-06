@@ -14,7 +14,7 @@
 
 namespace framework64 {
 
-class ShaderProgram;
+struct ShaderProgram;
 
 class Shader {
 public:

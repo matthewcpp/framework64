@@ -40,7 +40,7 @@ void camera_common_init(fw64Camera* camera, fw64Display* display) {
     fw64_camera_update_projection_matrix(camera);
     fw64_camera_update_view_matrix(camera);
 
-    IVec2 pos = {0.0f, 0.0f};
+    IVec2 pos = {0, 0};
     IVec2 size = fw64_display_get_size(display);
     fw64_camera_set_viewport(camera, &pos, &size);
 }
@@ -118,8 +118,9 @@ static void _temp_camera_compute_view_projection(fw64Camera* camera, float* view
 int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3* ray_origin, Vec3* ray_direction) {
     float view[16], proj[16];
     _temp_camera_compute_view_projection(camera, view, proj);
+    Vec2 display_size = fw64_display_get_size_f(camera->display);
 
-    Vec3 viewport_pt = {window_pos->x, fw64_display_get_size(camera->display).y - window_pos->y, 0.0f}, far_pt;
+    Vec3 viewport_pt = {(float)window_pos->x, display_size.y - (float)window_pos->y, 0.0f}, far_pt;
     fw64_matrix_unproject(&viewport_pt, view, proj, &camera->viewport.position, &camera->viewport.size, ray_origin);
 
     viewport_pt.z = 1.0f;

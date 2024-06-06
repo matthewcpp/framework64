@@ -29,8 +29,8 @@ void flame_update(Flame* flame, float time_delta) {
 
         fw64Material* material = fw64_mesh_get_material_for_primitive(flame->entity.mesh, 0);
         fw64Texture* texture = fw64_material_get_texture(material);
-        int frameCount = fw64_texture_hslices(texture) * fw64_texture_vslices(texture);
-        int current_tex_frame = fw64_material_get_texture_frame(material);
+        uint32_t frameCount = fw64_texture_hslices(texture) * fw64_texture_vslices(texture);
+        uint32_t current_tex_frame = fw64_material_get_texture_frame(material);
         fw64_material_set_texture_frame(material, (current_tex_frame + 1) % frameCount);
     }
 }

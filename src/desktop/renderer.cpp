@@ -105,7 +105,7 @@ void fw64Renderer::begin(fw64PrimitiveMode mode, fw64RendererFlags flags) {
 }
 
 fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Viewport const * viewport) const {
-    float bottom = viewport->position.y + viewport->size.y;
+    float bottom = static_cast<float>(viewport->position.y + viewport->size.y);
 
     return {
         static_cast<GLint>(viewport->position.x ),
@@ -197,7 +197,7 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
     }
 }
 
-void fw64Renderer::end(fw64RendererFlags flags) {
+void fw64Renderer::end(fw64RendererFlags) {
     setDrawingMode(DrawingMode::None);
 
     current_camera = nullptr;

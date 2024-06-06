@@ -4,4 +4,5 @@ set(src_files
 
 create_game(
     TARGET sprites
-    SOURCES ${src_files})
+    SOURCES ${src_files}
+    ALL_WARNINGS_AS_ERRORS)

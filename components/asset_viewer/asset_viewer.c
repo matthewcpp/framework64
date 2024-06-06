@@ -132,11 +132,11 @@ void unknown_state_init(fw64AssetViewerUnknownState* state, const char* message,
 }
 
 void unknown_state_uninit(fw64AssetViewerUnknownState* state) {
-
+    (void)state;
 }
 
 void unknown_state_update(fw64AssetViewerUnknownState* state) {
-
+    (void)state;
 }
 
 void unknown_state_draw(fw64AssetViewerUnknownState* state) {

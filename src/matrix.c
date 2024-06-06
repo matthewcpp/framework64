@@ -376,7 +376,7 @@ void matrix_get_rotation(float* mat, Quat* out) {
     if (trace > 0) {
         S = fw64_sqrtf(trace + 1.0f) * 2;
 
-        out->w = 0.25 * S;
+        out->w = 0.25f * S;
         out->x = (sm23 - sm32) / S;
         out->y = (sm31 - sm13) / S;
         out->z = (sm12 - sm21) / S;
@@ -384,7 +384,7 @@ void matrix_get_rotation(float* mat, Quat* out) {
         S = fw64_sqrtf(1.0f + sm11 - sm22 - sm33) * 2;
 
         out->w = (sm23 - sm32) / S;
-        out->x = 0.25 * S;
+        out->x = 0.25f * S;
         out->y = (sm12 + sm21) / S;
         out->z = (sm31 + sm13) / S;
     } else if (sm22 > sm33) {

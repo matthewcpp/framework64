@@ -139,8 +139,8 @@ void fw64_audio_unload_soundbank(fw64Audio* audio) {
     audio->unloadSoundBank();
 }
 
-int fw64_audio_sound_count(fw64Audio* audio) {
-    return static_cast<int>(audio->soundCount());
+uint32_t fw64_audio_sound_count(fw64Audio* audio) {
+    return static_cast<uint32_t>(audio->soundCount());
 }
 
 int fw64_audio_play_sound(fw64Audio* audio, uint32_t sound_num) {
@@ -178,11 +178,11 @@ void fw64_audio_set_music_volume(fw64Audio* audio, float volume) {
     Mix_VolumeMusic(static_cast<int>(volume * MIX_MAX_VOLUME));
 }
 
-int fw64_audio_music_track_count(fw64Audio* audio) {
-    return audio->musicTrackCount();
+uint32_t fw64_audio_music_track_count(fw64Audio* audio) {
+    return static_cast<uint32_t>(audio->musicTrackCount());
 }
 
-fw64AudioStatus fw64_audio_get_music_status(fw64Audio* audio) {
+fw64AudioStatus fw64_audio_get_music_status(fw64Audio*) {
     return Mix_PlayingMusic() ? FW64_AUDIO_PLAYING : FW64_AUDIO_STOPPED;
 }
 

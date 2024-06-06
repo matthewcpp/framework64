@@ -4,7 +4,8 @@ set(src_files
 create_game(
     TARGET media
     SOURCES ${src_files}
-    EXTRA_LIBS fw64_components)
+    EXTRA_LIBS fw64_components
+    ALL_WARNINGS_AS_ERRORS)
 
 # Note this is used here to avoid a clash with the media directory having the same name as the example executable
 if (FW64_PLATFORM_DESKTOP)

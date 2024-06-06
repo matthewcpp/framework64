@@ -2,11 +2,11 @@
 
 namespace framework64 {
 
-void FillShader::setUniforms(ShaderProgram* program, fw64Material const & material) {
+void FillShader::setUniforms(ShaderProgram*, fw64Material const &) {
 
 }
 
-ShaderProgram* FillShader::create(uint32_t primitive_attributes, uint32_t material_features, std::string const & shader_dir) {
+ShaderProgram* FillShader::create(uint32_t, uint32_t, std::string const & shader_dir) {
     std::string vertex_path = shader_dir + "fill.vert.glsl";
     std::string fragment_path = shader_dir + "fill.frag.glsl";
 

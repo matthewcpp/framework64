@@ -20,7 +20,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->sprite_batch = fw64_spritebatch_create(1, allocator);
     set_active_font(game, 0);
 
-    IVec2 display_size = fw64_display_get_size(display);
+    Vec2 display_size = fw64_display_get_size_f(display);
     float matrix[16];
     matrix_ortho2d(matrix, 0, display_size.x, display_size.y, 0);
 

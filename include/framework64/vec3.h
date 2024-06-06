@@ -7,12 +7,7 @@ extern "C" {
 #endif
 
 typedef struct {
-    union {
-        struct {
-            float x, y, z;
-        };
-        float el[3];
-    };
+    float x, y, z;
 } Vec3;
 
 void vec3_zero(Vec3* v);
