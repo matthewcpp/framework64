@@ -5,7 +5,8 @@
 
 #define FW64_MESH_RESOURCES_HEADER_SIZE 3 * sizeof(uint32_t)
 
-fw64MaterialBundle* fw64_material_bundle_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase*, fw64Allocator* allocator) {
+fw64MaterialBundle* fw64_material_bundle_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase* assets, fw64Allocator* allocator) {
+    (void)assets;
     fw64MaterialBundle* resources = allocator->malloc(allocator, sizeof(fw64MaterialBundle));
     fw64_data_source_read(data_source, resources, FW64_MESH_RESOURCES_HEADER_SIZE, 1);
     resources->flags = 0;

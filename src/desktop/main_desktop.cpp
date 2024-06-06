@@ -1,4 +1,4 @@
-#include "game.h"
+#include "${game_include_path}"
 
 #include "framework64/desktop/engine.hpp"
 #include "framework64/desktop/input.hpp"

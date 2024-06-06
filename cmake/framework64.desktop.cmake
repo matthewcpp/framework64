@@ -59,14 +59,24 @@ endfunction()
 # performs platform specific configuration of a framework64 game
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
-    set(oneValueArgs TARGET SAVE_FILE_TYPE)
+    set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
     set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     set(target_name ${DESKTOP_GAME_TARGET})
     set(game_sources ${DESKTOP_GAME_SOURCES})
 
-    add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
+    if (DEFINED DESKTOP_GAME_GAME_HEADER_PATH)
+        set(game_include_path ${DESKTOP_GAME_GAME_HEADER_PATH})
+    else()
+        set(game_include_path "game.h")
+    endif()
+
+    set(main_file_src ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
+    set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_desktop_${target_name}.cpp)
+    configure_file(${main_file_src} ${main_file_dest})
+
+    add_executable(${target_name} ${game_sources} ${main_file_dest})
     target_link_libraries(${target_name} PUBLIC framework64)
 
     if (${DESKTOP_GAME_ALL_WARNINGS_AS_ERRORS})

@@ -1,4 +1,4 @@
-#include "game.h"
+#include "${game_include_path}"
 #include "framework64/n64_libultra/engine.h"
 
 #include "assets/assets.h"

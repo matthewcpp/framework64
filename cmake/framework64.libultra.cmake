@@ -50,7 +50,7 @@ endfunction()
 # performs platform specific configuration of a framework64 game
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
-    set(oneValueArgs TARGET SAVE_FILE_TYPE)
+    set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
     set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(N64_ROM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -89,7 +89,17 @@ function(create_game)
 		${asm_dest_dir}/asset_data.s
 	)
 
-    add_executable(${target_name} ${game_sources} ${FW64_ROOT_DIR}/src/n64_libultra/main_n64.c ${asm_files})
+    if (DEFINED N64_ROM_GAME_HEADER_PATH)
+        set(game_include_path ${N64_ROM_GAME_HEADER_PATH})
+    else()
+        set(game_include_path "game.h")
+    endif()
+
+    set(main_file_src ${FW64_ROOT_DIR}/src/n64_libultra/main_n64.c)
+    set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_n64_${target_name}.c)
+    configure_file(${main_file_src} ${main_file_dest})
+    
+    add_executable(${target_name} ${game_sources} ${main_file_dest} ${asm_files})
 
     # Include the game specific asset directory
     target_include_directories(${target_name} PUBLIC ${game_asset_dir}/include)

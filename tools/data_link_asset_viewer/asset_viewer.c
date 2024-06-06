@@ -1,4 +1,4 @@
-#include "game.h"
+#include "asset_viewer.h"
 #include "assets/assets.h"
 
 #include "framework64/controller_mapping/n64.h"
