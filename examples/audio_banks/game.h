@@ -46,6 +46,7 @@ void ui_init(UI* ui, fw64Engine* engine, AudioState* audio_state);
 void ui_draw(UI* ui);
 
 typedef struct {
+    fw64Engine* engine;
     AudioState audio_state;
     SceneView scene_view;
     Controller controller;

@@ -1,6 +1,7 @@
 #include "game.h"
 #include "assets/assets.h"
 
+#include "framework64/matrix.h"
 #include "framework64/node.h"
 #include "framework64/util/quad.h"
 #include "framework64/util/texture_util.h"
@@ -23,9 +24,7 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
-
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
     scene_view_draw(&game->scene_view);
     ui_draw(&game->ui);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
@@ -75,177 +74,193 @@ void scene_view_draw(SceneView* scene_view) {
 static int sound_banks[SOUND_BANK_COUNT] = { FW64_ASSET_soundbank_soundbank1, FW64_ASSET_soundbank_soundbank2 };
 static int music_banks[MUSIC_BANK_COUNT] = { FW64_ASSET_musicbank_musicbank1, FW64_ASSET_musicbank_musicbank2 };
 
-static void controller_change_sound_bank(Game* game, int delta) {
-    game->sound_bank += delta;
+static void controller_change_sound_bank(Controller* controller, int delta) {
+    controller->audio_state->sound_bank += delta;
 
-    if (game->sound_bank < 0) {
-        game->sound_bank = 0;
+    if (controller->audio_state->sound_bank < 0) {
+        controller->audio_state->sound_bank = 0;
     }
 
-    if (game->sound_bank >= SOUND_BANK_COUNT) {
-        game->sound_bank = SOUND_BANK_COUNT - 1;
+    if (controller->audio_state->sound_bank >= SOUND_BANK_COUNT) {
+        controller->audio_state->sound_bank = SOUND_BANK_COUNT - 1;
     }
 
-    fw64_audio_load_soundbank_asset(game->engine->audio, game->engine->assets, sound_banks[game->sound_bank]);
+    fw64_audio_load_soundbank_asset(controller->engine->audio, controller->engine->assets, sound_banks[controller->audio_state->sound_bank]);
 
-    game->sound_num = 0;
+    controller->audio_state->sound_num = 0;
 }
 
-static void controller_change_sound(Game* game, int delta) {
-    int sound_count = (int)fw64_audio_sound_count(game->engine->audio);
-    game->sound_num += delta;
+static void controller_change_sound(Controller* controller, int delta) {
+    int sound_count = (int)fw64_audio_sound_count(controller->engine->audio);
+    controller->audio_state->sound_num += delta;
 
-    if (game->sound_num < 0) {
-        game->sound_num = 0;
+    if (controller->audio_state->sound_num < 0) {
+        controller->audio_state->sound_num = 0;
     }
 
-    if (game->sound_num >= sound_count) {
-        game->sound_num = sound_count - 1;
-    }
-}
-
-static void controller_change_music_bank(Game* game, int delta) {
-    game->music_bank += delta;
-
-    if (game->music_bank < 0) {
-        game->music_bank = 0;
-    }
-
-    if (game->music_bank >= MUSIC_BANK_COUNT) {
-        game->music_bank = MUSIC_BANK_COUNT - 1;
-    }
-
-    fw64_audio_load_musicbank_asset(game->engine->audio, game->engine->assets,  music_banks[game->music_bank]);
-
-    game->music_track = 0;
-}
-
-static void controller_change_music_track(Game* game, int delta) {
-    int music_track_count = (int)fw64_audio_music_track_count(game->engine->audio);
-    game->music_track += delta;
-
-    if (game->music_track < 0) {
-        game->music_track = 0;
-    }
-
-    if (game->music_track >= music_track_count) {
-        game->music_track = music_track_count - 1;
+    if (controller->audio_state->sound_num >= sound_count) {
+        controller->audio_state->sound_num = sound_count - 1;
     }
 }
 
-void controller_init(Controller* controller, fw64Engine* engine, AudioInfo* info){
+static void controller_change_music_bank(Controller* controller, int delta) {
+    controller->audio_state->music_bank += delta;
+
+    if (controller->audio_state->music_bank < 0) {
+        controller->audio_state->music_bank = 0;
+    }
+
+    if (controller->audio_state->music_bank >= MUSIC_BANK_COUNT) {
+        controller->audio_state->music_bank = MUSIC_BANK_COUNT - 1;
+    }
+
+    fw64_audio_load_musicbank_asset(controller->engine->audio, controller->engine->assets,  music_banks[controller->audio_state->music_bank]);
+
+    controller->audio_state->music_track = 0;
+}
+
+static void controller_change_music_track(Controller* controller, int delta) {
+    int music_track_count = (int)fw64_audio_music_track_count(controller->engine->audio);
+    controller->audio_state->music_track += delta;
+
+    if (controller->audio_state->music_track < 0) {
+        controller->audio_state->music_track = 0;
+    }
+
+    if (controller->audio_state->music_track >= music_track_count) {
+        controller->audio_state->music_track = music_track_count - 1;
+    }
+}
+
+void controller_init(Controller* controller, fw64Engine* engine, AudioState* audio_state){
     controller->engine = engine;
+    controller->audio_state = audio_state;
 
-    controller->sound_bank = -1;
-    controller_change_sound_bank(game, 1);
+    controller->audio_state->sound_bank = -1;
+    controller_change_sound_bank(controller, 1);
 
-    controller->music_bank = -1;
-    controller_change_music_bank(game, 1);
+    controller->audio_state->music_bank = -1;
+    controller_change_music_bank(controller, 1);
 }
 
 void controller_update(Controller* controller) {
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_A))
-        controller->sound_id = fw64_audio_play_sound(controller->engine->audio, controller->sound_num);
+        controller->audio_state->sound_id = fw64_audio_play_sound(controller->engine->audio, controller->audio_state->sound_num);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_B))
-        fw64_audio_stop_sound(controller->engine->audio, controller->sound_id);
+        fw64_audio_stop_sound(controller->engine->audio, controller->audio_state->sound_id);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT))
-        change_sound(controller, 1);
+        controller_change_sound(controller, 1);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT))
-        change_sound(controller, -1);
+        controller_change_sound(controller, -1);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP))
-        change_sound_bank(controller, 1);
+        controller_change_sound_bank(controller, 1);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_DOWN))
-        change_sound_bank(controller, -1);
+        controller_change_sound_bank(controller, -1);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START))
-        fw64_audio_play_music(controller->engine->audio, controller->music_track);
+        fw64_audio_play_music(controller->engine->audio, controller->audio_state->music_track);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z))
         fw64_audio_stop_music(controller->engine->audio);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT))
-        change_music_track(controller, 1);
+        controller_change_music_track(controller, 1);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT))
-        change_music_track(controller, -1);
+        controller_change_music_track(controller, -1);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_UP))
-        change_music_bank(controller, 1);
+        controller_change_music_bank(controller, 1);
 
     if (fw64_input_controller_button_pressed(controller->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN))
-        change_music_bank(controller, -1);
+        controller_change_music_bank(controller, -1);
 }
 
 // --- UI
 
 static void draw_sound_controls(UI* ui) {
-    fw64Renderer* renderer = ui->engine->renderer;
+    fw64SpriteBatch* sprite_batch = ui->sprite_batch;
     char buffer[32];
 
-    fw64_renderer_draw_text(renderer, ui->font, 10, 10, "Sounds");
-    fw64_renderer_draw_text(renderer, ui->font, 10, 25, "Bank:");
-    sprintf(buffer, "%d", ui->sound_bank);
-    fw64_renderer_draw_text(renderer, ui->font, 70, 25, buffer);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Sounds", 10, 10);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Bank:", 10, 25);
+    sprintf(buffer, "%d", ui->audio_state->sound_bank);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, buffer, 70, 25);
 
-    fw64_renderer_draw_text(renderer, ui->font, 10, 40, "Sound:");
-    sprintf(buffer, "%d", ui->sound_num);
-    fw64_renderer_draw_text(renderer, ui->font, 70, 40, buffer);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Sound:", 10, 40);
+    sprintf(buffer, "%d", ui->audio_state->sound_num);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, buffer, 70, 40);
 
-    fw64_renderer_draw_text(renderer, ui->font, 30, 55, "Play");
-    fw64_renderer_draw_text(renderer, ui->font, 30, 70, "Stop");
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Play", 30, 55);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Stop", 30, 70);
 
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 3, 53, 25);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 2, 80, 25);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 4, 53, 40);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 5, 80, 40);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 3, 53, 25);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 2, 80, 25);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 4, 53, 40);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 5, 80, 40);
 
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 0, 10, 55);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 1, 10, 70);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 0, 10, 55);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 1, 10, 70);
 }
 
 static void draw_music_controls(UI* ui) {
-    fw64Renderer* renderer = ui->engine->renderer;
+    fw64SpriteBatch* sprite_batch = ui->sprite_batch;
     char buffer[32];
 
     int offset = 200;
 
-    fw64_renderer_draw_text(renderer, ui->font, offset + 10, 10, "Music");
-    fw64_renderer_draw_text(renderer, ui->font, offset + 10, 25, "Bank:");
-    sprintf(buffer, "%d", ui->music_bank);
-    fw64_renderer_draw_text(renderer, ui->font, offset + 70, 25, buffer);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Music", offset + 10, 10);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Bank:", offset + 10, 25);
+    sprintf(buffer, "%d", ui->audio_state->music_bank);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, buffer, offset + 70, 25);
 
-    fw64_renderer_draw_text(renderer, ui->font, offset + 10, 40, "Track:");
-    sprintf(buffer, "%d", ui->music_track);
-    fw64_renderer_draw_text(renderer, ui->font, offset + 70, 40, buffer);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Track:", offset + 10, 40);
+    sprintf(buffer, "%d", ui->audio_state->music_track);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, buffer, offset + 70, 40);
 
-    fw64_renderer_draw_text(renderer, ui->font, offset + 30, 55, "Play");
-    fw64_renderer_draw_text(renderer, ui->font, offset + 30, 70, "Stop");
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Play", offset + 30, 55);
+    fw64_spritebatch_draw_string(sprite_batch, ui->font, "Stop", offset + 30, 70);
 
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 8, offset + 53, 25);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 9, offset + 80, 25);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 10, offset + 53, 40);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 11, offset + 80, 40);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 8, offset + 53, 25);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 9, offset + 80, 25);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 10, offset + 53, 40);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 11, offset + 80, 40);
 
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 12, offset + 10, 55);
-    fw64_renderer_draw_sprite_slice(renderer, ui->buttons, 13, offset + 10, 70);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 12, offset + 10, 55);
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, ui->buttons, 13, offset + 10, 70);
 }
 
-void void ui_init(UI* ui, fw64Engine* engine, AudioInfo* info) {
+void ui_init(UI* ui, fw64Engine* engine, AudioState* audio_state) {
     fw64Allocator* allocator = fw64_default_allocator();
     fw64Display* display = fw64_displays_get_primary(engine->displays);
+    Vec2 display_size = fw64_display_get_size_f(display);
 
     ui->engine = engine;
     ui->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     ui->buttons = fw64_texture_util_create_from_loaded_image(engine->assets, FW64_ASSET_image_buttons, allocator);
-    ui->renderpass = fw64_renderpass_create(display, allocator);
     ui->sprite_batch = fw64_spritebatch_create(1, allocator);
+    ui->audio_state = audio_state;
+
+    ui->renderpass = fw64_renderpass_create(display, allocator);
+    float matrix[16];
+    matrix_ortho2d(matrix, 0, display_size.x, display_size.y, 0);
+    fw64_renderpass_set_projection_matrix(ui->renderpass, matrix, NULL);
 }
 
 void ui_draw(UI* ui) {
+    fw64_spritebatch_begin(ui->sprite_batch);
+    draw_sound_controls(ui);
+    draw_music_controls(ui);
+    fw64_spritebatch_end(ui->sprite_batch);
 
+    fw64_renderpass_begin(ui->renderpass);
+    fw64_renderpass_draw_sprite_batch(ui->renderpass, ui->sprite_batch);
+    fw64_renderpass_end(ui->renderpass);
+
+    fw64_renderer_submit_renderpass(ui->engine->renderer, ui->renderpass);
 }
