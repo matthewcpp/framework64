@@ -142,6 +142,7 @@
         "stdint.h": "c",
         "render_pass.h": "c",
         "matrix.h": "c",
-        "sprite_batch.h": "c"
+        "sprite_batch.h": "c",
+        "texture_util.h": "c"
     }
 }
