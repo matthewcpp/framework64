@@ -5,7 +5,7 @@
 #include "framework64/engine.h"
 
 typedef struct {
-    fw64Node entity;
+    fw64Node* entity;
     float update_time_remaining;
     fw64Texture* texture;
 } Flame;
@@ -14,7 +14,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void flame_init(Flame* flame, fw64Engine* engine);
+void flame_init(Flame* flame, fw64Engine* engine, fw64Node* node);
 void flame_update(Flame* flame, float time_delta);
 void flame_draw(Flame* flame, fw64Renderer* renderer);
 

@@ -3,8 +3,8 @@
 #include "flame.h"
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
-
+#include "framework64/render_pass.h"
+#include "framework64/scene.h"
 #include "framework64/util/quad.h"
 
 #include "fps_camera/fps_camera.h"
@@ -16,6 +16,8 @@ typedef struct {
     fw64Node ground;
     fw64Node moon;
     Flame flame;
+    fw64Scene scene;
+    fw64RenderPass* renderpass;
 } Game;
 
 #ifdef __cplusplus
