@@ -9,7 +9,7 @@
 #include "framework64/quat.h"
 #include "framework64/query.h"
 #include "framework64/collision.h"
-#include "framework64/renderer.h"
+#include "framework64/render_pass.h"
 #include "framework64/vec3.h"
 
 typedef struct fw64AssetDatabase fw64AssetDatabase;
@@ -57,8 +57,8 @@ Box* fw64_scene_get_initial_bounds(fw64Scene* scene);
  */
 void fw64_scene_update_bounding(fw64Scene* scene);
 
-void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer);
-void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frustum* frustum);
+void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask);
 
 fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId, uint32_t mesh_index);
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index);

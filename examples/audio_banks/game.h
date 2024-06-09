@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rotate_node/rotate_node.h"
+#include "common/rotate_node.h"
 
 #include "framework64/engine.h"
 #include "framework64/scene.h"

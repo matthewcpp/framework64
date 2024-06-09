@@ -56,7 +56,7 @@ void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
 
     // scene is static so only need to setup renderpass drawing once
     fw64_renderpass_begin(scene_view->renderpass);
-    fw64_renderpass_draw_static_mesh(scene_view->renderpass, node->mesh, &node->transform);
+    fw64_scene_draw_all(&scene_view->scene, scene_view->renderpass);
     fw64_renderpass_end(scene_view->renderpass);
 }
 

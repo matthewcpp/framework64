@@ -234,7 +234,7 @@ void fw64_scene_update_bounding(fw64Scene* scene) {
     }
 }
 
-void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer) {
+void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
     uint32_t node_count = fw64_scene_get_node_count(scene);
 
     for (uint32_t i = 0 ; i < node_count; i++) {
@@ -243,21 +243,25 @@ void fw64_scene_draw_all(fw64Scene* scene, fw64Renderer* renderer) {
         if (!node->mesh)
             continue;
 
-        fw64_renderer_draw_static_mesh(renderer, &node->transform, node->mesh);
+        fw64_renderpass_draw_static_mesh(rendererpass, node->mesh, &node->transform);
     }
 }
 
-void fw64_scene_draw_frustrum(fw64Scene* scene, fw64Renderer* renderer, fw64Frustum* frustum) {
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask) {
     uint32_t node_count = fw64_scene_get_node_count(scene);
 
     for (uint32_t i = 0 ; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
+        if (!(node->layer_mask & layer_mask)) {
+            continue;
+        }
+
         if (!node->mesh || !node->collider) // TODO: requiring collider may not be the most ideal setup
             continue;
 
         if (fw64_frustum_intersects_box(frustum, &node->collider->bounding)) {
-            fw64_renderer_draw_static_mesh(renderer, &node->transform, node->mesh);
+            fw64_renderpass_draw_static_mesh(rendererpass, node->mesh, &node->transform);
         }
     }
 }

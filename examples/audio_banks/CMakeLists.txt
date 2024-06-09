@@ -1,5 +1,5 @@
 set(src_files
-    ../common/rotate_node/rotate_node.h ../common/rotate_node/rotate_node.c
+    ../common/common/rotate_node.h ../common/common/rotate_node.c
     game.h game.c)
 
 create_game(
