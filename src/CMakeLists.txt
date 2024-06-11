@@ -25,6 +25,7 @@ set(common_source_files
         ../include/framework64/matrix_project.h matrix_project.c
         ../include/framework64/media.h
         ../include/framework64/mesh.h
+        ../include/framework64/mesh_instance.h mesh_instance.c
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
         ../include/framework64/quat.h quat.c
