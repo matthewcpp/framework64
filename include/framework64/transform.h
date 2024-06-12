@@ -15,7 +15,7 @@ typedef struct {
     Vec3 position;
     Quat rotation;
     Vec3 scale;
-    fw64Matrix matrix;
+    float world_matrix[16];
 } fw64Transform;
 
 void fw64_transform_init(fw64Transform* transform);

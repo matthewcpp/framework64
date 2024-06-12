@@ -5,12 +5,7 @@ void fw64_transform_init(fw64Transform* transform) {
     vec3_zero(&transform->position);
     quat_ident(&transform->rotation);
     vec3_one(&transform->scale);
-
-#ifdef FW64_PLATFORM_N64_LIBULTRA
-    guMtxIdent(&transform->matrix);
-#else
-    matrix_set_identity(&transform->matrix.m[0]);
-#endif
+    matrix_set_identity(transform->world_matrix);
 }
 
 void fw64_transform_forward(fw64Transform* transform, Vec3* out) {
@@ -55,14 +50,7 @@ void fw64_transform_look_at(fw64Transform* transform, Vec3* target, Vec3* up) {
 }
 
 void fw64_transform_update_matrix(fw64Transform* transform) {
-#ifdef FW64_PLATFORM_N64_LIBULTRA
-    float fmatrix[16];
-    matrix_from_trs(fmatrix, &transform->position, &transform->rotation, &transform->scale);
-
-    guMtxF2L((float (*)[4])fmatrix, &transform->matrix);
-#else
-    matrix_from_trs(&transform->matrix.m[0], &transform->position, &transform->rotation, &transform->scale);
-#endif
+    matrix_from_trs(transform->world_matrix, &transform->position, &transform->rotation, &transform->scale);
 }
 
 void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* out) {
@@ -80,11 +68,5 @@ void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out)
 }
 
 void fw64_transform_xform_box(fw64Transform* transform, Box* source, Box* target) {
-    #ifdef FW64_PLATFORM_N64_LIBULTRA
-        float fmatrix[16];
-        matrix_from_trs(fmatrix, &transform->position, &transform->rotation, &transform->scale);
-        matrix_transform_box(&fmatrix[0], source, target);
-    #else
-        matrix_transform_box(&transform->matrix.m[0], source, target);
-    #endif
+     matrix_transform_box(transform->world_matrix, source, target);
 }

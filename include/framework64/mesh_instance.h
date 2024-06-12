@@ -5,10 +5,18 @@
 #include "framework64/node.h"
 #include "framework64/util/sparse_set.h"
 
+#ifdef FW64_PLATFORM_N64_LIBULTRA
+    #include <nusys.h>
+#endif
+
 typedef struct {
     fw64Node* node;
     fw64Mesh* mesh;
     Box render_bounds;
+
+#ifdef FW64_PLATFORM_N64_LIBULTRA
+    Mtx render_matrix;
+#endif
 } fw64MeshInstance;
 
 typedef struct {

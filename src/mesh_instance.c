@@ -1,8 +1,15 @@
 #include "framework64/mesh_instance.h"
 
 static void fw64_mesh_instance_update(fw64MeshInstance* mesh_instance) {
-    (void)mesh_instance;
+    Box mesh_bounding = fw64_mesh_get_bounding_box(mesh_instance->mesh);
+    matrix_transform_box(mesh_instance->node->transform.world_matrix, &mesh_bounding, &mesh_instance->render_bounds);
+
+#ifdef FW64_PLATFORM_N64_LIBULTRA
+    guMtxF2L((float (*)[4])mesh_instance->transform->world_matrix, &transform->render_matrix);
+#endif
 }
+
+
 
 void fw64_mesh_instances_init(fw64MeshInstances* mesh_instances, fw64Allocator* allocator) {
     fw64_sparse_set_init(&mesh_instances->components, sizeof(fw64MeshInstance), allocator);

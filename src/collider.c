@@ -30,13 +30,7 @@ void fw64_collider_set_type_mesh(fw64Collider* collider, fw64CollisionMesh * col
 }
 
 static void fw64_collider_update_box_with_transform(fw64Transform* transform, Box* source, Box* target) {
-#ifdef FW64_PLATFORM_N64_LIBULTRA
-    float fmatrix[16];
-    matrix_from_trs(fmatrix, &transform->position, &transform->rotation, &transform->scale);
-    matrix_transform_box(&fmatrix[0], source, target);
-#else
-    matrix_transform_box(&transform->matrix.m[0], source, target);
-#endif
+    matrix_transform_box(transform->world_matrix, source, target);
 }
 
 void fw64_collider_update_box(fw64Collider* collider) {

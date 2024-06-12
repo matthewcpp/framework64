@@ -205,13 +205,13 @@ void fw64Renderer::end(fw64RendererFlags) {
     primitive_type = primitive_type = fw64Primitive::Mode::Unknown;
 }
 
-void fw64Renderer::updateMeshTransformBlock(fw64Matrix & matrix) {
+void fw64Renderer::updateMeshTransformBlock(float* matrix) {
     // compute the normal matrix: transpose(inverse(modelView))
-    matrix_multiply(mesh_transform_uniform_block.data.normal_matrix.data(), view_matrix.data(), &matrix.m[0]);
+    matrix_multiply(mesh_transform_uniform_block.data.normal_matrix.data(), view_matrix.data(), matrix);
     matrix_invert(mesh_transform_uniform_block.data.normal_matrix.data(), mesh_transform_uniform_block.data.normal_matrix.data());
     matrix_transpose(mesh_transform_uniform_block.data.normal_matrix.data());
 
-    matrix_multiply(mesh_transform_uniform_block.data.mvp_matrix.data(), view_projection_matrix.data(), &matrix.m[0]);
+    matrix_multiply(mesh_transform_uniform_block.data.mvp_matrix.data(), view_projection_matrix.data(), matrix);
 
     mesh_transform_uniform_block.update();
 }
@@ -226,7 +226,7 @@ void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
 
 void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
     setDrawingMode(DrawingMode::Mesh);
-    updateMeshTransformBlock(transform->matrix);
+    updateMeshTransformBlock(transform->world_matrix);
 
     for (auto const & primitive : mesh->primitives) {
         if (primitive->mode != primitive_type)
@@ -244,8 +244,8 @@ void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* con
             continue;
 
         // should this be done in the shader?
-        fw64Matrix transform_matrix;
-        matrix_multiply(&transform_matrix.m[0], &transform->matrix.m[0], &controller->matrices[primitive->joint_index].m[0]);
+        float transform_matrix[16];
+        matrix_multiply(transform_matrix, transform->world_matrix, &controller->matrices[primitive->joint_index].m[0]);
         updateMeshTransformBlock(transform_matrix);
 
         drawPrimitive(*primitive);
