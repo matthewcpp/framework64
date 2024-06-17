@@ -5,6 +5,7 @@ class Scene {
     name = "scene"
     nodes = [];
     colliderCount = 0;
+    meshInstanceCount = 0;
     collisionMeshes = [];
     customBoundingBoxes = [];
     materialBundle = null;

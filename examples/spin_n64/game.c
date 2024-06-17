@@ -15,12 +15,14 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_scene_info_init(&scene_info);
     scene_info.mesh_count = 1;
     scene_info.node_count = 1;
+    scene_info.mesh_instance_count = 1;
 
     fw64_scene_init(&game->scene, &scene_info, engine->assets, allocator);
     fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_n64_logo, 0);
     game->node = fw64_scene_get_node(&game->scene, 0);
     vec3_set_all(&game->node->transform.scale, 0.1f);
-    fw64_node_set_mesh(game->node, mesh);
+    game->node->mesh_instance = fw64_scene_get_mesh_instance(&game->scene, 0);
+    fw64_mesh_instance_init(game->node->mesh_instance, game->node, mesh);
 
     game->rotation = 0.0f;
 
@@ -46,7 +48,7 @@ void game_update(Game* game){
 void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES,  FW64_RENDERER_FLAG_CLEAR);
     fw64_renderpass_begin(game->renderpass);
-    fw64_renderpass_draw_static_mesh(game->renderpass, game->node->mesh, &game->node->transform);
+    fw64_renderpass_draw_static_mesh(game->renderpass, game->node->mesh_instance->mesh, &game->node->transform);
     fw64_renderpass_end(game->renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);

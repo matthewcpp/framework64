@@ -143,6 +143,7 @@
         "render_pass.h": "c",
         "matrix.h": "c",
         "sprite_batch.h": "c",
-        "texture_util.h": "c"
+        "texture_util.h": "c",
+        "node.h": "c"
     }
 }

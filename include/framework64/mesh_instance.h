@@ -9,7 +9,7 @@
     #include <nusys.h>
 #endif
 
-typedef struct {
+struct fw64MeshInstance {
     fw64Node* node;
     fw64Mesh* mesh;
     Box render_bounds;
@@ -17,7 +17,9 @@ typedef struct {
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     Mtx render_matrix;
 #endif
-} fw64MeshInstance;
+};
+
+void fw64_mesh_instance_init(fw64MeshInstance* mesh_instance, fw64Node* node, fw64Mesh* mesh);
 
 typedef struct {
     fw64SparseSet components;

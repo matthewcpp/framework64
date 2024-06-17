@@ -145,6 +145,7 @@ class LevelParser {
         }
 
         if (Object.hasOwn(extras, "mesh")) {
+            scene.meshInstanceCount += 1;
             // if the mesh is ignored just set an empty collider
             if (extras.mesh === "ignore"){
                 node.mesh = N64Node.MeshIgnored;

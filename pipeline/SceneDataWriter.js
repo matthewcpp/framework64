@@ -3,13 +3,14 @@ const BuildInfo = require("./BuildInfo")
 
 const fs = require("fs");
 
-/// The order these values are written should correspond with the SceneInfo struct in scene.c
+/// The order these values are written should correspond with the SceneInfo struct in framework64/scene.h
 function writeSceneInfo(scene, file, writer) {
-    const sceneInfoBuffer = Buffer.alloc(24);
+    const sceneInfoBuffer = Buffer.alloc(28);
     let index = 0;
 
     index = writer.writeUInt32(sceneInfoBuffer, scene.nodes.length, index);
-    index = writer.writeUInt32(sceneInfoBuffer, scene.meshBundle.length, index);
+    index = writer.writeUInt32(sceneInfoBuffer, scene.meshBundle.length, index); // mesh_count
+    index = writer.writeUInt32(sceneInfoBuffer, scene.meshInstanceCount, index); // mesh_count
     index = writer.writeUInt32(sceneInfoBuffer, scene.colliderCount, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.collisionMeshes.length, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.customBoundingBoxes.length, index);
@@ -122,6 +123,6 @@ function writeCollisionMeshes(scene, writer, file) {
 module.exports = {
     writeSceneInfo: writeSceneInfo,
     writeNodes: writeNodes,
-    writeCollisionMeshes : writeCollisionMeshes,
-    writeCustomBoundingBoxes : writeCustomBoundingBoxes
+    writeCollisionMeshes: writeCollisionMeshes,
+    writeCustomBoundingBoxes: writeCustomBoundingBoxes
 };

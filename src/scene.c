@@ -28,6 +28,12 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
         scene->meshes = NULL;
     }
 
+    if (scene->info.mesh_instance_count > 0) {
+        scene->mesh_instances = allocator->malloc(allocator, sizeof(fw64MeshInstance) * scene->info.mesh_instance_count);
+    } else {
+        scene->mesh_instances = NULL;
+    }
+
     if (scene->info.collider_count > 0) {
         scene->colliders = allocator->malloc(allocator, scene->info.collider_count * sizeof(fw64Collider));
         memset(scene->colliders, 0, scene->info.collider_count * sizeof(fw64Collider));
@@ -114,6 +120,12 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
         scene->collision_meshes = NULL;
     }
 
+    if (scene->info.mesh_instance_count > 0) {
+        scene->mesh_instances = allocator->malloc(allocator, sizeof(fw64MeshInstance) * scene->info.mesh_instance_count);
+    } else {
+        scene->mesh_instances = NULL;
+    }
+
     if (scene->info.node_count > 0) {
         box_invalidate(&scene->bounding_box);
 
@@ -127,17 +139,20 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
         }
 
         uint32_t collider_index = 0;
+        uint32_t mesh_instance_index = 0;
 
         for (uint32_t i = 0; i < scene->info.node_count; i++) {
             fw64Node* node = scene->nodes + i;
             fw64_transform_update_matrix(&node->transform);
 
             // read the mesh index written to the node
-            uintptr_t mesh_index = (uintptr_t)node->mesh;
-            node->mesh = NULL;
+            uintptr_t mesh_index = (uintptr_t)node->mesh_instance;
 
             if (mesh_index != FW64_N64_NODE_NO_MESH) {
-                fw64_node_set_mesh(node, scene->meshes[mesh_index]);
+                node->mesh_instance = scene->mesh_instances + mesh_instance_index++;
+                fw64_mesh_instance_init(node->mesh_instance, node, scene->meshes[mesh_index]);
+            } else {
+                node->mesh_instance = NULL;
             }
 
             // read the collider info written to the node
@@ -151,7 +166,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 
                 if (collider_type == FW64_COLLIDER_BOX) {
                     if (collision_mesh_index == FW64_N64_BOX_COLLIDER_USE_MESH_BOUNDING) {
-                        Box bounding_box = fw64_mesh_get_bounding_box(node->mesh);
+                        Box bounding_box = fw64_mesh_get_bounding_box(node->mesh_instance->mesh);
                         fw64_collider_set_type_box(node->collider, &bounding_box);
                     }
                     else {
@@ -207,8 +222,13 @@ if (scene->meshes) {
         scene->allocator->free(scene->allocator, scene->collision_meshes);
     }
 
-    if (scene->colliders)
+    if (scene->mesh_instances) {
+        scene->allocator->free(scene->allocator, scene->mesh_instances);
+    }
+
+    if (scene->colliders) {
         scene->allocator->free(scene->allocator, scene->colliders);
+    }
 
     if (scene->nodes) {
         scene->allocator->free(scene->allocator, scene->nodes);
@@ -240,10 +260,10 @@ void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
     for (uint32_t i = 0 ; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
-        if (!node->mesh)
+        if (!node->mesh_instance)
             continue;
 
-        fw64_renderpass_draw_static_mesh(rendererpass, node->mesh, &node->transform);
+        fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance->mesh, &node->transform);
     }
 }
 
@@ -257,11 +277,11 @@ void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw
             continue;
         }
 
-        if (!node->mesh || !node->collider) // TODO: requiring collider may not be the most ideal setup
+        if (!node->mesh_instance)
             continue;
 
         if (fw64_frustum_intersects_box(frustum, &node->collider->bounding)) {
-            fw64_renderpass_draw_static_mesh(rendererpass, node->mesh, &node->transform);
+            fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance->mesh, &node->transform);
         }
     }
 }

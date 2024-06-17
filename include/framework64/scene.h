@@ -5,6 +5,7 @@
 #include "framework64/data_io.h"
 #include "framework64/material_bundle.h"
 #include "framework64/mesh.h"
+#include "framework64/mesh_instance.h"
 #include "framework64/node.h"
 #include "framework64/quat.h"
 #include "framework64/query.h"
@@ -17,6 +18,7 @@ typedef struct fw64AssetDatabase fw64AssetDatabase;
 typedef struct {
     uint32_t node_count;
     uint32_t mesh_count;
+    uint32_t mesh_instance_count;
     uint32_t collider_count;
     uint32_t collision_mesh_count;
     uint32_t custom_bounding_box_count;
@@ -25,6 +27,7 @@ typedef struct {
 
 struct fw64Scene {
     fw64SceneInfo info;
+    fw64MeshInstance* mesh_instances;
     fw64Node* nodes;
     fw64Collider* colliders;
     fw64Mesh** meshes;
@@ -78,6 +81,9 @@ int fw64_scene_raycast(fw64Scene* scene, Vec3* origin, Vec3* direction, uint32_t
 int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint32_t mask, fw64OverlapSphereQueryResult* result);
 int fw64_scene_moving_sphere_intersection(fw64Scene* scene, Vec3* center, float radius, Vec3* velocity, uint32_t mask, fw64IntersectMovingSphereQuery* result);
 int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocity, uint32_t mask, fw64IntersectMovingBoxQuery* result);
+
+#define fw64_scene_get_mesh_instance_count(scene) ((scene)->info.mesh_instance_count)
+#define fw64_scene_get_mesh_instance(scene, index) ((scene)->mesh_instances + (index))
 
 #ifdef __cplusplus
 }

@@ -5,15 +5,16 @@
 #include "framework64/box.h"
 #include "framework64/collider.h"
 #include "framework64/camera.h"
-#include "framework64/mesh.h"
 #include "framework64/transform.h"
 
 #include <limits.h>
 
+typedef struct fw64MeshInstance fw64MeshInstance;
+
 typedef struct {
     fw64Transform transform;
     fw64Collider* collider;
-    fw64Mesh* mesh;
+    fw64MeshInstance* mesh_instance;
     void* data;
     uint32_t layer_mask;
 
@@ -43,11 +44,6 @@ void fw64_node_set_box_collider(fw64Node* node, fw64Collider* collider);
  */
 void fw64_node_set_mesh_collider(fw64Node* node, fw64Collider* collider, fw64CollisionMesh* collision_mesh);
 
-/**
- * Sets the mesh associated with this node.
- * If the node has a box collider attached, and mesh is not null, it will update the collider to track the new mesh, otherwise the attached collider will be reset to type none.
- */
-void fw64_node_set_mesh(fw64Node* node, fw64Mesh* mesh);
 void fw64_node_update(fw64Node* node);
 void fw64_node_billboard(fw64Node* node, fw64Camera* camera);
 
