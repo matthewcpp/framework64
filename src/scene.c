@@ -260,10 +260,11 @@ void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
     for (uint32_t i = 0 ; i < node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
 
-        if (!node->mesh_instance)
+        if (!node->mesh_instance) {
             continue;
+        }
 
-        fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance->mesh, &node->transform);
+        fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance);
     }
 }
 
@@ -277,11 +278,13 @@ void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw
             continue;
         }
 
-        if (!node->mesh_instance)
+        if (!node->mesh_instance) {
             continue;
+        }
+
 
         if (fw64_frustum_intersects_box(frustum, &node->collider->bounding)) {
-            fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance->mesh, &node->transform);
+            fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance);
         }
     }
 }

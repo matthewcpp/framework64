@@ -67,8 +67,8 @@ void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g,
     pass->clear_color = GPACK_RGBA5551(r, g, b, 1);
 }
 
-void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64Transform* transform) {
-    fw64_n64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh, transform);
+void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance) {
+    fw64_n64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh_instance);
 }
 
 void fw64_renderpass_draw_animated_mesh(fw64RenderPass* pass, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {

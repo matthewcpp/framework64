@@ -5,7 +5,7 @@ static void fw64_mesh_instance_update(fw64MeshInstance* mesh_instance) {
     matrix_transform_box(mesh_instance->node->transform.world_matrix, &mesh_bounding, &mesh_instance->render_bounds);
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
-    guMtxF2L((float (*)[4])mesh_instance->transform->world_matrix, &transform->render_matrix);
+    guMtxF2L((float (*)[4])mesh_instance->node->transform.world_matrix, &mesh_instance->render_matrix);
 #endif
 }
 

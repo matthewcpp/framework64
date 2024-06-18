@@ -6,7 +6,7 @@
 #include "camera.h"
 #include "color.h"
 #include "font.h"
-#include "mesh.h"
+#include "mesh_instance.h"
 #include "render_pass.h"
 #include "sprite_batch.h"
 #include "texture.h"
@@ -54,7 +54,7 @@ void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled
 int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
 
 /** Draws a mesh with the supplied transform. */
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh);
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance);
 
 /** Draws an animated mesh with the supplied transform and animation state. */
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);

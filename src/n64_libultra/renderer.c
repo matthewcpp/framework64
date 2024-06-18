@@ -540,8 +540,8 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
     }
 }
 
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->render_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;

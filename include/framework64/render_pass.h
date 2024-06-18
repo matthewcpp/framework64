@@ -7,7 +7,7 @@
 #include "framework64/camera.h"
 #include "framework64/color.h"
 #include "framework64/display.h"
-#include "framework64/mesh.h"
+#include "framework64/mesh_instance.h"
 #include "framework64/sprite_batch.h"
 
 typedef struct fw64RenderPass fw64RenderPass;
@@ -40,7 +40,7 @@ void fw64_renderpass_set_clear_flags(fw64RenderPass* pass, fw64ClearFlags flags)
 void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g, uint8_t b);
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* text_batch);
-void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64Transform* transform);
+void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance);
 void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 #ifdef __cplusplus
 }
