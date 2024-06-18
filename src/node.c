@@ -13,6 +13,11 @@ void fw64_node_init(fw64Node* node) {
 
 void fw64_node_update(fw64Node* node) {
     fw64_transform_update_matrix(&node->transform);
+
+    if (node->mesh_instance) {
+        fw64_mesh_instance_update(node->mesh_instance);
+    }
+
     if (node->collider)
         fw64_collider_update(node->collider);
 }

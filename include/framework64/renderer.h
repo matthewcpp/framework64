@@ -53,9 +53,6 @@ int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
 void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled);
 int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
 
-/** Draws a mesh with the supplied transform. */
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance);
-
 /** Draws an animated mesh with the supplied transform and animation state. */
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
@@ -86,9 +83,6 @@ void fw64_renderer_draw_sprite_slice(fw64Renderer* renderer, fw64Texture* textur
  * Note: the rotation value is currently ignored.
  */
 void fw64_renderer_draw_sprite_slice_transform(fw64Renderer* renderer, fw64Texture* texture, int frame, int x, int y, float scale_x , float scale_y, float rotation);
-
-void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
-void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count);
 
 /**
  * Sets the fill color to use for immediate mode rendering functions: sprites, text, and filled rectangles.

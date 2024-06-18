@@ -19,8 +19,6 @@ struct fw64MeshInstance {
 #endif
 };
 
-void fw64_mesh_instance_init(fw64MeshInstance* mesh_instance, fw64Node* node, fw64Mesh* mesh);
-
 typedef struct {
     fw64SparseSet components;
 } fw64MeshInstances;
@@ -30,6 +28,9 @@ typedef fw64SparseSetHandle fw64MeshInstanceHandle;
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+void fw64_mesh_instance_init(fw64MeshInstance* mesh_instance, fw64Node* node, fw64Mesh* mesh);
+void fw64_mesh_instance_update(fw64MeshInstance* mesh_instance);
 
 void fw64_mesh_instances_init(fw64MeshInstances* mesh_instances, fw64Allocator* allocator);
 fw64MeshInstance* fw64_mesh_instances_create(fw64MeshInstances* mesh_instances, fw64Node* node, fw64Mesh* mesh, fw64MeshInstanceHandle* handle);

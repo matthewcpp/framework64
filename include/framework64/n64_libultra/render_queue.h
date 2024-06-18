@@ -15,4 +15,4 @@ void fw64_n64_render_queue_uninit(fw64N64RenderQueue* render_queue);
 void fw64_n64_render_queue_clear(fw64N64RenderQueue* render_queue);
 
 void fw64_n64_render_queue_enqueue_sprite_batch(fw64N64RenderQueue* render_queue, fw64SpriteBatch* sprite_batch);
-void fw64_n64_render_queue_enqueue_static_mesh(fw64N64RenderQueue* render_queue,  fw64MeshInstance* mesh_instance);
+void fw64_n64_render_queue_enqueue_static_mesh(fw64N64RenderQueue* render_queue, fw64MeshInstance* mesh_instance);

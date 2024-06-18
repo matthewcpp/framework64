@@ -78,8 +78,8 @@ void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBat
     renderpass->render_queue.sprite_batches.emplace_back(sprite_batch);
 }
 
-void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64Transform* transform) {
-    renderpass->render_queue.mesh_instances.emplace_back(mesh, transform);
+void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance) {
+    renderpass->render_queue.mesh_instances.emplace_back(mesh_instance);
 }
 
 void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64AnimationController* animated_mesh_instances, fw64Transform* transform){

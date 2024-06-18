@@ -543,8 +543,8 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->render_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
-    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
-        fw64Primitive* primitive = mesh->primitives + i;
+    for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh_instance->mesh->primitives + i;
         
         n64_renderer_configure_mesh_shading_mode(renderer, primitive->material);
         gSPDisplayList(renderer->display_list++, primitive->display_list);
@@ -556,7 +556,9 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* me
 }
 
 void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+    (void)transform;
+    // TODO: fix when skinned mesh instance
+    //gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
@@ -704,8 +706,8 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         fw64_renderer_load_matrices(renderer, &renderpass->projection_matrix, &renderpass->persp_norm, &renderpass->view_matrix, 1);
 
         for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.static_meshes); i++) {
-            fw64N64MeshInstance* mesh_instance = (fw64N64MeshInstance*)fw64_dynamic_vector_item(&renderpass->render_queue.static_meshes, i);
-            fw64_renderer_draw_static_mesh(renderer, mesh_instance->transform, mesh_instance->mesh);
+            fw64MeshInstance* mesh_instance = *(fw64MeshInstance**)fw64_dynamic_vector_item(&renderpass->render_queue.static_meshes, i);
+            fw64_renderer_draw_static_mesh(renderer, mesh_instance);
         }
     }
 

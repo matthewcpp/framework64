@@ -144,6 +144,7 @@
         "matrix.h": "c",
         "sprite_batch.h": "c",
         "texture_util.h": "c",
-        "node.h": "c"
+        "node.h": "c",
+        "fill_rect.h": "c"
     }
 }

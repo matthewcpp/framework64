@@ -186,7 +186,7 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
     mesh_transform_uniform_block.data.camera_far = renderpass->camera_far;
 
     for (auto& mesh_instance : renderpass->render_queue.mesh_instances) {
-        drawStaticMesh(mesh_instance.mesh, mesh_instance.transform);
+        drawStaticMesh(mesh_instance->mesh, &mesh_instance->node->transform);
     }
 
     if (renderpass->render_queue.sprite_batches.size()) {
