@@ -4,17 +4,16 @@
 
 #include "framework64/box.h"
 #include "framework64/collider.h"
+#include "framework64/component.h"
 #include "framework64/camera.h"
 #include "framework64/transform.h"
 
 #include <limits.h>
 
-typedef struct fw64MeshInstance fw64MeshInstance;
-
 typedef struct {
     fw64Transform transform;
     fw64Collider* collider;
-    fw64MeshInstance* mesh_instance;
+    fw64Component* components;
     void* data;
     uint32_t layer_mask;
 
@@ -29,6 +28,11 @@ extern "C" {
 #endif
 
 void fw64_node_init(fw64Node* node);
+void fw64_node_update(fw64Node* node);
+
+void fw64_node_add_componet(fw64Node* node, fw64Component* component);
+fw64Component* fw64_node_find_component(fw64Node* node, fw64ComponentTypeId component_type_id);
+
 /** Associates the collider with this node.  
  * Sets the collider type to none (no collision) 
  */
@@ -44,7 +48,6 @@ void fw64_node_set_box_collider(fw64Node* node, fw64Collider* collider);
  */
 void fw64_node_set_mesh_collider(fw64Node* node, fw64Collider* collider, fw64CollisionMesh* collision_mesh);
 
-void fw64_node_update(fw64Node* node);
 void fw64_node_billboard(fw64Node* node, fw64Camera* camera);
 
 #ifdef __cplusplus

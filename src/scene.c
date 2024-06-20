@@ -143,16 +143,16 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 
         for (uint32_t i = 0; i < scene->info.node_count; i++) {
             fw64Node* node = scene->nodes + i;
+            fw64MeshInstance* mesh_instance = NULL;
             fw64_transform_update_matrix(&node->transform);
 
             // read the mesh index written to the node
-            uintptr_t mesh_index = (uintptr_t)node->mesh_instance;
+            uintptr_t mesh_index = (uintptr_t)node->components;
 
             if (mesh_index != FW64_N64_NODE_NO_MESH) {
-                node->mesh_instance = scene->mesh_instances + mesh_instance_index++;
-                fw64_mesh_instance_init(node->mesh_instance, node, scene->meshes[mesh_index]);
-            } else {
-                node->mesh_instance = NULL;
+                mesh_instance = scene->mesh_instances + mesh_instance_index++;
+                fw64_mesh_instance_init(mesh_instance, node, scene->meshes[mesh_index]);
+                fw64_node_add_componet(node, (fw64Component*)mesh_instance);
             }
 
             // read the collider info written to the node
@@ -166,7 +166,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 
                 if (collider_type == FW64_COLLIDER_BOX) {
                     if (collision_mesh_index == FW64_N64_BOX_COLLIDER_USE_MESH_BOUNDING) {
-                        Box bounding_box = fw64_mesh_get_bounding_box(node->mesh_instance->mesh);
+                        Box bounding_box = fw64_mesh_get_bounding_box(mesh_instance->mesh);
                         fw64_collider_set_type_box(node->collider, &bounding_box);
                     }
                     else {
@@ -255,36 +255,21 @@ void fw64_scene_update_bounding(fw64Scene* scene) {
 }
 
 void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
-    uint32_t node_count = fw64_scene_get_node_count(scene);
-
-    for (uint32_t i = 0 ; i < node_count; i++) {
-        fw64Node* node = fw64_scene_get_node(scene, i);
-
-        if (!node->mesh_instance) {
-            continue;
-        }
-
-        fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance);
+    for (uint32_t i = 0 ; i < scene->info.mesh_instance_count; i++) {
+        fw64_renderpass_draw_static_mesh(rendererpass, scene->mesh_instances + i);
     }
 }
 
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask) {
-    uint32_t node_count = fw64_scene_get_node_count(scene);
+    for (uint32_t i = 0 ; i < scene->info.mesh_instance_count; i++) {
+        fw64MeshInstance* mesh_instance = scene->mesh_instances + i;
 
-    for (uint32_t i = 0 ; i < node_count; i++) {
-        fw64Node* node = fw64_scene_get_node(scene, i);
-
-        if (!(node->layer_mask & layer_mask)) {
+        if (!(mesh_instance->node->layer_mask & layer_mask)) {
             continue;
         }
 
-        if (!node->mesh_instance) {
-            continue;
-        }
-
-
-        if (fw64_frustum_intersects_box(frustum, &node->collider->bounding)) {
-            fw64_renderpass_draw_static_mesh(rendererpass, node->mesh_instance);
+        if (fw64_frustum_intersects_box(frustum, &mesh_instance->render_bounds)) {
+            fw64_renderpass_draw_static_mesh(rendererpass, mesh_instance);
         }
     }
 }

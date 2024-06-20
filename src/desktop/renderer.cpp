@@ -435,16 +435,6 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
     renderer->end(flags);
 }
 
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64Transform* transform, fw64Mesh* mesh) {
-    assert(renderer->primitive_type == fw64Primitive::Mode::Triangles || renderer->primitive_type == fw64Primitive::Mode::Lines);
-    renderer->drawStaticMesh(mesh, transform);
-}
-
-void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
-    assert(renderer->primitive_type == fw64Primitive::Mode::Triangles || renderer->primitive_type == fw64Primitive::Mode::Lines);
-    renderer->drawAnimatedMesh(mesh, controller, transform);
-}
-
 void fw64_renderer_draw_sprite(fw64Renderer* renderer, fw64Texture* texture, int x, int y) {
     renderer->drawSprite(texture, static_cast<float>(x), static_cast<float>(y));
 }
@@ -466,13 +456,6 @@ int fw64_renderer_get_sprite_scissoring_enabled(fw64Renderer* renderer) {
     return static_cast<int>(renderer->sprite_scissor_enabled);
 }
 
-void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text) {
-    renderer->drawText(font, static_cast<float>(x), static_cast<float>(y), text, std::numeric_limits<uint32_t>::max());
-}
-
-void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count) {
-    renderer->drawText(font, static_cast<float>(x), static_cast<float>(y), text, count);
-}
 
 void fw64_renderer_draw_filled_rect(fw64Renderer* renderer, int x, int y, int width, int height) {
     renderer->drawFilledRect(static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height));

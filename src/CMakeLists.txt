@@ -9,6 +9,7 @@ set(common_source_files
         ../include/framework64/collision.h collision.c
         ../include/framework64/collider.h collider.c
         ../include/framework64/color.h color.c
+        ../include/framework64/component.h
         ../include/framework64/data_io.h data_io.c
         ../include/framework64/data_link.h
         ../include/framework64/display.h

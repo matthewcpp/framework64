@@ -1,6 +1,8 @@
 #pragma once
 
+#include "framework64/animation_controller.h"
 #include "framework64/box.h"
+#include "framework64/component.h"
 #include "framework64/mesh.h"
 #include "framework64/node.h"
 #include "framework64/util/sparse_set.h"
@@ -9,7 +11,8 @@
     #include <nusys.h>
 #endif
 
-struct fw64MeshInstance {
+typedef struct {
+    fw64Component component;
     fw64Node* node;
     fw64Mesh* mesh;
     Box render_bounds;
@@ -17,11 +20,13 @@ struct fw64MeshInstance {
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     Mtx render_matrix;
 #endif
-};
+} fw64MeshInstance;
 
 typedef struct {
     fw64SparseSet components;
 } fw64MeshInstances;
+
+
 
 typedef fw64SparseSetHandle fw64MeshInstanceHandle;
 

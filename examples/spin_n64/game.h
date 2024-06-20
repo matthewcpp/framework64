@@ -8,7 +8,6 @@ typedef struct lines_example {
     fw64Engine* engine;
     float rotation;
     fw64Scene scene;
-    fw64Node* node;
     fw64RenderPass* renderpass;
 } Game;
 

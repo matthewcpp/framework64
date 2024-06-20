@@ -10,6 +10,7 @@ void fw64_mesh_instance_update(fw64MeshInstance* mesh_instance) {
 }
 
 void fw64_mesh_instance_init(fw64MeshInstance* mesh_instance, fw64Node* node, fw64Mesh* mesh) {
+    mesh_instance->component.type_id = FW64_COMPONENT_TYPE_MESH_INSTANCE;
     mesh_instance->node = node;
     mesh_instance->mesh = mesh;
     fw64_mesh_instance_update(mesh_instance);
