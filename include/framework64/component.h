@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file component.h */
+
 #include <stdint.h>
 
 typedef struct fw64Component fw64Component;
@@ -12,5 +14,6 @@ struct fw64Component {
 
 typedef enum {
     FW64_COMPONENT_TYPE_NONE,
-    FW64_COMPONENT_TYPE_MESH_INSTANCE
+    FW64_COMPONENT_TYPE_MESH_INSTANCE,
+    FW64_COMPONENT_TYPE_SKINNED_MESH_INSTANCE,
 } fw64BuiltinComponentType;

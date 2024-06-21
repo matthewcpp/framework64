@@ -11,6 +11,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/collision.h \
                         ../include/framework64/collider.h \
                         ../include/framework64/color.h \
+                        ../include/framework64/component.h \
                         ../include/framework64/data_io.h \
                         ../include/framework64/data_link.h \
                         ../include/framework64/display.h \
@@ -28,6 +29,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/matrix_project.h \
                         ../include/framework64/media.h \
                         ../include/framework64/mesh.h \
+                        ../include/framework64/mesh_istance.h \
                         ../include/framework64/node.h \
                         ../include/framework64/plane.h \
                         ../include/framework64/quat.h \
@@ -40,6 +42,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/scene.h \
                         ../include/framework64/sprite_batch.h \
                         ../include/framework64/skinned_mesh.h \
+                        ../include/framework64/skinned_mesh_instance.h \
                         ../include/framework64/texture.h \
                         ../include/framework64/time.h \
                         ../include/framework64/transform.h \

@@ -1,5 +1,7 @@
 #pragma once
 
+/** \file mesh_instance.h */
+
 #include "framework64/animation_controller.h"
 #include "framework64/box.h"
 #include "framework64/component.h"
@@ -25,8 +27,6 @@ typedef struct {
 typedef struct {
     fw64SparseSet components;
 } fw64MeshInstances;
-
-
 
 typedef fw64SparseSetHandle fw64MeshInstanceHandle;
 
