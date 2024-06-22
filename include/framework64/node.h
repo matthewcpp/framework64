@@ -10,7 +10,7 @@
 
 #include <limits.h>
 
-typedef struct {
+struct fw64Node {
     fw64Transform transform;
     fw64Collider* collider;
     fw64Component* components;
@@ -21,7 +21,7 @@ typedef struct {
     uint32_t _align;
     #endif
 
-} fw64Node;
+};
 
 #ifdef __cplusplus
 extern "C" {

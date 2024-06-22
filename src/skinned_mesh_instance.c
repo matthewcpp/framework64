@@ -1,7 +1,8 @@
 #include "framework64/skinned_mesh_instance.h"
 
 void fw64_skinned_mesh_instance_init(fw64SkinnedMeshInstance* instance, fw64Node* node, fw64SkinnedMesh* skinned_mesh, int initial_animation, fw64Allocator* allocator) {
-    instance->node = node;
+    instance->base.type_id = FW64_COMPONENT_TYPE_SKINNED_MESH_INSTANCE;
+    instance->base.node = node;
     instance->skinned_mesh = skinned_mesh;
     
     fw64_animation_controller_init(&instance->controller, skinned_mesh->animation_data, initial_animation, allocator);
@@ -30,5 +31,12 @@ void fw64_skinned_mesh_instances_update(fw64SkinnedMeshInstances* instances, flo
         fw64SkinnedMeshInstance* skinned_mesh_instance  = (fw64SkinnedMeshInstance*)(fw64_sparse_set_itr_get_item(&itr));
 
         fw64_animation_controller_update(&skinned_mesh_instance->controller, time_delta);
+
+        Box mesh_bounding = fw64_mesh_get_bounding_box(skinned_mesh_instance->skinned_mesh->mesh);
+        matrix_transform_box(skinned_mesh_instance->base.node->transform.world_matrix, &mesh_bounding, &skinned_mesh_instance->render_bounds);
+
+        #ifdef FW64_PLATFORM_N64_LIBULTRA
+        guMtxF2L((float (*)[4])skinned_mesh_instance->base.node->transform.world_matrix, &skinned_mesh_instance->n64_matrix);
+        #endif
     }
 }

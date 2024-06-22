@@ -264,7 +264,7 @@ void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw
     for (uint32_t i = 0 ; i < scene->info.mesh_instance_count; i++) {
         fw64MeshInstance* mesh_instance = scene->mesh_instances + i;
 
-        if (!(mesh_instance->node->layer_mask & layer_mask)) {
+        if (!(mesh_instance->base.node->layer_mask & layer_mask)) {
             continue;
         }
 

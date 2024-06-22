@@ -14,13 +14,11 @@
 #endif
 
 typedef struct {
-    fw64Component component;
-    fw64Node* node;
+    fw64Component base;
     fw64Mesh* mesh;
     Box render_bounds;
-
 #ifdef FW64_PLATFORM_N64_LIBULTRA
-    Mtx render_matrix;
+    Mtx n64_matrix;
 #endif
 } fw64MeshInstance;
 
