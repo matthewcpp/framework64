@@ -21,6 +21,7 @@ typedef struct {
 } fw64SkinnedMeshInstance;
 
 typedef struct {
+    fw64Components base;
     fw64SparseSet components;
 } fw64SkinnedMeshInstances;
 

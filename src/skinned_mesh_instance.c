@@ -9,6 +9,7 @@ void fw64_skinned_mesh_instance_init(fw64SkinnedMeshInstance* instance, fw64Node
 }
 
 void fw64_skinned_mesh_instances_init(fw64SkinnedMeshInstances* instances, fw64Allocator* allocator) {
+    instances->base.type_id = FW64_COMPONENT_TYPE_SKINNED_MESH_INSTANCE;
     fw64_sparse_set_init(&instances->components, sizeof(fw64SkinnedMeshInstance), allocator);
 }
 
