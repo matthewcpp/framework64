@@ -15,5 +15,3 @@ typedef struct {
 void fw64_registry_init(fw64Registry* registry, fw64Allocator* allocator);
 int fw64_registry_add(fw64Registry* registry, fw64Components* components);
 fw64Components* fw64_registry_get_components(fw64Registry* registry, uint32_t component_id);
-
-fw64SkinnedMeshInstances* fw64_registry_get_skinned_mesh_instances(fw64Registry* registry);

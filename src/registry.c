@@ -22,17 +22,3 @@ fw64Components* fw64_registry_get_components(fw64Registry* registry, uint32_t co
 
     return NULL;
 }
-
-fw64SkinnedMeshInstances* fw64_registry_get_skinned_mesh_instances(fw64Registry* registry) {
-    fw64SkinnedMeshInstances* instances = (fw64SkinnedMeshInstances*)fw64_registry_get_components(registry, FW64_COMPONENT_TYPE_SKINNED_MESH_INSTANCE);
-
-    if (!instances) {
-        fw64Allocator* allocator = registry->components_vec._allocator;
-        instances = allocator->malloc(allocator, sizeof(fw64SkinnedMeshInstances));
-        fw64_skinned_mesh_instances_init(instances, allocator);
-
-        fw64_registry_add(registry, &instances->base);
-    }
-
-    return instances;
-}
