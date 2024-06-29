@@ -11,6 +11,8 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->engine = engine;
 
+    fw64_registry_init(&game->registry, allocator);
+
     fw64SceneInfo scene_info;
     fw64_scene_info_init(&scene_info);
     scene_info.node_count = 1;

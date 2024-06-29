@@ -147,7 +147,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
             fw64_transform_update_matrix(&node->transform);
 
             // read the mesh index written to the node
-            uintptr_t mesh_index = (uintptr_t)node->components;
+            uintptr_t mesh_index = (uintptr_t)node->mesh_instance;
 
             if (mesh_index != FW64_N64_NODE_NO_MESH) {
                 mesh_instance = scene->mesh_instances + mesh_instance_index++;

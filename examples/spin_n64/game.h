@@ -2,11 +2,13 @@
 
 #include "framework64/camera.h"
 #include "framework64/engine.h"
+#include "framework64/registry.h"
 #include "framework64/scene.h"
 
 typedef struct lines_example {
     fw64Engine* engine;
     float rotation;
+    fw64Registry registry;
     fw64Scene scene;
     fw64RenderPass* renderpass;
 } Game;

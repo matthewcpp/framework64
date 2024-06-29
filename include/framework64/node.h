@@ -6,6 +6,7 @@
 #include "framework64/collider.h"
 #include "framework64/component.h"
 #include "framework64/camera.h"
+#include "framework64/mesh_instance.h"
 #include "framework64/transform.h"
 
 #include <limits.h>
@@ -13,8 +14,8 @@
 struct fw64Node {
     fw64Transform transform;
     fw64Collider* collider;
+    fw64MeshInstance* mesh_instance;
     fw64Component* components;
-    void* data;
     uint32_t layer_mask;
 
     #ifdef FW64_PLATFORM_IS_64_BIT

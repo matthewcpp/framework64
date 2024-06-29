@@ -146,6 +146,8 @@
         "texture_util.h": "c",
         "node.h": "c",
         "fill_rect.h": "c",
-        "skinned_mesh.h": "c"
+        "skinned_mesh.h": "c",
+        "collider.h": "c",
+        "component.h": "c"
     }
 }

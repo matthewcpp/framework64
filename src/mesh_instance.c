@@ -1,5 +1,7 @@
 #include "framework64/mesh_instance.h"
 
+#include "framework64/node.h"
+
 void fw64_mesh_instance_update(fw64MeshInstance* mesh_instance) {
     Box mesh_bounding = fw64_mesh_get_bounding_box(mesh_instance->mesh);
     matrix_transform_box(mesh_instance->base.node->transform.world_matrix, &mesh_bounding, &mesh_instance->render_bounds);

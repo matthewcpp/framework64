@@ -3,6 +3,7 @@
 #include "framework64/desktop/render_pass.hpp"
 
 #include "framework64/matrix.h"
+#include "framework64/node.h"
 
 #include <cassert>
 #include <iostream>

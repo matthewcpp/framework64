@@ -6,7 +6,6 @@
 #include "framework64/box.h"
 #include "framework64/component.h"
 #include "framework64/mesh.h"
-#include "framework64/node.h"
 #include "framework64/util/sparse_set.h"
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA

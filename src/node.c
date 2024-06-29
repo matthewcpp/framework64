@@ -4,10 +4,10 @@
 
 void fw64_node_init(fw64Node* node) {
     fw64_transform_init(&node->transform);
-    node->components = NULL;
+    node->mesh_instance = NULL;
     node->collider = NULL;
     node->layer_mask = 1U;
-    node->data = NULL;
+    node->components = NULL;
 }
 
 void fw64_node_update(fw64Node* node) {
@@ -18,6 +18,10 @@ void fw64_node_update(fw64Node* node) {
 }
 
 void fw64_node_add_componet(fw64Node* node, fw64Component* component) {
+    if (component->type_id == FW64_COMPONENT_TYPE_MESH_INSTANCE || component->type_id == FW64_COMPONENT_TYPE_SKINNED_MESH_INSTANCE) {
+        node->mesh_instance = (fw64MeshInstance*)component;
+    }
+
     component->next = node->components;
     node->components = component;
 }
