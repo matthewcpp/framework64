@@ -34,6 +34,12 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
         scene->mesh_instances = NULL;
     }
 
+    if (scene->info.skinned_mesh_instance_count > 0) {
+        scene->skinned_mesh_instances = allocator->malloc(allocator, sizeof(fw64SkinnedMeshInstance) * scene->info.skinned_mesh_instance_count);
+    } else {
+        scene->skinned_mesh_instances = NULL;
+    }
+
     if (scene->info.collider_count > 0) {
         scene->colliders = allocator->malloc(allocator, scene->info.collider_count * sizeof(fw64Collider));
         memset(scene->colliders, 0, scene->info.collider_count * sizeof(fw64Collider));
@@ -78,6 +84,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
     scene->allocator = allocator;
     scene->assets = assets;
     scene->material_bundle = material_bundle;
+    scene->skinned_mesh_instances = NULL;
 
     if (scene->info.mesh_count > 0) {
         scene->meshes = allocator->malloc(allocator, scene->info.mesh_count * sizeof(fw64Mesh*));
@@ -226,6 +233,10 @@ if (scene->meshes) {
         scene->allocator->free(scene->allocator, scene->mesh_instances);
     }
 
+    if (scene->skinned_mesh_instances) {
+        scene->allocator->free(scene->allocator, scene->skinned_mesh_instances);
+    }
+
     if (scene->colliders) {
         scene->allocator->free(scene->allocator, scene->colliders);
     }
@@ -251,6 +262,12 @@ void fw64_scene_update_bounding(fw64Scene* scene) {
         }
 
         box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
+    }
+}
+
+void fw64_scene_update(fw64Scene* scene, float time_delta) {
+    for (uint32_t i = 0; i < scene->info.skinned_mesh_instance_count; i++) {
+        fw64_skinned_mesh_instance_update(scene->skinned_mesh_instances + i, time_delta);
     }
 }
 

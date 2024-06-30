@@ -6,6 +6,7 @@
 #include "framework64/material_bundle.h"
 #include "framework64/mesh.h"
 #include "framework64/mesh_instance.h"
+#include "framework64/skinned_mesh_instance.h"
 #include "framework64/node.h"
 #include "framework64/quat.h"
 #include "framework64/query.h"
@@ -19,6 +20,7 @@ typedef struct {
     uint32_t node_count;
     uint32_t mesh_count;
     uint32_t mesh_instance_count;
+    uint32_t skinned_mesh_instance_count;
     uint32_t collider_count;
     uint32_t collision_mesh_count;
     uint32_t custom_bounding_box_count;
@@ -28,6 +30,7 @@ typedef struct {
 struct fw64Scene {
     fw64SceneInfo info;
     fw64MeshInstance* mesh_instances;
+    fw64SkinnedMeshInstance* skinned_mesh_instances;
     fw64Node* nodes;
     fw64Collider* colliders;
     fw64Mesh** meshes;
@@ -59,6 +62,8 @@ Box* fw64_scene_get_initial_bounds(fw64Scene* scene);
  * Recalculates the scene's bounding based on the transform of all child nodes.
  */
 void fw64_scene_update_bounding(fw64Scene* scene);
+
+void fw64_scene_update(fw64Scene* scene, float time_delta);
 
 void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask);

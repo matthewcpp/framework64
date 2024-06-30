@@ -6,6 +6,7 @@ class Scene {
     nodes = [];
     colliderCount = 0;
     meshInstanceCount = 0;
+    skinnedMeshInstanceCount = 0;
     collisionMeshes = [];
     customBoundingBoxes = [];
     materialBundle = null;

@@ -98,6 +98,8 @@ int fw64_sparse_set_handle_is_valid(fw64SparseSet* sparse_set, fw64SparseSetHand
  */
 void fw64_sparse_set_clear(fw64SparseSet* sparse_set);
 
+#define fw64_sparse_set_get_allocator(sparse_set) ((sparse_set)->allocator)
+
 /**
  * Structure used to iterate over all items in a sparse set.
  * Note that any insertion, deletion, or clear operation will invalidate an iterator.
