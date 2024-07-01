@@ -24,16 +24,6 @@ extern "C" {
 void fw64_skinned_mesh_instance_init(fw64SkinnedMeshInstance* instance, fw64Node* node, fw64SkinnedMesh* skinned_mesh, int initial_animation, fw64Allocator* allocator);
 void fw64_skinned_mesh_instance_update(fw64SkinnedMeshInstance* instance, float time_delta);
 
-typedef struct {
-    fw64SparseSet set;
-} fw64SkinnedMeshInstanceComponents;
-
-typedef fw64SparseSetHandle fw64SkinnedMeshInstanceHandle;
-
-void fw64_skinned_mesh_instance_components_init(fw64SkinnedMeshInstanceComponents* components, fw64Allocator* allocator);
-fw64SkinnedMeshInstance* fw64_skinned_mesh_instance_components_create(fw64SkinnedMeshInstanceComponents* components, fw64Node* node, fw64SkinnedMesh* skinned_mesh, fw64SparseSetHandle* out_handle);
-void fw64_skinned_mesh_instance_components_update(fw64SkinnedMeshInstanceComponents* components, float time_delta);
-
 #ifdef __cplusplus
 }
 #endif

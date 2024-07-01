@@ -20,33 +20,15 @@ void fw64_node_update(fw64Node* node) {
     if (node->mesh_instance) {
         fw64_mesh_instance_update(node->mesh_instance);
     }
-
 }
 
-void fw64_node_add_componet(fw64Node* node, fw64Component* component) {
-    if (component->type_id == FW64_COMPONENT_TYPE_MESH_INSTANCE || component->type_id == FW64_COMPONENT_TYPE_SKINNED_MESH_INSTANCE) {
-        node->mesh_instance = (fw64MeshInstance*)component;
-    }
-
-    component->next = node->components;
-    node->components = component;
-}
-
-fw64Component* fw64_node_find_component(fw64Node* node, fw64ComponentTypeId component_type_id) {
-    fw64Component* current = node->components;
-
-    while (current) {
-        if (current->type_id == component_type_id) {
-            return current;
-        }
-    }
-
-    return NULL;
+void fw64_node_set_mesh_instance(fw64Node* node, fw64MeshInstance* mesh_instance) {
+    node->mesh_instance = mesh_instance;
 }
 
 // TODO: Temp implementation
 static void setup_box_collider(fw64Node* node) {
-    fw64MeshInstance* mesh_instance = (fw64MeshInstance*)fw64_node_find_component(node, FW64_COMPONENT_TYPE_MESH_INSTANCE);
+    fw64MeshInstance* mesh_instance = node->mesh_instance;
 
     Box box = fw64_mesh_get_bounding_box(mesh_instance->mesh);
     fw64_collider_set_type_box(node->collider, &box);
@@ -59,8 +41,8 @@ void fw64_node_set_collider(fw64Node* node, fw64Collider* collider) {
 
 void fw64_node_set_box_collider(fw64Node* node, fw64Collider* collider) {
     fw64_node_set_collider(node, collider);
-    fw64MeshInstance* mesh_instance = (fw64MeshInstance*)fw64_node_find_component(node, FW64_COMPONENT_TYPE_MESH_INSTANCE);
-    
+    fw64MeshInstance* mesh_instance = node->mesh_instance;
+
     if (mesh_instance != NULL)
         setup_box_collider(node);
 }

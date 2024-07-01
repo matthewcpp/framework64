@@ -36,6 +36,10 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
 
     if (scene->info.skinned_mesh_instance_count > 0) {
         scene->skinned_mesh_instances = allocator->malloc(allocator, sizeof(fw64SkinnedMeshInstance) * scene->info.skinned_mesh_instance_count);
+
+        for (uint32_t i = 0; i < scene->info.skinned_mesh_instance_count; i++) {
+            scene->skinned_mesh_instances[i].mesh_instance.base.node = NULL;
+        }
     } else {
         scene->skinned_mesh_instances = NULL;
     }
@@ -159,7 +163,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
             if (mesh_index != FW64_N64_NODE_NO_MESH) {
                 mesh_instance = scene->mesh_instances + mesh_instance_index++;
                 fw64_mesh_instance_init(mesh_instance, node, scene->meshes[mesh_index]);
-                fw64_node_add_componet(node, (fw64Component*)mesh_instance);
+                fw64_node_set_mesh_instance(node, mesh_instance);
             }
 
             // read the collider info written to the node

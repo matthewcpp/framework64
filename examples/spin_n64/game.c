@@ -26,7 +26,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_n64_logo, 0);
     fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(&game->scene, 0);
     fw64_mesh_instance_init(mesh_instance, node, mesh);
-    fw64_node_add_componet(node, (fw64Component*)mesh_instance);
+    fw64_node_set_mesh_instance(node, mesh_instance);
 
     game->rotation = 0.0f;
 

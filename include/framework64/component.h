@@ -12,7 +12,6 @@ typedef uint32_t fw64ComponentTypeId;
 struct fw64Component {
     uint32_t type_id;
     fw64Node* node;
-    fw64Component* next;
 };
 
 typedef enum {

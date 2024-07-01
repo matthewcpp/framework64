@@ -31,8 +31,7 @@ extern "C" {
 void fw64_node_init(fw64Node* node);
 void fw64_node_update(fw64Node* node);
 
-void fw64_node_add_componet(fw64Node* node, fw64Component* component);
-fw64Component* fw64_node_find_component(fw64Node* node, fw64ComponentTypeId component_type_id);
+void fw64_node_set_mesh_instance(fw64Node* node, fw64MeshInstance* mesh_instance);
 
 /** Associates the collider with this node.  
  * Sets the collider type to none (no collision) 
