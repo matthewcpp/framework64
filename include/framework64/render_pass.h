@@ -8,6 +8,7 @@
 #include "framework64/color.h"
 #include "framework64/display.h"
 #include "framework64/mesh_instance.h"
+#include "framework64/skinned_mesh_instance.h"
 #include "framework64/sprite_batch.h"
 
 typedef struct fw64RenderPass fw64RenderPass;
@@ -41,7 +42,7 @@ void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g,
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* text_batch);
 void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance);
-void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
+void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* renderpass, fw64SkinnedMeshInstance* skinned_mesh_instance);
 #ifdef __cplusplus
 }
 #endif

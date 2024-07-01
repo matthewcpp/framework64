@@ -34,6 +34,13 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
         scene->mesh_instances = NULL;
     }
 
+    if (scene->info.skinned_mesh_count > 0) {
+        scene->skinned_meshes = allocator->malloc(allocator, scene->info.skinned_mesh_count * sizeof(fw64Mesh*));
+        memset(scene->skinned_meshes, 0, scene->info.skinned_mesh_count * sizeof(fw64SkinnedMesh*));
+    } else {
+        scene->skinned_meshes = NULL;
+    }
+
     if (scene->info.skinned_mesh_instance_count > 0) {
         scene->skinned_mesh_instances = allocator->malloc(allocator, sizeof(fw64SkinnedMeshInstance) * scene->info.skinned_mesh_instance_count);
 
@@ -286,6 +293,10 @@ void fw64_scene_update(fw64Scene* scene, float time_delta) {
 void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
     for (uint32_t i = 0 ; i < scene->info.mesh_instance_count; i++) {
         fw64_renderpass_draw_static_mesh(rendererpass, scene->mesh_instances + i);
+    }
+
+    for (uint32_t i = 0 ; i < scene->info.skinned_mesh_instance_count; i++) {
+        fw64_renderpass_draw_skinned_mesh(rendererpass, scene->skinned_mesh_instances + i);
     }
 }
 

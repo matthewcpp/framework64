@@ -190,6 +190,10 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
         drawStaticMesh(mesh_instance->mesh, &mesh_instance->node->transform);
     }
 
+    for (auto& skinned_mesh_instance : renderpass->render_queue.skinned_mesh_instances) {
+        drawAnimatedMesh(skinned_mesh_instance->skinned_mesh->mesh, &skinned_mesh_instance->controller, &skinned_mesh_instance->mesh_instance.node->transform);
+    }
+
     if (renderpass->render_queue.sprite_batches.size()) {
         setDrawingMode(DrawingMode::Rect);
         for (auto batch : renderpass->render_queue.sprite_batches) {

@@ -82,8 +82,8 @@ void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstan
     renderpass->render_queue.mesh_instances.emplace_back(mesh_instance);
 }
 
-void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64AnimationController* animated_mesh_instances, fw64Transform* transform){
-    renderpass->render_queue.animated_mesh_instances.emplace_back(mesh, animated_mesh_instances, transform);
+void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* renderpass, fw64SkinnedMeshInstance* skinned_mesh_instance) {
+    renderpass->render_queue.skinned_mesh_instances.emplace_back(skinned_mesh_instance);
 }
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* /*renderpass*/, int /*enabled*/) {

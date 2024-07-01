@@ -65,6 +65,7 @@ void game_draw(Game* game) {
     fw64_renderpass_begin(game->renderpass);
     fw64_scene_draw_all(&game->scene, game->renderpass);
     fw64_renderpass_end(game->renderpass);
+    fw64_renderer_submit_renderpass(renderer, game->renderpass);
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
