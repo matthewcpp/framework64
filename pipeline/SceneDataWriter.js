@@ -5,12 +5,13 @@ const fs = require("fs");
 
 /// The order these values are written should correspond with the SceneInfo struct in framework64/scene.h
 function writeSceneInfo(scene, file, writer) {
-    const sceneInfoBuffer = Buffer.alloc(32);
+    const sceneInfoBuffer = Buffer.alloc(36);
     let index = 0;
 
     index = writer.writeUInt32(sceneInfoBuffer, scene.nodes.length, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.meshBundle.length, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.meshInstanceCount, index);
+    index = writer.writeUInt32(sceneInfoBuffer, /* skinned mesh count */ 0, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.skinnedMeshInstanceCount, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.colliderCount, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.collisionMeshes.length, index);

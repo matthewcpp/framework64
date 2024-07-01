@@ -20,6 +20,7 @@ typedef struct {
     uint32_t node_count;
     uint32_t mesh_count;
     uint32_t mesh_instance_count;
+    uint32_t skinned_mesh_count;
     uint32_t skinned_mesh_instance_count;
     uint32_t collider_count;
     uint32_t collision_mesh_count;
@@ -34,6 +35,7 @@ struct fw64Scene {
     fw64Node* nodes;
     fw64Collider* colliders;
     fw64Mesh** meshes;
+    fw64SkinnedMesh** skinned_meshes;
     fw64CollisionMesh* collision_meshes;
     fw64MaterialBundle* material_bundle;
     fw64Allocator* allocator;
@@ -72,6 +74,10 @@ fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId, uint
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene);
 
+fw64SkinnedMesh* fw64_scene_load_skinned_mesh_asset(fw64Scene* scene, fw64AssetId asset_id, uint32_t index);
+fw64SkinnedMesh* fw64_scene_get_skinned_mesh(fw64Scene* scene, uint32_t index);
+uint32_t fw64_scene_get_skinned_mesh_count(fw64Scene* scene);
+
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
 
@@ -89,6 +95,9 @@ int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocit
 
 #define fw64_scene_get_mesh_instance_count(scene) ((scene)->info.mesh_instance_count)
 #define fw64_scene_get_mesh_instance(scene, index) ((scene)->mesh_instances + (index))
+
+#define fw64_scene_get_skinned_mesh_instance_count(scene) ((scene)->info.skinned_mesh_instance_count)
+#define fw64_scene_get_skinned_mesh_instance(scene, index) ((scene)->skinned_mesh_instances + (index))
 
 #ifdef __cplusplus
 }

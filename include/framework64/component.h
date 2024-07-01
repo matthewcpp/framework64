@@ -14,12 +14,6 @@ struct fw64Component {
     fw64Node* node;
 };
 
-typedef enum {
-    FW64_COMPONENT_TYPE_NONE,
-    FW64_COMPONENT_TYPE_MESH_INSTANCE,
-    FW64_COMPONENT_TYPE_SKINNED_MESH_INSTANCE,
-} fw64BuiltinComponentType;
-
 typedef struct {
     uint32_t type_id;
 } fw64Components;

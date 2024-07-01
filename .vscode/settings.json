@@ -148,6 +148,8 @@
         "fill_rect.h": "c",
         "skinned_mesh.h": "c",
         "collider.h": "c",
-        "component.h": "c"
+        "component.h": "c",
+        "transform.h": "c",
+        "mesh_instance.h": "c"
     }
 }

@@ -38,7 +38,7 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
         scene->skinned_mesh_instances = allocator->malloc(allocator, sizeof(fw64SkinnedMeshInstance) * scene->info.skinned_mesh_instance_count);
 
         for (uint32_t i = 0; i < scene->info.skinned_mesh_instance_count; i++) {
-            scene->skinned_mesh_instances[i].mesh_instance.base.node = NULL;
+            scene->skinned_mesh_instances[i].mesh_instance.node = NULL;
         }
     } else {
         scene->skinned_mesh_instances = NULL;
@@ -212,11 +212,19 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 }
 
 void fw64_scene_uninit(fw64Scene* scene) {
-if (scene->meshes) {
+    if (scene->meshes) {
         for (uint32_t i = 0; i < scene->info.mesh_count; i++)
             fw64_mesh_delete(scene->meshes[i], scene->assets, scene->allocator);
 
         scene->allocator->free(scene->allocator, scene->meshes);
+    }
+
+    if (scene->skinned_meshes) {
+        for (uint32_t i = 0; i < scene->info.skinned_mesh_count; i++) {
+            fw64_skinned_mesh_delete(scene->skinned_meshes[i], scene->assets, scene->allocator);
+        }
+
+        scene->allocator->free(scene->allocator, scene->skinned_meshes);
     }
 
     if (scene->material_bundle) {
@@ -285,7 +293,7 @@ void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw
     for (uint32_t i = 0 ; i < scene->info.mesh_instance_count; i++) {
         fw64MeshInstance* mesh_instance = scene->mesh_instances + i;
 
-        if (!(mesh_instance->base.node->layer_mask & layer_mask)) {
+        if (!(mesh_instance->node->layer_mask & layer_mask)) {
             continue;
         }
 
@@ -435,6 +443,28 @@ fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index) {
 
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene) {
     return scene->info.mesh_count;
+}
+
+fw64SkinnedMesh* fw64_scene_load_skinned_mesh_asset(fw64Scene* scene, fw64AssetId asset_id, uint32_t index) {
+    fw64SkinnedMesh* skinned_mesh = fw64_assets_load_skinned_mesh(scene->assets, asset_id, scene->allocator);
+
+    if (skinned_mesh) {
+        if (scene->skinned_meshes[index]) {
+            fw64_skinned_mesh_delete(scene->skinned_meshes[index], scene->assets, scene->allocator);
+        }
+
+        scene->skinned_meshes[index] = skinned_mesh;
+    }
+
+    return skinned_mesh;
+}
+
+fw64SkinnedMesh* fw64_scene_get_skinned_mesh(fw64Scene* scene, uint32_t index) {
+    return scene->skinned_meshes[index];
+}
+
+uint32_t fw64_scene_get_skinned_mesh_count(fw64Scene* scene) {
+    return scene->info.skinned_mesh_count;
 }
 
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index) {

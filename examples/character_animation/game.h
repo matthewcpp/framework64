@@ -13,7 +13,6 @@ typedef struct {
     fw64Engine* engine;
     fw64ArcballCamera arcball;
     fw64Scene scene;
-    fw64SkinnedMeshInstances skinned_mesh_instances;
     fw64RenderPass* renderpass;
 
     int current_animation;

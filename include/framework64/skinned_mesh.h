@@ -4,14 +4,12 @@
 
 #include "framework64/allocator.h"
 #include "framework64/animation_data.h"
-#include "framework64/component.h"
 #include "framework64/data_io.h"
 
 typedef struct fw64Mesh fw64Mesh;
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
 typedef struct {
-    fw64Component base;
     fw64Mesh* mesh;
     fw64AnimationData* animation_data;
 } fw64SkinnedMesh;
