@@ -1,5 +1,6 @@
 set(components_source_files
     arcball_camera/arcball_camera.h arcball_camera/arcball_camera.c
+    billboard_node/billboard_node.h billboard_node/billboard_node.c
     # asset_viewer/asset_viewer.h asset_viewer/asset_viewer.c
     # file_explorer/file_explorer.h file_explorer/file_explorer.c
     file_downloader/file_downloader_message.h file_downloader/file_downloader.h file_downloader/file_downloader.c
