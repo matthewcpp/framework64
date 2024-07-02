@@ -555,11 +555,12 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* me
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
-void fw64_renderer_draw_animated_mesh(fw64Renderer* renderer, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
-    (void)transform;
-    // TODO: fix when skinned mesh instance
-    //gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&transform->matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+void fw64_renderer_draw_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInstance* instance) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&instance->mesh_instance.n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
+    fw64Mesh* mesh = instance->skinned_mesh->mesh;
+    fw64AnimationController* controller = &instance->controller;
+
     for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh->primitives + i;
 
@@ -716,8 +717,7 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
     if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.skinned_meshes)) {
         for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.skinned_meshes); i++) {
             fw64SkinnedMeshInstance* mesh_instance = *(fw64SkinnedMeshInstance**)fw64_dynamic_vector_item(&renderpass->render_queue.skinned_meshes, i);
-            // fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform
-            fw64_renderer_draw_animated_mesh(renderer, mesh_instance->skinned_mesh->mesh, &mesh_instance->controller, &mesh_instance->mesh_instance.node->transform);
+            fw64_renderer_draw_skinned_mesh(renderer, mesh_instance);
         }
     }
 
