@@ -541,7 +541,7 @@ void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x
 }
 
 void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->render_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh_instance->mesh->primitives + i;
@@ -701,13 +701,23 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
 
     renderer->enabled_features = renderpass->enabled_features;
 
-    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.static_meshes)) {
+    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.static_meshes) || !fw64_dynamic_vector_is_empty(&renderpass->render_queue.skinned_meshes)) {
         // TODO: This will likely change to only be set for goraud shaded objects
         fw64_renderer_load_matrices(renderer, &renderpass->projection_matrix, &renderpass->persp_norm, &renderpass->view_matrix, 1);
+    }
 
+    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.static_meshes)) {
         for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.static_meshes); i++) {
             fw64MeshInstance* mesh_instance = *(fw64MeshInstance**)fw64_dynamic_vector_item(&renderpass->render_queue.static_meshes, i);
             fw64_renderer_draw_static_mesh(renderer, mesh_instance);
+        }
+    }
+
+    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.skinned_meshes)) {
+        for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.skinned_meshes); i++) {
+            fw64SkinnedMeshInstance* mesh_instance = *(fw64SkinnedMeshInstance**)fw64_dynamic_vector_item(&renderpass->render_queue.skinned_meshes, i);
+            // fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform
+            fw64_renderer_draw_animated_mesh(renderer, mesh_instance->skinned_mesh->mesh, &mesh_instance->controller, &mesh_instance->mesh_instance.node->transform);
         }
     }
 

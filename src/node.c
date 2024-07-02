@@ -24,6 +24,7 @@ void fw64_node_update(fw64Node* node) {
 
 void fw64_node_set_mesh_instance(fw64Node* node, fw64MeshInstance* mesh_instance) {
     node->mesh_instance = mesh_instance;
+    fw64_mesh_instance_update(mesh_instance);
 }
 
 // TODO: Temp implementation
