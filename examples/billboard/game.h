@@ -25,7 +25,7 @@ typedef struct {
     Flame flame;
     fw64Scene* scene;
     fw64RenderPass* renderpass[RENDERPASS_COUNT];
-    BillboardNodes billboard_nodes;
+    fw64BillboardNodes billboard_nodes;
 } Game;
 
 #ifdef __cplusplus

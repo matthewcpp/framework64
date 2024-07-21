@@ -7,21 +7,21 @@
 typedef struct {
     fw64Node* node;
     fw64Camera* camera;
-} BillboardNode;
+} fw64BillboardNode;
 
-typedef fw64SparseSetHandle BillboardNodeHandle;
+typedef fw64SparseSetHandle fw64BillboardNodeHandle;
 
 typedef struct {
     fw64SparseSet components;
-} BillboardNodes;
+} fw64BillboardNodes;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void billboard_nodes_init(BillboardNodes* system, fw64Allocator* allocator);
-BillboardNode* billboard_nodes_create(BillboardNodes* system, fw64Node* node, fw64Camera* camera, BillboardNodeHandle* out_handle);
-void billboard_nodes_update(BillboardNodes* system);
+void fw64_billboard_nodes_init(fw64BillboardNodes* system, fw64Allocator* allocator);
+fw64BillboardNode* fw64_billboard_nodes_create(fw64BillboardNodes* system, fw64Node* node, fw64Camera* camera, fw64BillboardNodeHandle* out_handle);
+void fw64_billboard_nodes_update(fw64BillboardNodes* system);
 
 #ifdef __cplusplus
 }

@@ -19,7 +19,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
 
     fw64_renderer_set_clear_color(engine->renderer, 0, 17, 51);
-    billboard_nodes_init(&game->billboard_nodes, allocator);
+    fw64_billboard_nodes_init(&game->billboard_nodes, allocator);
 
     fw64_fps_camera_init(&game->fps, engine->input, fw64_displays_get_primary(engine->displays));
     game->fps.movement_speed = 70.0f;
@@ -38,7 +38,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Node* billboard_nodes[2];
     fw64_scene_find_nodes_with_layer_mask(game->scene, FW64_layer_billboard, billboard_nodes, 2);
     for (int i = 0; i < 2; i++) {
-        billboard_nodes_create(&game->billboard_nodes, billboard_nodes[i], &game->fps.camera, NULL);
+        fw64_billboard_nodes_create(&game->billboard_nodes, billboard_nodes[i], &game->fps.camera, NULL);
     }
 }
 
@@ -73,7 +73,7 @@ static void flame_update(Flame* flame, float time_delta) {
 void game_update(Game* game){
     fw64_fps_camera_update(&game->fps, game->engine->time->time_delta);
     flame_update(&game->flame, game->engine->time->time_delta);
-    billboard_nodes_update(&game->billboard_nodes);
+    fw64_billboard_nodes_update(&game->billboard_nodes);
 }
 
 void game_draw(Game* game) {
