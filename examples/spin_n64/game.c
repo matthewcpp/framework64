@@ -3,8 +3,6 @@
 
 #include "framework64/controller_mapping/n64.h"
 
-#define ROTATION_SPEED 90.0f
-
 void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
     fw64Display* display = fw64_displays_get_primary(engine->displays);
@@ -25,7 +23,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_n64_logo);
     fw64_scene_create_mesh_instance(&game->scene, node, mesh);
 
-    game->rotation = 0.0f;
+    fw64_rotate_node_init(&game->rotate_node, node);
 
     fw64Camera camera;
     fw64_camera_init(&camera, display);
@@ -40,13 +38,7 @@ void game_init(Game* game, fw64Engine* engine) {
 }
 
 void game_update(Game* game){
-    game->rotation += game->engine->time->time_delta * ROTATION_SPEED;
-
-    fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-    quat_from_euler(&node->transform.rotation, 0.0f, game->rotation, 0.0f);
-
-    fw64_node_update(node);
-    fw64_mesh_instance_update(fw64_scene_get_mesh_instance(&game->scene, 0));
+    fw64_rotate_node_update(&game->rotate_node, game->engine->time->time_delta);
 }
 
 void game_draw(Game* game) {
