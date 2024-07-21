@@ -1,6 +1,6 @@
-uniform vec4 diffuse_color;
+in vec4 line_color;
 out vec4 final_color;
 
 void main() {
-    final_color = diffuse_color;
+    final_color = line_color;
 }

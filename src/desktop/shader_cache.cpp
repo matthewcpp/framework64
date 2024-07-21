@@ -56,7 +56,7 @@ ShaderProgram* ShaderCache::getShaderProgram(fw64ShadingMode shading_mode) {
         }
 
         case FW64_SHADING_MODE_LINE: {
-            primitive_attributes = fw64Primitive::Attributes::Positions;
+            primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::VertexColors;
             shader = &line_shader;
             break;
         }
