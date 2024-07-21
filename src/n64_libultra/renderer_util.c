@@ -26,7 +26,3 @@ void fw64_renderer_util_fullscreen_overlay(fw64Renderer* renderer, uint8_t r, ui
     gSPDisplayList(renderer->display_list++, &fullscreen_overlay_dl[0]);
 } 
 
-// TODO: This is going away
-void fw64_renderer_util_clear_viewport(fw64Renderer* renderer, fw64Camera* camera, fw64RendererFlags flags) {
-    fw64_n64_renderer_clear_viewport(renderer, &camera->viewport, renderer->clear_color, (fw64ClearFlags)flags);
-}

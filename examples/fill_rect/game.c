@@ -126,7 +126,7 @@ void game_draw(Game* game) {
     draw_progress_text(game, &screen_size);
     fw64_spritebatch_end(game->sprite_batch);
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_begin(game->renderpass);
     fw64_renderpass_draw_sprite_batch(game->renderpass, game->sprite_batch);
     fw64_renderpass_end(game->renderpass);

@@ -47,7 +47,7 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, fw64_asset_viewer_determine_primitive_mode(&game->asset_viewer), FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, fw64_asset_viewer_determine_primitive_mode(&game->asset_viewer), FW64_CLEAR_FLAG_ALL);
     fw64_asset_viewer_draw(&game->asset_viewer);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);

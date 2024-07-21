@@ -75,18 +75,18 @@ void fw64Renderer::endFrame() {
     display.swap();
 }
 
-void fw64Renderer::begin(fw64PrimitiveMode mode, fw64RendererFlags flags) {
+void fw64Renderer::begin(fw64PrimitiveMode mode, fw64ClearFlags flags) {
     if (lighting_dirty) {
         updateLightingBlock();
         lighting_dirty = false;
     }
 
     GLbitfield clear_bits = 0;
-    if (flags & FW64_RENDERER_FLAG_CLEAR_COLOR) {
+    if (flags & FW64_CLEAR_FLAG_COLOR) {
         clear_bits |= GL_COLOR_BUFFER_BIT;
     }
 
-    if (flags & FW64_RENDERER_FLAG_CLEAR_DEPTH) {
+    if (flags & FW64_CLEAR_FLAG_DEPTH) {
         clear_bits |= GL_DEPTH_BUFFER_BIT;
     }
 
@@ -235,7 +235,7 @@ void fw64Renderer::drawSpriteBatch(fw64SpriteBatch* sprite_batch) {
     }
 }
 
-void fw64Renderer::end(fw64RendererFlags) {
+void fw64Renderer::end(fw64RendererSwapFlags) {
     setDrawingMode(DrawingMode::None);
 
     current_camera = nullptr;
@@ -427,7 +427,7 @@ void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g,
     renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64RendererFlags flags) {
+void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags flags) {
     renderer->begin(primitive_mode, flags);
 }
 
@@ -439,7 +439,7 @@ void fw64_renderer_set_viewport(fw64Renderer* renderer, fw64Viewport* viewport) 
     renderer->setViewport(viewport);
 }
 
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
+void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags flags) {
     renderer->end(flags);
 }
 
