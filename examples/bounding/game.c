@@ -70,12 +70,12 @@ void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->camera, &frustum);
 
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     draw_scene_layer(game, game->renderpass[RENDERPASS_SCENE_TRIANGLES], &frustum, FW64_layer_triangles);
     ui_draw(&game->ui);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NONE);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
 
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_LINES, FW64_RENDERER_FLAG_NONE);
+    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_LINES, FW64_CLEAR_FLAG_NONE);
     draw_scene_layer(game, game->renderpass[RENDERPASS_SCENE_LINES], &frustum, FW64_layer_lines);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

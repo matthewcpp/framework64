@@ -28,7 +28,6 @@ struct fw64Renderer{
     IVec2 screen_size;
     fw64PrimitiveMode primitive_mode;
     fw64ShadingMode shading_mode;
-    fw64RendererFlags flags;
 
     Lights2 lights;
     uint32_t active_light_mask;

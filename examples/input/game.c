@@ -35,7 +35,7 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
 
     for (int i = 0; i < FW64_MAX_CONTROLLER_COUNT; i++) {
         controller_info_draw(&game->controller_infos[i]);

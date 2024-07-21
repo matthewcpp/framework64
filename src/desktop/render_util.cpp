@@ -5,8 +5,3 @@
 void fw64_renderer_util_fullscreen_overlay(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     renderer->renderFullscreenOverlay(r, g, b, a);
 }
-
-// TODO: This is going away
-void fw64_renderer_util_clear_viewport(fw64Renderer* renderer, fw64Camera* camera, fw64RendererFlags flags) {
-    renderer->clearViewport(camera->viewport, static_cast<fw64ClearFlags>(flags));
-}

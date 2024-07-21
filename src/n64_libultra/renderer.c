@@ -21,7 +21,6 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->display_list = NULL;
     renderer->primitive_mode = FW64_PRIMITIVE_MODE_UNSET;
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
-    renderer->flags = FW64_RENDERER_FLAG_NONE;
 
     n64_fill_rect_init(&renderer->fill_rect);
     renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
@@ -136,11 +135,9 @@ static void fw64_renderer_load_matrices(fw64Renderer* renderer, fw64Matrix* proj
     }
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64RendererFlags flags) {
+void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags clear_flags) {
     renderer->primitive_mode = primitive_mode;
     fw64_texture_state_default(&renderer->active_texture);
-    
-    renderer->flags = flags;
 
     if (renderer->starting_new_frame) {
         renderer->display_list = &renderer->gfx_list[0];
@@ -152,24 +149,23 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mod
     fw64_renderer_init_rdp(renderer);
     fw64_renderer_init_rsp(renderer);
 
-    if (flags & FW64_RENDERER_FLAG_CLEAR) {
-        fw64_n64_renderer_clear_rect(renderer, 0, 0, renderer->screen_size.x, renderer->screen_size.y, renderer->clear_color, (fw64ClearFlags)flags);
+    if (clear_flags) {
+        fw64_n64_renderer_clear_rect(renderer, 0, 0, renderer->screen_size.x, renderer->screen_size.y, renderer->clear_color, clear_flags);
     }
 
     gSPSetLights2(renderer->display_list++, renderer->lights);
 }
 
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags) {
+void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags) {
     gDPFullSync(renderer->display_list++);
     gSPEndDisplayList(renderer->display_list++);
 
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
-    renderer->flags = FW64_RENDERER_FLAG_NONE;
 
     nuGfxTaskStart(renderer->display_list_start, 
         (s32)(renderer->display_list - renderer->display_list_start) * sizeof (Gfx), 
         (renderer->primitive_mode == FW64_PRIMITIVE_MODE_LINES) ? NU_GFX_UCODE_L3DEX2 : NU_GFX_UCODE_F3DEX, 
-        (flags & FW64_RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
+        (swap_flags & FW64_RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
 }
 
 static inline void n64_renderer_set_render_mode_opaque(fw64Renderer* renderer) {

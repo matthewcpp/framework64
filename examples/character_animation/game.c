@@ -78,7 +78,7 @@ void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->arcball.camera, &frustum);
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_set_camera(game->renderpass, &game->arcball.camera);
     fw64_renderpass_begin(game->renderpass);
     fw64_scene_draw_frustrum(&game->scene, game->renderpass, &frustum, ~0U);

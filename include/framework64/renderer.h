@@ -13,16 +13,9 @@
 #include "vec2.h"
 
 typedef enum {
-    FW64_RENDERER_FLAG_NONE = 0,
-    FW64_RENDERER_FLAG_NOCLEAR = 0,
-    FW64_RENDERER_FLAG_CLEAR_COLOR = 1,
-    FW64_RENDERER_FLAG_CLEAR_DEPTH = 2,
-    FW64_RENDERER_FLAG_CLEAR = FW64_RENDERER_FLAG_CLEAR_COLOR | FW64_RENDERER_FLAG_CLEAR_DEPTH,
-    FW64_RENDERER_FLAG_CLEAR_ALL = FW64_RENDERER_FLAG_CLEAR,
-
     FW64_RENDERER_FLAG_NOSWAP = 0,
-    FW64_RENDERER_FLAG_SWAP = 4,
-} fw64RendererFlags;
+    FW64_RENDERER_FLAG_SWAP = 1,
+} fw64RendererSwapFlags;
 
 #define FW64_RENDERER_MAX_LIGHT_COUNT 2
 
@@ -33,13 +26,12 @@ typedef struct fw64Renderer fw64Renderer;
 extern "C" {
 #endif
 
-
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64RendererFlags flags);
+void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags clear_flags);
 
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass);
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererFlags flags);
+void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags);
 
 void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled);
 int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);

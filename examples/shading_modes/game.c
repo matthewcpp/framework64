@@ -101,7 +101,7 @@ void game_update(Game* game) {
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
 
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_begin(renderpass);

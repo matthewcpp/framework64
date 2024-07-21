@@ -138,7 +138,7 @@ void update_viewport_info(Game* game) {
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     
     fw64RenderPass* pass = game->renderpasses[RENDER_PASS_VIEW];
     fw64_renderpass_set_camera(pass, &game->camera);

@@ -31,11 +31,11 @@ public:
     bool init(int width, int height);
 
     void setClearColor(float r, float g, float b, float a);
-    void begin(fw64PrimitiveMode primitive_mode, fw64RendererFlags flags);
+    void begin(fw64PrimitiveMode primitive_mode, fw64ClearFlags flags);
     void setCamera(fw64Camera* cam);
     void setViewMatrices(float* projection, float* view);
     void setViewport(fw64Viewport const * viewport);
-    void end(fw64RendererFlags flags);
+    void end(fw64RendererSwapFlags flags);
 
     void clearViewport(fw64Viewport const & viewport, fw64ClearFlags flags);
 

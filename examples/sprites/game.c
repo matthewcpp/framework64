@@ -68,7 +68,7 @@ void draw_sprites(Game* game) {
 void game_draw(Game* game){
     fw64Renderer* renderer = game->engine->renderer;
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_begin(game->render_pass);
     draw_sprites(game);
     fw64_renderpass_draw_sprite_batch(game->render_pass, game->sprite_batch);

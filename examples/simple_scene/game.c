@@ -43,7 +43,7 @@ void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->chase_cam.camera, &frustum);
 
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
 
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_begin(renderpass);
