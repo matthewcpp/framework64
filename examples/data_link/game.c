@@ -4,8 +4,7 @@
 #include "framework64/controller_mapping/n64.h"
 #include "framework64/log.h"
 #include "framework64/n64_libultra/data_link.h"
-
-#include "framework64/data_link.h"
+#include "framework64/util/renderpass_util.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -32,8 +31,13 @@ void on_data_link_message(fw64DataSource* message, void* arg) {
 void game_init(Game* game, fw64Engine* engine) {
     memset(game, 0, sizeof(Game));
     game->engine = engine;
+    fw64Display* display = fw64_displays_get_primary(engine->displays);
+    fw64Allocator* allocator = fw64_default_allocator();
 
-    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
+    game->spritebatch = fw64_spritebatch_create(1, allocator);
+    game->renderpass = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_util_ortho2d(game->renderpass);
+
     message_list_init(game);
 
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas14, fw64_default_allocator());
@@ -51,14 +55,21 @@ void game_update(Game* game){
 
 void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_renderer_set_camera(game->engine->renderer, &game->camera);
 
+    fw64_spritebatch_begin(game->spritebatch);
     if (fw64_data_link_connected(game->engine->data_link)) {
         draw_data_link_messages(game);
     }
     else {
-        fw64_renderer_draw_text(game->engine->renderer, game->font, 10, 10, "No data link connection.");
+        fw64_spritebatch_draw_string(game->spritebatch, game->font, "No data link connection.", 10, 10);
     }
+    fw64_spritebatch_end(game->spritebatch);
+
+    fw64_renderpass_begin(game->renderpass);
+    fw64_renderpass_draw_sprite_batch(game->renderpass, game->spritebatch);
+    fw64_renderpass_end(game->renderpass);
+
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
 
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
@@ -69,11 +80,11 @@ void draw_data_link_messages(Game* game) {
     int y_pos = 10;
 
     sprintf(buffer, "Messages: %u Data: %u", game->total_message_count, game->total_message_data);
-    fw64_renderer_draw_text(game->engine->renderer, game->font, 10, y_pos, buffer);
+    fw64_spritebatch_draw_string(game->spritebatch, game->font, buffer, 10, y_pos);
 
     for (size_t i = 0; i < MESSAGE_LIST_COUNT; i++) {
         y_pos += fw64_font_size(game->font) + 4;
-        fw64_renderer_draw_text(game->engine->renderer, game->font, 10, y_pos, game->message_list[i]);
+        fw64_spritebatch_draw_string(game->spritebatch, game->font, game->message_list[i], 10, y_pos);
     }
 }
 

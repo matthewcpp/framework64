@@ -5,6 +5,10 @@
             "format": "RGBA32"
         },
         {
+            "src": "image_types/rgba16.png",
+            "format": "RGBA16"
+        },
+        {
             "src": "image_types/ia8.png",
             "format": "IA8"
         },
@@ -44,7 +48,7 @@
             "name": "header",
             "src": "Consolas.ttf",
             "size": "14",
-            "sourceString": "Format: IA8 IA4 I8 I4 RGBA32 RGBA16 CI8 CI4"
+            "sourceString": "Format: IA8 IA4 I8 I4 RGBA32 RGBA16 CI8 CI4 Unknown"
         }
     ]
 }

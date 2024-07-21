@@ -1,27 +1,40 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
+#include "framework64/scene.h"
+#include "debug_boxes/debug_boxes.h"
 
 typedef enum {
-    CUBE_TOP_LEFT,
-    CUBE_TOP_RIGHT,
-    CUBE_BOTTOM_LEFT,
-    CUBE_BOTTOM_RIGHT,
-    CUBE_COUNT,
-    CUBE_NONE = CUBE_COUNT
-} CubeId;
+    RENDERPASS_SCENE_TRIANGLES,
+    RENDERPASS_SCENE_LINES,
+    RENDERPASS_COUNT
+} RenderPass;
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
-    fw64Node penguin;
-    fw64Collider penguin_collider;
-    fw64Node penguin_box;
-    fw64Node cubes[CUBE_COUNT];
-    fw64Collider cube_colliders[CUBE_COUNT];
-    CubeId intersection;
+    fw64Scene* scene;
+    fw64Node* node;
+    fw64Node* active;
+} Penguin;
+
+typedef struct {
+    fw64Engine* engine;
+    Penguin* penguin;
+    fw64Scene* scene;
     fw64Font* font;
+    fw64SpriteBatch* spritebatch;
+    fw64RenderPass* renderpass;
+    char text[32];
+} Ui;
+
+typedef struct {
+    fw64Engine* engine;
+    fw64Scene* scene;
+    fw64Camera camera;
+    fw64RenderPass* renderpass[RENDERPASS_COUNT];
+    Penguin penguin;
+    fw64DebugBoxes debug_boxes;
+    Ui ui;
 } Game;
 
 #ifdef __cplusplus

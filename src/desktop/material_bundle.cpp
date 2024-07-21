@@ -44,7 +44,7 @@ fw64MaterialBundle* fw64MaterialBundle::loadFromDatasource(fw64DataSource* data_
     }
 
     for (uint32_t i = 0; i < material_bundle_info.material_count; i++) {
-        auto& material = material_bundle->materials.emplace_back(std::make_unique<fw64Material>());
+        auto& material = material_bundle->materials.emplace_back(std::make_unique<fw64Material>(shader_cache));
 
         uint32_t texture_index, shading_mode;
         fw64_data_source_read(data_source, &texture_index, sizeof(uint32_t), 1);

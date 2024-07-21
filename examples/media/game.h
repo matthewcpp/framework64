@@ -1,7 +1,7 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "file_explorer/file_explorer.h"
+#include "media_file_picker/media_file_picker.h"
 #include "asset_viewer/asset_viewer.h"
 
 #define DIR_LISTING_MAX 10
@@ -14,12 +14,30 @@ typedef enum {
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
     fw64Font* font;
-    fw64Texture* texture;
-    fw64FileExplorer file_explorer;
-    fw64AssetViewer file_viewer;
+    fw64RenderPass* renderpass;
+    fw64SpriteBatch* spritebatch;
+    fw64MediaFilePicker file_picker;
+} MediaFileExplorer;
+
+typedef struct {
+    fw64Engine* engine;
+    fw64RenderPass* renderpass;
+    fw64SpriteBatch* spritebatch;
+} NoMediaPresent;
+
+typedef struct {
+    fw64Engine* engine;
+    fw64RenderPass* renderpass;
+    fw64AssetViewer view;
+} MediaAssetViewer;
+
+typedef struct {
+    fw64Engine* engine;
     GameState state;
+    MediaFileExplorer file_explorer;
+    MediaAssetViewer asset_viewer;
+    NoMediaPresent no_media_present;
 } Game;
 
 #ifdef __cplusplus

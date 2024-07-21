@@ -13,6 +13,7 @@ typedef struct {
 
     fw64Font* fonts[FONT_COUNT];
     int active_font_index;
+    Vec3 translate;
 } Game;
 
 #ifdef __cplusplus

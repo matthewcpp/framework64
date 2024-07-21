@@ -4,21 +4,28 @@
 #include "framework64/camera.h"
 #include "framework64/engine.h"
 #include "framework64/node.h"
+#include "framework64/scene.h"
+#include "framework64/skinned_mesh_instance.h"
 
 #include "arcball_camera/arcball_camera.h"
 
 typedef struct {
     fw64Engine* engine;
+    fw64SpriteBatch* spritebatch;
+    fw64RenderPass* renderpass;
+    fw64Font* font;
+    fw64SkinnedMeshInstance* skinned_mesh_instance;
+} Ui;
+
+typedef struct {
+    fw64Engine* engine;
     fw64ArcballCamera arcball;
+    fw64Scene scene;
+    fw64RenderPass* renderpass;
 
-    fw64Font* consolas;
-    fw64Texture* button_sprite;
-
-    fw64Node node;
-    fw64SkinnedMesh* skinned_mesh;
-    fw64AnimationController animation_state;
     int current_animation;
     float current_speed;
+    Ui ui;
 } Game;
 
 #ifdef __cplusplus

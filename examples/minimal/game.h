@@ -4,7 +4,6 @@
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
 } Game;
 
 #ifdef __cplusplus

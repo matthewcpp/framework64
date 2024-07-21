@@ -8,21 +8,11 @@
             "frameSize": "128x128",
             "resize": "320x32",
             "format": "rgba32"
-        },
-        {
-            "src": "grass.png",
-            "hslices": 1,
-            "vslices": 1
-        },
-        {
-            "src": "moon.png",
-            "hslices": 1,
-            "vslices": 1
         }
     ],
-    "meshes": [
+    "levels": [
         {
-            "src": "campfire/campfire.gltf"
+            "src": "examples/billboard/billboard.gltf"
         }
     ]
 }

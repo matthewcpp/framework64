@@ -7,7 +7,8 @@
 #include "framework64/camera.h"
 #include "framework64/color.h"
 #include "framework64/display.h"
-#include "framework64/mesh.h"
+#include "framework64/mesh_instance.h"
+#include "framework64/skinned_mesh_instance.h"
 #include "framework64/sprite_batch.h"
 
 typedef struct fw64RenderPass fw64RenderPass;
@@ -32,6 +33,7 @@ void fw64_renderpass_end(fw64RenderPass* renderpass);
 void fw64_renderpass_set_view_matrix(fw64RenderPass* pass, float* view);
 void fw64_renderpass_set_projection_matrix(fw64RenderPass* pass, float* projection, uint16_t* persp_norm_ptr);
 void fw64_renderpass_set_viewport(fw64RenderPass* pass, fw64Viewport* viewport);
+const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass);
 void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera);
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled);
@@ -40,8 +42,19 @@ void fw64_renderpass_set_clear_flags(fw64RenderPass* pass, fw64ClearFlags flags)
 void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g, uint8_t b);
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* text_batch);
-void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64Transform* transform);
-void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
+void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance);
+void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* renderpass, fw64SkinnedMeshInstance* skinned_mesh_instance);
+
+void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled);
+/**
+ * Sets the min and max positions of fog.
+ * The values for min / max should be values in the range [0.0, 1.0]
+ * A values of 0.0 is on the near plane, while 1.0 is on the far plane.
+ */ 
+void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min, float fog_max);
+void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_t g, uint8_t b);
+
+
 #ifdef __cplusplus
 }
 #endif

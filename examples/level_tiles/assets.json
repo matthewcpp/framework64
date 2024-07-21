@@ -2,7 +2,15 @@
     "levels":
     [
         {
-            "src": "tiles_test/tiles_test.gltf"
+            "src": "examples/level_tiles/level_tiles.gltf"
+        }
+    ],
+    "skinnedMeshes": [
+        {
+            "src": "catherine/catherine.gltf",
+            "animations": [
+                "Run"
+            ]
         }
     ]
 }

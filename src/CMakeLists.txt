@@ -7,6 +7,7 @@ set(common_source_files
         ../include/framework64/box.h box.c
         ../include/framework64/camera.h camera.c
         ../include/framework64/collision.h collision.c
+        ../include/framework64/collision_mesh.h collision_mesh.c
         ../include/framework64/collider.h collider.c
         ../include/framework64/color.h color.c
         ../include/framework64/data_io.h data_io.c
@@ -18,13 +19,13 @@ set(common_source_files
         ../include/framework64/frustum.h frustum.c
         ../include/framework64/image.h
         ../include/framework64/input.h
-        ../include/framework64/level.h level.c
         ../include/framework64/material_bundle.h
         ../include/framework64/math.h math.c
         ../include/framework64/matrix.h matrix.c
         ../include/framework64/matrix_project.h matrix_project.c
         ../include/framework64/media.h
         ../include/framework64/mesh.h
+        ../include/framework64/mesh_instance.h mesh_instance.c
         ../include/framework64/node.h node.c
         ../include/framework64/plane.h plane.c
         ../include/framework64/quat.h quat.c
@@ -35,7 +36,9 @@ set(common_source_files
         ../include/framework64/renderer.h
         ../include/framework64/scene.h scene.c
         ../include/framework64/skinned_mesh.h skinned_mesh.c
+        ../include/framework64/skinned_mesh_instance.h skinned_mesh_instance.c
         ../include/framework64/sprite_batch.h
+        ../include/framework64/static_vector.h static_vector.c
         ../include/framework64/texture.h
         ../include/framework64/transform.h transform.c
         ../include/framework64/types.h
@@ -52,7 +55,9 @@ set(common_source_files
         ../include/framework64/util/mesh_editor.h
         ../include/framework64/util/quad.h util/quad.c
         ../include/framework64/util/renderer_util.h
+        ../include/framework64/util/renderpass_util.h util/renderpass_util.c
         ../include/framework64/util/sparse_set.h util/sparse_set.c
+        ../include/framework64/util/text_util.h util/text_util.c
         ../include/framework64/util/texture_util.h util/texture_util.c
 
         ../include/framework64/controller_mapping/n64.h

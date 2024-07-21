@@ -13,7 +13,6 @@
 typedef struct {
     fw64Texture* texture;
     fw64AssetId image_asset_id;
-    int is_animated;
     float min_s;
     float max_s;
     float min_t;

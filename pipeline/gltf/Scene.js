@@ -5,9 +5,14 @@ class Scene {
     name = "scene"
     nodes = [];
     colliderCount = 0;
+    meshInstanceCount = 0;
+    skinnedMeshInstanceCount = 0;
     collisionMeshes = [];
+    transformCustomBoundingBoxIndex = -1;
     customBoundingBoxes = [];
     materialBundle = null;
+    extraMeshCount = 0;
+    extraNodeCount = 0;
 
     meshBundle = [];
 

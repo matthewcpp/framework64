@@ -3,8 +3,13 @@
 
 #include <framework64/matrix.h>
 #include <framework64/util/renderer_util.h>
+#include <framework64/util/renderpass_util.h>
 
 #include "framework64/controller_mapping/n64.h"
+
+static void view_init(View* view, fw64Engine* engine, fw64Scene* scene, Vec2* viewport_pos, Vec2* viewport_size, fw64CameraProjectionMode projection_mode);
+static void view_update(View* view, float time_delta);
+static void view_draw(View* view);
 
 static void init_scene(Game* game);
 static void init_views(Game* game);
@@ -20,6 +25,8 @@ void game_init(Game* game, fw64Engine* engine) {
 }
 
 void view_init(View* view, fw64Engine* engine, fw64Scene* scene, Vec2* viewport_pos, Vec2* viewport_size, fw64CameraProjectionMode projection_mode) {
+    view->engine = engine;
+    view->scene = scene;
     fw64Display* display = fw64_displays_get_primary(engine->displays);
     fw64_arcball_init(&view->arcball_camera, engine->input, display);
     view->arcball_camera.camera.projection_mode = projection_mode;
@@ -33,13 +40,6 @@ void view_init(View* view, fw64Engine* engine, fw64Scene* scene, Vec2* viewport_
 
     Box bounding = {{-6.0f, -6.0f, -6.0f}, {6.0f, 6.0f, 6.0f}};
     fw64_arcball_set_initial(&view->arcball_camera, &bounding);
-
-    fw64_renderpass_begin(view->renderpass);
-    for (uint32_t i = 0; i < fw64_scene_get_node_count(scene); i++) {
-        fw64Node* node = fw64_scene_get_node(scene, i);
-        fw64_renderpass_draw_static_mesh(view->renderpass, node->mesh, &node->transform);
-    }
-    fw64_renderpass_end(view->renderpass);
 }
 
 void view_update(View* view, float time_delta) {
@@ -52,18 +52,20 @@ void init_scene(Game* game) {
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
 
-    info.mesh_count = 1;
     info.node_count = 5;
+    info.mesh_count = 1;
+    info.mesh_instance_count = 5;
 
     fw64_scene_init(scene, &info, game->engine->assets, fw64_default_allocator());
-    fw64Mesh* mesh = fw64_scene_load_mesh_asset(scene, FW64_ASSET_mesh_blue_cube, 0);
+    fw64Mesh* mesh = fw64_scene_load_mesh_asset(scene, FW64_ASSET_mesh_blue_cube);
     float x_pos = -3.0f;
 
     for (uint32_t i = 0; i < info.node_count; i++) {
-        fw64Node* node = fw64_scene_get_node(scene, i);
-        fw64_node_set_mesh(node, mesh);
+        fw64Node* node = fw64_scene_create_node(scene);
         vec3_set(&node->transform.position, x_pos, 0.0f, 0.0f);
         fw64_node_update(node);
+
+        fw64_scene_create_mesh_instance(scene, node, mesh);
         x_pos += 3.0f;
     }
 }
@@ -83,9 +85,19 @@ void init_views(Game* game) {
     view_init(&game->ortho_view, game->engine, &game->scene, &ortho_pos, &viewport_size, FW64_CAMERA_PROJECTION_ORTHOGRAPHIC);
 }
 
+static void view_draw(View* view) {
+    fw64Frustum frustum;
+    fw64_camera_extract_frustum_planes(&view->arcball_camera.camera, & frustum);
+
+    fw64_renderpass_begin(view->renderpass);
+    fw64_scene_draw_frustrum(view->scene, view->renderpass, &frustum, ~0U);
+    fw64_renderpass_end(view->renderpass);
+
+    fw64_renderer_submit_renderpass(view->engine->renderer, view->renderpass);
+}
+
 void init_overlay(Game* game) {
     fw64Display* display = fw64_displays_get_primary(game->engine->displays);
-    IVec2 display_size = fw64_display_get_size(display);
 
     game->overlay.renderpass = fw64_renderpass_create(display, fw64_default_allocator());
     game->overlay.spritebatch = fw64_spritebatch_create(1, fw64_default_allocator());
@@ -99,11 +111,7 @@ void init_overlay(Game* game) {
 
     fw64_spritebatch_end(game->overlay.spritebatch);
 
-    fw64_renderpass_set_depth_testing_enabled(game->overlay.renderpass, 0);
-
-    float projection_matrix[16];
-    matrix_ortho2d(projection_matrix, 0, (float)display_size.x, (float)display_size.y, 0);
-    fw64_renderpass_set_projection_matrix(game->overlay.renderpass, projection_matrix, NULL);
+    fw64_renderpass_util_ortho2d(game->overlay.renderpass);
 
     fw64_renderpass_begin(game->overlay.renderpass);
     fw64_renderpass_draw_sprite_batch(game->overlay.renderpass, game->overlay.spritebatch);
@@ -118,9 +126,9 @@ void game_update(Game* game){
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_NONE);
-    fw64_renderer_submit_renderpass(renderer, game->persp_view.renderpass);
-    fw64_renderer_submit_renderpass(renderer, game->ortho_view.renderpass);
+    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
+    view_draw(&game->persp_view);
+    view_draw(&game->ortho_view);
     fw64_renderer_submit_renderpass(renderer, game->overlay.renderpass);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

@@ -2,66 +2,86 @@
 
 #include "framework64/util/renderer_util.h"
 
+#include "assets/layers.h"
+
 void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int node_id, int index) {
+    fw64Display* display = fw64_displays_get_primary(engine->displays);
+
     player->engine = engine;
     player->scene = scene;
     player->player_index = index;
-    player->active = 0;
 
-    player->current_weapon = NULL;
-    fw64_transform_init(&player->weapon_transform);
+    player->weapon = NULL;
+    player->scene_renderpass = fw64_renderpass_create(display, fw64_default_allocator());
 
-    fw64_fps_camera_init(&player->fps_camera, engine->input, fw64_displays_get_primary(engine->displays));
+    player->weapon_renderpass = fw64_renderpass_create(display, fw64_default_allocator());
+    fw64_renderpass_set_clear_flags(player->weapon_renderpass, FW64_CLEAR_FLAG_DEPTH);
+
+    fw64_fps_camera_init(&player->fps_camera, engine->input, display);
     player->fps_camera.player_index = player->player_index;
 
-    fw64_camera_init(&player->weapon_camera, fw64_displays_get_primary(engine->displays));
-    vec3_zero(&player->weapon_camera.transform.position);
-    fw64_camera_update_view_matrix(&player->weapon_camera);
-
-    player->weapon_camera.near = 0.1f;
-    player->weapon_camera.far = 125.0f;
-    player->weapon_camera.fovy = 60.0f;
-    fw64_camera_update_projection_matrix(&player->weapon_camera);
-
     player->node = fw64_scene_get_node(player->scene, node_id);
+    player->weapon_node = fw64_scene_create_node(player->scene);
+    player->weapon_node->layer_mask = FW64_layer_weapon;
 
     Box* bounding = &player->node->collider->bounding;
-    Vec3 position;
-    box_center(bounding, &position);
-
-    position.y += bounding->max.y - bounding->min.y;
+    Vec3 position = player->node->transform.position;
+    position.y += bounding->max.y;
     player->fps_camera.camera.transform.position = position;
 }
 
 void player_update(Player* player) {
     fw64_fps_camera_update(&player->fps_camera, player->engine->time->time_delta);
+
+    quat_from_euler(&player->node->transform.rotation, 0.0f, player->fps_camera.rotation.y, 0.0f);
+    player->node->transform.position.x = player->fps_camera.camera.transform.position.x;
+    player->node->transform.position.z = player->fps_camera.camera.transform.position.z;
+    fw64_node_update(player->node);
 }
 
 void player_set_weapon(Player* player, Weapon* weapon) {
-    player->current_weapon = weapon;
+    player->weapon = weapon;
 
-    player->weapon_transform.position = weapon->position;
-    player->weapon_transform.rotation = weapon->rotation;
-    player->weapon_transform.scale = weapon->scale;
+    fw64_renderpass_set_projection_matrix(player->weapon_renderpass, weapon->projection_matrix, NULL);
+    fw64_renderpass_set_view_matrix(player->weapon_renderpass, weapon->view_matrix);
 
-    fw64_transform_update_matrix(&player->weapon_transform);
+    if (player->weapon_node->mesh_instance) {
+        fw64_mesh_instance_set_mesh(player->weapon_node->mesh_instance, weapon->mesh);
+    } else {
+        fw64_scene_create_mesh_instance(player->scene, player->weapon_node, weapon->mesh);
+    }
 }
 
 void player_draw_view(Player* player) {
-    fw64_renderer_set_camera(player->engine->renderer, &player->fps_camera.camera);
-    fw64_scene_draw_all(player->scene, player->engine->renderer);
+    fw64Frustum frustum;
+    fw64_camera_extract_frustum_planes(&player->fps_camera.camera, &frustum);
+    uint32_t layer_mask = player->node->layer_mask | FW64_layer_weapon;
 
-    if (!player->current_weapon)
+    fw64_renderpass_begin(player->scene_renderpass);
+    fw64_renderpass_set_camera(player->scene_renderpass, &player->fps_camera.camera);
+    fw64_scene_draw_frustrum(player->scene, player->scene_renderpass, &frustum, ~layer_mask);
+    fw64_renderpass_end(player->scene_renderpass);
+
+    fw64_renderer_submit_renderpass(player->engine->renderer, player->scene_renderpass);
+}
+
+void player_draw_weapon(Player* player) {
+    if (!player->weapon) {
         return;
+    }
 
-    fw64_renderer_set_camera(player->engine->renderer, &player->weapon_camera);
-    fw64_renderer_util_clear_viewport(player->engine->renderer, &player->weapon_camera, FW64_RENDERER_FLAG_CLEAR_DEPTH);
-    fw64_renderer_draw_static_mesh(player->engine->renderer, &player->weapon_transform, player->current_weapon->mesh);
+    fw64_renderpass_begin(player->weapon_renderpass);
+    fw64_renderpass_draw_static_mesh(player->weapon_renderpass, player->weapon_node->mesh_instance);
+    fw64_renderpass_end(player->weapon_renderpass);
+
+    fw64_renderer_submit_renderpass(player->engine->renderer, player->weapon_renderpass);
 }
 
 void player_set_viewport_rect(Player* player, float x, float y, float w, float h) {
     Vec2 relative_pos = {x, y};
     Vec2 relative_size = {w, h};
     fw64_camera_set_viewport_relative(&player->fps_camera.camera, &relative_pos, &relative_size);
-    fw64_camera_set_viewport_relative(&player->weapon_camera, &relative_pos, &relative_size);
+
+    fw64_renderpass_set_viewport(player->scene_renderpass, &player->fps_camera.camera.viewport);
+    fw64_renderpass_set_viewport(player->weapon_renderpass, &player->fps_camera.camera.viewport);
 }

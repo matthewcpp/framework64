@@ -25,7 +25,7 @@
 struct fw64Renderer {
 public: 
     fw64Renderer(fw64Display& display, framework64::ShaderCache& shader_cache)
-        : display(display), shader_cache(shader_cache) {}
+        : screen_overlay(shader_cache), sprite_material(shader_cache), display(display), shader_cache(shader_cache) {}
 
 public:
     bool init(int width, int height);
@@ -51,11 +51,7 @@ public:
     void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
 public:
-    void drawFilledRect(float x, float y, float width, float height);
-    void drawSprite(fw64Texture* texture, float x, float y);
-    void drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y);
-    void drawText(fw64Font* font, float x, float y, const char* text, uint32_t count);
-
+    void drawSpriteBatch(fw64SpriteBatch* spritebatch);
     void drawRenderPass(fw64RenderPass* renderpass);
 public:
     void setDepthTestingEnabled(bool enabled);
@@ -76,7 +72,7 @@ public:
     void renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 private:     
-    void updateMeshTransformBlock(fw64Matrix & matrix);
+    void updateMeshTransformBlock(float* matrix);
     void updateLightingBlock();
     void setActiveShader(framework64::ShaderProgram* shader);
     void setGlDepthTestingState();
@@ -138,11 +134,10 @@ private:
 
     bool depth_testing_enabled = true;
     bool fog_enabled = false;
-    bool fog_dirty = true;
     bool lighting_dirty = false;
 
 public:
-    framework64::SpriteBatch sprite_batch;
+    fw64Material sprite_material;
     fw64Primitive::Mode primitive_type;
     DrawingMode drawing_mode = DrawingMode::None;
     

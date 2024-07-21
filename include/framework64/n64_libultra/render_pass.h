@@ -22,6 +22,7 @@ typedef enum {
 #define GET_RENDERER_FEATURE(renderer, feature) ((renderer)->enabled_features & (feature))
 
 struct fw64RenderPass {
+    Vp n64_viewport;
     fw64Viewport viewport;
     Mtx projection_matrix;
     Mtx view_matrix;
@@ -33,4 +34,8 @@ struct fw64RenderPass {
     fw64ClearFlags clear_flags;
     fw64N64RendererFeature enabled_features;
     u16 clear_color;
+    fw64ColorRGBA8 fog_color;
+    s32 fog_min, fog_max;
 };
+
+void update_n64_viewport(fw64Viewport* viewport, Vp* n64_viewport);

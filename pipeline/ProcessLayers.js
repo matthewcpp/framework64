@@ -47,7 +47,7 @@ function writeMapping(mapping, destFile) {
     fs.writeSync(file, "#pragma once\n\n");
 
     mapping.forEach((value, key) => {
-        fs.writeSync(file, `#define FW64_layer_${key} ${value}\n`);
+        fs.writeSync(file, `#define FW64_layer_${key} ${value}U\n`);
     });
 
     fs.writeSync(file, "\n");

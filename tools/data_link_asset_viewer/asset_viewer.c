@@ -20,14 +20,15 @@ static void on_file_download_progress(fw64FileDownloader* file_downloader, void*
 static void on_file_download_complete(fw64FileDownloader* file_downloader, void* arg);
 
 void game_init(Game* game, fw64Engine* engine) {
+    fw64Display* display = fw64_displays_get_primary(engine->displays);
+    fw64Allocator* allocator = fw64_default_allocator();
+
     game->engine = engine;
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas14, allocator);
+    game->renderpass = fw64_renderpass_create(display, allocator);
 
-    game->consolas = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas14, fw64_default_allocator());
-    fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
-
-    fw64_file_viewer_init(&game->file_viewer, engine, game->consolas, FILE_VIEWER_DATA_SIZE);
+    fw64_asset_viewer_init(&game->asset_viewer, engine, game->renderpass, game->font, FILE_VIEWER_DATA_SIZE);
     fw64_file_downloader_init(&game->file_downloader, engine);
-
 
     fw64FileDownloaderCallbacks callbacks;
     callbacks.begin = on_file_download_begin;
@@ -38,20 +39,23 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_data_link_set_connected_callback(engine->data_link, on_data_link_connected, game);
     fw64_data_link_set_mesage_callback(engine->data_link, on_data_link_message, game);
 
-    fw64_file_viewer_set_empty_state(&game->file_viewer, "No data link connection", NULL);
+    fw64_asset_viewer_set_empty_state(&game->asset_viewer, "No data link connection", NULL);
 }
 
 void game_update(Game* game){
-    fw64_file_viewer_update(&game->file_viewer);
+    fw64_asset_viewer_update(&game->asset_viewer);
 }
 
 void game_draw(Game* game) {
-    fw64_file_viewer_draw(&game->file_viewer);
+    fw64_renderer_begin(game->engine->renderer, fw64_asset_viewer_determine_primitive_mode(&game->asset_viewer), FW64_RENDERER_FLAG_CLEAR);
+    fw64_asset_viewer_draw(&game->asset_viewer);
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
+    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void on_data_link_connected(void* arg) {
     Game* game = (Game*)arg;
-    fw64_file_viewer_set_empty_state(&game->file_viewer, "No asset loaded", NULL);
+    fw64_asset_viewer_set_empty_state(&game->asset_viewer, "No asset loaded", NULL);
 }
 
 static void on_data_link_message(fw64DataSource* message, void* arg) {
@@ -63,7 +67,7 @@ static void on_data_link_message(fw64DataSource* message, void* arg) {
 static void on_file_download_begin(fw64FileDownloader* file_downloader, void* arg) {
     Game* game = (Game*)arg;
 
-    fw64_file_viewer_set_empty_state(&game->file_viewer, "Loading", file_downloader->current_asset_filename);
+    fw64_asset_viewer_set_empty_state(&game->asset_viewer, "Loading", file_downloader->current_asset_filename);
 }
 
 static void on_file_download_progress(fw64FileDownloader* file_downloader, void* arg) {
@@ -76,5 +80,5 @@ static void on_file_download_progress(fw64FileDownloader* file_downloader, void*
 static void on_file_download_complete(fw64FileDownloader* file_downloader, void* arg) {
     Game* game = (Game*)arg;
     fw64_renderer_set_clear_color(game->engine->renderer, 0, 100, 0);
-    fw64_file_viewer_load_from_media(&game->file_viewer, file_downloader->current_asset_filepath);
+    fw64_asset_viewer_load_from_media(&game->asset_viewer, file_downloader->current_asset_filepath);
 }

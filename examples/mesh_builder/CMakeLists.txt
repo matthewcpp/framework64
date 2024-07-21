@@ -4,4 +4,5 @@ set(src_files
 create_game(
     TARGET mesh_builder
     SOURCES ${src_files}
+    EXTRA_LIBS fw64_components
     ALL_WARNINGS_AS_ERRORS)

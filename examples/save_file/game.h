@@ -2,7 +2,15 @@
 
 #include "framework64/camera.h"
 #include "framework64/engine.h"
-#include "framework64/node.h"
+#include "framework64/scene.h"
+
+#include "rotate_node/rotate_node.h"
+
+typedef enum {
+    RENDER_PASS_SCENE,
+    RENDER_PASS_UI,
+    RENDER_PASS_COUNT
+} RenderPass;
 
 typedef struct {
     uint64_t magic;
@@ -10,15 +18,15 @@ typedef struct {
     uint64_t example_padding[62];
 } SaveData;
 
-typedef struct lines_example {
+typedef struct {
     SaveData save_data;
     fw64Engine* engine;
-    fw64Camera camera;
     fw64Font* font;
-    float rotation;
-    fw64Node solid_cube;
+    fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
+    fw64SpriteBatch* spritebatch;
+    RotateNode rotate_node;
+    fw64Scene scene;
     int loaded;
-    int selected_index;
 } Game;
 
 #ifdef __cplusplus

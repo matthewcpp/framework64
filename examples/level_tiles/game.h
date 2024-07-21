@@ -1,22 +1,44 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/level.h"
+#include "framework64/scene.h"
 #include "framework64/util/bump_allocator.h"
-#include "fps_camera/fps_camera.h"
 
-#define ACTIVE_TILE_COUNT 6
+#define TILE_COUNT 4
+
+typedef struct {
+    fw64Scene* scene;
+    fw64BumpAllocator allocator;
+    int index;
+} Tile;
 
 typedef struct {
     fw64Engine* engine;
-    fw64Level level;
-    fw64FpsCamera fps_camera;
-    fw64BumpAllocator allocators[ACTIVE_TILE_COUNT];
-    uint32_t chunk_handles[ACTIVE_TILE_COUNT];
-    float next_row_pos;
-    float next_row_trigger;
-    int handle_index;
-    float player_previous_z;
+    fw64Scene* persistent;
+    Vec3 next_scene_pos;
+    int next_tile_index;
+    Tile tiles[TILE_COUNT];
+} Tiles;
+
+typedef struct {
+    fw64Engine* engine;
+    fw64Node* node;
+    Tiles* tiles;
+    Vec3 prev_pos;
+} Player;
+
+typedef struct {
+    fw64Node* target;
+    fw64Camera camera;
+    Vec3 offset;
+} FollowCamera;
+
+typedef struct {
+    fw64Engine* engine;
+    Tiles tiles;
+    Player player;
+    FollowCamera follow_camera;
+    fw64RenderPass* renderpass;
 } Game;
 
 #ifdef __cplusplus

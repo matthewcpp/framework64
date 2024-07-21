@@ -12,6 +12,7 @@ void fw64_n64_texture_batch_init(fw64N64TextureBatch* texture_batch, size_t laye
 
     texture_batch->layers = allocator->malloc(allocator, sizeof(fw64TextureBatchLayer) * texture_batch->layer_count);
     memset(texture_batch->layers, 0, sizeof(fw64TextureBatchLayer) * texture_batch->layer_count);
+    memset(texture_batch->pool, 0, sizeof(fw64N64QuadBatch*) * TEXT_BATCH_POOL_BUCKET_COUNT);
 
     texture_batch->active_layer = texture_batch->layers;
 }

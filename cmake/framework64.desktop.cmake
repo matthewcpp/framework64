@@ -17,7 +17,7 @@ function (enable_all_warnings_as_errors)
         target_compile_definitions(${target_name} PRIVATE _CRT_SECURE_NO_WARNINGS)
     else()
         # additional warnings
-        target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic)
+        target_compile_options(${target_name} PRIVATE -Wall -Wextra -Wpedantic -Wno-strict-prototypes)
     endif()
 endfunction()
 

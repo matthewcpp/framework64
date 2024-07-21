@@ -16,5 +16,10 @@
         {
             "src": "penguin/penguin.gltf"
         }
+    ],
+    "levels": [
+        {
+            "src": "examples/bounding/bounding.gltf"
+        }
     ]
 }

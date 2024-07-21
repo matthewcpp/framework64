@@ -5,7 +5,6 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
 }
 
 void game_update(Game* game){

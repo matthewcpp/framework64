@@ -22,8 +22,9 @@ ShaderProgram* SpriteShader::create(uint32_t, uint32_t, std::string const & shad
     if (!program->handle)
         return nullptr;
 
+    setupShaderProgram(program.get());
+
     program->texture_info.uniform_block.create();
-    program->mesh_transform_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64SpriteTransformData");
     program->diffuse_texture_location = glGetUniformLocation(program->handle, "diffuse_texture_sampler");
 
     // TODO: this should return a derived program object with this value, and the program should be passed to set uniforms

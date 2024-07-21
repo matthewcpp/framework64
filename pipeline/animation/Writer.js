@@ -118,6 +118,7 @@ function writeHeaderFile(animationData, meshName, destPath) {
         const animation = animations[i];
         const safeAnimationName = Util.safeDefineName(animation.name);
         fs.writeSync(file, `#define ${safeSkinnedMeshString}_${safeAnimationName} ${i}\n`);
+        fs.writeSync(file, `#define ${safeSkinnedMeshString}_${safeAnimationName}_name "${animation.name}"\n`);
     }
 
     fs.closeSync(file);

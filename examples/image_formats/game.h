@@ -1,10 +1,14 @@
 #pragma once
 
 #include "framework64/engine.h"
+#include "framework64/util/bump_allocator.h"
+
+#include "ui_navigation/ui_navigation.h"
 
 typedef enum {
     IMAGE_FORMAT_NONE,
     IMAGE_FORMAT_RGBA32,
+    IMAGE_FORMAT_RGBA16,
     IMAGE_FORMAT_CI8,
     IMAGE_FORMAT_CI4,
     IMAGE_FORMAT_IA8,
@@ -16,13 +20,14 @@ typedef enum {
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
+    fw64RenderPass* renderpass;
+    fw64SpriteBatch* spritebatch;
     fw64Texture* texture;
     ImageFormat image_format;
+    const char* format_name;
     fw64Font* font;
-    IVec2 header_size;
-    IVec2 screen_size;
-    char header_text[24];
+    fw64BumpAllocator tex_allocator;
+    fw64UiNavigation ui_nav;
 } Game;
 
 #ifdef __cplusplus

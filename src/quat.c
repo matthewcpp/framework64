@@ -2,6 +2,8 @@
 
 #include "framework64/types.h"
 
+#include <math.h>
+
 void quat_ident(Quat* q) {
     q->x = 0.0f;
     q->y = 0.0f;
@@ -100,6 +102,28 @@ void quat_from_euler(Quat* q, float x, float y, float z) {
     q->y = cx * sy * cz + sx * cy * sz;
     q->z = cx * cy * sz - sx * sy * cz;
     q->w = cx * cy * cz + sx * sy * sz;
+}
+
+// https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Source_code_2
+Vec3 quat_to_euler(Quat* q) {
+    Vec3 angles;
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (q->w * q->x + q->y * q->z);
+    double cosr_cosp = 1 - 2 * (q->x * q->x + q->y * q->y);
+    angles.x = atan2f(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = fw64_sqrtf(1 + 2 * (q->w * q->y - q->x * q->z));
+    double cosp = fw64_sqrtf(1 - 2 * (q->w * q->y - q->x * q->z));
+    angles.y = 2 * atan2f(sinp, cosp) - M_PI / 2;
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (q->w * q->z + q->x * q->y);
+    double cosy_cosp = 1 - 2 * (q->y * q->y + q->z * q->z);
+    angles.z = atan2f(siny_cosp, cosy_cosp);
+
+    return angles;
 }
 
 void quat_slerp(Quat* out, Quat* a, Quat* b, float t) {

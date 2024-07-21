@@ -55,6 +55,10 @@ void fw64_renderpass_set_viewport(fw64RenderPass* pass, fw64Viewport* viewport) 
     pass->viewport = *viewport;
 }
 
+const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass) {
+    return &renderpass->viewport;
+}
+
 void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera) {
     pass->setViewport(camera->viewport);
     pass->setViewMatrix(camera->view.m);
@@ -78,14 +82,33 @@ void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBat
     renderpass->render_queue.sprite_batches.emplace_back(sprite_batch);
 }
 
-void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64Transform* transform) {
-    renderpass->render_queue.mesh_instances.emplace_back(mesh, transform);
+void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance) {
+    renderpass->render_queue.mesh_instances.emplace_back(mesh_instance);
 }
 
-void fw64_renderpass_draw_animated_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64AnimationController* animated_mesh_instances, fw64Transform* transform){
-    renderpass->render_queue.animated_mesh_instances.emplace_back(mesh, animated_mesh_instances, transform);
+void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* renderpass, fw64SkinnedMeshInstance* skinned_mesh_instance) {
+    renderpass->render_queue.skinned_mesh_instances.emplace_back(skinned_mesh_instance);
 }
 
-void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* /*renderpass*/, int /*enabled*/) {
-    // TODO: Implement me during renderpass switchover
+void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled) {
+    renderpass->depth_testing_enabled = static_cast<bool>(enabled);
+}
+
+void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled) {
+    renderpass->fog_enabled = static_cast<bool>(enabled);
+}
+
+void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min, float fog_max) {
+    assert( fog_min >= 0.0f && fog_min <= 1.0f &&
+        fog_max >= 0.0f && fog_max <= 1.0f &&
+        fog_max >= fog_min);
+
+    renderpass->fog_begin = fog_min;
+    renderpass->fog_end = fog_max;
+}
+
+void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_t g, uint8_t b) {
+    renderpass->fog_color[0] = r / 255.0f;
+    renderpass->fog_color[1] = g / 255.0f;
+    renderpass->fog_color[2] = b / 255.0f;
 }

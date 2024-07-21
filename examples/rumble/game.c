@@ -3,6 +3,7 @@
 
 #include "framework64/math.h"
 #include "framework64/random.h"
+#include "framework64/util/renderpass_util.h"
 #include "framework64/util/quad.h"
 
 #include "framework64/controller_mapping/n64.h"
@@ -11,20 +12,36 @@
 
 static void shake_quad(Game* game);
 static void set_shake_speed(Game* game);
+static void update_spritebatch(Game* game);
 
 void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
-    game->engine = engine;
-    fw64_camera_init(&game->camera, fw64_displays_get_primary(engine->displays));
+    fw64Display* display = fw64_displays_get_primary(engine->displays);
 
+    game->engine = engine;
     game->rumble_frequency = 0.5f;
     game->rumble_duration = 2.0f;
-
-    fw64_node_init(&game->node);
-    fw64_node_set_mesh(&game->node, fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, allocator));
-
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     game->buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
+    game->spritebatch = fw64_spritebatch_create(1, allocator);
+
+    game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
+    fw64Camera camera;
+    fw64_camera_init(&camera, display);
+    fw64_renderpass_set_camera(game->renderpasses[RENDER_PASS_SCENE], &camera);
+
+    game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
+
+    fw64SceneInfo info;
+    fw64_scene_info_init(&info);
+    info.node_count = 1;
+    info.mesh_instance_count = 1;
+    fw64_scene_init(&game->scene, &info, engine->assets, allocator);
+
+    fw64Node* node = fw64_scene_create_node(&game->scene);
+    fw64Mesh* mesh = fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, allocator);
+    fw64_scene_create_mesh_instance(&game->scene, node, mesh);
 
     set_shake_speed(game);
     game->shake_time = 0.0f;
@@ -64,38 +81,27 @@ void game_update(Game* game){
         shake_quad(game);
     }
     else {
-        vec3_zero(&game->node.transform.position);
-        fw64_node_update(&game->node);
+        fw64Node* node = fw64_scene_get_node(&game->scene, 0);
+        vec3_zero(&node->transform.position);
+        fw64_node_update(node);
     }
 }
 
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
-    char text[32];
-    IVec2 viewport_size = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
-
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
 
-    fw64_renderer_set_camera(renderer, &game->camera);
-    fw64_renderer_draw_static_mesh(renderer, &game->node.transform, game->node.mesh);
+    fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
+    fw64_renderpass_begin(renderpass);
+    fw64_scene_draw_all(&game->scene, renderpass);
+    fw64_renderpass_end(renderpass);
+    fw64_renderer_submit_renderpass(renderer, renderpass);
 
-    int draw_x = 20, draw_y = 20;
-    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 0, draw_x, draw_y);
-    draw_x += fw64_texture_slice_width(game->buttons) + 5;
-    fw64_renderer_draw_text(renderer, game->font, draw_x, draw_y, "Start");
-    draw_x += 40;
-    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 1, draw_x, draw_y);
-    draw_x += fw64_texture_slice_width(game->buttons) + 5;
-    fw64_renderer_draw_text(renderer, game->font, draw_x, draw_y, "Stop");
-    draw_x = 20;
-    draw_y = viewport_size.y - 40;
-
-    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 10, draw_x, draw_y);
-    draw_x += fw64_texture_slice_width(game->buttons) + 5;
-    fw64_renderer_draw_sprite_slice(renderer, game->buttons, 11, draw_x, draw_y);
-    draw_x += fw64_texture_slice_width(game->buttons) + 5;
-    sprintf(text, "frequency: %.2f", game->rumble_frequency);
-    fw64_renderer_draw_text(renderer, game->font, draw_x, draw_y, text);
+    renderpass = game->renderpasses[RENDER_PASS_UI];
+    fw64_renderpass_begin(renderpass);
+    fw64_renderpass_draw_sprite_batch(renderpass, game->spritebatch);
+    fw64_renderpass_end(renderpass);
+    fw64_renderer_submit_renderpass(renderer, renderpass);
 
     fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }
@@ -104,8 +110,9 @@ void shake_quad(Game* game) {
     game->shake_time -= game->engine->time->time_delta;
 
     if (game->shake_time <= 0.0f) {
-        vec3_set(&game->node.transform.position, fw64_random_float_in_range(-0.5, 0.5), fw64_random_float_in_range(-0.5, 0.5), 0.0f);
-        fw64_node_update(&game->node);
+        fw64Node* node = fw64_scene_get_node(&game->scene, 0);
+        vec3_set(&node->transform.position, fw64_random_float_in_range(-0.5, 0.5), fw64_random_float_in_range(-0.5, 0.5), 0.0f);
+        fw64_node_update(node);
 
         game->shake_time = game->shake_speed;
     }
@@ -113,4 +120,32 @@ void shake_quad(Game* game) {
 
 static void set_shake_speed(Game* game) {
     game->shake_speed = (1.1f - game->rumble_frequency) / 2.0f;
+    update_spritebatch(game);
+}
+
+void update_spritebatch(Game* game) {
+    char text[32];
+    IVec2 viewport_size = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
+    int draw_x = 20, draw_y = 20;
+
+    fw64_spritebatch_begin(game->spritebatch);
+    
+    fw64_spritebatch_draw_sprite_slice(game->spritebatch, game->buttons, 0, draw_x, draw_y);
+    draw_x += fw64_texture_slice_width(game->buttons) + 5;
+    fw64_spritebatch_draw_string(game->spritebatch, game->font, "Start", draw_x, draw_y);
+    draw_x += 40;
+
+    fw64_spritebatch_draw_sprite_slice(game->spritebatch, game->buttons, 1, draw_x, draw_y);
+    draw_x += fw64_texture_slice_width(game->buttons) + 5;
+    fw64_spritebatch_draw_string(game->spritebatch, game->font, "Stop", draw_x, draw_y);
+    draw_x = 20;
+    draw_y = viewport_size.y - 40;
+
+    fw64_spritebatch_draw_sprite_slice(game->spritebatch, game->buttons, 10, draw_x, draw_y);
+    draw_x += fw64_texture_slice_width(game->buttons) + 5;
+    fw64_spritebatch_draw_sprite_slice(game->spritebatch, game->buttons, 11, draw_x, draw_y);
+    draw_x += fw64_texture_slice_width(game->buttons) + 5;
+    sprintf(text, "frequency: %.2f", game->rumble_frequency);
+    fw64_spritebatch_draw_string(game->spritebatch, game->font, text, draw_x, draw_y);
+    fw64_spritebatch_end(game->spritebatch);
 }

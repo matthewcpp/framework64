@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "framework64/matrix.h"
+#include "framework64/util/renderpass_util.h"
 
 #include "assets/assets.h"
 
@@ -8,14 +9,10 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
-    fw64Display* display = fw64_displays_get_primary(engine->displays);
 
     game->engine = engine;
     game->render_pass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), allocator);
-    Vec2 display_size = fw64_display_get_size_f(display);
-    float matrix[16];
-    matrix_ortho2d(matrix, 0, display_size.x, display_size.y, 0);
-    fw64_renderpass_set_projection_matrix(game->render_pass, matrix, NULL);
+    fw64_renderpass_util_ortho2d(game->render_pass);
 
     game->sprite_batch = fw64_spritebatch_create(2, allocator);
 

@@ -5,10 +5,10 @@
 
 typedef struct fw64Allocator fw64Allocator;
 
-typedef void*(*fw64AllocatorMallocFunc)(fw64Allocator*, size_t);
-typedef void*(*fw64AllocatorReallocFunc)(fw64Allocator*, void*, size_t);
-typedef void*(*fw64AllocatorMemalignFunc)(fw64Allocator*, size_t, size_t);
-typedef void(*fw64AllocatorFreeFunc)(fw64Allocator*, void*);
+typedef void*(*fw64AllocatorMallocFunc)(fw64Allocator*, size_t size);
+typedef void*(*fw64AllocatorReallocFunc)(fw64Allocator*, void* ptr, size_t new_size);
+typedef void*(*fw64AllocatorMemalignFunc)(fw64Allocator*, size_t alignment, size_t size);
+typedef void(*fw64AllocatorFreeFunc)(fw64Allocator*, void* ptr);
 
 struct fw64Allocator{
     fw64AllocatorMallocFunc malloc;

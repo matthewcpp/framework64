@@ -15,14 +15,14 @@ typedef struct {
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
     fw64Font* font;
 
     uint32_t total_message_count;
     uint32_t total_message_data;
 
     char** message_list;
-
+    fw64RenderPass* renderpass;
+    fw64SpriteBatch* spritebatch;
 } Game;
 
 #ifdef __cplusplus

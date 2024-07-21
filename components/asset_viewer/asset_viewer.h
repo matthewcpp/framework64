@@ -2,7 +2,7 @@
 
 #include <framework64/data_io.h>
 #include <framework64/engine.h>
-#include <framework64/node.h>
+#include <framework64/scene.h>
 
 #include <framework64/util/bump_allocator.h>
 #include "arcball_camera/arcball_camera.h"
@@ -16,18 +16,19 @@ typedef struct {
     fw64AssetType type;
     fw64Engine* engine;
     fw64Font* font;
+    fw64RenderPass* renderpass;
     fw64BumpAllocator allocator;
 } fw64AssetViewerStateBase;
 
 typedef struct {
     fw64AssetViewerStateBase base;
-    char* message;
-    char* path;
+    fw64SpriteBatch* spritebatch;
 } fw64AssetViewerUnknownState;
 
 typedef struct {
     fw64AssetViewerStateBase base;
-    fw64Node* node;
+    fw64Mesh* mesh;
+    fw64Scene scene;
     fw64ArcballCamera arcball;
 } fw64AssetViewerMeshState;
 
@@ -48,14 +49,23 @@ typedef struct {
     fw64AssetViewerStateData state;
 } fw64AssetViewer;
 
-void fw64_file_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64Font* font, uint32_t data_size);
-void fw64_file_viewer_uninit(fw64AssetViewer* file_viewer);
-void fw64_file_viewer_update(fw64AssetViewer* file_viewer);
-void fw64_file_viewer_draw(fw64AssetViewer* file_viewer);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-fw64AssetType fw64_file_viewer_determine_type(const char* path);
+void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size);
+void fw64_asset_viewer_uninit(fw64AssetViewer* file_viewer);
+void fw64_asset_viewer_update(fw64AssetViewer* file_viewer);
+void fw64_asset_viewer_draw(fw64AssetViewer* file_viewer);
 
-void fw64_file_viewer_load_from_media(fw64AssetViewer* file_viewer, const char* path);
-void fw64_file_viewer_load_data(fw64AssetViewer* file_viewer, fw64DataSource* data_reader, fw64AssetType type);
+fw64AssetType fw64_asset_viewer_determine_type(const char* path);
+fw64PrimitiveMode fw64_asset_viewer_determine_primitive_mode(fw64AssetViewer* file_viewer);
 
-void fw64_file_viewer_set_empty_state(fw64AssetViewer* file_viewer, const char* message, const char* path);
+void fw64_asset_viewer_load_from_media(fw64AssetViewer* file_viewer, const char* path);
+void fw64_asset_viewer_load_data(fw64AssetViewer* file_viewer, fw64DataSource* data_reader, fw64AssetType type);
+
+void fw64_asset_viewer_set_empty_state(fw64AssetViewer* file_viewer, const char* message, const char* path);
+
+#ifdef __cplusplus
+}
+#endif
