@@ -2,7 +2,8 @@
 
 #include "framework64/engine.h"
 #include "framework64/scene.h"
-#include "debug_boxes/debug_boxes.h"
+
+#include "fw64_debug_boxes.h"
 
 typedef enum {
     RENDERPASS_SCENE_TRIANGLES,

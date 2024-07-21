@@ -4,7 +4,7 @@
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
-#include "rotate_node/rotate_node.h"
+#include "fw64_rotate_node.h"
 
 typedef enum {
     RENDER_PASS_SCENE,
@@ -24,7 +24,7 @@ typedef struct {
     fw64Font* font;
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
     fw64SpriteBatch* spritebatch;
-    RotateNode rotate_node;
+    fw64RotateNode rotate_node;
     fw64Scene scene;
     int loaded;
 } Game;

@@ -74,14 +74,14 @@ void setup_scene(Game* game) {
     fw64_node_update(node);
     fw64_scene_create_mesh_instance(&game->scene, node, mesh);
 
-    rotate_node_init(&game->rotate_node, node);
+    fw64_rotate_node_init(&game->rotate_node, node);
 }
 
 void game_update(Game* game){
     IVec2 updated_pos = game->camera.viewport.position;
     IVec2 updated_size = game->camera.viewport.size;
 
-    rotate_node_update(&game->rotate_node, game->engine->time->time_delta);
+    fw64_rotate_node_update(&game->rotate_node, game->engine->time->time_delta);
 
     if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
         setup_initial_viewport(game);

@@ -22,7 +22,7 @@ add_executable(data_link_asset_service ${data_link_asset_service_src})
 
 enable_all_warnings_as_errors(TARGET data_link_asset_service)
 
-target_include_directories(data_link_asset_service PRIVATE ../../components/file_downloader)
+target_include_directories(data_link_asset_service PRIVATE ../../components)
 
 target_link_libraries(data_link_asset_service PRIVATE fw64_datalink_client)
 target_link_libraries(data_link_asset_service PRIVATE restinio::restinio)

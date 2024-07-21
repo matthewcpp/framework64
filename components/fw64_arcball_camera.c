@@ -1,4 +1,4 @@
-#include "arcball_camera/arcball_camera.h"
+#include "fw64_arcball_camera.h"
 
 #include "framework64/controller_mapping/n64.h"
 

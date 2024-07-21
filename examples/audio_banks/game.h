@@ -1,13 +1,13 @@
 #pragma once
 
-#include "rotate_node/rotate_node.h"
-
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
+#include "fw64_rotate_node.h"
+
 typedef struct {
     fw64Scene scene;
-    RotateNode rotate_node;
+    fw64RotateNode rotate_node;
     fw64RenderPass* renderpass;
     fw64Engine* engine;
 } SceneView;

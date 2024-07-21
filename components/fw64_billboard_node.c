@@ -1,12 +1,12 @@
-#include "billboard_node.h"
+#include "fw64_billboard_node.h"
 
-void billboard_nodes_init(BillboardNodes* system, fw64Allocator* allocator) {
-    fw64_sparse_set_init(&system->components, sizeof(BillboardNode), allocator);
+void fw64_billboard_nodes_init(fw64BillboardNodes* system, fw64Allocator* allocator) {
+    fw64_sparse_set_init(&system->components, sizeof(fw64BillboardNode), allocator);
 }
 
-BillboardNode* billboard_nodes_create(BillboardNodes* system, fw64Node* node, fw64Camera* camera, BillboardNodeHandle* out_handle) {
-    BillboardNodeHandle handle;
-    BillboardNode* billboard_node = (BillboardNode*)fw64_sparse_set_alloc(&system->components, &handle);
+fw64BillboardNode* fw64_billboard_nodes_create(fw64BillboardNodes* system, fw64Node* node, fw64Camera* camera, fw64BillboardNodeHandle* out_handle) {
+    fw64BillboardNodeHandle handle;
+    fw64BillboardNode* billboard_node = (fw64BillboardNode*)fw64_sparse_set_alloc(&system->components, &handle);
 
     billboard_node->node = node;
     billboard_node->camera = camera;
@@ -18,10 +18,10 @@ BillboardNode* billboard_nodes_create(BillboardNodes* system, fw64Node* node, fw
     return billboard_node;
 }
 
-void billboard_nodes_update(BillboardNodes* system) {
+void fw64_billboard_nodes_update(fw64BillboardNodes* system) {
     fw64SparseSetItr itr;
     for (fw64_sparse_set_itr_init(&itr, &system->components); fw64_sparse_set_itr_has_next(&itr); fw64_sparse_set_itr_next(&itr)) {
-        BillboardNode* billboard = (BillboardNode*)fw64_sparse_set_itr_get_item(&itr);
+        fw64BillboardNode* billboard = (fw64BillboardNode*)fw64_sparse_set_itr_get_item(&itr);
 
         Vec3 camera_forward, camera_up, target;
         fw64_transform_forward(&billboard->camera->transform, &camera_forward);

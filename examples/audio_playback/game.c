@@ -29,7 +29,7 @@ void game_init(Game* game, fw64Engine* engine) {
 void game_update(Game* game){
     fw64AudioStatus music_status = fw64_audio_get_music_status(game->engine->audio);
     game->scene_view.rotate_node.enabled = music_status == FW64_AUDIO_PLAYING;
-    rotate_node_update(&game->scene_view.rotate_node, game->engine->time->time_delta);
+    fw64_rotate_node_update(&game->scene_view.rotate_node, game->engine->time->time_delta);
     float playback_speed = fw64_audio_get_playback_speed(game->engine->audio);
 
     if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
@@ -70,7 +70,7 @@ static void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
     fw64Mesh* mesh = fw64_textured_quad_create(engine, FW64_ASSET_image_n64_logo, allocator);
     fw64_scene_create_mesh_instance(&scene_view->scene, node, mesh);
 
-    rotate_node_init(&scene_view->rotate_node, node);
+    fw64_rotate_node_init(&scene_view->rotate_node, node);
     vec3_set(&scene_view->rotate_node.axis, 0.0f, 0.0f, 1.0f);
 
     fw64_camera_init(&scene_view->camera, display);

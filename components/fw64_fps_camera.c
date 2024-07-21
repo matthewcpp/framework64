@@ -1,4 +1,4 @@
-#include "fps_camera/fps_camera.h"
+#include "fw64_fps_camera.h"
 
 #include "framework64/controller_mapping/n64.h"
 

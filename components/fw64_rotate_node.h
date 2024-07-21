@@ -9,14 +9,14 @@ typedef struct {
     float rotation;
     float direction;
     int enabled;
-} RotateNode;
+} fw64RotateNode;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void rotate_node_init(RotateNode* component, fw64Node* node);
-void rotate_node_update(RotateNode* component, float time_delta);
+void fw64_rotate_node_init(fw64RotateNode* component, fw64Node* node);
+void fw64_rotate_node_update(fw64RotateNode* component, float time_delta);
 
 #ifdef __cplusplus
 }

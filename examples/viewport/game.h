@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
-#include "rotate_node/rotate_node.h"
+#include "fw64_rotate_node.h"
 
 typedef enum {
     RENDER_PASS_VIEW,
@@ -22,7 +22,7 @@ typedef struct {
 
     int camera_pos_delta;
     int camera_size_delta;
-    RotateNode rotate_node;
+    fw64RotateNode rotate_node;
 } Game;
 
 #ifdef __cplusplus

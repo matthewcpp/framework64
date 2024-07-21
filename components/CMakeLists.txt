@@ -1,13 +1,13 @@
 set(components_source_files
-    arcball_camera/arcball_camera.h arcball_camera/arcball_camera.c
-    billboard_node/billboard_node.h billboard_node/billboard_node.c
-    debug_boxes/debug_boxes.h debug_boxes/debug_boxes.c
-    asset_viewer/asset_viewer.h asset_viewer/asset_viewer.c
-    media_file_picker/media_file_picker.h media_file_picker/media_file_picker.c
-    file_downloader/file_downloader_message.h file_downloader/file_downloader.h file_downloader/file_downloader.c
-    fps_camera/fps_camera.h fps_camera/fps_camera.c
-    rotate_node/rotate_node.h rotate_node/rotate_node.c
-    ui_navigation/ui_navigation.h ui_navigation/ui_navigation.c
+    fw64_arcball_camera.h fw64_arcball_camera.c
+    fw64_billboard_node.h fw64_billboard_node.c
+    fw64_debug_boxes.h fw64_debug_boxes.c
+    fw64_asset_viewer.h fw64_asset_viewer.c
+    fw64_media_file_picker.h fw64_media_file_picker.c
+    fw64_file_downloader_message.h fw64_file_downloader.h fw64_file_downloader.c
+    fw64_fps_camera.h fw64_fps_camera.c
+    fw64_rotate_node.h fw64_rotate_node.c
+    fw64_ui_navigation.h fw64_ui_navigation.c
     )
 
 add_library(fw64_components STATIC ${components_source_files})

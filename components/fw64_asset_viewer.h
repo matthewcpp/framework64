@@ -3,9 +3,9 @@
 #include <framework64/data_io.h>
 #include <framework64/engine.h>
 #include <framework64/scene.h>
-
 #include <framework64/util/bump_allocator.h>
-#include "arcball_camera/arcball_camera.h"
+
+#include <fw64_arcball_camera.h>
 
 typedef enum {
     FW64_ASSET_TYPE_UNKNOWN,

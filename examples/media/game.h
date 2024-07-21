@@ -1,8 +1,9 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "media_file_picker/media_file_picker.h"
-#include "asset_viewer/asset_viewer.h"
+
+#include "fw64_asset_viewer.h"
+#include "fw64_media_file_picker.h"
 
 #define DIR_LISTING_MAX 10
 

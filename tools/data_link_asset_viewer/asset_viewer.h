@@ -2,8 +2,8 @@
 
 #include "framework64/engine.h"
 
-#include "file_downloader/file_downloader.h"
-#include "asset_viewer/asset_viewer.h"
+#include "fw64_asset_viewer.h"
+#include "fw64_file_downloader.h"
 
 typedef struct {
     fw64Engine* engine;

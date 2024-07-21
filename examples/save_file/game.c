@@ -41,11 +41,11 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Node* node = fw64_scene_create_node(&game->scene);
     fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_blue_cube);
     fw64_scene_create_mesh_instance(&game->scene, node, mesh);
-    rotate_node_init(&game->rotate_node, node);
+    fw64_rotate_node_init(&game->rotate_node, node);
 }
 
 void game_update(Game* game){
-    rotate_node_update(&game->rotate_node, game->engine->time->time_delta);
+    fw64_rotate_node_update(&game->rotate_node, game->engine->time->time_delta);
 
     if (!fw64_save_file_valid(game->engine->save_file))
         return;

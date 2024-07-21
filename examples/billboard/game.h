@@ -1,13 +1,12 @@
 #pragma once
 
-#include "billboard_node/billboard_node.h"
-
 #include "framework64/engine.h"
 #include "framework64/render_pass.h"
 #include "framework64/scene.h"
 #include "framework64/util/quad.h"
 
-#include "fps_camera/fps_camera.h"
+#include "fw64_billboard_node.h"
+#include "fw64_fps_camera.h"
 
 typedef enum {
     RENDERPASS_DEPTH_ENABLED,
@@ -26,7 +25,7 @@ typedef struct {
     Flame flame;
     fw64Scene* scene;
     fw64RenderPass* renderpass[RENDERPASS_COUNT];
-    BillboardNodes billboard_nodes;
+    fw64BillboardNodes billboard_nodes;
 } Game;
 
 #ifdef __cplusplus

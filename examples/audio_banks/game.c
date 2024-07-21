@@ -48,7 +48,7 @@ void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
     fw64Mesh* mesh = fw64_textured_quad_create(engine, FW64_ASSET_image_n64_logo, allocator);
     fw64_scene_create_mesh_instance(&scene_view->scene, node, mesh);
 
-    rotate_node_init(&scene_view->rotate_node, node);
+    fw64_rotate_node_init(&scene_view->rotate_node, node);
     vec3_set(&scene_view->rotate_node.axis, 0.0f, 0.0f, 1.0f);
 
     scene_view->renderpass = fw64_renderpass_create(display, allocator);
@@ -63,7 +63,7 @@ void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
 }
 
 void scene_view_update(SceneView* scene_view) {
-    rotate_node_update(&scene_view->rotate_node, scene_view->engine->time->time_delta);
+    fw64_rotate_node_update(&scene_view->rotate_node, scene_view->engine->time->time_delta);
 }
 
 void scene_view_draw(SceneView* scene_view) {

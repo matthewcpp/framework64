@@ -1,4 +1,4 @@
-#include "debug_boxes.h"
+#include "fw64_debug_boxes.h"
 
 
 void fw64_debug_boxes_init(fw64DebugBoxes* debug_boxes, int box_count, fw64Scene* scene, fw64Mesh* mesh, fw64Allocator* allocator) {
