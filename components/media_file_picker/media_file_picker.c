@@ -1,4 +1,4 @@
-#include "file_explorer.h"
+#include "media_file_picker.h"
 
 #include "framework64/controller_mapping/n64.h"
 
@@ -8,17 +8,17 @@
 #define DIR_ALLOCATOR_SIZE 8 * 1024
 #define DEFAULT_PAGE_CAPCITY 8
 
-static void push_directory(fw64FileExplorer* explorer, const char* path);
+static void push_directory(fw64MediaFilePicker* explorer, const char* path);
 static int dir_stack_append(fw64FileExplorerDirStack* dir_stack, const char* path);
-static void reset_dir_data(fw64FileExplorer* explorer);
-static void read_next_page(fw64FileExplorer* explorer);
-static void read_path(fw64FileExplorer* explorer);
+static void reset_dir_data(fw64MediaFilePicker* explorer);
+static void read_next_page(fw64MediaFilePicker* explorer);
+static void read_path(fw64MediaFilePicker* explorer);
 
 
-void fw64_file_explorer_init(fw64FileExplorer* explorer, fw64Engine* engine, fw64Font* font, int max_page_item_size) {
+void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, int max_page_item_size) {
     explorer->engine = engine;
-    explorer->font = font;
     explorer->max_page_item_size = max_page_item_size;
+    explorer->flags = FW64_MEDIA_FILEPICKER_FLAG_NONE;
 
     explorer->dir_itr = NULL;
     explorer->file_callback = NULL;
@@ -29,14 +29,15 @@ void fw64_file_explorer_init(fw64FileExplorer* explorer, fw64Engine* engine, fw6
     explorer->dir_stack.current_index = 0;
 
     fw64_bump_allocator_init(&explorer->dir_allocator, DIR_ALLOCATOR_SIZE);
+    fw64_ui_navigation_init(&explorer->ui_nav, engine->input, 0);
     read_path(explorer);
 }
 
-void fw64_file_explorer_uninit(fw64FileExplorer* explorer) {
+void fw64_media_file_picker_uninit(fw64MediaFilePicker* explorer) {
     fw64_bump_allocator_uninit(&explorer->dir_allocator);
 }
 
-void read_path(fw64FileExplorer* explorer) {
+void read_path(fw64MediaFilePicker* explorer) {
     if (explorer->dir_itr) {
         fw64_media_close_dir(explorer->engine->media, explorer->dir_itr);
     }
@@ -52,7 +53,7 @@ void read_path(fw64FileExplorer* explorer) {
     explorer->dir_data.current_page_selected_item = 0;
 }
 
-void push_directory(fw64FileExplorer* explorer, const char* path) {
+void push_directory(fw64MediaFilePicker* explorer, const char* path) {
     int dir_appended = dir_stack_append(&explorer->dir_stack, path);
 
     if (!dir_appended)
@@ -61,7 +62,7 @@ void push_directory(fw64FileExplorer* explorer, const char* path) {
     read_path(explorer);
 }
 
-static void pop_directory(fw64FileExplorer* explorer) {
+static void pop_directory(fw64MediaFilePicker* explorer) {
     fw64FileExplorerDirStack* dir_stack = &explorer->dir_stack;
 
     if (dir_stack->current_index == 0)
@@ -86,7 +87,7 @@ int dir_stack_append(fw64FileExplorerDirStack* dir_stack, const char* path) {
     return 1;
 }
 
-void read_next_page(fw64FileExplorer* explorer) {
+void read_next_page(fw64MediaFilePicker* explorer) {
     fw64FileExplorerItemPage* page = fw64_bump_allocator_malloc(&explorer->dir_allocator, sizeof(fw64FileExplorerItemPage));
 
     page->items = fw64_bump_allocator_malloc(&explorer->dir_allocator, sizeof(fw64FileExplorerItem) * explorer->max_page_item_size);
@@ -115,7 +116,7 @@ void read_next_page(fw64FileExplorer* explorer) {
     explorer->dir_data.pages[explorer->dir_data.page_count++] = page;
 }
 
-static void change_page_selection(fw64FileExplorer* explorer, int direction) {
+static void change_page_selection(fw64MediaFilePicker* explorer, int direction) {
     fw64FileExplorerItemPage* page = explorer->dir_data.pages[explorer->dir_data.current_page_index];
 
     if (page->count == 0)
@@ -129,9 +130,10 @@ static void change_page_selection(fw64FileExplorer* explorer, int direction) {
         new_index = 0;
 
     explorer->dir_data.current_page_selected_item = new_index;
+    explorer->flags |= FW64_MEDIA_FILEPICKER_FLAG_SELECTION_CHANGED;
 }
 
-static void current_item_activated(fw64FileExplorer* explorer) {
+static void current_item_activated(fw64MediaFilePicker* explorer) {
     fw64FileExplorerItemPage* page = explorer->dir_data.pages[explorer->dir_data.current_page_index];
     fw64FileExplorerItem* item = page->items + explorer->dir_data.current_page_selected_item;
 
@@ -152,59 +154,27 @@ static void current_item_activated(fw64FileExplorer* explorer) {
             
         strcpy(&file_path[0] + path_dir_len, item->name);
 
+        explorer->flags |= FW64_MEDIA_FILEPCIKER_FLAG_PICKED_FILE;
         explorer->file_callback(file_path, explorer->file_callback_arg);
     }
 }
 
-void fw64_file_explorer_update(fw64FileExplorer* explorer) {
-    fw64Input* input = explorer->engine->input;
+void fw64_media_file_picker_update(fw64MediaFilePicker* explorer) {
+    fw64_ui_navigation_update(&explorer->ui_nav, explorer->engine->time->time_delta);
+    explorer->flags = FW64_MEDIA_FILEPICKER_FLAG_NONE;
 
-    if (fw64_input_controller_button_pressed(input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN)) {
+    if (fw64_ui_navigation_moved_down(&explorer->ui_nav)) {
         change_page_selection(explorer, 1);
-    }
-
-    else if (fw64_input_controller_button_pressed(input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) {
+    } else if (fw64_ui_navigation_moved_up(&explorer->ui_nav)) {
         change_page_selection(explorer, -1);
-    }
-
-    else if (fw64_input_controller_button_pressed(input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
+    } else if (fw64_ui_navigation_accepted(&explorer->ui_nav)) {
         current_item_activated(explorer);
-    }
-    else if (fw64_input_controller_button_pressed(input, 0, FW64_N64_CONTROLLER_BUTTON_B)) {
+    } else if (fw64_ui_navigation_back(&explorer->ui_nav)) {
         pop_directory(explorer);
     }
 }
 
-void fw64_file_explorer_draw(fw64FileExplorer* explorer) {
-    fw64Renderer* renderer = explorer->engine->renderer;
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-
-    int x_pos = 20;
-    int y_pos = 20;
-
-    fw64_renderer_draw_text(renderer, explorer->font, x_pos, y_pos, explorer->dir_stack.path);
-
-    fw64FileExplorerItemPage* page = explorer->dir_data.pages[explorer->dir_data.current_page_index];
-
-    for (int i = 0; i < page->count; i++) {
-        fw64FileExplorerItem* item = page->items + i;
-
-        y_pos += 20;
-
-        if (i == explorer->dir_data.current_page_selected_item) {
-            fw64_renderer_set_fill_color(renderer, 255, 255, 0, 255);
-            fw64_renderer_draw_text(renderer, explorer->font, x_pos, y_pos, item->name);
-            fw64_renderer_set_fill_color(renderer, 255, 255, 255, 255);
-        }
-        else {
-            fw64_renderer_draw_text(renderer, explorer->font, x_pos, y_pos, item->name);
-        }
-    }
-
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
-}
-
-void reset_dir_data(fw64FileExplorer* explorer) {
+void reset_dir_data(fw64MediaFilePicker* explorer) {
     fw64FileExplorerDirData* dir_data = &explorer->dir_data;
 
     dir_data->page_count = 0;
@@ -213,7 +183,7 @@ void reset_dir_data(fw64FileExplorer* explorer) {
     dir_data->current_page_index = 0;
 }
 
-void fw64_file_explorer_set_file_picked_callback(fw64FileExplorer* explorer, fw64FileExplorerFilePickedFunc func, void* arg) {
+void fw64_media_file_picker_set_file_picked_callback(fw64MediaFilePicker* explorer, fw64MediaFilePickerFilePickedFunc func, void* arg) {
     explorer->file_callback = func;
     explorer->file_callback_arg = arg;
 }
