@@ -139,3 +139,17 @@ fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t inde
     assert(index < mesh->primitives.size());
     return mesh->primitives[index]->material;
 }
+
+fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
+    assert(index < mesh->primitives.size());
+    switch (mesh->primitives[index]->mode) {
+        case fw64Primitive::Mode::Triangles:
+            return FW64_PRIMITIVE_MODE_TRIANGLES;
+        
+        case fw64Primitive::Mode::Lines:
+            return FW64_PRIMITIVE_MODE_LINES;
+
+        case fw64Primitive::Mode::Unknown:
+            return FW64_PRIMITIVE_MODE_UNSET;
+    }
+}

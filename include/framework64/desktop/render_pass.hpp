@@ -37,4 +37,10 @@ public:
     float camera_near = 0, camera_far = 1;
 
     framework64::RenderQueue render_queue;
+
+    std::array<float, 3> fog_color = {0.6f, 0.6f, 0.6f};
+    float fog_begin = 0.5;
+    float fog_end = 1.0f;
+    bool fog_enabled = 0;
+    bool depth_testing_enabled = true;
 };

@@ -2,6 +2,7 @@
 
 #include "framework64/renderer.h"
 #include "framework64/color.h"
+#include "framework64/mesh_instance.h"
 #include "framework64/n64_libultra/fill_rect.h"
 #include "framework64/n64_libultra/display_list.h"
 #include "framework64/n64_libultra/render_pass.h"
@@ -20,15 +21,9 @@ struct fw64Renderer{
     // display list for drawing commands
     Gfx gfx_list[GFX_DLIST_LEN];
 
-    fw64Camera* camera;
-
     u16 clear_color;
 
     fw64N64RendererFeature enabled_features;
-
-    s32 fog_min;
-    s32 fog_max;
-    fw64ColorRGBA8 fog_color;
 
     IVec2 screen_size;
     fw64PrimitiveMode primitive_mode;
@@ -49,3 +44,9 @@ void fw64_n64_configure_fog(fw64Renderer* renderer, int enabled);
 
 void fw64_n64_renderer_clear_rect(fw64Renderer* renderer, int x, int y, int width, int height, u16 clear_color, fw64ClearFlags flags);
 void fw64_n64_renderer_clear_viewport(fw64Renderer* renderer, fw64Viewport* viewport, u16 clear_color, fw64ClearFlags flags);
+
+/** Draws a mesh with the supplied transform. */
+void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance);
+
+void fw64_renderer_draw_text(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text);
+void fw64_renderer_draw_text_count(fw64Renderer* renderer, fw64Font* font, int x, int y, const char* text, uint32_t count);

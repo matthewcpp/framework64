@@ -1,13 +1,15 @@
 #include "framework64/n64_libultra/render_pass.h"
 
+#include "framework64/math.h"
+
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator) {
-    fw64RenderPass* renderpass = allocator->malloc(allocator, sizeof(fw64RenderPass));
+    fw64RenderPass* renderpass = allocator->memalign(allocator, 8, sizeof(fw64RenderPass));
     renderpass->allocator = allocator;
     fw64_n64_render_queue_init(&renderpass->render_queue, allocator);
 
-    IVec2 viewport_pos = {0,0};
-    IVec2 viewport_size = fw64_display_get_size(display);
-    fw64_viewport_set(&renderpass->viewport, &viewport_pos, &viewport_size);
+    ivec2_set(&renderpass->viewport.position, 0, 0);
+    renderpass->viewport.size = fw64_display_get_size(display);
+    update_n64_viewport(&renderpass->viewport, &renderpass->n64_viewport);
 
     guMtxIdent(&renderpass->projection_matrix);
     guMtxIdent(&renderpass->view_matrix);
@@ -48,8 +50,25 @@ void fw64_renderpass_set_projection_matrix(fw64RenderPass* pass, float* projecti
     }
 }
 
-void fw64_renderpass_set_viewport(fw64RenderPass* pass, fw64Viewport* viewport) {
-    pass->viewport = *viewport;
+void update_n64_viewport(fw64Viewport* viewport, Vp* n64_viewport) {
+    n64_viewport->vp.vscale[0] = viewport->size.x * 2;
+    n64_viewport->vp.vscale[1] = viewport->size.y * 2;
+    n64_viewport->vp.vscale[2] = G_MAXZ / 2;
+    n64_viewport->vp.vscale[3] = 0;
+
+    n64_viewport->vp.vtrans[0] = ((viewport->position.x * 2) + viewport->size.x) * 2;
+    n64_viewport->vp.vtrans[1] = ((viewport->position.y * 2) + viewport->size.y) * 2;
+    n64_viewport->vp.vtrans[2] = G_MAXZ / 2;
+    n64_viewport->vp.vtrans[3] = 0;
+}
+
+void fw64_renderpass_set_viewport(fw64RenderPass* renderpass, fw64Viewport* viewport) {
+    renderpass->viewport = *viewport;
+    update_n64_viewport(viewport, &renderpass->n64_viewport);
+}
+
+const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass) {
+    return &renderpass->viewport;
 }
 
 void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera) {
@@ -67,15 +86,12 @@ void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g,
     pass->clear_color = GPACK_RGBA5551(r, g, b, 1);
 }
 
-void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64Mesh* mesh, fw64Transform* transform) {
-    fw64_n64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh, transform);
+void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance) {
+    fw64_n64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh_instance);
 }
 
-void fw64_renderpass_draw_animated_mesh(fw64RenderPass* pass, fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform) {
-    (void)pass;
-    (void)mesh;
-    (void)controller;
-    (void)transform;
+void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* pass, fw64SkinnedMeshInstance* instance) {
+    fw64_n64_render_queue_enqueue_skinned_mesh(&pass->render_queue, instance);
 }
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* sprite_batch) {
@@ -92,4 +108,26 @@ static void fw64_n64_renderpass_toggle_feature(fw64RenderPass* renderpass, fw64N
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled) {
     fw64_n64_renderpass_toggle_feature(renderpass, N64_RENDERER_FEATURE_DEPTH_TEST, enabled);
+}
+
+void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled) {
+    fw64_n64_renderpass_toggle_feature(renderpass, N64_RENDERER_FEATURE_FOG, enabled);
+}
+
+/**
+ * The N64 Fog Algorithm is not totally clear.
+ * This implementation attempts to provide a reasonable approximation of how I think it should work.
+ * Note that a crash has been observed if fog_min == fog_max
+ */
+void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min, float fog_max) {
+    renderpass->fog_min = (s32)fw64_clamp(900.0f + (fog_min * 100.0f), 0.0f, 1000.0f);
+    renderpass->fog_max = (s32)fw64_clamp(900.0f + (fog_max * 100.0f), 0.0f, 1000.0f);
+
+    if (renderpass->fog_min == renderpass->fog_max) {
+        renderpass->fog_min = renderpass->fog_max - 8;
+    }
+}
+
+void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_t g, uint8_t b) {
+    fw64_color_rgba8_set(&renderpass->fog_color, r, g, b, 255);
 }

@@ -3,7 +3,7 @@
 #include "framework64/desktop/texture.hpp"
 
 void fw64Material::updateShader() {
-
+    shader = shader_cache.getShaderProgram(shading_mode);
 }
 
 // C Interface

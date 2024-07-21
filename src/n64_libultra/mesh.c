@@ -30,8 +30,6 @@ fw64Mesh* fw64_mesh_load_from_datasource(fw64AssetDatabase* assets, fw64DataSour
         fw64_material_bundle_delete(material_bundle, allocator);
     }
 
-    mesh->material_bundle = material_bundle;
-
     return mesh;
 }
 
@@ -58,6 +56,8 @@ fw64Mesh* load_mesh_data(fw64DataSource* data_source, fw64MeshInfo* mesh_info, f
     
     fixup_mesh_vertex_pointers(mesh, data_source, allocator);
     fixup_mesh_primitive_material_pointers(material_bundle, mesh);
+
+    mesh->material_bundle = material_bundle;
 
     return mesh;
 }
@@ -113,10 +113,8 @@ static void fixup_mesh_primitive_material_pointers(fw64MaterialBundle* material_
     }
 }
 
-
 void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* assets, fw64Allocator* allocator) {
     (void)assets;
-    if (!allocator) allocator = fw64_default_allocator();
 
     fw64_n64_mesh_uninit(mesh, allocator);
     allocator->free(allocator, mesh);
@@ -140,7 +138,8 @@ void fw64_n64_mesh_uninit(fw64Mesh* mesh, fw64Allocator* allocator) {
     if (mesh->primitives)
         allocator->free(allocator, mesh->primitives);
 
-    if (mesh->material_bundle) {
+    // this signifies that the material bundle was loaded with the mesh and therefore it is our responsibility to delete it here
+    if (mesh->info._material_bundle_count > 0) {
         fw64_material_bundle_delete(mesh->material_bundle, allocator);
     }
 }
@@ -153,4 +152,15 @@ fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t inde
     fw64Primitive* primitive = mesh->primitives + index;
 
     return primitive->material;
+}
+
+fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
+    fw64Primitive* primitive = mesh->primitives + index;
+    Gfx* command = primitive->display_list + 1;
+
+    if (command->line.cmd == G_LINE3D) {
+        return FW64_PRIMITIVE_MODE_LINES;
+    } else {
+        return FW64_PRIMITIVE_MODE_TRIANGLES;
+    }
 }

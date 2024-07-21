@@ -64,6 +64,15 @@ void fw64_camera_update_projection_matrix(fw64Camera* camera) {
 #endif
 }
 
+uint16_t* fw64_camera_get_perspnorm(fw64Camera* camera) {
+#ifdef FW64_PLATFORM_N64_LIBULTRA
+    return &camera->_persp_norm;
+#else
+    (void)camera;
+    return NULL;
+#endif
+}
+
 void fw64_camera_update_view_matrix(fw64Camera* camera) {
     Vec3 forward, up, target;
     fw64_transform_forward(&camera->transform, &forward);
@@ -94,7 +103,7 @@ void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* frustum
     fw64_frustum_set_from_matrix(frustum, &projScreenMatrix[0]);
 }
 
-void fw64_camera_set_viewport(fw64Camera* camera, IVec2* viewport_pos, IVec2* viewport_size) {
+void fw64_camera_set_viewport(fw64Camera* camera, const IVec2* viewport_pos, const IVec2* viewport_size) {
     fw64_viewport_set(&camera->viewport, viewport_pos, viewport_size);
 }
 

@@ -1,4 +1,3 @@
-
 #include "framework64/n64_libultra/display_list.h"
 #include "framework64/n64_libultra/filesystem.h"
 #include "framework64/n64_libultra/mesh_builder.h"

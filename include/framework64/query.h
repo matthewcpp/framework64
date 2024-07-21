@@ -27,6 +27,11 @@ typedef struct {
 } fw64OverlapSphereQueryResult;
 
 typedef struct {
+    fw64Collider* colliders[Fw64_COLLISION_QUERY_RESULT_SIZE];
+    int count;
+} fw64OverlapBoxQueryResult;
+
+typedef struct {
     fw64Node* node;
     Vec3 point;
     float distance;

@@ -21,54 +21,6 @@
 #include <unordered_map>
 #include <vector>
 
-namespace framework64 {
-
-class SpriteBatch {
-public:
-    SpriteBatch() = default;
-
-    bool init(ShaderCache& shader_cache);
-    void setScreenSize(int width, int height);
-    
-    void start();
-    void flush();
-
-    void drawSprite(fw64Texture* texture, float x, float y);
-    void drawSpriteFrame(fw64Texture* texture, int frame, float x, float y, float scale_x, float scale_y);
-    void drawText(fw64Font* font, float x, float y, const char* text, uint32_t count);
-    void drawSpriteBatch(fw64SpriteBatch* sprite_batch);
-
-    void setFillColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-    void drawFilledRect(float x, float y, float width, float height);
-
-    void newFrame();
-
-private:
-    void drawSpriteVertices(fw64Material& material);
-    void drawSpriteVertices(SpriteVertexBuffer& sprite_vertex_buffer, fw64Material& material);
-    void setCurrentTexture(fw64Texture* texture);
-    void submitCurrentBatch();
-    void createQuad(float xf, float yf, float wf, float hf, std::array<float, 4> const & color);
-
-private:
-    SpriteVertexBuffer vertex_buffer;
-
-    fw64Material sprite_material;
-    fw64Material fill_material;
-    fw64Material* current_material = nullptr;
-    GLuint current_shader_handle;
-
-    struct SpriteTransformData{
-        std::array<float, 16> mvp_matrix;
-    };
-
-    UniformBlock<SpriteTransformData> sprite_transform_uniform_block;
-    std::array<float, 4> fill_color = {1.0f, 1.0f, 1.0f, 1.0f};
-};
-
-}
-
-
 struct fw64SpriteBatch {
     fw64SpriteBatch(fw64Allocator* allocator, size_t num_layers);
     ~fw64SpriteBatch();

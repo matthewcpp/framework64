@@ -9,7 +9,10 @@ namespace framework64 {
 /// TODO: look into making this use a mesh?
 class ScreenOverlay {
 public:
-    void init(ShaderCache& shader_cache);
+    ScreenOverlay(ShaderCache& shader_cache)
+        :material(shader_cache) {}
+public:
+    void init();
 
     fw64Primitive primitive;
     fw64Material material;

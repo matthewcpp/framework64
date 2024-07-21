@@ -5,7 +5,7 @@
 /** \file log.h */
 
 #ifdef NDEBUG
-    #define fw64_debug_log(message, __VA_ARGS__) 
+    #define fw64_debug_log(message, ...) 
 #else
 
 #ifdef __cplusplus

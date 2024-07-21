@@ -2,199 +2,55 @@
 
 #include "framework64/collision.h"
 #include "framework64/matrix.h"
+#include "framework64/node.h"
 
-static void fw64_collider_update_box(fw64Collider* collider);
-static void fw64_collider_update_mesh(fw64Collider* collider);
+#include <stddef.h>
 
-void fw64_collider_init(fw64Collider* collider, fw64Transform* transform) {
-    collider->type = FW64_COLLIDER_NONE;
-    collider->transform = transform;
+static void fw64_collider_init(fw64Collider* collider, fw64Node* node, fw64ColliderType type, Box* box) {
+    collider->type = type;
+    collider->source = *box;
+    collider->node = node;
+    collider->flags = FW64_COLLIDER_FLAG_ACTIVE;
+
+    node->collider = collider;
+
+    fw64_collider_update(collider);
 }
 
-void fw64_collider_set_type_none(fw64Collider* collider) {
-    collider->type = FW64_COLLIDER_NONE;
+void fw64_collider_init_box(fw64Collider* collider, fw64Node* node, Box* box) {
+    collider->collision_mesh = NULL;
+    fw64_collider_init(collider, node, FW64_COLLIDER_BOX, box);
 }
 
-void fw64_collider_set_type_box(fw64Collider* collider, Box* box) {
-    collider->type = FW64_COLLIDER_BOX;
-    collider->source.box = *box;
-
-    fw64_collider_update_box(collider);
-}
-
-void fw64_collider_set_type_mesh(fw64Collider* collider, fw64CollisionMesh * collision_mesh) {
-    collider->type = FW64_COLLIDER_MESH;
-    collider->source.mesh = collision_mesh;
-
-    fw64_collider_update_mesh(collider);
-}
-
-static void fw64_collider_update_box_with_transform(fw64Transform* transform, Box* source, Box* target) {
-#ifdef FW64_PLATFORM_N64_LIBULTRA
-    float fmatrix[16];
-    matrix_from_trs(fmatrix, &transform->position, &transform->rotation, &transform->scale);
-    matrix_transform_box(&fmatrix[0], source, target);
-#else
-    matrix_transform_box(&transform->matrix.m[0], source, target);
-#endif
-}
-
-void fw64_collider_update_box(fw64Collider* collider) {
-    fw64_collider_update_box_with_transform(collider->transform, &collider->source.box, &collider->bounding);
-}
-
-void fw64_collider_update_mesh(fw64Collider* collider) {
-    fw64_collider_update_box_with_transform(collider->transform, &collider->source.mesh->box, &collider->bounding);
+void fw64_collider_init_collision_mesh(fw64Collider* collider, fw64Node* node, fw64CollisionMesh * collision_mesh) {
+    collider->collision_mesh = collision_mesh;
+    fw64_collider_init(collider, node, FW64_COLLIDER_COLLISION_MESH, &collision_mesh->box);
 }
 
 void fw64_collider_update(fw64Collider* collider) {
-    switch (collider->type) {
-        case FW64_COLLIDER_BOX:
-            fw64_collider_update_box(collider);
-            break;
-
-        case FW64_COLLIDER_MESH:
-            fw64_collider_update_mesh(collider);
-            break;
-
-        default:
-            break;
-    }
-}
-
-int fw64_collider_mesh_test_sphere(fw64Collider* collider, Vec3* center, float radius, Vec3* out_point) {
-    // first test the world space bounding
-    if (!fw64_collision_test_box_sphere(&collider->bounding, center, radius, out_point))
-        return 0;
-
-    int result = 0;
-
-    // transform query sphere into mesh local space
-    Vec3 local_center;
-    fw64_transform_inv_mult_point(collider->transform, center, &local_center);
-    float local_radius = radius; //todo: fix this
-
-    // check for collision of sphere and mesh triangles
-    float closest_distance = FLT_MAX;
-    Vec3 closest_hit;
-
-    Vec3* points = collider->source.mesh->points;
-    uint16_t* elements = collider->source.mesh->elements;
-
-    uint32_t triangle_count = collider->source.mesh->element_count / 3;
-
-    for (uint32_t i = 0; i < triangle_count; i++) {
-        Vec3 local_hit;
-        uint32_t index = i * 3;
-
-        Vec3* a = points + elements[index];
-        Vec3* b = points + elements[index + 1];
-        Vec3* c = points + elements[index + 2];
-
-        if (fw64_collision_test_sphere_triangle(&local_center, local_radius, a, b, c, &local_hit)) {
-            float distance = vec3_distance_squared(&local_center, &local_hit);
-
-            if (distance >= closest_distance)
-                continue;
-
-            closest_distance = distance;
-            closest_hit = local_hit;
-            result = 1;
-        }
-    }
-
-    // transform hit point back to world space
-    if (result) {
-        fw64_transform_mult_point(collider->transform, &closest_hit, out_point);
-    }
-
-    return result;
-}
-
-int fw64_mesh_collider_test_ray(fw64Collider* collider, Vec3* origin, Vec3* direction, Vec3* out_point, float* out_dist) {
-    // first test the world space bounding
-    if (!fw64_collision_test_ray_box(origin, direction, &collider->bounding, out_point, out_dist))
-        return 0;
-
-    int result = 0;
-
-    // transform the ray into local space
-    Vec3 local_origin, local_direction;
-    Quat inv_rotation = collider->transform->rotation;
-    quat_conjugate(&inv_rotation);
-
-    fw64_transform_inv_mult_point(collider->transform, origin, &local_origin);
-    quat_transform_vec3(&local_direction, &inv_rotation, direction);
-
-    // check for collision of sphere and mesh triangles
-    float closest_distance = FLT_MAX;
-    Vec3 closest_hit;
-
-    Vec3* points = collider->source.mesh->points;
-    uint16_t* elements = collider->source.mesh->elements;
-
-    uint32_t triangle_count = collider->source.mesh->element_count / 3;
-
-    for (uint32_t i = 0; i < triangle_count; i++) {
-        Vec3 local_hit;
-        float local_dist;
-        uint32_t index = i * 3;
-
-        Vec3* a = points + elements[index];
-        Vec3* b = points + elements[index + 1];
-        Vec3* c = points + elements[index + 2];
-
-        if (fw64_collision_test_ray_triangle(&local_origin, &local_direction, a, b, c, &local_hit, &local_dist)) {
-
-            if (local_dist >= closest_distance)
-                continue;
-
-            closest_distance = local_dist;
-            closest_hit = local_hit;
-            result = 1;
-        }
-    }
-
-    // transform hit point back to world space
-    if (result) {
-        fw64_transform_mult_point(collider->transform, &closest_hit, out_point);
-        *out_dist = closest_distance; // todo: this probably needs to be scaled?
-    }
-
-    return result;
+    matrix_transform_box(collider->node->transform.world_matrix, &collider->source, &collider->bounding);
 }
 
 int fw64_collider_test_sphere(fw64Collider* collider, Vec3* center, float radius, Vec3* out_point) {
-    switch (collider->type) {
-        case FW64_COLLIDER_BOX:
-            return fw64_collision_test_box_sphere(&collider->bounding, center, radius, out_point);
+    int result = fw64_collision_test_box_sphere(&collider->bounding, center, radius, out_point);
 
-        case FW64_COLLIDER_MESH:
-            return fw64_collider_mesh_test_sphere(collider, center, radius, out_point);
-
-        default:
-            return 0;
+    if (result && collider->type == FW64_COLLIDER_COLLISION_MESH) {
+        result = fw64_collision_mesh_test_sphere(collider->collision_mesh, &collider->node->transform, center, radius, out_point);
     }
+
+    return result;
 }
 
 int fw64_collider_test_ray(fw64Collider* collider, Vec3* origin, Vec3* direction, Vec3* out_point, float* out_dist) {
-    switch (collider->type) {
-        case FW64_COLLIDER_BOX:
-            return fw64_collision_test_ray_box(origin, direction, &collider->bounding, out_point, out_dist);
+    int result = fw64_collision_test_ray_box(origin, direction, &collider->bounding, out_point, out_dist);
 
-        case FW64_COLLIDER_MESH:
-            return fw64_mesh_collider_test_ray(collider, origin, direction, out_point, out_dist);
-        default:
-            return 0;
+    if (result && collider->type == FW64_COLLIDER_COLLISION_MESH) {
+        result = fw64_collision_mesh_test_ray(collider->collision_mesh, &collider->node->transform, origin, direction, out_point, out_dist);
     }
+
+    return result;
 }
 
 int fw64_collider_test_box(fw64Collider* collider, Box* box) {
-    switch (collider->type) {
-        case FW64_COLLIDER_BOX:
-            return box_intersection(&collider->bounding, box);
-
-        default:
-            return 0;
-    }
+    return box_intersection(&collider->bounding, box);
 }

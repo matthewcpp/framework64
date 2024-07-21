@@ -52,8 +52,11 @@ void fw64_camera_update_view_matrix(fw64Camera* camera);
 
 void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* planes);
 
+/** This function return NULL on all non-n64 platforms */
+uint16_t* fw64_camera_get_perspnorm(fw64Camera* camera);
+
 /** Viewport's position and size in window space.  Note: Top Left is 0,0 */
-void fw64_camera_set_viewport(fw64Camera* camera, IVec2* viewport_pos, IVec2* viewport_size);
+void fw64_camera_set_viewport(fw64Camera* camera, const IVec2* viewport_pos, const IVec2* viewport_size);
 
 /** Set Viewport rect proportional to the screen. position and size values should be in the range [0, 1]*/
 void fw64_camera_set_viewport_relative(fw64Camera* camera, Vec2* viewport_pos, Vec2* viewport_size);

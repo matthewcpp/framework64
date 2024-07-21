@@ -18,7 +18,7 @@ void fw64MeshBuilder::reset(size_t primitive_count, size_t image_count) {
     material_bundle = std::make_unique<fw64MaterialBundle>();
 
     for (size_t i  = 0; i < primitive_count; i++) {
-        material_bundle->materials.emplace_back(std::make_unique<fw64Material>());
+        material_bundle->materials.emplace_back(std::make_unique<fw64Material>(assets->shader_cache));
     }
 
     active_mesh_index = std::numeric_limits<size_t>::max();

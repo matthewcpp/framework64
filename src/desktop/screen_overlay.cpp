@@ -4,7 +4,7 @@
 
 namespace framework64 {
 
-void ScreenOverlay::init(ShaderCache& shader_cache) {
+void ScreenOverlay::init() {
     PrimitiveData mesh_data;
 
     primitive.primitive_data.positions = {
@@ -30,8 +30,7 @@ void ScreenOverlay::init(ShaderCache& shader_cache) {
     primitive.mode = fw64Primitive::Mode::Triangles;
     primitive.material = &material;
     material.color = {1.0f, 1.0f, 1.0f, 1.0f};
-    material.shader = shader_cache.getShaderProgram(FW64_SHADING_MODE_VERTEX_COLOR);
-
+    fw64_material_set_shading_mode(&material, FW64_SHADING_MODE_VERTEX_COLOR);
 }
 
 }
