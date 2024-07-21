@@ -22,7 +22,7 @@ typedef struct {
 
     int camera_pos_delta;
     int camera_size_delta;
-    RotateNode rotate_node;
+    fw64RotateNode rotate_node;
 } Game;
 
 #ifdef __cplusplus

@@ -7,7 +7,7 @@
 
 typedef struct {
     fw64Scene scene;
-    RotateNode rotate_node;
+    fw64RotateNode rotate_node;
     fw64RenderPass* renderpass;
     fw64Engine* engine;
 } SceneView;

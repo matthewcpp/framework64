@@ -2,7 +2,7 @@
 
 #define DEFAULT_ROTATION_SPEED = 75.0f
 
-void rotate_node_init(RotateNode* component, fw64Node* node) {
+void fw64_rotate_node_init(fw64RotateNode* component, fw64Node* node) {
     component->node = node;
     vec3_set(&component->axis, 0.0f, 1.0f, 0.0f);
     component->speed = 75.0f;
@@ -11,7 +11,7 @@ void rotate_node_init(RotateNode* component, fw64Node* node) {
     component->enabled = 1;
 }
 
-void rotate_node_update(RotateNode* component, float time_delta) {
+void fw64_rotate_node_update(fw64RotateNode* component, float time_delta) {
     if (!component->enabled) {
         return;
     }

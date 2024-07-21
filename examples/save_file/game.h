@@ -24,7 +24,7 @@ typedef struct {
     fw64Font* font;
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
     fw64SpriteBatch* spritebatch;
-    RotateNode rotate_node;
+    fw64RotateNode rotate_node;
     fw64Scene scene;
     int loaded;
 } Game;
