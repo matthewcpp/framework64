@@ -44,12 +44,14 @@ void N64Client::deviceThread(N64Client* client, const std::string rom_path) {
     if (!std::filesystem::is_regular_file(rom_path)) {
         std::cout << "Rom file does not exist: " << rom_path << std::endl;
         client->signalStatus(Status::Failed);
+        return;
     }
 
     DeviceError error = device_find();
     if (error != DEVICEERR_OK) {
         std::cout << "Error finding development cart: " << error << std::endl;
         client->signalStatus(Status::Failed);
+        return;
     }
 
     error = device_open();
@@ -57,12 +59,15 @@ void N64Client::deviceThread(N64Client* client, const std::string rom_path) {
     if (error != DEVICEERR_OK) {
         std::cout << "Error connecting to development cart: " << error << std::endl;
         client->signalStatus(Status::Failed);
+        return;
     }
 
     FILE* rom_file = std::fopen(rom_path.c_str(), "rb");
     if (!rom_file) {
         std::cout << "Could not open rom file for reading: "<< rom_path << std::endl;
+        device_close();
         client->signalStatus(Status::Failed);
+        return;
     }
 
     size_t file_size = static_cast<size_t>(std::filesystem::file_size(rom_path));
@@ -75,6 +80,7 @@ void N64Client::deviceThread(N64Client* client, const std::string rom_path) {
         std::cout << "Error uploading rom to development card: " << error << std::endl;
         device_close();
         client->signalStatus(Status::Failed);
+        return;
     }
 
     std::cout << "Rom upload complete" << std::endl;
