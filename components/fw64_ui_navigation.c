@@ -1,4 +1,4 @@
-#include "ui_navigation.h"
+#include "fw64_ui_navigation.h"
 
 #include "framework64/controller_mapping/n64.h"
 

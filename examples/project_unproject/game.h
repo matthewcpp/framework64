@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
-#include "arcball_camera/arcball_camera.h"
+#include "fw64_arcball_camera.h"
 
 typedef enum {
     FLAG_NONE = 0,

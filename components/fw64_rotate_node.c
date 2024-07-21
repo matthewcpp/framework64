@@ -1,4 +1,4 @@
-#include "rotate_node.h"
+#include "fw64_rotate_node.h"
 
 #define DEFAULT_ROTATION_SPEED = 75.0f
 

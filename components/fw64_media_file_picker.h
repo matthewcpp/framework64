@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/util/bump_allocator.h"
 
-#include "ui_navigation/ui_navigation.h"
+#include "fw64_ui_navigation.h"
 
 #define fw64_media_file_picker_MAX_DEPTH 8
 #define fw64_media_file_picker_MAX_PATH_LENGTH 256

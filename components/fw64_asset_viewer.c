@@ -1,4 +1,4 @@
-#include "asset_viewer.h"
+#include "fw64_asset_viewer.h"
 
 #include "framework64/util/renderpass_util.h"
 #include "framework64/util/text_util.h"

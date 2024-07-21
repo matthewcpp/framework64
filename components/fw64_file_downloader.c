@@ -1,12 +1,13 @@
-#include "file_downloader.h"
 
+
+#include "framework64/asset_database.h"
 #include "framework64/log.h"
+
+#include "fw64_file_downloader.h"
+#include "fw64_file_downloader_message.h"
 
 #include <stdio.h>
 #include <string.h>
-
-#include "framework64/asset_database.h"
-#include "file_downloader_message.h"
 
 #define BUMP_ALLOCATOR_SIZE 256
 

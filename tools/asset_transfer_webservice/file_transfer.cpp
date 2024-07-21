@@ -1,6 +1,6 @@
 #include "file_transfer.hpp"
 
-#include "file_downloader_message.h"
+#include "fw64_file_downloader_message.h"
 
 #include <cstring>
 #include <iostream>

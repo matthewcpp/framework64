@@ -1,4 +1,4 @@
-#include "billboard_node.h"
+#include "fw64_billboard_node.h"
 
 void billboard_nodes_init(BillboardNodes* system, fw64Allocator* allocator) {
     fw64_sparse_set_init(&system->components, sizeof(BillboardNode), allocator);

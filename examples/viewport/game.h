@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
-#include "rotate_node/rotate_node.h"
+#include "fw64_rotate_node.h"
 
 typedef enum {
     RENDER_PASS_VIEW,

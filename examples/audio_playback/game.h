@@ -4,7 +4,7 @@
 #include "framework64/scene.h"
 #include "framework64/sprite_batch.h"
 
-#include "rotate_node/rotate_node.h"
+#include "fw64_rotate_node.h"
 
 typedef struct {
     fw64Scene scene;

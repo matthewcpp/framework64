@@ -5,7 +5,7 @@
 #include <framework64/scene.h>
 #include <framework64/sprite_batch.h>
 
-#include "arcball_camera/arcball_camera.h"
+#include "fw64_arcball_camera.h"
 
 typedef struct {
     fw64Engine* engine;
