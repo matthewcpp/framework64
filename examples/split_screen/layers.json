@@ -1,0 +1,16 @@
+{
+    "default": 1,
+    "player1": 2,
+    "player2": 3,
+    "player3": 4,
+    "player4": 5,
+    "ground": 6,
+    "blue": 7,
+    "cyan": 8,
+    "green": 9,
+    "red": 10,
+    "wall": 11,
+    "hallway": 12,
+    "door": 13,
+    "weapon": 14
+}

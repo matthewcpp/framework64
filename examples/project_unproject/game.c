@@ -1,17 +1,19 @@
 #include "game.h"
-#include "framework64/util/texture_util.h"
-
-#include "assets/assets.h"
 
 #include "framework64/controller_mapping/n64.h"
+#include "framework64/util/texture_util.h"
+#include "framework64/util/renderpass_util.h"
+
+#include "assets/assets.h"
 
 #include <limits.h>
 
 void game_init(Game* game, fw64Engine* engine) {
-    game->engine = engine;
-    game->flags = FLAG_NONE;
+    fw64Display* display = fw64_displays_get_primary(engine->displays);
     fw64Allocator* allocator = fw64_default_allocator();
 
+    game->engine = engine;
+    game->flags = FLAG_NONE;
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     game->crosshair = fw64_texture_util_create_from_loaded_image(engine->assets, FW64_ASSET_image_crosshair, allocator);
     fw64_arcball_init(&game->arcball_camera, engine->input, fw64_displays_get_primary(engine->displays));
@@ -20,21 +22,26 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_scene_info_init(&info);
     info.node_count = 1;
     info.mesh_count = 1;
+    info.mesh_instance_count = 1;
     info.collider_count = 1;
     fw64_scene_init(&game->scene, &info, engine->assets, allocator);
 
-    fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_blue_cube, 0);
-    fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-    fw64Collider* collider = fw64_scene_get_collider(&game->scene, 0);
-    fw64_node_set_mesh(node, mesh);
-    fw64_node_set_box_collider(node, collider);
-    fw64_node_update(node);
+    fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_blue_cube);
+    Box mesh_bounding = fw64_mesh_get_bounding_box(mesh);
+    fw64Node* node = fw64_scene_create_node(&game->scene);
+    fw64_scene_create_mesh_instance(&game->scene, node, mesh);
+    fw64_scene_create_box_collider(&game->scene, node, &mesh_bounding);
+    fw64_arcball_set_initial(&game->arcball_camera, &mesh_bounding);
 
-    fw64_arcball_set_initial(&game->arcball_camera, &collider->bounding);
-
-    game->crosshair_pos = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
+    game->crosshair_pos = fw64_display_get_size(display);
     game->crosshair_pos.x /= 2;
     game->crosshair_pos.y /= 2;
+
+    game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
+    game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
+
+    game->spritebatch = fw64_spritebatch_create(1, allocator);
 }
 
 static void move_crosshair(Game* game);
@@ -62,23 +69,36 @@ void game_update(Game* game){
     if (game->flags & FLAG_HIT_POS_ACTIVE) {
         fw64_camera_world_to_viewport_pos(&game->arcball_camera.camera, &game->raycast.point, &game->hit_pos);
     }
+
+    fw64_spritebatch_begin(game->spritebatch);
+    fw64_spritebatch_draw_string(game->spritebatch, game->font, "min", game->min_pos.x, game->min_pos.y);
+    fw64_spritebatch_draw_string(game->spritebatch, game->font, "max", game->max_pos.x, game->max_pos.y);
+
+    if (game->flags & FLAG_HIT_POS_ACTIVE) {
+        fw64_spritebatch_draw_string(game->spritebatch, game->font, "hit", game->hit_pos.x, game->hit_pos.y);
+    }
+
+    fw64_spritebatch_draw_sprite(game->spritebatch, game->crosshair, 
+        game->crosshair_pos.x - fw64_texture_width(game->crosshair) / 2, game->crosshair_pos.y - fw64_texture_height(game->crosshair) / 2);
+    
+    fw64_spritebatch_end(game->spritebatch);
 }
 
 void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_RENDERER_FLAG_CLEAR);
-    fw64_renderer_set_camera(game->engine->renderer, &game->arcball_camera.camera);
-    fw64_scene_draw_all(&game->scene, game->engine->renderer);
 
-    fw64_renderer_draw_text(game->engine->renderer, game->font, game->min_pos.x, game->min_pos.y, "min");
-    fw64_renderer_draw_text(game->engine->renderer, game->font, game->max_pos.x, game->max_pos.y, "max");
+    fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
+    fw64_renderpass_set_camera(renderpass, &game->arcball_camera.camera);
+    fw64_renderpass_begin(renderpass);
+    fw64_scene_draw_all(&game->scene, renderpass);
+    fw64_renderpass_end(renderpass);
+    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 
-    if (game->flags & FLAG_HIT_POS_ACTIVE) {
-        fw64_renderer_draw_text(game->engine->renderer, game->font, game->hit_pos.x, game->hit_pos.y, "hit");
-    }
-
-    fw64_renderer_draw_sprite(game->engine->renderer, game->crosshair, 
-        game->crosshair_pos.x - fw64_texture_width(game->crosshair) / 2, game->crosshair_pos.y - fw64_texture_height(game->crosshair) / 2);
-
+    renderpass = game->renderpasses[RENDER_PASS_UI];
+    fw64_renderpass_begin(renderpass);
+    fw64_renderpass_draw_sprite_batch(renderpass, game->spritebatch);
+    fw64_renderpass_end(renderpass);
+    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

@@ -1,25 +1,28 @@
 #pragma once
 
-#include "framework64/camera.h"
 #include "framework64/engine.h"
-#include "framework64/node.h"
+#include "framework64/scene.h"
 
 #include "arcball_camera/arcball_camera.h"
 
-#define MESH_COUNT 5
+typedef enum {
+    RENDER_PASS_SCENE,
+    RENDER_PASS_UI,
+    RENDER_PASS_COUNT
+} RenderPasses;
 
 typedef struct {
     fw64Engine* engine;
     fw64ArcballCamera arcball;
 
-    fw64Font* consolas;
+    fw64Font* font;
     fw64Texture* button_sprite;
 
-    fw64Node node;
+    fw64Scene scene;
     int current_mesh;
-    fw64Mesh* meshes[MESH_COUNT];
 
-    int switch_model_text_width;
+    fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
+    fw64SpriteBatch* spritebatch;
 } Game;
 
 #ifdef __cplusplus

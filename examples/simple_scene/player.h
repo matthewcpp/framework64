@@ -25,8 +25,8 @@ typedef enum {
 } PlayerState;
 
 typedef struct {
-    fw64Node node;
-    fw64Collider collider;
+    fw64Node* node;
+    fw64Collider* collider;
     fw64Engine* engine;
     fw64Scene* scene;
 
@@ -50,7 +50,6 @@ typedef struct {
 
     int process_input;
     int controller_num;
-
 } Player;
 
 #ifdef __cplusplus
@@ -59,7 +58,6 @@ extern "C" {
 
 void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_index, Vec3* position);
 void player_update(Player* player);
-void player_draw(Player* player);
 
 void player_reset(Player* player, Vec3* position);
 void player_calculate_size(Player* player);

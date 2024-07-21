@@ -19,12 +19,8 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->engine = engine;
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
-
     game->camera_pos_delta = 4;
     game->camera_size_delta = 4;
-
-    game->rotation = 0.0f;
-
     game->spritebatch = fw64_spritebatch_create(1, allocator);
 
     setup_scene(game);
@@ -67,30 +63,25 @@ void setup_initial_viewport(Game* game) {
 void setup_scene(Game* game) {
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-
     info.node_count = 1;
     info.mesh_count = 1;
+    info.mesh_instance_count = 1;
 
     fw64_scene_init(&game->scene, &info, game->engine->assets, fw64_default_allocator());
-    fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_n64_logo, 0);
-    fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-    fw64_node_set_mesh(node, mesh);
+    fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_n64_logo);
+    fw64Node* node = fw64_scene_create_node(&game->scene);
     vec3_set_all(&node->transform.scale, 0.1f);
     fw64_node_update(node);
+    fw64_scene_create_mesh_instance(&game->scene, node, mesh);
+
+    rotate_node_init(&game->rotate_node, node);
 }
 
 void game_update(Game* game){
     IVec2 updated_pos = game->camera.viewport.position;
     IVec2 updated_size = game->camera.viewport.size;
 
-    game->rotation += game->engine->time->time_delta * 90.0f;
-    if (game->rotation >= 360.0f) {
-        game->rotation -= 360.0f;
-    }
-
-    fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-    quat_from_euler(&node->transform.rotation, 0, game->rotation, 0);
-    fw64_node_update(node);
+    rotate_node_update(&game->rotate_node, game->engine->time->time_delta);
 
     if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
         setup_initial_viewport(game);
@@ -152,8 +143,7 @@ void game_draw(Game* game) {
     fw64RenderPass* pass = game->renderpasses[RENDER_PASS_VIEW];
     fw64_renderpass_set_camera(pass, &game->camera);
     fw64_renderpass_begin(pass);
-    fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-    fw64_renderpass_draw_static_mesh(pass, node->mesh, &node->transform);
+    fw64_scene_draw_all(&game->scene, pass);
     fw64_renderpass_end(pass);
     fw64_renderer_submit_renderpass(renderer, pass);
 

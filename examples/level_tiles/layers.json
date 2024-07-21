@@ -1,4 +1,5 @@
 {
     "ground": 1,
-    "obstacles": 2
+    "obstacles": 2,
+    "triggers": 3
 }

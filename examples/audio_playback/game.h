@@ -1,17 +1,32 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
+#include "framework64/scene.h"
+#include "framework64/sprite_batch.h"
+
+#include "rotate_node/rotate_node.h"
+
+typedef struct {
+    fw64Scene scene;
+    fw64Camera camera;
+    RotateNode rotate_node;
+    fw64Engine* engine;
+    fw64RenderPass* renderpass;
+} SceneView;
+
+
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
-    fw64Texture* buttons;
     fw64Font* font;
-    fw64Node n64_logo;
-    float music_playback_speed;
-    float rotation;
-    char tempo_text[32];
+    fw64RenderPass* renderpass;
+    fw64SpriteBatch* sprite_batch;
+} UI;
+
+typedef struct {
+    fw64Engine* engine;
+    SceneView scene_view;
+    UI ui;
 } Game;
 
 #ifdef __cplusplus

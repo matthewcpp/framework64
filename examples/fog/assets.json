@@ -16,7 +16,7 @@
     ],
     "levels": [
         {
-            "src": "fogworld/fogworld.gltf",
+            "src": "examples/fog/fogworld.gltf",
             "typeMap": 0,
             "layerMap": 0
         }

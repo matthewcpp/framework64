@@ -4,16 +4,22 @@
 #include "framework64/input.h"
 
 typedef struct {
-    fw64Camera camera;
+    fw64Texture* buttons;
+    fw64Font* font;
+} Assets;
+
+typedef struct {
+    fw64Engine* engine;
+    fw64RenderPass* renderpass;
+    fw64SpriteBatch* spritebatch;
+    Assets* assets;
     int player_index;
 } ControllerInfo;
 
 typedef struct {
     fw64Engine* engine;
     ControllerInfo controller_infos[FW64_MAX_CONTROLLER_COUNT];
-    fw64Texture* buttons;
-    fw64Font* font;
-    IVec2 not_connected_text_dimensions;
+    Assets assets;
 } Game;
 
 #ifdef __cplusplus

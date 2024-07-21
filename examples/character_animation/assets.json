@@ -10,5 +10,12 @@
                 "Tired"
             ]
         }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12"
+        }
     ]
 }

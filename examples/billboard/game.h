@@ -1,21 +1,32 @@
 #pragma once
 
-#include "flame.h"
+#include "billboard_node/billboard_node.h"
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
-
+#include "framework64/render_pass.h"
+#include "framework64/scene.h"
 #include "framework64/util/quad.h"
 
 #include "fps_camera/fps_camera.h"
 
+typedef enum {
+    RENDERPASS_DEPTH_ENABLED,
+    RENDERPASS_DEPTH_DISABLED,
+    RENDERPASS_COUNT
+} RenderPass;
+
+typedef struct {
+    float update_time_remaining;
+    fw64Mesh* mesh;
+} Flame;
+
 typedef struct {
     fw64Engine* engine;
     fw64FpsCamera fps;
-    fw64Node campfire;
-    fw64Node ground;
-    fw64Node moon;
     Flame flame;
+    fw64Scene* scene;
+    fw64RenderPass* renderpass[RENDERPASS_COUNT];
+    BillboardNodes billboard_nodes;
 } Game;
 
 #ifdef __cplusplus

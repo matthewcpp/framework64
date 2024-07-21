@@ -1,15 +1,17 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
+#include "framework64/scene.h"
 #include "framework64/util/bump_allocator.h"
+
+#include "ui_navigation/ui_navigation.h"
 
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
-    fw64BumpAllocator bump_allocator;
-    fw64Mesh* mesh;
-    fw64Node node;
+    int tile_index;
+    fw64Scene scene;
+    fw64RenderPass* renderpass;
+    fw64UiNavigation ui_nav;
 } Game;
 
 #ifdef __cplusplus

@@ -3,6 +3,10 @@
 
 #include "framework64/matrix.h"
 #include "framework64/controller_mapping/n64.h"
+#include "framework64/util/renderpass_util.h"
+
+#define PAN_SPEED 64.0f
+#define STICK_THRESHHOLD 0.15f
 
 static void set_active_font(Game* game, int active_font_index);
 
@@ -11,6 +15,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Display* display = fw64_displays_get_primary(engine->displays);
 
     game->engine = engine;
+    vec3_zero(&game->translate);
 
     fw64AssetId fontAssets[FONT_COUNT] = {FW64_ASSET_font_Consolas12, FW64_ASSET_font_basicLAZER, FW64_ASSET_font_Mario64};
     for (size_t i = 0; i < FONT_COUNT; i++) {
@@ -20,12 +25,9 @@ void game_init(Game* game, fw64Engine* engine) {
     game->sprite_batch = fw64_spritebatch_create(1, allocator);
     set_active_font(game, 0);
 
-    Vec2 display_size = fw64_display_get_size_f(display);
-    float matrix[16];
-    matrix_ortho2d(matrix, 0, display_size.x, display_size.y, 0);
-
     game->renderpass = fw64_renderpass_create(display, allocator);
-    fw64_renderpass_set_projection_matrix(game->renderpass, matrix, NULL);
+    fw64_renderpass_util_ortho2d(game->renderpass);
+
     fw64_renderpass_begin(game->renderpass);
     fw64_renderpass_draw_sprite_batch(game->renderpass, game->sprite_batch);
     fw64_renderpass_end(game->renderpass);
@@ -73,6 +75,24 @@ void game_update(Game* game){
     } else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
         next_font(game, 1);
     }
+
+    Vec2 stick;
+    fw64_input_controller_stick(game->engine->input, 0, &stick);
+    if (stick.x >= STICK_THRESHHOLD) {
+        game->translate.x += PAN_SPEED * game->engine->time->time_delta;
+    } else if (stick.x <= -STICK_THRESHHOLD) {
+        game->translate.x -= PAN_SPEED * game->engine->time->time_delta;
+    }
+
+    if (stick.y >= STICK_THRESHHOLD) {
+        game->translate.y -= PAN_SPEED * game->engine->time->time_delta;
+    } else if (stick.y <= -STICK_THRESHHOLD) {
+        game->translate.y += PAN_SPEED * game->engine->time->time_delta;
+    }
+
+    float matrix[16];
+    matrix_translate(matrix, &game->translate);
+    fw64_renderpass_set_view_matrix(game->renderpass, matrix);
 }
 
 void game_draw(Game* game) {

@@ -1,15 +1,23 @@
 #pragma once
 
 #include "framework64/engine.h"
-#include "framework64/node.h"
+#include "framework64/scene.h"
 
 #include "arcball_camera/arcball_camera.h"
 
+typedef enum {
+    RENDER_PASS_SCENE,
+    RENDER_PASS_UI,
+    RENDER_PASS_COUNT
+} RenderPass;
+
 typedef struct {
     fw64Engine* engine;
-    fw64ArcballCamera arcball;
     fw64Font* font;
-    fw64Node node;
+    fw64SpriteBatch* spritebatch;
+    fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
+    fw64ArcballCamera arcball;
+    fw64Scene scene;
     int selected_material;
 } Game;
 

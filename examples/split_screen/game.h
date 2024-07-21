@@ -9,8 +9,7 @@
 typedef struct {
     fw64Engine* engine;
     Player players[4];
-    fw64Mesh* weapon_model;
-    Weapon us_ar33;
+    Weapon weapon;
     fw64Scene* scene;
 } Game;
 

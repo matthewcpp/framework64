@@ -10,9 +10,17 @@ typedef enum {
     FLAG_HIT_POS_ACTIVE = 1
 } Flags;
 
+typedef enum {
+    RENDER_PASS_SCENE,
+    RENDER_PASS_UI,
+    RENDER_PASS_COUNT
+} RenderPass;
+
 typedef struct {
     fw64Engine* engine;
     fw64Font* font;
+    fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
+    fw64SpriteBatch* spritebatch;
     fw64ArcballCamera arcball_camera;
     fw64Scene scene;
     uint32_t flags;

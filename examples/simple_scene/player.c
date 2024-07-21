@@ -21,10 +21,11 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_
     player->height = PLAYER_DEFAULT_HEIGHT;
     player->radius = PLAYER_DEFAULT_RADIUS;
 
-
-    fw64_node_init(&player->node);
-    fw64_node_set_mesh(&player->node, fw64_assets_load_mesh(engine->assets, mesh_index, fw64_default_allocator()));
-    fw64_node_set_box_collider(&player->node, &player->collider);
+    player->node = fw64_scene_create_node(scene);
+    fw64Mesh* mesh = fw64_scene_load_mesh_asset(scene, mesh_index);
+    fw64_scene_create_mesh_instance(scene, player->node, mesh);
+    Box bounding = fw64_mesh_get_bounding_box(mesh);
+    fw64_scene_create_box_collider(scene, player->node, &bounding);
 
     player_reset(player, position);
 }
@@ -35,11 +36,11 @@ void player_reset(Player* player, Vec3* position) {
     player->state = PLAYER_STATE_ON_GROUND;
     player->air_velocity = 0.0f;
 
-    quat_ident(&player->node.transform.rotation);
+    quat_ident(&player->node->transform.rotation);
 
     if (position) {
-        player->node.transform.position = *position;
-        fw64_node_update(&player->node);
+        player->node->transform.position = *position;
+        fw64_node_update(player->node);
     }
 }
 
@@ -63,7 +64,7 @@ void process_input(Player* player) {
             player->rotation += rotation_delta;
         }
 
-        quat_set_axis_angle(&player->node.transform.rotation, 0, 1, 0, player->rotation * ((float)M_PI / 180.0f));
+        quat_set_axis_angle(&player->node->transform.rotation, 0, 1, 0, player->rotation * ((float)M_PI / 180.0f));
     }
 
     if (stick.y >= PLAYER_STICK_THRESHOLD ) {
@@ -91,7 +92,7 @@ static Vec3 calculate_movement_vector(Player* player) {
     float time_delta = player->engine->time->time_delta;
 
     Vec3 movement;
-    fw64_transform_forward(&player->node.transform, &movement);
+    fw64_transform_forward(&player->node->transform, &movement);
     vec3_scale(&movement, &movement, player->speed * time_delta);
 
     movement.y += (player->air_velocity * time_delta) + (player->gravity * time_delta * time_delta / 2.0f);
@@ -105,7 +106,7 @@ static Vec3 calculate_movement_vector(Player* player) {
 #define LAYER_WALL 4U
 
 void update_position(Player* player) {
-    Vec3* position = &player->node.transform.position;
+    Vec3* position = &player->node->transform.position;
     player->previous_position = *position;
 
     Vec3 movement = calculate_movement_vector(player);
@@ -145,16 +146,12 @@ void update_position(Player* player) {
 
     player->state = new_state;
 
-    fw64_node_update(&player->node);
-}
-
-void player_draw(Player* player) {
-    fw64_renderer_draw_static_mesh(player->engine->renderer, &player->node.transform, player->node.mesh);
+    fw64_node_update(player->node);
 }
 
 void player_calculate_size(Player* player) {
     Vec3 extents;
-    box_extents(&player->node.collider->bounding, &extents);
+    box_extents(&player->node->collider->bounding, &extents);
     player->height = extents.y * 2.0f;
     player->radius = extents.x > extents.z ? extents.x : extents.z;
 }
