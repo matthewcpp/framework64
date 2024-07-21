@@ -20,11 +20,7 @@ else()
 endif()
 
 add_subdirectory(src)
-
-if (FW64_BUILD_EXAMPLES OR FW64_BUILD_TOOLS)
-    add_subdirectory(components)
-    set(FW64_COMPONENTS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/components)
-endif()
+add_subdirectory(components)
 
 if (FW64_BUILD_EXAMPLES)
     add_subdirectory(examples)

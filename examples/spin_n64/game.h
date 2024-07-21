@@ -4,11 +4,14 @@
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
+#include "fw64_rotate_node.h"
+
 typedef struct lines_example {
     fw64Engine* engine;
-    float rotation;
-    fw64Scene scene;
     fw64RenderPass* renderpass;
+    fw64RotateNode rotate_node;
+    fw64Scene scene;
+    
 } Game;
 
 #ifdef __cplusplus
