@@ -2,7 +2,6 @@
 
 #include "framework64/render_pass.h"
 
-#include "framework64/n64_libultra/lighting.h"
 #include "framework64/n64_libultra/render_queue.h"
 
 #include <nusys.h>

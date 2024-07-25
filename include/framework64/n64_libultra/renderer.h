@@ -16,7 +16,6 @@ struct fw64Renderer{
     // holds the current command insertion point of the display list
     Gfx* display_list;
     Gfx* display_list_start;
-    Mtx identity_matrix;
 
     // display list for drawing commands
     Gfx gfx_list[GFX_DLIST_LEN];
@@ -29,8 +28,6 @@ struct fw64Renderer{
     fw64PrimitiveMode primitive_mode;
     fw64ShadingMode shading_mode;
 
-    Lights2 lights;
-    uint32_t active_light_mask;
     uint32_t starting_new_frame;
 
     fw64TextureState active_texture;

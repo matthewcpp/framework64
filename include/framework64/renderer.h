@@ -42,12 +42,6 @@ int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
 void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled);
 int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
 
-void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
-void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled);
-void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z);
-void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b);
-
-
 #ifdef __cplusplus
 }
 #endif

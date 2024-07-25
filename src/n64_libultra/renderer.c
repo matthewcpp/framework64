@@ -25,21 +25,8 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     n64_fill_rect_init(&renderer->fill_rect);
     renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
 
-    guMtxIdent(&renderer->identity_matrix);
-
     renderer->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
 
-    //fw64_renderer_set_fog_positions(renderer, 0.4f, 0.8f);
-    //fw64_renderer_set_fog_color(renderer, 85, 85, 85);
-
-    // set default lighting state
-    Lights2 lights = gdSPDefLights2(
-        85 , 85, 85,
-        200, 200, 200, 40, 40, 40,
-        200, 200, 200, -40, -40, -40
-    );
-    renderer->lights = lights;
-    renderer->active_light_mask = 1;
     renderer->starting_new_frame = 1;
 }
 
@@ -416,39 +403,6 @@ void fw64_renderer_draw_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInst
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
-void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
-    renderer->lights.a.l.col[0] = r;
-    renderer->lights.a.l.col[1] = g;
-    renderer->lights.a.l.col[2] = b;
-    memcpy(&renderer->lights.a.l.colc[0], &renderer->lights.a.l.col[0], 3);
-}
-
-void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled) {
-    if (enabled) {
-        renderer->active_light_mask |= (1 << index);
-    }
-    else {
-        renderer->active_light_mask &= ~(1 << index);
-    }
-}
-
-void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z) {
-    Light* light = &renderer->lights.l[index];
-
-    light->l.dir[0] = (uint8_t)(x * 100.0f);
-    light->l.dir[1] = (uint8_t)(y * 100.0f);
-    light->l.dir[2] = (uint8_t)(z * 100.0f);
-}
-
-void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b) {
-    Light* light = &renderer->lights.l[index];
-
-    light->l.col[0] = r;
-    light->l.col[1] = g;
-    light->l.col[2] = b;
-
-    memcpy(&light->l.colc[0], &light->l.col[0], 3);
-}
 
 void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
     if (enabled)
@@ -536,6 +490,7 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
         
         gSPNumLights(renderer->display_list++, NUMLIGHTS_1);
+
         // Setup light directions
         int light_index = 0;
         for (int i = 0; i < MAX_LIGHT_COUNT; i++) {

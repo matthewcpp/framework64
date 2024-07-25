@@ -4,6 +4,7 @@
 #include "framework64/scene.h"
 
 #include "fw64_arcball_camera.h"
+#include "fw64_headlight.h"
 
 typedef enum {
     RENDER_PASS_SCENE,
@@ -15,6 +16,7 @@ typedef struct {
     fw64Engine* engine;
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
     fw64ArcballCamera arcball;
+    fw64Headlight headlight;
     fw64Scene scene;
 } Game;
 
