@@ -51,6 +51,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
     const meshInfo = new MeshInfo();
     meshInfo.materialBundle = mesh.materialBundle;
     meshInfo.primitiveCount = mesh.primitives.length;
+    meshInfo.renderQueue = mesh.renderQueue;
     meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
     meshInfo.bounding = mesh.bounding;
 
@@ -119,19 +120,23 @@ class MeshInfo {
     primitiveCount = 0;
     vertexCount = 0;
     displayListCount = 0;
+    renderQueue = 0
     vertexPointerDataSize = 0;
-    bounding = null;
     materialBundle = null;
+    bounding = null;
+    
 
     get buffer() {
-        const buff = Buffer.alloc(20 + Bounding.SizeOf);
+        const buff = Buffer.alloc(12 + Bounding.SizeOf);
         let index = 0;
 
-        index = buff.writeUInt32BE(this.primitiveCount, index);
-        index = buff.writeUInt32BE(this.vertexCount, index);
-        index = buff.writeUInt32BE(this.displayListCount, index);
-        index = buff.writeUInt32BE(this.vertexPointerDataSize, index);
-        index = buff.writeUInt32BE(this.materialBundle != null ? 1 : 0, index);
+        // NOTE: This needs to match up with include/n64_libultra/mesh.h
+        index = buff.writeUInt16BE(this.primitiveCount, index);
+        index = buff.writeUInt16BE(this.vertexCount, index);
+        index = buff.writeUInt16BE(this.displayListCount, index);
+        index = buff.writeUInt16BE(this.renderQueue, index);
+        index = buff.writeUInt16BE(this.vertexPointerDataSize, index);
+        index = buff.writeUInt16BE(this.materialBundle != null ? 1 : 0, index);
         index = this.bounding.writeToBuffer(buff, index);
 
         return buff;

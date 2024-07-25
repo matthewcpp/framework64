@@ -13,6 +13,7 @@ set(platform_source_files
     ${n64_include_dir}/font.h font.c
     ${n64_include_dir}/image.h image.c
     ${n64_include_dir}/input.h input.c
+    ${n64_include_dir}/lighting.h lighting.c
     ${n64_include_dir}/material.h material.c
     ${n64_include_dir}/material_bundle.h material_bundle.c
     ${n64_include_dir}/media.h media.c

@@ -1,0 +1,13 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 14
+        }
+    ],
+    "meshes": [
+        {
+            "src": "suzanne/suzanne.gltf"
+        }
+    ]
+}

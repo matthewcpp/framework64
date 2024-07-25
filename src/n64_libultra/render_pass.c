@@ -131,3 +131,64 @@ void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min
 void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_t g, uint8_t b) {
     fw64_color_rgba8_set(&renderpass->fog_color, r, g, b, 255);
 }
+
+void fw64_renderpass_set_light_enabled(fw64RenderPass* renderpass, int index, int enabled) {
+    uint32_t mask = 1 << index;
+    if (enabled) {
+        renderpass->lighting_info.active_mask |= mask;
+    } else {
+        renderpass->lighting_info.active_mask &= ~mask;
+    }
+
+    update_n64_lighting_state(renderpass);
+}
+
+
+#define LIGHT_FACTOR 80.0f
+// [11.7.3.2 Light Structure Definition ]
+// The convention is that the light direction points toward the light. 
+// This means the light direction indicates the direction TO the light and NOT the direction that the light is shining.
+void fw64_renderpass_set_light_direction(fw64RenderPass* renderpass, int index, Vec3* direction) {
+    Light_t* light = &renderpass->lighting_info.lights[index];
+
+    light->dir[0] = (int8_t)(-direction->x * LIGHT_FACTOR);
+    light->dir[1] = (int8_t)(-direction->y * LIGHT_FACTOR);
+    light->dir[2] = (int8_t)(-direction->z * LIGHT_FACTOR);
+    update_n64_lighting_state(renderpass);
+}
+
+void fw64_renderpass_set_light_color(fw64RenderPass* renderpass, int index, fw64ColorRGBA8 color) {
+    Light_t* light = &renderpass->lighting_info.lights[index];
+
+    light->col[0] = color.r;
+    light->col[1] = color.g;
+    light->col[2] = color.b;
+
+    light->colc[0] = color.r;
+    light->colc[1] = color.g;
+    light->colc[2] = color.b;
+}
+
+void fw64_renderpass_set_lighting_ambient_color(fw64RenderPass* renderpass, fw64ColorRGBA8 color) {
+    Ambient_t* ambient = &renderpass->n64_lighting_state.a.l;
+
+    ambient->col[0] = color.r;
+    ambient->col[1] = color.g;
+    ambient->col[2] = color.b;
+
+    ambient->colc[0] = color.r;
+    ambient->colc[1] = color.g;
+    ambient->colc[2] = color.b;
+}
+
+void update_n64_lighting_state(fw64RenderPass* renderpass) {
+    int index = 0;
+
+    if (renderpass->lighting_info.active_mask & (1 << 0)) {
+        renderpass->n64_lighting_state.l[index++].l = renderpass->lighting_info.lights[0];
+    }
+
+        if (renderpass->lighting_info.active_mask & (1 << 1)) {
+        renderpass->n64_lighting_state.l[index++].l = renderpass->lighting_info.lights[1];
+    }
+}

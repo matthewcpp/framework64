@@ -2,9 +2,18 @@ const Bounding = require("./Bounding");
 const Splitter = require("./Splitter");
 
 class Mesh {
+    // This needs to align with renderqueue.h
+    static RenderQueue = {
+        UnlitStatic: 0,
+        UnlitSkinned: 1,
+        LitStatic: 2,
+        LitSkinned: 3
+    };
+
     name;
     primitives = [];
     materialBundle = null;
+    renderQueue = Mesh.RenderQueue.UnlitStatic;
 
     constructor(name) {
         this.name = name;
@@ -65,6 +74,11 @@ class Mesh {
 
             primitive.jointIndices[0] = jointIndex;
         }
+    }
+
+    determineRenderQueue() {
+        //TODO: ImplementMe
+        this.renderQueue = Mesh.RenderQueue.UnlitStatic;
     }
 }
 

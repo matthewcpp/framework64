@@ -1,3 +1,4 @@
+// This should be kept in sync with include/framework64/renderer.h
 #define FW64_MAX_LIGHT_COUNT 2
 
 struct fw64Light {

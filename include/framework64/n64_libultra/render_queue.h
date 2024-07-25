@@ -6,10 +6,19 @@
 #include "framework64/util/dynamic_vector.h"
 #include "framework64/sprite_batch.h"
 
+// this needs to align with pipeline/Mesh.js
+typedef enum {
+    FW64_RENDER_QUEUE_UNLIT_STATIC,
+    FW64_RENDER_QUEUE_UNLIT_SKINNED,
+    FW64_RENDER_QUEUE_LIT_STATIC,
+    FW64_RENDER_QUEUE_LIT_SKINNED,
+    FW64_RENDER_QUEUE_INDEX_COUNT
+} fw64MeshRenderQueueIndex;
+
 typedef struct {
     fw64DynamicVector sprite_batches;
-    fw64DynamicVector static_meshes;
-    fw64DynamicVector skinned_meshes;
+
+    fw64DynamicVector meshes[FW64_RENDER_QUEUE_INDEX_COUNT];
 } fw64N64RenderQueue;
 
 void fw64_n64_render_queue_init(fw64N64RenderQueue* render_queue, fw64Allocator* allocator);

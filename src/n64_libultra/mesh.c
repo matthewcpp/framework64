@@ -164,3 +164,7 @@ fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
         return FW64_PRIMITIVE_MODE_TRIANGLES;
     }
 }
+
+uint32_t fw64_mesh_get_render_queue_index(fw64Mesh* mesh) {
+    return mesh->info.render_queue;
+}

@@ -121,20 +121,6 @@ IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera
     return viewport_size;
 }
 
-static void fw64_renderer_load_matrices(fw64Renderer* renderer, fw64Matrix* projection, uint16_t* persp_norm_ptr, fw64Matrix* view, int setupForLighting) {
-    gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(projection), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
-    uint16_t persp_norm = (persp_norm_ptr) ? *persp_norm_ptr : FW64_N64_LIBULTRA_DEFAULT_PERSPNORM;
-    gSPPerspNormalize(renderer->display_list++, persp_norm);
-
-    if (setupForLighting) {
-        // sets the view projection matrices  This is slightly counter intuitive
-        // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
-        gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(view), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
-    } else {
-        gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(view), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-    }
-}
-
 void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags clear_flags) {
     renderer->primitive_mode = primitive_mode;
     fw64_texture_state_default(&renderer->active_texture);
@@ -357,9 +343,8 @@ static void n64_renderer_configure_mesh_shading_mode(fw64Renderer* renderer, fw6
             break;
     }
 }
-
-
-void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
+/*
+static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
@@ -372,6 +357,21 @@ void fw64_renderer_draw_static_mesh(fw64Renderer* renderer, fw64MeshInstance* me
 
     // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix see note above in set_camera
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+}
+*/
+
+static void fw64_renderer_draw_unlit_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    
+    for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh_instance->mesh->primitives + i;
+        
+        n64_renderer_configure_mesh_shading_mode(renderer, primitive->material);
+        gSPDisplayList(renderer->display_list++, primitive->display_list);
+        gDPPipeSync(renderer->display_list++);
+    }
+
+    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
 void fw64_renderer_draw_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInstance* instance) {
@@ -489,27 +489,33 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         gSPClearGeometryMode(renderer->display_list++, G_FOG);
     }
 
-    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.static_meshes) || !fw64_dynamic_vector_is_empty(&renderpass->render_queue.skinned_meshes)) {
-        // TODO: This will likely change to only be set for goraud shaded objects
-        fw64_renderer_load_matrices(renderer, &renderpass->projection_matrix, &renderpass->persp_norm, &renderpass->view_matrix, 1);
-    }
+    gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->projection_matrix), G_MTX_PROJECTION|G_MTX_LOAD|G_MTX_NOPUSH);
+    gSPPerspNormalize(renderer->display_list++, renderpass->persp_norm);
 
-    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.static_meshes)) {
-        for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.static_meshes); i++) {
-            fw64MeshInstance* mesh_instance = *(fw64MeshInstance**)fw64_dynamic_vector_item(&renderpass->render_queue.static_meshes, i);
-            fw64_renderer_draw_static_mesh(renderer, mesh_instance);
+    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.meshes[FW64_RENDER_QUEUE_UNLIT_STATIC]) || !fw64_dynamic_vector_is_empty(&renderpass->render_queue.meshes[FW64_RENDER_QUEUE_UNLIT_SKINNED])) {
+        gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+
+        fw64DynamicVector* queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_UNLIT_STATIC];
+        for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
+            fw64MeshInstance* mesh_instance = *(fw64MeshInstance**)fw64_dynamic_vector_item(queue, i);
+            fw64_renderer_draw_unlit_static_mesh(renderer, mesh_instance);
         }
-    }
 
-    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.skinned_meshes)) {
-        for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.skinned_meshes); i++) {
-            fw64SkinnedMeshInstance* mesh_instance = *(fw64SkinnedMeshInstance**)fw64_dynamic_vector_item(&renderpass->render_queue.skinned_meshes, i);
+        queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_UNLIT_SKINNED];
+        for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
+            fw64SkinnedMeshInstance* mesh_instance = *(fw64SkinnedMeshInstance**)fw64_dynamic_vector_item(queue, i);
             fw64_renderer_draw_skinned_mesh(renderer, mesh_instance);
         }
     }
 
+    if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_STATIC]) || !fw64_dynamic_vector_is_empty(&renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_SKINNED])) {
+        // When lighting is enabled, the camera view matrix should be present in the prjection matrix.  Slightly counter intuitive.
+        // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
+        gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
+    }
+
     if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.sprite_batches)) {
-        fw64_renderer_load_matrices(renderer, &renderpass->projection_matrix, &renderpass->persp_norm, &renderpass->view_matrix, 0);
+        gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
         n64_renderer_configure_shading_mode_sprite(renderer);
 
         for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.sprite_batches); i++){

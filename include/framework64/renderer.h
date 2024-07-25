@@ -17,6 +17,9 @@ typedef enum {
     FW64_RENDERER_FLAG_SWAP = 1,
 } fw64RendererSwapFlags;
 
+// this needs to be kept in sync with:
+// - src/desktop/glsl/gouraud.vert.glsl
+// - include/framework64/n64_libultra/renderer.h
 #define FW64_RENDERER_MAX_LIGHT_COUNT 2
 
 typedef struct fw64Renderer fw64Renderer;

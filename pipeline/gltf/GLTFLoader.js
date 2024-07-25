@@ -191,6 +191,7 @@ class GLTFLoader {
             }
     
             mesh.prunePrimitiveVertices();
+            mesh.determineRenderQueue();
             this.meshes.push(mesh);
         }
     }

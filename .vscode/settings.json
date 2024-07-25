@@ -165,6 +165,8 @@
         "collision.h": "c",
         "text_util.h": "c",
         "renderer_util.h": "c",
-        "random.h": "c"
+        "random.h": "c",
+        "renderer.h": "c",
+        "skinned_mesh_instance.h": "c"
     }
 }
