@@ -3,7 +3,7 @@ const Splitter = require("./Splitter");
 
 class Mesh {
     // This needs to align with renderqueue.h
-    static RenderQueue = {
+    static RenderQueueIndex = {
         UnlitStatic: 0,
         UnlitSkinned: 1,
         LitStatic: 2,
@@ -13,7 +13,7 @@ class Mesh {
     name;
     primitives = [];
     materialBundle = null;
-    renderQueue = Mesh.RenderQueue.UnlitStatic;
+    renderQueueIndex = Mesh.RenderQueueIndex.UnlitStatic;
 
     constructor(name) {
         this.name = name;
@@ -39,6 +39,14 @@ class Mesh {
 
     get hasMaterialBundle() {
         return this.materialBundle != null;
+    }
+
+    get isSkinned() {
+        if (this.primitives.length === 0) {
+            return false;
+        } else {
+            return this.primitives[0].jointIndices != null;
+        }
     }
 
     prunePrimitiveVertices() {
@@ -74,11 +82,6 @@ class Mesh {
 
             primitive.jointIndices[0] = jointIndex;
         }
-    }
-
-    determineRenderQueue() {
-        //TODO: ImplementMe
-        this.renderQueue = Mesh.RenderQueue.UnlitStatic;
     }
 }
 

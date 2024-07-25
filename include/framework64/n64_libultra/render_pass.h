@@ -18,9 +18,13 @@ typedef enum {
     N64_RENDERER_FEATURE_SPRITE_SCISSOR = 1 << 4
 } fw64N64RendererFeature;
 
+#define MAX_LIGHT_COUNT 2
+
 typedef struct {
-    Light_t lights[2];
-    uint32_t active_mask;
+    Light lights[MAX_LIGHT_COUNT];
+    Ambient ambient;
+    uint16_t active_mask;
+    uint16_t active_count;
 } LightingInfo;
 
 #define SET_RENDERER_FEATURE(renderer, feature) ((renderer)->enabled_features |= (feature))
@@ -29,7 +33,6 @@ typedef struct {
 
 struct fw64RenderPass {
     Vp n64_viewport;
-    Lights2 n64_lighting_state;
     Mtx projection_matrix;
     Mtx view_matrix;
 
@@ -48,4 +51,4 @@ struct fw64RenderPass {
 };
 
 void update_n64_viewport(fw64Viewport* viewport, Vp* n64_viewport);
-void update_n64_lighting_state(fw64RenderPass* renderpass);
+#define fw64_n64_lighting_info_light_is_enabled(lighting_info, index) ((lighting_info)->lights[(index)].l.pad3)

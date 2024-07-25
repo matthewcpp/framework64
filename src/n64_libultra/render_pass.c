@@ -20,6 +20,19 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
 
     renderpass->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
 
+    fw64ColorRGBA8 light_color = {255, 0, 0, 255};
+    fw64ColorRGBA8 ambient_light_color = {55, 55, 55, 255};
+    Vec3 light_dir = {0.57735f, 0.57735f, 0.57735};
+    fw64_renderpass_set_light_direction(renderpass, 0, &light_dir);
+    fw64_renderpass_set_light_color(renderpass, 0, light_color);
+    fw64_renderpass_set_light_enabled(renderpass, 0 , 1);
+
+    fw64_renderpass_set_light_direction(renderpass, 1, &light_dir);
+    fw64_renderpass_set_light_color(renderpass, 1, light_color);
+    fw64_renderpass_set_light_enabled(renderpass, 1 , 0);
+
+    fw64_renderpass_set_lighting_ambient_color(renderpass, ambient_light_color);
+
     return renderpass;
 }
 
@@ -133,14 +146,7 @@ void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_
 }
 
 void fw64_renderpass_set_light_enabled(fw64RenderPass* renderpass, int index, int enabled) {
-    uint32_t mask = 1 << index;
-    if (enabled) {
-        renderpass->lighting_info.active_mask |= mask;
-    } else {
-        renderpass->lighting_info.active_mask &= ~mask;
-    }
-
-    update_n64_lighting_state(renderpass);
+    renderpass->lighting_info.lights[index].l.pad3 = (char)enabled;
 }
 
 
@@ -149,16 +155,15 @@ void fw64_renderpass_set_light_enabled(fw64RenderPass* renderpass, int index, in
 // The convention is that the light direction points toward the light. 
 // This means the light direction indicates the direction TO the light and NOT the direction that the light is shining.
 void fw64_renderpass_set_light_direction(fw64RenderPass* renderpass, int index, Vec3* direction) {
-    Light_t* light = &renderpass->lighting_info.lights[index];
+    Light_t* light = &renderpass->lighting_info.lights[index].l;
 
     light->dir[0] = (int8_t)(-direction->x * LIGHT_FACTOR);
     light->dir[1] = (int8_t)(-direction->y * LIGHT_FACTOR);
     light->dir[2] = (int8_t)(-direction->z * LIGHT_FACTOR);
-    update_n64_lighting_state(renderpass);
 }
 
 void fw64_renderpass_set_light_color(fw64RenderPass* renderpass, int index, fw64ColorRGBA8 color) {
-    Light_t* light = &renderpass->lighting_info.lights[index];
+    Light_t* light = &renderpass->lighting_info.lights[index].l;
 
     light->col[0] = color.r;
     light->col[1] = color.g;
@@ -170,7 +175,7 @@ void fw64_renderpass_set_light_color(fw64RenderPass* renderpass, int index, fw64
 }
 
 void fw64_renderpass_set_lighting_ambient_color(fw64RenderPass* renderpass, fw64ColorRGBA8 color) {
-    Ambient_t* ambient = &renderpass->n64_lighting_state.a.l;
+    Ambient_t* ambient = &renderpass->lighting_info.ambient.l;
 
     ambient->col[0] = color.r;
     ambient->col[1] = color.g;
@@ -179,16 +184,4 @@ void fw64_renderpass_set_lighting_ambient_color(fw64RenderPass* renderpass, fw64
     ambient->colc[0] = color.r;
     ambient->colc[1] = color.g;
     ambient->colc[2] = color.b;
-}
-
-void update_n64_lighting_state(fw64RenderPass* renderpass) {
-    int index = 0;
-
-    if (renderpass->lighting_info.active_mask & (1 << 0)) {
-        renderpass->n64_lighting_state.l[index++].l = renderpass->lighting_info.lights[0];
-    }
-
-        if (renderpass->lighting_info.active_mask & (1 << 1)) {
-        renderpass->n64_lighting_state.l[index++].l = renderpass->lighting_info.lights[1];
-    }
 }

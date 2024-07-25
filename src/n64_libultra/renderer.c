@@ -234,13 +234,8 @@ static void n64_renderer_configure_shading_mode_unlit_textured(fw64Renderer* ren
     n64_renderer_set_shading_mode_unlit_textured(renderer);
 }
 
-#define PACK_LIGHT_VAL(r, g, b) (u32)(r << 24) | (g << 16) | (b << 8) | 255
-
 /** Color = shade * primitive color  */ 
-static void n64_renderer_configure_shading_mode_gouraud(fw64Renderer* renderer, fw64Material* material) {
-    gSPLightColor(renderer->display_list++, LIGHT_1, PACK_LIGHT_VAL(material->color.r, material->color.g, material->color.b));
-    gSPLightColor(renderer->display_list++, LIGHT_2, PACK_LIGHT_VAL(material->color.r, material->color.g, material->color.b));
-
+static void n64_renderer_configure_shading_mode_gouraud(fw64Renderer* renderer) {
     if (renderer->shading_mode == FW64_SHADING_MODE_GOURAUD)
         return;
 
@@ -261,8 +256,6 @@ static void n64_renderer_configure_shading_mode_gouraud_textured(fw64Renderer* r
     if (renderer->shading_mode == FW64_SHADING_MODE_GOURAUD_TEXTURED)
         return;
 
-    gSPLightColor(renderer->display_list++, LIGHT_1, UINT32_MAX);
-    gSPLightColor(renderer->display_list++, LIGHT_2, UINT32_MAX);
     n64_renderer_set_render_mode_opaque(renderer);
     if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_FOG)){
         gDPSetCombineMode(renderer->display_list++, G_CC_MODULATERGB, G_CC_MODULATERGB2);
@@ -312,10 +305,6 @@ static void n64_renderer_configure_shading_mode_sprite(fw64Renderer* renderer) {
     renderer->shading_mode = FW64_SHADING_MODE_SPRITE;
 }
 
-void fw64_renderer_set_fill_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    gDPSetPrimColor(renderer->display_list++, 0xFFFF, 0xFFFF, r, g, b, a);
-}
-
 static void n64_renderer_configure_mesh_shading_mode(fw64Renderer* renderer, fw64Material* material) {
     switch(material->shading_mode) {
         case FW64_SHADING_MODE_VERTEX_COLOR:
@@ -324,14 +313,6 @@ static void n64_renderer_configure_mesh_shading_mode(fw64Renderer* renderer, fw6
 
         case FW64_SHADING_MODE_VERTEX_COLOR_TEXTURED:
             n64_renderer_configure_shading_mode_vertex_color_textured(renderer, material);
-            break;
-
-        case FW64_SHADING_MODE_GOURAUD:
-            n64_renderer_configure_shading_mode_gouraud(renderer, material);
-            break;
-
-        case FW64_SHADING_MODE_GOURAUD_TEXTURED:
-            n64_renderer_configure_shading_mode_gouraud_textured(renderer, material);
             break;
 
         case FW64_SHADING_MODE_UNLIT_TEXTURED:
@@ -343,14 +324,53 @@ static void n64_renderer_configure_mesh_shading_mode(fw64Renderer* renderer, fw6
             break;
     }
 }
-/*
-static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
+
+static void n64_renderer_configure_lit_mesh_shading_mode(fw64Renderer* renderer, fw64Material* material) {
+    switch(material->shading_mode) {
+        case FW64_SHADING_MODE_GOURAUD:
+            n64_renderer_configure_shading_mode_gouraud(renderer);
+            break;
+
+        case FW64_SHADING_MODE_GOURAUD_TEXTURED:
+            n64_renderer_configure_shading_mode_gouraud_textured(renderer, material);
+            break;
+
+        default:
+            break;
+    }
+}
+
+static void fw64_n64_renderer_configure_lighting_info(fw64Renderer* renderer, LightingInfo* lighting_info, fw64Material* material) {
+    // 11.7.3.6 Note on Material Properties
+    // To obtain the correct light color in a particular situation, multiply the color of the material times the color of the light
+    // for each light source and use the result as the light's color.
+    int light_index = 0;
+    for (int i = 0; i < MAX_LIGHT_COUNT; i++) {
+        if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
+            continue;
+        }
+
+        light_index += 1;
+
+        Light_t* light = &lighting_info->lights[i].l;
+        uint32_t r = ((uint32_t)light->col[0] * (uint32_t)material->color.r) / 255;
+        uint32_t g = ((uint32_t)light->col[1] * (uint32_t)material->color.g) / 255;
+        uint32_t b = ((uint32_t)light->col[2] * (uint32_t)material->color.b) / 255;
+        uint32_t light_val = (r << 24) | (g << 16) | (b << 8) | 255;
+
+        //todo fix me
+        gSPLightColor(renderer->display_list++, LIGHT_1, light_val);
+    }
+}
+
+static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, LightingInfo* lighting_info, fw64MeshInstance* mesh_instance) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh_instance->mesh->primitives + i;
+        n64_renderer_configure_lit_mesh_shading_mode(renderer, primitive->material);
+        fw64_n64_renderer_configure_lighting_info(renderer, lighting_info, primitive->material);
         
-        n64_renderer_configure_mesh_shading_mode(renderer, primitive->material);
         gSPDisplayList(renderer->display_list++, primitive->display_list);
         gDPPipeSync(renderer->display_list++);
     }
@@ -358,7 +378,6 @@ static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, fw64MeshI
     // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix see note above in set_camera
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
-*/
 
 static void fw64_renderer_draw_unlit_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
@@ -509,9 +528,30 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
     }
 
     if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_STATIC]) || !fw64_dynamic_vector_is_empty(&renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_SKINNED])) {
+        LightingInfo* lighting_info = &renderpass->lighting_info;
+
         // When lighting is enabled, the camera view matrix should be present in the prjection matrix.  Slightly counter intuitive.
         // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
         gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
+        
+        // Setup light directions
+        int light_index = 0;
+        for (int i = 0; i < MAX_LIGHT_COUNT; i++) {
+            if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
+                continue;
+            }
+            light_index += 1;
+            gSPLight(renderer->display_list++, &(renderpass->lighting_info.lights[i]), (i + 1));
+        }
+        gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), light_index);
+        // TODO: investigate if this can go first?
+        gSPNumLights(renderer->display_list++, light_index + 1);
+
+        fw64DynamicVector* queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_STATIC];
+        for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
+            fw64MeshInstance* mesh_instance = *(fw64MeshInstance**)fw64_dynamic_vector_item(queue, i);
+            fw64_renderer_draw_lit_static_mesh(renderer, lighting_info, mesh_instance);
+        }
     }
 
     if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.sprite_batches)) {

@@ -28,6 +28,8 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_arcball_init(&game->arcball, engine->input, display);
     Box mesh_bounding = fw64_mesh_get_bounding_box(mesh);
     fw64_arcball_set_initial(&game->arcball, &mesh_bounding);
+
+    //fw64_renderer_set_clear_color(engine->renderer, 0, 255, 0);
 }
 
 void game_update(Game* game){
@@ -41,5 +43,7 @@ void game_draw(Game* game) {
     fw64_renderpass_begin(renderpass);
     fw64_scene_draw_all(&game->scene, renderpass);
     fw64_renderpass_end(renderpass);
+    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
+
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

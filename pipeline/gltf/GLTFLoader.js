@@ -191,8 +191,43 @@ class GLTFLoader {
             }
     
             mesh.prunePrimitiveVertices();
-            mesh.determineRenderQueue();
             this.meshes.push(mesh);
+        }
+
+        this.determineMeshRenderQueueIndices();
+    }
+
+    determineMeshRenderQueueIndices() {
+        for (const mesh of this.meshes) {
+            let hasUnlitPrimitives = false, hasLitPrimitives = false;
+  
+            for (const primitive of mesh.primitives) {
+                const material = this.materials[primitive.material];
+
+                switch (material.shadingMode) {
+                    case Material.ShadingMode.VertexColors:
+                    case Material.ShadingMode.VertexColorsTextured:
+                    case Material.ShadingMode.UnlitTextured:
+                    case Material.ShadingMode.DecalTexture:
+                        hasLitPrimitives |= true;
+                        break;
+
+                    case Material.ShadingMode.Gouraud:
+                    case Material.ShadingMode.GouraudTextured:
+                        hasLitPrimitives |= true;
+                        break;
+                }
+            }
+
+            if (hasUnlitPrimitives && !hasLitPrimitives) {
+                mesh.renderQueueIndex = mesh.isSkinned ? Mesh.RenderQueueIndex.UnlitSkinned : Mesh.RenderQueueIndex.UnlitStatic;
+            } else if (!hasUnlitPrimitives && hasLitPrimitives) {
+                mesh.renderQueueIndex =  mesh.isSkinned ? Mesh.RenderQueueIndex.LitSkinned : Mesh.RenderQueueIndex.LitStatic;
+            } else if (!hasUnlitPrimitives && !hasUnlitPrimitives){
+                throw new Error(`mesh ${mesh.name} unable to determine render queue index for mesh`);
+            } else {
+                throw new Error(`mesh ${mesh.name} contains lit and unlit primitives`);
+            }
         }
     }
 
