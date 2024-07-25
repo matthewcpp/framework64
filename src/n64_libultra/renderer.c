@@ -139,7 +139,7 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mod
         fw64_n64_renderer_clear_rect(renderer, 0, 0, renderer->screen_size.x, renderer->screen_size.y, renderer->clear_color, clear_flags);
     }
 
-    gSPSetLights2(renderer->display_list++, renderer->lights);
+    //gSPSetLights2(renderer->display_list++, renderer->lights);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags) {
@@ -357,6 +357,7 @@ static void fw64_n64_renderer_configure_lighting_info(fw64Renderer* renderer, Li
         uint32_t g = ((uint32_t)light->col[1] * (uint32_t)material->color.g) / 255;
         uint32_t b = ((uint32_t)light->col[2] * (uint32_t)material->color.b) / 255;
         uint32_t light_val = (r << 24) | (g << 16) | (b << 8) | 255;
+        //fw64ColorRGBA8 light_val = {r,g,b,255};
 
         //todo fix me
         gSPLightColor(renderer->display_list++, LIGHT_1, light_val);
@@ -534,6 +535,7 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
         gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
         
+        gSPNumLights(renderer->display_list++, NUMLIGHTS_1);
         // Setup light directions
         int light_index = 0;
         for (int i = 0; i < MAX_LIGHT_COUNT; i++) {
@@ -541,11 +543,10 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
                 continue;
             }
             light_index += 1;
-            gSPLight(renderer->display_list++, &(renderpass->lighting_info.lights[i]), (i + 1));
+            gSPLight(renderer->display_list++, &(renderpass->lighting_info.lights[i]), 1);
         }
-        gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), light_index);
-        // TODO: investigate if this can go first?
-        gSPNumLights(renderer->display_list++, light_index + 1);
+        gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), 2);
+        
 
         fw64DynamicVector* queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_STATIC];
         for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
