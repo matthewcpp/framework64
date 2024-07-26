@@ -23,13 +23,14 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
     fw64ColorRGBA8 light_color = {255, 255, 255, 255};
     fw64ColorRGBA8 ambient_light_color = {55, 55, 55, 255};
     Vec3 light_dir = {0.57735f, -0.57735f, 0.57735};
-    fw64_renderpass_set_light_direction(renderpass, 0, &light_dir);
-    fw64_renderpass_set_light_color(renderpass, 0, light_color);
-    fw64_renderpass_set_light_enabled(renderpass, 0 , 1);
 
-    fw64_renderpass_set_light_direction(renderpass, 1, &light_dir);
-    fw64_renderpass_set_light_color(renderpass, 1, light_color);
-    fw64_renderpass_set_light_enabled(renderpass, 1 , 0);
+    renderpass->lighting_info.active_count = 0;
+    for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
+        fw64_renderpass_set_light_direction(renderpass, i, &light_dir);
+        fw64_renderpass_set_light_color(renderpass, i, light_color);
+        fw64_n64_lighting_info_set_enabled_flag(&renderpass->lighting_info, i, 0);
+        fw64_renderpass_set_light_enabled(renderpass, i , i == 0);
+    }
 
     fw64_renderpass_set_lighting_ambient_color(renderpass, ambient_light_color);
 
@@ -146,9 +147,16 @@ void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_
 }
 
 void fw64_renderpass_set_light_enabled(fw64RenderPass* renderpass, int index, int enabled) {
-    renderpass->lighting_info.lights[index].l.pad3 = (char)enabled;
+    // disable light
+    if (fw64_n64_lighting_info_light_is_enabled(&renderpass->lighting_info, index) && !enabled) {
+        renderpass->lighting_info.active_count -= 1;
+        fw64_n64_lighting_info_set_enabled_flag(&renderpass->lighting_info, index, 0);
+    } // enable light
+    else if (!fw64_n64_lighting_info_light_is_enabled(&renderpass->lighting_info, index) && enabled) {
+        renderpass->lighting_info.active_count += 1;
+        fw64_n64_lighting_info_set_enabled_flag(&renderpass->lighting_info, index, 1);
+    }
 }
-
 
 #define LIGHT_FACTOR 80.0f
 // [11.7.3.2 Light Structure Definition ]

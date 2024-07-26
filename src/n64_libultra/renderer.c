@@ -125,8 +125,6 @@ void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mod
     if (clear_flags) {
         fw64_n64_renderer_clear_rect(renderer, 0, 0, renderer->screen_size.x, renderer->screen_size.y, renderer->clear_color, clear_flags);
     }
-
-    //gSPSetLights2(renderer->display_list++, renderer->lights);
 }
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags) {
@@ -332,7 +330,7 @@ static void fw64_n64_renderer_configure_lighting_info(fw64Renderer* renderer, Li
     // To obtain the correct light color in a particular situation, multiply the color of the material times the color of the light
     // for each light source and use the result as the light's color.
     int light_index = 0;
-    for (int i = 0; i < MAX_LIGHT_COUNT; i++) {
+    for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
         if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
             continue;
         }
@@ -344,27 +342,24 @@ static void fw64_n64_renderer_configure_lighting_info(fw64Renderer* renderer, Li
         uint32_t g = ((uint32_t)light->col[1] * (uint32_t)material->color.g) / 255;
         uint32_t b = ((uint32_t)light->col[2] * (uint32_t)material->color.b) / 255;
         uint32_t light_val = (r << 24) | (g << 16) | (b << 8) | 255;
-        //fw64ColorRGBA8 light_val = {r,g,b,255};
 
-        //todo fix me
-        gSPLightColor(renderer->display_list++, LIGHT_1, light_val);
+        // Note: unfortunetly this is necessary due to the way gSPLightColor is setup.
+        // Simply passing the index into the macro causes error.
+        // Maybe this is something that can be fixed down the road.
+        switch (light_index) {
+            case LIGHT_1:
+                gSPLightColor(renderer->display_list++, LIGHT_1, light_val);
+                break;
+            case LIGHT_2:
+                gSPLightColor(renderer->display_list++, LIGHT_2, light_val);
+                break;
+            case LIGHT_3:
+                gSPLightColor(renderer->display_list++, LIGHT_3, light_val);
+                break;
+            default:
+                break;
+        }
     }
-}
-
-static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, LightingInfo* lighting_info, fw64MeshInstance* mesh_instance) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-    
-    for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
-        fw64Primitive* primitive = mesh_instance->mesh->primitives + i;
-        n64_renderer_configure_lit_mesh_shading_mode(renderer, primitive->material);
-        fw64_n64_renderer_configure_lighting_info(renderer, lighting_info, primitive->material);
-        
-        gSPDisplayList(renderer->display_list++, primitive->display_list);
-        gDPPipeSync(renderer->display_list++);
-    }
-
-    // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix see note above in set_camera
-    //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
 static void fw64_renderer_draw_unlit_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
@@ -400,6 +395,23 @@ void fw64_renderer_draw_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInst
     }
 
     // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix see note above in set_camera
+    //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+}
+
+static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, LightingInfo* lighting_info, fw64MeshInstance* mesh_instance) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+    
+    for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh_instance->mesh->primitives + i;
+        n64_renderer_configure_lit_mesh_shading_mode(renderer, primitive->material);
+        fw64_n64_renderer_configure_lighting_info(renderer, lighting_info, primitive->material);
+        
+        gSPDisplayList(renderer->display_list++, primitive->display_list);
+        gDPPipeSync(renderer->display_list++);
+    }
+
+    // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix due
+    // to the fact that the camera view matrix is included on the projection matrix stack.
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
@@ -489,18 +501,21 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
         gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
         
-        gSPNumLights(renderer->display_list++, NUMLIGHTS_1);
+        gSPNumLights(renderer->display_list++, lighting_info->active_count);
 
         // Setup light directions
         int light_index = 0;
-        for (int i = 0; i < MAX_LIGHT_COUNT; i++) {
+        for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
             if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
                 continue;
             }
             light_index += 1;
-            gSPLight(renderer->display_list++, &(renderpass->lighting_info.lights[i]), 1);
+            gSPLight(renderer->display_list++, &(renderpass->lighting_info.lights[i]), light_index);
         }
-        gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), 2);
+
+        // set the ambient light
+        light_index += 1;
+        gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), light_index);
         
 
         fw64DynamicVector* queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_STATIC];

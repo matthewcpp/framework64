@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/render_pass.h"
+#include "framework64/renderer.h"
 
 #include "framework64/n64_libultra/render_queue.h"
 
@@ -17,12 +18,9 @@ typedef enum {
     N64_RENDERER_FEATURE_SPRITE_SCISSOR = 1 << 4
 } fw64N64RendererFeature;
 
-#define MAX_LIGHT_COUNT 2
-
 typedef struct {
-    Light lights[MAX_LIGHT_COUNT];
+    Light lights[FW64_RENDERER_MAX_LIGHT_COUNT];
     Ambient ambient;
-    uint16_t active_mask;
     uint16_t active_count;
 } LightingInfo;
 
@@ -51,3 +49,4 @@ struct fw64RenderPass {
 
 void update_n64_viewport(fw64Viewport* viewport, Vp* n64_viewport);
 #define fw64_n64_lighting_info_light_is_enabled(lighting_info, index) ((lighting_info)->lights[(index)].l.pad3)
+#define fw64_n64_lighting_info_set_enabled_flag(lighting_info, index, enabled) ((lighting_info)->lights[(index)].l.pad3 = (char)(enabled))
