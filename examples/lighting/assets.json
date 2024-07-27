@@ -2,7 +2,7 @@
     "fonts": [
         {
             "src": "Consolas.ttf",
-            "size": 14
+            "size": 12
         }
     ],
     "meshes": [

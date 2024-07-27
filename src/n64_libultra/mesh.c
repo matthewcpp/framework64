@@ -165,6 +165,6 @@ fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
     }
 }
 
-uint32_t fw64_mesh_get_render_queue_index(fw64Mesh* mesh) {
+fw64MeshRenderQueueIndex fw64_mesh_get_render_queue_index(fw64Mesh* mesh) {
     return mesh->info.render_queue;
 }

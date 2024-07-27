@@ -7,10 +7,11 @@ const BuildInfo = require("./BuildInfo");
 
 /** The order that data is written in this function needs to match up with MeshInfo in desktop/mesh.cpp */
 function writeMeshInfo(mesh, writer, file) {
-    const buffer = Buffer.alloc(8 + Bounding.SizeOf)
+    const buffer = Buffer.alloc(12 + Bounding.SizeOf)
 
     let index = 0;
     index = writer.writeUInt32(buffer, mesh.primitives.length, index);
+    index = writer.writeUInt32(buffer, mesh.renderQueueIndex, index);
     index = writer.writeUInt32(buffer, mesh.hasMaterialBundle ? 1 : 0, index);
     mesh.bounding.write(writer, buffer, index);
 

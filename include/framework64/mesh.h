@@ -27,6 +27,15 @@ typedef enum {
     FW64_VERTEX_ATTRIBUTE_COLOR = (1 << 3)
 } fw64VertexAttributes;
 
+// this needs to align with pipeline/Mesh.js
+typedef enum {
+    FW64_RENDER_QUEUE_UNLIT_STATIC,
+    FW64_RENDER_QUEUE_UNLIT_SKINNED,
+    FW64_RENDER_QUEUE_LIT_STATIC,
+    FW64_RENDER_QUEUE_LIT_SKINNED,
+    FW64_RENDER_QUEUE_INDEX_COUNT
+} fw64MeshRenderQueueIndex;
+
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 typedef struct fw64MaterialBundle fw64MaterialBundle;
 typedef struct fw64Mesh fw64Mesh;
@@ -42,7 +51,7 @@ fw64Mesh* fw64_mesh_load_from_datasource_with_bundle(fw64AssetDatabase* assets, 
 /** Cleans up a mesh that was manually constructed after calling \ref mesh_init */
 void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* assets, fw64Allocator* allocator);
 
-uint32_t fw64_mesh_get_render_queue_index(fw64Mesh* mesh);
+fw64MeshRenderQueueIndex fw64_mesh_get_render_queue_index(fw64Mesh* mesh);
 
 Box fw64_mesh_get_bounding_box(fw64Mesh* mesh);
 int fw64_mesh_get_primitive_count(fw64Mesh* mesh);

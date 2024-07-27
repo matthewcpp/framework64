@@ -39,6 +39,7 @@ fw64Primitive* fw64Mesh::createPrimitive(framework64::PrimitiveData&& data, fw64
 /// Note this should coorespond to pipeline/desktop/MeshWriter.js _writeMeshInfo
 struct MeshInfo {
     uint32_t primitive_count;
+    uint32_t render_queue_index;
     uint32_t material_bundle_count;
     Box bounding_box;
 };
@@ -66,6 +67,7 @@ fw64Mesh* fw64Mesh::loadFromDatasource(fw64DataSource* data_source, fw64Material
         material_bundle = mesh->material_bundle.get();
     }
 
+    mesh->render_queue_index = static_cast<fw64MeshRenderQueueIndex>(mesh_info.render_queue_index);
     mesh->bounding_box = mesh_info.bounding_box;
     mesh->primitives.reserve(mesh_info.primitive_count);
 
@@ -152,4 +154,8 @@ fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
         case fw64Primitive::Mode::Unknown:
             return FW64_PRIMITIVE_MODE_UNSET;
     }
+}
+
+fw64MeshRenderQueueIndex fw64_mesh_get_render_queue_index(fw64Mesh* mesh) {
+    return mesh->render_queue_index;
 }

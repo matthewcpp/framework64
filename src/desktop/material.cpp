@@ -31,15 +31,18 @@ void fw64_material_set_shading_mode(fw64Material* material, fw64ShadingMode mode
 }
 
 
-void fw64_material_set_color(fw64Material* material, uint8_t r, uint8_t g, uint8_t b) {
-    material->color[0] = static_cast<float>(r) / 255.0f;
-    material->color[1] = static_cast<float>(g) / 255.0f;
-    material->color[2] = static_cast<float>(b) / 255.0f;
+void fw64_material_set_color(fw64Material* material, fw64ColorRGBA8 color) {
+    material->color[0] = static_cast<float>(color.r) / 255.0f;
+    material->color[1] = static_cast<float>(color.g) / 255.0f;
+    material->color[2] = static_cast<float>(color.b) / 255.0f;
+    material->color[3] = static_cast<float>(color.a) / 255.0f;
 }
 
-void fw64_material_get_color(fw64Material* material, fw64ColorRGBA8* color) {
-    color->r = static_cast<uint8_t>(material->color[0] * 255.0f);
-    color->g = static_cast<uint8_t>(material->color[1] * 255.0f);
-    color->b = static_cast<uint8_t>(material->color[2] * 255.0f);
-    color->a = static_cast<uint8_t>(material->color[3] * 255.0f);
+fw64ColorRGBA8 fw64_material_get_color(fw64Material* material) {
+    return {
+       .r = static_cast<uint8_t>(material->color[0] * 255.0f),
+       .g = static_cast<uint8_t>(material->color[1] * 255.0f),
+       .b = static_cast<uint8_t>(material->color[2] * 255.0f),
+       .a = static_cast<uint8_t>(material->color[3] * 255.0f)
+    };
 }

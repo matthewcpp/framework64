@@ -11,16 +11,24 @@
 namespace framework64 {
 
 struct RenderQueue {
+    RenderQueue();
+    
+    void clear();
+    void enqueueSpriteBatch(fw64SpriteBatch* sprite_batch);
+    void enqueueMeshInstance(fw64MeshInstance* mesh_instance);
+    void enqueueSkinnedMeshInstance(fw64SkinnedMeshInstance* skinned_mesh_instance);
+
+    inline bool hasActiveQueueIndex(fw64MeshRenderQueueIndex index) const {
+        return active_queue_indices[index];
+    }
 
     std::vector<fw64SpriteBatch*> sprite_batches;
     std::vector<fw64MeshInstance*> mesh_instances;
     std::vector<fw64SkinnedMeshInstance*> skinned_mesh_instances;
 
-    void clear() {
-        sprite_batches.clear();
-        mesh_instances.clear();
-        skinned_mesh_instances.clear();
-    }
+    std::array<bool, FW64_RENDER_QUEUE_INDEX_COUNT> active_queue_indices;
+
+    
 };
 
 }

@@ -55,6 +55,7 @@ struct fw64Mesh {
 
     std::unique_ptr<fw64MaterialBundle> material_bundle;
     std::vector<std::unique_ptr<fw64Primitive>> primitives;
+    fw64MeshRenderQueueIndex render_queue_index;
     Box bounding_box;
 
     /// *moves* pdata into the new primitive and creates the GL objects

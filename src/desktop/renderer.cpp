@@ -21,10 +21,9 @@ bool fw64Renderer::init(int width, int height) {
     sprite_material.shader = shader_cache.getShaderProgram(FW64_SHADING_MODE_SPRITE);
     sprite_material.shading_mode = FW64_SHADING_MODE_SPRITE;
 
-    mesh_transform_uniform_block.create();
     fog_data_uniform_block.create();
-
-    initLighting();
+    lighting_data_uniform_block.create();
+    mesh_transform_uniform_block.create();
 
     screen_overlay.init();
 
@@ -37,20 +36,6 @@ bool fw64Renderer::initFramebuffer(int width, int height) {
         return false;
     }
     return true;
-}
-
-void fw64Renderer::initLighting() {
-    lights[0].light.light_direction = {0.57735f, 0.57735f, 0.57735f, 1.0f};
-    lights[0].light.light_color = {1.0f, 1.0f, 1.0f, 1.0f};
-    lights[0].active = 1;
-
-    lights[1].light.light_direction = {-0.57735f, -0.57735f, 0.57735f, 1.0f};
-    lights[1].light.light_color = {1.0f, 1.0f, 1.0f, 1.0f};
-    lights[1].active = 0;
-
-    lighting_data_uniform_block.create();
-
-    lighting_dirty = true;
 }
 
 void fw64Renderer::setClearColor(float r, float g, float b, float a) {
@@ -76,11 +61,6 @@ void fw64Renderer::endFrame() {
 }
 
 void fw64Renderer::begin(fw64PrimitiveMode mode, fw64ClearFlags flags) {
-    if (lighting_dirty) {
-        updateLightingBlock();
-        lighting_dirty = false;
-    }
-
     GLbitfield clear_bits = 0;
     if (flags & FW64_CLEAR_FLAG_COLOR) {
         clear_bits |= GL_COLOR_BUFFER_BIT;
@@ -199,6 +179,10 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
         fog_data_uniform_block.update();
     }
 
+    if (renderpass->render_queue.hasActiveQueueIndex(FW64_RENDER_QUEUE_LIT_STATIC) || renderpass->render_queue.hasActiveQueueIndex(FW64_RENDER_QUEUE_LIT_SKINNED)) {
+        updateLightingBlock(renderpass->lighting_info);
+    }
+
     for (auto& mesh_instance : renderpass->render_queue.mesh_instances) {
         drawStaticMesh(mesh_instance->mesh, &mesh_instance->node->transform);
     }
@@ -314,10 +298,12 @@ void fw64Renderer::setDepthTestingEnabled(bool enabled) {
         setGlDepthTestingState();
 }
 
-void fw64Renderer::updateLightingBlock() {
+void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
     int block_index = 0;
 
-    for (auto const & light_info : lights) {
+    lighting_data_uniform_block.data.ambient_light_color = lighting_info.ambient_color;
+
+    for (auto const & light_info : lighting_info.lights) {
         if (light_info.active) {
             lighting_data_uniform_block.data.lights[block_index++] = light_info.light;
         }
@@ -327,41 +313,6 @@ void fw64Renderer::updateLightingBlock() {
     lighting_data_uniform_block.update();
 }
 
-void fw64Renderer::setAmbientLightColor(uint8_t r, uint8_t g, uint8_t b) {
-    lighting_data_uniform_block.data.ambient_light_color[0] = static_cast<float>(r) / 255.0f;
-    lighting_data_uniform_block.data.ambient_light_color[1] = static_cast<float>(g) / 255.0f;
-    lighting_data_uniform_block.data.ambient_light_color[2] = static_cast<float>(b) / 255.0f;
-
-    lighting_dirty = true;
-}
-
-void fw64Renderer::setLightEnabled(int index, int enabled) {
-    assert(index < FW64_RENDERER_MAX_LIGHT_COUNT);
-
-    lights[index].active = enabled;
-
-    lighting_dirty = true;
-}
-
-void fw64Renderer::setLightDirection(int index, float x, float y, float z) {
-    assert(index < FW64_RENDERER_MAX_LIGHT_COUNT);
-
-    lights[index].light.light_direction[0] = x;
-    lights[index].light.light_direction[1] = y;
-    lights[index].light.light_direction[2] = z;
-
-    lighting_dirty = true;
-}
-
-void fw64Renderer::setLightColor(int index, uint8_t r, uint8_t g, uint8_t b) {
-    assert(index < FW64_RENDERER_MAX_LIGHT_COUNT);
-
-    lights[index].light.light_color[0] = static_cast<float>(r) / 255.0f;
-    lights[index].light.light_color[1] = static_cast<float>(g) / 255.0f;
-    lights[index].light.light_color[2] = static_cast<float>(b) / 255.0f;
-
-    lighting_dirty = true;
-}
 
 void fw64Renderer::renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     screen_overlay.primitive.material->color[0] = static_cast<float>(r) / 255.0f;
@@ -449,22 +400,6 @@ void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled
 
 int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
     return renderer->depthTestingEnabled();
-}
-
-void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
-    renderer->setAmbientLightColor(r, g, b);
-}
-
-void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled) {
-    renderer->setLightEnabled(index, enabled);
-}
-
-void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z) {
-    renderer->setLightDirection(index, x, y, z);
-}
-
-void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b) {
-    renderer->setLightColor(index, r, g, b);
 }
 
 void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled) {

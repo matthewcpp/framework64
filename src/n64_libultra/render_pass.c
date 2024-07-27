@@ -5,7 +5,7 @@
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator) {
     fw64RenderPass* renderpass = allocator->memalign(allocator, 8, sizeof(fw64RenderPass));
     renderpass->allocator = allocator;
-    fw64_n64_render_queue_init(&renderpass->render_queue, allocator);
+    fw64_render_queue_init(&renderpass->render_queue, allocator);
 
     ivec2_set(&renderpass->viewport.position, 0, 0);
     renderpass->viewport.size = fw64_display_get_size(display);
@@ -38,12 +38,12 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
 }
 
 void fw64_renderpass_delete(fw64RenderPass* renderpass) {
-    fw64_n64_render_queue_uninit(&renderpass->render_queue);
+    fw64_render_queue_uninit(&renderpass->render_queue);
     renderpass->allocator->free(renderpass->allocator, renderpass);
 }
 
 void fw64_renderpass_begin(fw64RenderPass* renderpass) {
-    fw64_n64_render_queue_clear(&renderpass->render_queue);
+    fw64_render_queue_clear(&renderpass->render_queue);
 }
 
 void fw64_renderpass_end(fw64RenderPass* renderpass) {
@@ -101,15 +101,15 @@ void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g,
 }
 
 void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance) {
-    fw64_n64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh_instance);
+    fw64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh_instance);
 }
 
 void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* pass, fw64SkinnedMeshInstance* instance) {
-    fw64_n64_render_queue_enqueue_skinned_mesh(&pass->render_queue, instance);
+    fw64_render_queue_enqueue_skinned_mesh(&pass->render_queue, instance);
 }
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* sprite_batch) {
-    fw64_n64_render_queue_enqueue_sprite_batch(&renderpass->render_queue, sprite_batch);
+    fw64_render_queue_enqueue_sprite_batch(&renderpass->render_queue, sprite_batch);
 }
 
 static void fw64_n64_renderpass_toggle_feature(fw64RenderPass* renderpass, fw64N64RendererFeature feature, int enabled) {
