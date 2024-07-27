@@ -3,6 +3,7 @@
 
 struct fw64Light {
     vec4 light_color;
+    /// this direction is the vector TO the light in camera space
     vec4 light_direction;
 };
 
