@@ -490,7 +490,7 @@ int matrix_invert(float* out, float* a) {
     return 1;
 }
 
-void matrix_transform_vec3(float* m, Vec3* vec) {
+void matrix_transform_vec3(const float* m, Vec3* vec) {
     float x = vec->x;
     float y = vec->y;
     float z = vec->z;
@@ -504,7 +504,7 @@ void matrix_transform_vec3(float* m, Vec3* vec) {
     vec->z = (m[2] * x + m[6] * y + m[10] * z + m[14]) / w;
 }
 
-void matrix_transform_vec4(float* m, Vec4* vec) {
+void matrix_transform_vec4(const float* m, Vec4* vec) {
     float x = vec->x;
     float y = vec->y;
     float z = vec->z;
@@ -514,6 +514,30 @@ void matrix_transform_vec4(float* m, Vec4* vec) {
     vec->y = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
     vec->z = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
     vec->w = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+}
+
+void mat3_set_from_mat4(float* out, const float* a) {
+    out[0] = a[0];
+    out[1] = a[1];
+    out[2] = a[2];
+
+    out[3] = a[4];
+    out[4] = a[5];
+    out[5] = a[6];
+
+    out[6] = a[8];
+    out[7] = a[9];
+    out[8] = a[10];
+}
+
+void mat3_transform_vec3(const float* m, Vec3* v) {
+    float x = v->x;
+    float y = v->y;
+    float z = v->z;
+
+    v->x = x * m[0] + y * m[3] + z * m[6];
+    v->y = x * m[1] + y * m[4] + z * m[7];
+    v->z = x * m[2] + y * m[5] + z * m[8];
 }
 
 void mat2_set_rotation(float* mat, float rad) {
