@@ -6,7 +6,10 @@
 
 #include <stdio.h>
 
-static void material_editor_init(MaterialEditor* editor, fw64UiNavigation* ui_nav, fw64Mesh* mesh, IVec2* pos, fw64Font* font);
+static void color_editor_init(ColorEditor* color_editor, fw64UiNavigation* ui_nav, fw64ColorRGBA8 initial_color, ColorEditorCallback callback, void* arg);
+static void color_editor_update(ColorEditor* color_editor, float time_delta);
+
+static void material_editor_init(MaterialEditor* editor, fw64Engine* engine, fw64Mesh* mesh, IVec2* pos, fw64Font* font);
 static void material_editor_update(MaterialEditor* editor);
 static void material_editor_draw(MaterialEditor* editor, fw64SpriteBatch* spritebatch);
 
@@ -90,50 +93,58 @@ void game_draw(Game* game) {
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
-static void material_editor_next_color(MaterialEditor* editor, int direction) {
-    editor->color_index += direction;
-
-    if (editor->color_index > COLOR_COUNT) {
-        editor->color_index = 0;
-    } else if (editor->color_index < 0) {
-        editor->color_index = COLOR_COUNT;
-    }
-
-    if (editor->color_index == COLOR_COUNT) {
-        editor->current_color = editor->default_color;
-    } else {
-        editor->current_color = global_colors[editor->color_index].color;
-    }
-
-    fw64Material* material = fw64_mesh_get_material_for_primitive(editor->mesh, 0);
-    fw64_material_set_color(material, editor->current_color);
+static void color_editor_update_color_str(ColorEditor* color_editor) {
+    sprintf(color_editor->color_str, "Material: %d, %d, %d", color_editor->current_color.r, color_editor->current_color.g, color_editor->current_color.b);
 }
 
-void material_editor_init(MaterialEditor* editor, fw64UiNavigation* ui_nav, fw64Mesh* mesh, IVec2* pos, fw64Font* font){
-    editor->ui_nav = ui_nav;
+void color_editor_init(ColorEditor* color_editor, fw64UiNavigation* ui_nav, fw64ColorRGBA8 initial_color, ColorEditorCallback callback, void* arg) {
+    color_editor->ui_nav = ui_nav;
+    color_editor->callback = callback;
+    color_editor->callback_arg = arg;
+    color_editor->current_color = initial_color;
+    color_editor->component_index = 0;
+
+    color_editor_update_color_str(color_editor);
+}
+
+#define EDIT_SPEED 75.0f
+
+void color_editor_update(ColorEditor* color_editor, float time_delta) {
+    float direction = 0.0f;
+
+    if (fw64_ui_navigation_moved_up(color_editor->ui_nav)) {
+        direction = 1.0f;
+    } else if (fw64_ui_navigation_moved_down(color_editor->ui_nav)) {
+        direction = -1.0f;
+    }
+
+    uint8_t* values = (uint8_t*)&color_editor->current_color;
+    int delta = (int)(direction * EDIT_SPEED * time_delta);
+    int new_value = (int)(values[color_editor->component_index]) + delta;
+
+    values[color_editor->component_index] = (uint8_t)new_value;
+
+    color_editor_update_color_str(color_editor);
+}
+
+void material_editor_init(MaterialEditor* editor, fw64Engine* engine, fw64Mesh* mesh, IVec2* pos, fw64Font* font){
     editor->mesh = mesh;
-    editor->color_index = COLOR_COUNT - 1;
     editor->pos = *pos;
     editor->font = font;
 
     fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, 0);
     editor->default_color = fw64_material_get_color(material);
     editor->current_color = editor->default_color;
-
-    material_editor_next_color(editor, 1);
+    color_editor_init(&editor->color_editor, );
 }
 
 void material_editor_draw(MaterialEditor* editor, fw64SpriteBatch* spritebatch) {
-    char text[32];
-    sprintf(text, "Material: %d, %d, %d", editor->current_color.r, editor->current_color.g, editor->current_color.b);
-    fw64_spritebatch_draw_string(spritebatch, editor->font, text, editor->pos.x, editor->pos.y);
+    fw64_spritebatch_draw_string(spritebatch, editor->color_editor.color_str, text, editor->pos.x, editor->pos.y);
 }
 
 void material_editor_update(MaterialEditor* editor) {
-    if (fw64_ui_navigation_moved_right(editor->ui_nav)) {
-        material_editor_next_color(editor, 1);
-    } else if (fw64_ui_navigation_moved_left(editor->ui_nav)) {
-        material_editor_next_color(editor, -1);
+    if (editor->active) {
+        color_editor_update(&editor->color_editor);
     }
 }
 

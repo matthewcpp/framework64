@@ -8,6 +8,7 @@ extern "C" {
 float fw64_smoothstep(float a, float b, float x);
 float fw64_lerp(float a, float b, float t);
 float fw64_clamp(float x, float lower, float upper);
+int fw64_clampi(int x, int lower, int upper);
 
 float fw64_maxf(float a, float b);
 float fw64_minf(float a, float b);

@@ -22,14 +22,24 @@ typedef enum {
     SETTING_MATERIAL_COLOR
 } SettingIndex;
 
+typedef void (*ColorEditorCallback)(fw64ColorRGBA8 color, void* arg);
+
+typedef struct {
+    fw64UiNavigation* ui_nav;
+    fw64ColorRGBA8 current_color;
+    char color_str[32];
+    ColorEditorCallback callback;
+    void* callback_arg;
+    int component_index;
+} ColorEditor;
+
 typedef struct {
     fw64Mesh* mesh;
-    int color_index;
-    fw64UiNavigation* ui_nav;
-    fw64ColorRGBA8 default_color;
-    fw64ColorRGBA8 current_color;
-    IVec2 pos;
     fw64Font* font;
+    fw64ColorRGBA8 default_color;
+    IVec2 pos;
+    ColorEditor color_editor;
+    int active;
 } MaterialEditor;
 
 typedef struct {
