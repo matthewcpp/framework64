@@ -1,0 +1,39 @@
+#pragma once
+
+#include "framework64/render_pass.h"
+#include "framework64/sprite_batch.h"
+
+#include "fw64_headlight.h"
+#include "fw64_ui_navigation.h"
+
+typedef enum {
+    LIGHT_MODE_OFF,
+    LIGHT_MODE_TOP,
+    LIGHT_MODE_BOTTOM,
+    LIGHT_MODE_LEFT,
+    LIGHT_MODE_RIGHT,
+    LIGHT_MODE_FRONT,
+    LIGHT_MODE_BACK,
+    LIGHT_MODE_HEADLIGHT,
+    LIGHT_MODE_COUNT
+} LightMode;
+
+typedef struct {
+    fw64UiNavigation* ui_nav;
+    fw64RenderPass* renderpass;
+    fw64Font* font;
+    fw64Headlights* headlights;
+    int light_index;
+    LightMode light_mode;
+    int current_mode;
+    int active;
+    char display_str[32];
+    fw64HeadlightHandle headlight_handle;
+    IVec2 pos;
+} LightEditor;
+
+void light_editor_init(LightEditor* editor, fw64UiNavigation* ui_nav, fw64Font* font, IVec2* pos, fw64RenderPass* renderpass, int light_index, LightMode inital_mode, fw64Headlights* headlights);
+void light_editor_update(LightEditor* editor, float time_delta);
+void light_editor_draw(LightEditor* editor, fw64SpriteBatch* spritebatch);
+void light_editor_activate(LightEditor* editor);
+void light_editor_deactivate(LightEditor* editor);

@@ -36,7 +36,6 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_arcball_init(&game->arcball, engine->input, display);
     Box mesh_bounding = fw64_mesh_get_bounding_box(mesh);
     fw64_arcball_set_initial(&game->arcball, &mesh_bounding);
-    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &game->arcball.camera);
 
     ui_init(&game->ui, engine, &game->scene);
 }
@@ -56,7 +55,6 @@ void game_update(Game* game){
 
     if (game->mode == GAME_MODE_SCENE) {
         fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
-        fw64_headlight_update(&game->headlight);
     } else {
         ui_update(&game->ui);
     }

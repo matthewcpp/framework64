@@ -44,7 +44,6 @@ typedef struct {
     GameMode mode;
     Ui ui;
     fw64ArcballCamera arcball;
-    fw64Headlight headlight;
     fw64Scene scene;
 } Game;
 

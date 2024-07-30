@@ -23,6 +23,9 @@ typedef struct {
     uint16_t generation;
 } fw64SparseSetHandle;
 
+/** Returns and invalid fw64SparseSetHandle */
+fw64SparseSetHandle fw64_sparse_set_invalid_handle();
+
 /**
  * A sparse set is useful for data of game objects and track their lifecycle.
  * There is a dense array which is used for efficient iteration over the whole set.

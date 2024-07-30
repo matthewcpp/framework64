@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+fw64SparseSetHandle fw64_sparse_set_invalid_handle() {
+    fw64SparseSetHandle handle = {USHRT_MAX, USHRT_MAX};
+
+    return handle;
+}
+
 /** Maps a sparse array index to a dense array index.
  * dense_index is updated when the item it refers to is swapped to a new index as part of a deletion.
  * free_list_next contains the index of the sparse array of the next hole to be used when allocating.
