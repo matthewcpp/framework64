@@ -26,7 +26,7 @@ namespace framework64{
 };
 
 struct fw64Primitive {
-    enum Mode { 
+    enum class Mode { 
         Unknown = 0,
         Triangles = GL_TRIANGLES, 
         Lines = GL_LINES 

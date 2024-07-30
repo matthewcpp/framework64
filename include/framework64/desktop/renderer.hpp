@@ -68,7 +68,7 @@ public:
 
 private:     
     void updateMeshTransformBlock(float* matrix);
-    void updateLightingBlock(const LightingInfo& lighting_info, const float* view_matrix);
+    void updateLightingBlock(const LightingInfo& lighting_info);
     void setActiveShader(framework64::ShaderProgram* shader);
     void setGlDepthTestingState();
     void drawPrimitive(fw64Primitive const & primitive);

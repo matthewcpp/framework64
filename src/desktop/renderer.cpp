@@ -180,7 +180,7 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
     }
 
     if (renderpass->render_queue.hasActiveQueueIndex(FW64_RENDER_QUEUE_LIT_STATIC) || renderpass->render_queue.hasActiveQueueIndex(FW64_RENDER_QUEUE_LIT_SKINNED)) {
-        updateLightingBlock(renderpass->lighting_info, renderpass->view_matrix.data());
+        updateLightingBlock(renderpass->lighting_info);
     }
 
     for (auto& mesh_instance : renderpass->render_queue.mesh_instances) {
@@ -243,7 +243,7 @@ void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
     active_shader->shader->setUniforms(active_shader, *primitive.material);
     glBindVertexArray(primitive.gl_info.gl_vertex_array_object);
 
-    glDrawElements(primitive.mode, primitive.gl_info.element_count, primitive.gl_info.primitive_mode, 0);
+    glDrawElements(static_cast<GLenum>(primitive.mode), primitive.gl_info.element_count, primitive.gl_info.primitive_mode, 0);
 }
 
 void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
@@ -298,7 +298,7 @@ void fw64Renderer::setDepthTestingEnabled(bool enabled) {
         setGlDepthTestingState();
 }
 
-void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info, const float* view_matrix) {
+void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
     int block_index = 0;
 
     lighting_data_uniform_block.data.ambient_light_color = lighting_info.ambient_color;
@@ -313,7 +313,7 @@ void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info, const 
         Vec3* light_dir = reinterpret_cast<Vec3*>(lighting_data_uniform_block.data.lights[block_index].direction.data());
         
         float mat3[9];
-        mat3_set_from_mat4(mat3, view_matrix);
+        mat3_set_from_mat4(mat3, view_matrix.data());
         mat3_transform_vec3(mat3, light_dir);
         vec3_normalize(light_dir);
         vec3_negate(light_dir);

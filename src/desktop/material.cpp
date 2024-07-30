@@ -40,9 +40,9 @@ void fw64_material_set_color(fw64Material* material, fw64ColorRGBA8 color) {
 
 fw64ColorRGBA8 fw64_material_get_color(fw64Material* material) {
     return {
-       .r = static_cast<uint8_t>(material->color[0] * 255.0f),
-       .g = static_cast<uint8_t>(material->color[1] * 255.0f),
-       .b = static_cast<uint8_t>(material->color[2] * 255.0f),
-       .a = static_cast<uint8_t>(material->color[3] * 255.0f)
+       static_cast<uint8_t>(material->color[0] * 255.0f),
+       static_cast<uint8_t>(material->color[1] * 255.0f),
+       static_cast<uint8_t>(material->color[2] * 255.0f),
+       static_cast<uint8_t>(material->color[3] * 255.0f)
     };
 }

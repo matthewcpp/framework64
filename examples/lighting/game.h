@@ -19,15 +19,18 @@ typedef enum {
 } GameMode;
 
 typedef enum {
-    SETTING_MATERIAL_COLOR
+    SETTING_MATERIAL_COLOR,
+    SETTING_LIGHT1,
+    SETTING_LIGHT2,
+    SETTING_LIGHT3,
+    SETTING_INVALID
 } SettingIndex;
 
-typedef void (*ColorEditorCallback)(fw64ColorRGBA8 color, void* arg);
+typedef void (*ColorEditorCallback)(void* arg);
 
 typedef struct {
     fw64UiNavigation* ui_nav;
     fw64ColorRGBA8 current_color;
-    char color_str[32];
     ColorEditorCallback callback;
     void* callback_arg;
     int component_index;
@@ -39,6 +42,7 @@ typedef struct {
     fw64ColorRGBA8 default_color;
     IVec2 pos;
     ColorEditor color_editor;
+    char display_str[32];
     int active;
 } MaterialEditor;
 

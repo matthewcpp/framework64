@@ -10,7 +10,7 @@
 
 struct Light {
     std::array<float, 4> color = {1.0f, 1.0f, 1.0f, 1.0f};
-    std::array<float, 4> direction = {0.57735f, -0.57735f, 0.57735, 1.0f};
+    std::array<float, 4> direction = {0.57735f, -0.57735f, 0.57735f, 1.0f};
 };
 
 struct LightInfo {
