@@ -6,7 +6,7 @@ const processImage = require("./ProcessImage");
 
 const path = require("path");
 
-const defaultSourceString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~ ";
+const defaultSourceString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~<> ";
 
 async function processFontFile(fontInfo, bundle, baseDirectory, outputDirectory) {
     const fontName = determineFontName(fontInfo);
