@@ -7,6 +7,9 @@
 #include "fw64_headlight.h"
 #include "fw64_ui_navigation.h"
 
+#include "color_editor.h"
+#include "material_editor.h"
+
 typedef enum {
     RENDER_PASS_SCENE,
     RENDER_PASS_UI,
@@ -25,26 +28,6 @@ typedef enum {
     SETTING_LIGHT3,
     SETTING_INVALID
 } SettingIndex;
-
-typedef void (*ColorEditorCallback)(void* arg);
-
-typedef struct {
-    fw64UiNavigation* ui_nav;
-    fw64ColorRGBA8 current_color;
-    ColorEditorCallback callback;
-    void* callback_arg;
-    int component_index;
-} ColorEditor;
-
-typedef struct {
-    fw64Mesh* mesh;
-    fw64Font* font;
-    fw64ColorRGBA8 default_color;
-    IVec2 pos;
-    ColorEditor color_editor;
-    char display_str[32];
-    int active;
-} MaterialEditor;
 
 typedef struct {
     fw64Engine* engine;
