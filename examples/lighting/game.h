@@ -8,6 +8,7 @@
 #include "fw64_ui_navigation.h"
 
 #include "color_editor.h"
+#include "light_editor.h"
 #include "material_editor.h"
 
 typedef enum {
@@ -33,9 +34,12 @@ typedef struct {
     fw64Engine* engine;
     fw64Scene* scene;
     SettingIndex setting_index;
+    int setting_index_is_active;
     MaterialEditor material_editor;
+    LightEditor light_editors[3];
     fw64UiNavigation ui_nav;
     fw64SpriteBatch* spritebatch;
+    int is_active;
 } Ui;
 
 typedef struct {
@@ -45,6 +49,7 @@ typedef struct {
     Ui ui;
     fw64ArcballCamera arcball;
     fw64Scene scene;
+    fw64Headlights headlights;
 } Game;
 
 #ifdef __cplusplus
