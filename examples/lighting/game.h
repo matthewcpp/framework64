@@ -7,6 +7,7 @@
 #include "fw64_headlight.h"
 #include "fw64_ui_navigation.h"
 
+#include "ambient_editor.h"
 #include "color_editor.h"
 #include "light_editor.h"
 #include "material_editor.h"
@@ -27,6 +28,7 @@ typedef enum {
     SETTING_LIGHT1,
     SETTING_LIGHT2,
     SETTING_LIGHT3,
+    SETTING_AMBIENT,
     SETTING_INVALID
 } SettingIndex;
 
@@ -37,6 +39,7 @@ typedef struct {
     int setting_index_is_active;
     MaterialEditor material_editor;
     LightEditor light_editors[3];
+    AmbientEditor ambient_editor;
     fw64UiNavigation ui_nav;
     fw64SpriteBatch* spritebatch;
     int is_active;

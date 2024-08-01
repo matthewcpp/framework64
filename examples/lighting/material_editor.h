@@ -9,7 +9,6 @@
 typedef struct {
     fw64Mesh* mesh;
     fw64Font* font;
-    fw64ColorRGBA8 default_color;
     IVec2 pos;
     ColorEditor color_editor;
     char display_str[32];

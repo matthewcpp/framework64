@@ -1,4 +1,5 @@
 set(src_files
+    ambient_editor.h ambient_editor.c
     color_editor.h color_editor.c
     light_editor.h light_editor.c
     material_editor.h material_editor.c

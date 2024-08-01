@@ -2,6 +2,8 @@
 
 #include "framework64/math.h"
 
+#include <stdio.h>
+
 void color_editor_init(ColorEditor* color_editor, fw64UiNavigation* ui_nav, fw64ColorRGBA8 initial_color, ColorEditorCallback callback, void* arg) {
     color_editor->ui_nav = ui_nav;
     color_editor->callback = callback;
@@ -40,4 +42,28 @@ void color_editor_update(ColorEditor* color_editor, float time_delta) {
     if (color_editor->callback) {
         color_editor->callback(color_editor->callback_arg);
     }
+}
+
+void color_editor_update_str(ColorEditor* color_editor, char* buffer, const char* label, int active) {
+    const char* r_label = " ", *g_label = " ", *b_label = " ";
+
+    if (active) {
+        switch(color_editor->component_index) {
+            case 0:
+                r_label = ">";
+                break;
+            case 1:
+                g_label = ">";
+                break;
+            case 2:
+                b_label = ">";
+                break;
+        }
+    }
+
+    sprintf(buffer, "%s: %s%d, %s%d, %s%d", 
+        label,
+        r_label, color_editor->current_color.r, 
+        g_label, color_editor->current_color.g, 
+        b_label, color_editor->current_color.b);
 }

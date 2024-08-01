@@ -1,29 +1,7 @@
 #include "material_editor.h"
 
-#include <stdio.h>
-
 static void material_editor_update_str(MaterialEditor* editor) {
-    ColorEditor* color_editor = &editor->color_editor;
-    const char* r_label = " ", *g_label = " ", *b_label = " ";
-
-    if (editor->active) {
-        switch(editor->color_editor.component_index) {
-            case 0:
-                r_label = ">";
-                break;
-            case 1:
-                g_label = ">";
-                break;
-            case 2:
-                b_label = ">";
-                break;
-        }
-    }
-
-    sprintf(editor->display_str, "Material: %s%d, %s%d, %s%d", 
-        r_label, color_editor->current_color.r, 
-        g_label, color_editor->current_color.g, 
-        b_label, color_editor->current_color.b);
+    color_editor_update_str(&editor->color_editor, editor->display_str, "Material", editor->active);
 }
 
 static void material_editor_color_updated(void* arg) {
@@ -45,8 +23,8 @@ void material_editor_init(MaterialEditor* editor, fw64UiNavigation* ui_nav, fw64
     editor->active = 0;
 
     fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, 0);
-    editor->default_color = fw64_material_get_color(material);
-    color_editor_init(&editor->color_editor, ui_nav, editor->default_color, material_editor_color_updated, editor);
+    fw64ColorRGBA8 default_color = fw64_material_get_color(material);
+    color_editor_init(&editor->color_editor, ui_nav, default_color, material_editor_color_updated, editor);
     material_editor_update_str(editor);
 }
 

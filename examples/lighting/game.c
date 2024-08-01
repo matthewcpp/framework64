@@ -104,6 +104,9 @@ static void ui_init(Ui* ui, fw64Engine* engine, fw64Scene* scene, fw64RenderPass
     widget_pos.y += fw64_font_line_height(font);
 
     light_editor_init(&ui->light_editors[2], &ui->ui_nav, font, &widget_pos, scene_renderpass, 2, LIGHT_MODE_OFF, headlights, camera_transform);
+    widget_pos.y += fw64_font_line_height(font);
+
+    ambient_editor_init(&ui->ambient_editor, &ui->ui_nav, scene_renderpass, &widget_pos, font);
 }
 
 static void ui_activate_current_control(Ui* ui) {
@@ -119,6 +122,9 @@ static void ui_activate_current_control(Ui* ui) {
             break;
         case SETTING_LIGHT3:
             light_editor_activate(&ui->light_editors[2]);
+            break;
+        case SETTING_AMBIENT:
+            ambient_editor_activate(&ui->ambient_editor);
             break;
         case SETTING_INVALID:
             break;
@@ -138,6 +144,9 @@ static void ui_deactivate_current_control(Ui* ui) {
             break;
         case SETTING_LIGHT3:
             light_editor_deactivate(&ui->light_editors[2]);
+            break;
+        case SETTING_AMBIENT:
+            ambient_editor_deactivate(&ui->ambient_editor);
             break;
         case SETTING_INVALID:
             break;
@@ -160,6 +169,9 @@ static void ui_update(Ui* ui) {
                 break;
             case SETTING_LIGHT3:
                 light_editor_update(&ui->light_editors[2],  ui->engine->time->time_delta);
+                break;
+            case SETTING_AMBIENT:
+                ambient_editor_update(&ui->ambient_editor, ui->engine->time->time_delta);
                 break;
             case SETTING_INVALID:
                 break;
@@ -218,6 +230,9 @@ void ui_draw(Ui* ui, fw64RenderPass* renderpass) {
 
     ui_set_color(ui, SETTING_LIGHT3);
     light_editor_draw(&ui->light_editors[2], ui->spritebatch);
+
+    ui_set_color(ui, SETTING_AMBIENT);
+    ambient_editor_draw(&ui->ambient_editor, ui->spritebatch);
 
     fw64_spritebatch_end(ui->spritebatch);
 

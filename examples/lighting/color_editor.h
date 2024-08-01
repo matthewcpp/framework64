@@ -16,3 +16,5 @@ typedef struct {
 
 void color_editor_init(ColorEditor* color_editor, fw64UiNavigation* ui_nav, fw64ColorRGBA8 initial_color, ColorEditorCallback callback, void* arg);
 void color_editor_update(ColorEditor* color_editor, float time_delta);
+
+void color_editor_update_str(ColorEditor* color_editor, char* buffer, const char* label, int active);
