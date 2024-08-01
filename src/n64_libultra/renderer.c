@@ -22,8 +22,8 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->primitive_mode = FW64_PRIMITIVE_MODE_UNSET;
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
 
-    n64_fill_rect_init(&renderer->fill_rect);
     renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
+    memset(&renderer->empty_light, 0, sizeof(Light));
 
     renderer->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
 
@@ -325,43 +325,6 @@ static void n64_renderer_configure_lit_mesh_shading_mode(fw64Renderer* renderer,
     }
 }
 
-static void fw64_n64_renderer_configure_lighting_info(fw64Renderer* renderer, LightingInfo* lighting_info, fw64Material* material) {
-    // 11.7.3.6 Note on Material Properties
-    // To obtain the correct light color in a particular situation, multiply the color of the material times the color of the light
-    // for each light source and use the result as the light's color.
-    int light_index = 0;
-    for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
-        if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
-            continue;
-        }
-
-        light_index += 1;
-
-        Light_t* light = &lighting_info->lights[i].l;
-        uint32_t r = ((uint32_t)light->col[0] * (uint32_t)material->color.r) / 255;
-        uint32_t g = ((uint32_t)light->col[1] * (uint32_t)material->color.g) / 255;
-        uint32_t b = ((uint32_t)light->col[2] * (uint32_t)material->color.b) / 255;
-        uint32_t light_val = (r << 24) | (g << 16) | (b << 8) | 255;
-
-        // Note: unfortunetly this is necessary due to the way gSPLightColor is setup.
-        // Simply passing the index into the macro causes error.
-        // Maybe this is something that can be fixed down the road.
-        switch (light_index) {
-            case LIGHT_1:
-                gSPLightColor(renderer->display_list++, LIGHT_1, light_val);
-                break;
-            case LIGHT_2:
-                gSPLightColor(renderer->display_list++, LIGHT_2, light_val);
-                break;
-            case LIGHT_3:
-                gSPLightColor(renderer->display_list++, LIGHT_3, light_val);
-                break;
-            default:
-                break;
-        }
-    }
-}
-
 static void fw64_renderer_draw_unlit_static_mesh(fw64Renderer* renderer, fw64MeshInstance* mesh_instance) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     
@@ -398,13 +361,53 @@ void fw64_renderer_draw_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInst
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
+static void fw64_n64_renderer_configure_mesh_lighting_info(fw64Renderer* renderer, LightingInfo* lighting_info, fw64Material* material) {
+    // 11.7.3.6 Note on Material Properties
+    // To obtain the correct light color in a particular situation, multiply the color of the material times the color of the light
+    // for each light source and use the result as the light's color.
+    int light_index = 0;
+    for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
+        if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
+            continue;
+        }
+
+        light_index += 1;
+
+        Light_t* light = &lighting_info->lights[i].l;
+        uint32_t r = ((uint32_t)light->col[0] * (uint32_t)material->color.r) / 255;
+        uint32_t g = ((uint32_t)light->col[1] * (uint32_t)material->color.g) / 255;
+        uint32_t b = ((uint32_t)light->col[2] * (uint32_t)material->color.b) / 255;
+        uint32_t light_val = (r << 24) | (g << 16) | (b << 8) | 255;
+
+        // Note: unfortunetly this is necessary due to the way gSPLightColor is setup.
+        // Simply passing the index into the macro causes error.
+        // Maybe this is something that can be fixed down the road.
+        switch (light_index) {
+            case LIGHT_1:
+                gSPLightColor(renderer->display_list++, LIGHT_1, light_val);
+                break;
+            case LIGHT_2:
+                gSPLightColor(renderer->display_list++, LIGHT_2, light_val);
+                break;
+            case LIGHT_3:
+                gSPLightColor(renderer->display_list++, LIGHT_3, light_val);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, LightingInfo* lighting_info, fw64MeshInstance* mesh_instance) {
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
         fw64Primitive* primitive = mesh_instance->mesh->primitives + i;
         n64_renderer_configure_lit_mesh_shading_mode(renderer, primitive->material);
-        fw64_n64_renderer_configure_lighting_info(renderer, lighting_info, primitive->material);
+
+        if (lighting_info->active_count > 0) {
+            fw64_n64_renderer_configure_mesh_lighting_info(renderer, lighting_info, primitive->material);
+        }
         
         gSPDisplayList(renderer->display_list++, primitive->display_list);
         gDPPipeSync(renderer->display_list++);
@@ -501,22 +504,29 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         // Refer to: 11.7.3.1 Important Note on Matrix Manipulation in the N64 Programming manual on ultra64.ca
         gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_PROJECTION|G_MTX_MUL|G_MTX_NOPUSH);
         
-        gSPNumLights(renderer->display_list++, lighting_info->active_count);
+        if (lighting_info->active_count > 0) {
+            gSPNumLights(renderer->display_list++, lighting_info->active_count);
 
-        // Setup light directions
-        int light_index = 0;
-        for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
-            if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
-                continue;
+            // Setup light directions
+            int light_index = 0;
+            for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
+                if (!fw64_n64_lighting_info_light_is_enabled(lighting_info, i)) {
+                    continue;
+                }
+                light_index += 1;
+                gSPLight(renderer->display_list++, &(renderpass->lighting_info.lights[i]), light_index);
             }
-            light_index += 1;
-            gSPLight(renderer->display_list++, &(renderpass->lighting_info.lights[i]), light_index);
-        }
 
-        // set the ambient light
-        light_index += 1;
-        gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), light_index);
-        
+            // set the ambient light
+            light_index += 1;
+            gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), light_index);
+        }
+        else {
+            // note, in the case of 0 lights then we recreate set setup for gSPSetLights0, refer to gbi.h
+            gSPNumLights(renderer->display_list++, 1);
+            gSPLight(renderer->display_list++, &(renderer->empty_light), 1);
+            gSPLight(renderer->display_list++, &(renderpass->lighting_info.ambient), 2);
+        }
 
         fw64DynamicVector* queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_STATIC];
         for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {

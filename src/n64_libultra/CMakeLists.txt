@@ -9,7 +9,6 @@ set(platform_source_files
     ${n64_include_dir}/display_list.h display_list.c
     ${n64_include_dir}/engine.h engine.c
     ${n64_include_dir}/filesystem.h filesystem.c
-    ${n64_include_dir}/fill_rect.h fill_rect.c
     ${n64_include_dir}/font.h font.c
     ${n64_include_dir}/image.h image.c
     ${n64_include_dir}/input.h input.c

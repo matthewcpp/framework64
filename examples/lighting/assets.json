@@ -8,6 +8,9 @@
     "meshes": [
         {
             "src": "suzanne/suzanne.gltf"
+        },
+        {
+            "src": "penguin/penguin.gltf"
         }
     ]
 }

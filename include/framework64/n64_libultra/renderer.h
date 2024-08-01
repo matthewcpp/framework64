@@ -3,7 +3,6 @@
 #include "framework64/renderer.h"
 #include "framework64/color.h"
 #include "framework64/mesh_instance.h"
-#include "framework64/n64_libultra/fill_rect.h"
 #include "framework64/n64_libultra/display_list.h"
 #include "framework64/n64_libultra/render_pass.h"
 
@@ -31,7 +30,7 @@ struct fw64Renderer{
     uint32_t starting_new_frame;
 
     fw64TextureState active_texture;
-    N64FillRect fill_rect;
+    Light empty_light; // this is used in the case where only an ambient light is set
 };
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
