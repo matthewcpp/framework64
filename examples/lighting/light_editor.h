@@ -6,6 +6,8 @@
 #include "fw64_headlight.h"
 #include "fw64_ui_navigation.h"
 
+#include "color_editor.h"
+
 typedef enum {
     LIGHT_MODE_OFF,
     LIGHT_MODE_TOP,
@@ -18,19 +20,25 @@ typedef enum {
     LIGHT_MODE_COUNT
 } LightMode;
 
+typedef enum {
+    LIGHT_EDIT_TARGET_MODE,
+    LIGHT_EDIT_TARGET_COLOR
+} LightEditTarget;
+
 typedef struct {
+    int active;
     fw64UiNavigation* ui_nav;
+    LightEditTarget edit_target;
     fw64RenderPass* renderpass;
-    fw64Font* font;
-    fw64Headlights* headlights;
-    fw64Transform* camera_transform;
     int light_index;
     int light_mode;
-    int current_mode;
-    int active;
-    char display_str[32];
+    fw64Transform* camera_transform;
+    fw64Headlights* headlights;
     fw64HeadlightHandle headlight_handle;
     IVec2 pos;
+    fw64Font* font;
+    ColorEditor color_editor;
+    char display_str[32];
 } LightEditor;
 
 void light_editor_init(LightEditor* editor, fw64UiNavigation* ui_nav, fw64Font* font, IVec2* pos, fw64RenderPass* renderpass, int light_index, LightMode inital_mode, fw64Headlights* headlights, fw64Transform* camera_transform);

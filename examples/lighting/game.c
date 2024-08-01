@@ -165,7 +165,7 @@ static void ui_update(Ui* ui) {
                 break;
         }
 
-        if (fw64_ui_navigation_back(&ui->ui_nav)) {
+        if (fw64_ui_navigation_back(&ui->ui_nav) || fw64_ui_navigation_accepted(&ui->ui_nav)) {
                 ui->setting_index_is_active = 0;
                 ui_deactivate_current_control(ui);
         }

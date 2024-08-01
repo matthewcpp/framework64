@@ -17,7 +17,8 @@ static void light_editor_update_display_str(LightEditor* editor) {
     if (editor->light_mode == LIGHT_MODE_OFF) {
         sprintf(editor->display_str, "Light %d: %s", editor->light_index, light_mode_names[editor->light_mode]);
     } else {
-        sprintf(editor->display_str, "Light %d: %s", editor->light_index, light_mode_names[editor->light_mode]);
+        fw64ColorRGBA8 c = editor->color_editor.current_color;
+        sprintf(editor->display_str, "Light %d: %s %d, %d, %d", editor->light_index, light_mode_names[editor->light_mode], c.r, c.g, c.b);
     }
 }
 
@@ -63,6 +64,13 @@ static void light_editor_adjust_light_params(LightEditor* editor) {
     light_editor_update_display_str(editor);
 }
 
+static void light_editor_update_light_color(void* arg) {
+    LightEditor* editor = (LightEditor*)arg;
+
+    fw64_renderpass_set_light_color(editor->renderpass, editor->light_index, editor->color_editor.current_color);
+    light_editor_update_display_str(editor);
+}
+
 void light_editor_init(LightEditor* editor, fw64UiNavigation* ui_nav, fw64Font* font, IVec2* pos, fw64RenderPass* renderpass, int light_index, LightMode inital_mode, fw64Headlights* headlights, fw64Transform* camera_transform) {
     editor->ui_nav = ui_nav;
     editor->renderpass = renderpass;
@@ -74,11 +82,25 @@ void light_editor_init(LightEditor* editor, fw64UiNavigation* ui_nav, fw64Font* 
     editor->font = font;
     editor->headlights = headlights;
     editor->camera_transform = camera_transform;
+    editor->edit_target = LIGHT_EDIT_TARGET_MODE;
 
+    fw64ColorRGBA8 initial_color = {255, 255, 255, 255};
+    color_editor_init(&editor->color_editor, ui_nav, initial_color, light_editor_update_light_color, editor);
     light_editor_adjust_light_params(editor);
 }
 
-void light_editor_update(LightEditor* editor, float time_delta) {
+static void light_editor_update_target_mode(LightEditor* editor) {
+        // did we navigate away from mode picker?
+    if (fw64_ui_navigation_moved_left(editor->ui_nav)) {
+        editor->edit_target = LIGHT_EDIT_TARGET_COLOR;
+        editor->color_editor.component_index = 2;
+        return;
+    } else if (fw64_ui_navigation_moved_right(editor->ui_nav)) {
+        editor->edit_target = LIGHT_EDIT_TARGET_COLOR;
+        editor->color_editor.component_index = 0;
+        return;
+    }
+
     int previous_mode = editor->light_mode;
     if (fw64_ui_navigation_moved_up(editor->ui_nav)) {
         editor->light_mode += 1;
@@ -95,8 +117,25 @@ void light_editor_update(LightEditor* editor, float time_delta) {
     if (editor->light_mode != previous_mode) {
         light_editor_adjust_light_params(editor);
     }
-    
-    (void)time_delta;
+}
+
+static void light_editor_update_target_color(LightEditor* editor, float time_delta) {
+    // did we navigate away from color picker?
+    if ((editor->color_editor.component_index == 0 && fw64_ui_navigation_moved_left(editor->ui_nav)) ||
+        (editor->color_editor.component_index == 2 && fw64_ui_navigation_moved_right(editor->ui_nav))) 
+    {
+        editor->edit_target = LIGHT_EDIT_TARGET_MODE;
+    } else {
+        color_editor_update(&editor->color_editor, time_delta);
+    }
+}
+
+void light_editor_update(LightEditor* editor, float time_delta) {
+    if (editor->edit_target == LIGHT_EDIT_TARGET_MODE) {
+        light_editor_update_target_mode(editor);
+    } else {
+        light_editor_update_target_color(editor, time_delta);
+    }
 }
 
 void light_editor_draw(LightEditor* editor, fw64SpriteBatch* spritebatch) {
@@ -105,6 +144,7 @@ void light_editor_draw(LightEditor* editor, fw64SpriteBatch* spritebatch) {
 
 void light_editor_activate(LightEditor* editor) {
     editor->active = 1;
+    editor->edit_target = LIGHT_EDIT_TARGET_MODE;
 }
 
 void light_editor_deactivate(LightEditor* editor) {
