@@ -17,8 +17,26 @@ static void light_editor_update_display_str(LightEditor* editor) {
     if (editor->light_mode == LIGHT_MODE_OFF) {
         sprintf(editor->display_str, "Light %d: %s", editor->light_index, light_mode_names[editor->light_mode]);
     } else {
+        const char* mode_indicator = " ", *r_indicator = " ", *g_indicator = " ", *b_indicator = " ";
         fw64ColorRGBA8 c = editor->color_editor.current_color;
-        sprintf(editor->display_str, "Light %d: %s %d, %d, %d", editor->light_index, light_mode_names[editor->light_mode], c.r, c.g, c.b);
+        if (editor->active) {
+            if (editor->edit_target == LIGHT_EDIT_TARGET_MODE) {
+                mode_indicator = ">";
+            } else if (editor->color_editor.component_index == 0){
+                r_indicator = ">";
+            } else if (editor->color_editor.component_index == 1){
+                g_indicator = ">";
+            } else if (editor->color_editor.component_index == 2){
+                b_indicator = ">";
+            }
+        }
+
+        sprintf(editor->display_str, "Light %d: %s%s %s%d, %s%d, %s%d", 
+        editor->light_index, 
+        mode_indicator, light_mode_names[editor->light_mode], 
+        r_indicator, c.r, 
+        g_indicator, c.g, 
+        b_indicator, c.b);
     }
 }
 
@@ -94,10 +112,12 @@ static void light_editor_update_target_mode(LightEditor* editor) {
     if (fw64_ui_navigation_moved_left(editor->ui_nav)) {
         editor->edit_target = LIGHT_EDIT_TARGET_COLOR;
         editor->color_editor.component_index = 2;
+        light_editor_update_display_str(editor);
         return;
     } else if (fw64_ui_navigation_moved_right(editor->ui_nav)) {
         editor->edit_target = LIGHT_EDIT_TARGET_COLOR;
         editor->color_editor.component_index = 0;
+        light_editor_update_display_str(editor);
         return;
     }
 
@@ -125,6 +145,7 @@ static void light_editor_update_target_color(LightEditor* editor, float time_del
         (editor->color_editor.component_index == 2 && fw64_ui_navigation_moved_right(editor->ui_nav))) 
     {
         editor->edit_target = LIGHT_EDIT_TARGET_MODE;
+        light_editor_update_display_str(editor);
     } else {
         color_editor_update(&editor->color_editor, time_delta);
     }
@@ -145,8 +166,10 @@ void light_editor_draw(LightEditor* editor, fw64SpriteBatch* spritebatch) {
 void light_editor_activate(LightEditor* editor) {
     editor->active = 1;
     editor->edit_target = LIGHT_EDIT_TARGET_MODE;
+    light_editor_update_display_str(editor);
 }
 
 void light_editor_deactivate(LightEditor* editor) {
     editor->active = 0;
+    light_editor_update_display_str(editor);
 }
