@@ -7,10 +7,7 @@
 #include "fw64_headlight.h"
 #include "fw64_ui_navigation.h"
 
-#include "ambient_editor.h"
-#include "color_editor.h"
-#include "light_editor.h"
-#include "material_editor.h"
+#include "ui.h"
 
 typedef enum {
     RENDER_PASS_SCENE,
@@ -23,27 +20,7 @@ typedef enum {
     GAME_MODE_MENU
 } GameMode;
 
-typedef enum {
-    SETTING_MATERIAL_COLOR,
-    SETTING_LIGHT1,
-    SETTING_LIGHT2,
-    SETTING_LIGHT3,
-    SETTING_AMBIENT,
-    SETTING_INVALID
-} SettingIndex;
 
-typedef struct {
-    fw64Engine* engine;
-    fw64Scene* scene;
-    SettingIndex setting_index;
-    int setting_index_is_active;
-    MaterialEditor material_editor;
-    LightEditor light_editors[3];
-    AmbientEditor ambient_editor;
-    fw64UiNavigation ui_nav;
-    fw64SpriteBatch* spritebatch;
-    int is_active;
-} Ui;
 
 typedef struct {
     fw64Engine* engine;

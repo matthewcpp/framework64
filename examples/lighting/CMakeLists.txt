@@ -3,6 +3,8 @@ set(src_files
     color_editor.h color_editor.c
     light_editor.h light_editor.c
     material_editor.h material_editor.c
+    mesh_picker.h mesh_picker.c
+    ui.h ui.c
     game.h game.c)
 
 create_game(

@@ -7,21 +7,23 @@ static void material_editor_update_str(MaterialEditor* editor) {
 static void material_editor_color_updated(void* arg) {
     MaterialEditor* editor = (MaterialEditor*)arg;
 
-    int primitive_count = fw64_mesh_get_primitive_count(editor->mesh);
+    fw64Mesh* mesh = editor->node->mesh_instance->mesh;
+    int primitive_count = fw64_mesh_get_primitive_count(mesh);
     for (int i = 0; i < primitive_count; i++) {
-        fw64Material* material = fw64_mesh_get_material_for_primitive(editor->mesh, i);
+        fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, i);
         fw64_material_set_color(material, editor->color_editor.current_color);
     }
 
     material_editor_update_str(editor);
 }
 
-void material_editor_init(MaterialEditor* editor, fw64UiNavigation* ui_nav, fw64Mesh* mesh, IVec2* pos, fw64Font* font){
-    editor->mesh = mesh;
+void material_editor_init(MaterialEditor* editor, fw64UiNavigation* ui_nav, fw64Node* node, IVec2* pos, fw64Font* font){
+    editor->node = node;
     editor->pos = *pos;
     editor->font = font;
     editor->active = 0;
 
+    fw64Mesh* mesh = editor->node->mesh_instance->mesh;
     fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, 0);
     fw64ColorRGBA8 default_color = fw64_material_get_color(material);
     color_editor_init(&editor->color_editor, ui_nav, default_color, material_editor_color_updated, editor);
