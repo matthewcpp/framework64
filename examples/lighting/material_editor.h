@@ -20,3 +20,6 @@ void material_editor_update(MaterialEditor* editor, float time_delta);
 void material_editor_draw(MaterialEditor* editor, fw64SpriteBatch* spritebatch);
 void material_editor_activate(MaterialEditor* editor);
 void material_editor_deactivate(MaterialEditor* editor);
+
+void material_editor_update_color(MaterialEditor* editor);
+

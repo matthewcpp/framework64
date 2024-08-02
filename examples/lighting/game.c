@@ -25,8 +25,10 @@ void game_init(Game* game, fw64Engine* engine) {
     info.mesh_instance_count = 1;
     fw64_scene_init(&game->scene, &info, engine->assets, allocator);
 
+    fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_suzanne);
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_penguin);
-    fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_suzanne);
+    
+    fw64Mesh* mesh = fw64_scene_get_mesh(&game->scene, 0);
     fw64Node* node = fw64_scene_create_node(&game->scene);
     fw64_scene_create_mesh_instance(&game->scene, node, mesh);
 
@@ -34,9 +36,13 @@ void game_init(Game* game, fw64Engine* engine) {
     Box mesh_bounding = fw64_mesh_get_bounding_box(mesh);
     fw64_arcball_set_initial(&game->arcball, &mesh_bounding);
 
+    game->arcball.camera.near = 5.0f;
+    game->arcball.camera.far = 900.0f;
+    fw64_camera_update_projection_matrix(&game->arcball.camera);
+
     fw64_headlights_init(&game->headlights, allocator);
 
-    ui_init(&game->ui, engine, &game->scene, game->renderpasses[RENDER_PASS_SCENE], &game->headlights, &game->arcball.camera.transform);
+    ui_init(&game->ui, engine, &game->scene, game->renderpasses[RENDER_PASS_SCENE], &game->headlights, &game->arcball);
 }
 
 void game_update(Game* game){

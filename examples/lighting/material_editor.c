@@ -17,16 +17,26 @@ static void material_editor_color_updated(void* arg) {
     material_editor_update_str(editor);
 }
 
+static fw64ColorRGBA8 material_editor_get_mesh_default_color(MaterialEditor* editor) {
+    fw64Mesh* mesh = editor->node->mesh_instance->mesh;
+    fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, 0);
+    return fw64_material_get_color(material);
+}
+
 void material_editor_init(MaterialEditor* editor, fw64UiNavigation* ui_nav, fw64Node* node, IVec2* pos, fw64Font* font){
     editor->node = node;
     editor->pos = *pos;
     editor->font = font;
     editor->active = 0;
 
-    fw64Mesh* mesh = editor->node->mesh_instance->mesh;
-    fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, 0);
-    fw64ColorRGBA8 default_color = fw64_material_get_color(material);
+    fw64ColorRGBA8 default_color = material_editor_get_mesh_default_color(editor);
     color_editor_init(&editor->color_editor, ui_nav, default_color, material_editor_color_updated, editor);
+    material_editor_update_str(editor);
+}
+
+void material_editor_update_color(MaterialEditor* editor) {
+    editor->color_editor.current_color = material_editor_get_mesh_default_color(editor);
+    editor->color_editor.component_index = 0;
     material_editor_update_str(editor);
 }
 
