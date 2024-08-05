@@ -8,6 +8,7 @@
 #include "framework64/skinned_mesh_instance.h"
 
 #include "fw64_arcball_camera.h"
+#include "fw64_headlight.h"
 
 typedef struct {
     fw64Engine* engine;
@@ -20,6 +21,7 @@ typedef struct {
 typedef struct {
     fw64Engine* engine;
     fw64ArcballCamera arcball;
+    fw64Headlight headlight;
     fw64Scene scene;
     fw64RenderPass* renderpass;
 

@@ -20,7 +20,7 @@ struct LightInfo {
 
 struct LightingInfo {
     std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
-    std::array<float, 4> ambient_color = {0.215f, 0.215f, 0.215f, 1.0f};
+    std::array<float, 4> ambient_color = {0.1f, 0.1f, 0.1f, 1.0f};
 };
 
 struct fw64RenderPass {

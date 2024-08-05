@@ -58,6 +58,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
     fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
 
+    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &game->arcball.camera.transform);
+
     game->current_mesh = -1;
     load_next_mesh(game, 1);
 }
@@ -96,6 +98,7 @@ void game_update(Game* game) {
     }
 
     fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
+    fw64_headlight_update(&game->headlight);
 }
 
 void game_draw(Game* game) {

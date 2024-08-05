@@ -21,7 +21,7 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
     renderpass->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
 
     fw64ColorRGBA8 light_color = {255, 255, 255, 255};
-    fw64ColorRGBA8 ambient_light_color = {55, 55, 55, 255};
+    fw64ColorRGBA8 ambient_light_color = {25, 25, 25, 255};
     Vec3 light_dir = {0.57735f, -0.57735f, 0.57735};
 
     renderpass->lighting_info.active_count = 0;
