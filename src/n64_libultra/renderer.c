@@ -225,6 +225,7 @@ static void n64_renderer_configure_shading_mode_gouraud(fw64Renderer* renderer) 
         return;
 
     n64_renderer_set_render_mode_opaque(renderer);
+    // what about fog?
     gDPSetCombineMode(renderer->display_list++, G_CC_SHADE, G_CC_SHADE);
 
     gSPSetGeometryMode(renderer->display_list++, G_LIGHTING | G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK);
@@ -399,6 +400,7 @@ static void fw64_n64_renderer_configure_mesh_lighting_info(fw64Renderer* rendere
 }
 
 static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, LightingInfo* lighting_info, fw64MeshInstance* mesh_instance) {
+    // when using lighting the view matrix is actually placed on the projection matrix stack, so we just load the model matrix
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     for (uint32_t i = 0 ; i < mesh_instance->mesh->info.primitive_count; i++) {
