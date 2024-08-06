@@ -340,8 +340,8 @@ static void fw64_renderer_draw_unlit_static_mesh(fw64Renderer* renderer, fw64Mes
     gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
-void fw64_renderer_draw_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInstance* instance) {
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&instance->mesh_instance.n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+static void fw64_renderer_draw_unlit_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInstance* instance) {
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&instance->mesh_instance.n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_PUSH);
     
     fw64Mesh* mesh = instance->skinned_mesh->mesh;
     fw64AnimationController* controller = &instance->controller;
@@ -358,8 +358,7 @@ void fw64_renderer_draw_skinned_mesh(fw64Renderer* renderer, fw64SkinnedMeshInst
         gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     }
 
-    // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix see note above in set_camera
-    //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
 static void fw64_n64_renderer_configure_mesh_lighting_info(fw64Renderer* renderer, LightingInfo* lighting_info, fw64Material* material) {
@@ -413,6 +412,34 @@ static void fw64_renderer_draw_lit_static_mesh(fw64Renderer* renderer, LightingI
         
         gSPDisplayList(renderer->display_list++, primitive->display_list);
         gDPPipeSync(renderer->display_list++);
+    }
+
+    // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix due
+    // to the fact that the camera view matrix is included on the projection matrix stack.
+    //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
+}
+
+static void fw64_renderer_draw_lit_skinned_mesh(fw64Renderer* renderer, LightingInfo* lighting_info, fw64SkinnedMeshInstance* skinned_mesh_instance) {
+    // when using lighting the view matrix is actually placed on the projection matrix stack, so we just load the model matrix
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&skinned_mesh_instance->mesh_instance.n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
+
+    fw64Mesh* mesh = skinned_mesh_instance->skinned_mesh->mesh;
+    fw64AnimationController* controller = &skinned_mesh_instance->controller;
+    
+    for (uint32_t i = 0 ; i < mesh->info.primitive_count; i++) {
+        fw64Primitive* primitive = mesh->primitives + i;
+        n64_renderer_configure_lit_mesh_shading_mode(renderer, primitive->material);
+
+        if (lighting_info->active_count > 0) {
+            fw64_n64_renderer_configure_mesh_lighting_info(renderer, lighting_info, primitive->material);
+        }
+
+        gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+        
+        gSPDisplayList(renderer->display_list++, primitive->display_list);
+        gDPPipeSync(renderer->display_list++);
+
+        gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
     }
 
     // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix due
@@ -495,7 +522,7 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_UNLIT_SKINNED];
         for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
             fw64SkinnedMeshInstance* mesh_instance = *(fw64SkinnedMeshInstance**)fw64_dynamic_vector_item(queue, i);
-            fw64_renderer_draw_skinned_mesh(renderer, mesh_instance);
+            fw64_renderer_draw_unlit_skinned_mesh(renderer, mesh_instance);
         }
     }
 
@@ -534,6 +561,12 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
         for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
             fw64MeshInstance* mesh_instance = *(fw64MeshInstance**)fw64_dynamic_vector_item(queue, i);
             fw64_renderer_draw_lit_static_mesh(renderer, lighting_info, mesh_instance);
+        }
+
+        queue = &renderpass->render_queue.meshes[FW64_RENDER_QUEUE_LIT_SKINNED];
+        for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
+            fw64SkinnedMeshInstance* mesh_instance = *(fw64SkinnedMeshInstance**)fw64_dynamic_vector_item(queue, i);
+            fw64_renderer_draw_lit_skinned_mesh(renderer, lighting_info, mesh_instance);
         }
     }
 
