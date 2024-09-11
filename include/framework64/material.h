@@ -11,28 +11,28 @@ typedef struct fw64Material fw64Material;
 extern "C" {
 #endif
 
+// This needs to be kept in sync with pipeline/gltf/material.js
 typedef enum {
     FW64_SHADING_MODE_UNSET,
 
     /** Vertex color * material color */
-    FW64_SHADING_MODE_VERTEX_COLOR,
+    FW64_SHADING_MODE_UNLIT = 1,
 
     /** Vertex color * material color */
-    FW64_SHADING_MODE_VERTEX_COLOR_TEXTURED,
+    FW64_SHADING_MODE_UNLIT_TEXTURED = 2,
 
     /** Gouraud Shaded: Untextured */
-    FW64_SHADING_MODE_GOURAUD,
+    FW64_SHADING_MODE_LIT = 3,
 
     /** Gouraud Shaded: Textured */
-    FW64_SHADING_MODE_GOURAUD_TEXTURED,
+    FW64_SHADING_MODE_LIT_TEXTURED = 4,
 
-    /** Vertex color * Texture color */
-    FW64_SHADING_MODE_UNLIT_TEXTURED,
+    FW64_SHADING_MODE_DECAL_TEXTURE = 5,
 
-    FW64_SHADING_MODE_DECAL_TEXTURE,
-    FW64_SHADING_MODE_SPRITE,
-    FW64_SHADING_MODE_FILL,
-    FW64_SHADING_MODE_LINE,
+    FW64_SHADING_MODE_LINE = 6,
+
+    /** Currently only used for N64...THis will go away with transparency support */
+    FW64_SHADING_MODE_UNLIT_TRANSPARENT_TEXTURED = 7,
 
     FW64_SHADING_MODE_COUNT
 } fw64ShadingMode;
@@ -48,8 +48,10 @@ void fw64_material_set_texture_frame(fw64Material* material, uint32_t frame);
 uint32_t fw64_material_get_texture_frame(fw64Material* material);
 
 void fw64_material_set_shading_mode(fw64Material* material, fw64ShadingMode mode);
-void fw64_material_set_color(fw64Material* material, uint8_t r, uint8_t g, uint8_t b);
-void fw64_material_get_color(fw64Material* material, fw64ColorRGBA8* color);
+fw64ShadingMode fw64_material_get_shading_mode(const fw64Material* material);
+
+void fw64_material_set_color(fw64Material* material, fw64ColorRGBA8 color);
+fw64ColorRGBA8 fw64_material_get_color(fw64Material* material);
 
 #ifdef __cplusplus
 }

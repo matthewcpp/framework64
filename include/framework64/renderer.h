@@ -17,7 +17,9 @@ typedef enum {
     FW64_RENDERER_FLAG_SWAP = 1,
 } fw64RendererSwapFlags;
 
-#define FW64_RENDERER_MAX_LIGHT_COUNT 2
+// this needs to be kept in sync with:
+// - src/desktop/glsl/gouraud.vert.glsl
+#define FW64_RENDERER_MAX_LIGHT_COUNT 3
 
 typedef struct fw64Renderer fw64Renderer;
 
@@ -38,12 +40,6 @@ int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
 
 void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled);
 int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
-
-void fw64_renderer_set_ambient_light_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
-void fw64_renderer_set_light_enabled(fw64Renderer* renderer, int index, int enabled);
-void fw64_renderer_set_light_direction(fw64Renderer* renderer, int index, float x, float y, float z);
-void fw64_renderer_set_light_color(fw64Renderer* renderer, int index, uint8_t r, uint8_t g, uint8_t b);
-
 
 #ifdef __cplusplus
 }

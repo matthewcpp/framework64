@@ -9,7 +9,6 @@ ${desktop_include_directory}/display.hpp display.cpp
 ${desktop_include_directory}/engine.hpp engine.cpp
 ${desktop_include_directory}/filesystem.hpp filesystem.cpp
 ${desktop_include_directory}/file_datasource.hpp file_datasource.cpp
-${desktop_include_directory}/fill_shader.hpp fill_shader.cpp
 ${desktop_include_directory}/font.hpp font.cpp
 ${desktop_include_directory}/framebuffer.hpp framebuffer.cpp
 ${desktop_include_directory}/gouraud_shader.hpp gouraud_shader.cpp
@@ -28,7 +27,6 @@ mesh_editor.cpp
 ${desktop_include_directory}/n64_input_interface.hpp n64_input_interface.cpp
 ${desktop_include_directory}/primitive_data.hpp primitive_data.cpp
 ${desktop_include_directory}/render_pass.hpp render_pass.cpp
-${desktop_include_directory}/render_queue.hpp
 ${desktop_include_directory}/renderer.hpp renderer.cpp
 render_util.cpp
 ${desktop_include_directory}/save_file.hpp save_file.cpp

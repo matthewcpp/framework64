@@ -1,6 +1,26 @@
 in vec4 unlit_color;
 out vec4 final_color;
 
+layout(std140) uniform fw64MeshTransformData {
+    mat4 fw64_mvp_matrix;
+    mat4 fw64_normal_matrix;
+    float fw64_camera_near;
+    float fw64_camera_far;
+};
+
+// TODO: these values should represent 0...1 between near and far plane
+// TODO: https://community.khronos.org/t/plane-intersection-on-the-fragment-shader/77283
+layout(std140) uniform fw64FogData {
+    vec4 fw64_fog_color;
+    float fw64_fog_min_distance;
+    float fw64_fog_max_distance;
+};
+
+float fw64_get_fog_factor(float d) {
+    float cam_t = (d - fw64_camera_near) / (fw64_camera_far - fw64_camera_near);
+
+    return smoothstep(fw64_fog_min_distance, fw64_fog_max_distance, cam_t);
+}
 
 #ifdef FW64_DIFFUSE_TEXTURE
 layout(std140) uniform fw64TextureFrameData {
@@ -25,6 +45,9 @@ void main() {
 #else
     final_color = unlit_color;
 #endif
+
+    float fragment_distance_to_camera =  gl_FragCoord.z / gl_FragCoord.w;
+    final_color = mix(final_color, fw64_fog_color, fw64_get_fog_factor(fragment_distance_to_camera));
 
     if (final_color.a == 0.0)
         discard;

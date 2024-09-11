@@ -30,7 +30,7 @@ void ScreenOverlay::init() {
     primitive.mode = fw64Primitive::Mode::Triangles;
     primitive.material = &material;
     material.color = {1.0f, 1.0f, 1.0f, 1.0f};
-    fw64_material_set_shading_mode(&material, FW64_SHADING_MODE_VERTEX_COLOR);
+    fw64_material_set_shading_mode(&material, FW64_SHADING_MODE_UNLIT);
 }
 
 }

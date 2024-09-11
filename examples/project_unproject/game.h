@@ -4,6 +4,7 @@
 #include "framework64/scene.h"
 
 #include "fw64_arcball_camera.h"
+#include "fw64_headlight.h"
 
 typedef enum {
     FLAG_NONE = 0,
@@ -27,6 +28,7 @@ typedef struct {
     fw64Texture* crosshair;
     IVec2 crosshair_pos, min_pos, max_pos, hit_pos;
     fw64RaycastHit raycast;
+    fw64Headlight headlight;
 } Game;
 
 #ifdef __cplusplus

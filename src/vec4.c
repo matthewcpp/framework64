@@ -13,3 +13,10 @@ void vec4_div(Vec4* v, float d, Vec4* out) {
     out->z = v->z / d;
     out->w = v->w / d;
 }
+
+void vec4_negate(Vec4* v) {
+    v->x *= -1.0f;
+    v->y *= -1.0f;
+    v->z *= -1.0f;
+    v->w *= -1.0f;
+}

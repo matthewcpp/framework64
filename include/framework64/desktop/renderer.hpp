@@ -3,11 +3,12 @@
 #include "framework64/renderer.h"
 
 #include "framework64/desktop/display.hpp"
+#include "framework64/desktop/framebuffer.hpp"
+#include "framework64/desktop/render_pass.hpp"
 #include "framework64/desktop/shader_cache.hpp"
 #include "framework64/desktop/screen_overlay.hpp"
 #include "framework64/desktop/sprite_batch.hpp"
 #include "framework64/desktop/uniform_block.hpp"
-#include "framework64/desktop/framebuffer.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -44,7 +45,6 @@ public:
 
 private:
     bool initDisplay(int width, int height);
-    void initLighting();
     bool initFramebuffer(int width, int height);
 public:
     void drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform);
@@ -52,6 +52,7 @@ public:
 
 public:
     void drawSpriteBatch(fw64SpriteBatch* spritebatch);
+    void drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index);
     void drawRenderPass(fw64RenderPass* renderpass);
 public:
     void setDepthTestingEnabled(bool enabled);
@@ -64,16 +65,11 @@ public:
     void setFogColor(float r, float g, float b);
 
 public:
-    void setAmbientLightColor(uint8_t r, uint8_t g, uint8_t b);
-    void setLightEnabled(int index, int enabled);
-    void setLightDirection(int index, float x, float y, float z);
-    void setLightColor(int index, uint8_t r, uint8_t g, uint8_t b);
-
     void renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 private:     
     void updateMeshTransformBlock(float* matrix);
-    void updateLightingBlock();
+    void updateLightingBlock(const LightingInfo& lighting_info);
     void setActiveShader(framework64::ShaderProgram* shader);
     void setGlDepthTestingState();
     void drawPrimitive(fw64Primitive const & primitive);
@@ -81,23 +77,6 @@ private:
     void fogValuesChanged();
 
 private:
-
-    struct Light {
-        std::array<float, 4> light_color;
-        std::array<float, 4> light_direction;
-    };
-
-    struct LightInfo {
-        Light light;
-        int active;
-    };
-
-    struct LightingData {
-        std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
-        std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
-        int light_count;
-    };
-
     struct MeshTransformData {
         std::array<float, 16> mvp_matrix;
         std::array<float, 16> normal_matrix;
@@ -120,13 +99,19 @@ private:
     ViewportRect getViewportRect(fw64Viewport const * viewport) const;
 
 private:
+
+struct LightingData {
+    std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
+    std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+    int light_count;
+};
+
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
     framework64::UniformBlock<MeshTransformData> mesh_transform_uniform_block;
     framework64::UniformBlock<FogData> fog_data_uniform_block;
 
     std::array<float, 16> view_matrix, projection_matrix, view_projection_matrix;
     framework64::ShaderProgram* active_shader = nullptr;
-    std::array<LightInfo, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
     framework64::ScreenOverlay screen_overlay;
 
     float fog_min_distance = 0.4f;
@@ -134,7 +119,6 @@ private:
 
     bool depth_testing_enabled = true;
     bool fog_enabled = false;
-    bool lighting_dirty = false;
 
 public:
     fw64Material sprite_material;

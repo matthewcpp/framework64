@@ -23,7 +23,7 @@ static fw64Mesh* build_rgb_triangle(Game* game) {
 
     fw64_mesh_builder_set_triangle_vertex_indices(mesh_builder, 0, 0, 1, 2);
 
-    fw64_material_set_shading_mode(fw64_mesh_builder_get_material(mesh_builder, 0), FW64_SHADING_MODE_VERTEX_COLOR);
+    fw64_material_set_shading_mode(fw64_mesh_builder_get_material(mesh_builder, 0), FW64_SHADING_MODE_UNLIT);
 
     Box bounding = {{-1.0f, -1.0f, 0.0f}, {1.0f, 1.0f, 0.0f}};
     fw64_mesh_builder_set_bounding(mesh_builder, &bounding);
@@ -43,7 +43,7 @@ static fw64Mesh* build_textured_quad(Game* game) {
     fw64_material_set_shading_mode(material, FW64_SHADING_MODE_UNLIT_TEXTURED);
     fw64_material_set_texture(material, texture, 0);
 
-    fw64VertexAttributes attributes = FW64_VERTEX_ATTRIBUTE_POSITION | FW64_VERTEX_ATTRIBUTE_TEXCOORD;
+    fw64VertexAttributes attributes = FW64_VERTEX_ATTRIBUTE_POSITION | FW64_VERTEX_ATTRIBUTE_TEXCOORD | FW64_VERTEX_ATTRIBUTE_COLOR;
     fw64_mesh_builder_allocate_primitive_quad_data(mesh_builder, 0, attributes, 16);
     fw64_mesh_builder_set_active_primitive(mesh_builder, 0);
 
@@ -61,15 +61,19 @@ static fw64Mesh* build_textured_quad(Game* game) {
             float x_tc = 0.25f * (float)x;
 
             fw64_mesh_builder_set_vertex_position_f(mesh_builder, index, x_pos, y_pos - pos_step, 0.0f);
+            fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder, index, 255, 255, 255, 255);
             fw64_mesh_builder_set_vertex_texcoords_f(mesh_builder, index++, x_tc, y_tc + tc_step);
 
             fw64_mesh_builder_set_vertex_position_f(mesh_builder, index, x_pos + pos_step, y_pos - pos_step, 0.0f);
+            fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder, index, 255, 255, 255, 255);
             fw64_mesh_builder_set_vertex_texcoords_f(mesh_builder, index++, x_tc + tc_step, y_tc + tc_step);
 
             fw64_mesh_builder_set_vertex_position_f(mesh_builder, index, x_pos + pos_step, y_pos, 0.0f);
+            fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder, index, 255, 255, 255, 255);
             fw64_mesh_builder_set_vertex_texcoords_f(mesh_builder, index++, x_tc + tc_step, y_tc);
 
             fw64_mesh_builder_set_vertex_position_f(mesh_builder, index, x_pos, y_pos, 0.0f);
+            fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder, index, 255, 255, 255, 255);
             fw64_mesh_builder_set_vertex_texcoords_f(mesh_builder, index++, x_tc, y_tc);
         }
     }

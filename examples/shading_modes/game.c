@@ -11,15 +11,14 @@ typedef enum {
     MESH_CONTROLLER_CUBE,
     MESH_SUZANNE,
     MESH_PENGUIN,
-    MESH_N64_BREW_LOGO,
     MESH_COUNT
 } Meshes;
 
 static const char* shading_mode_text[] = {
-    "VertexColor",
-    "VertexColorTextured",
-    "Gouraud",
-    "GouraudTextured",
+    "Unlit",
+    "UnlitTextured",
+    "Lit",
+    "LitTextured",
     "UnlitTextured"
 };
 
@@ -45,7 +44,6 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_controller_cube);
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_suzanne);
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_penguin);
-    fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_n64_brew_logo);
 
     fw64_arcball_init(&game->arcball, engine->input, display);
 
@@ -57,6 +55,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
     game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
     fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
+
+    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &game->arcball.camera.transform);
 
     game->current_mesh = -1;
     load_next_mesh(game, 1);
@@ -94,8 +94,12 @@ void game_update(Game* game) {
     else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
         load_next_mesh(game, -1);
     }
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
+        load_next_mesh(game, 1);
+    }
 
     fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
+    fw64_headlight_update(&game->headlight);
 }
 
 void game_draw(Game* game) {

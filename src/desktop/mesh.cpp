@@ -36,7 +36,7 @@ fw64Primitive* fw64Mesh::createPrimitive(framework64::PrimitiveData&& data, fw64
     return primitive.get();
 }
 
-/// Note this should coorespond to pipeline/desktop/MeshWriter.js _writeMeshInfo
+/// Note this should coorespond to pipeline/desktop/GLMeshWriter.js _writeMeshInfo
 struct MeshInfo {
     uint32_t primitive_count;
     uint32_t material_bundle_count;
@@ -95,11 +95,12 @@ fw64Mesh* fw64Mesh::loadFromDatasource(fw64DataSource* data_source, fw64Material
             fw64_data_source_read(data_source, primitive_data.colors.data(), sizeof(float), info.vertex_count * 4);
         }
         
-        const uint32_t element_size = info.mode == fw64Primitive::Mode::Triangles ? 3 : 2;
+        const auto primitive_mode = static_cast<fw64Primitive::Mode>(info.mode);
+        const uint32_t element_size = primitive_mode == fw64Primitive::Mode::Triangles ? 3 : 2;
         primitive_data.indices_array_uint16.resize(info.element_count * element_size);
         fw64_data_source_read(data_source, primitive_data.indices_array_uint16.data(), sizeof(uint16_t), info.element_count * element_size);
 
-        auto* primitive = mesh->createPrimitive(std::move(primitive_data), static_cast<fw64Primitive::Mode>(info.mode), info.bounding_box);
+        auto* primitive = mesh->createPrimitive(std::move(primitive_data), primitive_mode, info.bounding_box);
         primitive->joint_index = info.joint_index;
         primitive->material = material_bundle->materials[info.material_index].get();
     }
@@ -131,8 +132,8 @@ Box fw64_mesh_get_bounding_box(fw64Mesh* mesh) {
     return mesh->bounding_box;
 }
 
-int fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
-    return static_cast<int>(mesh->primitives.size());
+uint32_t fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
+    return static_cast<uint32_t>(mesh->primitives.size());
 }
 
 fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index) {
@@ -142,6 +143,7 @@ fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t inde
 
 fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
     assert(index < mesh->primitives.size());
+
     switch (mesh->primitives[index]->mode) {
         case fw64Primitive::Mode::Triangles:
             return FW64_PRIMITIVE_MODE_TRIANGLES;
@@ -152,4 +154,6 @@ fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
         case fw64Primitive::Mode::Unknown:
             return FW64_PRIMITIVE_MODE_UNSET;
     }
+
+    return FW64_PRIMITIVE_MODE_UNSET;
 }

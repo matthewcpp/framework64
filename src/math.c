@@ -22,6 +22,16 @@ float fw64_clamp(float x, float lower, float upper) {
     return x;
 }
 
+int fw64_clampi(int x, int lower, int upper) {
+    if (x < lower) {
+        x = lower;
+    } else if (x > upper) {
+        x = upper;
+    } 
+
+    return x;
+}
+
 float fw64_maxf(float a, float b) {
     return a >= b ? a : b;
 }

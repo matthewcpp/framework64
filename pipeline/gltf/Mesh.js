@@ -32,6 +32,14 @@ class Mesh {
         return this.materialBundle != null;
     }
 
+    get isSkinned() {
+        if (this.primitives.length === 0) {
+            return false;
+        } else {
+            return this.primitives[0].jointIndices != null;
+        }
+    }
+
     prunePrimitiveVertices() {
         for (const primitive of this.primitives) {
             primitive.pruneUnusedVertices();
@@ -53,6 +61,21 @@ class Mesh {
                 this.primitives.push(primitive);
             }
         }
+    }
+
+    sortPrimitives(materials) {
+        this.primitives.sort((primA, primB) => {
+            const matA = materials[primA.material];
+            const matB = materials[primB.material];
+
+            if (matA.shadingMode < matB.shadingMode) {
+                return -1;
+            } else if (matA.shadingMode == matB.shadingMode) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
     }
 
     remapJointIndices(jointMap) {

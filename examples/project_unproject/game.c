@@ -42,6 +42,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
 
     game->spritebatch = fw64_spritebatch_create(1, allocator);
+    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &game->arcball_camera.camera.transform);
 }
 
 static void move_crosshair(Game* game);
@@ -61,6 +62,7 @@ void game_update(Game* game){
     }
 
     fw64_arcball_update(&game->arcball_camera, game->engine->time->time_delta);
+    fw64_headlight_update(&game->headlight);
 
     Vec3 min = {-1.0f, -1.0f, -1.0f}, max = {1.0f, 1.0f, 1.0f};
     fw64_camera_world_to_viewport_pos(&game->arcball_camera.camera, &min, &game->min_pos);

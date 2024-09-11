@@ -109,18 +109,18 @@ Vec3 quat_to_euler(Quat* q) {
     Vec3 angles;
 
     // roll (x-axis rotation)
-    double sinr_cosp = 2 * (q->w * q->x + q->y * q->z);
-    double cosr_cosp = 1 - 2 * (q->x * q->x + q->y * q->y);
+    float sinr_cosp = 2.0f * (q->w * q->x + q->y * q->z);
+    float cosr_cosp = 1.0f - 2.0f * (q->x * q->x + q->y * q->y);
     angles.x = atan2f(sinr_cosp, cosr_cosp);
 
     // pitch (y-axis rotation)
-    double sinp = fw64_sqrtf(1 + 2 * (q->w * q->y - q->x * q->z));
-    double cosp = fw64_sqrtf(1 - 2 * (q->w * q->y - q->x * q->z));
+    float sinp = fw64_sqrtf(1.0f + 2.0f * (q->w * q->y - q->x * q->z));
+    float cosp = fw64_sqrtf(1.0f - 2.0f * (q->w * q->y - q->x * q->z));
     angles.y = 2 * atan2f(sinp, cosp) - M_PI / 2;
 
     // yaw (z-axis rotation)
-    double siny_cosp = 2 * (q->w * q->z + q->x * q->y);
-    double cosy_cosp = 1 - 2 * (q->y * q->y + q->z * q->z);
+    float siny_cosp = 2.0f * (q->w * q->z + q->x * q->y);
+    float cosy_cosp = 1.0f - 2.0f * (q->y * q->y + q->z * q->z);
     angles.z = atan2f(siny_cosp, cosy_cosp);
 
     return angles;

@@ -5,6 +5,7 @@
 
 #include "framework64/controller_mapping/n64.h"
 #include "framework64/skinned_mesh_instance.h"
+#include "framework64/util/renderpass_util.h"
 
 #include <stdio.h>
 
@@ -48,11 +49,14 @@ void game_init(Game* game, fw64Engine* engine) {
     game->renderpass = fw64_renderpass_create(display, allocator);
     ui_init(&game->ui, engine, skinned_mesh_instance);
     ui_update(&game->ui, game->current_animation);
+
+    fw64_headlight_init(&game->headlight, game->renderpass, 0, &game->arcball.camera.transform);
 }
 
 void game_update(Game* game) {
     fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
     fw64_scene_update(&game->scene, game->engine->time->time_delta);
+    fw64_headlight_update(&game->headlight);
 
     if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         set_animation(game, game->current_animation + 1);
@@ -135,7 +139,9 @@ void ui_init(Ui* ui, fw64Engine* engine, fw64SkinnedMeshInstance* skinned_mesh_i
     ui->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     ui->spritebatch = fw64_spritebatch_create(1, allocator);
     ui->renderpass = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_util_ortho2d(ui->renderpass);
     fw64_renderpass_set_depth_testing_enabled(ui->renderpass, 0);
+
 }
 
 static const char* animation_names[catherine_animation__count__] = {

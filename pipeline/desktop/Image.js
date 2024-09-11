@@ -74,6 +74,10 @@ class Image {
         return this._data.bitmap.data;
     }
 
+    get hasAlpha() {
+        return this._data.hasAlpha();
+    }
+
     resize(width, height) {
         this._data.resize(width, height);
     }

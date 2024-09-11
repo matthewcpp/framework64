@@ -51,6 +51,7 @@ void set_next_wrap_mode(Game* game, int direction) {
     fw64TexturedQuadParams params;
     fw64_textured_quad_params_init(&params);
     params.image_asset_id = FW64_ASSET_image_pyoro64;
+    params.shading_mode = FW64_SHADING_MODE_UNLIT_TRANSPARENT_TEXTURED;
 
     const char* mode_name;
 

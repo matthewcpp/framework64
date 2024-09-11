@@ -21,12 +21,14 @@ struct fw64Primitive {
 
 #define FW64_MESH_FLAGS_IMAGES_ARE_SHARED 1
 
+/// this needs to line up with pipeline/n64_libultra/MeshWriter.js
 typedef struct {
-    uint32_t primitive_count;
-    uint32_t vertex_count;
-    uint32_t display_list_count;
-    uint32_t _vertex_pointer_data_size; // only used during loading
-    uint32_t _material_bundle_count;
+    uint16_t primitive_count;
+    uint16_t vertex_count;
+    uint16_t display_list_count;
+    uint16_t unused;
+    uint16_t _vertex_pointer_data_size; // only used during loading
+    uint16_t _material_bundle_count;
     Box bounding_box;
 } fw64MeshInfo;
 

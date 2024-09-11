@@ -16,11 +16,11 @@ class LevelParser {
 
     _meshes = [];
 
-    parse(gltfPath, layerMap) {
+    async parse(gltfPath, layerMap) {
         this._reset();
 
         this.layerMap = layerMap;
-        this.gltfData.loadFile(gltfPath);
+        await this.gltfData.loadFile(gltfPath);
 
         const gltf = this.gltfData.gltf;
 

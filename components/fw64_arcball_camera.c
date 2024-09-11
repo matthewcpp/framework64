@@ -6,20 +6,20 @@
 #define ARCBALL_ZOOM_SPEED 1.0f
 #define ARCBALL_DEAD_ZONE 0.2f
 
-static void _arcball_reset(fw64ArcballCamera* arcball) {
-    arcball->_rot_x = 0.0f;
-    arcball->_rot_y = 0.0f;
-    arcball->_distance = arcball->_diagonal * 2.0f;
-}
-
 void fw64_arcball_init(fw64ArcballCamera* arcball, fw64Input* input, fw64Display* display) {
     arcball->_input = input;
 
     fw64_camera_init(&arcball->camera, display);
 
     arcball->_diagonal = 1.0f;
-    _arcball_reset(arcball);
+    fw64_arcball_reset(arcball);
     vec3_zero(&arcball->_target);
+}
+
+void fw64_arcball_reset(fw64ArcballCamera* arcball) {
+    arcball->_rot_x = 0.0f;
+    arcball->_rot_y = 0.0f;
+    arcball->_distance = arcball->_diagonal * 2.0f;
 }
 
 void _arcball_update_camera_position(fw64ArcballCamera* arcball) {
@@ -49,7 +49,7 @@ void _arcball_update_camera_position(fw64ArcballCamera* arcball) {
 void fw64_arcball_set_initial(fw64ArcballCamera* arcball, Box* box) {
     box_center(box, &arcball->_target);
     arcball->_diagonal = vec3_distance(&box->min, &box->max);
-    _arcball_reset(arcball);
+    fw64_arcball_reset(arcball);
 
     _arcball_update_camera_position(arcball);
 }
@@ -77,10 +77,6 @@ void fw64_arcball_update(fw64ArcballCamera* arcball, float time_delta) {
     }
     else if (fw64_input_controller_button_down(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_R)) {
         arcball->_distance -= arcball->_diagonal * ARCBALL_ZOOM_SPEED * time_delta;
-    } 
-
-    if (fw64_input_controller_button_pressed(arcball->_input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
-        _arcball_reset(arcball);
     }
 
     _arcball_update_camera_position(arcball);

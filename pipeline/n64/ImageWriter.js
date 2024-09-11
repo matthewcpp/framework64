@@ -79,8 +79,9 @@ function buildImageBuffer(image, horizontalSlices, verticalSlices) {
     return Buffer.concat(buffers);
 }
 
+// This needs to line up with n64_lubultra/image.h
 function createImageHeaderBuffer(image, horizontalSlices, verticalSlices) {
-    const headerBuffer = Buffer.alloc(14);
+    const headerBuffer = Buffer.alloc(16);
     let bufferOffset = 0;
 
     let paletteCount = 0, paletteSize = 0;
@@ -90,6 +91,7 @@ function createImageHeaderBuffer(image, horizontalSlices, verticalSlices) {
     }
 
     bufferOffset = headerBuffer.writeUInt16BE(image.format, bufferOffset);
+    bufferOffset = headerBuffer.writeUInt16BE(image.hasAlpha ? 1 : 0, bufferOffset);
     bufferOffset = headerBuffer.writeUInt16BE(image.width, bufferOffset);
     bufferOffset = headerBuffer.writeUInt16BE(image.height, bufferOffset);
     bufferOffset = headerBuffer.writeUInt16BE(horizontalSlices, bufferOffset);
