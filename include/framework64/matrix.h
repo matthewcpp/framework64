@@ -21,13 +21,16 @@ void matrix_get_rotation(float* mat, Quat* out);
 void matrix_multiply(float* out, float* a, float* b);
 void matrix_transpose(float* matrix);
 int matrix_invert(float* out, float* matrix);
-void matrix_transform_vec3(float* matrix, Vec3* vec);
-void matrix_transform_vec4(float* matrix, Vec4* vec);
+void matrix_transform_vec3(const float* matrix, Vec3* vec);
+void matrix_transform_vec4(const float* matrix, Vec4* vec);
 
 void matrix_perspective(float* out, float fov_degrees, float aspect, float near, float far);
 void matrix_ortho(float* out, float left, float right, float bottom, float top, float near, float far);
 void matrix_ortho2d(float* out, float left, float right, float bottom, float top);
 void matrix_camera_look_at(float* out, Vec3* eye, Vec3* target, Vec3* up);
+
+void mat3_set_from_mat4(float* mat3, const float* mat4);
+void mat3_transform_vec3(const float* mat3, Vec3* vec);
 
 /** Creates a rotation matrix for the supplied angle in radians. */
 void mat2_set_rotation(float* mat, float rad);
