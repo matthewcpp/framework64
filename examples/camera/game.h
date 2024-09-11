@@ -6,12 +6,14 @@
 #include <framework64/sprite_batch.h>
 
 #include "fw64_arcball_camera.h"
+#include "fw64_headlight.h"
 
 typedef struct {
     fw64Engine* engine;
     fw64Scene* scene;
     fw64ArcballCamera arcball_camera;
     fw64RenderPass* renderpass;
+    fw64Headlight headlight;
 } View;
 
 typedef struct {

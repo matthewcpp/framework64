@@ -40,11 +40,13 @@ void view_init(View* view, fw64Engine* engine, fw64Scene* scene, Vec2* viewport_
 
     Box bounding = {{-6.0f, -6.0f, -6.0f}, {6.0f, 6.0f, 6.0f}};
     fw64_arcball_set_initial(&view->arcball_camera, &bounding);
+    fw64_headlight_init(&view->headlight, view->renderpass, 0, &view->arcball_camera.camera.transform);
 }
 
 void view_update(View* view, float time_delta) {
     fw64_arcball_update(&view->arcball_camera, time_delta);
     fw64_renderpass_set_camera(view->renderpass, &view->arcball_camera.camera);
+    fw64_headlight_update(&view->headlight);
 }
 
 void init_scene(Game* game) {

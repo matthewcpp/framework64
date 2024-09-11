@@ -36,8 +36,8 @@ void game_init(Game* game, fw64Engine* engine) {
     create_flame(game);
 
     fw64Node* billboard_nodes[2];
-    fw64_scene_find_nodes_with_layer_mask(game->scene, FW64_layer_billboard, billboard_nodes, 2);
-    for (int i = 0; i < 2; i++) {
+    uint32_t node_count = fw64_scene_find_nodes_with_layer_mask(game->scene, FW64_layer_billboard, billboard_nodes, 2);
+    for (uint32_t i = 0; i < node_count; i++) {
         fw64_billboard_nodes_create(&game->billboard_nodes, billboard_nodes[i], &game->fps.camera, NULL);
     }
 }

@@ -74,8 +74,8 @@ void set_camera_ypos(Game* game) {
     fw64MeshDataItr itr;
 
     fw64Mesh* mesh = hit.node->mesh_instance->mesh;
-    int primitive_count = fw64_mesh_get_primitive_count(mesh);
-    for (int i = 0; i < primitive_count; i++) {
+    uint32_t primitive_count = fw64_mesh_get_primitive_count(mesh);
+    for (uint32_t i = 0; i < primitive_count; i++) {
         fw64_mesh_data_itr_init(&itr, mesh, i);
 
         while(fw64_mesh_data_itr_next(&itr)) {

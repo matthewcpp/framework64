@@ -5,6 +5,7 @@
 #include "framework64/math.h"
 #include "framework64/matrix.h"
 #include "framework64/util/texture_util.h"
+#include "framework64/util/renderpass_util.h"
 #include "framework64/controller_mapping/n64.h"
 
 #include <stdio.h>
@@ -19,13 +20,10 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->sprite_batch = fw64_spritebatch_create(LAYER_COUNT, allocator);
 
-    fw64Display* display = fw64_displays_get_primary(engine->displays);
-    Vec2 display_size = fw64_display_get_size_f(display);
-    game->renderpass = fw64_renderpass_create(display, allocator);
+    game->renderpass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), allocator);
+    fw64_renderpass_set_depth_testing_enabled(game->renderpass, 0);
 
-    float projection[16];
-    matrix_ortho2d(projection, 0, display_size.x, display_size.y, 0);
-    fw64_renderpass_set_projection_matrix(game->renderpass, projection, NULL);
+    fw64_renderpass_util_ortho2d(game->renderpass);
 
     game->progress_bar.x = 40;
     game->progress_bar.width = 240;
@@ -37,10 +35,16 @@ void game_init(Game* game, fw64Engine* engine) {
 #define PROGRESS_SPEED 0.3f
 
 void game_update(Game* game){
-    if (fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT)) {
+    if (fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT) ||
+        fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT) ||
+        fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_L)) 
+    {
         game->progress_bar.progress -= PROGRESS_SPEED * game->engine->time->time_delta;
     }
-    if (fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT)) {
+    if (fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT) ||
+        fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) ||
+        fw64_input_controller_button_down(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_R)) 
+    {
         game->progress_bar.progress += PROGRESS_SPEED * game->engine->time->time_delta;
     }
 

@@ -57,6 +57,10 @@ void game_init(Game* game, fw64Engine* engine) {
     player_init(&game->player, engine, &game->tiles);
     follow_camera_init(&game->follow_camera, engine, game->player.node);
 
+    Vec3 forward;
+    fw64_transform_back(&game->follow_camera.camera.transform, &forward);
+    fw64_renderpass_set_light_direction(game->renderpass, 0, &forward);
+
     tiles_load_next_tile(&game->tiles, 3);
     tiles_load_next_random_tile(&game->tiles);
     tiles_load_next_random_tile(&game->tiles);
