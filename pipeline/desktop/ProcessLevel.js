@@ -8,7 +8,7 @@ const path = require("path");
 async function processLevel(level, layerMap, bundle, baseDirectory, outputDirectory, includeDirectory) {
     const srcPath = path.join(baseDirectory, level.src);
     const levelParser = new LevelParser();
-    levelParser.parse(srcPath, layerMap);
+    await levelParser.parse(srcPath, layerMap);
 
     for (const scene of levelParser.scenes) {
         const safeSceneName =  Util.safeDefineName(scene.name);

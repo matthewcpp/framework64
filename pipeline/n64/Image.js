@@ -60,6 +60,10 @@ class Image {
         this._data.crop(x, y, w, h);
     }
 
+    get hasAlpha() {
+        return this._data.hasAlpha();
+    }
+
     writeToFile(path) {
         return this._data.writeAsync(path);
     }

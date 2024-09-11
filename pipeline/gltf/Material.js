@@ -4,12 +4,13 @@ class Material {
     /** this needs to match up with fw64ShadingMode defined in material.h*/
     static ShadingMode  = {
         Unset: 0,
-        VertexColors: 1,
-        VertexColorsTextured: 2,
-        Gouraud: 3,
-        GouraudTextured: 4,
-        UnlitTextured: 5,
-        DecalTexture: 6
+        Unlit: 1,
+        UnlitTextured: 2,
+        Lit: 3,
+        LitTextured: 4,
+        DecalTexture: 5,
+        Line: 6,
+        UnlitTransparentTextured: 7
     }
 
     /* note: this is specified as RGBA32 */
@@ -22,6 +23,18 @@ class Material {
 
     hasTexture() {
         return this.texture !== Material.NoTexture;
+    }
+
+    get usesNormals() {
+        return this.shadingMode === Material.ShadingMode.Lit || this.shadingMode === Material.ShadingMode.LitTextured;
+    }
+
+    get usesVertexColors() {
+        return !this.usesNormals;
+    }
+
+    get hasAlpha() {
+        return this.color[3] < 255;
     }
 
     setColorFromFloatArray(baseColor) {

@@ -7,7 +7,7 @@ const path = require("path");
 async function processMesh(meshJson, archive, baseDirectory, outputDirectory) {
     const sourceFile = path.join(baseDirectory, meshJson.src);
     const gltfLoader = new GLTFLoader();
-    gltfLoader.loadFile(sourceFile);
+    await gltfLoader.loadFile(sourceFile);
 
     if (!gltfLoader.gltf.meshes || gltfLoader.gltf.meshes.length === 0) {
         throw new Error(`glTF File: ${gltfPath} contains no meshes`);

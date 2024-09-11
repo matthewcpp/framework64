@@ -1,8 +1,10 @@
+const GLTFVertexIndex = require("./GLTFVertexIndex")
 const Material = require("./Material");
 const Mesh = require("./Mesh");
 const Primitive = require("./Primitive");
 const Texture = require("./Texture");
-const GLTFVertexIndex = require("./GLTFVertexIndex")
+
+const Jimp = require("jimp");
 
 const fs = require("fs");
 const path = require("path");
@@ -44,7 +46,7 @@ class GLTFLoader {
     /** This holds the index of the current mesh collider node that is being parsed. i.e. scene node / Colliders / <this node> */
     _meshColliderNodeIndex = GLTFLoader.InvalidNodeIndex;
 
-    loadFile(gltfPath) {
+    async loadFile(gltfPath) {
         this.gltfPath = gltfPath;
         this.gltf = JSON.parse(fs.readFileSync(gltfPath, {encoding: "utf8"}));
 
@@ -56,7 +58,7 @@ class GLTFLoader {
         else
             this.imagesJson = [];
 
-        this._parseImages();
+        await this._parseImages();
         this._parseTextures();
         this._parseMaterials();
         this._parseMeshes();
@@ -72,7 +74,7 @@ class GLTFLoader {
         this.meshes = [];
     }
 
-    _parseImages() {
+    async _parseImages() {
         if (!this.gltf.images)
             return;
 
@@ -90,6 +92,13 @@ class GLTFLoader {
                     format: "RGBA16"
                 }
             }
+
+
+            // TODO: Eventually when the Image class is standardized across platforms we want to just load it here and save it off
+            // right now this results in reading each image twice.
+            const imagePath = path.join(path.dirname(this.gltfPath), imageURI);
+            const bitmap = await Jimp.read(imagePath);
+            imageInfo.hasAlpha = bitmap.hasAlpha();
 
             this.images.push(imageInfo);
         }
@@ -169,17 +178,17 @@ class GLTFLoader {
     
                 this._readPositions(gltfPrimitive, primitive);
     
-                if (gltfPrimitive.attributes.COLOR_0) {
+                if (Object.hasOwn(gltfPrimitive.attributes, "COLOR_0")) {
                     this._readVertexColors(gltfPrimitive, primitive);
                 }
-                else if (gltfPrimitive.attributes.NORMAL) {
+                else if (Object.hasOwn(gltfPrimitive.attributes, "NORMAL")) {
                     this._readNormals(gltfPrimitive, primitive);
                 }
     
-                if (gltfPrimitive.attributes.TEXCOORD_0)
+                if (Object.hasOwn(gltfPrimitive.attributes, "TEXCOORD_0"))
                     this._readTexCoords(gltfPrimitive, primitive, gltfMesh.name);
     
-                if (gltfPrimitive.attributes.JOINTS_0)
+                if (Object.hasOwn(gltfPrimitive.attributes, "JOINTS_0"))
                     this._readJointIndices(gltfPrimitive, primitive);
     
                 this._readIndices(gltfPrimitive, primitive);
@@ -191,7 +200,28 @@ class GLTFLoader {
             }
     
             mesh.prunePrimitiveVertices();
+            this._validateMeshPrimitives(mesh);
+            mesh.sortPrimitives(this.materials);
             this.meshes.push(mesh);
+        }
+    }
+
+    _validateMeshPrimitives(mesh) {
+        for (let i = 0; i < mesh.primitives.length; i++) {
+            const primitive = mesh.primitives[i];
+            const material = this.materials[primitive.material];
+
+            if (material.usesNormals && !primitive.hasNormals ) {
+                throw new Error(`Mesh ${mesh.name} primitive ${i}: uses lit material but does not contain normals.`);
+            }
+
+            if (material.usesVertexColors && !primitive.hasVertexColors) {
+                throw new Error(`Mesh ${mesh.name} primitive ${i}: uses unlit material but does not contain vertex colors.`);
+            }
+
+            if (material.hasTexture() && !primitive.hasTexCoords) {
+                throw new Error(`Mesh ${mesh.name} primitive ${i}: Material uses texture but primitive does not contain tex coords.`);
+            }
         }
     }
 
@@ -206,18 +236,27 @@ class GLTFLoader {
     }
 
     _determineShadingMode(primitive, material) {
+        let materialImageHasAlpha = false;
+
+        if (material.hasTexture()) {
+            const texture = this.textures[material.texture];
+            materialImageHasAlpha = this.images[texture.image].hasAlpha;
+        }
         if (primitive.hasVertexColors) {
-            if (material.hasTexture())
-                return Material.ShadingMode.VertexColorsTextured;
-            else
-                return Material.ShadingMode.VertexColors;
+            if (material.hasAlpha || materialImageHasAlpha) {
+                return Material.ShadingMode.UnlitTransparentTextured;
+            } else if (material.hasTexture()) {
+                return Material.ShadingMode.UnlitTextured;
+            } else {
+                return Material.ShadingMode.Unlit;
+            }
         }
 
         if (primitive.hasNormals) {
             if (material.hasTexture())
-                return Material.ShadingMode.GouraudTextured;
+                return Material.ShadingMode.LitTextured;
             else
-                return Material.ShadingMode.Gouraud;
+                return Material.ShadingMode.Lit;
         }
 
         throw new Error("Could not determine shading mode for primitive");
