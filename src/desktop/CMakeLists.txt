@@ -9,7 +9,6 @@ ${desktop_include_directory}/display.hpp display.cpp
 ${desktop_include_directory}/engine.hpp engine.cpp
 ${desktop_include_directory}/filesystem.hpp filesystem.cpp
 ${desktop_include_directory}/file_datasource.hpp file_datasource.cpp
-${desktop_include_directory}/fill_shader.hpp fill_shader.cpp
 ${desktop_include_directory}/font.hpp font.cpp
 ${desktop_include_directory}/framebuffer.hpp framebuffer.cpp
 ${desktop_include_directory}/gouraud_shader.hpp gouraud_shader.cpp
