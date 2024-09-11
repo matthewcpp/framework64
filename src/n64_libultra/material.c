@@ -35,15 +35,16 @@ uint32_t fw64_material_get_texture_frame(fw64Material* material) {
 
 void fw64_material_set_shading_mode(fw64Material* material, fw64ShadingMode mode) {
     material->shading_mode = mode;
-    return;
 }
 
-void fw64_material_set_color(fw64Material* material, uint8_t r, uint8_t g, uint8_t b) {
-    material->color.r = r;
-    material->color.g = g;
-    material->color.b = b;
+fw64ShadingMode fw64_material_get_shading_mode(const fw64Material* material) {
+    return material->shading_mode;
 }
 
-void fw64_material_get_color(fw64Material* material, fw64ColorRGBA8* color) {
-    *color = material->color;
+void fw64_material_set_color(fw64Material* material, fw64ColorRGBA8 color) {
+    material->color = color;
+}
+
+fw64ColorRGBA8 fw64_material_get_color(fw64Material* material) {
+    return material->color;
 }

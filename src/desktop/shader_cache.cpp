@@ -15,40 +15,33 @@ ShaderProgram* ShaderCache::getShaderProgram(fw64ShadingMode shading_mode) {
     Shader* shader = nullptr;
 
     switch(shading_mode) {
-        case FW64_SHADING_MODE_VERTEX_COLOR: {
+        case FW64_SHADING_MODE_UNLIT: {
             primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::VertexColors;
             shader = &unlit_shader;
             break;
         }
 
-        case FW64_SHADING_MODE_VERTEX_COLOR_TEXTURED: {
+        case FW64_SHADING_MODE_UNLIT_TEXTURED: {
             primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::VertexColors | fw64Primitive::Attributes::TexCoords;
             material_features = fw64Material::Features::DiffuseTexture;
             shader = &unlit_shader;
             break;
         }
 
-        case FW64_SHADING_MODE_GOURAUD: {
+        case FW64_SHADING_MODE_LIT: {
             primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::Normals;
             shader = &gouraud_shader;
             break;
         }
 
-        case FW64_SHADING_MODE_GOURAUD_TEXTURED: {
+        case FW64_SHADING_MODE_LIT_TEXTURED: {
             primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::Normals | fw64Primitive::Attributes::TexCoords;
             material_features = fw64Material::Features::DiffuseTexture;
             shader = &gouraud_shader;
             break;
         }
 
-        case FW64_SHADING_MODE_UNLIT_TEXTURED: {
-            primitive_attributes = fw64Primitive::Attributes::Positions| fw64Primitive::Attributes::TexCoords;
-            material_features = fw64Material::Features::DiffuseTexture;
-            shader = &unlit_shader;
-            break;
-        }
-
-        case FW64_SHADING_MODE_SPRITE: {
+        case FW64_SHADING_MODE_UNLIT_TRANSPARENT_TEXTURED: {
             primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::TexCoords;
             material_features = fw64Material::Features::DiffuseTexture;
             shader = &sprite_shader;
@@ -58,12 +51,6 @@ ShaderProgram* ShaderCache::getShaderProgram(fw64ShadingMode shading_mode) {
         case FW64_SHADING_MODE_LINE: {
             primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::VertexColors;
             shader = &line_shader;
-            break;
-        }
-
-        case FW64_SHADING_MODE_FILL: {
-            primitive_attributes = fw64Primitive::Attributes::Positions | fw64Primitive::Attributes::VertexColors;
-            shader = &fill_shader;
             break;
         }
 

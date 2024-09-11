@@ -144,7 +144,7 @@ void fw64_n64_mesh_uninit(fw64Mesh* mesh, fw64Allocator* allocator) {
     }
 }
 
-int fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
+uint32_t fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
     return mesh->info.primitive_count;
 }
 

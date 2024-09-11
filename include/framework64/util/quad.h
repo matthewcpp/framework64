@@ -6,6 +6,7 @@
 #include "framework64/asset_database.h"
 #include "framework64/color.h"
 #include "framework64/engine.h"
+#include "framework64/material.h"
 #include "framework64/mesh.h"
 
 #include <stdint.h>
@@ -13,6 +14,7 @@
 typedef struct {
     fw64Texture* texture;
     fw64AssetId image_asset_id;
+    fw64ShadingMode shading_mode;
     float min_s;
     float max_s;
     float min_t;

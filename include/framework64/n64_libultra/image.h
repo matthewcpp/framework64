@@ -12,8 +12,10 @@
 #define FW64_N64_IMAGE_FORMAT_CI8 6
 #define FW64_N64_IMAGE_FORMAT_CI4 7
 
+// this needs to line up with createImageHeaderBuffer in pipeline/n64_libultra/ImageWriter.js
 typedef struct {
     uint16_t format;
+    uint16_t has_alpha;
     uint16_t width;
     uint16_t height;
     uint16_t hslices;

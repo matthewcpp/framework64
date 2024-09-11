@@ -190,8 +190,6 @@ void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
     }
 }
 
-
-
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask) {
     for (uint32_t i = 0 ; i < fw64_scene_get_mesh_instance_count(scene); i++) {
         fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(scene, i);
