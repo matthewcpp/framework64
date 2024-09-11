@@ -5,7 +5,7 @@
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator) {
     fw64RenderPass* renderpass = allocator->memalign(allocator, 8, sizeof(fw64RenderPass));
     renderpass->allocator = allocator;
-    fw64_n64_render_queue_init(&renderpass->render_queue, allocator);
+    fw64_render_queue_init(&renderpass->render_queue, allocator);
 
     ivec2_set(&renderpass->viewport.position, 0, 0);
     renderpass->viewport.size = fw64_display_get_size(display);
@@ -20,16 +20,30 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
 
     renderpass->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
 
+    fw64ColorRGBA8 light_color = {255, 255, 255, 255};
+    fw64ColorRGBA8 ambient_light_color = {25, 25, 25, 255};
+    Vec3 light_dir = {0.57735f, -0.57735f, 0.57735};
+
+    renderpass->lighting_info.active_count = 0;
+    for (int i = 0; i < FW64_RENDERER_MAX_LIGHT_COUNT; i++) {
+        fw64_renderpass_set_light_direction(renderpass, i, &light_dir);
+        fw64_renderpass_set_light_color(renderpass, i, light_color);
+        fw64_n64_lighting_info_set_enabled_flag(&renderpass->lighting_info, i, 0);
+        fw64_renderpass_set_light_enabled(renderpass, i , i == 0);
+    }
+
+    fw64_renderpass_set_lighting_ambient_color(renderpass, ambient_light_color);
+
     return renderpass;
 }
 
 void fw64_renderpass_delete(fw64RenderPass* renderpass) {
-    fw64_n64_render_queue_uninit(&renderpass->render_queue);
+    fw64_render_queue_uninit(&renderpass->render_queue);
     renderpass->allocator->free(renderpass->allocator, renderpass);
 }
 
 void fw64_renderpass_begin(fw64RenderPass* renderpass) {
-    fw64_n64_render_queue_clear(&renderpass->render_queue);
+    fw64_render_queue_clear(&renderpass->render_queue);
 }
 
 void fw64_renderpass_end(fw64RenderPass* renderpass) {
@@ -76,6 +90,8 @@ void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera) {
     pass->projection_matrix = camera->projection;
     pass->view_matrix = camera->view;
     pass->persp_norm = camera->_persp_norm;
+
+    update_n64_viewport(&pass->viewport, &pass->n64_viewport);
 }
 
 void fw64_renderpass_set_clear_flags(fw64RenderPass* pass, fw64ClearFlags flags) {
@@ -87,15 +103,15 @@ void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g,
 }
 
 void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance) {
-    fw64_n64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh_instance);
+    fw64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh_instance);
 }
 
 void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* pass, fw64SkinnedMeshInstance* instance) {
-    fw64_n64_render_queue_enqueue_skinned_mesh(&pass->render_queue, instance);
+    fw64_render_queue_enqueue_skinned_mesh(&pass->render_queue, instance);
 }
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* sprite_batch) {
-    fw64_n64_render_queue_enqueue_sprite_batch(&renderpass->render_queue, sprite_batch);
+    fw64_render_queue_enqueue_sprite_batch(&renderpass->render_queue, sprite_batch);
 }
 
 static void fw64_n64_renderpass_toggle_feature(fw64RenderPass* renderpass, fw64N64RendererFeature feature, int enabled) {
@@ -130,4 +146,52 @@ void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min
 
 void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_t g, uint8_t b) {
     fw64_color_rgba8_set(&renderpass->fog_color, r, g, b, 255);
+}
+
+void fw64_renderpass_set_light_enabled(fw64RenderPass* renderpass, int index, int enabled) {
+    // disable light
+    if (fw64_n64_lighting_info_light_is_enabled(&renderpass->lighting_info, index) && !enabled) {
+        renderpass->lighting_info.active_count -= 1;
+        fw64_n64_lighting_info_set_enabled_flag(&renderpass->lighting_info, index, 0);
+    } // enable light
+    else if (!fw64_n64_lighting_info_light_is_enabled(&renderpass->lighting_info, index) && enabled) {
+        renderpass->lighting_info.active_count += 1;
+        fw64_n64_lighting_info_set_enabled_flag(&renderpass->lighting_info, index, 1);
+    }
+}
+
+#define LIGHT_FACTOR 80.0f
+// [11.7.3.2 Light Structure Definition ]
+// The convention is that the light direction points toward the light. 
+// This means the light direction indicates the direction TO the light and NOT the direction that the light is shining.
+void fw64_renderpass_set_light_direction(fw64RenderPass* renderpass, int index, Vec3* direction) {
+    Light_t* light = &renderpass->lighting_info.lights[index].l;
+
+    light->dir[0] = (int8_t)(-direction->x * LIGHT_FACTOR);
+    light->dir[1] = (int8_t)(-direction->y * LIGHT_FACTOR);
+    light->dir[2] = (int8_t)(-direction->z * LIGHT_FACTOR);
+}
+
+void fw64_renderpass_set_light_color(fw64RenderPass* renderpass, int index, fw64ColorRGBA8 color) {
+    Light_t* light = &renderpass->lighting_info.lights[index].l;
+
+    light->col[0] = color.r;
+    light->col[1] = color.g;
+    light->col[2] = color.b;
+
+    light->colc[0] = color.r;
+    light->colc[1] = color.g;
+    light->colc[2] = color.b;
+}
+
+void fw64_renderpass_set_lighting_ambient_color(fw64RenderPass* renderpass, fw64ColorRGBA8 color) {
+    Ambient_t* ambient = &renderpass->lighting_info.ambient.l;
+
+    ambient->col[0] = color.r;
+    ambient->col[1] = color.g;
+    ambient->col[2] = color.b;
+
+    ambient->colc[0] = color.r;
+    ambient->colc[1] = color.g;
+    ambient->colc[2] = color.b;
 }

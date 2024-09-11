@@ -54,6 +54,10 @@ void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled);
 void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min, float fog_max);
 void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_t g, uint8_t b);
 
+void fw64_renderpass_set_light_enabled(fw64RenderPass* renderpass, int index, int enabled);
+void fw64_renderpass_set_light_direction(fw64RenderPass* renderpass, int index, Vec3* direction);
+void fw64_renderpass_set_light_color(fw64RenderPass* renderpass, int index, fw64ColorRGBA8 color);
+void fw64_renderpass_set_lighting_ambient_color(fw64RenderPass* renderpass, fw64ColorRGBA8 color);
 
 #ifdef __cplusplus
 }
