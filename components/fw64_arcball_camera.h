@@ -25,6 +25,7 @@ extern "C" {
 void fw64_arcball_init(fw64ArcballCamera* arcball, fw64Input* input, fw64Display* display);
 void fw64_arcball_set_initial(fw64ArcballCamera* arcball, Box* box);
 void fw64_arcball_update(fw64ArcballCamera* arcball, float time_delta);
+void fw64_arcball_reset(fw64ArcballCamera* arcball);
 
 #ifdef __cplusplus
 }
