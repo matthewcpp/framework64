@@ -18,7 +18,7 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
 
     switch (platform) {
         case "n64_libultra":
-            const processN64 = require("./n64/Process");
+            const processN64 = require("./n64_libultra/Process");
             await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
 

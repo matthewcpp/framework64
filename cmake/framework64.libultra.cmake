@@ -17,7 +17,7 @@ add_definitions(-DF3DEX_GBI_2 -DFW64_PLATFORM_N64_LIBULTRA)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin) # note: roms will be copied into this directory as post build step
 
-set(FW64_N64_ASM_SRC_DIR ${FW64_ROOT_DIR}/src/n64_libultra/asm)
+set(FW64_N64_ASM_SRC_DIR ${FW64_ROOT_DIR}/src/framework64/n64_libultra/asm)
 
 function (enable_all_warnings_as_errors)
     set(options)
@@ -95,7 +95,7 @@ function(create_game)
         set(game_include_path "game.h")
     endif()
 
-    set(main_file_src ${FW64_ROOT_DIR}/src/n64_libultra/main_n64.c)
+    set(main_file_src ${FW64_ROOT_DIR}/src/framework64/n64_libultra/main_n64.c)
     set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_n64_${target_name}.c)
     configure_file(${main_file_src} ${main_file_dest})
     
@@ -136,7 +136,7 @@ function(create_game)
     # create the linkerscript file containing the paths to the built obects
     set(main_obj_dir ${obj_folder_root})
     set(configured_linkerfile_path ${CMAKE_CURRENT_BINARY_DIR}/${target_name}.ld.in)
-    configure_file(${FW64_ROOT_DIR}/src/n64_libultra/linkerscript.ld.in ${configured_linkerfile_path})
+    configure_file(${FW64_ROOT_DIR}/src/framework64/n64_libultra/linkerscript.ld.in ${configured_linkerfile_path})
 
     # Run the linker file though the preprocessor
     set(linkerscript_dest ${CMAKE_CURRENT_BINARY_DIR}/${target_name}.ld)
