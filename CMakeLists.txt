@@ -19,7 +19,7 @@ else()
     project(framework64)
 endif()
 
-add_subdirectory(src)
+add_subdirectory(src/framework64)
 add_subdirectory(components)
 
 if (FW64_BUILD_EXAMPLES)

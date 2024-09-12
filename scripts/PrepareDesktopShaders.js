@@ -3,7 +3,7 @@ const path = require("path");
 
 async function prepareDesktopShaders(destDir) {
     console.log("Preparing Desktop Shaders");
-    const shaderDir = path.resolve(__dirname, "..", "src", "desktop", "glsl");
+    const shaderDir = path.resolve(__dirname, "..", "src", "framework64", "desktop", "glsl");
 
     if (!fse.existsSync(shaderDir)) {
         throw new Error(`Unable to locate shader directory: ${shaderDir}`);

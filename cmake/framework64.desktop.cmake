@@ -72,7 +72,7 @@ function(create_game)
         set(game_include_path "game.h")
     endif()
 
-    set(main_file_src ${FW64_ROOT_DIR}/src/desktop/main_desktop.cpp)
+    set(main_file_src ${FW64_ROOT_DIR}/src/framework64/desktop/main_desktop.cpp)
     set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_desktop_${target_name}.cpp)
     configure_file(${main_file_src} ${main_file_dest})
 
