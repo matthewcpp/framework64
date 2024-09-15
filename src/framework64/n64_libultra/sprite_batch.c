@@ -11,7 +11,7 @@
 #include <string.h>
 
 fw64SpriteBatch* fw64_spritebatch_create(size_t layer_count, fw64Allocator* allocator) {
-    fw64SpriteBatch* sprite_batch = allocator->malloc(allocator, sizeof(fw64SpriteBatch));
+    fw64SpriteBatch* sprite_batch = fw64_allocator_malloc(allocator, sizeof(fw64SpriteBatch));
     fw64_n64_texture_batch_init(&sprite_batch->texture_batch, layer_count, allocator);
     fw64_color_rgba8_set(&sprite_batch->color, 255, 255, 255, 255);
 

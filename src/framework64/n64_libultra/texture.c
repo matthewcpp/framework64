@@ -7,7 +7,7 @@
 
 fw64Texture* fw64_texture_create_from_image(fw64Image* image, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
-    fw64Texture* texture = allocator->malloc(allocator, sizeof(fw64Texture));
+    fw64Texture* texture = fw64_allocator_malloc(allocator, sizeof(fw64Texture));
 
     fw64_n64_texture_init_with_image(texture, image);
 
@@ -34,7 +34,7 @@ void fw64_texture_set_image(fw64Texture* texture, fw64Image* image) {
 
 void fw64_texture_delete(fw64Texture* texture, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
-    allocator->free(allocator, texture);
+    fw64_allocator_free(allocator, texture);
 }
 
 int fw64_texture_slice_width(fw64Texture* texture) {

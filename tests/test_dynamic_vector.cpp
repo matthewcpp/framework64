@@ -10,7 +10,7 @@ protected:
     fw64DynamicVector vector;
 
     void SetUp() override {
-        fw64_default_allocator_init();
+        _fw64_default_allocator_init();
     }
 
     void TearDown() override {

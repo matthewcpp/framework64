@@ -27,21 +27,21 @@ TEST_F(BumpAllocatorTest, Init) {
 
 TEST_F(BumpAllocatorTest, Malloc) {
     #define ALLOCATION_SIZE 32
-    void* data1 = allocator->malloc(allocator, ALLOCATION_SIZE);
+    void* data1 = fw64_allocator_malloc(allocator, ALLOCATION_SIZE);
 
     ASSERT_EQ(bump_allocator.previous, bump_allocator.start);
     ASSERT_EQ(data1, bump_allocator.previous);
     ASSERT_EQ( bump_allocator.next, bump_allocator.previous + ALLOCATION_SIZE);
 
-    void* data2 = allocator->malloc(allocator, ALLOCATION_SIZE);
+    void* data2 = fw64_allocator_malloc(allocator, ALLOCATION_SIZE);
 
     ASSERT_EQ(bump_allocator.previous, data2);
     ASSERT_EQ( bump_allocator.next, bump_allocator.previous + ALLOCATION_SIZE);
 }
 
 TEST_F(BumpAllocatorTest, Malloc_Unaligned) {
-    void* data1 = allocator->malloc(allocator, 11);
-    void* data2 = allocator->malloc(allocator, 8);
+    void* data1 = fw64_allocator_malloc(allocator, 11);
+    void* data2 = fw64_allocator_malloc(allocator, 8);
 
     auto ptr_diff = reinterpret_cast<uintptr_t>(data2) - reinterpret_cast<uintptr_t>(data1);
     ASSERT_EQ(ptr_diff, 16);
@@ -49,8 +49,8 @@ TEST_F(BumpAllocatorTest, Malloc_Unaligned) {
 
 TEST_F(BumpAllocatorTest, Memalign) {
     #define ALIGNMENT 8
-    void* data1 = allocator->malloc(allocator, 8);
-    void* data2 = allocator->memalign(allocator, ALIGNMENT, 32);
+    void* data1 = fw64_allocator_malloc(allocator, 8);
+    void* data2 = fw64_allocator_memalign(allocator, ALIGNMENT, 32);
 
     uintptr_t stride = (uintptr_t)data2 - (uintptr_t)data1;
     ASSERT_EQ((uintptr_t)data2 % ALIGNMENT, 0);
@@ -58,30 +58,30 @@ TEST_F(BumpAllocatorTest, Memalign) {
 }
 
 TEST_F(BumpAllocatorTest, Free) {
-    void* data1 = allocator->malloc(allocator, 64);
-    allocator->malloc(allocator, 8);
-    void* data3 = allocator->malloc(allocator, 128);
+    void* data1 = fw64_allocator_malloc(allocator, 64);
+    fw64_allocator_malloc(allocator, 8);
+    void* data3 = fw64_allocator_malloc(allocator, 128);
 
     // free the first allocation...nothing happens
     char* expected_next = bump_allocator.next;
 
-    allocator->free(allocator, data1);
+    fw64_allocator_free(allocator, data1);
     ASSERT_EQ(bump_allocator.next, expected_next);
 
 
     // free the last allocation...the space can be reclaimed
     expected_next = bump_allocator.previous;
-    allocator->free(allocator, data3);
+    fw64_allocator_free(allocator, data3);
     ASSERT_EQ(bump_allocator.next, expected_next);
 }
 
 TEST_F(BumpAllocatorTest, ReallocLast) {
-    int* data = (int*)allocator->malloc(allocator, 10 * sizeof(int));
+    int* data = (int*)fw64_allocator_malloc(allocator, 10 * sizeof(int));
 
     for (int i = 0; i < 10; i++)
         data[i] = i * 10;
 
-    int* data2 = (int*)allocator->realloc(allocator, data, 20 * sizeof(int));
+    int* data2 = (int*)fw64_allocator_realloc(allocator, data, 20 * sizeof(int));
 
     ASSERT_EQ(data, data2);
 
@@ -90,13 +90,13 @@ TEST_F(BumpAllocatorTest, ReallocLast) {
 }
 
 TEST_F(BumpAllocatorTest, Realloc) {
-    int* data = (int*)allocator->malloc(allocator, 10 * sizeof(int));
+    int* data = (int*)fw64_allocator_malloc(allocator, 10 * sizeof(int));
 
     for (int i = 0; i < 10; i++)
         data[i] = i * 10;
 
-    allocator->malloc(allocator, 16);
-    int* data2 = (int*)allocator->realloc(allocator, data, 20 * sizeof(int));
+    fw64_allocator_malloc(allocator, 16);
+    int* data2 = (int*)fw64_allocator_realloc(allocator, data, 20 * sizeof(int));
 
     ASSERT_NE(data, data2);
 
@@ -105,9 +105,9 @@ TEST_F(BumpAllocatorTest, Realloc) {
 }
 
 TEST_F(BumpAllocatorTest, Clear) {
-    allocator->malloc(allocator, 2);
-    allocator->malloc(allocator, 4);
-    allocator->malloc(allocator, 8);
+    fw64_allocator_malloc(allocator, 2);
+    fw64_allocator_malloc(allocator, 4);
+    fw64_allocator_malloc(allocator, 8);
 
     ASSERT_NE(bump_allocator.next, bump_allocator.start);
     ASSERT_NE(bump_allocator.previous, bump_allocator.start);

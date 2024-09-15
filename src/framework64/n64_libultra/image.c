@@ -25,11 +25,11 @@ typedef enum {
 
 fw64Image* fw64_image_load_from_datasource(fw64DataSource* data_source, fw64Allocator* allocator)
 {
-    fw64Image* image = allocator->malloc(allocator, sizeof(fw64Image));
+    fw64Image* image = fw64_allocator_malloc(allocator, sizeof(fw64Image));
     int result = fw64_n64_image_read_data(image, data_source, allocator);
 
     if (!result) {
-        allocator->free(allocator, image);
+        fw64_allocator_free(allocator, image);
         image = NULL;
     }
 
@@ -84,7 +84,7 @@ int fw64_n64_image_init_dma_mode(fw64Image* image, int handle, uint32_t rom_addr
 
     uint32_t frame_size = fw64_n64_image_get_frame_size(image);
     image->rom_addr = rom_address + sizeof(fw64N64ImageInfo);
-    image->data = allocator->memalign(allocator, 8, frame_size);
+    image->data = fw64_allocator_memalign(allocator, 8, frame_size);
     fw64_image_load_frame(image, 0);
 
     return 1;
@@ -99,11 +99,11 @@ int fw64_n64_image_read_data(fw64Image* image, fw64DataSource* data_source, fw64
     }
 
     int data_size = fw64_n64_image_get_data_size(image);
-    uint8_t* image_data = allocator->memalign(allocator, 8, data_size);
+    uint8_t* image_data = fw64_allocator_memalign(allocator, 8, data_size);
     bytes_read = fw64_data_source_read(data_source, image_data, data_size, 1);
 
     if (bytes_read != data_size) {
-        allocator->free(allocator, image_data);
+        fw64_allocator_free(allocator, image_data);
         return 0;
     }
 
@@ -111,11 +111,11 @@ int fw64_n64_image_read_data(fw64Image* image, fw64DataSource* data_source, fw64
     image->rom_addr = 0;
 
     if (image->info.palette_count > 0) {
-        image->palettes = allocator->malloc(allocator, sizeof(uint16_t*) * image->info.palette_count);
+        image->palettes = fw64_allocator_malloc(allocator, sizeof(uint16_t*) * image->info.palette_count);
         uint32_t palette_data_size = image->info.palette_size * sizeof(uint16_t);
 
         for (uint16_t i = 0; i < image->info.palette_count; i++) {
-            uint16_t* color_data = allocator->memalign(allocator, 8, palette_data_size);
+            uint16_t* color_data = fw64_allocator_memalign(allocator, 8, palette_data_size);
             fw64_data_source_read(data_source, color_data, palette_data_size, 1);
 
             image->palettes[i] = color_data;
@@ -131,17 +131,17 @@ int fw64_n64_image_read_data(fw64Image* image, fw64DataSource* data_source, fw64
 void fw64_image_delete(fw64AssetDatabase* assets, fw64Image* image, fw64Allocator* allocator) {
     (void)assets;
     if (!allocator) allocator = fw64_default_allocator();
-    allocator->free(allocator, image->data);
+    fw64_allocator_free(allocator, image->data);
 
     if (image->palettes) {
         for (uint16_t i = 0; i < image->info.palette_count; i++) {
-            allocator->free(allocator, image->palettes[i]);
+            fw64_allocator_free(allocator, image->palettes[i]);
         }
 
-        allocator->free(allocator, image->palettes);
+        fw64_allocator_free(allocator, image->palettes);
     }
 
-    allocator->free(allocator, image);
+    fw64_allocator_free(allocator, image);
 }
 
 uint8_t* fw64_n64_image_get_data(fw64Image* image, int frame) {

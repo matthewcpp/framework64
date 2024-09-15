@@ -16,7 +16,7 @@ fw64SkinnedMesh* fw64_skinned_mesh_load_from_datasource(fw64DataSource* data_sou
         return NULL;
     }
 
-    fw64SkinnedMesh* skinned_mesh = allocator->malloc(allocator, sizeof(fw64SkinnedMesh));
+    fw64SkinnedMesh* skinned_mesh = fw64_allocator_malloc(allocator, sizeof(fw64SkinnedMesh));
     skinned_mesh->mesh = mesh;
     skinned_mesh->animation_data = animation_data;
 
@@ -27,5 +27,5 @@ void fw64_skinned_mesh_delete(fw64SkinnedMesh* skinned_mesh, fw64AssetDatabase* 
     fw64_mesh_delete(skinned_mesh->mesh, assets, allocator);
     fw64_animation_data_delete(skinned_mesh->animation_data, allocator);
 
-    allocator->free(allocator, skinned_mesh);
+    fw64_allocator_free(allocator, skinned_mesh);
 }

@@ -22,7 +22,7 @@ void fw64_animation_controller_init(fw64AnimationController* controller, fw64Ani
     if (allocator == NULL) allocator = fw64_default_allocator();
 
     controller->animation_data = animation_data;
-    controller->matrices = allocator->memalign(allocator, 8, sizeof(fw64Matrix) * animation_data->skin.joint_count);
+    controller->matrices = fw64_allocator_memalign(allocator, 8, sizeof(fw64Matrix) * animation_data->skin.joint_count);
     controller->speed = 1.0f;
     controller->loop = 1;
     controller->state = FW64_ANIMATION_STATE_STOPPED;
@@ -36,7 +36,7 @@ void fw64_animation_controller_init(fw64AnimationController* controller, fw64Ani
 }
 
 void fw64_animation_controller_uninit(fw64AnimationController* controller, fw64Allocator* allocator) {
-    allocator->free(allocator, controller->matrices);
+    fw64_allocator_free(allocator, controller->matrices);
 }
 
 void fw64_animation_controller_play(fw64AnimationController* controller) {

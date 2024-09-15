@@ -20,7 +20,7 @@ protected:
     fw64SparseSet sparse_set;
 
     void SetUp() override {
-        fw64_default_allocator_init();
+        _fw64_default_allocator_init();
         fw64_sparse_set_init(&sparse_set, sizeof(TestPlayer), fw64_default_allocator());
     }
 

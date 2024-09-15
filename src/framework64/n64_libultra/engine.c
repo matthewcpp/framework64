@@ -64,7 +64,7 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     engine->save_file = &save_file;
     engine->time = &time;
 
-    fw64_default_allocator_init();
+    _fw64_default_allocator_init();
     fw64_n64_data_link_init(engine->data_link);
 
     InitHeap(memory_heap, FW64_N64_HEAP_SIZE);

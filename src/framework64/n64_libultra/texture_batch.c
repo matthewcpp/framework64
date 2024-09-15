@@ -10,7 +10,7 @@ void fw64_n64_texture_batch_init(fw64N64TextureBatch* texture_batch, size_t laye
     texture_batch->allocator = allocator;
     texture_batch->layer_count = layer_count;
 
-    texture_batch->layers = allocator->malloc(allocator, sizeof(fw64TextureBatchLayer) * texture_batch->layer_count);
+    texture_batch->layers = fw64_allocator_malloc(allocator, sizeof(fw64TextureBatchLayer) * texture_batch->layer_count);
     memset(texture_batch->layers, 0, sizeof(fw64TextureBatchLayer) * texture_batch->layer_count);
     memset(texture_batch->pool, 0, sizeof(fw64N64QuadBatch*) * TEXT_BATCH_POOL_BUCKET_COUNT);
 
@@ -27,8 +27,8 @@ void fw64_n64_texture_batch_uninit(fw64N64TextureBatch* texture_batch) {
             fw64_n64_quad_batch_uninit(layer->batches[i], allocator);
         }
 
-        allocator->free(allocator, layer->batches);
-        allocator->free(allocator, layer);
+        fw64_allocator_free(allocator, layer->batches);
+        fw64_allocator_free(allocator, layer);
     }
 
     for (size_t i = 0; i < TEXT_BATCH_POOL_BUCKET_COUNT; i++) {
@@ -41,17 +41,17 @@ void fw64_n64_texture_batch_uninit(fw64N64TextureBatch* texture_batch) {
         }
     }
 
-    allocator->free(allocator, texture_batch);
+    fw64_allocator_free(allocator, texture_batch);
 }
 
 void fw64_n64_quad_batch_uninit(fw64N64QuadBatch* quad_batch, fw64Allocator* allocator) {
-    allocator->free(allocator, quad_batch->vertices);
+    fw64_allocator_free(allocator, quad_batch->vertices);
 
     if (quad_batch->display_list) {
-        allocator->free(allocator, quad_batch->display_list);
+        fw64_allocator_free(allocator, quad_batch->display_list);
     }
 
-    allocator->free(allocator, quad_batch);
+    fw64_allocator_free(allocator, quad_batch);
 }
 
 int fw64_n64_texture_batch_set_active_layer(fw64N64TextureBatch* batch, size_t index) {
@@ -135,10 +135,10 @@ static void sort_batches(fw64N64QuadBatch **a, const size_t n) {
 }
 
 static fw64N64QuadBatch* create_new_char_batch(fw64N64TextureBatch* texture_batch, uint16_t capacity) {
-    fw64N64QuadBatch* char_batch = texture_batch->allocator->malloc(texture_batch->allocator, sizeof(fw64N64QuadBatch));
+    fw64N64QuadBatch* char_batch = fw64_allocator_malloc(texture_batch->allocator, sizeof(fw64N64QuadBatch));
     memset(char_batch, 0, sizeof(fw64N64QuadBatch));
 
-    char_batch->vertices = texture_batch->allocator->memalign(texture_batch->allocator, 8, sizeof(Vtx) * 4 * capacity);
+    char_batch->vertices = fw64_allocator_memalign(texture_batch->allocator, 8, sizeof(Vtx) * 4 * capacity);
     char_batch->capacity = capacity;
 
     return char_batch;
@@ -158,9 +158,9 @@ static fw64N64QuadBatch* get_or_create_new_char_batch(fw64N64TextureBatch* textu
         layer->batch_capacity = layer->batch_capacity == 0 ? 8 : layer->batch_capacity * 2;
         fw64N64QuadBatch** old_batches = layer->batches;
 
-        layer->batches = texture_batch->allocator->malloc(texture_batch->allocator, sizeof(fw64N64QuadBatch*) * layer->batch_capacity);
+        layer->batches = fw64_allocator_malloc(texture_batch->allocator, sizeof(fw64N64QuadBatch*) * layer->batch_capacity);
         memcpy(layer->batches, old_batches, layer->batch_count * sizeof(fw64N64QuadBatch*));
-        texture_batch->allocator->free(texture_batch->allocator, old_batches);
+        fw64_allocator_free(texture_batch->allocator, old_batches);
     }
 
     layer->batches[layer->batch_count++] = char_batch;
@@ -227,7 +227,7 @@ void fw64_n64_texture_batch_finalize(fw64N64TextureBatch* texture_batch) {
 
             if (batch->display_list == NULL) {
                 size_t display_list_size = TEXTURE_LOAD_GFX_SIZE + fw64_n64_compute_quad_display_list_size(batch->capacity);
-                batch->display_list = texture_batch->allocator->memalign(texture_batch->allocator, 8, sizeof(Gfx) * display_list_size);
+                batch->display_list = fw64_allocator_memalign(texture_batch->allocator, 8, sizeof(Gfx) * display_list_size);
             }
 
             Gfx* display_list = fw64_n64_load_texture(&texture_state, batch->display_list, batch->id.tex_info.texture, batch->id.tex_info.index);

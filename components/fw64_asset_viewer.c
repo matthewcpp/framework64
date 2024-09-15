@@ -169,7 +169,7 @@ int mesh_state_init(fw64AssetViewerMeshState* state, fw64DataSource* data_reader
     fw64_scene_create_mesh_instance(&state->scene, node, state->mesh);
 
     fw64Node* camera_node = fw64_scene_create_node(&state->scene);
-    fw64Camera* camera = allocator->malloc(allocator, sizeof(fw64Camera));
+    fw64Camera* camera = fw64_allocator_malloc(allocator, sizeof(fw64Camera));
     fw64_camera_init(camera, camera_node, fw64_displays_get_primary(state->base.engine->displays));
     fw64_arcball_init(&state->arcball, state->base.engine->input, camera);
     camera->near = 1.0f;
