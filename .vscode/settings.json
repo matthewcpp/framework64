@@ -167,6 +167,7 @@
         "renderer_util.h": "c",
         "random.h": "c",
         "renderer.h": "c",
-        "skinned_mesh_instance.h": "c"
+        "skinned_mesh_instance.h": "c",
+        "scene_playground.h": "c"
     }
 }
