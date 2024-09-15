@@ -5,8 +5,12 @@
 TEST(Camera, PerspectiveMatrix) {
     fw64Display display;
     display.initWithoutWindow(32, 240);
+
+    fw64Node camera_node;
+    fw64_node_init(&camera_node);
+
     fw64Camera camera;
-    fw64_camera_init(&camera, &display);
+    fw64_camera_init(&camera, &camera_node, &display);
 
     camera.aspect = 1.3333f;
     camera.fovy = 60.0f;
@@ -26,14 +30,18 @@ TEST(Camera, ViewMatrix) {
     fw64Display display;
     display.initWithoutWindow(32, 240);
 
-    fw64Camera camera;
-    fw64_camera_init(&camera, &display);
+    fw64Node camera_node;
+    fw64_node_init(&camera_node);
+    vec3_set(&camera_node.transform.position, 0.0f, 0.0f, 10.0f);
+    fw64_node_update(&camera_node);
 
-    vec3_set(&camera.transform.position, 0.0f, 0.0f, 10.0f);
+    fw64Camera camera;
+    fw64_camera_init(&camera, &camera_node, &display);
+
     Vec3 target = {0.0f, 0.0f, 0.0f};
     Vec3 up = {0.0f, 1.0f, 0.0f};
-    fw64_transform_up(&camera.transform, &up);
-    fw64_transform_look_at(&camera.transform, &target, &up);
+    fw64_transform_up(&camera_node.transform, &up);
+    fw64_transform_look_at(&camera_node.transform, &target, &up);
 
     fw64_camera_update_view_matrix(&camera);
 

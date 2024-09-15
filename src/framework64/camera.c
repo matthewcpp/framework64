@@ -5,31 +5,30 @@
 
 #include <string.h>
 
-static void camera_common_init(fw64Camera* camera, fw64Display* display);
+static void camera_common_init(fw64Camera* camera, fw64Node* node, fw64Display* display);
 
-void fw64_camera_init(fw64Camera* camera, fw64Display* display) {
-    fw64_camera_init_persp(camera, display);
+void fw64_camera_init(fw64Camera* camera, fw64Node* node, fw64Display* display) {
+    fw64_camera_init_persp(camera, node, display);
 }
 
-void fw64_camera_init_persp(fw64Camera* camera, fw64Display* display){
+void fw64_camera_init_persp(fw64Camera* camera, fw64Node* node, fw64Display* display){
     camera->projection_mode = FW64_CAMERA_PROJECTION_PERSPECTIVE;
-    camera_common_init(camera, display);
+    camera_common_init(camera, node, display);
 }
 
-void fw64_camera_init_ortho(fw64Camera* camera, fw64Display* display) {
+void fw64_camera_init_ortho(fw64Camera* camera, fw64Node* node, fw64Display* display) {
     camera->projection_mode = FW64_CAMERA_PROJECTION_ORTHOGRAPHIC;
-    camera_common_init(camera, display);
+    camera_common_init(camera, node, display);
 }
 
-void camera_common_init(fw64Camera* camera, fw64Display* display) {
-    fw64_transform_init(&camera->transform);
+void camera_common_init(fw64Camera* camera, fw64Node* node, fw64Display* display) {
+    camera->node = node;
     camera->display = display;
 
     camera->near = 0.1f;
     camera->far = 500.0f;
     camera->fovy = 45.0f;
     camera->aspect = 1.33f;
-    camera->transform.position.z = 5.0f;
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     camera->_persp_norm = FW64_N64_LIBULTRA_DEFAULT_PERSPNORM;
@@ -75,17 +74,17 @@ uint16_t* fw64_camera_get_perspnorm(fw64Camera* camera) {
 
 void fw64_camera_update_view_matrix(fw64Camera* camera) {
     Vec3 forward, up, target;
-    fw64_transform_forward(&camera->transform, &forward);
-    fw64_transform_up(&camera->transform, &up);
+    fw64_transform_forward(&camera->node->transform, &forward);
+    fw64_transform_up(&camera->node->transform, &up);
 
-    vec3_add(&target, &camera->transform.position, &forward);
+    vec3_add(&target, &camera->node->transform.position, &forward);
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     guLookAt(&camera->view, 
-    camera->transform.position.x, camera->transform.position.y, camera->transform.position.z,
+    camera->node->transform.position.x, camera->node->transform.position.y, camera->node->transform.position.z,
     target.x, target.y, target.z, up.x, up.y, up.z);
 #else
-    matrix_camera_look_at(&camera->view.m[0], &camera->transform.position, &target, &up);
+    matrix_camera_look_at(&camera->view.m[0], &camera->node->transform.position, &target, &up);
 #endif
 }
 
@@ -117,11 +116,11 @@ static void _temp_camera_compute_view_projection(fw64Camera* camera, float* view
     matrix_perspective(proj, camera->fovy, camera->aspect, camera->near, camera->far);
 
     Vec3 forward, up, target;
-    fw64_transform_forward(&camera->transform, &forward);
-    fw64_transform_up(&camera->transform, &up);
+    fw64_transform_forward(&camera->node->transform, &forward);
+    fw64_transform_up(&camera->node->transform, &up);
 
-    vec3_add(&target, &camera->transform.position, &forward);
-    matrix_camera_look_at(view, &camera->transform.position, &target, &up);
+    vec3_add(&target, &camera->node->transform.position, &forward);
+    matrix_camera_look_at(view, &camera->node->transform.position, &target, &up);
 }
 
 int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3* ray_origin, Vec3* ray_direction) {

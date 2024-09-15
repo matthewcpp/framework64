@@ -18,26 +18,32 @@ void game_init(Game* game, fw64Engine* engine) {
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, fw64_default_allocator());
     game->spritebatch = fw64_spritebatch_create(1, allocator);
     game->mode = -1;
+    game->mesh_node = NULL;
+
+    fw64SceneInfo info;
+    fw64_scene_info_init(&info);
+    info.node_count = 2;
+    info.mesh_instance_count = 1;
+    fw64_scene_init(&game->scene, &info, engine->assets, allocator);
+
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 0.0f, 5.0f);
+    fw64_node_update(camera_node);
+    fw64Camera camera;
+    fw64_camera_init(&camera, camera_node, display);
 
     game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
-    fw64Camera camera;
-    fw64_camera_init(&camera, fw64_displays_get_primary(engine->displays));
     fw64_renderpass_set_camera(game->renderpasses[RENDER_PASS_SCENE], &camera);
 
     game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
     fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
-
-    fw64SceneInfo info;
-    fw64_scene_info_init(&info);
-    info.node_count = 1;
-    info.mesh_instance_count = 1;
-    fw64_scene_init(&game->scene, &info, engine->assets, allocator);
 
     fw64_bump_allocator_init(&game->mesh_allocator, 5120);
     fw64_ui_navigation_init(&game->ui_nav, engine->input, 0);
     fw64_renderer_set_clear_color(engine->renderer, 39, 58, 93);
     set_next_wrap_mode(game, 1);
 }
+
 void set_next_wrap_mode(Game* game, int direction) {
     game->mode += direction;
 
@@ -53,7 +59,7 @@ void set_next_wrap_mode(Game* game, int direction) {
     params.image_asset_id = FW64_ASSET_image_pyoro64;
     params.shading_mode = FW64_SHADING_MODE_UNLIT_TRANSPARENT_TEXTURED;
 
-    const char* mode_name;
+    const char* mode_name = NULL;
 
     switch (game->mode)
     {
@@ -89,22 +95,21 @@ void set_next_wrap_mode(Game* game, int direction) {
     fw64Allocator* mesh_allocator = &game->mesh_allocator.interface;
 
     fw64Mesh* mesh;
-    if (fw64_scene_get_node_count(&game->scene) > 0) {
-        fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-        fw64_mesh_delete(node->mesh_instance->mesh, game->engine->assets, mesh_allocator);
+    if (game->mesh_node) {
+        fw64_mesh_delete(game->mesh_node->mesh_instance->mesh, game->engine->assets, mesh_allocator);
         fw64_bump_allocator_reset(&game->mesh_allocator);
         mesh = fw64_textured_quad_create_with_params(game->engine, &params, mesh_allocator);
-        fw64_mesh_instance_set_mesh(node->mesh_instance, mesh);
+        fw64_mesh_instance_set_mesh(game->mesh_node->mesh_instance, mesh);
     } else {
-        fw64Node* node = fw64_scene_create_node(&game->scene);
         mesh = fw64_textured_quad_create_with_params(game->engine, &params, mesh_allocator);
-        fw64_scene_create_mesh_instance(&game->scene, node, mesh);
+        game->mesh_node = fw64_scene_create_node(&game->scene);
+        fw64_scene_create_mesh_instance(&game->scene, game->mesh_node, mesh);
     }
 
     fw64Texture* texture = fw64_material_get_texture(fw64_mesh_get_material_for_primitive(mesh, 0));
     fw64_texture_set_wrap_mode(texture, wrap_mode, wrap_mode);
-    const fw64Viewport* glViewport = fw64_renderpass_get_viewport(game->renderpasses[RENDER_PASS_UI]);
-    IVec2 pos = fw64_text_util_center_string(game->font, mode_name, &glViewport->size);
+    const fw64Viewport* viewport = fw64_renderpass_get_viewport(game->renderpasses[RENDER_PASS_UI]);
+    IVec2 pos = fw64_text_util_center_string(game->font, mode_name, &viewport->size);
     fw64_spritebatch_begin(game->spritebatch);
     fw64_spritebatch_draw_string(game->spritebatch, game->font, mode_name, pos.x, 10);
     fw64_spritebatch_end(game->spritebatch);

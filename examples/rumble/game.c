@@ -25,23 +25,26 @@ void game_init(Game* game, fw64Engine* engine) {
     game->buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
     game->spritebatch = fw64_spritebatch_create(1, allocator);
 
-    game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
-    fw64Camera camera;
-    fw64_camera_init(&camera, display);
-    fw64_renderpass_set_camera(game->renderpasses[RENDER_PASS_SCENE], &camera);
-
-    game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
-    fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
-
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-    info.node_count = 1;
+    info.node_count = 2;
     info.mesh_instance_count = 1;
     fw64_scene_init(&game->scene, &info, engine->assets, allocator);
 
     fw64Node* node = fw64_scene_create_node(&game->scene);
     fw64Mesh* mesh = fw64_textured_quad_create(game->engine, FW64_ASSET_image_n64_logo, allocator);
     fw64_scene_create_mesh_instance(&game->scene, node, mesh);
+
+    game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 0.0f, 5.0f);
+    fw64_node_update(camera_node);
+    fw64Camera camera;
+    fw64_camera_init(&camera, camera_node, display);
+    fw64_renderpass_set_camera(game->renderpasses[RENDER_PASS_SCENE], &camera);
+
+    game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
 
     set_shake_speed(game);
     game->shake_time = 0.0f;

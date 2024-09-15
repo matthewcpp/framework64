@@ -23,7 +23,7 @@ PrimitiveData& PrimitiveData::operator=(PrimitiveData&& other) {
 GLMeshInfo PrimitiveData::createGlMesh() {
     GLMeshInfo mesh_info;
 
-    GLuint array_buffer_size = (positions.size() + normals.size() + tex_coords.size() + colors.size()) * sizeof(float);
+    GLuint array_buffer_size = static_cast<GLuint>((positions.size() + normals.size() + tex_coords.size() + colors.size()) * sizeof(float));
     glGenVertexArrays(1, &mesh_info.gl_vertex_array_object);
     glBindVertexArray(mesh_info.gl_vertex_array_object);
 

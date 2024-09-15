@@ -204,7 +204,7 @@
 			],
 			"extras":{
 				"extraMeshes":"1",
-				"extraNodes":"1",
+				"extraNodes":"2",
 				"extraColliders":"1",
 				"extraMeshInstances":"1"
 			},

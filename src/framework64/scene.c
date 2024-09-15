@@ -86,7 +86,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
         uintptr_t mesh_index = (uintptr_t)node->mesh_instance;
 
         if (mesh_index != FW64_N64_NODE_NO_MESH) {
-            fw64Mesh* mesh = fw64_scene_get_mesh(scene, mesh_index);
+            fw64Mesh* mesh = fw64_scene_get_mesh(scene, (uint32_t)mesh_index);
             fw64_scene_create_mesh_instance(scene, node, mesh);
         } 
         else {
@@ -112,7 +112,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
                 }
             }
             else if (collider_type == FW64_COLLIDER_COLLISION_MESH) {
-                fw64CollisionMesh* collision_mesh = fw64_static_vector_get_item(&scene->collision_meshes, collision_mesh_index);
+                fw64CollisionMesh* collision_mesh = fw64_static_vector_get_item(&scene->collision_meshes, (uint32_t)collision_mesh_index);
                 fw64_collider_init_collision_mesh(collider, node, collision_mesh);
             }
 

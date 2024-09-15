@@ -21,4 +21,3 @@ void fw64_node_update(fw64Node* node) {
         fw64_mesh_instance_update(node->mesh_instance);
     }
 }
-

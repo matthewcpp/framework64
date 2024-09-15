@@ -20,6 +20,7 @@ typedef struct {
 
 typedef struct {
     fw64Engine* engine;
+    fw64Camera camera;
     fw64ArcballCamera arcball;
     fw64Headlight headlight;
     fw64Scene scene;

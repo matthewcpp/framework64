@@ -34,7 +34,7 @@ fw64Node* fw64_debug_boxes_add(fw64DebugBoxes* debug_boxes, fw64MeshInstance* so
 }
 
 void fw64_debug_boxes_update(fw64DebugBoxes* debug_boxes) {
-    for (size_t i = 0; i < fw64_static_vector_size(&debug_boxes->entries); i++) {
+    for (uint32_t i = 0; i < fw64_static_vector_size(&debug_boxes->entries); i++) {
         fw64DebugBoxEntry* entry = (fw64DebugBoxEntry*)fw64_static_vector_get_item(&debug_boxes->entries, i);
         box_center(&entry->src->render_bounds, &entry->dest->node->transform.position);
         box_extents(&entry->src->render_bounds, &entry->dest->node->transform.scale);

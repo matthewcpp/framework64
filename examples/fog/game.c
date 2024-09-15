@@ -1,5 +1,6 @@
 #include "game.h"
 #include "assets/assets.h"
+#include "assets/scene_Fogworld.h"
 
 #include "framework64/collision.h"
 #include "framework64/math.h"
@@ -29,19 +30,20 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->engine = engine;
     game->mode = GAME_MODE_PLAYING;
-    fw64_fps_camera_init(&game->fps_camera, engine->input, fw64_displays_get_primary(engine->displays));
-
-    vec3_set(&game->fps_camera.camera.transform.position, -164.0f, 45.0f, 0.0f);
-    game->fps_camera.movement_speed = 100.0f;
-    game->fps_camera.camera.near = 10.0f;
-    game->fps_camera.camera.far = 500.0f;
-    fw64_camera_update_projection_matrix(&game->fps_camera.camera);
-
     game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_Fogworld, allocator);
+
+    fw64Node* camera_node = fw64_scene_get_node(game->scene, FW64_scene_Fogworld_node_Player);
+    fw64_camera_init(&game->camera, camera_node, display);
+    game->camera.near = 10.0f;
+    game->camera.far = 500.0f;
+    fw64_camera_update_projection_matrix(&game->camera);
+
+    fw64_fps_camera_init(&game->fps_camera, engine->input, &game->camera);
+    game->fps_camera.movement_speed = 100.0f;
+
     game->renderpass = fw64_renderpass_create(display, allocator);
     fog_settings_init(&game->fog_settings, engine->renderer, game->renderpass);
     ui_init(&game->ui, engine, &game->fog_settings);
-
 }
 
 void game_update(Game* game){
@@ -61,7 +63,7 @@ void game_update(Game* game){
 }
 
 void set_camera_ypos(Game* game) {
-    Vec3 origin = game->fps_camera.camera.transform.position;
+    Vec3 origin = game->fps_camera.camera->node->transform.position;
     origin.y = 1000.0f;
     Vec3 dir = { 0.0f, -1.0f, 0.0f };
 
@@ -83,7 +85,7 @@ void set_camera_ypos(Game* game) {
 
             if (fw64_collision_test_ray_triangle(&origin, &dir, &a, &b, &c, &point, &dist)) {
                 point.y += CAMERA_EYE_OFFSET;
-                game->fps_camera.camera.transform.position = point;
+                game->fps_camera.camera->node->transform.position = point;
                 return;
             }
         }
@@ -92,13 +94,13 @@ void set_camera_ypos(Game* game) {
 
 void game_draw(Game* game) {
     fw64Frustum view_frustum;
-    fw64_camera_extract_frustum_planes(&game->fps_camera.camera, &view_frustum);
+    fw64_camera_extract_frustum_planes(game->fps_camera.camera, &view_frustum);
 
     fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 1);
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     
     fw64_renderpass_begin(game->renderpass);
-    fw64_renderpass_set_camera(game->renderpass, &game->fps_camera.camera);
+    fw64_renderpass_set_camera(game->renderpass, game->fps_camera.camera);
     fw64_scene_draw_frustrum(game->scene, game->renderpass, &view_frustum, ~0U);
     fw64_renderpass_end(game->renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
@@ -136,7 +138,7 @@ static void ui_update_spritebatch(Ui* ui) {
 
     int pos_x = 50, pos_y = 50;
     fw64_spritebatch_set_active_layer(ui->spritebatch, 0);
-    fw64_spritebatch_draw_sprite_slice_rect(ui->spritebatch, ui->overlay, 0, pos_x, pos_y, 128.0f, 64.0f);
+    fw64_spritebatch_draw_sprite_slice_rect(ui->spritebatch, ui->overlay, 0, pos_x, pos_y, 128, 64);
     pos_y += 5;
 
     fw64_spritebatch_set_active_layer(ui->spritebatch, 1);
@@ -169,7 +171,7 @@ static void ui_update_active_setting(Ui* ui, float direction) {
             break;
 
         case FOG_SETTING_FOG_END: 
-            ui->fog_settings->end = fw64_clamp(ui->fog_settings->end + 0.1f * direction, ui->fog_settings->begin + 0.1, 1.0f);
+            ui->fog_settings->end = fw64_clamp(ui->fog_settings->end + 0.1f * direction, ui->fog_settings->begin + 0.1f, 1.0f);
             break;
     }
 

@@ -35,13 +35,15 @@ uint32_t fw64Font::getGlyphIndex(fw64FontCodepoint codepoint) const {
         return glyph.codepoint < codepoint;
     });
 
-    if (result == glyphs.end())
+    if (result == glyphs.end()) {
         return fw64FontInvalidCodepointIndex;
+    }
 
-    if ((*result).codepoint == codepoint)
-        return result - glyphs.begin();
-    else
+    if ((*result).codepoint == codepoint) {
+        return static_cast<uint32_t>(result - glyphs.begin());
+    } else {
         return fw64FontInvalidCodepointIndex;
+    }
 }
 
 Vec2 fw64Font::measureString(const char* text, size_t length) const{

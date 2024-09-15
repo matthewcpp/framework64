@@ -22,7 +22,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_node_update(game->player.node);
     player_calculate_size(&game->player);
 
-    chase_camera_init(&game->chase_cam, engine);
+    chase_camera_init(&game->chase_cam, engine, game->scene);
     game->chase_cam.target = &game->player.node->transform;
 
     ui_init(&game->ui, engine, &game->player);

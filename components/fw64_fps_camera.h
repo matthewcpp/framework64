@@ -3,12 +3,11 @@
 /** \file fps_camera.h */
 
 #include "framework64/camera.h"
-#include "framework64/display.h"
 #include "framework64/input.h"
 #include "framework64/vec2.h"
 
 typedef struct {
-    fw64Camera camera;
+    fw64Camera* camera;
     float movement_speed;
     float turn_speed;
     int player_index;
@@ -20,7 +19,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_fps_camera_init(fw64FpsCamera *fps, fw64Input *input, fw64Display* display);
+void fw64_fps_camera_init(fw64FpsCamera *fps, fw64Input *input, fw64Camera* camera);
 void fw64_fps_camera_update(fw64FpsCamera *fps, float time_delta);
 
 #ifdef __cplusplus

@@ -8,7 +8,6 @@
 
 typedef struct {
     fw64Scene scene;
-    fw64Camera camera;
     fw64RotateNode rotate_node;
     fw64Engine* engine;
     fw64RenderPass* renderpass;

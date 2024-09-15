@@ -79,7 +79,7 @@ int dir_stack_append(fw64FileExplorerDirStack* dir_stack, const char* path) {
     if (dir_stack->current_index > 0)
         dir_stack->path[dir_stack->path_len++] = '/';
 
-    size_t path_len = strlen(path);
+    int path_len = (int)strlen(path);
     strcpy(&dir_stack->path[dir_stack->path_len], path);
     dir_stack->path_len += path_len;
     dir_stack->component_lengths[++dir_stack->current_index] = path_len;

@@ -160,7 +160,7 @@ int mesh_state_init(fw64AssetViewerMeshState* state, fw64DataSource* data_reader
     fw64Allocator* allocator = &state->base.allocator.interface;
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-    info.node_count = 1;
+    info.node_count = 2;
     info.mesh_instance_count = 1;
     fw64_scene_init(&state->scene, &info, state->base.engine->assets, allocator);
 
@@ -168,11 +168,14 @@ int mesh_state_init(fw64AssetViewerMeshState* state, fw64DataSource* data_reader
     fw64Node* node = fw64_scene_create_node(&state->scene);
     fw64_scene_create_mesh_instance(&state->scene, node, state->mesh);
 
-    fw64_arcball_init(&state->arcball, state->base.engine->input, fw64_displays_get_primary(state->base.engine->displays));
-    state->arcball.camera.near = 1.0f;
-    state->arcball.camera.far = 100.0f;
-    fw64_camera_set_viewport(&state->arcball.camera, &viewport->position, &viewport->size);
-    fw64_camera_update_projection_matrix(&state->arcball.camera);
+    fw64Node* camera_node = fw64_scene_create_node(&state->scene);
+    fw64Camera* camera = allocator->malloc(allocator, sizeof(fw64Camera));
+    fw64_camera_init(camera, camera_node, fw64_displays_get_primary(state->base.engine->displays));
+    fw64_arcball_init(&state->arcball, state->base.engine->input, camera);
+    camera->near = 1.0f;
+    camera->far = 100.0f;
+    fw64_camera_set_viewport(camera, &viewport->position, &viewport->size);
+    fw64_camera_update_projection_matrix(camera);
 
     Box mesh_bounding = fw64_mesh_get_bounding_box(state->mesh);
     fw64_arcball_set_initial(&state->arcball, &mesh_bounding);
@@ -190,12 +193,12 @@ void mesh_state_uninit(fw64AssetViewerMeshState* state) {
 
 void mesh_state_update(fw64AssetViewerMeshState* state) {
     fw64_arcball_update(&state->arcball, state->base.engine->time->time_delta);
-    fw64_renderpass_set_camera(state->base.renderpass, &state->arcball.camera);
+    fw64_renderpass_set_camera(state->base.renderpass, state->arcball.camera);
 }
 
 void mesh_state_draw(fw64AssetViewerMeshState* state) {
     fw64Frustum frustum;
-    fw64_camera_extract_frustum_planes(&state->arcball.camera, &frustum);
+    fw64_camera_extract_frustum_planes(state->arcball.camera, &frustum);
     fw64_scene_draw_frustrum(&state->scene, state->base.renderpass, &frustum, ~0U);
 }
 

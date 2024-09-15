@@ -177,18 +177,23 @@ void next_game_state(Game* game, int direction) {
 void game_init(Game* game, fw64Engine* engine) {
     fw64Display* display = fw64_displays_get_primary(engine->displays);
     game->engine = engine;
-    fw64Camera camera;
-    fw64_camera_init(&camera, display);
-
-    game->renderpass = fw64_renderpass_create(display, fw64_default_allocator());
-    fw64_renderpass_set_camera(game->renderpass, &camera);
 
     fw64_bump_allocator_init(&game->allocator, 1024 * 100);
     fw64_ui_navigation_init(&game->ui_nav, engine->input, 0);
 
     fw64SceneInfo scene_info;
     fw64_scene_info_init(&scene_info);
+    scene_info.node_count = 1;
     fw64_scene_init(&game->scene, &scene_info, engine->assets, &game->allocator.interface);
+
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 0.0f, 5.0f);
+    fw64_node_update(camera_node);
+    fw64Camera camera;
+    fw64_camera_init(&camera, camera_node, display);
+
+    game->renderpass = fw64_renderpass_create(display, fw64_default_allocator());
+    fw64_renderpass_set_camera(game->renderpass, &camera);
 
     game->game_state = GAME_STATE_NONE;
     next_game_state(game, 1);

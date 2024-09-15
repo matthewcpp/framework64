@@ -40,7 +40,7 @@ void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
 
     fw64SceneInfo scene_info;
     fw64_scene_info_init(&scene_info);
-    scene_info.node_count = 1;
+    scene_info.node_count = 2;
     scene_info.mesh_instance_count = 1;
     fw64_scene_init(&scene_view->scene, &scene_info, engine->assets, allocator);
 
@@ -52,8 +52,12 @@ void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
     vec3_set(&scene_view->rotate_node.axis, 0.0f, 0.0f, 1.0f);
 
     scene_view->renderpass = fw64_renderpass_create(display, allocator);
+
+    fw64Node* camera_node = fw64_scene_create_node(&scene_view->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 0.0f, 5.0f);
+    fw64_node_update(camera_node);
     fw64Camera camera;
-    fw64_camera_init(&camera, display);
+    fw64_camera_init(&camera, camera_node, display);
     fw64_renderpass_set_camera(scene_view->renderpass, &camera);
 
     // scene is static so only need to setup renderpass drawing once

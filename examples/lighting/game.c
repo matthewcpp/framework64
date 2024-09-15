@@ -21,7 +21,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
     info.mesh_count = 2;
-    info.node_count = 1;
+    info.node_count = 2;
     info.mesh_instance_count = 1;
     fw64_scene_init(&game->scene, &info, engine->assets, allocator);
 
@@ -32,13 +32,15 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Node* node = fw64_scene_create_node(&game->scene);
     fw64_scene_create_mesh_instance(&game->scene, node, mesh);
 
-    fw64_arcball_init(&game->arcball, engine->input, display);
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    fw64_camera_init(&game->camera, camera_node, display);
+    game->camera.near = 5.0f;
+    game->camera.far = 900.0f;
+    fw64_camera_update_projection_matrix(&game->camera);
+
+    fw64_arcball_init(&game->arcball, engine->input, &game->camera);
     Box mesh_bounding = fw64_mesh_get_bounding_box(mesh);
     fw64_arcball_set_initial(&game->arcball, &mesh_bounding);
-
-    game->arcball.camera.near = 5.0f;
-    game->arcball.camera.far = 900.0f;
-    fw64_camera_update_projection_matrix(&game->arcball.camera);
 
     fw64_headlights_init(&game->headlights, allocator);
 
@@ -67,7 +69,7 @@ void game_update(Game* game){
 void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
-    fw64_renderpass_set_camera(renderpass, &game->arcball.camera);
+    fw64_renderpass_set_camera(renderpass, game->arcball.camera);
     fw64_renderpass_begin(renderpass);
     fw64_scene_draw_all(&game->scene, renderpass);
     fw64_renderpass_end(renderpass);

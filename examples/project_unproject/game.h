@@ -22,6 +22,7 @@ typedef struct {
     fw64Font* font;
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
     fw64SpriteBatch* spritebatch;
+    fw64Camera camera;
     fw64ArcballCamera arcball_camera;
     fw64Scene scene;
     uint32_t flags;

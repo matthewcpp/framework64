@@ -16,11 +16,10 @@ void game_init(Game* game, fw64Engine* engine) {
     game->flags = FLAG_NONE;
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     game->crosshair = fw64_texture_util_create_from_loaded_image(engine->assets, FW64_ASSET_image_crosshair, allocator);
-    fw64_arcball_init(&game->arcball_camera, engine->input, fw64_displays_get_primary(engine->displays));
-    
+
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-    info.node_count = 1;
+    info.node_count = 2;
     info.mesh_count = 1;
     info.mesh_instance_count = 1;
     info.collider_count = 1;
@@ -31,6 +30,11 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Node* node = fw64_scene_create_node(&game->scene);
     fw64_scene_create_mesh_instance(&game->scene, node, mesh);
     fw64_scene_create_box_collider(&game->scene, node, &mesh_bounding);
+
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    fw64_camera_init(&game->camera, camera_node, display);
+
+    fw64_arcball_init(&game->arcball_camera, engine->input, &game->camera);
     fw64_arcball_set_initial(&game->arcball_camera, &mesh_bounding);
 
     game->crosshair_pos = fw64_display_get_size(display);
@@ -42,7 +46,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
 
     game->spritebatch = fw64_spritebatch_create(1, allocator);
-    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &game->arcball_camera.camera.transform);
+    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &game->camera.node->transform);
 }
 
 static void move_crosshair(Game* game);
@@ -53,7 +57,7 @@ void game_update(Game* game){
     if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_A)) {
         Vec3 ray_origin, ray_direction;
         
-        fw64_camera_ray_from_viewport_pos(&game->arcball_camera.camera, &game->crosshair_pos, &ray_origin, &ray_direction);
+        fw64_camera_ray_from_viewport_pos(&game->camera, &game->crosshair_pos, &ray_origin, &ray_direction);
         if (fw64_scene_raycast(&game->scene, &ray_origin, &ray_direction, UINT32_MAX, &game->raycast)) {
             game->flags |= FLAG_HIT_POS_ACTIVE;
         } else {
@@ -65,11 +69,11 @@ void game_update(Game* game){
     fw64_headlight_update(&game->headlight);
 
     Vec3 min = {-1.0f, -1.0f, -1.0f}, max = {1.0f, 1.0f, 1.0f};
-    fw64_camera_world_to_viewport_pos(&game->arcball_camera.camera, &min, &game->min_pos);
-    fw64_camera_world_to_viewport_pos(&game->arcball_camera.camera, &max, &game->max_pos);
+    fw64_camera_world_to_viewport_pos(&game->camera, &min, &game->min_pos);
+    fw64_camera_world_to_viewport_pos(&game->camera, &max, &game->max_pos);
 
     if (game->flags & FLAG_HIT_POS_ACTIVE) {
-        fw64_camera_world_to_viewport_pos(&game->arcball_camera.camera, &game->raycast.point, &game->hit_pos);
+        fw64_camera_world_to_viewport_pos(&game->camera, &game->raycast.point, &game->hit_pos);
     }
 
     fw64_spritebatch_begin(game->spritebatch);
@@ -90,7 +94,7 @@ void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
 
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
-    fw64_renderpass_set_camera(renderpass, &game->arcball_camera.camera);
+    fw64_renderpass_set_camera(renderpass, &game->camera);
     fw64_renderpass_begin(renderpass);
     fw64_scene_draw_all(&game->scene, renderpass);
     fw64_renderpass_end(renderpass);

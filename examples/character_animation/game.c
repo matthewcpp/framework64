@@ -28,7 +28,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64SceneInfo scene_info;
     fw64_scene_info_init(&scene_info);
-    scene_info.node_count = 1;
+    scene_info.node_count = 2;
     scene_info.skinned_mesh_count = 1;
     scene_info.skinned_mesh_instance_count = 1;
 
@@ -37,12 +37,15 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64SkinnedMesh* skinned_mesh = fw64_scene_load_skinned_mesh_asset(&game->scene, FW64_ASSET_skinnedmesh_catherine);
     fw64SkinnedMeshInstance* skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(&game->scene, node, skinned_mesh, game->current_animation);
     
-    fw64_arcball_init(&game->arcball, engine->input, display);
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    fw64_camera_init(&game->camera, camera_node, display);
+    game->camera.near = 150.0f;
+    game->camera.far = 750.0f;
+    fw64_camera_update_projection_matrix(&game->camera);
 
+    fw64_arcball_init(&game->arcball, engine->input, &game->camera);
     fw64_arcball_set_initial(&game->arcball, &skinned_mesh_instance->mesh_instance.render_bounds);
-    game->arcball.camera.near = 150.0f;
-    game->arcball.camera.far = 750.0f;
-    fw64_camera_update_projection_matrix(&game->arcball.camera);
+
 
     fw64_animation_controller_play(&skinned_mesh_instance->controller);
 
@@ -50,7 +53,7 @@ void game_init(Game* game, fw64Engine* engine) {
     ui_init(&game->ui, engine, skinned_mesh_instance);
     ui_update(&game->ui, game->current_animation);
 
-    fw64_headlight_init(&game->headlight, game->renderpass, 0, &game->arcball.camera.transform);
+    fw64_headlight_init(&game->headlight, game->renderpass, 0, &game->camera.node->transform);
 }
 
 void game_update(Game* game) {
@@ -80,10 +83,10 @@ void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
     fw64Frustum frustum;
-    fw64_camera_extract_frustum_planes(&game->arcball.camera, &frustum);
+    fw64_camera_extract_frustum_planes(game->arcball.camera, &frustum);
 
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-    fw64_renderpass_set_camera(game->renderpass, &game->arcball.camera);
+    fw64_renderpass_set_camera(game->renderpass, game->arcball.camera);
     fw64_renderpass_begin(game->renderpass);
     fw64_scene_draw_frustrum(&game->scene, game->renderpass, &frustum, ~0U);
     fw64_renderpass_end(game->renderpass);

@@ -406,6 +406,14 @@ class GLTFLoader {
                 vertex[GLTFVertexIndex.ColorA] = 1.0;
             };
         }
+        else if (accessor.componentType == GltfComponentType.UnsignedByte) {
+            parseVertexColor = (vertex, buffer, offset) => {
+                vertex[GLTFVertexIndex.ColorR] = buffer.readUInt8(offset) / 255.0;
+                vertex[GLTFVertexIndex.ColorG] = buffer.readUInt8(offset + 1) / 255.0;
+                vertex[GLTFVertexIndex.ColorB] = buffer.readUInt8(offset + 2) / 255.0;
+                vertex[GLTFVertexIndex.ColorA] = 1.0;
+            };
+        }
         else {
             throw new Error(`Unsupported Vertex color type: ${accessor.componentType}`);
         }

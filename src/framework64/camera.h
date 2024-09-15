@@ -4,7 +4,7 @@
 
 #include "framework64/display.h"
 #include "framework64/frustum.h"
-#include "framework64/transform.h"
+#include "framework64/node.h"
 #include "framework64/types.h"
 #include "framework64/viewport.h"
 
@@ -24,7 +24,7 @@ typedef enum  {
 } fw64CameraProjectionMode;
 
 typedef struct {
-    fw64Transform transform;
+    fw64Node* node;
     fw64Matrix projection;
     fw64Matrix view;
     float near, far;
@@ -43,9 +43,9 @@ typedef struct {
 #endif
 } fw64Camera;
 
-void fw64_camera_init(fw64Camera* camera, fw64Display* display);
-void fw64_camera_init_persp(fw64Camera* camera, fw64Display* display);
-void fw64_camera_init_ortho(fw64Camera* camera, fw64Display* display);
+void fw64_camera_init(fw64Camera* camera, fw64Node* node, fw64Display* display);
+void fw64_camera_init_persp(fw64Camera* camera, fw64Node* node, fw64Display* display);
+void fw64_camera_init_ortho(fw64Camera* camera, fw64Node* node, fw64Display* display);
 
 void fw64_camera_update_projection_matrix(fw64Camera* camera);
 void fw64_camera_update_view_matrix(fw64Camera* camera);

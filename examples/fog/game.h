@@ -42,6 +42,7 @@ typedef struct {
 
 typedef struct {
     fw64Engine* engine;
+    fw64Camera camera;
     fw64FpsCamera fps_camera;
     fw64Scene* scene;
     fw64RenderPass* renderpass;
