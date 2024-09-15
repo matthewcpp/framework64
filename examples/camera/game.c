@@ -27,25 +27,28 @@ void game_init(Game* game, fw64Engine* engine) {
 void view_init(View* view, fw64Engine* engine, fw64Scene* scene, Vec2* viewport_pos, Vec2* viewport_size, fw64CameraProjectionMode projection_mode) {
     view->engine = engine;
     view->scene = scene;
+    fw64Allocator* allocator = fw64_scene_get_allocator(scene);
     fw64Display* display = fw64_displays_get_primary(engine->displays);
-    fw64_arcball_init(&view->arcball_camera, engine->input, display);
-    view->arcball_camera.camera.projection_mode = projection_mode;
+    fw64Node* camera_node = fw64_scene_create_node(scene);
+    fw64_camera_init(&view->camera, camera_node, display);
+    
+    view->camera.projection_mode = projection_mode;
+    fw64_camera_set_viewport_relative(&view->camera, viewport_pos, viewport_size);
+    fw64_camera_update_projection_matrix(&view->camera);
 
-    fw64_camera_set_viewport_relative(&view->arcball_camera.camera, viewport_pos, viewport_size);
-    fw64_camera_update_projection_matrix(&view->arcball_camera.camera);
-
-    view->renderpass = fw64_renderpass_create(display, fw64_default_allocator());
+    view->renderpass = fw64_renderpass_create(display, allocator);
     fw64_renderpass_set_clear_flags(view->renderpass, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_set_clear_color(view->renderpass, 25, 25, 25);
 
     Box bounding = {{-6.0f, -6.0f, -6.0f}, {6.0f, 6.0f, 6.0f}};
+    fw64_arcball_init(&view->arcball_camera, engine->input, &view->camera);
     fw64_arcball_set_initial(&view->arcball_camera, &bounding);
-    fw64_headlight_init(&view->headlight, view->renderpass, 0, &view->arcball_camera.camera.transform);
+    fw64_headlight_init(&view->headlight, view->renderpass, 0, &camera_node->transform);
 }
 
 void view_update(View* view, float time_delta) {
     fw64_arcball_update(&view->arcball_camera, time_delta);
-    fw64_renderpass_set_camera(view->renderpass, &view->arcball_camera.camera);
+    fw64_renderpass_set_camera(view->renderpass, view->arcball_camera.camera);
     fw64_headlight_update(&view->headlight);
 }
 
@@ -54,7 +57,7 @@ void init_scene(Game* game) {
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
 
-    info.node_count = 5;
+    info.node_count = 7;
     info.mesh_count = 1;
     info.mesh_instance_count = 5;
 
@@ -62,7 +65,7 @@ void init_scene(Game* game) {
     fw64Mesh* mesh = fw64_scene_load_mesh_asset(scene, FW64_ASSET_mesh_blue_cube);
     float x_pos = -3.0f;
 
-    for (uint32_t i = 0; i < info.node_count; i++) {
+    for (uint32_t i = 0; i < 5; i++) {
         fw64Node* node = fw64_scene_create_node(scene);
         vec3_set(&node->transform.position, x_pos, 0.0f, 0.0f);
         fw64_node_update(node);
@@ -89,7 +92,7 @@ void init_views(Game* game) {
 
 static void view_draw(View* view) {
     fw64Frustum frustum;
-    fw64_camera_extract_frustum_planes(&view->arcball_camera.camera, & frustum);
+    fw64_camera_extract_frustum_planes(view->arcball_camera.camera, &frustum);
 
     fw64_renderpass_begin(view->renderpass);
     fw64_scene_draw_frustrum(view->scene, view->renderpass, &frustum, ~0U);
@@ -105,10 +108,10 @@ void init_overlay(Game* game) {
     game->overlay.spritebatch = fw64_spritebatch_create(1, fw64_default_allocator());
 
     fw64_spritebatch_begin(game->overlay.spritebatch);
-    fw64Viewport* viewport = &game->persp_view.arcball_camera.camera.viewport;
+    fw64Viewport* viewport = &game->persp_view.arcball_camera.camera->viewport;
     fw64_spritebatch_draw_string(game->overlay.spritebatch, game->font, "persp", viewport->position.x, viewport->position.y);
 
-    viewport = &game->ortho_view.arcball_camera.camera.viewport;
+    viewport = &game->ortho_view.arcball_camera.camera->viewport;
     fw64_spritebatch_draw_string(game->overlay.spritebatch, game->font, "ortho", viewport->position.x, viewport->position.y);
 
     fw64_spritebatch_end(game->overlay.spritebatch);

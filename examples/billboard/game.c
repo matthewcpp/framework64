@@ -21,24 +21,28 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_renderer_set_clear_color(engine->renderer, 0, 17, 51);
     fw64_billboard_nodes_init(&game->billboard_nodes, allocator);
 
-    fw64_fps_camera_init(&game->fps, engine->input, fw64_displays_get_primary(engine->displays));
+    game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_billboard_example, allocator);
+    fw64Node* camera_node = fw64_scene_create_node(game->scene);
+    vec3_set(&camera_node->transform.position, 0.6f, 12.0f, 40.0f);
+
+    fw64_camera_init(&game->camera, camera_node, display);
+    game->camera.near = 1.0f;
+    game->camera.far = 300.0f;
+    fw64_camera_update_projection_matrix(&game->camera);
+
+    fw64_fps_camera_init(&game->fps, engine->input, &game->camera);
     game->fps.movement_speed = 70.0f;
-    game->fps.camera.near = 1.0f;
-    game->fps.camera.far = 300.0f;
-    fw64_camera_update_projection_matrix(&game->fps.camera);
-    vec3_set(&game->fps.camera.transform.position, 0.6f, 12.0f, 40.0f);
 
     game->renderpass[RENDERPASS_DEPTH_ENABLED] = fw64_renderpass_create(display, allocator);
     game->renderpass[RENDERPASS_DEPTH_DISABLED] = fw64_renderpass_create(display, allocator);
     fw64_renderpass_set_depth_testing_enabled(game->renderpass[RENDERPASS_DEPTH_DISABLED], 0);
 
-    game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_billboard_example, allocator);
     create_flame(game);
 
     fw64Node* billboard_nodes[2];
     uint32_t node_count = fw64_scene_find_nodes_with_layer_mask(game->scene, FW64_layer_billboard, billboard_nodes, 2);
     for (uint32_t i = 0; i < node_count; i++) {
-        fw64_billboard_nodes_create(&game->billboard_nodes, billboard_nodes[i], &game->fps.camera, NULL);
+        fw64_billboard_nodes_create(&game->billboard_nodes, billboard_nodes[i], game->fps.camera, NULL);
     }
 }
 
@@ -79,20 +83,20 @@ void game_update(Game* game){
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
     fw64Frustum frustum;
-    fw64_camera_extract_frustum_planes(&game->fps.camera, &frustum);
+    fw64_camera_extract_frustum_planes(game->fps.camera, &frustum);
 
     fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
 
     fw64RenderPass* renderpass = game->renderpass[RENDERPASS_DEPTH_ENABLED];
     fw64_renderpass_begin(renderpass);
-    fw64_renderpass_set_camera(renderpass, &game->fps.camera);
+    fw64_renderpass_set_camera(renderpass, game->fps.camera);
     fw64_scene_draw_frustrum(game->scene, renderpass, &frustum, ~FW64_layer_flame);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(renderer, renderpass);
 
     renderpass = game->renderpass[RENDERPASS_DEPTH_DISABLED];
     fw64_renderpass_begin(renderpass);
-    fw64_renderpass_set_camera(renderpass, &game->fps.camera);
+    fw64_renderpass_set_camera(renderpass, game->fps.camera);
     fw64_scene_draw_frustrum(game->scene, renderpass, &frustum, FW64_layer_flame);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(renderer, renderpass);

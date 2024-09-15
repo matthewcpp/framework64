@@ -2,7 +2,7 @@
 
 #include "framework64/camera.h"
 #include "framework64/engine.h"
-#include "framework64/transform.h"
+#include "framework64/scene.h"
 
 typedef struct {
     fw64Engine* engine;
@@ -20,7 +20,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void chase_camera_init(ChaseCamera* chase_cam, fw64Engine* engine);
+void chase_camera_init(ChaseCamera* chase_cam, fw64Engine* engine, fw64Scene* scene);
 void chase_camera_update(ChaseCamera* chase_cam);
 
 #ifdef __cplusplus

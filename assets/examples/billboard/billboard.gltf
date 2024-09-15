@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.0.44",
+		"generator":"Khronos glTF Blender I/O v4.2.60",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -73,6 +73,9 @@
 			"children":[
 				4
 			],
+			"extras":{
+				"extraNodes":1
+			},
 			"name":"billboard_example"
 		}
 	],
@@ -174,12 +177,13 @@
 			"primitives":[
 				{
 					"attributes":{
-						"COLOR_0":8,
-						"POSITION":9,
-						"NORMAL":10,
-						"TEXCOORD_0":11
+						"POSITION":8,
+						"NORMAL":9,
+						"TEXCOORD_0":10,
+						"COLOR_0":11,
+						"COLOR_1":12
 					},
-					"indices":12,
+					"indices":13,
 					"material":2
 				}
 			]
@@ -189,11 +193,13 @@
 			"primitives":[
 				{
 					"attributes":{
-						"POSITION":13,
-						"NORMAL":14,
-						"TEXCOORD_0":15
+						"POSITION":14,
+						"NORMAL":15,
+						"TEXCOORD_0":16,
+						"COLOR_0":17,
+						"COLOR_1":18
 					},
-					"indices":12,
+					"indices":13,
 					"material":3
 				}
 			]
@@ -203,12 +209,13 @@
 			"primitives":[
 				{
 					"attributes":{
-						"COLOR_0":16,
-						"POSITION":17,
-						"NORMAL":18,
-						"TEXCOORD_0":19
+						"POSITION":19,
+						"NORMAL":20,
+						"TEXCOORD_0":21,
+						"COLOR_0":22,
+						"COLOR_1":23
 					},
-					"indices":12,
+					"indices":13,
 					"material":4
 				}
 			]
@@ -313,12 +320,6 @@
 			"bufferView":8,
 			"componentType":5126,
 			"count":4,
-			"type":"VEC4"
-		},
-		{
-			"bufferView":9,
-			"componentType":5126,
-			"count":4,
 			"max":[
 				1,
 				0.8333333730697632,
@@ -332,25 +333,38 @@
 			"type":"VEC3"
 		},
 		{
-			"bufferView":10,
+			"bufferView":9,
 			"componentType":5126,
 			"count":4,
 			"type":"VEC3"
 		},
 		{
-			"bufferView":11,
+			"bufferView":10,
 			"componentType":5126,
 			"count":4,
 			"type":"VEC2"
 		},
 		{
+			"bufferView":11,
+			"componentType":5121,
+			"count":4,
+			"normalized":true,
+			"type":"VEC4"
+		},
+		{
 			"bufferView":12,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":13,
 			"componentType":5123,
 			"count":6,
 			"type":"SCALAR"
 		},
 		{
-			"bufferView":13,
+			"bufferView":14,
 			"componentType":5126,
 			"count":4,
 			"max":[
@@ -366,25 +380,32 @@
 			"type":"VEC3"
 		},
 		{
-			"bufferView":14,
+			"bufferView":15,
 			"componentType":5126,
 			"count":4,
 			"type":"VEC3"
 		},
 		{
-			"bufferView":15,
+			"bufferView":16,
 			"componentType":5126,
 			"count":4,
 			"type":"VEC2"
 		},
 		{
-			"bufferView":16,
-			"componentType":5126,
+			"bufferView":17,
+			"componentType":5121,
 			"count":4,
+			"normalized":true,
 			"type":"VEC4"
 		},
 		{
-			"bufferView":17,
+			"bufferView":18,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":19,
 			"componentType":5126,
 			"count":4,
 			"max":[
@@ -400,16 +421,29 @@
 			"type":"VEC3"
 		},
 		{
-			"bufferView":18,
+			"bufferView":20,
 			"componentType":5126,
 			"count":4,
 			"type":"VEC3"
 		},
 		{
-			"bufferView":19,
+			"bufferView":21,
 			"componentType":5126,
 			"count":4,
 			"type":"VEC2"
+		},
+		{
+			"bufferView":22,
+			"componentType":5121,
+			"count":4,
+			"normalized":true,
+			"type":"VEC4"
+		},
+		{
+			"bufferView":23,
+			"componentType":5126,
+			"count":4,
+			"type":"VEC3"
 		}
 	],
 	"bufferViews":[
@@ -463,26 +497,32 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":64,
+			"byteLength":48,
 			"byteOffset":32304,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":48,
-			"byteOffset":32368,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":48,
-			"byteOffset":32416,
+			"byteOffset":32352,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":32,
-			"byteOffset":32464,
+			"byteOffset":32400,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":16,
+			"byteOffset":32432,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":32448,
 			"target":34962
 		},
 		{
@@ -511,8 +551,14 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":64,
+			"byteLength":16,
 			"byteOffset":32636,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":32652,
 			"target":34962
 		},
 		{
@@ -532,6 +578,18 @@
 			"byteLength":32,
 			"byteOffset":32796,
 			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":16,
+			"byteOffset":32828,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":32844,
+			"target":34962
 		}
 	],
 	"samplers":[
@@ -542,7 +600,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":32828,
+			"byteLength":32892,
 			"uri":"billboard.bin"
 		}
 	]

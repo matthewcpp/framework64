@@ -17,7 +17,10 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int node_
     player->weapon_renderpass = fw64_renderpass_create(display, fw64_default_allocator());
     fw64_renderpass_set_clear_flags(player->weapon_renderpass, FW64_CLEAR_FLAG_DEPTH);
 
-    fw64_fps_camera_init(&player->fps_camera, engine->input, display);
+    player->camera_node = fw64_scene_create_node(scene);
+    fw64_camera_init(&player->camera, player->camera_node, display);
+
+    fw64_fps_camera_init(&player->fps_camera, engine->input, &player->camera);
     player->fps_camera.player_index = player->player_index;
 
     player->node = fw64_scene_get_node(player->scene, node_id);
@@ -27,15 +30,16 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int node_
     Box* bounding = &player->node->collider->bounding;
     Vec3 position = player->node->transform.position;
     position.y += bounding->max.y;
-    player->fps_camera.camera.transform.position = position;
+    player->camera_node->transform.position = position;
 }
 
 void player_update(Player* player) {
     fw64_fps_camera_update(&player->fps_camera, player->engine->time->time_delta);
 
     quat_from_euler(&player->node->transform.rotation, 0.0f, player->fps_camera.rotation.y, 0.0f);
-    player->node->transform.position.x = player->fps_camera.camera.transform.position.x;
-    player->node->transform.position.z = player->fps_camera.camera.transform.position.z;
+    // TODO: This should go away when controller is implemented
+    player->node->transform.position.x = player->camera_node->transform.position.x;
+    player->node->transform.position.z = player->camera_node->transform.position.z;
     fw64_node_update(player->node);
 }
 
@@ -54,11 +58,11 @@ void player_set_weapon(Player* player, Weapon* weapon) {
 
 void player_draw_view(Player* player) {
     fw64Frustum frustum;
-    fw64_camera_extract_frustum_planes(&player->fps_camera.camera, &frustum);
+    fw64_camera_extract_frustum_planes(&player->camera, &frustum);
     uint32_t layer_mask = player->node->layer_mask | FW64_layer_weapon;
 
     fw64_renderpass_begin(player->scene_renderpass);
-    fw64_renderpass_set_camera(player->scene_renderpass, &player->fps_camera.camera);
+    fw64_renderpass_set_camera(player->scene_renderpass, &player->camera);
     fw64_scene_draw_frustrum(player->scene, player->scene_renderpass, &frustum, ~layer_mask);
     fw64_renderpass_end(player->scene_renderpass);
 
@@ -80,8 +84,8 @@ void player_draw_weapon(Player* player) {
 void player_set_viewport_rect(Player* player, float x, float y, float w, float h) {
     Vec2 relative_pos = {x, y};
     Vec2 relative_size = {w, h};
-    fw64_camera_set_viewport_relative(&player->fps_camera.camera, &relative_pos, &relative_size);
+    fw64_camera_set_viewport_relative(&player->camera, &relative_pos, &relative_size);
 
-    fw64_renderpass_set_viewport(player->scene_renderpass, &player->fps_camera.camera.viewport);
-    fw64_renderpass_set_viewport(player->weapon_renderpass, &player->fps_camera.camera.viewport);
+    fw64_renderpass_set_viewport(player->scene_renderpass, &player->camera.viewport);
+    fw64_renderpass_set_viewport(player->weapon_renderpass, &player->camera.viewport);
 }

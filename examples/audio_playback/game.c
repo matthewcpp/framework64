@@ -61,7 +61,7 @@ static void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
 
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-    info.node_count = 1;
+    info.node_count = 2;
     info.mesh_instance_count = 1;
 
     fw64_scene_init(&scene_view->scene, &info, engine->assets, allocator);
@@ -73,10 +73,14 @@ static void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
     fw64_rotate_node_init(&scene_view->rotate_node, node);
     vec3_set(&scene_view->rotate_node.axis, 0.0f, 0.0f, 1.0f);
 
-    fw64_camera_init(&scene_view->camera, display);
+    fw64Node* camera_node = fw64_scene_create_node(&scene_view->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 0.0f, 5.0f);
+    fw64_node_update(camera_node);
+    fw64Camera camera;
+    fw64_camera_init(&camera, camera_node, display);
 
     scene_view->renderpass = fw64_renderpass_create(display, allocator);
-    fw64_renderpass_set_camera(scene_view->renderpass, &scene_view->camera);
+    fw64_renderpass_set_camera(scene_view->renderpass, &camera);
 }
 
 void scene_view_draw(SceneView* scene_view) {

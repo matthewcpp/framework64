@@ -32,10 +32,11 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     game->button_sprite = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
+    game->mesh_node = NULL;
 
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-    info.node_count = 1;
+    info.node_count = 2;
     info.mesh_instance_count = 1;
     info.mesh_count = MESH_COUNT;
 
@@ -45,18 +46,20 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_suzanne);
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_penguin);
 
-    fw64_arcball_init(&game->arcball, engine->input, display);
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    fw64_camera_init(&game->camera, camera_node, display);
+    game->camera.near = 1.0f;
+    game->camera.far = 1000.0f;
+    fw64_camera_update_projection_matrix(&game->camera);
 
-    game->arcball.camera.near = 1.0f;
-    game->arcball.camera.far = 1000.0f;
-    fw64_camera_update_projection_matrix(&game->arcball.camera);
+    fw64_arcball_init(&game->arcball, engine->input, &game->camera);
 
     game->spritebatch = fw64_spritebatch_create(1, allocator);
     game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
     game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
     fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);
 
-    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &game->arcball.camera.transform);
+    fw64_headlight_init(&game->headlight, game->renderpasses[RENDER_PASS_SCENE], 0, &camera_node->transform);
 
     game->current_mesh = -1;
     load_next_mesh(game, 1);
@@ -73,12 +76,11 @@ static void load_next_mesh(Game* game, int direction) {
 
     fw64Mesh* mesh = fw64_scene_get_mesh(&game->scene, game->current_mesh);
 
-    if (fw64_scene_get_node_count(&game->scene) == 0) {
-        fw64Node* node = fw64_scene_create_node(&game->scene);
-        fw64_scene_create_mesh_instance(&game->scene, node, mesh);
+    if (game->mesh_node == NULL) {
+        game->mesh_node = fw64_scene_create_node(&game->scene);
+        fw64_scene_create_mesh_instance(&game->scene, game->mesh_node, mesh);
     } else {
-        fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-        fw64_mesh_instance_set_mesh(node->mesh_instance, mesh);
+        fw64_mesh_instance_set_mesh(game->mesh_node->mesh_instance, mesh);
     }
 
     Box bounding_box = fw64_mesh_get_bounding_box(mesh);
@@ -109,7 +111,7 @@ void game_draw(Game* game) {
 
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_begin(renderpass);
-    fw64_renderpass_set_camera(renderpass, &game->arcball.camera);
+    fw64_renderpass_set_camera(renderpass, &game->camera);
     fw64_scene_draw_all(&game->scene, renderpass);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(renderer, renderpass);

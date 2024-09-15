@@ -15,7 +15,7 @@ void ui_init(Ui* ui, fw64Engine* engine, fw64Scene* scene, fw64RenderPass* scene
     ui->is_active = 0;
     ui->arcball_camera = arcball_camera;
 
-    fw64Transform* camera_transform = &arcball_camera->camera.transform;
+    fw64Transform* camera_transform = &arcball_camera->camera->node->transform;
 
     fw64Font* font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
 

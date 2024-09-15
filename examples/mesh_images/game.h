@@ -16,6 +16,7 @@ typedef struct {
     fw64Font* font;
     fw64SpriteBatch* spritebatch;
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
+    fw64Camera camera;
     fw64ArcballCamera arcball;
     fw64Scene scene;
     int selected_material;

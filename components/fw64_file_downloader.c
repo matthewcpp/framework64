@@ -90,7 +90,7 @@ void fw64_file_downloader_continue(fw64FileDownloader* file_downloader, fw64Data
     char message_chunk_buffer[MESSAGE_CHUNK_BUFFER_SIZE];
 
     while (payload_data_remaining > 0) {
-        size_t data_to_read = payload_data_remaining > MESSAGE_CHUNK_BUFFER_SIZE ? MESSAGE_CHUNK_BUFFER_SIZE : payload_data_remaining;
+        uint32_t data_to_read = payload_data_remaining > MESSAGE_CHUNK_BUFFER_SIZE ? MESSAGE_CHUNK_BUFFER_SIZE : payload_data_remaining;
         fw64_data_source_read(message, &message_chunk_buffer[0], 1, data_to_read);
 
         if (file_downloader->data_writer) {

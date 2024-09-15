@@ -11,6 +11,7 @@
 typedef struct {
     fw64Engine* engine;
     fw64Scene* scene;
+    fw64Camera camera;
     fw64ArcballCamera arcball_camera;
     fw64RenderPass* renderpass;
     fw64Headlight headlight;

@@ -20,13 +20,12 @@ typedef enum {
     GAME_MODE_MENU
 } GameMode;
 
-
-
 typedef struct {
     fw64Engine* engine;
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
     GameMode mode;
     Ui ui;
+    fw64Camera camera;
     fw64ArcballCamera arcball;
     fw64Scene scene;
     fw64Headlights headlights;

@@ -11,7 +11,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64SceneInfo scene_info;
     fw64_scene_info_init(&scene_info);
-    scene_info.node_count = 1;
+    scene_info.node_count = 2;
     scene_info.mesh_count = 1;
     scene_info.mesh_instance_count = 1;
 
@@ -25,13 +25,15 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_rotate_node_init(&game->rotate_node, node);
 
-    fw64Camera camera;
-    fw64_camera_init(&camera, display);
-    vec3_set(&camera.transform.position, 0.0f, 7.5f, 18.0f);
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 7.5f, 18.0f);
     Vec3 target = {0.0f, 0.0f, 0.0f};
     Vec3 up = {0.0f, 1.0f, 0.0f};
-    fw64_transform_look_at(&camera.transform, &target, &up);
-    fw64_camera_update_view_matrix(&camera);
+    fw64_transform_look_at(&camera_node->transform, &target, &up);
+    fw64_node_update(camera_node);
+
+    fw64Camera camera;
+    fw64_camera_init(&camera, camera_node, display);
 
     game->renderpass = fw64_renderpass_create(display, allocator);
     fw64_renderpass_set_camera(game->renderpass, &camera);

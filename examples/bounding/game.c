@@ -165,18 +165,14 @@ void ui_draw(Ui* ui) {
 }
 
 void setup_camera(Game* game) {
-    fw64_camera_init(&game->camera, fw64_displays_get_primary(game->engine->displays));
-
+    fw64Node* camera_node = fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Camera);
+    
+    fw64_camera_init(&game->camera, camera_node, fw64_displays_get_primary(game->engine->displays));
     game->camera.near = 10.0f;
     game->camera.far = 500.0f;
     fw64_camera_update_projection_matrix(&game->camera);
 
-    fw64Node* node = fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Camera);
-    game->camera.transform.position = node->transform.position;
-
     Vec3 center = {0.0f, 0.0f, 0.0f}, up = {0.0f, 1.0f, 0.0f};
-    fw64_transform_look_at(&game->camera.transform, &center, &up);
-
+    fw64_transform_look_at(&camera_node->transform, &center, &up);
     fw64_camera_update_view_matrix(&game->camera);
 }
-

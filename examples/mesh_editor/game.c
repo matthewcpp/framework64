@@ -45,16 +45,19 @@ void game_init(Game* game, fw64Engine* engine) {
     game->tile_index = -1;
     game->renderpass = fw64_renderpass_create(display, allocator);
 
-    fw64Camera camera;
-    fw64_camera_init(&camera, display);
-    fw64_renderpass_set_camera(game->renderpass, &camera);
-
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
     info.mesh_count = 1;
     info.mesh_instance_count = 1;
-    info.node_count = 1;
+    info.node_count = 2;
     fw64_scene_init(&game->scene, &info, engine->assets, allocator);
+
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 0.0f, 5.0f);
+    fw64_node_update(camera_node);
+    fw64Camera camera;
+    fw64_camera_init(&camera, camera_node, display);
+    fw64_renderpass_set_camera(game->renderpass, &camera);
 
     fw64Node* node = fw64_scene_create_node(&game->scene);
     fw64Mesh* mesh = fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_minesweeper_tile);

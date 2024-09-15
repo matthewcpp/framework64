@@ -28,6 +28,7 @@ typedef struct {
     fw64SpriteBatch* spritebatch;
     fw64BumpAllocator mesh_allocator;
     fw64Scene scene;
+    fw64Node* mesh_node;
     fw64UiNavigation ui_nav;
 } Game;
 

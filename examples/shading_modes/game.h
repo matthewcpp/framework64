@@ -14,6 +14,7 @@ typedef enum {
 
 typedef struct {
     fw64Engine* engine;
+    fw64Camera camera;
     fw64ArcballCamera arcball;
     fw64Headlight headlight;
 
@@ -21,6 +22,7 @@ typedef struct {
     fw64Texture* button_sprite;
 
     fw64Scene scene;
+    fw64Node* mesh_node;
     int current_mesh;
 
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];

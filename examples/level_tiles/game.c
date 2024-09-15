@@ -12,7 +12,7 @@
 void player_init(Player* player, fw64Engine* engine, Tiles* level);
 void player_update(Player* player);
 
-void follow_camera_init(FollowCamera* follow_cam, fw64Engine* engine, fw64Node* target);
+void follow_camera_init(FollowCamera* follow_cam, fw64Engine* engine, Tiles* tiles, fw64Node* target);
 void follow_camera_update(FollowCamera* follow_cam);
 
 void tiles_init(Tiles* tiles, fw64Engine* engine, fw64SceneInfo* persistent_info);
@@ -48,17 +48,17 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-    info.node_count = 1;
+    info.node_count = 2;
     info.collider_count = 1;
     info.skinned_mesh_count = 1;
     info.skinned_mesh_instance_count = 1;
     tiles_init(&game->tiles, engine, &info);
 
     player_init(&game->player, engine, &game->tiles);
-    follow_camera_init(&game->follow_camera, engine, game->player.node);
+    follow_camera_init(&game->follow_camera, engine, &game->tiles, game->player.node);
 
     Vec3 forward;
-    fw64_transform_back(&game->follow_camera.camera.transform, &forward);
+    fw64_transform_back(&game->follow_camera.camera.node->transform, &forward);
     fw64_renderpass_set_light_direction(game->renderpass, 0, &forward);
 
     tiles_load_next_tile(&game->tiles, 3);
@@ -194,22 +194,23 @@ void tiles_draw(Tiles* tiles, fw64RenderPass* renderpass, fw64Frustum* frustum) 
     }
 }
 
-void follow_camera_init(FollowCamera* follow_cam, fw64Engine* engine, fw64Node* target) {
-    fw64_camera_init(&follow_cam->camera, fw64_displays_get_primary(engine->displays));
+void follow_camera_init(FollowCamera* follow_cam, fw64Engine* engine, Tiles* tiles, fw64Node* target) {
+    fw64Node* camera_node = fw64_scene_create_node(tiles->persistent);
+    fw64_camera_init(&follow_cam->camera, camera_node, fw64_displays_get_primary(engine->displays));
     follow_cam->target = target;
     vec3_set(&follow_cam->offset, 0.0f, 15.0f, -40.0f);
 }
 
 void follow_camera_update(FollowCamera* follow_cam) {
-    vec3_add(&follow_cam->camera.transform.position, &follow_cam->target->transform.position, &follow_cam->offset);
-    follow_cam->camera.transform.position.x = 0.0f;
+    vec3_add(&follow_cam->camera.node->transform.position, &follow_cam->target->transform.position, &follow_cam->offset);
+    follow_cam->camera.node->transform.position.x = 0.0f;
     
     Vec3 target, extents, up = {0.0f, 1.0f, 0.0f};
     box_center(&follow_cam->target->collider->bounding, &target);
     box_extents(&follow_cam->target->collider->bounding, &extents);
     target.x = 0.0f;
     target.y += extents.y;
-    fw64_transform_look_at(&follow_cam->camera.transform, &target, &up);
+    fw64_transform_look_at(&follow_cam->camera.node->transform, &target, &up);
     fw64_camera_update_view_matrix(&follow_cam->camera);
 }
 

@@ -437,7 +437,7 @@
 			"extras":{
 				"extraMeshes":"1",
 				"extraMeshInstances":"4",
-				"extraNodes":"4"
+				"extraNodes":"8"
 			},
 			"name":"Split Screen"
 		}

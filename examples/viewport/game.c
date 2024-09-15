@@ -50,20 +50,20 @@ void setup_initial_viewport(Game* game) {
     IVec2 viewport_size = {display_size.x / 2, display_size.y / 2};
 
     IVec2 viewport_pos = {(display_size.x - viewport_size.x) / 2, (display_size.y - viewport_size.y) / 2};
-    fw64_camera_init(&game->camera, primary_display);
-    fw64_camera_set_viewport(&game->camera, &viewport_pos, &viewport_size);
-
-    vec3_set(&game->camera.transform.position, 0.0f, 7.5f, 18.0f);
+    fw64Node* camera_node = fw64_scene_create_node(&game->scene);
+    vec3_set(&camera_node->transform.position, 0.0f, 7.5f, 18.0f);
     Vec3 target = {0.0f, 0.0f, 0.0f};
     Vec3 up = {0.0f, 1.0f, 0.0f};
-    fw64_transform_look_at(&game->camera.transform, &target, &up);
-    fw64_camera_update_view_matrix(&game->camera);
+    fw64_transform_look_at(&camera_node->transform, &target, &up);
+
+    fw64_camera_init(&game->camera, camera_node, primary_display);
+    fw64_camera_set_viewport(&game->camera, &viewport_pos, &viewport_size);
 }
 
 void setup_scene(Game* game) {
     fw64SceneInfo info;
     fw64_scene_info_init(&info);
-    info.node_count = 1;
+    info.node_count = 2;
     info.mesh_count = 1;
     info.mesh_instance_count = 1;
 
