@@ -228,6 +228,7 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
 
     if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.sprite_batches)) {
         setDrawingMode(DrawingMode::Rect);
+        glDisable(GL_DEPTH_TEST);
 
         for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.sprite_batches); i++){
             fw64SpriteBatch* sprite_batch = *((fw64SpriteBatch**)fw64_dynamic_vector_item(&renderpass->render_queue.sprite_batches, i));
@@ -250,7 +251,7 @@ void fw64Renderer::drawSpriteBatch(fw64SpriteBatch* sprite_batch) {
 
             auto& sprite_vertex_buffer = sprite_batch->vertex_buffers[batch.second];
             glBindVertexArray(sprite_vertex_buffer.gl_vertex_array_object);
-            glDrawArrays(GL_TRIANGLES, 0, sprite_vertex_buffer.cpu_buffer.size());
+            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(sprite_vertex_buffer.cpu_buffer.size()));
             glBindVertexArray(0);
         }
     }

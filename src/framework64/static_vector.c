@@ -5,8 +5,8 @@
 #include <string.h>
 
 void fw64_static_vector_init(fw64StaticVector* vector, size_t item_size, size_t item_capacity, fw64Allocator* allocator) {
-    vector->item_size = item_size;
-    vector->item_capacity = item_capacity;
+    vector->item_size = (uint32_t)item_size;
+    vector->item_capacity = (uint32_t)item_capacity;
     vector->item_count = 0;
 
     if (item_capacity) {
@@ -18,7 +18,7 @@ void fw64_static_vector_init(fw64StaticVector* vector, size_t item_size, size_t 
 }
 
 void fw64_static_vector_resize(fw64StaticVector* vector, size_t count) {
-    vector->item_count = fw64_mini(vector->item_capacity, count);
+    vector->item_count = fw64_mini(vector->item_capacity, (int)count);
 }
 
 void fw64_static_vector_uninit(fw64StaticVector* vector, fw64Allocator* allocator) {
