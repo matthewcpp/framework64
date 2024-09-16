@@ -44,7 +44,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
         return NULL;
     }
 
-    fw64Scene* scene = allocator->malloc(allocator, sizeof(fw64Scene));
+    fw64Scene* scene = fw64_allocator_malloc(allocator, sizeof(fw64Scene));
     scene->allocator = allocator;
     scene->assets = assets;
     scene->material_bundle = material_bundle;
@@ -74,7 +74,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
     // this is read last so that in the case of bump allocator the space can be re-used.
     Box* custom_bounding_boxes = NULL;
     if (scene_info.custom_bounding_box_count) {
-        custom_bounding_boxes = allocator->malloc(allocator, sizeof(Box) * scene_info.custom_bounding_box_count);
+        custom_bounding_boxes = fw64_allocator_malloc(allocator, sizeof(Box) * scene_info.custom_bounding_box_count);
         fw64_data_source_read(data_source, custom_bounding_boxes, sizeof(Box), scene_info.custom_bounding_box_count);
     }
 
@@ -125,7 +125,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
     
 
     if (custom_bounding_boxes) {
-        allocator->free(allocator, custom_bounding_boxes);
+        fw64_allocator_free(allocator, custom_bounding_boxes);
     }
 
     return scene;
@@ -159,7 +159,7 @@ void fw64_scene_uninit(fw64Scene* scene) {
 
 void fw64_scene_delete(fw64Scene* scene) {
     fw64_scene_uninit(scene);
-    scene->allocator->free(scene->allocator, scene);
+    fw64_allocator_free(scene->allocator, scene);
 }
 
 void fw64_scene_update_bounding(fw64Scene* scene) {

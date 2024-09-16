@@ -14,18 +14,18 @@ fw64Font* fw64_font_load_from_datasource(fw64DataSource* data_source, fw64Alloca
     fw64N64FontInfo font_info;
     fw64_data_source_read(data_source, &font_info, sizeof(fw64N64FontInfo), 1);
 
-    fw64Font* font = allocator->malloc(allocator, sizeof(fw64Font));
+    fw64Font* font = fw64_allocator_malloc(allocator, sizeof(fw64Font));
     font->glyph_count = (int)font_info.glyph_count;
     font->size = (int)font_info.size;
     font->line_height = (int)font_info.line_height;
 
     size_t glyph_data_size = sizeof(fw64FontGlyph) * font->glyph_count;
-    font->glyphs = allocator->malloc(allocator, glyph_data_size);
+    font->glyphs = fw64_allocator_malloc(allocator, glyph_data_size);
     fw64_data_source_read(data_source, font->glyphs, 1, glyph_data_size);
     
 
     // load the font's image
-    fw64Image* image = allocator->malloc(allocator, sizeof(fw64Image));
+    fw64Image* image = fw64_allocator_malloc(allocator, sizeof(fw64Image));
     fw64_n64_image_read_data(image, data_source, allocator);
     fw64_n64_texture_init_with_image(&font->texture, image);
 
@@ -34,9 +34,9 @@ fw64Font* fw64_font_load_from_datasource(fw64DataSource* data_source, fw64Alloca
 
 void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* allocator) {
     if (!allocator) allocator = fw64_default_allocator();
-    allocator->free(allocator, font->glyphs);
+    fw64_allocator_free(allocator, font->glyphs);
     fw64_image_delete(assets, font->texture.image, allocator);
-    allocator->free(allocator, font);
+    fw64_allocator_free(allocator, font);
 }
 
 static uint16_t find_font_glyph_rec(fw64FontGlyph* glyphs, int min_index, int max_index, uint16_t codepoint) {

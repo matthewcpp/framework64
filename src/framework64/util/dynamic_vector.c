@@ -12,7 +12,7 @@ void fw64_dynamic_vector_init(fw64DynamicVector* vector, uint32_t item_size, fw6
 
 void fw64_dynamic_vector_uninit(fw64DynamicVector* vector) {
     if (vector->_data) {
-        vector->_allocator->free(vector->_allocator, vector->_data);
+        fw64_allocator_free(vector->_allocator, vector->_data);
     }
 }
 
@@ -21,14 +21,14 @@ void fw64_dynamic_vector_uninit(fw64DynamicVector* vector) {
 static void fw64_dynamic_vector_grow(fw64DynamicVector* vector) {
     if (vector->_capacity > 0) {
         uint16_t new_capacity = vector->_capacity * 2;
-        char* new_data = vector->_allocator->malloc(vector->_allocator, new_capacity * vector->_item_size);
+        char* new_data = fw64_allocator_malloc(vector->_allocator, new_capacity * vector->_item_size);
         memcpy(new_data, vector->_data, vector->_capacity * vector->_item_size);
-        vector->_allocator->free(vector->_allocator, vector->_data);
+        fw64_allocator_free(vector->_allocator, vector->_data);
         vector->_data = new_data;
         vector->_capacity = new_capacity;
     } else {
         vector->_capacity = FW64_DYNAMIC_VECTOR_DEFAULT_CAPACITY;
-        vector->_data = vector->_allocator->malloc(vector->_allocator, vector->_capacity * vector->_item_size);
+        vector->_data = fw64_allocator_malloc(vector->_allocator, vector->_capacity * vector->_item_size);
     }
 }
 

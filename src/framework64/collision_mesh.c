@@ -10,7 +10,7 @@ int fw64_collision_mesh_load_from_datasource(fw64CollisionMesh* collision_mesh, 
 
     uint32_t point_data_size = collision_mesh->point_count * sizeof(Vec3);
     uint32_t element_data_size = collision_mesh->element_count * sizeof(uint16_t);
-    char* data_buffer = allocator->malloc(allocator, point_data_size + element_data_size);
+    char* data_buffer = fw64_allocator_malloc(allocator, point_data_size + element_data_size);
 
     //read data buffer and update pointers
     fw64_data_source_read(data_source, data_buffer, 1, point_data_size + element_data_size);
@@ -22,7 +22,7 @@ int fw64_collision_mesh_load_from_datasource(fw64CollisionMesh* collision_mesh, 
 
 void fw64_collision_mesh_uninit(fw64CollisionMesh* collision_mesh, fw64Allocator* allocator) {
     // note the chunk of data for the mesh collider is allocated together so just need to free the start
-    allocator->free(allocator, collision_mesh->points);
+    fw64_allocator_free(allocator, collision_mesh->points);
 }
 
 int fw64_collision_mesh_test_sphere(fw64CollisionMesh* collision_mesh, fw64Transform* transform, Vec3* center, float radius, Vec3* out_point) {

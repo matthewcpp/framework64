@@ -11,7 +11,7 @@ static void fw64_n64_mesh_builder_clear_data(fw64MeshBuilder* mesh_builder);
 
 fw64MeshBuilder* fw64_mesh_builder_create(fw64AssetDatabase* assets, size_t primitive_count, size_t image_count, fw64Allocator* allocator) {
     (void)assets;
-    fw64MeshBuilder* mesh_builder = allocator->malloc(allocator, sizeof(fw64MeshBuilder));
+    fw64MeshBuilder* mesh_builder = fw64_allocator_malloc(allocator, sizeof(fw64MeshBuilder));
     memset(mesh_builder, 0, sizeof(fw64MeshBuilder));
 
     mesh_builder->allocator = allocator;
@@ -25,14 +25,14 @@ void fw64_mesh_builder_reset(fw64MeshBuilder* mesh_builder, size_t primitive_cou
     fw64_n64_mesh_builder_clear_data(mesh_builder);
 
     fw64Allocator* allocator = mesh_builder->allocator;
-    mesh_builder->material_bundle = allocator->malloc(allocator, sizeof(fw64MaterialBundle));
+    mesh_builder->material_bundle = fw64_allocator_malloc(allocator, sizeof(fw64MaterialBundle));
     fw64_n64_material_bundle_init(mesh_builder->material_bundle, image_count, image_count, primitive_count, allocator);
 
     for (uint32_t i = 0; i < primitive_count; i++) {
         fw64_n64_material_init(mesh_builder->material_bundle->materials + i);
     }
 
-    mesh_builder->primitive_infos = allocator->malloc(allocator, sizeof(fw64N64PrimitiveInfo) * primitive_count);
+    mesh_builder->primitive_infos = fw64_allocator_malloc(allocator, sizeof(fw64N64PrimitiveInfo) * primitive_count);
     mesh_builder->primitive_info_count = primitive_count;
 
     mesh_builder->next_image_index = 0;
@@ -50,22 +50,21 @@ void fw64_n64_mesh_builder_clear_data(fw64MeshBuilder* mesh_builder) {
             fw64N64PrimitiveInfo* info = mesh_builder->primitive_infos + i;
 
             if (info->vertices) {
-                allocator->free(allocator, info->vertices);
+                fw64_allocator_free(allocator, info->vertices);
             }
             
             if (info->display_list) {
-                allocator->free(allocator, info->display_list);
+                fw64_allocator_free(allocator, info->display_list);
             }
         }
 
-        allocator->free(allocator, mesh_builder->primitive_infos);
+        fw64_allocator_free(allocator, mesh_builder->primitive_infos);
     }
 }
 
 void fw64_mesh_builder_delete(fw64MeshBuilder* mesh_builder) {
     fw64_n64_mesh_builder_clear_data(mesh_builder);
-
-    mesh_builder->allocator->free(mesh_builder->allocator, mesh_builder);
+    fw64_allocator_free(mesh_builder->allocator, mesh_builder);
 }
 
 fw64Texture* fw64_mesh_builder_load_image(fw64MeshBuilder* mesh_builder, fw64AssetId asset_id) {
@@ -96,10 +95,10 @@ int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder
     // TODO: check if already allocated and reset
     fw64N64PrimitiveInfo* info = mesh_builder->primitive_infos + index;
     info->vertex_count = count * 4;
-    info->vertices = allocator->memalign(allocator, 8, info->vertex_count * sizeof(Vtx));
+    info->vertices = fw64_allocator_memalign(allocator, 8, info->vertex_count * sizeof(Vtx));
 
     info->display_list_count = fw64_n64_compute_quad_display_list_size(count);
-    info->display_list = allocator->memalign(allocator, 8, info->display_list_count * sizeof(Gfx));
+    info->display_list = fw64_allocator_memalign(allocator, 8, info->display_list_count * sizeof(Gfx));
 
     Gfx* display_list = fw64_n64_create_quad_display_list(info->display_list, info->vertices, count);
     gSPEndDisplayList(display_list++);
@@ -119,10 +118,10 @@ int fw64_mesh_builder_allocate_primitive_data(fw64MeshBuilder* mesh_builder, siz
     // TODO: check if already allocated and reset
     fw64N64PrimitiveInfo* info = mesh_builder->primitive_infos + index;
     info->vertex_count = vertex_count;
-    info->vertices = allocator->memalign(allocator, 8, info->vertex_count * sizeof(Vtx));
+    info->vertices = fw64_allocator_memalign(allocator, 8, info->vertex_count * sizeof(Vtx));
 
     info->display_list_count = element_count + 2;
-    info->display_list = allocator->memalign(allocator, 8, info->display_list_count * sizeof(Gfx));
+    info->display_list = fw64_allocator_memalign(allocator, 8, info->display_list_count * sizeof(Gfx));
 
     gSPVertex(info->display_list, info->vertices, vertex_count, 0);
     gSPEndDisplayList(info->display_list + info->display_list_count - 1);
@@ -187,7 +186,7 @@ void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, Box* bounding
 fw64Mesh* fw64_mesh_builder_commit(fw64MeshBuilder* mesh_builder) {
     fw64Allocator* allocator = mesh_builder->allocator;
 
-    fw64Mesh* mesh = allocator->malloc(allocator, sizeof(fw64Mesh));
+    fw64Mesh* mesh = fw64_allocator_malloc(allocator, sizeof(fw64Mesh));
     fw64_n64_mesh_init(mesh);
     
     mesh->info.primitive_count = mesh_builder->primitive_info_count;
@@ -196,7 +195,7 @@ fw64Mesh* fw64_mesh_builder_commit(fw64MeshBuilder* mesh_builder) {
     mesh->info._material_bundle_count = 1;
     mesh->info.bounding_box = mesh_builder->bounding;
 
-    mesh->primitives = allocator->malloc(allocator, mesh->info.primitive_count * sizeof(fw64Primitive));
+    mesh->primitives = fw64_allocator_malloc(allocator, mesh->info.primitive_count * sizeof(fw64Primitive));
     mesh->material_bundle = mesh_builder->material_bundle;
     mesh->vertex_buffer = mesh_builder->primitive_infos->vertices;
     mesh->display_list = mesh_builder->primitive_infos->display_list;

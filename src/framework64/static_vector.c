@@ -10,8 +10,8 @@ void fw64_static_vector_init(fw64StaticVector* vector, size_t item_size, size_t 
     vector->item_count = 0;
 
     if (item_capacity) {
-        // vector->data = allocator->malloc(allocator, item_size * item_capacity);
-        vector->data =allocator->memalign(allocator, 8, item_size * item_capacity);
+        // vector->data = fw64_allocator_malloc(allocator, item_size * item_capacity);
+        vector->data = fw64_allocator_memalign(allocator, 8, item_size * item_capacity);
     } else {
         vector->data = NULL;
     }
@@ -23,7 +23,7 @@ void fw64_static_vector_resize(fw64StaticVector* vector, size_t count) {
 
 void fw64_static_vector_uninit(fw64StaticVector* vector, fw64Allocator* allocator) {
     if (vector->data) {
-        allocator->free(allocator, vector->data);
+        fw64_allocator_free(allocator, vector->data);
     }
 }
 

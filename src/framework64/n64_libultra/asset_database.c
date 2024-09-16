@@ -31,8 +31,9 @@ void fw64_assets_close_datasource(fw64AssetDatabase* assets, fw64DataSource* dat
 
 fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     fw64DataSource* data_source = fw64_assets_open_datasource(asset_database, asset_id);
-    if (!data_source)
+    if (!data_source) {
         return NULL;
+    }
         
     fw64Image* image = fw64_image_load_from_datasource(data_source, allocator);
     fw64_assets_close_datasource(asset_database, data_source);
@@ -43,14 +44,16 @@ fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId
 fw64Image* fw64_assets_load_image_dma(fw64AssetDatabase* assets, fw64AssetId asset_id, fw64Allocator* allocator) {
     (void)assets;
     int handle = fw64_filesystem_open(asset_id);
-    if (handle < 0)
+    if (handle < 0) {
         return NULL;
+    }
 
-    fw64Image* image = allocator->malloc(allocator, sizeof(fw64Image));
+    fw64Image* image = fw64_allocator_malloc(allocator, sizeof(fw64Image));
     int result = fw64_n64_image_init_dma_mode(image, handle, fw64_n64_filesystem_get_rom_address(asset_id), allocator);
 
-    if (!result)
-        allocator->free(allocator, image);
+    if (!result) {
+        fw64_allocator_free(allocator, image);
+    }
 
     fw64_filesystem_close(handle);
 

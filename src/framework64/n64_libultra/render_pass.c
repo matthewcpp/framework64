@@ -3,7 +3,7 @@
 #include "framework64/math.h"
 
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator) {
-    fw64RenderPass* renderpass = allocator->memalign(allocator, 8, sizeof(fw64RenderPass));
+    fw64RenderPass* renderpass = fw64_allocator_memalign(allocator, 8, sizeof(fw64RenderPass));
     renderpass->allocator = allocator;
     fw64_render_queue_init(&renderpass->render_queue, allocator);
 
@@ -39,7 +39,7 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
 
 void fw64_renderpass_delete(fw64RenderPass* renderpass) {
     fw64_render_queue_uninit(&renderpass->render_queue);
-    renderpass->allocator->free(renderpass->allocator, renderpass);
+    fw64_allocator_free(renderpass->allocator, renderpass);
 }
 
 void fw64_renderpass_begin(fw64RenderPass* renderpass) {

@@ -46,16 +46,16 @@ void fw64_sparse_set_init_with_capacity(fw64SparseSet* sparse_set, uint16_t item
     sparse_set->item_count = 0;
 
     sparse_set->arr_cap = item_capacity;
-    sparse_set->dense_arr = allocator->malloc(allocator, sparse_set->arr_cap * sparse_set->item_size);
+    sparse_set->dense_arr = fw64_allocator_malloc(allocator, sparse_set->arr_cap * sparse_set->item_size);
     memset(sparse_set->dense_arr, 0, sparse_set->arr_cap * sparse_set->item_size);
 
-    sparse_set->lookup_arr = allocator->malloc(allocator, sparse_set->arr_cap * sizeof (fw64LookupInfo));
+    sparse_set->lookup_arr = fw64_allocator_malloc(allocator, sparse_set->arr_cap * sizeof (fw64LookupInfo));
     sparse_set->free_list = FW64_SPARSE_SET_INVALID_INDEX;
 }
 
 void fw64_sparse_set_uninit(fw64SparseSet* sparse_set) {
-    sparse_set->allocator->free(sparse_set->allocator, sparse_set->dense_arr);
-    sparse_set->allocator->free(sparse_set->allocator, sparse_set->lookup_arr);
+    fw64_allocator_free(sparse_set->allocator, sparse_set->dense_arr);
+    fw64_allocator_free(sparse_set->allocator, sparse_set->lookup_arr);
 }
 
 /**
@@ -86,8 +86,8 @@ static void fw64_sparse_set_push_free_list_index(fw64SparseSet* sparse_set, uint
 
 static void fw64_sparse_set_grow_arrays(fw64SparseSet* sparse_set) {
     sparse_set->arr_cap *= 2;
-    sparse_set->dense_arr = sparse_set->allocator->realloc(sparse_set->allocator, sparse_set->dense_arr, sparse_set->arr_cap * sparse_set->item_size);
-    sparse_set->lookup_arr = sparse_set->allocator->realloc(sparse_set->allocator, sparse_set->lookup_arr, sparse_set->arr_cap * sizeof (fw64LookupInfo));
+    sparse_set->dense_arr = fw64_allocator_realloc(sparse_set->allocator, sparse_set->dense_arr, sparse_set->arr_cap * sparse_set->item_size);
+    sparse_set->lookup_arr = fw64_allocator_realloc(sparse_set->allocator, sparse_set->lookup_arr, sparse_set->arr_cap * sizeof (fw64LookupInfo));
 
     fw64SparseSetItemMetadata* new_item = FW64_SPARSE_SET_GET_DENSE_ARR_METADATA(sparse_set, sparse_set->item_count);
     memset(new_item, 0, sparse_set->arr_cap / 2 * sparse_set->item_size);

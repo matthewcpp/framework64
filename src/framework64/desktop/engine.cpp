@@ -54,7 +54,7 @@ bool Engine::init(Settings const & settings) {
         return false;
     }
 
-    fw64_default_allocator_init();
+    _fw64_default_allocator_init();
 
     n64_input_interface = std::make_unique<N64InputInterface>();
     shader_cache = std::make_unique<ShaderCache>(shader_dir_path);

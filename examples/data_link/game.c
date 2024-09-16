@@ -91,10 +91,10 @@ void draw_data_link_messages(Game* game) {
 void message_list_init(Game* game) {
     fw64Allocator* allocator = fw64_default_allocator();
 
-    game->message_list = allocator->malloc(allocator, sizeof(char*) * MESSAGE_LIST_COUNT);
+    game->message_list = fw64_allocator_malloc(allocator, sizeof(char*) * MESSAGE_LIST_COUNT);
 
     for (size_t i = 0; i < MESSAGE_LIST_COUNT; i++) {
-        char* message_buffer = allocator->malloc(allocator, MESSAGE_LIST_MESSAGE_SIZE);
+        char* message_buffer = fw64_allocator_malloc(allocator, MESSAGE_LIST_MESSAGE_SIZE);
         message_buffer[0] = 0;
 
         game->message_list[i] = message_buffer;

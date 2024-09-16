@@ -118,7 +118,7 @@ void player_update(Player* player) {
 void tiles_init(Tiles* tiles, fw64Engine* engine, fw64SceneInfo* persistent_info) {
     fw64Allocator* allocator = fw64_default_allocator();
     tiles->engine = engine;
-    tiles->persistent = allocator->malloc(allocator, sizeof(fw64Scene));
+    tiles->persistent = fw64_allocator_malloc(allocator, sizeof(fw64Scene));
     fw64_scene_init(tiles->persistent, persistent_info, engine->assets, allocator);
 
     vec3_set(&tiles->next_scene_pos, 0.0f, 0.0f, 50.0f);
