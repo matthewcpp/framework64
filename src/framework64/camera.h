@@ -30,7 +30,11 @@ typedef struct {
     float near, far;
     float fovy;
     float aspect;
+
+    /** This value specifies half the size of the vertical viewing volume.
+      * The horizontal size of the viewing volume depends on the aspect ratio. */
     float ortho_size;
+
     fw64CameraProjectionMode projection_mode;
 
     fw64Display* display;
