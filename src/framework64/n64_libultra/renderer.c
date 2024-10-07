@@ -141,19 +141,35 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags)
 
 static inline void n64_renderer_set_render_mode_opaque(fw64Renderer* renderer) {
     if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_FOG)) {
-        gDPSetRenderMode(renderer->display_list++, G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2);
+        if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST)) {
+            gDPSetRenderMode(renderer->display_list++, G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2);
+        } else{
+            gDPSetRenderMode(renderer->display_list++, G_RM_FOG_SHADE_A, G_RM_AA_OPA_SURF2);
+        }
     }
     else {
-        gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF);
+        if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST)) {
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_OPA_SURF, G_RM_AA_ZB_OPA_SURF);
+        } else {
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_OPA_SURF, G_RM_AA_OPA_SURF);
+        }
     }
 }
 
 static inline void n64_renderer_set_render_mode_transparent(fw64Renderer* renderer) {
     if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_FOG)) {
-        gDPSetRenderMode(renderer->display_list++, G_RM_FOG_SHADE_A, G_RM_AA_ZB_OPA_SURF2);
+        if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST)) {
+            gDPSetRenderMode(renderer->display_list++, G_RM_FOG_SHADE_A, G_RM_AA_ZB_XLU_SURF2);
+        } else {
+            gDPSetRenderMode(renderer->display_list++, G_RM_FOG_SHADE_A, G_RM_AA_XLU_SURF2);
+        }
     }
     else {
-        gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_XLU_SURF, G_RM_AA_ZB_XLU_SURF);
+        if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST)) {
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_XLU_SURF, G_RM_AA_ZB_XLU_SURF);
+        } else {
+            gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_XLU_SURF, G_RM_AA_XLU_SURF);
+        }
     }
 }
 
@@ -463,12 +479,10 @@ static void fw64_renderer_render_lit_textured_queue(fw64Renderer* renderer, fw64
 
 static void fw64_renderer_render_sprite_batches(fw64Renderer* renderer, fw64RenderPass* renderpass) {
     gSPMatrix(renderer->display_list++, OS_K0_TO_PHYSICAL(&renderpass->view_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-    
-    #define	FW64_N64_CC_SPRITE	TEXEL0, 0, SHADE, 0, TEXEL0, 0, SHADE, 0
 
     gDPSetRenderMode(renderer->display_list++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
     gSPClearGeometryMode(renderer->display_list++, G_ZBUFFER | G_LIGHTING | G_CULL_BOTH);
-    gDPSetCombineMode(renderer->display_list++, FW64_N64_CC_SPRITE, FW64_N64_CC_SPRITE); // sprite
+    gDPSetCombineMode(renderer->display_list++, G_CC_MODULATEIA, G_CC_MODULATEIA);
     gSPTexture(renderer->display_list++, 0x8000, 0x8000, 0, 0, G_ON );
     gDPSetTexturePersp(renderer->display_list++, G_TP_PERSP);
     gDPPipeSync(renderer->display_list++);
@@ -481,9 +495,16 @@ static void fw64_renderer_render_sprite_batches(fw64Renderer* renderer, fw64Rend
             fw64TextureBatchLayer* layer = texture_batch->layers + l;
 
             for (uint32_t i = 0; i < layer->batch_count; i++) {
-                fw64N64QuadBatch* char_batch = layer->batches[i];
-                gSPDisplayList(renderer->display_list++, char_batch->display_list);
+                fw64N64BatchedTexture* batched_texure = layer->batches[i];
+                renderer->display_list = fw64_n64_load_texture(&renderer->active_texture, renderer->display_list, batched_texure->id.tex_info.texture, batched_texure->id.tex_info.index);
                 gDPPipeSync(renderer->display_list++);
+                fw64N64BatchedVertexChunk* chunk = batched_texure->first_chunk;
+
+                while (chunk) {
+                    gSPDisplayList(renderer->display_list++, chunk->display_list);
+                    gDPPipeSync(renderer->display_list++);
+                    chunk = chunk->next;
+                }
             }
         }
     }
