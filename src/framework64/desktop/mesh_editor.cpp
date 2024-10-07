@@ -5,9 +5,14 @@
 #include <cassert>
 
 void fw64_mesh_editor_init(fw64MeshEditor* mesh_editor, fw64Mesh* mesh) {
+    assert(mesh != nullptr);
+    assert(mesh->primitives.size() > 0);
+
     mesh_editor->mesh = mesh;
     mesh_editor->primitive = nullptr;
     mesh_editor->flags = 0;
+
+    fw64_mesh_editor_set_active_primitive(mesh_editor, 0);
 }
 
 int fw64_mesh_editor_set_active_primitive(fw64MeshEditor* mesh_editor, size_t index) {

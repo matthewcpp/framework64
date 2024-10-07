@@ -17,7 +17,10 @@ extern "C" {
 #endif
 
 
-/** Initializes a new mesh editor with the supplied mesh. */
+/** 
+ * Initializes a new mesh editor with the supplied mesh.
+ * Sets primitive 0 as the active editing target.
+ * */
 void fw64_mesh_editor_init(fw64MeshEditor* mesh_editor, fw64Mesh* mesh);
 
 /**
