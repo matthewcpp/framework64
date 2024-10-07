@@ -80,6 +80,7 @@ int fw64_mesh_builder_set_active_primitive(fw64MeshBuilder* mesh_builder, size_t
 void fw64_mesh_builder_set_vertex_position_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z);
 void fw64_mesh_builder_set_vertex_position_int16(fw64MeshBuilder* mesh_builder, size_t index, int16_t x, int16_t y, int16_t z);
 void fw64_mesh_builder_set_vertex_normal_f(fw64MeshBuilder* mesh_builder, size_t index, float x, float y, float z);
+void fw64_mesh_builder_set_vertex_color_c(fw64MeshBuilder* mesh_builder, size_t index, fw64ColorRGBA8 color);
 void fw64_mesh_builder_set_vertex_color_rgba8(fw64MeshBuilder* mesh_builder, size_t index, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 /**
@@ -92,7 +93,7 @@ void fw64_mesh_builder_set_vertex_texcoords_f(fw64MeshBuilder* mesh_builder, siz
  * Manually sets the bounding box of the mesh.
  * If this has not been called before \ref fw64_mesh_builder_commit then the bounding will be calculated.
 */
-void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, Box* bounding);
+void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, const Box* bounding);
 
 /**
  * Creates a mesh from the specified data.
