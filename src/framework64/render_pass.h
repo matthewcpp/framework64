@@ -32,7 +32,7 @@ void fw64_renderpass_end(fw64RenderPass* renderpass);
 
 void fw64_renderpass_set_view_matrix(fw64RenderPass* pass, float* view);
 void fw64_renderpass_set_projection_matrix(fw64RenderPass* pass, float* projection, uint16_t* persp_norm_ptr);
-void fw64_renderpass_set_viewport(fw64RenderPass* pass, fw64Viewport* viewport);
+void fw64_renderpass_set_viewport(fw64RenderPass* pass, const fw64Viewport* viewport);
 const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass);
 void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera);
 
