@@ -47,6 +47,5 @@ struct fw64RenderPass {
     s32 fog_min, fog_max;
 };
 
-void update_n64_viewport(fw64Viewport* viewport, Vp* n64_viewport);
 #define fw64_n64_lighting_info_light_is_enabled(lighting_info, index) ((lighting_info)->lights[(index)].l.pad3)
 #define fw64_n64_lighting_info_set_enabled_flag(lighting_info, index, enabled) ((lighting_info)->lights[(index)].l.pad3 = (char)(enabled))

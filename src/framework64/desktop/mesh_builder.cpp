@@ -229,15 +229,24 @@ void fw64_mesh_builder_set_vertex_texcoords_f(fw64MeshBuilder* mesh_builder, siz
 }
 
 void fw64_mesh_builder_set_vertex_color_rgba8(fw64MeshBuilder* mesh_builder, size_t index, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    auto & active_prim = mesh_builder->primitive_info_vec[mesh_builder->active_mesh_index];
-    size_t pos_index = index * 4;
-    active_prim.primitive_data.colors[pos_index++] = static_cast<float>(r) / 255.0f;
-    active_prim.primitive_data.colors[pos_index++] = static_cast<float>(g) / 255.0f;
-    active_prim.primitive_data.colors[pos_index++] = static_cast<float>(b) / 255.0f;
-    active_prim.primitive_data.colors[pos_index++] = static_cast<float>(a) / 255.0f;
+    fw64ColorRGBA8 color = {r, g, b, a};
+    fw64_mesh_builder_set_vertex_color_c(mesh_builder, index, color);
 }
 
-void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, Box* bounding) {
+void fw64_mesh_builder_set_vertex_color_c(fw64MeshBuilder* mesh_builder, size_t index, fw64ColorRGBA8 color) {
+    auto & active_prim = mesh_builder->primitive_info_vec[mesh_builder->active_mesh_index];
+    size_t pos_index = index * 4;
+    
+    //premultiply alpha value
+    float alpha = static_cast<float>(color.a) / 255.0f;
+
+    active_prim.primitive_data.colors[pos_index++] = (static_cast<float>(color.r) / 255.0f) * alpha;
+    active_prim.primitive_data.colors[pos_index++] = (static_cast<float>(color.g) / 255.0f) * alpha;
+    active_prim.primitive_data.colors[pos_index++] = (static_cast<float>(color.b) / 255.0f) * alpha;
+    active_prim.primitive_data.colors[pos_index++] = alpha;
+}
+
+void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, const Box* bounding) {
     mesh_builder->bounding = *bounding;
 }
 

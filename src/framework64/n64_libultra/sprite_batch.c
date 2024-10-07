@@ -43,8 +43,8 @@ void fw64_spritebatch_end(fw64SpriteBatch* sprite_batch) {
 }
 
 static void fw64_spritebatch_add_quad(fw64SpriteBatch* sprite_batch, fw64Texture* texture, uint16_t index, int16_t draw_pos_x, int16_t draw_pos_y, int16_t tile_width, int16_t tile_height) {
-    fw64N64QuadBatch* batch = fw64_n64_texture_batch_get_batch(&sprite_batch->texture_batch, texture, index);
-    Vtx* vtx = batch->vertices + (batch->count * 4);
+    fw64N64BatchedVertexChunk* batch = fw64_n64_texture_batch_get_vertex_chunk(&sprite_batch->texture_batch, texture, index);
+    Vtx* vtx = batch->vertices + chunk_vertex_count(batch);
 
     fw64_n64_vertex_set_position_s16(vtx, draw_pos_x, draw_pos_y + tile_height, 0);
     fw64_n64_vertex_set_color(vtx, sprite_batch->color);

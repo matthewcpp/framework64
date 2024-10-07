@@ -74,6 +74,7 @@ void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask);
 
 fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId);
+int fw64_scene_insert_mesh(fw64Scene* scene, fw64Mesh* mesh);
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_mesh_count(fw64Scene* scene);
 

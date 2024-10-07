@@ -58,7 +58,7 @@ void fw64_renderpass_set_projection_matrix(fw64RenderPass* pass, float* projecti
     pass->setProjectionMatrix(projection);
 }
 
-void fw64_renderpass_set_viewport(fw64RenderPass* pass, fw64Viewport* viewport) {
+void fw64_renderpass_set_viewport(fw64RenderPass* pass, const fw64Viewport* viewport) {
     pass->viewport = *viewport;
 }
 

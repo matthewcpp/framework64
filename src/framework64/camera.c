@@ -45,20 +45,20 @@ void camera_common_init(fw64Camera* camera, fw64Node* node, fw64Display* display
 }
 
 void fw64_camera_update_projection_matrix(fw64Camera* camera) {
-    float ortho_size_v = camera->aspect * camera->ortho_size;
+    float ortho_size_h = camera->aspect * camera->ortho_size;
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     if (camera->projection_mode == FW64_CAMERA_PROJECTION_PERSPECTIVE) {
         guPerspective(&camera->projection, &camera->_persp_norm, 
             camera->fovy, camera->aspect, camera->near, camera->far, 1.0f);
     } else {
-        guOrtho(&camera->projection, -ortho_size_v, ortho_size_v, -camera->ortho_size, camera->ortho_size, camera->near, camera->far, 1.0f);
+        guOrtho(&camera->projection, -ortho_size_h, ortho_size_h, -camera->ortho_size, camera->ortho_size, camera->near, camera->far, 1.0f);
     }
 #else
     if (camera->projection_mode == FW64_CAMERA_PROJECTION_PERSPECTIVE) {
         matrix_perspective(&camera->projection.m[0], camera->fovy, camera->aspect, camera->near, camera->far);
     } else {
-        matrix_ortho(&camera->projection.m[0], -ortho_size_v, ortho_size_v, -camera->ortho_size, camera->ortho_size, camera->near, camera->far);
+        matrix_ortho(&camera->projection.m[0], -ortho_size_h, ortho_size_h, -camera->ortho_size, camera->ortho_size, camera->near, camera->far);
     }
 #endif
 }

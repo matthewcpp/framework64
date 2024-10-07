@@ -173,13 +173,18 @@ void fw64_mesh_builder_set_vertex_color_rgba8(fw64MeshBuilder* mesh_builder, siz
     fw64_n64_vertex_set_color_rgba8(active_primitive_info->vertices + index, r, g, b, a);
 }
 
+void fw64_mesh_builder_set_vertex_color_c(fw64MeshBuilder* mesh_builder, size_t index, fw64ColorRGBA8 color) {
+    fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
+    fw64_n64_vertex_set_color(active_primitive_info->vertices + index, color);
+}
+
 void fw64_mesh_builder_set_vertex_texcoords_f(fw64MeshBuilder* mesh_builder, size_t index, float s, float t) {
     fw64N64PrimitiveInfo* active_primitive_info = mesh_builder->primitive_infos + mesh_builder-> active_primitive_index;
     fw64Material* material = mesh_builder->material_bundle->materials + mesh_builder->active_primitive_index;
     fw64_n64_vertex_set_texcoords_f(active_primitive_info->vertices + index, material->texture, s, t);
 }
 
-void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, Box* bounding) {
+void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, const Box* bounding) {
     mesh_builder->bounding = *bounding;
 }
 

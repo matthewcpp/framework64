@@ -2,6 +2,8 @@
 
 #include "framework64/math.h"
 
+static void update_n64_viewport(const fw64Viewport* viewport, Vp* n64_viewport);
+
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator) {
     fw64RenderPass* renderpass = fw64_allocator_memalign(allocator, 8, sizeof(fw64RenderPass));
     renderpass->allocator = allocator;
@@ -64,7 +66,7 @@ void fw64_renderpass_set_projection_matrix(fw64RenderPass* pass, float* projecti
     }
 }
 
-void update_n64_viewport(fw64Viewport* viewport, Vp* n64_viewport) {
+void update_n64_viewport(const fw64Viewport* viewport, Vp* n64_viewport) {
     n64_viewport->vp.vscale[0] = viewport->size.x * 2;
     n64_viewport->vp.vscale[1] = viewport->size.y * 2;
     n64_viewport->vp.vscale[2] = G_MAXZ / 2;
@@ -76,7 +78,7 @@ void update_n64_viewport(fw64Viewport* viewport, Vp* n64_viewport) {
     n64_viewport->vp.vtrans[3] = 0;
 }
 
-void fw64_renderpass_set_viewport(fw64RenderPass* renderpass, fw64Viewport* viewport) {
+void fw64_renderpass_set_viewport(fw64RenderPass* renderpass, const fw64Viewport* viewport) {
     renderpass->viewport = *viewport;
     update_n64_viewport(viewport, &renderpass->n64_viewport);
 }

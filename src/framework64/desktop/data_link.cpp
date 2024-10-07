@@ -13,7 +13,7 @@ bool fw64DataLink::initialize(int port) {
         websocket_server.set_error_channels(websocketpp::log::elevel::all);
 
         websocket_server.init_asio();
-        websocket_server.listen(port);
+        websocket_server.listen(static_cast<uint16_t>(port));
         websocket_server.start_accept();
 
         status = Status::Running;

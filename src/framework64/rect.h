@@ -5,7 +5,10 @@
 #include "framework64/vec2.h"
 
 typedef struct {
+    /** The center of the rectangle */
     Vec2 origin;
+
+    /** The extents of the rectangle */
     Vec2 size;
 } fw64Rect;
 
