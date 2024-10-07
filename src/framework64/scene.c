@@ -366,6 +366,11 @@ fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId asset_id) {
     return mesh;
 }
 
+int fw64_scene_insert_mesh(fw64Scene* scene, fw64Mesh* mesh) {
+    return fw64_static_vector_push_back(&scene->meshes, &mesh);
+}
+
+
 fw64Mesh* fw64_scene_get_mesh(fw64Scene* scene, uint32_t index) {
     return *((fw64Mesh**)fw64_static_vector_get_item(&scene->meshes, index));
 }
