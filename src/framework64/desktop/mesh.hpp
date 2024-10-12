@@ -57,6 +57,8 @@ struct fw64Mesh {
     std::vector<std::unique_ptr<fw64Primitive>> primitives;
     Box bounding_box;
 
+    fw64MaterialCollection material_collection;
+
     /// *moves* pdata into the new primitive and creates the GL objects
     /// TODO: joint index
     fw64Primitive* createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode, Box const & primitive_bounding);

@@ -105,6 +105,12 @@ fw64Mesh* fw64Mesh::loadFromDatasource(fw64DataSource* data_source, fw64Material
         primitive->material = material_bundle->materials[info.material_index].get();
     }
 
+    fw64_material_collection_init_empty(&mesh->material_collection, static_cast<uint32_t>(mesh->primitives.size()), allocator);
+
+    for (size_t i = 0; i < mesh->primitives.size(); i++) {
+        fw64_material_collection_set_material(&mesh->material_collection, i, mesh->primitives[i].get()->material);
+    }
+
     return mesh.release();
 }
 
@@ -124,8 +130,16 @@ fw64Mesh* fw64_mesh_load_from_datasource_with_bundle(fw64AssetDatabase* asset_da
 
 void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase*, fw64Allocator* allocator) {
     assert(mesh != nullptr);
-    assert(allocator != nullptr);
+    assert(allocator != nullptr); // should mesh check if this is the same allocator?
+
+    // Not ideal...TODO figure out a better way to do this?
+    fw64_material_collection_uninit(&mesh->material_collection, allocator);
+
     delete mesh;
+}
+
+fw64MaterialCollection* fw64_mesh_get_material_collection(fw64Mesh* mesh) {
+    return &mesh->material_collection;
 }
 
 Box fw64_mesh_get_bounding_box(fw64Mesh* mesh) {
