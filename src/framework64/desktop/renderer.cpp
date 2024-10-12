@@ -25,8 +25,6 @@ bool fw64Renderer::init(int width, int height) {
     lighting_data_uniform_block.create();
     mesh_transform_uniform_block.create();
 
-    screen_overlay.init();
-
     return true;
 }
 
@@ -334,21 +332,6 @@ void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
 
     lighting_data_uniform_block.data.light_count = block_index;
     lighting_data_uniform_block.update();
-}
-
-
-void fw64Renderer::renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    screen_overlay.primitive.material->color[0] = static_cast<float>(r) / 255.0f;
-    screen_overlay.primitive.material->color[1] = static_cast<float>(g) / 255.0f;
-    screen_overlay.primitive.material->color[2] = static_cast<float>(b) / 255.0f;
-    screen_overlay.primitive.material->color[3] = static_cast<float>(a) / 255.0f;
-
-    matrix_set_identity(mesh_transform_uniform_block.data.normal_matrix.data());
-    matrix_set_identity(mesh_transform_uniform_block.data.mvp_matrix.data());
-    mesh_transform_uniform_block.update();
-
-    glDisable(GL_DEPTH_TEST);
-    drawPrimitive(screen_overlay.primitive, &screen_overlay.material);
 }
 
 void fw64Renderer::setDrawingMode(DrawingMode mode) {

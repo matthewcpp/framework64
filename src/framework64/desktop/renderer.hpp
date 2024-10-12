@@ -4,9 +4,9 @@
 
 #include "framework64/desktop/display.hpp"
 #include "framework64/desktop/framebuffer.hpp"
+#include "framework64/desktop/mesh.hpp"
 #include "framework64/desktop/render_pass.hpp"
 #include "framework64/desktop/shader_cache.hpp"
-#include "framework64/desktop/screen_overlay.hpp"
 #include "framework64/desktop/sprite_batch.hpp"
 #include "framework64/desktop/uniform_block.hpp"
 
@@ -26,7 +26,7 @@
 struct fw64Renderer {
 public: 
     fw64Renderer(fw64Display& display, framework64::ShaderCache& shader_cache)
-        : screen_overlay(shader_cache), sprite_material(shader_cache), display(display), shader_cache(shader_cache) {}
+        : sprite_material(shader_cache), display(display), shader_cache(shader_cache) {}
 
 public:
     bool init(int width, int height);
@@ -60,9 +60,6 @@ public:
     [[nodiscard]] inline bool fogEnabled() const { return fog_enabled; }
     void setFogPositions(float fog_min, float fog_max);
     void setFogColor(float r, float g, float b);
-
-public:
-    void renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 private:     
     void updateMeshTransformBlock(float* matrix);
@@ -109,7 +106,6 @@ struct LightingData {
 
     std::array<float, 16> view_matrix, projection_matrix, view_projection_matrix;
     framework64::ShaderProgram* active_shader = nullptr;
-    framework64::ScreenOverlay screen_overlay;
 
     float fog_min_distance = 0.4f;
     float fog_max_distance = 0.8f;

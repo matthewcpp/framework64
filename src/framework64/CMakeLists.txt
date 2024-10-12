@@ -57,7 +57,6 @@ set(common_source_files
     util/mesh_data_itr.h
     util/mesh_editor.h
     util/quad.h util/quad.c
-    util/renderer_util.h
     util/renderpass_util.h util/renderpass_util.c
     util/sparse_set.h util/sparse_set.c
     util/text_util.h util/text_util.c
