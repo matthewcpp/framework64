@@ -46,7 +46,7 @@ void fw64_render_queue_enqueue_static_mesh(fw64RenderQueue* render_queue, fw64Me
     uint32_t primitive_count = fw64_mesh_get_primitive_count(mesh_instance->mesh);
 
     for (uint32_t i = 0; i < primitive_count; i++) {
-        fw64Material* material = fw64_mesh_get_material_for_primitive(mesh_instance->mesh, i);
+        fw64Material* material = fw64_material_collection_get_material(mesh_instance->materials, i);
         fw64StaticDrawInfo* draw_info = fw64_dynamic_vector_emplace_back(&render_queue->buckets[fw64_material_get_shading_mode(material)].static_);
         draw_info->instance = mesh_instance;
         draw_info->index = i;
@@ -57,7 +57,7 @@ void fw64_render_queue_enqueue_skinned_mesh(fw64RenderQueue* render_queue, fw64S
         uint32_t primitive_count = fw64_mesh_get_primitive_count(skinned_mesh_instance->mesh_instance.mesh);
 
     for (uint32_t i = 0; i < primitive_count; i++) {
-        fw64Material* material = fw64_mesh_get_material_for_primitive(skinned_mesh_instance->mesh_instance.mesh, i);
+        fw64Material* material = fw64_material_collection_get_material(skinned_mesh_instance->mesh_instance.materials, i);
         fw64SkinnedDrawInfo* draw_info = fw64_dynamic_vector_emplace_back(&render_queue->buckets[fw64_material_get_shading_mode(material)].skinned_);
         draw_info->instance = skinned_mesh_instance;
         draw_info->index = i;

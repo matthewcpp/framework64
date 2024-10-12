@@ -46,9 +46,6 @@ public:
 private:
     bool initDisplay(int width, int height);
     bool initFramebuffer(int width, int height);
-public:
-    void drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform);
-    void drawAnimatedMesh(fw64Mesh* mesh, fw64AnimationController* controller, fw64Transform* transform);
 
 public:
     void drawSpriteBatch(fw64SpriteBatch* spritebatch);
@@ -72,7 +69,7 @@ private:
     void updateLightingBlock(const LightingInfo& lighting_info);
     void setActiveShader(framework64::ShaderProgram* shader);
     void setGlDepthTestingState();
-    void drawPrimitive(fw64Primitive const & primitive);
+    void drawPrimitive(fw64Primitive const & primitive, const fw64Material* material);
 
     void fogValuesChanged();
 
