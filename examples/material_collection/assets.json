@@ -1,0 +1,39 @@
+{
+    "skinnedMeshes": [
+        {
+            "src": "catherine/catherine.gltf",
+            "animations": [
+                "Walk"
+            ]
+        }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12"
+        }
+    ],
+    "images": [
+        {
+            "src": "/catherine/AltFaceTex.png",
+            "format": "ci4",
+            "name": "catherine_alt_face"
+        },
+        {
+            "src": "/catherine/AltChestTex.png",
+            "format": "ci4",
+            "name": "catherine_alt_chest"
+        },
+        {
+            "src": "/catherine/AltPantsTex.png",
+            "format": "ci4",
+            "name": "catherine_alt_pants"
+        },
+        {
+            "src": "/catherine/AltBackTex.png",
+            "format": "ci4",
+            "name": "catherine_alt_back"
+        }
+    ]
+}
