@@ -159,13 +159,13 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         fw64StaticDrawInfo* draw_info = (fw64StaticDrawInfo*)fw64_dynamic_vector_item(queue, i);
 
         updateMeshTransformBlock(draw_info->instance->node->transform.world_matrix);
-        fw64Primitive* primitive = draw_info->instance->mesh->primitives[draw_info->index].get();
-        fw64Material* material = fw64_material_collection_get_material(draw_info->instance->materials, draw_info->index);
+        const auto& primitive = draw_info->instance->mesh->primitives[draw_info->index];
+        const fw64Material* material = fw64_material_collection_get_material(draw_info->instance->materials, draw_info->index);
 
-        if (primitive->mode != primitive_type)
+        if (primitive.mode != primitive_type)
             continue;
 
-        drawPrimitive(*primitive, material);
+        drawPrimitive(primitive, material);
     }
 
     queue = &renderpass->render_queue.buckets[index].skinned_;
@@ -173,17 +173,17 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         fw64SkinnedDrawInfo* draw_info = (fw64SkinnedDrawInfo*)fw64_dynamic_vector_item(queue, i);
         fw64SkinnedMeshInstance* skinned_mesh_instance = draw_info->instance;
 
-        fw64Primitive* primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives[draw_info->index].get();
-        fw64Material* material = fw64_material_collection_get_material(skinned_mesh_instance->mesh_instance.materials, draw_info->index);
+        const auto & primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives[draw_info->index];
+        const fw64Material* material = fw64_material_collection_get_material(skinned_mesh_instance->mesh_instance.materials, draw_info->index);
 
-        if (primitive->mode != primitive_type)
+        if (primitive.mode != primitive_type)
             continue;
 
         float transform_matrix[16];
-        matrix_multiply(transform_matrix, skinned_mesh_instance->mesh_instance.node->transform.world_matrix, &skinned_mesh_instance->controller.matrices[primitive->joint_index].m[0]);
+        matrix_multiply(transform_matrix, skinned_mesh_instance->mesh_instance.node->transform.world_matrix, &skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0]);
         updateMeshTransformBlock(transform_matrix);
 
-        drawPrimitive(*primitive, material);
+        drawPrimitive(primitive, material);
     }
 }
 

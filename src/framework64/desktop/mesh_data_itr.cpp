@@ -6,7 +6,7 @@
 #define TRIANGLE_INDEX_NONE (-1)
 
 void fw64_mesh_data_itr_init(fw64MeshDataItr* itr, fw64Mesh* mesh, uint32_t primitive_index) {
-    itr->primitive = mesh->primitives[primitive_index].get();
+    itr->primitive = &mesh->primitives[primitive_index];
     itr->triangle_index = TRIANGLE_INDEX_NONE;
 }
 

@@ -121,14 +121,15 @@ fw64Mesh* fw64MeshBuilder::createMesh() {
         material->shader = assets->shader_cache.getShaderProgram(material->shading_mode);
     }
 
+    fw64_material_collection_init_empty(&mesh->material_collection, primitive_info_vec.size(), allocator);
+
     for (size_t i = 0; i < primitive_info_vec.size(); i++) {
         auto& primitive_info = primitive_info_vec[i];
-        auto* primitive = mesh->createPrimitive(std::move(primitive_info.primitive_data), primitive_info.mode);
-        primitive->material = mesh->material_bundle->materials[i].get();
+        mesh->createPrimitive(std::move(primitive_info.primitive_data), primitive_info.mode);
+        fw64_material_collection_set_material(&mesh->material_collection, i, mesh->material_bundle->materials[i].get());
     }
 
     mesh->bounding_box = bounding;
-    mesh->initializeMaterialCollection(allocator);
 
     primitive_info_vec.clear();
 
