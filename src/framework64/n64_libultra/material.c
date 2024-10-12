@@ -4,6 +4,7 @@
 #include "framework64/n64_libultra/image.h"
 
 #include <limits.h>
+#include <string.h>
 
 void fw64_n64_material_init(fw64Material* material) {
     fw64_color_rgba8_set(&material->color, 255, 255, 255, 255);
@@ -47,4 +48,10 @@ void fw64_material_set_color(fw64Material* material, fw64ColorRGBA8 color) {
 
 fw64ColorRGBA8 fw64_material_get_color(fw64Material* material) {
     return material->color;
+}
+fw64Material* fw64_material_clone(const fw64Material* material, fw64Allocator* allocator) {
+    fw64Material* clone = fw64_allocator_malloc(allocator, sizeof(fw64Material));
+    memcpy(clone, material, sizeof(material));
+
+    return clone;
 }

@@ -18,6 +18,8 @@ class ShaderCache;
 struct fw64Material {
     fw64Material(framework64::ShaderCache& shader_cache)
         :shader_cache(shader_cache) {}
+    
+    fw64Material(const fw64Material& material) = default;
 
     enum Features {
         None = 0,

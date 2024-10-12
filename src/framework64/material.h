@@ -53,6 +53,9 @@ fw64ShadingMode fw64_material_get_shading_mode(const fw64Material* material);
 void fw64_material_set_color(fw64Material* material, fw64ColorRGBA8 color);
 fw64ColorRGBA8 fw64_material_get_color(fw64Material* material);
 
+/** Returns a duplicate of the source material */
+fw64Material* fw64_material_clone(const fw64Material* material, fw64Allocator* allocator);
+
 #ifdef __cplusplus
 }
 #endif

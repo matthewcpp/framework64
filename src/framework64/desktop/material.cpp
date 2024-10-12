@@ -50,3 +50,9 @@ fw64ColorRGBA8 fw64_material_get_color(fw64Material* material) {
        static_cast<uint8_t>(material->color[3] * 255.0f)
     };
 }
+
+fw64Material* fw64_material_clone(const fw64Material* material, fw64Allocator* allocator) {
+    (void)allocator;
+
+    return new fw64Material(*material);
+}

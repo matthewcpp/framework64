@@ -24,6 +24,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/input.h \
                         ../include/framework64/log.h \
                         ../include/framework64/material.h \
+                        ../include/framework64/material_set.h \
                         ../include/framework64/material_bundle.h \
                         ../include/framework64/matrix.h \
                         ../include/framework64/matrix_project.h \

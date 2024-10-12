@@ -19,7 +19,9 @@ set(common_source_files
     frustum.h frustum.c
     image.h
     input.h
+    material.h
     material_bundle.h
+    material_collection.h material_collection.c
     math.h math.c
     matrix.h matrix.c
     matrix_project.h matrix_project.c
