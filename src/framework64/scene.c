@@ -390,7 +390,7 @@ fw64SkinnedMesh* fw64_scene_load_skinned_mesh_asset(fw64Scene* scene, fw64AssetI
 }
 
 fw64SkinnedMesh* fw64_scene_get_skinned_mesh(fw64Scene* scene, uint32_t index) {
-    return fw64_static_vector_get_item(&scene->skinned_meshes, index);
+    return *((fw64SkinnedMesh**)fw64_static_vector_get_item(&scene->skinned_meshes, index));
 }
 
 uint32_t fw64_scene_get_skinned_mesh_count(fw64Scene* scene) {
