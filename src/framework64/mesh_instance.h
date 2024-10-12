@@ -20,6 +20,7 @@ typedef struct fw64Node fw64Node;
 typedef struct {
     fw64Node* node;
     fw64Mesh* mesh;
+    fw64MaterialCollection* materials;
     Box render_bounds;
     fw64MeshInstanceFlags flags;
 #ifdef FW64_PLATFORM_N64_LIBULTRA
@@ -34,6 +35,9 @@ extern "C" {
 void fw64_mesh_instance_init(fw64MeshInstance* mesh_instance, fw64Node* node, fw64Mesh* mesh);
 void fw64_mesh_instance_update(fw64MeshInstance* mesh_instance);
 void fw64_mesh_instance_set_mesh(fw64MeshInstance* mesh_instance, fw64Mesh* mesh);
+
+#define fw64_mesh_instance_get_material_collection(mesh_instance) ((mesh_instance)->materials)
+#define fw64_mesh_instance_set_material_collection(mesh_instance, material_collection) (mesh_instance)->materials = (material_collection)
 
 #ifdef __cplusplus
 }

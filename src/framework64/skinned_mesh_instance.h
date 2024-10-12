@@ -24,6 +24,7 @@ void fw64_skinned_mesh_instance_init(fw64SkinnedMeshInstance* instance, fw64Node
 void fw64_skinned_mesh_uninit(fw64SkinnedMeshInstance* instance, fw64Allocator* allocator);
 void fw64_skinned_mesh_instance_update(fw64SkinnedMeshInstance* instance, float time_delta);
 
+#define fw64_skinned_mesh_instance_set_material_collection(instance, collection) (instance)->mesh_instance.materials = (collection)
 #ifdef __cplusplus
 }
 #endif
