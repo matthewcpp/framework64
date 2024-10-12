@@ -59,6 +59,8 @@ struct fw64Mesh {
 
     fw64MaterialCollection material_collection;
 
+    void initializeMaterialCollection(fw64Allocator* allocator);
+
     /// *moves* pdata into the new primitive and creates the GL objects
     /// TODO: joint index
     fw64Primitive* createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode, Box const & primitive_bounding);

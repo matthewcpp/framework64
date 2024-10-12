@@ -221,5 +221,10 @@ fw64Mesh* fw64_mesh_builder_commit(fw64MeshBuilder* mesh_builder) {
         info->display_list = NULL;
     }
 
+    fw64_material_collection_init_empty(&mesh->material_collection, mesh->info.primitive_count, allocator);
+    for (uint16_t i = 0; i < mesh->info.primitive_count; i++) {
+        fw64_material_collection_set_material(&mesh->material_collection, i, mesh->primitives[i].material);
+    }
+
     return mesh;
 }

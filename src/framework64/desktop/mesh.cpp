@@ -105,13 +105,17 @@ fw64Mesh* fw64Mesh::loadFromDatasource(fw64DataSource* data_source, fw64Material
         primitive->material = material_bundle->materials[info.material_index].get();
     }
 
-    fw64_material_collection_init_empty(&mesh->material_collection, static_cast<uint32_t>(mesh->primitives.size()), allocator);
-
-    for (size_t i = 0; i < mesh->primitives.size(); i++) {
-        fw64_material_collection_set_material(&mesh->material_collection, i, mesh->primitives[i].get()->material);
-    }
+    mesh->initializeMaterialCollection(allocator);
 
     return mesh.release();
+}
+
+void fw64Mesh::initializeMaterialCollection(fw64Allocator* allocator) {
+    fw64_material_collection_init_empty(&material_collection, static_cast<uint32_t>(primitives.size()), allocator);
+
+    for (size_t i = 0; i < primitives.size(); i++) {
+        fw64_material_collection_set_material(&material_collection, i, primitives[i].get()->material);
+    }
 }
 
 // C interface
@@ -148,11 +152,6 @@ Box fw64_mesh_get_bounding_box(fw64Mesh* mesh) {
 
 uint32_t fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
     return static_cast<uint32_t>(mesh->primitives.size());
-}
-
-fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index) {
-    assert(index < mesh->primitives.size());
-    return mesh->primitives[index]->material;
 }
 
 fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {

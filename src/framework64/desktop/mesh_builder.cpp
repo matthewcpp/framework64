@@ -128,6 +128,7 @@ fw64Mesh* fw64MeshBuilder::createMesh() {
     }
 
     mesh->bounding_box = bounding;
+    mesh->initializeMaterialCollection(allocator);
 
     primitive_info_vec.clear();
 

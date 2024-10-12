@@ -16,7 +16,7 @@ typedef enum {
 
 typedef struct {
     float update_time_remaining;
-    fw64Mesh* mesh;
+    fw64MeshInstance* mesh_instance;
 } Flame;
 
 typedef struct {

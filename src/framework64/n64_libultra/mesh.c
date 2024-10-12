@@ -156,12 +156,6 @@ uint32_t fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
     return mesh->info.primitive_count;
 }
 
-fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index) {
-    fw64Primitive* primitive = mesh->primitives + index;
-
-    return primitive->material;
-}
-
 fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
     fw64Primitive* primitive = mesh->primitives + index;
     Gfx* command = primitive->display_list + 1;

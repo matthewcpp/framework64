@@ -106,7 +106,8 @@ void set_next_wrap_mode(Game* game, int direction) {
         fw64_scene_create_mesh_instance(&game->scene, game->mesh_node, mesh);
     }
 
-    fw64Texture* texture = fw64_material_get_texture(fw64_mesh_get_material_for_primitive(mesh, 0));
+    fw64Material* material = fw64_material_collection_get_material(fw64_mesh_get_material_collection(mesh), 0);
+    fw64Texture* texture = fw64_material_get_texture(material);
     fw64_texture_set_wrap_mode(texture, wrap_mode, wrap_mode);
     const fw64Viewport* viewport = fw64_renderpass_get_viewport(game->renderpasses[RENDER_PASS_UI]);
     IVec2 pos = fw64_text_util_center_string(game->font, mode_name, &viewport->size);

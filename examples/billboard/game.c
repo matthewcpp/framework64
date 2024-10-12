@@ -51,13 +51,13 @@ void create_flame(Game* game) {
     fw64Node* node = fw64_scene_get_node(game->scene, FW64_scene_billboard_example_node_flame);
 
     fw64Image* flame_image = fw64_assets_load_image_dma(game->engine->assets, FW64_ASSET_image_fire_sprite, allocator);
-    fw64Material* material = fw64_mesh_get_material_for_primitive(node->mesh_instance->mesh, 0);
+    fw64Material* material = fw64_material_collection_get_material(node->mesh_instance->materials, 0);
     fw64Texture* texture = fw64_texture_create_from_image(flame_image, allocator);
     fw64_texture_set_image(texture, flame_image);
     fw64_material_set_texture(material, texture, 0);
 
     game->flame.update_time_remaining = FLAME_UPDATE_TIME;
-    game->flame.mesh = node->mesh_instance->mesh;
+    game->flame.mesh_instance = node->mesh_instance;
 }
 
 static void flame_update(Flame* flame, float time_delta) {
@@ -66,7 +66,7 @@ static void flame_update(Flame* flame, float time_delta) {
     if (flame->update_time_remaining <= 0.0f) {
         flame->update_time_remaining = FLAME_UPDATE_TIME;
 
-        fw64Material* material = fw64_mesh_get_material_for_primitive(flame->mesh, 0);
+        fw64Material* material = fw64_material_collection_get_material(flame->mesh_instance->materials, 0);
         fw64Texture* texture = fw64_material_get_texture(material);
         uint32_t frameCount = fw64_texture_hslices(texture) * fw64_texture_vslices(texture);
         uint32_t current_tex_frame = fw64_material_get_texture_frame(material);
