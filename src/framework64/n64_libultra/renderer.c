@@ -238,12 +238,13 @@ static void fw64_n64_renderer_configure_mesh_lighting_info(fw64Renderer* rendere
 static void fw64_renderer_draw_lit_primitive(fw64Renderer* renderer, LightingInfo* lighting_info, fw64StaticDrawInfo* draw_info) {
     fw64MeshInstance* mesh_instance = draw_info->instance;
     fw64Primitive* primitive = mesh_instance->mesh->primitives + draw_info->index;
+    fw64Material* material = fw64_material_collection_get_material(draw_info->instance->materials, draw_info->index);
 
     // when using lighting the view matrix is actually placed on the projection matrix stack, so we just load the model matrix
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&mesh_instance->n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
 
     if (lighting_info->active_count > 0) {
-        fw64_n64_renderer_configure_mesh_lighting_info(renderer, lighting_info, primitive->material);
+        fw64_n64_renderer_configure_mesh_lighting_info(renderer, lighting_info, material);
     }
         
     gSPDisplayList(renderer->display_list++, primitive->display_list);
@@ -258,12 +259,13 @@ static void fw64_renderer_draw_lit_skinned_primitive(fw64Renderer* renderer, Lig
     fw64SkinnedMeshInstance* skinned_mesh_instance = draw_info->instance;
     fw64AnimationController* controller = &skinned_mesh_instance->controller;
     fw64Primitive* primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives + draw_info->index;
+    fw64Material* material = fw64_material_collection_get_material(draw_info->instance->mesh_instance.materials, draw_info->index);
 
     // when using lighting the view matrix is actually placed on the projection matrix stack, so we just load the model matrix
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&skinned_mesh_instance->mesh_instance.n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
 
     if (lighting_info->active_count > 0) {
-        fw64_n64_renderer_configure_mesh_lighting_info(renderer, lighting_info, primitive->material);
+        fw64_n64_renderer_configure_mesh_lighting_info(renderer, lighting_info, material);
     }
 
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);

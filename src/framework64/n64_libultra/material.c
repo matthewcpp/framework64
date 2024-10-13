@@ -51,7 +51,7 @@ fw64ColorRGBA8 fw64_material_get_color(fw64Material* material) {
 }
 fw64Material* fw64_material_clone(const fw64Material* material, fw64Allocator* allocator) {
     fw64Material* clone = fw64_allocator_malloc(allocator, sizeof(fw64Material));
-    memcpy(clone, material, sizeof(material));
+    memcpy(clone, material, sizeof(fw64Material));
 
     return clone;
 }
