@@ -59,6 +59,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
     const displayListBuffers = [];
     const vertexPointerBuffers = []
     const vertexPointerCountBuffer = Buffer.alloc(mesh.primitives.length * 4); // holds number of vertex pointer indices per primitive
+    const materialCollectionBuffer = Buffer.alloc(mesh.primitives.length * 4); // holds material indidices
 
     for (let i = 0; i <  mesh.primitives.length; i++) {
         const primitive = mesh.primitives[i];
@@ -66,9 +67,9 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
         const primitiveInfo = new PrimitiveInfo();
         primitiveInfo.verticesBufferIndex = meshInfo.vertexCount; // the index for this primitive is set to the total size of the mesh's vertices buffer added thus far
         primitiveInfo.displayListBufferIndex = meshInfo.displayListCount; // the index for this primitive is set to the total size of the mesh's display list buffer this far
-        primitiveInfo.material = materialBundle.getBundledMaterialIndex(primitive.material);
         primitiveInfo.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : Primitive.NoJoint; // used for skinning, refer to Mesh.splitPrimitivesForSkinning
         primitiveInfos.push(primitiveInfo);
+        materialCollectionBuffer.writeUInt32BE(materialBundle.getBundledMaterialIndex(primitive.material), i * 4);
 
         // slice the vertices into chunks that can fit into N64 vertex cache
         const slices = N64Slicer.slice(primitive);
@@ -108,6 +109,8 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
     fs.writeSync(file, vertexPointerCountBuffer);
     for (const buffer of vertexPointerBuffers)
         fs.writeSync(file, buffer);
+
+    fs.writeSync(file, materialCollectionBuffer);
 }
 
 /**
@@ -144,6 +147,7 @@ class MeshInfo {
 /**
  * This class represents a single primitive in the mesh.
  * It contains indices into the various mesh-level arrays
+ * this should correspond to fw64Primitive in n64_libultra/mesh.h
  */
 class PrimitiveInfo {
     verticesBufferIndex;
@@ -152,12 +156,11 @@ class PrimitiveInfo {
     jointIndex;
 
     get buffer() {
-        const buff = Buffer.alloc(16)
+        const buff = Buffer.alloc(12)
 
         let index = 0;
         index = buff.writeUInt32BE(this.verticesBufferIndex, index);
         index = buff.writeUInt32BE(this.displayListBufferIndex, index);
-        index = buff.writeUInt32BE(this.material, index);
         index = buff.writeUInt32BE(this.jointIndex, index);
 
         return buff;

@@ -7,7 +7,7 @@
 #include <string.h>
 
 static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, fw64DataSource* data_source, fw64Allocator* allocator);
-static void fixup_mesh_primitive_material_pointers(fw64MaterialBundle* material_bundle, fw64Mesh* mesh, fw64Allocator* allocator);
+static void load_material_collection(fw64MaterialBundle* material_bundle, fw64Mesh* mesh, fw64DataSource* data_source, fw64Allocator* allocator);
 static fw64Mesh* load_mesh_data(fw64DataSource* data_source, fw64MeshInfo* mesh_info, fw64MaterialBundle* material_bundle, fw64Allocator* allocator);
 
 fw64Mesh* fw64_mesh_load_from_datasource(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64Allocator* allocator) {
@@ -55,7 +55,7 @@ fw64Mesh* load_mesh_data(fw64DataSource* data_source, fw64MeshInfo* mesh_info, f
     fw64_data_source_read(data_source, mesh->primitives, sizeof(fw64Primitive), mesh->info.primitive_count);
     
     fixup_mesh_vertex_pointers(mesh, data_source, allocator);
-    fixup_mesh_primitive_material_pointers(material_bundle, mesh, allocator);
+    load_material_collection(material_bundle, mesh, data_source, allocator);
 
     mesh->material_bundle = material_bundle;
 
@@ -94,25 +94,19 @@ static void fixup_mesh_vertex_pointers(fw64Mesh* mesh, fw64DataSource* data_sour
     fw64_allocator_free(allocator, vertex_pointer_data);
 }
 
-/** When the mesh info is loaded from ROM, the value in material and texture pointers represents an index into top level mesh arrays.
- * After the textures are loaded, we need to convert each index into an actual pointer to the correct object type.
-*/
-void fixup_mesh_primitive_material_pointers(fw64MaterialBundle* material_bundle, fw64Mesh* mesh, fw64Allocator* allocator) {
+/** When the material collection is loaded from ROM, the value in each pointer represents an index into the material bundle */
+void load_material_collection(fw64MaterialBundle* material_bundle, fw64Mesh* mesh, fw64DataSource* data_source, fw64Allocator* allocator) {
     fw64_material_collection_init_empty(&mesh->material_collection, mesh->info.primitive_count, allocator);
+    fw64_data_source_read(data_source, mesh->material_collection.materials, mesh->info.primitive_count, sizeof(fw64Material*));
 
-    // fixup material pointers for primitives
     for (uint32_t i = 0; i < mesh->info.primitive_count; i++) {
-        fw64Primitive* primitive = mesh->primitives + i;
-
-        uint32_t primitive_material_index = (uint32_t)primitive->material;
+        uint32_t material_index = (uint32_t)fw64_material_collection_get_material(&mesh->material_collection, i);
+        
         // TODO: Investigate this further.  This indicates that this primitive contains lines
-        if (primitive_material_index == FW64_PRIMITIVE_NO_MATERIAL) {
-            primitive->material = NULL;
-        }
-        else {
-            primitive->material = material_bundle->materials + primitive_material_index;
-            fw64_material_collection_set_material(&mesh->material_collection, i, primitive->material);
-        }
+        fw64Material* material = (material_index != FW64_PRIMITIVE_NO_MATERIAL) ? 
+            material_bundle->materials + material_index : NULL;
+
+        fw64_material_collection_set_material(&mesh->material_collection, i, material);
     }
 }
 

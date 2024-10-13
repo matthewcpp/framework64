@@ -12,10 +12,10 @@
 
 #define FW64_PRIMITIVE_NO_MATERIAL UINT32_MAX
 
+/** This should correspond to PrimitiveInfo in pipeline/MeshWriter.js  */
 struct fw64Primitive {
     Vtx* vertices; // offset into mesh vertex array
     Gfx* display_list; // offset into mesh display_list array
-    fw64Material* material;
     uint32_t joint_index; // used for skinning
 };
 

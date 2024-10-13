@@ -15,6 +15,7 @@ int fw64_mesh_editor_set_active_primitive(fw64MeshEditor* mesh_editor, size_t in
         return 0;
     }
 
+    mesh_editor->prim_index = index;
     mesh_editor->primitive = mesh_editor->mesh->primitives + index;
 
     return 1;
@@ -38,5 +39,6 @@ void fw64_mesh_editor_set_vertex_color_rgba8(fw64MeshEditor* mesh_editor, size_t
 }
 
 void fw64_mesh_editor_set_vertex_texcoords_f(fw64MeshEditor* mesh_editor, size_t index, float s, float t) {
-    fw64_n64_vertex_set_texcoords_f(mesh_editor->primitive->vertices + index, mesh_editor->primitive->material->texture, s, t);
+    fw64Material* material = fw64_material_collection_get_material(&mesh_editor->mesh->material_collection, mesh_editor->prim_index);
+    fw64_n64_vertex_set_texcoords_f(mesh_editor->primitive->vertices + index, material->texture, s, t);
 }
