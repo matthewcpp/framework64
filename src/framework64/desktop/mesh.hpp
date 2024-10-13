@@ -40,7 +40,6 @@ struct fw64Primitive {
         VertexColors = 8 
     };
 
-    fw64Material* material = nullptr;
     Mode mode = Mode::Unknown;
     uint32_t joint_index = FW64_JOINT_INDEX_NONE;
     Box bounding_box;
@@ -54,13 +53,15 @@ struct fw64Mesh {
     ~fw64Mesh();
 
     std::unique_ptr<fw64MaterialBundle> material_bundle;
-    std::vector<std::unique_ptr<fw64Primitive>> primitives;
+    std::vector<fw64Primitive> primitives;
     Box bounding_box;
+
+    fw64MaterialCollection material_collection;
 
     /// *moves* pdata into the new primitive and creates the GL objects
     /// TODO: joint index
-    fw64Primitive* createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode, Box const & primitive_bounding);
-    fw64Primitive* createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode);
+    fw64Primitive& createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode, Box const & primitive_bounding);
+    fw64Primitive& createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode);
 
     static fw64Mesh* loadFromDatasource(fw64DataSource* data_source, fw64MaterialBundle* material_bundle, framework64::ShaderCache& shader_cache, fw64Allocator* allocator);
 };

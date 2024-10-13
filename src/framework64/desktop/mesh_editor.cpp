@@ -22,7 +22,7 @@ int fw64_mesh_editor_set_active_primitive(fw64MeshEditor* mesh_editor, size_t in
         return 0;
     }
 
-    mesh_editor->primitive = mesh_editor->mesh->primitives[index].get();
+    mesh_editor->primitive = &mesh_editor->mesh->primitives[index];
 
     return 1;
 }

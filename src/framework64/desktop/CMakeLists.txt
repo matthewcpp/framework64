@@ -26,10 +26,8 @@ set(platform_source_files
     primitive_data.hpp primitive_data.cpp
     render_pass.hpp render_pass.cpp
     renderer.hpp renderer.cpp
-    render_util.cpp
     save_file.hpp save_file.cpp
     settings.hpp
-    screen_overlay.hpp screen_overlay.cpp
     shader.hpp shader.cpp
     shader_cache.hpp shader_cache.cpp
     sprite_batch.hpp sprite_batch.cpp

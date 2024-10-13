@@ -7,6 +7,7 @@ set(components_source_files
     fw64_fps_camera.h fw64_fps_camera.c
     fw64_headlight.h fw64_headlight.c
     fw64_media_file_picker.h fw64_media_file_picker.c
+    fw64_mesh_prim_highlighter.h fw64_mesh_prim_highlighter.c
     fw64_rotate_node.h fw64_rotate_node.c
     fw64_ui_navigation.h fw64_ui_navigation.c
     )

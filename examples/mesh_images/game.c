@@ -62,8 +62,8 @@ void game_update(Game* game){
 }
 
 void change_palette(Game* game, int direction) {
-    fw64Mesh* mesh = fw64_scene_get_mesh(&game->scene, 0);
-    fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, game->selected_material);
+    fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(&game->scene, 0);
+    fw64Material* material = fw64_material_collection_get_material(mesh_instance->materials, game->selected_material);
     fw64Texture* texture = fw64_material_get_texture(material);
     fw64Image* image = fw64_texture_get_image(texture);
     int palette_count = fw64_image_get_palette_count(image);
@@ -130,10 +130,10 @@ void update_spritebatch(Game* game) {
     char value_text[16];
 
     fw64_spritebatch_begin(game->spritebatch);
-    fw64Mesh* mesh = fw64_scene_get_mesh(&game->scene, 0);
+    fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(&game->scene, 0);
 
     for (int i = 0; i < 6; i ++) {
-        fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, i);
+        fw64Material* material = fw64_material_collection_get_material(mesh_instance->materials, i);
         fw64Texture* texture = fw64_material_get_texture(material);
 
         sprintf(value_text, "%s: %d", names[i], fw64_texture_get_palette_index(texture));

@@ -10,7 +10,7 @@ static void material_editor_color_updated(void* arg) {
     fw64Mesh* mesh = editor->node->mesh_instance->mesh;
     uint32_t primitive_count = fw64_mesh_get_primitive_count(mesh);
     for (uint32_t i = 0; i < primitive_count; i++) {
-        fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, i);
+        fw64Material* material = fw64_material_collection_get_material(fw64_mesh_get_material_collection(mesh), i);
         fw64_material_set_color(material, editor->color_editor.current_color);
     }
 
@@ -19,7 +19,7 @@ static void material_editor_color_updated(void* arg) {
 
 static fw64ColorRGBA8 material_editor_get_mesh_default_color(MaterialEditor* editor) {
     fw64Mesh* mesh = editor->node->mesh_instance->mesh;
-    fw64Material* material = fw64_mesh_get_material_for_primitive(mesh, 0);
+    fw64Material* material = fw64_material_collection_get_material(fw64_mesh_get_material_collection(mesh), 0);
     return fw64_material_get_color(material);
 }
 

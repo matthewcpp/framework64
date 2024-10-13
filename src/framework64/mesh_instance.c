@@ -21,5 +21,6 @@ void fw64_mesh_instance_init(fw64MeshInstance* mesh_instance, fw64Node* node, fw
 void fw64_mesh_instance_set_mesh(fw64MeshInstance* mesh_instance, fw64Mesh* mesh) {
     // TODO: need to deal /w skinned mesh?
     mesh_instance->mesh = mesh;
+    mesh_instance->materials = fw64_mesh_get_material_collection(mesh);
     fw64_mesh_instance_update(mesh_instance);
 }

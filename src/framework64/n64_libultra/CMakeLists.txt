@@ -19,7 +19,6 @@ set(platform_source_files
     mesh_editor.c
     render_pass.h render_pass.c
     renderer.h renderer.c
-    renderer_util.c
     save_file.h save_file.c
     sprite_batch.h sprite_batch.c
     texture.h texture.c

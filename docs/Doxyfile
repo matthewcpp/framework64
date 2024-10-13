@@ -24,6 +24,7 @@ INPUT             =     ../README.md \
                         ../include/framework64/input.h \
                         ../include/framework64/log.h \
                         ../include/framework64/material.h \
+                        ../include/framework64/material_set.h \
                         ../include/framework64/material_bundle.h \
                         ../include/framework64/matrix.h \
                         ../include/framework64/matrix_project.h \
@@ -58,7 +59,6 @@ INPUT             =     ../README.md \
                         ../include/framework64/util/mesh_data_itr.h \
                         ../include/framework64/util/mesh_editor.h \
                         ../include/framework64/util/quad.h \
-                        ../include/framework64/util/renderer_util.h \
                         ../include/framework64/util/renderpass_util.h \
                         ../include/framework64/util/texture_util.h 
 USE_MDFILE_AS_MAINPAGE = ../README.md

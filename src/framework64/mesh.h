@@ -6,6 +6,7 @@
 #include "framework64/box.h"
 #include "framework64/data_io.h"
 #include "framework64/material.h"
+#include "framework64/material_collection.h"
 #include "framework64/texture.h"
 
 #include <limits.h>
@@ -45,8 +46,14 @@ void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* assets, fw64Allocator* 
 Box fw64_mesh_get_bounding_box(fw64Mesh* mesh);
 uint32_t fw64_mesh_get_primitive_count(fw64Mesh* mesh);
 
-fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index);
 fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index);
+
+/** 
+ * Returns the material set for this mesh.
+ * Note: modifying materials in this set will affect all instances referencing this mesh.
+ * Refer to \ref fw64_material_set_clone to make a deep copy.
+ * */
+fw64MaterialCollection* fw64_mesh_get_material_collection(fw64Mesh* mesh);
 
 #ifdef __cplusplus
 }

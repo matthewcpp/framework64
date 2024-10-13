@@ -12,28 +12,28 @@ fw64Mesh::fw64Mesh() {
 
 fw64Mesh::~fw64Mesh(){
     for (auto const & primitive : primitives) {
-        glDeleteVertexArrays(1, &primitive->gl_info.gl_vertex_array_object);
-        glDeleteBuffers(1, &primitive->gl_info.gl_array_buffer_object);
-        glDeleteBuffers(1, &primitive->gl_info.gl_element_buffer_object);
+        glDeleteVertexArrays(1, &primitive.gl_info.gl_vertex_array_object);
+        glDeleteBuffers(1, &primitive.gl_info.gl_array_buffer_object);
+        glDeleteBuffers(1, &primitive.gl_info.gl_element_buffer_object);
     }
 }
 
-fw64Primitive* fw64Mesh::createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode) {
+fw64Primitive& fw64Mesh::createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode) {
     Box primitive_bounding = data.computeBoundingBox();
     return createPrimitive(std::move(data), primitive_mode, primitive_bounding);
 }
 
-fw64Primitive* fw64Mesh::createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode, Box const & primitive_bounding) {
-    auto& primitive = primitives.emplace_back(std::make_unique<fw64Primitive>());
+fw64Primitive& fw64Mesh::createPrimitive(framework64::PrimitiveData&& data, fw64Primitive::Mode primitive_mode, Box const & primitive_bounding) {
+    auto& primitive = primitives.emplace_back();
 
-    primitive->primitive_data = std::move(data);
-    primitive->gl_info = primitive->primitive_data.createGlMesh();
-    primitive->mode = primitive_mode;
-    primitive->bounding_box = primitive_bounding;
+    primitive.primitive_data = std::move(data);
+    primitive.gl_info = primitive.primitive_data.createGlMesh();
+    primitive.mode = primitive_mode;
+    primitive.bounding_box = primitive_bounding;
 
-    box_encapsulate_box(&bounding_box, &primitive->bounding_box);
+    box_encapsulate_box(&bounding_box, &primitive.bounding_box);
 
-    return primitive.get();
+    return primitive;
 }
 
 /// Note this should coorespond to pipeline/desktop/GLMeshWriter.js _writeMeshInfo
@@ -69,6 +69,8 @@ fw64Mesh* fw64Mesh::loadFromDatasource(fw64DataSource* data_source, fw64Material
     mesh->bounding_box = mesh_info.bounding_box;
     mesh->primitives.reserve(mesh_info.primitive_count);
 
+    fw64_material_collection_init_empty(&mesh->material_collection, mesh_info.primitive_count, allocator);
+
     for (uint32_t i = 0; i < mesh_info.primitive_count; i++) {
         PrimitiveInfo info;
         fw64_data_source_read(data_source, &info, sizeof(info), 1);
@@ -100,9 +102,9 @@ fw64Mesh* fw64Mesh::loadFromDatasource(fw64DataSource* data_source, fw64Material
         primitive_data.indices_array_uint16.resize(info.element_count * element_size);
         fw64_data_source_read(data_source, primitive_data.indices_array_uint16.data(), sizeof(uint16_t), info.element_count * element_size);
 
-        auto* primitive = mesh->createPrimitive(std::move(primitive_data), primitive_mode, info.bounding_box);
-        primitive->joint_index = info.joint_index;
-        primitive->material = material_bundle->materials[info.material_index].get();
+        auto& primitive = mesh->createPrimitive(std::move(primitive_data), primitive_mode, info.bounding_box);
+        primitive.joint_index = info.joint_index;
+        fw64_material_collection_set_material(&mesh->material_collection, i, material_bundle->materials[info.material_index].get());
     }
 
     return mesh.release();
@@ -124,8 +126,16 @@ fw64Mesh* fw64_mesh_load_from_datasource_with_bundle(fw64AssetDatabase* asset_da
 
 void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase*, fw64Allocator* allocator) {
     assert(mesh != nullptr);
-    assert(allocator != nullptr);
+    assert(allocator != nullptr); // should mesh check if this is the same allocator?
+
+    // Not ideal...TODO figure out a better way to do this?
+    fw64_material_collection_uninit(&mesh->material_collection, allocator);
+
     delete mesh;
+}
+
+fw64MaterialCollection* fw64_mesh_get_material_collection(fw64Mesh* mesh) {
+    return &mesh->material_collection;
 }
 
 Box fw64_mesh_get_bounding_box(fw64Mesh* mesh) {
@@ -136,15 +146,10 @@ uint32_t fw64_mesh_get_primitive_count(fw64Mesh* mesh) {
     return static_cast<uint32_t>(mesh->primitives.size());
 }
 
-fw64Material* fw64_mesh_get_material_for_primitive(fw64Mesh* mesh, uint32_t index) {
-    assert(index < mesh->primitives.size());
-    return mesh->primitives[index]->material;
-}
-
 fw64PrimitiveMode fw64_mesh_primitive_get_mode(fw64Mesh* mesh, uint32_t index) {
     assert(index < mesh->primitives.size());
 
-    switch (mesh->primitives[index]->mode) {
+    switch (mesh->primitives[index].mode) {
         case fw64Primitive::Mode::Triangles:
             return FW64_PRIMITIVE_MODE_TRIANGLES;
         

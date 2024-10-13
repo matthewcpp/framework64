@@ -10,6 +10,7 @@ typedef struct {
     fw64Mesh* mesh;
     fw64Primitive* primitive;
     uint32_t flags;
+    size_t prim_index;
 } fw64MeshEditor;
 
 #ifdef __cplusplus

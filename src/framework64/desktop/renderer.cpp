@@ -25,8 +25,6 @@ bool fw64Renderer::init(int width, int height) {
     lighting_data_uniform_block.create();
     mesh_transform_uniform_block.create();
 
-    screen_overlay.init();
-
     return true;
 }
 
@@ -159,12 +157,13 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         fw64StaticDrawInfo* draw_info = (fw64StaticDrawInfo*)fw64_dynamic_vector_item(queue, i);
 
         updateMeshTransformBlock(draw_info->instance->node->transform.world_matrix);
-        fw64Primitive* primitive = draw_info->instance->mesh->primitives[draw_info->index].get();
+        const auto& primitive = draw_info->instance->mesh->primitives[draw_info->index];
+        const fw64Material* material = fw64_material_collection_get_material(draw_info->instance->materials, draw_info->index);
 
-        if (primitive->mode != primitive_type)
+        if (primitive.mode != primitive_type)
             continue;
 
-        drawPrimitive(*primitive);
+        drawPrimitive(primitive, material);
     }
 
     queue = &renderpass->render_queue.buckets[index].skinned_;
@@ -172,16 +171,17 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         fw64SkinnedDrawInfo* draw_info = (fw64SkinnedDrawInfo*)fw64_dynamic_vector_item(queue, i);
         fw64SkinnedMeshInstance* skinned_mesh_instance = draw_info->instance;
 
-        fw64Primitive* primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives[draw_info->index].get();
+        const auto & primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives[draw_info->index];
+        const fw64Material* material = fw64_material_collection_get_material(skinned_mesh_instance->mesh_instance.materials, draw_info->index);
 
-        if (primitive->mode != primitive_type)
+        if (primitive.mode != primitive_type)
             continue;
 
         float transform_matrix[16];
-        matrix_multiply(transform_matrix, skinned_mesh_instance->mesh_instance.node->transform.world_matrix, &skinned_mesh_instance->controller.matrices[primitive->joint_index].m[0]);
+        matrix_multiply(transform_matrix, skinned_mesh_instance->mesh_instance.node->transform.world_matrix, &skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0]);
         updateMeshTransformBlock(transform_matrix);
 
-        drawPrimitive(*primitive);
+        drawPrimitive(primitive, material);
     }
 }
 
@@ -276,40 +276,12 @@ void fw64Renderer::updateMeshTransformBlock(float* matrix) {
     mesh_transform_uniform_block.update();
 }
 
-void fw64Renderer::drawPrimitive(fw64Primitive const & primitive) {
-    setActiveShader(primitive.material->shader);
-    active_shader->shader->setUniforms(active_shader, *primitive.material);
+void fw64Renderer::drawPrimitive(fw64Primitive const & primitive, const fw64Material* material) {
+    setActiveShader(material->shader);
+    active_shader->shader->setUniforms(active_shader, *material);
     glBindVertexArray(primitive.gl_info.gl_vertex_array_object);
 
     glDrawElements(static_cast<GLenum>(primitive.mode), primitive.gl_info.element_count, primitive.gl_info.primitive_mode, 0);
-}
-
-void fw64Renderer::drawStaticMesh(fw64Mesh* mesh, fw64Transform* transform) {
-    setDrawingMode(DrawingMode::Mesh);
-    updateMeshTransformBlock(transform->world_matrix);
-
-    for (auto const & primitive : mesh->primitives) {
-        if (primitive->mode != primitive_type)
-            continue;
-
-        drawPrimitive(*primitive);
-    }
-}
-
-void fw64Renderer::drawAnimatedMesh(fw64Mesh *mesh, fw64AnimationController* controller, fw64Transform *transform) {
-    setDrawingMode(DrawingMode::Mesh);
-
-    for (auto const & primitive : mesh->primitives) {
-        if (primitive->mode != primitive_type)
-            continue;
-
-        // should this be done in the shader?
-        float transform_matrix[16];
-        matrix_multiply(transform_matrix, transform->world_matrix, &controller->matrices[primitive->joint_index].m[0]);
-        updateMeshTransformBlock(transform_matrix);
-
-        drawPrimitive(*primitive);
-    }
 }
 
 void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
@@ -360,21 +332,6 @@ void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
 
     lighting_data_uniform_block.data.light_count = block_index;
     lighting_data_uniform_block.update();
-}
-
-
-void fw64Renderer::renderFullscreenOverlay(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    screen_overlay.primitive.material->color[0] = static_cast<float>(r) / 255.0f;
-    screen_overlay.primitive.material->color[1] = static_cast<float>(g) / 255.0f;
-    screen_overlay.primitive.material->color[2] = static_cast<float>(b) / 255.0f;
-    screen_overlay.primitive.material->color[3] = static_cast<float>(a) / 255.0f;
-
-    matrix_set_identity(mesh_transform_uniform_block.data.normal_matrix.data());
-    matrix_set_identity(mesh_transform_uniform_block.data.mvp_matrix.data());
-    mesh_transform_uniform_block.update();
-
-    glDisable(GL_DEPTH_TEST);
-    drawPrimitive(screen_overlay.primitive);
 }
 
 void fw64Renderer::setDrawingMode(DrawingMode mode) {
