@@ -1,17 +1,22 @@
 #include "libdragon_engine.h"
 
 #include "libdragon_asset_database.h"
+#include "libdragon_display.h"
 #include "libdragon_input.h"
+#include "libdragon_renderer.h"
 
 #include <libdragon.h>
 
 #include <string.h>
 
 fw64AssetDatabase asset_database;
+fw64Displays displays;
 fw64Input input;
+fw64Renderer renderer;
 
 void fw64_n64_libdragon_engine_init(fw64Engine* engine) {
     _fw64_default_allocator_init();
+    fw64_n64_libdragon_displays_init(&displays);
 
 #ifndef NDEBUG
     //Init logging
@@ -33,7 +38,9 @@ void fw64_n64_libdragon_engine_init(fw64Engine* engine) {
     memset(&input, 0, sizeof(input));
 
     engine->assets = &asset_database;
+    engine->displays = &displays;
     engine->input = &input;
+    engine->renderer = &renderer;
 }
 
 void fw64_n64_libdragon_engine_update(fw64Engine* engine) {
