@@ -15,7 +15,7 @@ ARG LIBDRAGON_GIT_REPO=https://github.com/DragonMinded/libdragon.git
 ARG LIBDRAGON_GIT_BRANCH=preview
 
 RUN apt-get update && \
-    apt-get install -y nano wget git g++ cmake ninja-build && \
+    apt-get install -y nano wget git g++ gdb-multiarch cmake ninja-build && \
     \
     cd /tmp && wget ${LIBDRAGON_TOOLCHAIN_URL} && apt-get install -y ./gcc-toolchain-mips64-x86_64.deb && \
     rm ./gcc-toolchain-mips64-x86_64.deb && \

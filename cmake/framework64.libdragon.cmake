@@ -64,10 +64,15 @@ function(create_game)
     set(main_file_src ${fw64_libdragon_src_dir}/src/framework64/n64_libdragon/main_n64.c)
     set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_n64_${target_name}.c)
 
-    configure_file(${fw64_libdragon_src_dir}/main_n64_libdragon.c ${game_binary_dir}/main_n64_libdragon.c COPYONLY)
+    configure_file(${fw64_libdragon_src_dir}/main_n64_libdragon.c ${game_binary_dir}/main_n64_libdragon_${target_name}.c COPYONLY)
 
     add_custom_command(TARGET ${target_name} 
         POST_BUILD COMMAND make
+        WORKING_DIRECTORY ${game_binary_dir}
+    )
+
+    add_custom_command(TARGET ${target_name} 
+        POST_BUILD COMMAND touch ${main_file_dest}
         WORKING_DIRECTORY ${game_binary_dir}
     )
 

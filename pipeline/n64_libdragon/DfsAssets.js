@@ -28,7 +28,7 @@ class DfsAssets {
         const assetId = this.assetDefines.length.toString();
         const name = path.basename(assetPath, path.extname(assetPath));
 
-        this.assetDefines.push(`#define FW64_ASSET_${type}_${name} "${assetId}"\n`)
+        this.assetDefines.push(`#define FW64_ASSET_${type}_${name} "rom:/${assetId}"\n`)
 
         return assetId;
     }

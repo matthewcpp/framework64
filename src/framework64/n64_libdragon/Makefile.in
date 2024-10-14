@@ -8,7 +8,7 @@ N64_C_AND_CXX_FLAGS += -I${fw64_include_dir} -I${fw64_current_game_dir}
 N64_C_AND_CXX_FLAGS += -DFW64_PLATFORM_N64_LIBDRAGON
 N64_LDFLAGS += -L${fw64_libdragon_lib_search_dir} -l${target_name} -lframework64
 
-OBJS = $(BUILD_DIR)/main_n64_libdragon.o
+OBJS = $(BUILD_DIR)/main_n64_libdragon_${target_name}.o
 
 ${target_name}.z64: N64_ROM_TITLE = "${target_name}"
 #${target_name}.z64: $(BUILD_DIR)/${target_name}.dfs

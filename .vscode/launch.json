@@ -66,7 +66,8 @@
             "name": "GDB Debug Rom",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build_n64_libultra/examples/text/text.elf",
+            // "program": "${workspaceFolder}/build_n64_libultra/examples/text/text.elf", // enable for libultra
+            "program": "${workspaceFolder}/build_n64_libdragon/bin/minimal/build/minimal.elf", // enable for libultra
             "cwd": "${workspaceRoot}",
             "MIMode": "gdb",
             "miDebuggerPath": "gdb-multiarch",
