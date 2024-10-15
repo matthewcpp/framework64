@@ -10,7 +10,6 @@
 typedef struct {
     Vec2 pos;
     fw64Texture* texture;
-    rdpq_blitparms_t rdpq_params;
 } SpriteBlitInfo;
 
 struct fw64SpriteBatch {

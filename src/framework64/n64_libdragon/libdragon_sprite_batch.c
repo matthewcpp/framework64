@@ -38,11 +38,4 @@ void fw64_spritebatch_draw_sprite_slice(fw64SpriteBatch* spritebatch, fw64Textur
     info->texture = texture;
     info->pos.x = (float)x;
     info->pos.y = (float)y;
-
-    memset(&info->rdpq_params, 0 , sizeof(rdpq_blitparms_t));
-    info->rdpq_params.s0 =  frame * ANIM_FRAME_W;//Extract correct sprite from sheet
-    info->rdpq_params.cx = ANIM_FRAME_W/2,
-    info->rdpq_params.cy = ANIM_FRAME_H,
-    info->rdpq_params.width = ANIM_FRAME_W, //Extract correct width from sheet
-    info->rdpq_params.flip_x = 0;
 }

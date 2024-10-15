@@ -20,7 +20,6 @@ async function convertLibdragonSprite(sourceFile, assetDirectory, outputDirector
         "matthewcpp/framework64-n64-libdragon",
         mkspritePath,
         "--output", dockerMappedOutDir,
-        "--compress", "0",
         sourcePath
     ];
 

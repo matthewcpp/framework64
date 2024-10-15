@@ -6,6 +6,7 @@
 #include "libdragon_renderer.h"
 
 #include <libdragon.h>
+#include <GL/gl_integration.h>
 
 #include <string.h>
 
@@ -24,8 +25,10 @@ void fw64_n64_libdragon_engine_init(fw64Engine* engine) {
     //debug_init_usblog();
 #endif
 
-    //Init RDPQ
+    //Init Graphics
     rdpq_init();
+    gl_init();
+    fw64_libdragon_renderer_init(&renderer);
 
     //Init display
     display_init(RESOLUTION_320x240, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE);

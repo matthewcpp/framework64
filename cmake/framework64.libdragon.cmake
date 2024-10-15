@@ -28,7 +28,7 @@ endfunction()
 # performs platform specific configuration of a framework64 game
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
-    set(oneValueArgs TARGET SAVE_FILE_TYPE)
+    set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
     set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(N64_ROM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -38,6 +38,12 @@ function(create_game)
     set(game_sources ${N64_ROM_SOURCES})
     set(game_binary_dir ${CMAKE_SOURCE_DIR}/build_n64_libdragon/bin/${target_name})
     set(game_asset_dir ${game_binary_dir}/assets)
+
+    if (DEFINED N64_ROM_GAME_HEADER_PATH)
+        set(game_include_path ${N64_ROM_GAME_HEADER_PATH})
+    else()
+        set(game_include_path "game.h")
+    endif()
 
     # Create static library containing all game logic.
     # This will be linked in to the platform main file
@@ -64,10 +70,10 @@ function(create_game)
     set(main_file_src ${fw64_libdragon_src_dir}/src/framework64/n64_libdragon/main_n64.c)
     set(main_file_dest ${CMAKE_CURRENT_BINARY_DIR}/main_n64_${target_name}.c)
 
-    configure_file(${fw64_libdragon_src_dir}/main_n64_libdragon.c ${game_binary_dir}/main_n64_libdragon_${target_name}.c COPYONLY)
+    configure_file(${fw64_libdragon_src_dir}/main_n64_libdragon.c ${game_binary_dir}/main_n64_libdragon_${target_name}.c)
 
     add_custom_command(TARGET ${target_name} 
-        POST_BUILD COMMAND make
+        POST_BUILD COMMAND make clean && make
         WORKING_DIRECTORY ${game_binary_dir}
     )
 
