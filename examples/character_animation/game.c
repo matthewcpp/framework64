@@ -34,7 +34,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_scene_init(&game->scene, &scene_info, engine->assets, allocator);
     fw64Node* node = fw64_scene_create_node(&game->scene);
-    fw64SkinnedMesh* skinned_mesh = fw64_scene_load_skinned_mesh_asset(&game->scene, FW64_ASSET_skinnedmesh_catherine);
+    fw64SkinnedMesh* skinned_mesh = fw64_scene_load_skinned_mesh_asset(&game->scene, FW64_ASSET_skinnedmesh_zombie);
     fw64SkinnedMeshInstance* skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(&game->scene, node, skinned_mesh, game->current_animation);
     
     fw64Node* camera_node = fw64_scene_create_node(&game->scene);
