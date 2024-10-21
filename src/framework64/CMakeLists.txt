@@ -15,6 +15,7 @@ set(common_source_files
     display.h
     engine.h
     filesystem.h
+    fmv.h
     font.h
     frustum.h frustum.c
     image.h
@@ -71,6 +72,8 @@ target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if (FW64_PLATFORM_DESKTOP)
     add_subdirectory(desktop)
+elseif(FW64_PLATFORM_N64_LIBDRAGON)
+    add_subdirectory(n64_libdragon)
 elseif(FW64_PLATFORM_N64_LIBULTRA)
     add_subdirectory(n64_libultra)
 endif()

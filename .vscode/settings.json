@@ -169,7 +169,16 @@
         "renderer.h": "c",
         "skinned_mesh_instance.h": "c",
         "scene_playground.h": "c",
-        "scene_billboard_example.h": "c",
-        "log.h": "c"
+        "libdragon_display.h": "c",
+        "display.h": "c",
+        "libdragon_renderer.h": "c",
+        "*.tcc": "c",
+        "gl_integration.h": "c",
+        "stat.h": "c",
+        "texture.h": "c",
+        "libdragon_material.h": "c",
+        "stdbool.h": "c",
+        "libdragon_dfs_datasource.h": "c",
+        "fmv.h": "c"
     }
 }

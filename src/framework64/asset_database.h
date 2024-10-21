@@ -14,9 +14,13 @@ typedef struct fw64Font fw64Font;
 typedef struct fw64Mesh fw64Mesh;
 typedef struct fw64Scene fw64Scene;
 
+#ifndef FW64_PLATFORM_N64_LIBDRAGON
 typedef uint64_t fw64AssetId;
-
 #define FW64_INVALID_ASSET_ID UINT64_MAX
+#else
+typedef const char* fw64AssetId;
+#define FW64_INVALID_ASSET_ID NULL
+#endif
 
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 

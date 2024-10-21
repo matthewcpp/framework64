@@ -40,6 +40,15 @@
                     "FW64_BUILD_EXAMPLES": "ON",
                     "FW64_BUILD_TOOLS": "ON"
                 }
+            },
+            "n64_libdragon": {
+                "short": "n64_libdragon",
+                "long": "n64_libdragon",
+                "settings": {
+                    "FW64_PLATFORM_N64_LIBDRAGON": "ON",
+                    "FW64_BUILD_EXAMPLES": "ON",
+                    "FW64_BUILD_TOOLS": "ON"
+                }
             }
         }
     }

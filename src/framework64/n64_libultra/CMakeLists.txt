@@ -7,6 +7,7 @@ set(platform_source_files
     display_list.h display_list.c
     engine.h engine.c
     filesystem.h filesystem.c
+    fmv.h fmv.c
     font.h font.c
     image.h image.c
     input.h input.c

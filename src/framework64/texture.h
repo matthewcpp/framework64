@@ -15,7 +15,7 @@ typedef enum {
     FW64_TEXTURE_WRAP_REPEAT = G_TX_WRAP,
     FW64_TEXTURE_WRAP_MIRROR = G_TX_MIRROR
 } fw64TextureWrapMode;
-#else
+#elif FW64_PLATFORM_DESKTOP
 #ifdef __linux__
 #include <GL/glew.h>
 #else
@@ -26,6 +26,12 @@ typedef enum {
     FW64_TEXTURE_WRAP_CLAMP = GL_CLAMP_TO_EDGE,
     FW64_TEXTURE_WRAP_REPEAT = GL_REPEAT,
     FW64_TEXTURE_WRAP_MIRROR =  GL_MIRRORED_REPEAT
+} fw64TextureWrapMode;
+#elif FW64_PLATFORM_N64_LIBDRAGON
+typedef enum {
+    FW64_TEXTURE_WRAP_CLAMP = 0, // GL_CLAMP_TO_EDGE,
+    FW64_TEXTURE_WRAP_REPEAT = 1, // GL_REPEAT,
+    FW64_TEXTURE_WRAP_MIRROR =  2, // GL_MIRRORED_REPEAT
 } fw64TextureWrapMode;
 #endif
 

@@ -24,6 +24,28 @@ typedef enum {
 
 #define FW64_N64_STICK_INDEX 0
 
+#elif FW64_PLATFORM_N64_LIBDRAGON
+
+// note: this needs to align with joypad_buttons_u in libdragon/include joypad.h
+typedef enum {
+    FW64_N64_CONTROLLER_BUTTON_A          = 1 << 15,
+    FW64_N64_CONTROLLER_BUTTON_B          = 1 << 14,
+    FW64_N64_CONTROLLER_BUTTON_Z          = 1 << 13,
+    FW64_N64_CONTROLLER_BUTTON_START      = 1 << 12,
+    FW64_N64_CONTROLLER_BUTTON_DPAD_UP    = 1 << 11,
+    FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN  = 1 << 10,
+    FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT  = 1 << 9,
+    FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT = 1 << 8,
+    //FW64_N64_CONTROLLER_BUTTON_Y        = 1 << 7,
+    //FW64_N64_CONTROLLER_BUTTON_X        = 1 << 6,
+    FW64_N64_CONTROLLER_BUTTON_L          = 1 << 5,
+    FW64_N64_CONTROLLER_BUTTON_R          = 1 << 4,
+    FW64_N64_CONTROLLER_BUTTON_C_UP       = 1 << 3,
+    FW64_N64_CONTROLLER_BUTTON_C_DOWN     = 1 << 2,
+    FW64_N64_CONTROLLER_BUTTON_C_LEFT     = 1 << 1,
+    FW64_N64_CONTROLLER_BUTTON_C_RIGHT    = 1 << 0
+} fw64N64ControllerButton;
+
 #else
 // https://www.reddit.com/r/RetroArch/comments/etwgqz/mapping_a_xbox_one_controller_to_n64/
 typedef enum {

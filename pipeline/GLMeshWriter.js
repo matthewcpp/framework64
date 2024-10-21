@@ -1,6 +1,7 @@
 const Bounding = require("./gltf/Bounding");
 const Primitive = require("./gltf/Primitive");
 const GLTFVertexIndex = require("./gltf/GLTFVertexIndex");
+const VertexAttributes = require("./gltf/VertexAttributes");
 
 const fs = require("fs");
 
@@ -139,15 +140,6 @@ function _writeVertexColorUnsignedByte(vertex, vertexIndex, buffer, writer) {
     bufferIndex = buffer.writeUInt8(Math.round(vertex[GLTFVertexIndex.ColorG] * 255), bufferIndex);
     bufferIndex = buffer.writeUInt8(Math.round(vertex[GLTFVertexIndex.ColorB] * 255), bufferIndex);
     bufferIndex = buffer.writeUInt8(Math.round(vertex[GLTFVertexIndex.ColorA] * 255), bufferIndex);
-}
-
-/// This needs to be kept in sync with desktop/mesh.h
-class VertexAttributes{
-    static None = 0;
-    static Positions = 1;
-    static Normals = 2;
-    static TexCoords = 4;
-    static VertexColors = 8;
 }
 
 module.exports = {

@@ -40,6 +40,7 @@ class Mesh {
         }
     }
 
+    // called by the GLTF loader
     prunePrimitiveVertices() {
         for (const primitive of this.primitives) {
             primitive.pruneUnusedVertices();
@@ -49,6 +50,7 @@ class Mesh {
     // due to the way GLTF is exported from blender, it is possible that primitives may
     // contain faces which are influenced by more than one bone.
     // In this case we need to split the primitives so that each draw call uses the correct joint matrix
+    // This should be called when processing a skinned mesh
     splitPrimitivesForSkinning(){
         const primitives = this.primitives;
         this.primitives = [];
