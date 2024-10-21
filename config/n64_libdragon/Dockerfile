@@ -7,12 +7,15 @@ FROM ubuntu:jammy
 
 ENV FW64_N64_LIBDRAGON_DOCKER_CONTAINER=1
 ENV N64_INST=/opt/libdragon
+ENV T3D_INST=/opt/tiny3d
 
 ARG LIBDRAGON_TOOLCHAIN_URL="https://github.com/DragonMinded/libdragon/releases/download/toolchain-continuous-prerelease/gcc-toolchain-mips64-x86_64.deb"
 ARG NODE_MAJOR_VERSION=20
 
 ARG LIBDRAGON_GIT_REPO=https://github.com/DragonMinded/libdragon.git
 ARG LIBDRAGON_GIT_BRANCH=preview
+
+ARG TINY3D_GIT_REPO=https://github.com/HailToDodongo/tiny3d.git
 
 RUN apt-get update && \
     apt-get install -y nano wget git g++ gdb-multiarch cmake ninja-build && \
@@ -29,4 +32,5 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* 
 
 RUN cd /tmp && git clone ${LIBDRAGON_GIT_REPO} && cd libdragon && git switch ${LIBDRAGON_GIT_BRANCH} && \
-    make libdragon tools && make install tools-install
+    make libdragon tools && make install tools-install && \
+    cd /opt && git clone ${TINY3D_GIT_REPO} && cd tiny3d && ./build.sh
