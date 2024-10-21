@@ -10,6 +10,17 @@
 #define QUAT_KEYFRAME(buffer, index) (Quat*)VEC_KEYFRAME(buffer, index, 4)
 #define FLOAT_MATRIX(matrices, index) ((matrices) + ((index) * 16));
 
+typedef struct {
+    uint32_t count;
+    float times[];
+} fw64AnimationInputBuffer;
+
+/** This struct acts as a convience way to access input buffers */
+typedef struct {
+    uint32_t count;
+    float values[];
+} fw64AnimationValueBuffer;
+
 #define INVALID_KEYFRAME_BUFFER_INDEX UINT16_MAX
 
 static void initialize_matrices(fw64AnimationController* controller);
@@ -19,8 +30,6 @@ static void compute_local_matrix(fw64AnimationController* controller, uint32_t j
 static uint32_t get_keyframe_index(float* input_buffer, uint32_t key_count, float time);
 
 void fw64_animation_controller_init(fw64AnimationController* controller, fw64AnimationData* animation_data, int initial_animation, fw64Allocator* allocator) {
-    if (allocator == NULL) allocator = fw64_default_allocator();
-
     controller->animation_data = animation_data;
     controller->matrices = fw64_allocator_memalign(allocator, 8, sizeof(fw64Matrix) * animation_data->skin.joint_count);
     controller->speed = 1.0f;
@@ -29,10 +38,12 @@ void fw64_animation_controller_init(fw64AnimationController* controller, fw64Ani
 
     initialize_matrices(controller);
 
-    if (initial_animation >= 0)
+    if (initial_animation >= 0) {
         fw64_animation_controller_set_animation(controller, initial_animation);
-    else
+    }
+    else {
         controller->current_animation = NULL;
+    }
 }
 
 void fw64_animation_controller_uninit(fw64AnimationController* controller, fw64Allocator* allocator) {
@@ -58,17 +69,20 @@ void fw64_animation_controller_set_animation(fw64AnimationController* controller
 }
 
 void fw64_animation_controller_update(fw64AnimationController* controller, float time_delta) {
-    if (controller->state != FW64_ANIMATION_STATE_PLAYING)
+    if (controller->state != FW64_ANIMATION_STATE_PLAYING) {
         return;
+    }
 
     float next_time = controller->current_time + (time_delta * controller->speed);
 
     if (controller->loop) {
-        while (next_time < 0.0f)
+        while (next_time < 0.0f) {
             next_time += controller->current_animation->total_time;
+        }
 
-        while (next_time > controller->current_animation->total_time)
+        while (next_time > controller->current_animation->total_time) {
             next_time -= controller->current_animation->total_time;
+        }
     }
     else {
         next_time = fw64_clamp(next_time, 0.0f, controller->current_animation->total_time);
@@ -117,8 +131,9 @@ void update_skin(fw64AnimationController* controller) {
 
 uint32_t get_keyframe_index(float* input_buffer, uint32_t key_count, float time) {
     for (uint32_t i = 0; i < key_count; i++) {
-        if (time <= input_buffer[i])
+        if (time <= input_buffer[i]) {
             return i;
+        }
     }
 
     return key_count;
@@ -129,43 +144,61 @@ uint32_t get_keyframe_index(float* input_buffer, uint32_t key_count, float time)
 #define QUAT_KEYFRAME(buffer, index) (Quat*)VEC_KEYFRAME(buffer, index, 4)
 #define FLOAT_MATRIX(matrices, index) ((matrices) + ((index) * 16));
 
-void compute_local_matrix(fw64AnimationController* controller, uint32_t joint_index, float* local_matrix) {
+static void compute_vec3_value(fw64AnimationController* controller, uint16_t input_index, uint16_t value_index, Vec3* value) {
     float* keyframe_data = controller->animation_data->keyframe_data;
-    fw64AnimationTrack* track = controller->animation_data->tracks + (controller->current_animation->tracks_index + joint_index);
 
-    float* input_buffer = keyframe_data + controller->current_animation->input_index;
-    float* translation_buffer = keyframe_data + track->translation;
-    float* rotation_buffer = keyframe_data + track->rotation;
-    float* scale_buffer = keyframe_data + track->scale;
+    fw64AnimationInputBuffer* input_buffer = (fw64AnimationInputBuffer*)(keyframe_data + input_index);
+    fw64AnimationValueBuffer* value_buffer = (fw64AnimationValueBuffer*)(keyframe_data + value_index);
+    uint32_t key_count = input_buffer->count;
 
-    uint32_t keyframe_index = get_keyframe_index(input_buffer, controller->current_animation->key_count, controller->current_time);
+    uint32_t keyframe_index = get_keyframe_index(input_buffer->times, key_count, controller->current_time);
 
     if (keyframe_index == 0) {
-        matrix_from_trs(&local_matrix[0],
-                        VEC3_KEYFRAME(translation_buffer, 0),
-                        QUAT_KEYFRAME(rotation_buffer, 0),
-                        VEC3_KEYFRAME(scale_buffer, 0));
-    }
-    else if (keyframe_index == controller->current_animation->key_count) {
-        matrix_from_trs(&local_matrix[0],
-                        VEC3_KEYFRAME(translation_buffer, keyframe_index - 1),
-                        QUAT_KEYFRAME(rotation_buffer, keyframe_index - 1),
-                        VEC3_KEYFRAME(scale_buffer, keyframe_index - 1));
-    }
-    else {
+        memcpy(value, VEC3_KEYFRAME(value_buffer->values, 0), sizeof(Vec3));
+    } else if (keyframe_index == key_count) {
+        memcpy(value, VEC3_KEYFRAME(value_buffer->values, keyframe_index - 1), sizeof(Vec3));
+    } else {
         uint32_t a = keyframe_index - 1;
         uint32_t b = keyframe_index;
 
-        Vec3 translation, scale;
-        Quat rotation;
-        float t = (controller->current_time - input_buffer[a]) / (input_buffer[b] - input_buffer[a]);
-
-        vec3_lerp(&translation, VEC3_KEYFRAME(translation_buffer, a), VEC3_KEYFRAME(translation_buffer, b), t);
-        quat_slerp(&rotation, QUAT_KEYFRAME(rotation_buffer, a), QUAT_KEYFRAME(rotation_buffer, b), t);
-        vec3_lerp(&scale, VEC3_KEYFRAME(scale_buffer, a), VEC3_KEYFRAME(scale_buffer, b), t);
-
-        matrix_from_trs(&local_matrix[0], &translation, &rotation, &scale);
+        float t = (controller->current_time - input_buffer->times[a]) / (input_buffer->times[b] - input_buffer->times[a]);
+        vec3_lerp(value, VEC3_KEYFRAME(value_buffer->values, a), VEC3_KEYFRAME(value_buffer->values, b), t);
     }
+}
+
+static void compute_quat_value(fw64AnimationController* controller, uint16_t input_index, uint16_t value_index, Quat* value) {
+    float* keyframe_data = controller->animation_data->keyframe_data;
+
+    fw64AnimationInputBuffer* input_buffer = (fw64AnimationInputBuffer*)(keyframe_data + input_index);
+    fw64AnimationValueBuffer* value_buffer = (fw64AnimationValueBuffer*)(keyframe_data + value_index);
+    uint32_t key_count = input_buffer->count;
+
+    uint32_t keyframe_index = get_keyframe_index(input_buffer->times, key_count, controller->current_time);
+
+    if (keyframe_index == 0) {
+        memcpy(value, QUAT_KEYFRAME(value_buffer->values, 0), sizeof(Quat));
+    } else if (keyframe_index == key_count) {
+        memcpy(value, QUAT_KEYFRAME(value_buffer->values, keyframe_index - 1), sizeof(Quat));
+    } else {
+        uint32_t a = keyframe_index - 1;
+        uint32_t b = keyframe_index;
+
+        float t = (controller->current_time - input_buffer->times[a]) / (input_buffer->times[b] - input_buffer->times[a]);
+        quat_slerp(value, QUAT_KEYFRAME(value_buffer->values, a), QUAT_KEYFRAME(value_buffer->values, b), t);
+    }
+}
+
+void compute_local_matrix(fw64AnimationController* controller, uint32_t joint_index, float* local_matrix) {
+    fw64AnimationTrack* track = controller->animation_data->tracks + (controller->current_animation->tracks_index + joint_index);
+
+    Vec3 translation, scale;
+    Quat rotation;
+
+    compute_vec3_value(controller, track->translation_input_index, track->translation, &translation);
+    compute_vec3_value(controller, track->scale_input_index, track->scale, &scale);
+    compute_quat_value(controller, track->rotation_input_index, track->rotation, &rotation);
+
+    matrix_from_trs(&local_matrix[0], &translation, &rotation, &scale);
 }
 
 void update_joint(fw64AnimationController* controller, uint32_t joint_index, float* parent_matrix) {

@@ -68,14 +68,14 @@ async function processDesktop(manifestFile, assetDirectory, outputDirectory, plu
 
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
-            console.log(`Processing Sound Bank: ${soundBank.name}`);
+            console.log(`Processing Sound Bank: ${soundBank.dir}`);
             await processSoundBank(soundBank, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 
     if (manifest.musicBanks) {
         for (const musicBank of manifest.musicBanks) {
-            console.log(`Processing Music Bank: ${musicBank.name}`);
+            console.log(`Processing Music Bank: ${musicBank.dir}`);
             await processMusicBank(musicBank, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
