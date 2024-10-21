@@ -20,20 +20,22 @@ typedef struct {
     float* inverse_bind_matrices;
 } fw64AnimationSkin;
 
-/** indices into the animation data buffer */
+/** This stuct contains indices into the animation data buffer a single joint's channels.
+ *  E.G. The Right leg bone for the run animation
+ */
 typedef struct {
+    uint16_t translation_input_index;
     uint16_t translation;
+    uint16_t rotation_input_index;
     uint16_t rotation;
+    uint16_t scale_input_index;
     uint16_t scale;
 } fw64AnimationTrack;
 
 typedef struct {
     float total_time; // time of animation in seconds
-    uint32_t key_count; // number of keys in the buffers
-    uint32_t input_index; // offset into keyframe_data of input buffer
     uint32_t tracks_index;  // index into the track array for the first joint's track
 } fw64Animation;
-
 
 typedef struct {
     fw64AnimationSkin skin;

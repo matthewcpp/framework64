@@ -1,12 +1,7 @@
-const crypto = require("crypto");
-
+const Animation = require("./Animation")
 const Util = require("../Util");
 
-class Track {
-    translation = null;
-    rotation = null;
-    scale = null;
-}
+const crypto = require("crypto");
 
 class KeyframeBuffer {
     size;
@@ -15,17 +10,6 @@ class KeyframeBuffer {
     constructor(size, index) {
         this.size = size;
         this.index = index;
-    }
-}
-
-class Animation {
-    name;
-    time = 0.0;
-    input = null;
-    tracks = []; // corresponds to the joints
-
-    constructor(name) {
-        this.name = name;
     }
 }
 
@@ -72,6 +56,7 @@ class BufferInfo {
 class Parser {
     data = null;
     gltf = null;
+    /** NodeJS Buffer holding all the content of the gltf .bin file */
     buffer = null;
     options = null;
 
@@ -165,6 +150,11 @@ class Parser {
         }
     }
 
+    /**
+     * This method acts as a cache for buffer chunks that will end up in the animation data array
+     * given an accessor it will return an index (specified in bytes) of the start of that accessors
+     * position in the animation data buffer.
+     */
     getBufferChunk(accessorIndex) {
         const accessor = this.gltf.accessors[accessorIndex];
 
@@ -177,7 +167,11 @@ class Parser {
 
         // check if we have a chunk with the same hash
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
-        const bufferSlice = this.buffer.slice(bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
+        const bufferSlice = Buffer.allocUnsafe(bufferView.byteLength + 4); // note we will write the length into the start of this buffer
+        this.buffer.copy(bufferSlice, 4, bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength);
+        this.buffer.writeFloatLE(bufferSlice, accessor.count, 0);
+
+        // TODO: is crypto necessary here?  can we simply cache the accessor index???
         const hash = crypto.createHash('md5').update(bufferSlice).digest('hex');
 
         if (info.bufferHashToChunk.has(hash)) {
@@ -206,7 +200,7 @@ class Parser {
 
     _createAnimationTracks(animation) {
         for (let i = 0; i < this.data.joints.length; i++) {
-            animation.tracks.push(new Track());
+            animation.tracks.push(new Animation.Track());
         }
     }
 
@@ -215,7 +209,7 @@ class Parser {
             if (!this._shouldParseAnimation(gltfAnimation.name))
                 continue;
 
-            const animation = new Animation(gltfAnimation.name);
+            const animation = new Animation.Animation(gltfAnimation.name);
             this._createAnimationTracks(animation);
 
             for (const channel of gltfAnimation.channels) {
@@ -225,19 +219,6 @@ class Parser {
 
                 // Note: Currently only supporting linear animation
                 const inputChunk = this.getBufferChunk(sampler.input);
-
-                if (animation.input === null)
-                    animation.input = inputChunk;
-                else if (animation.input !== inputChunk){
-                    // note: The animation importer is meant to work where animation is sampled regularly and all keys
-                    // have the same input (key time)  if we get here that means this is not the case, and this particular channel
-                    // has key times which do not correspond to the rest of the animation.  For now we will just ignore it,
-                    // however it is possible that the source file may need some modification.
-                    
-                    console.log(`time difference ${gltfAnimation.name} node: ${channel.target.node}`);
-                    continue;
-                }
-
                 const outputChunk = this.getBufferChunk(sampler.output);
 
                 let joint = this.nodeIndexToJointMap.get(channel.target.node);
@@ -254,14 +235,17 @@ class Parser {
 
                 switch (channel.target.path) {
                     case "translation":
+                        track.translationInput = inputChunk;
                         track.translation = outputChunk;
                     break;
 
                     case "rotation":
+                        track.rotationInput = inputChunk;
                         track.rotation = outputChunk;
                     break;
 
                     case "scale":
+                        track.scaleInput = inputChunk;
                         track.scale = outputChunk;
                         break;
                 }
