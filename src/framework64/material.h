@@ -37,6 +37,9 @@ typedef enum {
     FW64_SHADING_MODE_COUNT
 } fw64ShadingMode;
 
+// This is used during loading. Needs to be kept in sync with pipeline/gltf/material.js
+#define FW64_MATERIAL_NO_TEXTURE UINT32_MAX
+
 void fw64_material_set_texture(fw64Material* material, fw64Texture* texture, uint32_t initial_frame);
 fw64Texture* fw64_material_get_texture(fw64Material* material);
 

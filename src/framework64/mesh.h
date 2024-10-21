@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #define FW64_JOINT_INDEX_NONE UINT32_MAX
+#define FW64_PRIMITIVE_NO_MATERIAL UINT32_MAX
 
 typedef enum {
     FW64_PRIMITIVE_MODE_UNSET,
@@ -40,7 +41,6 @@ extern "C" {
 fw64Mesh* fw64_mesh_load_from_datasource(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64Allocator* allocator);
 fw64Mesh* fw64_mesh_load_from_datasource_with_bundle(fw64AssetDatabase* assets, fw64DataSource* data_source, fw64MaterialBundle* material_bundle, fw64Allocator* allocator);
 
-/** Cleans up a mesh that was manually constructed after calling \ref mesh_init */
 void fw64_mesh_delete(fw64Mesh* mesh, fw64AssetDatabase* assets, fw64Allocator* allocator);
 
 Box fw64_mesh_get_bounding_box(fw64Mesh* mesh);

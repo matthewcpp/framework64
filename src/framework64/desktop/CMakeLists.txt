@@ -7,6 +7,7 @@ set(platform_source_files
     engine.hpp engine.cpp
     filesystem.hpp filesystem.cpp
     file_datasource.hpp file_datasource.cpp
+    fmv.hpp fmv.cpp
     font.hpp font.cpp
     framebuffer.hpp framebuffer.cpp
     gouraud_shader.hpp gouraud_shader.cpp
