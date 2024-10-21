@@ -10,8 +10,6 @@
 
 #include <stdint.h>
 
-#define FW64_PRIMITIVE_NO_MATERIAL UINT32_MAX
-
 /** This should correspond to PrimitiveInfo in pipeline/MeshWriter.js  */
 struct fw64Primitive {
     Vtx* vertices; // offset into mesh vertex array
