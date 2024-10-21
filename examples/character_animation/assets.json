@@ -9,6 +9,9 @@
                 "Attack1",
                 "Tired"
             ]
+        },
+        {
+            "src": "temp/zombie/zombie.gltf"
         }
     ],
     "fonts": [
