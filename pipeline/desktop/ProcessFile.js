@@ -16,9 +16,11 @@ async function processFile(fileJson, bundle, baseDirectory, outputDirectory, inc
         }
     }
     else {
-        const sourceFile = path.join(baseDirectory, rawPath);
-        const destFile = path.join(outputDirectory, rawPath);
+        const sourceFile = path.join(baseDirectory, fileJson.src);
+        const destFile = path.join(outputDirectory, path.basename(fileJson.src));
         fs.copyFileSync(sourceFile, destFile);
+        const assetName = Util.safeDefineName(path.basename(fileJson.src, path.extname(fileJson.src)));
+        bundle.addFile(assetName, destFile);
     }
 }
 
