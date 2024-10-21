@@ -81,6 +81,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     if (manifest.soundBanks) {
         for (const soundBank of manifest.soundBanks) {
             checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
+            console.log(`Processing Sound Bank: ${soundBank.dir}`);
 
             const sourceDir = path.join(assetDirectory, soundBank.dir);
             await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, includeDirectory, archive);
@@ -90,6 +91,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     if (manifest.musicBanks) {
         for (const musicBank of manifest.musicBanks) {
             checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
+            console.log(`Processing Music Bank: ${musicBank.dir}`);
 
             const sourceDir = path.join(assetDirectory, musicBank.dir);
             await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, includeDirectory, archive);
