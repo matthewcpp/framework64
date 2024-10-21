@@ -1,0 +1,26 @@
+all: ${target_name}.z64
+.PHONY: all
+
+BUILD_DIR = build
+include $(N64_INST)/include/n64.mk
+
+N64_C_AND_CXX_FLAGS += -I${fw64_include_dir} -I${fw64_current_game_dir} ${additional_includes}
+N64_C_AND_CXX_FLAGS += -DFW64_PLATFORM_N64_LIBDRAGON
+N64_LDFLAGS = -L${fw64_libdragon_lib_search_dir} -l${target_name} ${additional_libs} -lframework64 -g -L$(N64_LIBDIR) -ldragon -lm -ldragonsys -Tn64.ld --gc-sections --wrap __do_global_ctors
+
+OBJS = $(BUILD_DIR)/main_n64_libdragon_${target_name}.o
+
+${target_name}.z64: N64_ROM_TITLE = "${target_name}"
+#${target_name}.z64: $(BUILD_DIR)/${target_name}.dfs
+${target_name}.z64: ${target_dfs_bundle}
+
+# $(BUILD_DIR)/${target_name}.dfs: $(wildcard ${target_dfs_dir}/*)
+$(BUILD_DIR)/${target_name}.elf: $(OBJS)
+
+clean:
+	rm -rf $(BUILD_DIR) *.z64
+.PHONY: clean
+
+-include $(wildcard $(BUILD_DIR)/*.d)
+
+

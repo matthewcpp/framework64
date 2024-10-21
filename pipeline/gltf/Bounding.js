@@ -34,7 +34,12 @@ class Bounding {
         return `${this.min[0]}, ${this.min[1]}, ${this.min[2]}, ${this.max[0]}, ${this.max[1]}, ${this.max[2]}`
     }
 
+    // TODO: Remove me
     writeToBuffer(buffer, index) {
+        return this.writeToBufferBE(buffer, index);
+    }
+
+    writeToBufferBE(buffer, index) {
         index = buffer.writeFloatBE(this.min[0], index);
         index = buffer.writeFloatBE(this.min[1], index);
         index = buffer.writeFloatBE(this.min[2], index);
