@@ -7,7 +7,8 @@ fw64FmvStatus fw64_fmv_get_status(fw64Fmv* fmv) {
  * Opens a video asset. The initial state of the video player will be stopped.
  * Retuns nonzeo on success or 0 on failure.
  */
-int fw64_fmv_open(fw64Fmv* fmv, fw64AssetId) {
+int fw64_fmv_open(fw64Fmv* fmv, fw64AssetId asset_id) {
+    (void)asset_id;
     fmv->status = FW64_FMV_STOPPED;
     return 1;
 }
