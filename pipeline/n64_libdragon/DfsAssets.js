@@ -62,7 +62,7 @@ class DfsAssets {
     }
 
     addAnimationData(animationPath, animationName) {
-        return this._addAsset("skinnedmesh", animationPath, animationName);
+        return this._addAsset("animation_data", animationPath, animationName);
     }
 
     addFile(filePath, fileName) {
