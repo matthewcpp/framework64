@@ -1,6 +1,6 @@
-const Bundle = require("./Bundle");
-const Util = require("../Util");
+const DesktopAssetBundle = require("./AssetBundle");
 const Environment = require("../Environment");
+const Util = require("../Util");
 
 const processFont = require("./ProcessFont");
 const processImage = require("./ProcessImage");
@@ -18,9 +18,10 @@ const path = require("path");
 async function processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap) {
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
-    const bundle = new Bundle(outputDirectory, includeDirectory);
+    const bundle = new DesktopAssetBundle(outputDirectory);
     const layerMap = processLayers(path.dirname(manifestFile), includeDirectory);
-    const environment = new Environment();
+    const pipelinePath = path.normalize(path.join(__dirname, ".."));
+    const environment = new Environment(bundle, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     if (manifest.images) {
         for (const image of manifest.images) {
@@ -83,11 +84,13 @@ async function processDesktop(manifestFile, assetDirectory, outputDirectory, plu
     if (manifest.files) {
         for (const file of manifest.files) {
             console.log(`Processing File: ${file.src}`);
-            await processFile(file, bundle, assetDirectory, outputDirectory, includeDirectory, pluginMap, environment);
+            await processFile(file, environment, pluginMap);
         }
     }
 
-    bundle.finalize();
+    bundle.writeHeader(path.join(includeDirectory, "assets.h"));
+    bundle.writeAssetBundle(path.join(outputDirectory, "asset_bundle.txt"));
+    bundle.writeManifest(path.join(outputDirectory, "manifest.txt"))
 }
 
 module.exports = processDesktop;

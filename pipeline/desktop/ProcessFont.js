@@ -1,7 +1,7 @@
 const Font = require("./Font");
+const FontUtils = require("../FontUtils");
 const FontWriter = require("./FontWriter");
 const Util = require("../Util")
-const FontUtils = require("../FontUtils");
 const processImage = require("./ProcessImage");
 
 const path = require("path");
@@ -22,7 +22,7 @@ async function processFontFile(fontInfo, bundle, baseDirectory, outputDirectory)
     const fontFileName = fontName + ".font";
     const destPath = path.join(outputDirectory, fontFileName);
     FontWriter.writeFile(font, destPath);
-    bundle.addFont(font.name, fontFileName);
+    bundle.addFont(fontFileName, font.name);
 }
 
 async function processImageFont(fontInfo, bundle, baseDirectory, outputDirectory) {
@@ -49,8 +49,8 @@ async function processImageFont(fontInfo, bundle, baseDirectory, outputDirectory
 
     const fontFileName = font.name + ".font";
     const destPath = path.join(outputDirectory, fontFileName);
-    FontWriter.writeFile(font, destPath)
-    bundle.addFont(font.name, fontFileName);
+    FontWriter.writeFile(font, destPath);
+    bundle.addFont(fontFileName, font.name);
 }
 
 async function processFont(fontInfo, bundle, baseDirectory, outputDirectory) {

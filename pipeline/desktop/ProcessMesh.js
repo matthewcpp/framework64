@@ -23,8 +23,8 @@ async function processMesh(meshJson, bundle, manifestDirectory, outputDirectory)
     const assetFileName = staticMesh.name + ".mesh";
     const destPath = path.join(outputDirectory, assetFileName);
     await MeshWriter.writeStaticMesh(staticMesh, destPath);
-    
-    bundle.addMesh(meshName, assetFileName);
+
+    bundle.addMesh(assetFileName, meshName);
 }
 
 module.exports = processMesh;

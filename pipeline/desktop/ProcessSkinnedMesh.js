@@ -1,10 +1,10 @@
-const path = require("path");
-
 const AnimationParser = require("../animation/Parser");
 const GLTFLoader = require("../gltf/GLTFLoader");
 const MaterialBundle = require("../gltf/MaterialBundle");
 const SkinnedMeshWriter = require("./SkinnedMeshWriter");
 const Util = require("../Util");
+
+const path = require("path");
 
 async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory) {
     const srcPath = path.join(manifestDirectory, skinnedMesh.src);
@@ -37,12 +37,12 @@ async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, output
     if (animationOnly) {
         const destFilePath = path.join(outputDirectory, meshName + ".animation");
         SkinnedMeshWriter.writeAimationData(animationData, meshName, destFilePath, includeFilePath);
-        bundle.addAnimationData(meshName, destFilePath);
+        bundle.addAnimationData(destFilePath, meshName);
     }
     else {
         const destFilePath = path.join(outputDirectory, meshName + ".skinnedmesh");
         await SkinnedMeshWriter.write(mesh, animationData, destFilePath, includeFilePath);
-        bundle.addSkinnedMesh(meshName, destFilePath);
+        bundle.addSkinnedMesh(destFilePath, meshName);
     }
 }
 

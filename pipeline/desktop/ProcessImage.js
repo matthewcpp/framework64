@@ -102,7 +102,7 @@ async function buildAtlasFromFrames(imageJson, bundle, baseDirectory, outputDire
         const imageFileName = image.name + ".image";
         const destPath = path.join(outputDirectory, imageFileName);
         await ImageWriter.writeFile(image, destPath);
-        bundle.addImage(image.name, imageFileName);
+        bundle.addImage(imageFileName, image.name);
     }
 
     return image;
@@ -125,7 +125,7 @@ async function _processImage(image, imageJson, bundle, outputDirectory) {
         fs.ensureDirSync(path.dirname(destPath));
 
         await ImageWriter.writeFile(image, destPath);
-        bundle.addImage(image.name, imageFileName);
+        bundle.addImage(imageFileName, image.name);
     }
 }
 
