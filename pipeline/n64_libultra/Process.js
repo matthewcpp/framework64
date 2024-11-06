@@ -1,23 +1,26 @@
+const AudioConvert = require("./AudioConvert");
+const Environment = require("../Environment");
+const FontConvert = require("./ProcessFont");
+const N64LibUltraAssetBundle = require("./AssetBundle");
+
 const processMesh = require("./ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
 const processFile = require("./ProcessFile");
-const FontConvert = require("./ProcessFont");
-const AudioConvert = require("./AudioConvert");
 const processLevel = require("./ProcessLevel");
 const processLayers = require("../ProcessLayers");
-const Archive = require("./Archive");
 const Util = require("../Util");
 
 const fs = require("fs")
 const path = require("path");
-const Environment = require("../Environment");
+
 
 async function processN64(manifestFile, assetDirectory, outputDirectory, pluginMap) {
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
-    const archive = new Archive(outputDirectory, includeDirectory);
-    const environment = new Environment();
+    const archive = new N64LibUltraAssetBundle();
+    const pipelinePath = path.normalize(path.join(__dirname, ".."));
+    const environment = new Environment(archive, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
 
@@ -74,7 +77,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     if (manifest.files) {
         for (const file of manifest.files) {
             console.log(`Processing File: ${file.src}`);
-            await processFile(file, archive, assetDirectory, outputDirectory, includeDirectory, pluginMap, environment);
+            await processFile(file, environment, pluginMap);
         }
     }
 
@@ -98,7 +101,9 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
         }
     }
 
-    archive.write();
+    archive.writeHeader(path.join(includeDirectory, "assets.h"));
+    archive.writeArchive(path.join(outputDirectory, "assets.dat"));
+    archive.writeManifest(path.join(outputDirectory, "manifest.txt"))
 }
 
 function checkRequiredFields(type, obj, fields) {

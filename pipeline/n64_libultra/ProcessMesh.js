@@ -23,7 +23,7 @@ async function processMesh(meshJson, archive, baseDirectory, outputDirectory) {
     const destPath = path.join(outputDirectory, `${staticMesh.name}.mesh`);
     await MeshWriter.writeStaticMesh(staticMesh, destPath);
 
-    await archive.add(destPath, "mesh");
+    archive.addMesh(destPath, staticMesh.name);
 }
 
 module.exports = processMesh;

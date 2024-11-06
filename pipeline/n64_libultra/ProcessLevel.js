@@ -16,7 +16,7 @@ async function processLevel(level, layerMap, archive, baseDirectory, outputDirec
         const sceneFile = path.join(outputDirectory, sceneFileName);
 
         await SceneWriter.write(scene, levelParser.gltfData, sceneFile);
-        await archive.add(sceneFile, "scene");
+        archive.addScene(sceneFile, scene.name);
 
 
         const sceneIncludeFileName =`scene_${safeSceneName}.h`;
