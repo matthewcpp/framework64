@@ -1,4 +1,5 @@
 const AudioConvert = require("./AudioConvert");
+const BuildInfo = require("../BuildInfo");
 const Environment = require("../Environment");
 const FontConvert = require("./ProcessFont");
 const N64LibUltraAssetBundle = require("./AssetBundle");
@@ -20,7 +21,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new N64LibUltraAssetBundle();
     const pipelinePath = path.normalize(path.join(__dirname, ".."));
-    const environment = new Environment(archive, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
+    const environment = new Environment(BuildInfo.current, archive, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
 

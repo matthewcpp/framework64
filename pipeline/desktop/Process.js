@@ -1,3 +1,4 @@
+const BuildInfo = require("../BuildInfo");
 const DesktopAssetBundle = require("./AssetBundle");
 const Environment = require("../Environment");
 const Util = require("../Util");
@@ -21,7 +22,7 @@ async function processDesktop(manifestFile, assetDirectory, outputDirectory, plu
     const bundle = new DesktopAssetBundle(outputDirectory);
     const layerMap = processLayers(path.dirname(manifestFile), includeDirectory);
     const pipelinePath = path.normalize(path.join(__dirname, ".."));
-    const environment = new Environment(bundle, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
+    const environment = new Environment(BuildInfo.current, bundle, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     if (manifest.images) {
         for (const image of manifest.images) {

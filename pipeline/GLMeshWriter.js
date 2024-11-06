@@ -40,7 +40,8 @@ function writeMeshData(mesh, materialBundle, writer, file) {
         }
 
         if (primitive.hasVertexColors) {
-            if (BuildInfo.platform == "desktop") {
+            // TODO: can we move this out of here?
+            if (BuildInfo.current.platform == "desktop") {
                 funcs.push(_writeVertexColorFloat);
                 buffers.push(Buffer.alloc(primitive.vertices.length * 4 * 4));
             }

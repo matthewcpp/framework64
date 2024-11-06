@@ -6,23 +6,25 @@ class Environment {
     _writer;
     _assetBundle;
     _assetDirectory;
+    _buildInfo;
     _includeDirectory;
     _outputDirectory;
     _pipelineDirectory;
 
-    constructor(assetBundle, assetDirectory, outputDirectory, includeDirectory, pipelineDirectory) {
+    constructor(buildInfo, assetBundle, assetDirectory, outputDirectory, includeDirectory, pipelineDirectory) {
         this._assetBundle = assetBundle;
+        this._buildInfo = buildInfo;
         this._assetDirectory = assetDirectory;
         this._outputDirectory = outputDirectory;
         this._includeDirectory = includeDirectory;
         this._pipelineDirectory = pipelineDirectory;
 
-        this._writer = BuildInfo.isLittleEndian ? WriteInterface.littleEndian() : WriteInterface.bigEndian();
+        this._writer = buildInfo.isLittleEndian ? WriteInterface.littleEndian() : WriteInterface.bigEndian();
     }
 
     /** Information about the current build  */
     get buildInfo() {
-        return BuildInfo.buildInfo;
+        return this._buildInfo;
     }
 
     /** Asset bundle object that should be used to added assets during processing. */

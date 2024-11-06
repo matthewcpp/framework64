@@ -24,9 +24,9 @@ function writeSceneInfo(scene, file, writer) {
 }
 
 function writeNodes(scene, writer, file) {
-    const is64Bit = BuildInfo.is64BitBuild;
+    const is64Bit = BuildInfo.current.is64BitBuild;
     const transformBuffer = Buffer.allocUnsafe(40);
-    const propertiesBuffer = Buffer.allocUnsafe(4 * BuildInfo.sizeOfVoidPtr);
+    const propertiesBuffer = Buffer.allocUnsafe(4 * BuildInfo.current.sizeOfVoidPtr);
     // matrix buffer is currently left empty as it is calculated at runtime
     // this could probably be calulated here and written to file
     const n64MatrixBuffer = Buffer.alloc(64, 0);
@@ -78,7 +78,7 @@ function writeCustomBoundingBoxes(scene, writer, file) {
 
 /** The write order of this function needs to correspond to in fw64CollisionMesh collider.h */
 function writeCollisionMeshes(scene, writer, file) {
-    const infoBuffer = Buffer.allocUnsafe(8 + (2 * BuildInfo.sizeOfVoidPtr) + Bounding.SizeOf);
+    const infoBuffer = Buffer.allocUnsafe(8 + (2 * BuildInfo.current.sizeOfVoidPtr) + Bounding.SizeOf);
 
     for (const collisionMesh of scene.collisionMeshes) {
         if (collisionMesh.primitives.length > 1) {
@@ -92,7 +92,7 @@ function writeCollisionMeshes(scene, writer, file) {
         index = primitive.bounding.write(writer, infoBuffer, index);
 
         // write empty data for pointers - these will be filled in at runtime
-        if (BuildInfo.is64BitBuild) {
+        if (BuildInfo.current.is64BitBuild) {
             index = writer.writeUInt64(infoBuffer, 0, index);
             index = writer.writeUInt64(infoBuffer, 0, index);
         }
