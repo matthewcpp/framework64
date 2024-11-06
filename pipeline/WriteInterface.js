@@ -1,5 +1,6 @@
 class WriteInterface {
     writeFloat;
+    writeUInt8;
     writeUInt32;
     writeUint64;
     floatBufferToNative;
@@ -9,6 +10,7 @@ class WriteInterface {
     static bigEndian() {
         const i = new WriteInterface();
         i.writeFloat = (buffer, val, offset) => { return buffer.writeFloatBE(val, offset); };
+        i.writeUInt8 = (buffer, val, offset) => {return buffer.writeUInt8(val, offset); };
         i.writeUInt16 = (buffer, val, offset) => { return buffer.writeUInt16BE(val, offset); };
         i.writeUInt32 = (buffer, val, offset) => { return buffer.writeUInt32BE(val, offset); };
         i.writeUInt64 = (buffer, val, offset) => { return buffer.writeBigUInt64BE(BigInt(val), offset); };
@@ -41,6 +43,7 @@ class WriteInterface {
     static littleEndian() {
         const i = new WriteInterface();
         i.writeFloat = (buffer, val, offset) => { return buffer.writeFloatLE(val, offset); };
+        i.writeUInt8 = (buffer, val, offset) => {return buffer.writeUInt8(val, offset); };
         i.writeUInt16 = (buffer, val, offset) => { return buffer.writeUInt16LE(val, offset); };
         i.writeUInt32 = (buffer, val, offset) => { return buffer.writeUInt32LE(val, offset); };
         i.writeUInt64 = (buffer, val, offset) => { return buffer.writeBigUInt64LE(BigInt(val), offset); };
