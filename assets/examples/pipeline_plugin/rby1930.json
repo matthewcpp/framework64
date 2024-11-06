@@ -1,0 +1,83 @@
+{
+    "title": "Composition with Red, Blue and Yellow",
+    "elements": [
+        {
+            "desc": "white",
+            "x": 0,
+            "y": 0,
+            "width": 200,
+            "height": 200,
+            "color": [255, 255, 255, 255]
+        },
+        
+        {
+            "desc": "yellow",
+            "x": 175,
+            "y": 180,
+            "width": 25,
+            "height": 20,
+            "color": [255, 255, 0, 255]
+        },
+
+        {
+            "desc": "red",
+            "x": 50,
+            "y": 0,
+            "width": 150,
+            "height": 145,
+            "color": [255, 0, 0, 255]
+        },
+
+        {
+            "desc": "blue",
+            "x": 0,
+            "y": 145,
+            "width": 45,
+            "height": 55,
+            "color": [0, 0, 255, 255]
+        },
+
+        {
+            "desc": "full height vertial",
+            "x": 45,
+            "y": 0,
+            "width": 5,
+            "height": 200,
+            "color": [0, 0, 0, 255]
+        },
+        {
+            "desc": "full width horizontal",
+            "x": 0,
+            "y": 145,
+            "width": 200,
+            "height": 5,
+            "color": [0, 0, 0, 255]
+        },
+        {
+            "desc": "small right vertical",
+            "x": 175,
+            "y": 150,
+            "width": 5,
+            "height": 50,
+            "color": [0, 0, 0, 255]
+        },
+
+        {
+            "desc": "lower right thick line",
+            "x": 175,
+            "y": 170,
+            "width": 25,
+            "height": 10,
+            "color": [0, 0, 0, 255]
+        },
+
+        {
+            "desc": "upper left thick line",
+            "x": 0,
+            "y": 60,
+            "width": 45,
+            "height": 10,
+            "color": [0, 0, 0, 255]
+        }
+    ]
+}

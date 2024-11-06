@@ -5,7 +5,7 @@ const fse = require("fs-extra");
 
 async function prepreBuiltinAssets(folder, name, platform) {
     if (name.toLowerCase() == 'all') {
-        return prepareAllExampleAssets(folder, platform);
+        return prepareAllBuiltinAssets(folder, platform);
     }
 
     console.log("Preparing assets for: ", name);
@@ -29,12 +29,13 @@ async function prepreBuiltinAssets(folder, name, platform) {
         purgeCompiledAssetData(folder, platformBuildDir, name)
     }
 
-    // TODO: support plugin loading
-    await prepareAssets(manifestFile, assetDirectory, platform, platformBuildDir, name, null);
+    const pluginManifestPath = path.join(targetDirectory, "pipeline", "plugins.json");
+    await prepareAssets(manifestFile, assetDirectory, platform, platformBuildDir, name, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
 }
 
 /** 
- * This function is needed because the compiler will need to regenerate the packed asset data when there is a change. 
+ * This function is needed because the compiler will need to regenerate the packed asset data when there is a change.
+ * TODO: this should be moved into n64_libulta directory
 */
 function purgeCompiledAssetData(folder, platformBuildDir, targetName){
     const compiledDataPath = path.join(platformBuildDir, folder, targetName, "CMakeFiles", `${targetName}.dir`, "asm", "asset_data.s.obj");
@@ -45,7 +46,7 @@ function purgeCompiledAssetData(folder, platformBuildDir, targetName){
     }
 }
 
-async function prepareAllExampleAssets(topLevelDir, platform) {
+async function prepareAllBuiltinAssets(topLevelDir, platform) {
     const examplesDirectory = path.resolve(__dirname, "..", topLevelDir);
     const dirContents = fse.readdirSync(examplesDirectory, {withFileTypes: true});
 
