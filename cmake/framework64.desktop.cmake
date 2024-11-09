@@ -23,6 +23,10 @@ endfunction()
 
 # performs platform specific configuration of the framework 64 library
 function (configure_core_library)
+    if(NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+        message(FATAL_ERROR "Desktop build requires x64 architecture")
+    endif()
+
     find_package(CLI11 CONFIG REQUIRED)
     find_package(GLEW REQUIRED)
     find_package(nlohmann_json CONFIG REQUIRED)
@@ -45,15 +49,10 @@ function (configure_core_library)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
 
-    file(WRITE ${CMAKE_BINARY_DIR}/build_info.json "{\"target\":\"desktop\",\"config\":\"${VCPKG_TARGET_TRIPLET}\",\"type\":\"${CMAKE_BUILD_TYPE}\"}")
-
     target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_DESKTOP)
+    target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_IS_64_BIT)
 
     enable_all_warnings_as_errors(TARGET framework64)
-
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_IS_64_BIT)
-    endif()
 endfunction()
 
 # performs platform specific configuration of a framework64 game

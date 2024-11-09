@@ -21,7 +21,7 @@ const path = require("path");
  * @param gameBinDirectory the output directory for this game's binary files
  * @param pluginManifest the path pointing to the plugin manifest for this build
  */
-async function prepareAssets(manifestFile, assetDirectory, platform, platformBuildDirectory, gameBuildDirectory, gameBinDirectory, pluginManifest) {
+async function prepareAssets(manifestFile, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, pluginManifest) {
     const outputDirectory = path.join(gameBinDirectory, "assets");
 
     if (fse.existsSync(outputDirectory)) {
@@ -45,7 +45,7 @@ async function prepareAssets(manifestFile, assetDirectory, platform, platformBui
             break;
 
         case "desktop":
-            BuildInfo._current = createDesktopBuildInfo(platformBuildDirectory);
+            BuildInfo._current = new BuildInfo(platform, true, true);
             const processDesktop = require("./desktop/Process");
             await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
             
@@ -57,23 +57,6 @@ async function prepareAssets(manifestFile, assetDirectory, platform, platformBui
         default:
             throw new Error(`Unsupported platform: ${manifest.platform}`);
     }
-}
-
-/** TODO: It would be good to move this into the desktop specific code*/
-function createDesktopBuildInfo(desktopBuildDirectory) {
-    const buildInfoFile = path.join(desktopBuildDirectory, "build_info.json");
-
-    if (!fse.existsSync(buildInfoFile)) {
-        throw new Error(`Unable to load build info file at: ${buildInfoFile}. Ensure that you have configured a build with CMake before running the asset pipeline.`);
-    }
-
-    const buildInfoJson = JSON.parse(fse.readFileSync(buildInfoFile, {encoding: "utf-8"}));
-    const x64Targets = ["arm64-osx", "x64-osx", "x64-windows"];
-
-    return new BuildInfo(
-        buildInfoJson.target, 
-        x64Targets.indexOf(buildInfoJson.config) >= 0,
-        true);
 }
 
 /** 

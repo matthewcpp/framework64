@@ -35,6 +35,6 @@ async function prepareGameAssets(platform, target) {
         console.log(`No target specified. using default target: ${packageJson.name}`);
     }
 
-    await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
+    await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
 }
 

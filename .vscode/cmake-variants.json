@@ -26,6 +26,7 @@
                 "long": "Desktop",
                 "settings": {
                     "FW64_PLATFORM_DESKTOP": "ON",
+                    "CMAKE_GENERATOR_PLATFORM": "x64",
                     "CMAKE_TOOLCHAIN_FILE": "${env:VCPKG_DIR}/scripts/buildsystems/vcpkg.cmake",
                     "Fw64_BUILD_TESTS": "ON",
                     "FW64_BUILD_EXAMPLES": "ON",

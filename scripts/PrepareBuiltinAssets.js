@@ -29,7 +29,7 @@ async function prepreBuiltinAssets(folder, name, platform) {
     const gameBuildDirectory = path.join(platformBuildDir, folder, name, "CMakeFiles", `${name}.dir`);
 
     const pluginManifestPath = path.join(targetDirectory, "pipeline", "plugins.json");
-    await Pipeline.prepareAssets(manifestFile, assetDirectory, platform, platformBuildDir, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
+    await Pipeline.prepareAssets(manifestFile, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
 }
 
 async function prepareAllBuiltinAssets(topLevelDir, platform) {
