@@ -1,7 +1,7 @@
-const Bounding = require("./gltf/Bounding")
-const BuildInfo = require("./BuildInfo")
+const Bounding = require("./gltf/Bounding");
 
 const fs = require("fs");
+const Environment = require("./Environment");
 
 /// The order these values are written should correspond with the SceneInfo struct in framework64/scene.h
 function writeSceneInfo(scene, file, writer) {
@@ -23,10 +23,11 @@ function writeSceneInfo(scene, file, writer) {
     fs.writeSync(file, sceneInfoBuffer);
 }
 
-function writeNodes(scene, writer, file) {
-    const is64Bit = BuildInfo.current.is64BitBuild;
+function writeNodes(environment, scene, writer, file) {
+    const is64Bit = environment.architecture === Environment.Architecture.Arch64;
+    const sizeOfVoidPtr = is64Bit ? 8 : 4;
     const transformBuffer = Buffer.allocUnsafe(40);
-    const propertiesBuffer = Buffer.allocUnsafe(4 * BuildInfo.current.sizeOfVoidPtr);
+    const propertiesBuffer = Buffer.allocUnsafe(4 * sizeOfVoidPtr);
     // matrix buffer is currently left empty as it is calculated at runtime
     // this could probably be calulated here and written to file
     const n64MatrixBuffer = Buffer.alloc(64, 0);
@@ -77,8 +78,9 @@ function writeCustomBoundingBoxes(scene, writer, file) {
 }
 
 /** The write order of this function needs to correspond to in fw64CollisionMesh collider.h */
-function writeCollisionMeshes(scene, writer, file) {
-    const infoBuffer = Buffer.allocUnsafe(8 + (2 * BuildInfo.current.sizeOfVoidPtr) + Bounding.SizeOf);
+function writeCollisionMeshes(environment, scene, writer, file) {
+    const sizeOfVoidPtr = environment.architecture === Environment.Architecture.Arch64 ? 8 : 4;
+    const infoBuffer = Buffer.allocUnsafe(8 + (2 * sizeOfVoidPtr) + Bounding.SizeOf);
 
     for (const collisionMesh of scene.collisionMeshes) {
         if (collisionMesh.primitives.length > 1) {
@@ -92,7 +94,7 @@ function writeCollisionMeshes(scene, writer, file) {
         index = primitive.bounding.write(writer, infoBuffer, index);
 
         // write empty data for pointers - these will be filled in at runtime
-        if (BuildInfo.current.is64BitBuild) {
+        if (environment.architecture == Environment.Architecture.Arch64) {
             index = writer.writeUInt64(infoBuffer, 0, index);
             index = writer.writeUInt64(infoBuffer, 0, index);
         }

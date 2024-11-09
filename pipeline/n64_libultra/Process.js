@@ -1,5 +1,4 @@
 const AudioConvert = require("./AudioConvert");
-const BuildInfo = require("../BuildInfo");
 const Environment = require("../Environment");
 const FontConvert = require("./ProcessFont");
 const N64LibUltraAssetBundle = require("./AssetBundle");
@@ -21,7 +20,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new N64LibUltraAssetBundle();
     const pipelinePath = path.normalize(path.join(__dirname, ".."));
-    const environment = new Environment(BuildInfo.current, archive, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
+    const environment = new Environment("n64_libultra", Environment.Architecture.Arch32, Environment.Endian.Big, archive, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
 
@@ -71,7 +70,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            await processLevel(level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory);
+            await processLevel(environment, level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 

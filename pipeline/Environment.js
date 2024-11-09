@@ -1,8 +1,21 @@
-const BuildInfo = require("./BuildInfo");
 const WriteInterface = require("./WriteInterface");
 const Writer = require("./WriteInterface");
 
 class Environment {
+    static Endian  = {
+        Big: 1,
+        Little: 2
+    };
+
+    static Architecture = {
+        Arch32: 1,
+        Arch64: 2
+    };
+
+    _platform;
+    _architecture;
+    _endian;
+
     _writer;
     _assetBundle;
     _assetDirectory;
@@ -10,21 +23,32 @@ class Environment {
     _includeDirectory;
     _outputDirectory;
     _pipelineDirectory;
+    
 
-    constructor(buildInfo, assetBundle, assetDirectory, outputDirectory, includeDirectory, pipelineDirectory) {
+    constructor(platform, architecture, endian, assetBundle, assetDirectory, outputDirectory, includeDirectory, pipelineDirectory) {
+        this._platform = platform;
+        this._architecture = architecture;
+        this._endian = endian;
+
         this._assetBundle = assetBundle;
-        this._buildInfo = buildInfo;
         this._assetDirectory = assetDirectory;
         this._outputDirectory = outputDirectory;
         this._includeDirectory = includeDirectory;
         this._pipelineDirectory = pipelineDirectory;
 
-        this._writer = buildInfo.isLittleEndian ? WriteInterface.littleEndian() : WriteInterface.bigEndian();
+        this._writer = this.endian === Environment.Endian.Little ? WriteInterface.littleEndian() : WriteInterface.bigEndian();
     }
 
-    /** Information about the current build  */
-    get buildInfo() {
-        return this._buildInfo;
+    get platform() {
+        return this._platform;
+    }
+
+    get architecture() {
+        return this._architecture;
+    }
+
+    get endian() {
+        return this._endian;
     }
 
     /** Asset bundle object that should be used to added assets during processing. */

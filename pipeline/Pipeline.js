@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const BuildInfo = require('./BuildInfo');
 const Util = require("./Util");
 // TODO: this needs to be moved into desktop
 const prepareDesktopShaders = require("../scripts/PrepareDesktopShaders");
@@ -38,14 +37,12 @@ async function prepareAssets(manifestFile, assetDirectory, platform, gameBuildDi
 
     switch (platform) {
         case "n64_libultra":
-            BuildInfo._current = new BuildInfo(platform, false, false);
             purgeCompiledAssetData(gameBuildDirectory)
             const processN64 = require("./n64_libultra/Process");
             await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
 
         case "desktop":
-            BuildInfo._current = new BuildInfo(platform, true, true);
             const processDesktop = require("./desktop/Process");
             await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
             

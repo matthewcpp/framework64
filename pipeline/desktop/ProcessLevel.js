@@ -5,7 +5,7 @@ const Util = require("../Util");
 
 const path = require("path");
 
-async function processLevel(level, layerMap, bundle, baseDirectory, outputDirectory, includeDirectory) {
+async function processLevel(environment, level, layerMap, bundle, baseDirectory, outputDirectory, includeDirectory) {
     const srcPath = path.join(baseDirectory, level.src);
     const levelParser = new LevelParser();
     await levelParser.parse(srcPath, layerMap);
@@ -15,7 +15,7 @@ async function processLevel(level, layerMap, bundle, baseDirectory, outputDirect
         const sceneFileName = safeSceneName + ".scene";
         const sceneFile = path.join(outputDirectory, sceneFileName);
         
-        await SceneWriter.write(scene, levelParser.gltfData, sceneFile);
+        await SceneWriter.write(environment, scene, levelParser.gltfData, sceneFile);
         bundle.addScene(sceneFileName, safeSceneName);
 
         const sceneIncludeFileName =`scene_${safeSceneName}.h`;

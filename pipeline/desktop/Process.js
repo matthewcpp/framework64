@@ -1,4 +1,3 @@
-const BuildInfo = require("../BuildInfo");
 const DesktopAssetBundle = require("./AssetBundle");
 const Environment = require("../Environment");
 const Util = require("../Util");
@@ -22,7 +21,7 @@ async function processDesktop(manifestFile, assetDirectory, outputDirectory, plu
     const bundle = new DesktopAssetBundle(outputDirectory);
     const layerMap = processLayers(path.dirname(manifestFile), includeDirectory);
     const pipelinePath = path.normalize(path.join(__dirname, ".."));
-    const environment = new Environment(BuildInfo.current, bundle, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
+    const environment = new Environment("desktop", Environment.Architecture.Arch64, Environment.Endian.Little, bundle, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     if (manifest.images) {
         for (const image of manifest.images) {
@@ -49,7 +48,7 @@ async function processDesktop(manifestFile, assetDirectory, outputDirectory, plu
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`);
-            await processMesh(mesh, bundle, assetDirectory, outputDirectory);
+            await processMesh(environment, mesh, bundle, assetDirectory, outputDirectory);
         }
     }
 
@@ -64,7 +63,7 @@ async function processDesktop(manifestFile, assetDirectory, outputDirectory, plu
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
 
-            await processLevel(level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory);
+            await processLevel(environment, level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 

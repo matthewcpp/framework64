@@ -3,7 +3,6 @@ const Primitive = require("./gltf/Primitive");
 const GLTFVertexIndex = require("./gltf/GLTFVertexIndex");
 
 const fs = require("fs");
-const BuildInfo = require("./BuildInfo");
 
 /** The order that data is written in this function needs to match up with MeshInfo in desktop/mesh.cpp */
 function writeMeshInfo(mesh, writer, file) {
@@ -17,7 +16,7 @@ function writeMeshInfo(mesh, writer, file) {
     fs.writeSync(file, buffer);
 }
 
-function writeMeshData(mesh, materialBundle, writer, file) {
+function writeMeshData(environment, mesh, materialBundle, writer, file) {
     for (const primitive of mesh.primitives) {
         _writePimitiveInfo(primitive, materialBundle, writer, file);
 
@@ -41,7 +40,7 @@ function writeMeshData(mesh, materialBundle, writer, file) {
 
         if (primitive.hasVertexColors) {
             // TODO: can we move this out of here?
-            if (BuildInfo.current.platform == "desktop") {
+            if (environment.platform == "desktop") {
                 funcs.push(_writeVertexColorFloat);
                 buffers.push(Buffer.alloc(primitive.vertices.length * 4 * 4));
             }
