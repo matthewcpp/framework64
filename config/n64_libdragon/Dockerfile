@@ -5,7 +5,7 @@ FROM ubuntu:jammy
 
 # install libdragon toolchain
 
-ENV FW64_N64_LIBDRAGON_DOCKER_CONTAINER=1
+ENV FW64_DOCKER_CONTAINER="n64_libdragon"
 ENV N64_INST=/opt/libdragon
 ENV T3D_INST=/opt/tiny3d
 
@@ -19,6 +19,10 @@ ARG LIBDRAGON_GIT_COMMIT=e36e91ea4ede4f70472bbf0086689ff5f4cf4aa5
 # Tiny3d - main - 10/29/2024
 ARG TINY3D_GIT_REPO=https://github.com/HailToDodongo/tiny3d.git
 ARG TINY3D_GIT_COMMIT=68842553bf330a91fc595a7c9803bfd198d3e468
+
+# framework64 raw package json
+ARG FRAMEWORK64_GIT_REPO="https://raw.githubusercontent.com/matthewcpp/framework64"
+ARG FRAMEWORK64_GIT_COMMIT=97d932be01f1124e0daac26e52aa3955d0b54329
 
 RUN apt-get update && \
     apt-get install -y nano wget git g++ gdb-multiarch cmake ninja-build && \
@@ -36,4 +40,5 @@ RUN apt-get update && \
 
 RUN cd /tmp && git clone ${LIBDRAGON_GIT_REPO} && cd libdragon && git checkout ${LIBDRAGON_GIT_COMMIT} && \
     make libdragon tools && make install tools-install && \
-    cd /opt && git clone ${TINY3D_GIT_REPO} && cd tiny3d && git checkout ${TINY3D_GIT_COMMIT} && ./build.sh
+    cd /opt && git clone ${TINY3D_GIT_REPO} && cd tiny3d && git checkout ${TINY3D_GIT_COMMIT} && ./build.sh && \
+    mkdir /opt/framework64 && cd /opt/framework64 && wget ${FRAMEWORK64_GIT_REPO}/${FRAMEWORK64_GIT_COMMIT}/package.json && npm install
