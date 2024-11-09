@@ -36,7 +36,5 @@ async function prepareGameAssets(platform, target) {
     }
 
     await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
-
-    await prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, target, pluginManifest);
 }
 
