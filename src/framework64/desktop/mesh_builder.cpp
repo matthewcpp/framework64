@@ -121,7 +121,7 @@ fw64Mesh* fw64MeshBuilder::createMesh() {
         material->shader = assets->shader_cache.getShaderProgram(material->shading_mode);
     }
 
-    fw64_material_collection_init_empty(&mesh->material_collection, primitive_info_vec.size(), allocator);
+    fw64_material_collection_init_empty(&mesh->material_collection, static_cast<uint32_t>(primitive_info_vec.size()), allocator);
 
     for (size_t i = 0; i < primitive_info_vec.size(); i++) {
         auto& primitive_info = primitive_info_vec[i];

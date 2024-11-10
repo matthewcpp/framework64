@@ -12,13 +12,13 @@
 
 typedef struct {
     uint32_t count;
-    float times[];
+    float times[1];
 } fw64AnimationInputBuffer;
 
 /** This struct acts as a convience way to access input buffers */
 typedef struct {
     uint32_t count;
-    float values[];
+    float values[1];
 } fw64AnimationValueBuffer;
 
 #define INVALID_KEYFRAME_BUFFER_INDEX UINT16_MAX

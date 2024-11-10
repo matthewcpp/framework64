@@ -55,7 +55,7 @@ async function processDesktop(manifestFile, assetDirectory, outputDirectory, plu
     if (manifest.skinnedMeshes) {
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory);
+            await processSkinnedMesh(environment, skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory);
         }
     }
 

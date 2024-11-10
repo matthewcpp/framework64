@@ -6,7 +6,7 @@ const Util = require("../Util");
 
 const path = require("path");
 
-async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory) {
+async function processSkinnedMesh(environment, skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory) {
     const srcPath = path.join(manifestDirectory, skinnedMesh.src);
 
     const gltfLoader = new GLTFLoader();
@@ -41,7 +41,7 @@ async function processSkinnedMesh(skinnedMesh, bundle, manifestDirectory, output
     }
     else {
         const destFilePath = path.join(outputDirectory, meshName + ".skinnedmesh");
-        await SkinnedMeshWriter.write(mesh, animationData, destFilePath, includeFilePath);
+        await SkinnedMeshWriter.write(environment, mesh, animationData, destFilePath, includeFilePath);
         bundle.addSkinnedMesh(destFilePath, meshName);
     }
 }
