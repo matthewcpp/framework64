@@ -1,0 +1,10 @@
+{
+    "version": 1,
+    "plugins": [
+        {
+            "src": "ProcessMondrian.js",
+            "description": "creates a binary represention of a json file describing a mondrian like image",
+            "extensions": [".json"]
+        }
+    ]
+}

@@ -1,7 +1,5 @@
 #include "player.h"
 
-#include "framework64/util/renderer_util.h"
-
 #include "assets/layers.h"
 
 void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int node_id, int index) {

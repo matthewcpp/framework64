@@ -7,7 +7,7 @@ const path = require("path");
 
 const WriteInterface = require("../WriteInterface");
 
-async function write(scene, gltfData, destPath) {
+async function write(environment, scene, gltfData, destPath) {
     const writer = WriteInterface.bigEndian();
     const images = await MeshWriter.createN64Images(gltfData);
     const materialBundle = scene.materialBundle;
@@ -25,8 +25,8 @@ async function write(scene, gltfData, destPath) {
     }
 
     // The order in which these are written out needs to align with scene.c reading
-    SceneDataWriter.writeCollisionMeshes(scene, writer, file);
-    SceneDataWriter.writeNodes(scene, writer, file);
+    SceneDataWriter.writeCollisionMeshes(environment, scene, writer, file);
+    SceneDataWriter.writeNodes(environment, scene, writer, file);
     SceneDataWriter.writeCustomBoundingBoxes(scene, writer, file);
 
     fs.closeSync(file);

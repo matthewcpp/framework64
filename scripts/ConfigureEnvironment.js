@@ -5,6 +5,10 @@ function configureEnvironment(platform, destDirectory) {
     const configDir = path.resolve(__dirname, "..", "config");
 
     switch (platform) {
+        case "desktop":
+            configureDesktop(configDir, destDirectory);
+            break;
+
         case "n64_libultra":
             configureN64Libultra(configDir, destDirectory);
             break;
@@ -13,6 +17,11 @@ function configureEnvironment(platform, destDirectory) {
             console.error(`Unsupported platform specified: ${platform}`);
             process.exit(1);
     }
+}
+
+function configureDesktop(configDir, destDirectory) {
+    console.log("Configuring for: desktop");
+    // Note: currently there is no desktop specific configuration that is needed and is included for parity
 }
 
 function configureN64Libultra(configDir, destDirectory) {

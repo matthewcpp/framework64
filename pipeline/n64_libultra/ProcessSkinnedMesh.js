@@ -38,12 +38,12 @@ async function processSkinnedMesh(skinnedMesh, archive, manifestDirectory, outpu
         const destFilePath = path.join(outputDirectory, meshName + ".animation");
         SkinnedMeshWriter.writeAimationData(animationData, meshName, destFilePath, includeFilePath);
         bundle.addAnimationData(meshName, destFilePath);
-        await archive.add(destFilePath, "animation");
+        archive.addAnimationData(destFilePath, meshName);
     }
     else {
         const destFilePath = path.join(outputDirectory, meshName + ".skinnedmesh");
         await SkinnedMeshWriter.write(mesh, animationData, destFilePath, includeFilePath);
-        await archive.add(destFilePath, "skinnedmesh");
+        archive.addSkinnedMesh(destFilePath, meshName);
     }
 }
 

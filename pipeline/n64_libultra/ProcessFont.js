@@ -40,7 +40,7 @@ async function processFontFile(manifestDirectory, outputDir, fontJson, archive) 
     const fontPath = path.join(outputDir, fontFileName);
     FontWriter.write(fontData, imageBuffer, fontPath);
 
-    await archive.add(fontPath, "font");
+    archive.addFont(fontPath, font.name);
 }
 
 async function processImageFont(manifestDirectory, outputDir, fontJson, archive) {
@@ -65,7 +65,7 @@ async function processImageFont(manifestDirectory, outputDir, fontJson, archive)
     const fontPath = path.join(outputDir, fontName);
     FontWriter.write(f, imageInfo.assetBuffer, fontPath);
 
-    await archive.add(fontPath, "font");
+    archive.addFont(fontPath, fontJson.name);
 }
 
 async function convertFont(manifestDirectory, outputDir, fontJson, archive) {

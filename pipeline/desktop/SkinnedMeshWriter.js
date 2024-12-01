@@ -5,9 +5,9 @@ const MeshWriter = require("./MeshWriter");
 const AnimationWriter = require("../animation/Writer");
 const WriteInterface = require("../WriteInterface");
 
-async function write(mesh, animationData, meshFilePath, includeFilePath) {
+async function write(environment, mesh, animationData, meshFilePath, includeFilePath) {
     const file = fs.openSync(meshFilePath, "w");
-    await MeshWriter.writeStaticMeshToFile(mesh, file);
+    await MeshWriter.writeStaticMeshToFile(environment, mesh, file);
     AnimationWriter.writeToFile(animationData, WriteInterface.littleEndian(), file);
     fs.closeSync(file);
 

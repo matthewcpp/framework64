@@ -1,23 +1,43 @@
 #!/usr/bin/env node
 
+const Util = require("./Util");
+// TODO: this needs to be moved into desktop
+const prepareDesktopShaders = require("../scripts/PrepareDesktopShaders");
+
 const { program } = require('commander');
 const rimraf = require("rimraf");
 
-const fs = require("fs-extra");
+const fse = require("fs-extra");
 const path = require("path");
-const Util = require("./Util")
 
-async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest) {
+/**
+ * 
+ * @param manifestFile the path to the asset manifest json file
+ * @param assetDirectory the root path of the folder containing all assets
+ * @param platform the platform that is currently being built
+ * @param platformBuildDirectory the root build directory for this platform
+ * @param gameBuildDirectory the path to the directory where all compiled code will be built to
+ * @param gameBinDirectory the output directory for this game's binary files
+ * @param pluginManifest the path pointing to the plugin manifest for this build
+ */
+async function prepareAssets(manifestFile, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, pluginManifest) {
+    const outputDirectory = path.join(gameBinDirectory, "assets");
+
+    if (fse.existsSync(outputDirectory)) {
+        rimraf.sync(outputDirectory);
+    }
+
     platform = platform.toLowerCase();
 
     const pluginMap = loadPlugins(pluginManifest);
 
     // ensure that required asset folders are setup for downstream processors
     const assetIncludeDirectory = Util.assetIncludeDirectory(outputDirectory);
-    fs.ensureDirSync(assetIncludeDirectory);
+    fse.ensureDirSync(assetIncludeDirectory);
 
     switch (platform) {
         case "n64_libultra":
+            purgeCompiledAssetData(gameBuildDirectory)
             const processN64 = require("./n64_libultra/Process");
             await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
@@ -25,11 +45,29 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
         case "desktop":
             const processDesktop = require("./desktop/Process");
             await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
+            
+            /// TODO: This should be moved into the desktop processing directory
+            const shaderDestDir = path.join(gameBinDirectory, "glsl");
+            prepareDesktopShaders(shaderDestDir);
             break;
 
         default:
             throw new Error(`Unsupported platform: ${manifest.platform}`);
     }
+}
+
+/** 
+ * This function is needed because the compiler will need to regenerate the packed asset data when there is a change.
+ * TODO: this should be moved into n64_libulta directory
+*/
+function purgeCompiledAssetData(gameBuildDirectory){
+    const compiledDataPath = path.join(gameBuildDirectory, "asm", "asset_data.s.obj");
+
+    if (fse.existsSync(compiledDataPath)) {
+        console.log(`Purging compiled asset data file: ${compiledDataPath}`);
+        fse.unlinkSync(compiledDataPath)
+    }
+    
 }
 
 function loadPlugins(pluginManifestPath) {
@@ -41,11 +79,11 @@ function loadPlugins(pluginManifestPath) {
 
     pluginManifestPath = path.resolve(pluginManifestPath);
 
-    if (!fs.existsSync(pluginManifestPath)) {
+    if (!fse.existsSync(pluginManifestPath)) {
         throw new Error(`Plugin manifest does not exist: ${pluginManifestPath}`);
     }
 
-    const pluginManifest = JSON.parse(fs.readFileSync(pluginManifestPath, {encoding: "utf8"}));
+    const pluginManifest = JSON.parse(fse.readFileSync(pluginManifestPath, {encoding: "utf8"}));
     const manifestDir = path.dirname(pluginManifestPath);
 
     if (!Object.hasOwn(pluginManifest, "plugins")) {
@@ -64,7 +102,7 @@ function loadPlugins(pluginManifestPath) {
         }
 
         const pluginPath = path.join(manifestDir, plugInfo.src);
-        if (!fs.existsSync(pluginPath)) {
+        if (!fse.existsSync(pluginPath)) {
             throw new Error(`Plugin does not exist: ${pluginPath}`);
         }
 

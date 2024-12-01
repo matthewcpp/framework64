@@ -117,8 +117,7 @@ async function finalizeImage(image, assetDir, outDir, imageJson, archive) {
     if (archive) {
         const filePath = path.join(outDir, `${image.name}.image`);
         ImageWriter.writeFile(image, imageJson.hslices, imageJson.vslices, filePath);
-        const entry = await archive.add(filePath, "image");
-        assetIndex = entry.index;
+        assetIndex = archive.addImage(filePath, image.name);
     }
     else {
         assetBuffer = ImageWriter.writeBuffer(image, imageJson.hslices, imageJson.vslices);

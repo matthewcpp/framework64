@@ -4,7 +4,7 @@ const MeshWriter = require("./MeshWriter");
 
 const path = require("path");
 
-async function processMesh(meshJson, bundle, manifestDirectory, outputDirectory) {
+async function processMesh(environment, meshJson, bundle, manifestDirectory, outputDirectory) {
     const srcPath = path.join(manifestDirectory, meshJson.src);
     const gltfLoader = new GLTFLoader();
     await gltfLoader.loadFile(srcPath);
@@ -22,9 +22,9 @@ async function processMesh(meshJson, bundle, manifestDirectory, outputDirectory)
 
     const assetFileName = staticMesh.name + ".mesh";
     const destPath = path.join(outputDirectory, assetFileName);
-    await MeshWriter.writeStaticMesh(staticMesh, destPath);
-    
-    bundle.addMesh(meshName, assetFileName);
+    await MeshWriter.writeStaticMesh(environment, staticMesh, destPath);
+
+    bundle.addMesh(assetFileName, meshName);
 }
 
 module.exports = processMesh;

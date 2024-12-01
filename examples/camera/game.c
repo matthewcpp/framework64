@@ -2,7 +2,6 @@
 #include "assets/assets.h"
 
 #include <framework64/matrix.h>
-#include <framework64/util/renderer_util.h>
 #include <framework64/util/renderpass_util.h>
 
 #include "framework64/controller_mapping/n64.h"

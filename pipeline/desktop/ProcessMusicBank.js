@@ -60,7 +60,7 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
     fs.writeSync(infoFile, infoBuffer);
     fs.closeSync(infoFile)
 
-    bundle.addMusicBank(musicBankName, destDirName);
+    bundle.addMusicBank(destDirName, musicBankName);
     AudioHeader.writeMusicBankHeader(musicBankFiles, musicBankName, includeDirectory);
 }
 

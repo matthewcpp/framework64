@@ -1,17 +1,14 @@
+const Pipeline = require("../pipeline/Pipeline");
+
 const { program } = require("commander");
 const fse = require("fs-extra");
 
 const path = require("path");
 
-const prepareAssets = require("./PrepareAssets");
-
 program
     .name("Prepare Game Assets")
     .version("1.0.0")
     .description("Prepares assets for a framework64 Game");
-
-program
-    .option("-p, --plugins <path>", "path to pipeline plugin manifest");
 
 program
     .argument("<platform>")
@@ -25,8 +22,10 @@ async function prepareGameAssets(platform, target) {
     const assetDirectory = path.join(gameDirectory, "assets");
     const assetManifest = path.join(assetDirectory, "assets.json");
     const platformBuildDir = path.join(gameDirectory, `build_${platform}`);
-    const options = program.opts();
-    const pluginManifest = Object.hasOwn(options, "plugins") ? options.plugins : null;
+
+    const gameBinDirectory = path.join(platformBuildDir,  "bin", target);
+    const gameBuildDirectory = path.join(platformBuildDir, "src", "CMakeFiles", `${target}.dir`);
+    const pluginManifestPath = path.join(gameDirectory, "pipeline", "plugins.json");
 
     // read game name from package manifest if not specified
     if (!target) {
@@ -36,21 +35,6 @@ async function prepareGameAssets(platform, target) {
         console.log(`No target specified. using default target: ${packageJson.name}`);
     }
 
-    if (platform.toLowerCase() === "n64_libultra") {
-        purgeCompiledAssetData(platformBuildDir, target)
-    }
-
-    await prepareAssets(assetManifest, assetDirectory, platform, platformBuildDir, target, pluginManifest);
+    await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
 }
 
-/** 
- * This function is needed because the compiler will need to regenerate the packed asset data when there is a change. 
-*/
-function purgeCompiledAssetData(platformBuildDir, targetName){
-    const compiledDataPath = path.join(platformBuildDir, "src", "CMakeFiles", `${targetName}.dir`, "asm", "asset_data.s.obj");
-    
-    if (fse.existsSync(compiledDataPath)) {
-        console.log(`Purging compiled asset data file: ${compiledDataPath}`);
-        fse.unlinkSync(compiledDataPath)
-    }
-}

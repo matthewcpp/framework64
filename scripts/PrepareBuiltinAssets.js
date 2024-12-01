@@ -1,11 +1,11 @@
-const prepareAssets = require("./PrepareAssets");
+const Pipeline = require("../pipeline/Pipeline");
 
 const path = require("path");
 const fse = require("fs-extra");
 
 async function prepreBuiltinAssets(folder, name, platform) {
     if (name.toLowerCase() == 'all') {
-        return prepareAllExampleAssets(folder, platform);
+        return prepareAllBuiltinAssets(folder, platform);
     }
 
     console.log("Preparing assets for: ", name);
@@ -25,27 +25,14 @@ async function prepreBuiltinAssets(folder, name, platform) {
     const assetDirectory = path.resolve(__dirname, "..", "assets");
     const platformBuildDir = path.resolve(__dirname, "..", `build_${platform}`);
 
-    if (platform.toLowerCase() === "n64_libultra") {
-        purgeCompiledAssetData(folder, platformBuildDir, name)
-    }
+    const gameBinDirectory = path.join(platformBuildDir,  "bin", name);
+    const gameBuildDirectory = path.join(platformBuildDir, folder, name, "CMakeFiles", `${name}.dir`);
 
-    // TODO: support plugin loading
-    await prepareAssets(manifestFile, assetDirectory, platform, platformBuildDir, name, null);
+    const pluginManifestPath = path.join(targetDirectory, "pipeline", "plugins.json");
+    await Pipeline.prepareAssets(manifestFile, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
 }
 
-/** 
- * This function is needed because the compiler will need to regenerate the packed asset data when there is a change. 
-*/
-function purgeCompiledAssetData(folder, platformBuildDir, targetName){
-    const compiledDataPath = path.join(platformBuildDir, folder, targetName, "CMakeFiles", `${targetName}.dir`, "asm", "asset_data.s.obj");
-    
-    if (fse.existsSync(compiledDataPath)) {
-        console.log(`Purging compiled asset data file: ${compiledDataPath}`);
-        fse.unlinkSync(compiledDataPath)
-    }
-}
-
-async function prepareAllExampleAssets(topLevelDir, platform) {
+async function prepareAllBuiltinAssets(topLevelDir, platform) {
     const examplesDirectory = path.resolve(__dirname, "..", topLevelDir);
     const dirContents = fse.readdirSync(examplesDirectory, {withFileTypes: true});
 

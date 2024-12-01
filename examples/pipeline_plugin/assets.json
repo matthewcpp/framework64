@@ -1,0 +1,18 @@
+{    "images": [
+        {
+            "src": "fill.png"
+        }
+    ],
+    "fonts": [
+        {
+            "src": "consolas.ttf",
+            "size": 12,
+            "name": "consolas"
+        }
+    ],
+    "files": [
+        {
+            "src": "examples/pipeline_plugin/rby1930.json"
+        }
+    ]
+}
