@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     Settings settings;
     
     auto* n64_command = app.add_subcommand("n64", "connect to n64 example");
-    n64_command->add_option("ROM Path", settings.n64_rom_path, "Path to data_link rom that will be loaded on N64");
+    n64_command->add_option("--rom", settings.n64_rom_path, "Path to data_link rom that will be loaded on N64");
     n64_command->callback([&settings](){ settings.platform = Platform::N64; });
 
     auto* desktop_command = app.add_subcommand("desktop", "transfer assets to Desktop");

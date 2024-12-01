@@ -9,7 +9,7 @@ import threading
 
 bl_info = {
     "name": "framework64",
-    "description": "Live in-engine preview",
+    "description": "Plugin for creating games with framework64",
     "author": "Matthew LaRocca",
     "version": (0, 1),
     "blender": (2, 80, 0),
@@ -37,15 +37,11 @@ class framework64_static_mesh_exporter(bpy.types.Operator):
 
     @staticmethod
     def webservice_data_transfer(asset_path, temp_dir):
-        if sys.platform == "win32":
-            endpoint_uri = "http://localhost:55660/static-mesh"
-        else:
-            endpoint_uri = "http://0.0.0.0:55660/static-mesh"
-
+        endpoint_uri = "http://127.0.0.1:62187"
         print("Transfer static mesh: {} --> {}".format(asset_path, endpoint_uri))
 
         try:
-            r = requests.post(endpoint_uri, data=json.dumps({"src": asset_path}))
+            r = requests.post(endpoint_uri, data=json.dumps({"type":"mesh", "src": asset_path}))
             r.raise_for_status()
         except requests.exceptions.RequestException as e:
             print("Transfer failed: {}".format(e))

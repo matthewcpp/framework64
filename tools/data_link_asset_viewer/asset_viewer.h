@@ -9,7 +9,6 @@ typedef struct {
     fw64Engine* engine;
     fw64Font* font;
     fw64RenderPass* renderpass;
-    fw64SpriteBatch* spritebatch;
     fw64AssetViewer asset_viewer;
     fw64FileDownloader file_downloader;
 } Game;
