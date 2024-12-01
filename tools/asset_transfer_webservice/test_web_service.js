@@ -8,9 +8,9 @@ program
     .description("Sends asset paths to the transfer service");
 
 program
-    .command("static-mesh")
+    .command("mesh")
     .argument("<path>", "Path of Asset to send to server.")
-    .argument("[uri]", "Uri of server to communicate with.", "http://0.0.0.0:55660")
+    .argument("[uri]", "Uri of server to communicate with.", "http://127.0.0.1:62187")
     .action(transferStaticMesh);
 
 
@@ -19,15 +19,14 @@ async function transferStaticMesh(assetPath, serviceUri) {
         throw new Error(`Path does not exist: ${assetPath}`)
     }
 
-    const endpointUri = serviceUri + "/static-mesh"
-
-    console.log(`Transfer static mesh: ${assetPath} --> ${endpointUri}`);
+    console.log(`Transfer static mesh: ${assetPath} --> ${serviceUri}`);
 
     const payload = {
+        type: "mesh",
         src: assetPath
     };
 
-    const response = await fetch(endpointUri, {
+    const response = await fetch(serviceUri, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

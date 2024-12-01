@@ -1,4 +1,5 @@
 const Pipeline = require("../pipeline/Pipeline");
+const preparePlatform = require("./PreparePlatform");
 
 const path = require("path");
 const fse = require("fs-extra");
@@ -27,9 +28,12 @@ async function prepreBuiltinAssets(folder, name, platform) {
 
     const gameBinDirectory = path.join(platformBuildDir,  "bin", name);
     const gameBuildDirectory = path.join(platformBuildDir, folder, name, "CMakeFiles", `${name}.dir`);
+    const outputDirectory = path.join(gameBinDirectory, "assets");
 
     const pluginManifestPath = path.join(targetDirectory, "pipeline", "plugins.json");
-    await Pipeline.prepareAssets(manifestFile, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
+
+    preparePlatform(platform, gameBuildDirectory, gameBinDirectory);
+    await Pipeline.prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
 }
 
 async function prepareAllBuiltinAssets(topLevelDir, platform) {

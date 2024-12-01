@@ -74,7 +74,7 @@ void N64Client::deviceThread(N64Client* client, const std::string rom_path) {
 
     std::cout << "Uploading rom to development cart..." << std::endl;
 
-    error = device_sendrom(rom_file, file_size);
+    error = device_sendrom(rom_file, static_cast<uint32_t>(file_size));
 
     if (error) {
         std::cout << "Error uploading rom to development card: " << error << std::endl;

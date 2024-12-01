@@ -173,7 +173,7 @@ int mesh_state_init(fw64AssetViewerMeshState* state, fw64DataSource* data_reader
     fw64_camera_init(camera, camera_node, fw64_displays_get_primary(state->base.engine->displays));
     fw64_arcball_init(&state->arcball, state->base.engine->input, camera);
     camera->near = 1.0f;
-    camera->far = 100.0f;
+    camera->far = 300.0f;
     fw64_camera_set_viewport(camera, &viewport->position, &viewport->size);
     fw64_camera_update_projection_matrix(camera);
 

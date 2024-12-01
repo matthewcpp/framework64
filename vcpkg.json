@@ -2,18 +2,20 @@
   "name": "framework64",
   "version": "0.5.0",
   "dependencies": [
-    "boost-random",
     "cli11",
     "curl",
     "glew",
     "gtest",
+    {
+      "name":"ixwebsocket",
+      "default-features": false
+    },
     "nlohmann-json",
     "restinio",
     "sdl2",
     "sdl2-mixer",
     "sdl2-image",
     "stduuid",
-    "tiny-process-library",
-    "websocketpp"
+    "tiny-process-library"
   ]
 }

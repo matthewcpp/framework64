@@ -3,6 +3,9 @@
 #include "file_transfer.hpp"
 #include "temp_dir.hpp"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 #include <iostream>
 
 namespace framework64::service {
@@ -20,18 +23,54 @@ bool AssetProcess::staticMesh(const std::filesystem::path& asset_path, data_link
         return false;
     }
 
-    std::cout << "Temporary output dir: " << temp_dir.path() << std::endl;
+    std::cout << "Temporary workspace dir: " << temp_dir.path() << std::endl;
 
-    auto processed_path = asset_pipeline.prepareStaticMesh(asset_path, temp_dir.path(), client.getPlatformName());
+    const auto output_dir = temp_dir.path() / "out";
+    std::filesystem::create_directory(output_dir);
 
-    if (processed_path.empty()) {
+    const auto assets_dir = asset_path.parent_path();
+    const auto manifest_file_path = temp_dir.path() / "assets.json";
+    std::cout << "Temporary asset manifest path: " << manifest_file_path << std::endl;
+
+    // create a temporary manifest file for this mesh that will be fed to the asset pipeline
+    {
+        json assets_json;
+        assets_json["meshes"] = json::array();
+        assets_json["meshes"].push_back({{"src", asset_path.filename().string()}});
+
+        std::ofstream assets_json_file(manifest_file_path);
+
+        if (!assets_json_file) {
+            std::cout << "Failed to create temporary asset manifest: " << manifest_file_path << std::endl;
+            return false;
+        }
+
+        assets_json_file << assets_json << std::endl;
+    }
+
+    try {
+        if (!asset_pipeline.run(client.getPlatformName(), manifest_file_path, assets_dir, output_dir)) {
+            std::cout << "Asset pipeline processing failed." << std::endl;
+            return false;
+        }
+
+        //determine the file path of the processed mesh that will be sent via datalink
+        auto processed_path = output_dir/ asset_path.filename();
+        processed_path.replace_extension(".mesh");
+
+        if (!std::filesystem::exists(processed_path)) {
+            std::cout << "Asset pipeline ran sucessfully but expected asset was not found: " << processed_path << std::endl;
+            return false;
+        }
+
+        FileTransfer file_transfer(client);
+        file_transfer.execute(processed_path);
+    } catch (std::runtime_error err) {
+        std::cout << "Error processing static mesh: " << err.what() << std::endl;
         return false;
     }
 
-    FileTransfer file_transfer(client);
-    file_transfer.execute(processed_path);
-    
-    return {};
+    return true;
 }
 
 }

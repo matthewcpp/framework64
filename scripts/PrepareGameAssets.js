@@ -1,4 +1,5 @@
 const Pipeline = require("../pipeline/Pipeline");
+const preparePlatform = require("./PreparePlatform");
 
 const { program } = require("commander");
 const fse = require("fs-extra");
@@ -25,6 +26,7 @@ async function prepareGameAssets(platform, target) {
 
     const gameBinDirectory = path.join(platformBuildDir,  "bin", target);
     const gameBuildDirectory = path.join(platformBuildDir, "src", "CMakeFiles", `${target}.dir`);
+    const outputDirectory = path.join(gameBinDirectory, "assets");
     const pluginManifestPath = path.join(gameDirectory, "pipeline", "plugins.json");
 
     // read game name from package manifest if not specified
@@ -35,6 +37,7 @@ async function prepareGameAssets(platform, target) {
         console.log(`No target specified. using default target: ${packageJson.name}`);
     }
 
-    await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
+    preparePlatform(platform, gameBuildDirectory, gameBinDirectory);
+    await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, outputDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
 }
 

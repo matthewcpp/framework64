@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 const Util = require("./Util");
-// TODO: this needs to be moved into desktop
-const prepareDesktopShaders = require("../scripts/PrepareDesktopShaders");
 
 const { program } = require('commander');
 const rimraf = require("rimraf");
@@ -16,12 +14,13 @@ const path = require("path");
  * @param assetDirectory the root path of the folder containing all assets
  * @param platform the platform that is currently being built
  * @param platformBuildDirectory the root build directory for this platform
- * @param gameBuildDirectory the path to the directory where all compiled code will be built to
- * @param gameBinDirectory the output directory for this game's binary files
+ * @param outputDirectory the output directory for this game's assets
  * @param pluginManifest the path pointing to the plugin manifest for this build
  */
-async function prepareAssets(manifestFile, assetDirectory, platform, gameBuildDirectory, gameBinDirectory, pluginManifest) {
-    const outputDirectory = path.join(gameBinDirectory, "assets");
+async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest) {
+    if (!fse.existsSync(manifestFile)) {
+        throw new Error(`Manifest file does not exist: ${manifestFile}`);
+    }
 
     if (fse.existsSync(outputDirectory)) {
         rimraf.sync(outputDirectory);
@@ -37,37 +36,19 @@ async function prepareAssets(manifestFile, assetDirectory, platform, gameBuildDi
 
     switch (platform) {
         case "n64_libultra":
-            purgeCompiledAssetData(gameBuildDirectory)
+            //purgeCompiledAssetData(gameBuildDirectory)
             const processN64 = require("./n64_libultra/Process");
             await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
-            break;
+        break;
 
         case "desktop":
             const processDesktop = require("./desktop/Process");
             await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
-            
-            /// TODO: This should be moved into the desktop processing directory
-            const shaderDestDir = path.join(gameBinDirectory, "glsl");
-            prepareDesktopShaders(shaderDestDir);
-            break;
+        break;
 
         default:
-            throw new Error(`Unsupported platform: ${manifest.platform}`);
+            throw new Error(`Unsupported platform: ${platform}`);
     }
-}
-
-/** 
- * This function is needed because the compiler will need to regenerate the packed asset data when there is a change.
- * TODO: this should be moved into n64_libulta directory
-*/
-function purgeCompiledAssetData(gameBuildDirectory){
-    const compiledDataPath = path.join(gameBuildDirectory, "asm", "asset_data.s.obj");
-
-    if (fse.existsSync(compiledDataPath)) {
-        console.log(`Purging compiled asset data file: ${compiledDataPath}`);
-        fse.unlinkSync(compiledDataPath)
-    }
-    
 }
 
 function loadPlugins(pluginManifestPath) {
@@ -131,8 +112,3 @@ function loadPlugins(pluginManifestPath) {
 module.exports = {
     prepareAssets: prepareAssets
 };
-
-if (require.main === module) {
-    require("../scripts/RunPipeline")();
-    main();
-}

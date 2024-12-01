@@ -2,79 +2,79 @@
 
 #include "asset_process.hpp"
 
-#define _WIN32_WINNT 0x0601
-#include <restinio/all.hpp>
+#define NOMINMAX
+#include <IXHttpServer.h>
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
+#include <iostream>
+
 namespace framework64::service {
 
-class WebService::Handler {
-public:
-    Handler(AssetPipeline& asset_pipeline, data_link::Client & client) 
-    : client(client), asset_pipeline(asset_pipeline) {}
-public:
-    auto processStaticMesh( const restinio::request_handle_t& req, restinio::router::route_params_t ) {
-        json req_json;
-        try {
-            req_json = json::parse(req->body());
-        }
-        catch(json::parse_error& ex) {
-            return parseError(req, ex.what());
-        }
+WebService::WebService(AssetPipeline& asset_pipeline, data_link::Client & client)
+    : asset_pipeline(asset_pipeline), client(client) {}
 
-        auto const & file_path = req_json["src"].get<std::string>();
-
-        AssetProcess asset_process(asset_pipeline);
-        asset_process.staticMesh(file_path, client);
-
-        return req->create_response(restinio::status_ok()).connection_close().done();
+WebService::~WebService() {
+    if (http_server) {
+        http_server->stop();
+        delete(http_server);
     }
-
-    auto nonMatchedRequest(const restinio::request_handle_t& req) {
-        return req->create_response(restinio::status_not_found()).connection_close().done();
-
-    }
-
-    restinio::request_handling_status_t parseError(const restinio::request_handle_t& req, const std::string& error_string) {
-        json response_json = json::object();
-        response_json["error"] = error_string;
-
-        auto response = req->create_response(restinio::status_bad_request());
-        response.set_body(response_json.dump());
-
-        return response.connection_close().done();
-    }
-
-private:
-    data_link::Client& client;
-    AssetPipeline& asset_pipeline;
-};
-
-void WebService::run(int port) {
-    std::cout << "Starting webservice on port: " << port << std::endl;
-    auto router = std::make_unique<restinio::router::express_router_t<>>();
-    router->http_post("/static-mesh", std::bind(&Handler::processStaticMesh, handler.get(), std::placeholders::_1, std::placeholders::_2));
-    router->non_matched_request_handler(std::bind(&Handler::nonMatchedRequest, handler.get(), std::placeholders::_1));
-
-    // Launching a server with custom traits.
-    struct my_server_traits : public restinio::default_single_thread_traits_t {
-        using request_handler_t = restinio::router::express_router_t<>;
-    };
-
-    restinio::run(
-            restinio::on_this_thread<my_server_traits>()
-                    .address("localhost")
-                    .port(static_cast<uint16_t>(port))
-                    .request_handler(std::move(router)));
 }
 
-WebService::WebService(AssetPipeline& asset_pipeline, data_link::Client & client) {
-    handler = std::make_unique<Handler>(asset_pipeline, client);
+bool WebService::run(int port) {
+    
+    http_server = new ix::HttpServer(port, "127.0.0.1");
+    http_server->setOnConnectionCallback([this](ix::HttpRequestPtr request, std::shared_ptr<ix::ConnectionState>){
+        if (request->method != "POST") {
+            return std::make_shared<ix::HttpResponse>(405);
+        }
+
+        auto response = this->onJsonPostMessage(request->body);
+
+        if (response.empty()) {
+            return std::make_shared<ix::HttpResponse>(200);
+        }
+        else {
+            return std::make_shared<ix::HttpResponse>(400);
+        }
+    }
+    );
+
+    auto res = http_server->listen();
+    if (!res.first)
+    {
+        std::cout << "Failed to start webservice on port " << port << ": " << res.second << std::endl;
+        return false;
+    }
+
+    std::cout << "Started webservice on port: " << port << std::endl;
+    http_server->start();
+    http_server->wait();
+
+    return true;
 }
 
-WebService::~WebService() = default;
+std::string WebService::onJsonPostMessage(const std::string& message) {
+    std::cout << "WebService::onJsonPostMessage" << std::endl;
+
+    json req_json;
+    try {
+        req_json = json::parse(message);
+    }
+    catch(json::parse_error& ex) {
+        std::cout << "Json parse error: " << ex.what() << std::endl;
+        return ex.what();
+    }
+
+    auto const asset_type = req_json["type"].get<std::string>();
+    auto const file_path = req_json["src"].get<std::string>();
+
+    AssetProcess asset_process(asset_pipeline);
+    asset_process.staticMesh(file_path, client);
+
+    return {};
+}
 
 
 }
