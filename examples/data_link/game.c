@@ -17,14 +17,14 @@ static void on_data_link_connected(void* arg) {
     Game* game = (Game*)arg;
 
     const char* start_message = "data link example started";
-    fw64_data_link_send_message(game->engine->data_link, Fw64_DATA_LINK_MESSAGE_TEXT, start_message, strlen(start_message));
+    fw64_data_link_send_message(game->engine->data_link, Fw64_DATA_LINK_MESSAGE_TEXT, start_message, (int)strlen(start_message));
 }
 
 void on_data_link_message(fw64DataSource* message, void* arg) {
     Game* game = (Game*)arg;
 
     game->total_message_count += 1;
-    game->total_message_data += fw64_data_source_size(message);
+    game->total_message_data += (uint32_t)fw64_data_source_size(message);
     message_list_push(game, message);
 }
 
