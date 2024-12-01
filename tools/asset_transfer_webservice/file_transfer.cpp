@@ -52,8 +52,8 @@ void FileTransfer::begin(const std::string& file_name, size_t file_size) {
 
     BeginMessageHeader header;
     header.message_type = client.littleToTargetEndian(Fw64_FILE_DOWNLOADER_MESSAGE_BEGIN);
-    header.file_name_size = client.littleToTargetEndian(file_name.size());
-    header.file_data_size = client.littleToTargetEndian(file_size);
+    header.file_name_size = client.littleToTargetEndian(static_cast<uint32_t>(file_name.size()));
+    header.file_data_size = client.littleToTargetEndian(static_cast<uint32_t>(file_size));
 
     std::memcpy(message_buffer.data(), &header, sizeof(BeginMessageHeader));
     std::memcpy(message_buffer.data() + sizeof(BeginMessageHeader), file_name.data(), file_name.size());
@@ -77,7 +77,7 @@ void FileTransfer::data(size_t file_size) {
     size_t data_remaining = file_size;
     while (data_remaining > 0) {
         const size_t payload_size = static_cast<uint32_t>(std::min(data_remaining, max_payload_size));
-        header.payload_size = client.littleToTargetEndian(payload_size);
+        header.payload_size = client.littleToTargetEndian(static_cast<uint32_t>(payload_size));
 
         message_buffer.resize(sizeof(DataMessageHeader) + payload_size);
         std::memcpy(message_buffer.data(), &header, sizeof(DataMessageHeader));

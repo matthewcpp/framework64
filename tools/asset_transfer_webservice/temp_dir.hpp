@@ -1,9 +1,10 @@
 #pragma once
 
-#include <filesystem>
-
 #define UUID_SYSTEM_GENERATOR
 #include <uuid.h>
+
+#include <filesystem>
+#include <iostream>
 
 namespace framework64::service {
 
@@ -20,6 +21,7 @@ public:
 
     ~TemporaryDirectory() {
         if (!_path.empty()) {
+            std::cout << "Removing temporary directory: " <<  _path << std::endl;
             std::filesystem::remove_all(_path);
         }
     }
