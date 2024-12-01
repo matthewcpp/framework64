@@ -48,15 +48,14 @@ endif()
 
 # Desktop Client
 
-find_package(websocketpp CONFIG REQUIRED)
-find_package(Boost REQUIRED COMPONENTS random)
+find_package(ixwebsocket CONFIG REQUIRED)
 
 set(desktop_client_sources
     include/data_link/desktop_client.hpp src/desktop/desktop_client.cpp
 )
 
 target_sources(fw64_datalink_client PRIVATE ${desktop_client_sources})
-target_link_libraries(fw64_datalink_client PUBLIC websocketpp::websocketpp Boost::random)
+target_link_libraries(fw64_datalink_client PUBLIC ixwebsocket::ixwebsocket)
 target_include_directories(fw64_datalink_client PUBLIC include)
 
 # Example Client
