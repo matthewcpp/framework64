@@ -1,37 +1,61 @@
 #include "framework64/desktop/data_link.hpp"
 
+#define NOMINMAX
+#include <IXWebSocketServer.h>
+
 #include <algorithm>
 #include <iostream>
+#include <memory>
+
+fw64DataLink::~fw64DataLink() {
+    if (websocket_server) {
+        websocket_server->stop();
+        delete(websocket_server);
+    }
+}
 
 bool fw64DataLink::initialize(int port) {
     status = Status::Starting;
 
-    try {
-        websocket_server.set_open_handler(std::bind(&fw64DataLink::onClientConnect, this, std::placeholders::_1));
-        websocket_server.set_message_handler(std::bind(&fw64DataLink::onMessage, this, std::placeholders::_1, std::placeholders::_2));
-        websocket_server.set_access_channels(websocketpp::log::alevel::all);
-        websocket_server.set_error_channels(websocketpp::log::elevel::all);
+    constexpr size_t max_connections = 10;
+    websocket_server = new ix::WebSocketServer(port, "127.0.0.1", ix::SocketServer::kDefaultTcpBacklog, max_connections);
+    // websocket_server = new ix::WebSocketServer(port, "127.0.0.1");
 
-        websocket_server.init_asio();
-        websocket_server.listen(static_cast<uint16_t>(port));
-        websocket_server.start_accept();
+    websocket_server->setOnClientMessageCallback([this](std::shared_ptr<ix::ConnectionState> connectionState, ix::WebSocket& websocket, const ix::WebSocketMessagePtr& msg) {
+        if (msg->type == ix::WebSocketMessageType::Open) {
+            this->should_trigger_connected_callback = true;
+            std::cout << "Websocket Connected:" << connectionState->getId() << std::endl;
+            connected_websocket = &websocket;
+        } else if (msg->type == ix::WebSocketMessageType::Close) {
+            std::cout << "Websocket Disconnected:" << connectionState->getId() << std::endl;
+            connected_websocket = nullptr;
+        } else if (msg->type == ix::WebSocketMessageType::Message) {
+            this->onWebsocketMessage(msg->str);
+        }
+    });
 
-        status = Status::Running;
-    }
-    catch(websocketpp::exception const & e) {
-        std::cout << "Failed to start websocket server: " << e.what() << std::endl;
+    auto result = websocket_server->listen();
+    if (!result.first) {
         status = Status::Failed;
+        return false;
     }
-    server_thread = std::thread(websocketServerThread, this);
+
+    websocket_server->start();
+    status = Status::Running;
 
     std::cout << "started websocket datalink server on port: " << port << std::endl;
 
-    return status == Status::Running;
+    return true;
 }
 
-void fw64DataLink::sendMessage(fw64DataLinkMessageType message_type, const uint8_t* data, size_t size) {
-    auto opcode = message_type == FW64_DATA_LINK_MESSAGE_BINARY ? websocketpp::frame::opcode::binary : websocketpp::frame::opcode::text;
-    websocket_server.send(websocket_connection_handle, data, size, opcode);
+void fw64DataLink::sendMessage(fw64DataLinkMessageType, const uint8_t* data, size_t size) {
+    if (!connected_websocket) {
+        return;
+    }
+
+    ix::IXWebSocketSendData send_data(reinterpret_cast<const char*>(data), size);
+    // TODO: is it ok to send everything as binary?
+    connected_websocket->sendBinary(send_data);
 }
 
 void fw64DataLink::update() {
@@ -75,32 +99,12 @@ void fw64DataLink::setMessageCallback(fw64DataLinkMessageCallback callback, void
     message_callback_arg = arg;
 }
 
-void fw64DataLink::onMessage(websocketpp::connection_hdl, WebsocketServer::message_ptr message) {
-    auto const & payload = message->get_payload();
+void fw64DataLink::onWebsocketMessage(const std::string& payload) {
     auto message_ref = incomming_message_pool.dequeue();
     message_ref->assign(reinterpret_cast<const uint8_t *>(payload.data()), payload.size());
-    {
-        std::lock_guard lock(mutex);
-        incomming_message_queue.push(message_ref);
-    }
-}
 
-void fw64DataLink::onClientConnect(websocketpp::connection_hdl connection_handle) {
-    websocket_connection_handle = connection_handle;
-    auto connection = websocket_server.get_con_from_hdl(connection_handle);
-
-    std::cout << "Sucessfull datalink connection from:" << connection->get_host() << std::endl;
-    should_trigger_connected_callback = true;
-}
-
-void fw64DataLink::websocketServerThread(fw64DataLink* data_link) {
-    try {
-        data_link->websocket_server.run();
-    }
-    catch(websocketpp::exception const & e) {
-        std::cout << "Websocket server exception: " << e.what() << std::endl;
-        data_link->status = Status::Failed;
-    }
+    std::lock_guard lock(mutex);
+    incomming_message_queue.push(message_ref);
 }
 
  // C API

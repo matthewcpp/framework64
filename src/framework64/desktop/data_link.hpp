@@ -2,15 +2,19 @@
 
 #include "framework64/data_link.h"
 
-#include <websocketpp/config/asio_no_tls.hpp>
-#include <websocketpp/server.hpp>
-
+#include <algorithm>
 #include <cstdint>
-#include <functional>
 #include <memory>
-#include <thread>
+#include <mutex>
+#include <queue>
 #include <vector>
 
+// forward declaration of websocket related classes from ix
+// want to keep the includes in the implementation file as it will end up including windows.h
+namespace ix {
+    class WebSocketServer;
+    class WebSocket;
+}
 
 namespace framework64::datalink{
 
@@ -48,8 +52,8 @@ struct IncommingMessage {
 
 struct fw64DataLink {
 public:
-    typedef websocketpp::server<websocketpp::config::asio> WebsocketServer;
-
+    fw64DataLink() = default;
+    ~fw64DataLink();
     bool initialize(int port);
 
     void update();
@@ -58,18 +62,14 @@ public:
     void setMessageCallback(fw64DataLinkMessageCallback callback, void* arg);
     void sendMessage(fw64DataLinkMessageType message_type, const uint8_t* data, size_t size);
 
+    void onWebsocketMessage(const std::string& payload);
+
     enum class Status {Disabled, Starting, Running, ClientConnected, Failed};
     inline bool isConnected() const { return status == Status::ClientConnected; }
 
 private:
-    void onMessage(websocketpp::connection_hdl, WebsocketServer::message_ptr message);
-    void onClientConnect(websocketpp::connection_hdl connection_handle);
-
-    static void websocketServerThread(fw64DataLink* data_link);
-
-    WebsocketServer websocket_server;
-    websocketpp::connection_hdl websocket_connection_handle;
-    std::thread server_thread;
+    ix::WebSocketServer* websocket_server = nullptr;
+    ix::WebSocket* connected_websocket = nullptr;
 
     fw64DataLinkMessageCallback message_callback = nullptr;
     void* message_callback_arg = nullptr;
@@ -109,8 +109,13 @@ private:
         std::vector<MessageRef> message_pool;
     };
 
+    /** Simple pool for holding message data */
     using IncommingMessagePool = MessagePool<framework64::datalink::IncommingMessage>;
     IncommingMessagePool incomming_message_pool;
+
+    /** This queue contains messages since the last call to update */
     std::queue<IncommingMessagePool::MessageRef> incomming_message_queue;
+
+    /** This queue contains messages that need to be processed this update frame */
     std::queue<IncommingMessagePool::MessageRef> processing_message_queue;
 };
