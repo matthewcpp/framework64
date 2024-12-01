@@ -343,7 +343,7 @@ DeviceError device_sendrom_everdrive(CartDevice* cart, byte* rom, uint32_t size)
     {
         int32_t  i;
         char*    path = device_getrom();
-        uint32_t pathlen = strlen(device_getrom());
+        uint32_t pathlen = static_cast<uint32_t>(strlen(device_getrom()));
         char*    filename = (char*)malloc(pathlen+1);
         int32_t  extension_start = -1;
         if (filename == NULL)
