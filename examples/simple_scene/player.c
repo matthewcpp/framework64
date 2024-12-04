@@ -118,7 +118,7 @@ void update_position(Player* player) {
     query_center.y += height_radius;
 
     fw64OverlapSphereQueryResult result;
-    if (fw64_scene_overlap_sphere(player->scene, &query_center, height_radius, 0xFFFFFFFF, &result)) {
+    if (fw64_scene_partition_overlap_sphere(player->scene->partition, &query_center, height_radius, 0xFFFFFFFF, &result)) {
         for (int i = 0; i < result.count; i++) {
             fw64OverlapSphereResult *hit = result.results + i;
 

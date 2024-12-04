@@ -88,7 +88,7 @@ void matrix_transform_box(float* matrix, Box* box, Box* out) {
         }
 }
 
-int box_intersection(Box* a, Box* b) {
+int box_intersection(const Box* a, const Box* b) {
     if (a->max.x < b->min.x || a->min.x > b->max.x) return 0;
     if (a->max.y < b->min.y || a->min.y > b->max.y) return 0;
     if (a->max.z < b->min.z || a->min.z > b->max.z) return 0;
@@ -97,7 +97,7 @@ int box_intersection(Box* a, Box* b) {
 }
 
 // Real Time Collision Detection 5.1.3
-void box_closest_point(Box* b, Vec3* p, Vec3* q) {
+void box_closest_point(const Box* b, const Vec3* p, Vec3* q) {
     float* p_el = (float*)p;
     float* q_el = (float*)q;
     float* b_min_el = (float*)&b->min;

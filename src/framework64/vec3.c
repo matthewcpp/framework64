@@ -50,7 +50,7 @@ void vec3_add_and_scale(Vec3* out, Vec3* a, Vec3* b, float k) {
     out->z = a->z + b->z * k;
 }
 
-void vec3_subtract(Vec3* out, Vec3* a, Vec3* b) {
+void vec3_subtract(Vec3* out, const Vec3* a, const Vec3* b) {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
     out->z = a->z - b->z;

@@ -31,7 +31,7 @@ void fw64_collider_update(fw64Collider* collider) {
     matrix_transform_box(collider->node->transform.world_matrix, &collider->source, &collider->bounding);
 }
 
-int fw64_collider_test_sphere(fw64Collider* collider, Vec3* center, float radius, Vec3* out_point) {
+int fw64_collider_test_sphere(const fw64Collider* collider, const Vec3* center, float radius, Vec3* out_point) {
     int result = fw64_collision_test_box_sphere(&collider->bounding, center, radius, out_point);
 
     if (result && collider->type == FW64_COLLIDER_COLLISION_MESH) {
@@ -51,6 +51,6 @@ int fw64_collider_test_ray(fw64Collider* collider, Vec3* origin, Vec3* direction
     return result;
 }
 
-int fw64_collider_test_box(fw64Collider* collider, Box* box) {
+int fw64_collider_test_box(const fw64Collider* collider, const Box* box) {
     return box_intersection(&collider->bounding, box);
 }

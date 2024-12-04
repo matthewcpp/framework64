@@ -36,9 +36,9 @@ void fw64_collider_init_box(fw64Collider* collider, fw64Node* node, Box* box);
 void fw64_collider_init_collision_mesh(fw64Collider* collider, fw64Node* node, fw64CollisionMesh* collision_mesh);
 void fw64_collider_update(fw64Collider* collider);
 
-int fw64_collider_test_sphere(fw64Collider* collider, Vec3* center, float radius, Vec3* out_point);
+int fw64_collider_test_sphere(const fw64Collider* collider, const Vec3* center, float radius, Vec3* out_point);
 int fw64_collider_test_ray(fw64Collider* collider, Vec3* origin, Vec3* direction, Vec3* out_point, float* out_dist);
-int fw64_collider_test_box(fw64Collider* collider, Box* box);
+int fw64_collider_test_box(const fw64Collider* collider, const Box* box);
 
 #define fw64_collider_activate(collider) ((collider)->flags |= FW64_COLLIDER_FLAG_ACTIVE)
 #define fw64_collider_deactivate(collider) ((collider)->flags &= ~FW64_COLLIDER_FLAG_ACTIVE)

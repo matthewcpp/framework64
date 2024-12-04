@@ -31,7 +31,7 @@ void fw64_transform_update_matrix(fw64Transform* transform);
 void fw64_transform_xform_box(fw64Transform* transform, Box* source, Box* target);
 
 void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out);
-void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* out);
+void fw64_transform_inv_mult_point(fw64Transform* transform, const Vec3* point, Vec3* out);
 
 #ifdef __cplusplus
 }

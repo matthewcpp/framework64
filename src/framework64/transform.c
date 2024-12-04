@@ -53,7 +53,7 @@ void fw64_transform_update_matrix(fw64Transform* transform) {
     matrix_from_trs(transform->world_matrix, &transform->position, &transform->rotation, &transform->scale);
 }
 
-void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* out) {
+void fw64_transform_inv_mult_point(fw64Transform* transform, const Vec3* point, Vec3* out) {
     Quat inv_rot = transform->rotation;
     quat_conjugate(&inv_rot);
 

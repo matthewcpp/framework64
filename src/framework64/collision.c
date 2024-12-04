@@ -119,7 +119,7 @@ int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, // ray
 }
 
 // Real Time Collision Detection 5.2.5
-int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p) {
+int fw64_collision_test_box_sphere(const Box* box, const Vec3* center, float radius, Vec3* p) {
     box_closest_point(box, center, p);
 
     Vec3 v;

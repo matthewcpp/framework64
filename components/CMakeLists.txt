@@ -10,6 +10,7 @@ set(components_source_files
     fw64_media_file_picker.h fw64_media_file_picker.c
     fw64_mesh_prim_highlighter.h fw64_mesh_prim_highlighter.c
     fw64_rotate_node.h fw64_rotate_node.c
+    fw64_scene_partition_default.h fw64_scene_partition_default.c
     fw64_ui_navigation.h fw64_ui_navigation.c
     )
 

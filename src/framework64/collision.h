@@ -23,7 +23,7 @@ int fw64_collision_test_sphere_triangle(Vec3* center, float radius, Vec3* a, Vec
  * Returns nonzero value if the sphere intersects AABB, otherwise 0
  * Additionally computes point on the AABB closest to sphere center
  */
-int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* point);
+int fw64_collision_test_box_sphere(const Box* box, const Vec3* center, float radius, Vec3* point);
 
 /**
  * Returns nonzero value if the ray intersects the triangle, otherwise 0

@@ -11,6 +11,9 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->engine = engine;
     game->scene = fw64_assets_load_scene(game->engine->assets, FW64_ASSET_scene_Playground, allocator);
+    fw64_scene_partition_default_init(&game->scene_partition, game->scene);
+    game->scene->partition = &game->scene_partition.base;
+
     game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
     game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator); 
     fw64_renderpass_util_ortho2d(game->renderpasses[RENDER_PASS_UI]);

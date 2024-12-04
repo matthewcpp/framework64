@@ -31,6 +31,18 @@ typedef struct {
     uint32_t material_bundle_count;
 } fw64SceneInfo;
 
+typedef struct fw64SceneParition fw64SceneParition;
+typedef int(*fw64OverlapBoxFunc)(fw64SceneParition* partition, const Box* box, uint32_t layer_mask, fw64OverlapBoxQueryResult* result);
+typedef int(*fw64OverlapSphereFunc)(fw64SceneParition* partition, const Vec3* center, float radius, uint32_t layer_mask, fw64OverlapSphereQueryResult* result);
+
+struct fw64SceneParition{
+    fw64OverlapBoxFunc overlap_box;
+    fw64OverlapSphereFunc overlap_sphere;
+} ;
+
+int fw64_scene_partition_overlap_box(fw64SceneParition* partition, const Box* box, uint32_t layer_mask, fw64OverlapBoxQueryResult* result);
+int fw64_scene_partition_overlap_sphere(fw64SceneParition* p, const Vec3* center, float radius, uint32_t layer_mask, fw64OverlapSphereQueryResult* result);
+
 struct fw64Scene {
     fw64StaticVector meshes;
     fw64StaticVector mesh_instances;
@@ -43,6 +55,8 @@ struct fw64Scene {
     fw64MaterialBundle* material_bundle;
     fw64Allocator* allocator;
     fw64AssetDatabase* assets;
+    /** Note: this is not cleaned up when the scene is deleted */
+    fw64SceneParition* partition;
     Box bounding_box;
 };
 
@@ -94,8 +108,6 @@ fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene);
 uint32_t fw64_scene_find_nodes_with_layer_mask(fw64Scene* scene, uint32_t layer_mask, fw64Node** node_buffer, uint32_t buffer_size);
 
 int fw64_scene_raycast(fw64Scene* scene, Vec3* origin, Vec3* direction, uint32_t mask, fw64RaycastHit* hit);
-int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint32_t mask, fw64OverlapSphereQueryResult* result);
-int fw64_scene_overlap_box(fw64Scene* scene, Box* box, uint32_t mask, fw64OverlapBoxQueryResult* result);
 int fw64_scene_moving_sphere_intersection(fw64Scene* scene, Vec3* center, float radius, Vec3* velocity, uint32_t mask, fw64IntersectMovingSphereQuery* result);
 int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocity, uint32_t mask, fw64IntersectMovingBoxQuery* result);
 

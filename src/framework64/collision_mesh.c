@@ -25,7 +25,7 @@ void fw64_collision_mesh_uninit(fw64CollisionMesh* collision_mesh, fw64Allocator
     fw64_allocator_free(allocator, collision_mesh->points);
 }
 
-int fw64_collision_mesh_test_sphere(fw64CollisionMesh* collision_mesh, fw64Transform* transform, Vec3* center, float radius, Vec3* out_point) {
+int fw64_collision_mesh_test_sphere(fw64CollisionMesh* collision_mesh, fw64Transform* transform, const Vec3* center, float radius, Vec3* out_point) {
     int result = 0;
 
     // transform query sphere into mesh local space

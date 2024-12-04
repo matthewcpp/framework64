@@ -6,6 +6,8 @@
 #include "chase_cam.h"
 #include "ui.h"
 
+#include "fw64_scene_partition_default.h"
+
 typedef enum {
     RENDER_PASS_SCENE,
     RENDER_PASS_UI,
@@ -15,6 +17,7 @@ typedef enum {
 typedef struct {
     fw64Engine* engine;
     fw64Scene* scene;
+    fw64ScenePartitionDefault scene_partition;
     UI ui;
 
     Player player;
