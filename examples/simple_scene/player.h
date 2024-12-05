@@ -4,6 +4,8 @@
 #include "framework64/node.h"
 #include "framework64/scene.h"
 
+#include "fw64_character_controller.h"
+
 
 #define PLAYER_DEFAULT_ACCELERATION 9.5f
 #define PLAYER_DEFAULT_DECELERATION 15.0f
@@ -30,23 +32,7 @@ typedef struct {
     fw64Engine* engine;
     fw64Scene* scene;
 
-    Vec3 previous_position;
-
-    float jump_impulse;
-    float air_velocity;
-    float gravity;
-
-    float height;
-    float radius;
-
-    float speed;
-    float acceleration;
-    float deceleration;
-    float max_speed;
-
-    float rotation;
-    float rotation_speed;
-    PlayerState state;
+    fw64CharacterController character_controller;
 
     int process_input;
     int controller_num;

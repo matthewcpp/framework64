@@ -21,17 +21,17 @@ void ui_update(UI* ui) {
     Vec3* pos = &ui->player->node->transform.position;
     const char* state = "";
 
-    switch (ui->player->state) {
-        case PLAYER_STATE_ON_GROUND:
+    switch (ui->player->character_controller.state) {
+        case FW64_CHARACTER_CONTROLLER_STATE_GROUNDED:
             state = "Ground";
             break;
 
-        case PLAYER_STATE_FALLING:
+        case FW64_CHARACTER_CONTROLLER_STATE_FALLING:
             state = "Falling";
             break;
     }
 
-    sprintf(status_text, "%.3f %.3f %.3f %s %.3f", pos->x, pos->y, pos->z, state, ui->player->air_velocity);
+    sprintf(status_text, "%.3f %.3f %.3f %s %.3f", pos->x, pos->y, pos->z, state, ui->player->character_controller.air_velocity);
 
     fw64_spritebatch_begin(ui->spritebatch);
     fw64_spritebatch_draw_string(ui->spritebatch, ui->font, status_text, 10, 10);
