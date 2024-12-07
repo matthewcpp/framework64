@@ -21,7 +21,7 @@ void ui_update(UI* ui) {
     Vec3* pos = &ui->player->node->transform.position;
     const char* state = "";
 
-    switch (ui->player->character_controller.state) {
+    switch (ui->player->character_controller.base.state) {
         case FW64_CHARACTER_CONTROLLER_STATE_GROUNDED:
             state = "Ground";
             break;
@@ -31,7 +31,7 @@ void ui_update(UI* ui) {
             break;
     }
 
-    sprintf(status_text, "%.3f %.3f %.3f %s %.3f", pos->x, pos->y, pos->z, state, ui->player->character_controller.air_velocity);
+    sprintf(status_text, "%.3f %.3f %.3f %s %.3f", pos->x, pos->y, pos->z, state, ui->player->character_controller.base.air_velocity);
 
     fw64_spritebatch_begin(ui->spritebatch);
     fw64_spritebatch_draw_string(ui->spritebatch, ui->font, status_text, 10, 10);

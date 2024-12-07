@@ -32,6 +32,7 @@ void game_init(Game* game, fw64Engine* engine) {
 }
 
 void game_update(Game* game){
+    player_fixed_update(&game->player);
     player_update(&game->player);
     chase_camera_update(&game->chase_cam);
 

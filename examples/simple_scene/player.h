@@ -4,7 +4,7 @@
 #include "framework64/node.h"
 #include "framework64/scene.h"
 
-#include "fw64_character_controller.h"
+#include "fw64_third_person_controller.h"
 
 
 #define PLAYER_DEFAULT_ACCELERATION 9.5f
@@ -16,7 +16,7 @@
 #define PLAYER_DEFAULT_JUMP_VELOCITY 10.0f
 #define PLAYER_DEFAULT_GRAVITY (-20.0f)
 
-#define PLAYER_STICK_THRESHOLD 0.15f
+
 
 #define PLAYER_DEFAULT_HEIGHT 10.0f
 #define PLAYER_DEFAULT_RADIUS 3.0f;
@@ -32,10 +32,7 @@ typedef struct {
     fw64Engine* engine;
     fw64Scene* scene;
 
-    fw64CharacterController character_controller;
-
-    int process_input;
-    int controller_num;
+    fw64ThirdPersonController character_controller;
 } Player;
 
 #ifdef __cplusplus
@@ -43,6 +40,7 @@ extern "C" {
 #endif
 
 void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_index, Vec3* position);
+void player_fixed_update(Player* player);
 void player_update(Player* player);
 
 void player_reset(Player* player, Vec3* position);
