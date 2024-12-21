@@ -21,7 +21,8 @@ typedef struct {
     UI ui;
 
     Player player;
-    ChaseCamera chase_cam;
+    // ChaseCamera chase_cam;
+    fw64Camera camera;
     fw64Node* respawn_node;
     fw64RenderPass* renderpasses[RENDER_PASS_COUNT];
 } Game;

@@ -2,7 +2,7 @@
 
 #include "framework64/controller_mapping/n64.h"
 
-void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_index, Vec3* position) {
+void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, fw64Camera* camera, fw64AssetId mesh_index, Vec3* position) {
     player->engine = engine;
     player->scene = scene;
 
@@ -12,7 +12,7 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_
     Box bounding = fw64_mesh_get_bounding_box(mesh);
     fw64Collider* collider = fw64_scene_create_box_collider(scene, player->node, &bounding);
 
-    fw64_third_person_controller_init(&player->character_controller, engine, scene, collider);
+    fw64_third_person_controller_init(&player->character_controller, engine, scene, collider, camera);
     player_reset(player, position);
 }
 

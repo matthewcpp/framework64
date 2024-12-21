@@ -5,12 +5,13 @@
 #define PLAYER_STICK_THRESHOLD 0.15f
 #define PLAYER_DEFAULT_ROTATION_SPEED 90.0f
 
-void fw64_third_person_controller_init(fw64ThirdPersonController* controller, fw64Engine* engine, fw64Scene* scene, fw64Collider* collider) {
+void fw64_third_person_controller_init(fw64ThirdPersonController* controller, fw64Engine* engine, fw64Scene* scene, fw64Collider* collider, fw64Camera* camera) {
     controller->engine = engine;
     controller->process_input = 1;
     controller->controller_num = 0;
 
     fw64_character_controller_init(&controller->base, scene, collider);
+    fw64_third_person_camera_init(&controller->camera, engine, camera, &collider->node->transform);
 }
 
 static void process_input(fw64ThirdPersonController* controller) {
@@ -49,4 +50,6 @@ void fw64_third_person_controller_update(fw64ThirdPersonController* controller) 
     if (controller->process_input) {
         process_input(controller);
     }
+
+    fw64_third_person_camera_update(&controller->camera);
 }

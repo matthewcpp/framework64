@@ -39,7 +39,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int mesh_index, Vec3* position);
+void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, fw64Camera* camera, fw64AssetId mesh_index, Vec3* position);
 void player_fixed_update(Player* player);
 void player_update(Player* player);
 
