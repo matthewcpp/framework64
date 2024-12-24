@@ -26,7 +26,7 @@ static void fps_cam_forward(fw64FpsCamera* fps, Vec3* out) {
     quat_from_euler(&q, 0.0f, fps->rotation.y, 0.0f);
 
     Vec3 forward = { 0.0f, 0.0f, -1.0f };
-    quat_transform_vec3(out, &q, &forward);
+    quat_transform_vec3(&q, &forward, out);
 }
 
 static void fps_cam_back(fw64FpsCamera* fps, Vec3* out) {
@@ -39,7 +39,7 @@ static void fps_cam_right(fw64FpsCamera* fps, Vec3* out) {
     quat_from_euler(&q, 0.0f, fps->rotation.y, 0.0f);
 
     Vec3 right = { 1.0f, 0.0f, 0.0f };
-    quat_transform_vec3(out, &q, &right);
+    quat_transform_vec3(&q, &right, out);
 }
 
 static void fps_cam_left(fw64FpsCamera* fps, Vec3* out) {
@@ -116,7 +116,7 @@ void fw64_fps_camera_update(fw64FpsCamera* fps, float time_delta) {
 
     Vec3 forward = { 0.0f, 0.0f, -1.0f };
     Vec3 tar;
-    quat_transform_vec3(&tar, &q, &forward);
+    quat_transform_vec3(&q, &forward, &tar);
     vec3_add(&transform->position, &tar, &tar);
 
     Vec3 up = {0.0f, 1.0f, 0.0f};

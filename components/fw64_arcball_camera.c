@@ -31,11 +31,11 @@ void _arcball_update_camera_position(fw64ArcballCamera* arcball) {
     quat_from_euler(&q, arcball->_rot_x, arcball->_rot_y, 0.0f);
 
     Vec3 up = {0.0f, 1.0f, 0.0f};
-    quat_transform_vec3(&up, &q, &up);
+    quat_transform_vec3(&q, &up, &up);
     vec3_normalize(&up);
 
     Vec3 orbit_pos = {0.0f, 0.0f, 1.0f};
-    quat_transform_vec3(&orbit_pos, &q, &orbit_pos);
+    quat_transform_vec3(&q, &orbit_pos, &orbit_pos);
     vec3_normalize(&orbit_pos);
     vec3_scale(&orbit_pos, arcball->_distance, &orbit_pos);
 

@@ -79,7 +79,7 @@ int fw64_collision_mesh_test_ray(fw64CollisionMesh* collision_mesh, fw64Transfor
     quat_conjugate(&inv_rotation);
 
     fw64_transform_inv_mult_point(transform, origin, &local_origin);
-    quat_transform_vec3(&local_direction, &inv_rotation, direction);
+    quat_transform_vec3(&inv_rotation, direction, &local_direction);
 
     // check for collision of sphere and mesh triangles
     float closest_distance = FLT_MAX;
