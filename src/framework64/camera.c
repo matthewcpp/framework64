@@ -142,7 +142,7 @@ int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3*
 
 int fw64_camera_ray_from_viewport_pos(fw64Camera* camera, IVec2* viewport_pos, Vec3* ray_origin, Vec3* ray_direction) {
     IVec2 window_pos = *viewport_pos;
-    ivec2_add(&window_pos, &window_pos, &camera->viewport.position);
+    ivec2_add(&window_pos, &camera->viewport.position, &window_pos);
 
     return fw64_camera_ray_from_window_pos(camera, &window_pos, ray_origin, ray_direction);
 }

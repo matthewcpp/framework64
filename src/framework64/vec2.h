@@ -11,15 +11,15 @@ typedef struct {
 } Vec2;
 
 void vec2_set(Vec2 *v, float x, float y);
-void vec2_add(Vec2* out, Vec2* a, Vec2* b);
-void vec2_scale(Vec2* out, Vec2* v, float k);
+void vec2_add(const Vec2* a, const Vec2* b, Vec2* out);
+void vec2_scale(const Vec2* v, float k, Vec2* out);
 
 typedef struct {
     int x, y;
 } IVec2;
 
 void ivec2_set(IVec2* vec, int x, int y);
-void ivec2_add(IVec2* out, IVec2 *a, IVec2 *b);
+void ivec2_add(const IVec2 *a, const IVec2 *b, IVec2* out);
 
 #ifdef __cplusplus
 }
