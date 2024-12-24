@@ -57,14 +57,14 @@ void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* 
     Quat inv_rot = transform->rotation;
     quat_conjugate(&inv_rot);
 
-    vec3_subtract(out, point, &transform->position);
+    vec3_subtract(point, &transform->position, out);
     quat_transform_vec3(out, &inv_rot, out);
 
 }
 
 void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out) {
     quat_transform_vec3(out, &transform->rotation, point);
-    vec3_add(out, &transform->position, out);
+    vec3_add(&transform->position, out, out);
 }
 
 void fw64_transform_xform_box(fw64Transform* transform, Box* source, Box* target) {

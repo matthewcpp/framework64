@@ -162,7 +162,7 @@ static void compute_vec3_value(fw64AnimationController* controller, uint16_t inp
         uint32_t b = keyframe_index;
 
         float t = (controller->current_time - input_buffer->times[a]) / (input_buffer->times[b] - input_buffer->times[a]);
-        vec3_lerp(value, VEC3_KEYFRAME(value_buffer->values, a), VEC3_KEYFRAME(value_buffer->values, b), t);
+        vec3_lerp(VEC3_KEYFRAME(value_buffer->values, a), VEC3_KEYFRAME(value_buffer->values, b), t, value);
     }
 }
 

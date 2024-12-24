@@ -17,10 +17,10 @@ void fw64_plane_set_values(fw64Plane* plane, float nx, float ny, float nz, float
 void fw64_plane_set_3_points(fw64Plane* plane, Vec3* v1, Vec3* v2, Vec3* v3) {
     Vec3 aux1, aux2;
 
-    vec3_subtract(&aux1, v1, v2);
-    vec3_subtract(&aux2, v3, v2);
+    vec3_subtract(v1, v2, &aux1);
+    vec3_subtract(v3, v2, &aux2);
 
-    vec3_cross(&plane->normal, &aux2, &aux1);
+    vec3_cross(&aux2, &aux1, &plane->normal);
     vec3_normalize(&plane->normal);
     plane->dist = -vec3_dot(&plane->normal, v2);
 }

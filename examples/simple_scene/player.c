@@ -93,7 +93,7 @@ static Vec3 calculate_movement_vector(Player* player) {
 
     Vec3 movement;
     fw64_transform_forward(&player->node->transform, &movement);
-    vec3_scale(&movement, &movement, player->speed * time_delta);
+    vec3_scale(&movement, player->speed * time_delta, &movement);
 
     movement.y += (player->air_velocity * time_delta) + (player->gravity * time_delta * time_delta / 2.0f);
     player->air_velocity += player->gravity * time_delta;
@@ -110,7 +110,7 @@ void update_position(Player* player) {
     player->previous_position = *position;
 
     Vec3 movement = calculate_movement_vector(player);
-    vec3_add(position, position, &movement);
+    vec3_add(position, &movement, position);
 
     PlayerState new_state = PLAYER_STATE_FALLING;
     float height_radius = player->height / 2.0f;
@@ -123,7 +123,7 @@ void update_position(Player* player) {
             fw64OverlapSphereResult *hit = result.results + i;
 
             Vec3 direction;
-            vec3_subtract(&direction, &query_center, &hit->point);
+            vec3_subtract(&query_center, &hit->point, &direction);
             vec3_normalize(&direction);
 
             int is_grounded = (hit->node->layer_mask & LAYER_GROUND) || direction.y > 0.9f;
@@ -133,12 +133,12 @@ void update_position(Player* player) {
                 new_state = PLAYER_STATE_ON_GROUND;
                 player->air_velocity = 0;
                 float hit_distance = vec3_distance(&query_center, &hit->point);
-                vec3_add_and_scale(position, position, &direction, height_radius - hit_distance);
+                vec3_add_and_scale(position, &direction, height_radius - hit_distance, position);
             } else { // walls
                 float hit_distance = vec3_distance(&query_center, &hit->point);
 
                 if (hit_distance < player->radius) {
-                    vec3_add_and_scale(position, position, &direction, player->radius - hit_distance);
+                    vec3_add_and_scale(position, &direction, player->radius - hit_distance, position);
                 }
             }
         }

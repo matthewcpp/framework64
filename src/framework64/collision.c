@@ -43,7 +43,7 @@ int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_poi
     }
 
     // Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
-    vec3_add_and_scale(out_point, origin, dir, tmin);
+    vec3_add_and_scale(origin, dir, tmin, out_point);
     *out_t = tmin;
     return 1;
 }
@@ -51,7 +51,7 @@ int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_poi
 // Real Time Collision Detection 5.3.2
 int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, float radius, Vec3* point, float* t) {
     Vec3 m;
-    vec3_subtract(&m, origin, center);
+    vec3_subtract(origin, center, &m);
     float b = vec3_dot(&m, direction);
     float c = vec3_dot(&m, &m) - (radius * radius);
     // exit early. ray origin outside sphere, and direction points away from sphere
@@ -66,7 +66,7 @@ int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, 
     // t < 0, ray started inside sphere. set t = 0
     if (*t < 0.0f) *t = 0.0f;
     // output point of first collision
-    vec3_add_and_scale(point, origin, direction, *t);
+    vec3_add_and_scale(origin, direction, *t, point);
     return 1;
 }
 
@@ -75,9 +75,9 @@ int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, // ray
                                     Vec3* point_a, Vec3* point_b, float radius, // capsule
                                     Vec3* out_point, float* out_t) { //output
     Vec3  ba;
-    vec3_subtract(&ba, point_b, point_a);
+    vec3_subtract(point_b, point_a, &ba);
     Vec3  oa;
-    vec3_subtract(&oa, origin, point_a);
+    vec3_subtract(origin, point_a, &oa);
     float baba = vec3_dot(&ba, &ba);
     float bard = vec3_dot(&ba, direction);
     float baoa = vec3_dot(&ba,&oa);
@@ -95,22 +95,22 @@ int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, // ray
         // body
         if( y>0.0 && y<baba ) {
             *out_t = t;
-            vec3_add_and_scale(out_point, origin, direction, *out_t);  
+            vec3_add_and_scale(origin, direction, *out_t, out_point);  
             return 1;
         }
         // caps
         Vec3 oc;
         if (y <= 0.0) {
-            vec3_copy(&oc, &oa);
+            vec3_copy(&oa, &oc);
         } else {
-            vec3_subtract(&oc, origin, point_b);
+            vec3_subtract(origin, point_b, &oc);
         } 
         b = vec3_dot(direction,&oc);
         c = vec3_dot(&oc,&oc) - (radius*radius);
         h = b*b - c;
         if( h>0.0 ) {
             *out_t = -b - fw64_sqrtf(h);
-            vec3_add_and_scale(out_point, origin, direction, *out_t);
+            vec3_add_and_scale(origin, direction, *out_t, out_point);
             return 1;
         }
     }
@@ -123,7 +123,7 @@ int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p
     box_closest_point(box, center, p);
 
     Vec3 v;
-    vec3_subtract(&v, p, center);
+    vec3_subtract(p, center, &v);
     return vec3_dot(&v, &v) < radius * radius;
 }
 
@@ -131,9 +131,9 @@ int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p
 void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* out) {
     // Check if P in vertex region outside A
     Vec3 ab, ac, ap;
-    vec3_subtract(&ab, b, a);
-    vec3_subtract(&ac, c, a);
-    vec3_subtract(&ap, p, a);
+    vec3_subtract(b, a, &ab);
+    vec3_subtract(c, a, &ac);
+    vec3_subtract(p, a, &ap);
 
     float d1 = vec3_dot(&ab, &ap);
     float d2 = vec3_dot(&ac, &ap);
@@ -144,7 +144,7 @@ void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* ou
 
     // Check if P in vertex region outside B
     Vec3 bp;
-    vec3_subtract(&bp, p, b);
+    vec3_subtract(p, b, &bp);
     float d3 = vec3_dot(&ab, &bp);
     float d4 = vec3_dot(&ac, &bp);
     if (d3 >= 0.0f && d4 <= d3) {
@@ -156,13 +156,13 @@ void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* ou
     float vc = d1 * d4 - d3 * d2;
     if (vc <= 0.0f && d1 >= 0.0f && d3 <= 0.0f) {
         float v = d1 / (d1 - d3);
-        vec3_add_and_scale(out, a, &ab, v); // barycentric coordinates (1-v,v,0)
+        vec3_add_and_scale(a, &ab, v, out); // barycentric coordinates (1-v,v,0)
         return;
     }
 
     // Check if P in vertex region outside C
     Vec3 cp;
-    vec3_subtract(&cp, p, c);
+    vec3_subtract(p, c, &cp);
     float d5 = vec3_dot(&ab, &cp);
     float d6 = vec3_dot(&ac, &cp);
     if (d6 >= 0.0f && d5 <= d6) {
@@ -174,7 +174,7 @@ void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* ou
     float vb = d5 * d2 - d1 * d6;
     if (vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f) {
         float w = d2 / (d2 - d6);
-        vec3_add_and_scale(out, a, &ac, w); // barycentric coordinates (1-w,0,w)
+        vec3_add_and_scale(a, &ac, w, out); // barycentric coordinates (1-w,0,w)
         return;
     }
 
@@ -183,8 +183,8 @@ void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* ou
     if (va <= 0.0f && (d4 - d3) >= 0.0f && (d5 - d6) >= 0.0f) {
         float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
         Vec3 bc;
-        vec3_subtract(&bc, c, b);
-        vec3_add_and_scale(out, b, &bc, w); // barycentric coordinates (0,1-w,w)
+        vec3_subtract(c, b, &bc);
+        vec3_add_and_scale(b, &bc, w, out); // barycentric coordinates (0,1-w,w)
         return;
     }
 
@@ -194,8 +194,8 @@ void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* ou
     float w = vc * denom;
 
     // return u*a + v*b + w*c, u = va * denom = 1.0f - v - w
-    vec3_add_and_scale(out, a, &ab, v);
-    vec3_add_and_scale(out, out, &ac, w);
+    vec3_add_and_scale(a, &ab, v, out);
+    vec3_add_and_scale(out, &ac, w, out);
 }
 
 // Real Time Collision Detection 5.2.7
@@ -206,7 +206,7 @@ int fw64_collision_test_sphere_triangle(Vec3* center, float radius, Vec3* a, Vec
     // Sphere and triangle intersect if the (squared) distance from sphere
     // center to point p is less than the (squared) sphere radius
     Vec3 v;
-    vec3_subtract(&v, point, center);
+    vec3_subtract(point, center, &v);
     return vec3_dot(&v, &v) <= radius * radius;
 }
 
@@ -215,22 +215,22 @@ int fw64_collision_test_ray_triangle(Vec3* origin, Vec3* direction, Vec3* vertex
     Vec3 edge1, edge2, h, s, q;
     float a,f,u,v;
 
-    vec3_subtract(&edge1, vertex1, vertex0);
-    vec3_subtract(&edge2, vertex2, vertex0);
+    vec3_subtract(vertex1, vertex0, &edge1);
+    vec3_subtract(vertex2, vertex0, &edge2);
 
-    vec3_cross(&h, direction, &edge2);
+    vec3_cross(direction, &edge2, &h);
     a = vec3_dot(&edge1, &h);
 
     if (a > -EPSILON && a < EPSILON)
         return 0;    // This ray is parallel to this triangle.
 
     f = 1.0f / a;
-    vec3_subtract(&s, origin, vertex0);
+    vec3_subtract(origin, vertex0, &s);
     u = f * vec3_dot(&s, &h);
     if (u < 0.0 || u > 1.0)
         return 0;
 
-    vec3_cross(&q, &s, &edge1);
+    vec3_cross(&s, &edge1, &q);
     v = f * vec3_dot(direction, &q);
     if (v < 0.0 || u + v > 1.0)
         return 0;
@@ -240,7 +240,7 @@ int fw64_collision_test_ray_triangle(Vec3* origin, Vec3* direction, Vec3* vertex
     float t = f * vec3_dot(&edge2, &q);
     if (t > EPSILON) // ray intersection
     {
-        vec3_add_and_scale(out_point, origin, direction, t);
+        vec3_add_and_scale(origin, direction, t, out_point);
         *out_t = t;
         return 1;
     }
@@ -265,7 +265,7 @@ int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* 
 
     // Use relative velocity; effectively treating 'a' as stationary
     Vec3 v;
-    vec3_subtract(&v, vb, va);
+    vec3_subtract(vb, va, &v);
     float* v_el = (float*)&v;
     // Initialize times of first and last contact
     float tfirst = 0.0f;
@@ -308,8 +308,8 @@ int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* 
 int fw64_collision_test_moving_spheres(Vec3* ca, float ra, Vec3* va, Vec3* cb, float rb, Vec3* vb, float* t)
 {
     Vec3 s, v;
-    vec3_subtract(&s, cb, ca);      // vector between the center of the 2 spheres
-    vec3_subtract(&v, vb, va);      // relative motion of sphere b with respect to stationary sphere a
+    vec3_subtract(cb, ca, &v);      // vector between the center of the 2 spheres
+    vec3_subtract(vb, va, &v);      // relative motion of sphere b with respect to stationary sphere a
     float r = rb + ra;              // the sum of all spheres (radii)
     float c = vec3_dot(&s, &s) - (r * r);
     if (c < 0.0f) { // if spheres overlap already, without any motion
@@ -343,8 +343,8 @@ int fw64_collision_test_moving_sphere_box(Vec3* center, float radius, Vec3* dire
     // this is an expanded AABB with the same lengths along the primary axes as the minkowski sum
     // but it is *not* the minkowski sum (it doesn't have quarter-sphere edges) and is just a first-pass test
     Box e;
-    vec3_copy(&e.max, &b->max);
-    vec3_copy(&e.min, &b->min);
+    vec3_copy(&b->max, &e.max);
+    vec3_copy(&b->min, &e.min);
     e.min.x -= radius; e.min.y -= radius; e.min.z -= radius;
     e.max.x += radius; e.max.y += radius; e.max.z += radius;
 

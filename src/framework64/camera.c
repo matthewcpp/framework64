@@ -77,7 +77,7 @@ void fw64_camera_update_view_matrix(fw64Camera* camera) {
     fw64_transform_forward(&camera->node->transform, &forward);
     fw64_transform_up(&camera->node->transform, &up);
 
-    vec3_add(&target, &camera->node->transform.position, &forward);
+    vec3_add(&camera->node->transform.position, &forward, &target);
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     guLookAt(&camera->view, 
@@ -119,7 +119,7 @@ static void _temp_camera_compute_view_projection(fw64Camera* camera, float* view
     fw64_transform_forward(&camera->node->transform, &forward);
     fw64_transform_up(&camera->node->transform, &up);
 
-    vec3_add(&target, &camera->node->transform.position, &forward);
+    vec3_add(&camera->node->transform.position, &forward, &target);
     matrix_camera_look_at(view, &camera->node->transform.position, &target, &up);
 }
 
@@ -134,7 +134,7 @@ int fw64_camera_ray_from_window_pos(fw64Camera* camera, IVec2* window_pos, Vec3*
     viewport_pt.z = 1.0f;
     fw64_matrix_unproject(&viewport_pt, view, proj, &camera->viewport.position, &camera->viewport.size, &far_pt);
 
-    vec3_subtract(ray_direction, &far_pt, ray_origin);
+    vec3_subtract(&far_pt, ray_origin, ray_direction);
     vec3_normalize(ray_direction);
 
     return 1;

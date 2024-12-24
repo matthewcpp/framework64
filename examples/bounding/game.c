@@ -105,19 +105,19 @@ void penguin_update(Penguin* penguin) {
 
         Vec3 forward;
         fw64_transform_forward(&node->transform, &forward);
-        vec3_scale(&forward, &forward, PENGUIN_MOVE_SPEED * penguin->engine->time->time_delta);
-        vec3_add(&node->transform.position, &node->transform.position, &forward);
+        vec3_scale(&forward, PENGUIN_MOVE_SPEED * penguin->engine->time->time_delta, &forward);
+        vec3_add(&node->transform.position, &forward, &node->transform.position);
     }
 
     Vec3 scale_delta;
     vec3_set_all(&scale_delta, penguin->engine->time->time_delta * PENGUIN_SIZE_CHANGE_SPEED);
     if (fw64_input_controller_button_down(input, 0, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
-        vec3_add(&node->transform.scale, &node->transform.scale, &scale_delta);
+        vec3_add(&node->transform.scale, &scale_delta, &node->transform.scale);
     }
 
     if (fw64_input_controller_button_down(input, 0, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
         vec3_negate(&scale_delta);
-        vec3_add(&node->transform.scale, &node->transform.scale, &scale_delta);
+        vec3_add(&node->transform.scale, &scale_delta, &node->transform.scale);
     }
 
     fw64OverlapBoxQueryResult result;

@@ -10,7 +10,7 @@ TEST(Vec3, Lerp) {
     Vec3 expected { 40.0f, 70.0f, 150.0f};
     Vec3 actual;
 
-    vec3_lerp(&actual, &a, &b, 0.5f);
+    vec3_lerp(&a, &b, 0.5f, &actual);
 
     ASSERT_TRUE(vec3_equals(&actual, &expected, EPSILON));
 }
