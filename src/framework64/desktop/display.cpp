@@ -57,14 +57,14 @@ void fw64Display::swap() {
 
 // C-API
 
-fw64Display* fw64_displays_get_primary(fw64Displays* displays) {
+fw64Display* fw64_displays_get_primary(const fw64Displays* displays) {
     return displays->primary;
 }
 
-IVec2 fw64_display_get_size(fw64Display* display) {
+IVec2 fw64_display_get_size(const fw64Display* display) {
     return {display->framebuffer_width(), display->framebuffer_height()};
 }
 
-Vec2 fw64_display_get_size_f(fw64Display* display) {
+Vec2 fw64_display_get_size_f(const fw64Display* display) {
     return {static_cast<float>(display->framebuffer_width()), static_cast<float>(display->framebuffer_height())};
 }
