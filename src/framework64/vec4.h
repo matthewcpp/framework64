@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 void vec4_set(Vec4* v, float x, float y, float z, float w);
-void vec4_div(Vec4* v, float d, Vec4* out);
+void vec4_div(const Vec4* v, float d, Vec4* out);
 void vec4_negate(Vec4* v);
 
 #ifdef __cplusplus
