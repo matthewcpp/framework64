@@ -1,15 +1,15 @@
 #include "framework64/n64_libultra/display.h"
 
 
-fw64Display* fw64_displays_get_primary(fw64Displays* displays) {
+fw64Display* fw64_displays_get_primary(const fw64Displays* displays) {
     return &displays->primary;
 }
 
-IVec2 fw64_display_get_size(fw64Display* display) {
+IVec2 fw64_display_get_size(const fw64Display* display) {
     return display->size;
 }
 
-Vec2 fw64_display_get_size_f(fw64Display* display) {
+Vec2 fw64_display_get_size_f(const fw64Display* display) {
     Vec2 result;
 
     result.x = (float)display->size.x;
