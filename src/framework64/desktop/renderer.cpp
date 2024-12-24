@@ -114,7 +114,7 @@ void fw64Renderer::setViewport(fw64Viewport const * viewport) {
 void fw64Renderer::setViewMatrices(float* projection, float* view) {
     std::memcpy(projection_matrix.data(), projection, sizeof(float) * 16);
     std::memcpy(view_matrix.data(), view, sizeof(float) * 16);
-    matrix_multiply(view_projection_matrix.data(), projection, view);
+    matrix_multiply(projection, view, view_projection_matrix.data());
 }
 
 void fw64Renderer::clearViewport(fw64Viewport const & viewport, fw64ClearFlags flags) {
@@ -178,7 +178,7 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
             continue;
 
         float transform_matrix[16];
-        matrix_multiply(transform_matrix, skinned_mesh_instance->mesh_instance.node->transform.world_matrix, &skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0]);
+        matrix_multiply(skinned_mesh_instance->mesh_instance.node->transform.world_matrix, &skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0], transform_matrix);
         updateMeshTransformBlock(transform_matrix);
 
         drawPrimitive(primitive, material);
@@ -267,11 +267,11 @@ void fw64Renderer::end(fw64RendererSwapFlags) {
 
 void fw64Renderer::updateMeshTransformBlock(float* matrix) {
     // compute the normal matrix: transpose(inverse(modelView))
-    matrix_multiply(mesh_transform_uniform_block.data.normal_matrix.data(), view_matrix.data(), matrix);
+    matrix_multiply(view_matrix.data(), matrix, mesh_transform_uniform_block.data.normal_matrix.data());
     matrix_invert(mesh_transform_uniform_block.data.normal_matrix.data(), mesh_transform_uniform_block.data.normal_matrix.data());
     matrix_transpose(mesh_transform_uniform_block.data.normal_matrix.data());
 
-    matrix_multiply(mesh_transform_uniform_block.data.mvp_matrix.data(), view_projection_matrix.data(), matrix);
+    matrix_multiply(view_projection_matrix.data(), matrix, mesh_transform_uniform_block.data.mvp_matrix.data());
 
     mesh_transform_uniform_block.update();
 }

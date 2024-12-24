@@ -210,17 +210,17 @@ void update_joint(fw64AnimationController* controller, uint32_t joint_index, flo
     float* inv_bind_matrix = FLOAT_MATRIX(controller->animation_data->skin.inverse_bind_matrices, joint_index);
 
     compute_local_matrix(controller, joint_index, &local_matrix[0]);
-    matrix_multiply(&world_matrix[0], parent_matrix, &local_matrix[0] );
+    matrix_multiply(parent_matrix, &local_matrix[0], &world_matrix[0]);
 
     fw64Matrix* joint_matrix = controller->matrices + joint_index;
     
 
 #ifdef FW64_PLATFORM_N64_LIBULTRA
     float temp[16];
-    matrix_multiply(&temp[0], &world_matrix[0], inv_bind_matrix);
+    matrix_multiply(&world_matrix[0], inv_bind_matrix, &temp[0]);
     guMtxF2L((float (*)[4])temp, joint_matrix);
 #else
-    matrix_multiply(&joint_matrix->m[0], &world_matrix[0], inv_bind_matrix);
+    matrix_multiply(&world_matrix[0], inv_bind_matrix, &joint_matrix->m[0]);
 #endif
 
     for (uint16_t i = 0; i < joint->children_count; i++) {
