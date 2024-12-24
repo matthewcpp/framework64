@@ -8,40 +8,40 @@ void fw64_transform_init(fw64Transform* transform) {
     matrix_set_identity(transform->world_matrix);
 }
 
-void fw64_transform_forward(fw64Transform* transform, Vec3* out) {
+void fw64_transform_forward(const fw64Transform* transform, Vec3* out) {
     Vec3 forward = {0.0f, 0.0f, -1.0f};
-    quat_transform_vec3(out, &transform->rotation, &forward);
+    quat_transform_vec3(&transform->rotation, &forward, out);
     vec3_normalize(out);
 }
 
-void fw64_transform_back(fw64Transform* transform, Vec3* out) {
+void fw64_transform_back(const fw64Transform* transform, Vec3* out) {
     fw64_transform_forward(transform, out);
     vec3_negate(out);
 }
 
-void fw64_transform_up(fw64Transform* transform, Vec3* out) {
+void fw64_transform_up(const fw64Transform* transform, Vec3* out) {
     Vec3 up = {0.0f, 1.0f, 0.0f};
-    quat_transform_vec3(out, &transform->rotation, &up);
+    quat_transform_vec3(&transform->rotation, &up, out);
     vec3_normalize(out);
 }
 
-void fw64_transform_down(fw64Transform* transform, Vec3* out) {
+void fw64_transform_down(const fw64Transform* transform, Vec3* out) {
     fw64_transform_up(transform, out);
     vec3_negate(out);
 }
 
-void fw64_transform_right(fw64Transform* transform, Vec3* out) {
+void fw64_transform_right(const fw64Transform* transform, Vec3* out) {
     Vec3 right = {1.0f, 0.0f, 0.0f};
-    quat_transform_vec3(out, &transform->rotation, &right);
+    quat_transform_vec3(&transform->rotation, &right, out);
     vec3_normalize(out);
 }
 
-void fw64_transform_left(fw64Transform* transform, Vec3* out) {
+void fw64_transform_left(const fw64Transform* transform, Vec3* out) {
     fw64_transform_right(transform, out);
     vec3_negate(out);
 }
 
-void fw64_transform_look_at(fw64Transform* transform, Vec3* target, Vec3* up) {
+void fw64_transform_look_at(fw64Transform* transform, const Vec3* target, const Vec3* up) {
     float matrix[16];
     matrix_target_to(&matrix[0], &transform->position, target, up);
 
@@ -53,20 +53,20 @@ void fw64_transform_update_matrix(fw64Transform* transform) {
     matrix_from_trs(transform->world_matrix, &transform->position, &transform->rotation, &transform->scale);
 }
 
-void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* out) {
+void fw64_transform_inv_mult_point(const fw64Transform* transform, const Vec3* point, Vec3* out) {
     Quat inv_rot = transform->rotation;
     quat_conjugate(&inv_rot);
 
     vec3_subtract(point, &transform->position, out);
-    quat_transform_vec3(out, &inv_rot, out);
+    quat_transform_vec3(&inv_rot, out, out);
 
 }
 
-void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out) {
-    quat_transform_vec3(out, &transform->rotation, point);
+void fw64_transform_mult_point(const fw64Transform* transform, const Vec3* point, Vec3* out) {
+    quat_transform_vec3(&transform->rotation, point, out);
     vec3_add(&transform->position, out, out);
 }
 
-void fw64_transform_xform_box(fw64Transform* transform, Box* source, Box* target) {
+void fw64_transform_xform_box(const fw64Transform* transform, const Box* source, Box* target) {
      matrix_transform_box(transform->world_matrix, source, target);
 }
