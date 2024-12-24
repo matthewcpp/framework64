@@ -19,19 +19,19 @@ typedef struct {
 } fw64Transform;
 
 void fw64_transform_init(fw64Transform* transform);
-void fw64_transform_forward(fw64Transform* transform, Vec3* out);
-void fw64_transform_back(fw64Transform* transform, Vec3* out);
-void fw64_transform_up(fw64Transform* transform, Vec3* out);
-void fw64_transform_down(fw64Transform* transform, Vec3* out);
-void fw64_transform_left(fw64Transform* transform, Vec3* out);
-void fw64_transform_right(fw64Transform* transform, Vec3* out);
+void fw64_transform_forward(const fw64Transform* transform, Vec3* out);
+void fw64_transform_back(const fw64Transform* transform, Vec3* out);
+void fw64_transform_up(const fw64Transform* transform, Vec3* out);
+void fw64_transform_down(const fw64Transform* transform, Vec3* out);
+void fw64_transform_left(const fw64Transform* transform, Vec3* out);
+void fw64_transform_right(const fw64Transform* transform, Vec3* out);
 
-void fw64_transform_look_at(fw64Transform* transform, Vec3* target, Vec3* up);
+void fw64_transform_look_at(fw64Transform* transform, const Vec3* target,const  Vec3* up);
 void fw64_transform_update_matrix(fw64Transform* transform);
-void fw64_transform_xform_box(fw64Transform* transform, Box* source, Box* target);
+void fw64_transform_xform_box(const fw64Transform* transform, const Box* source, Box* target);
 
-void fw64_transform_mult_point(fw64Transform* transform, Vec3* point, Vec3* out);
-void fw64_transform_inv_mult_point(fw64Transform* transform, Vec3* point, Vec3* out);
+void fw64_transform_mult_point(const fw64Transform* transform, const Vec3* point, Vec3* out);
+void fw64_transform_inv_mult_point(const fw64Transform* transform, const Vec3* point, Vec3* out);
 
 #ifdef __cplusplus
 }
