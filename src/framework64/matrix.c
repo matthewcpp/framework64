@@ -29,7 +29,7 @@ void matrix_translate(float* matrix, Vec3* t) {
     matrix[14] = t->z;
 }
 
-void matrix_from_trs(float* out, Vec3* v, Quat* q, Vec3* s) {
+void matrix_from_trs(float* matrix, const Vec3* v, const Quat* q, const Vec3* s) {
     float x2 = q->x + q->x;
     float y2 = q->y + q->y;
     float z2 = q->z + q->z;
@@ -43,61 +43,61 @@ void matrix_from_trs(float* out, Vec3* v, Quat* q, Vec3* s) {
     float wy = q->w * y2;
     float wz = q->w * z2;
 
-    out[0] = (1 - (yy + zz)) * s->x;
-    out[1] = (xy + wz) * s->x;
-    out[2] = (xz - wy) * s->x;
-    out[3] = 0;
-    out[4] = (xy - wz) * s->y;
-    out[5] = (1 - (xx + zz)) * s->y;
-    out[6] = (yz + wx) * s->y;
-    out[7] = 0;
-    out[8] = (xz + wy) * s->z;
-    out[9] = (yz - wx) * s->z;
-    out[10] = (1 - (xx + yy)) * s->z;
-    out[11] = 0;
-    out[12] = v->x;
-    out[13] = v->y;
-    out[14] = v->z;
-    out[15] = 1;
+    matrix[0] = (1 - (yy + zz)) * s->x;
+    matrix[1] = (xy + wz) * s->x;
+    matrix[2] = (xz - wy) * s->x;
+    matrix[3] = 0;
+    matrix[4] = (xy - wz) * s->y;
+    matrix[5] = (1 - (xx + zz)) * s->y;
+    matrix[6] = (yz + wx) * s->y;
+    matrix[7] = 0;
+    matrix[8] = (xz + wy) * s->z;
+    matrix[9] = (yz - wx) * s->z;
+    matrix[10] = (1 - (xx + yy)) * s->z;
+    matrix[11] = 0;
+    matrix[12] = v->x;
+    matrix[13] = v->y;
+    matrix[14] = v->z;
+    matrix[15] = 1;
 }
 
-void matrix_from_quat(float* out, Quat* q) {
-  float x2 = q->x + q->x;
-  float y2 = q->y + q->y;
-  float z2 = q->z + q->z;
+void matrix_from_quat(float* matrix, const Quat* q) {
+    float x2 = q->x + q->x;
+    float y2 = q->y + q->y;
+    float z2 = q->z + q->z;
 
-  float xx = q->x * x2;
-  float yx = q->y * x2;
-  float yy = q->y * y2;
-  float zx = q->z * x2;
-  float zy = q->z * y2;
-  float zz = q->z * z2;
-  float wx = q->w * x2;
-  float wy = q->w * y2;
-  float wz = q->w * z2;
+    float xx = q->x * x2;
+    float yx = q->y * x2;
+    float yy = q->y * y2;
+    float zx = q->z * x2;
+    float zy = q->z * y2;
+    float zz = q->z * z2;
+    float wx = q->w * x2;
+    float wy = q->w * y2;
+    float wz = q->w * z2;
 
-  out[0] = 1 - yy - zz;
-  out[1] = yx + wz;
-  out[2] = zx - wy;
-  out[3] = 0;
+    matrix[0] = 1 - yy - zz;
+    matrix[1] = yx + wz;
+    matrix[2] = zx - wy;
+    matrix[3] = 0;
 
-  out[4] = yx - wz;
-  out[5] = 1 - xx - zz;
-  out[6] = zy + wx;
-  out[7] = 0;
+    matrix[4] = yx - wz;
+    matrix[5] = 1 - xx - zz;
+    matrix[6] = zy + wx;
+    matrix[7] = 0;
 
-  out[8] = zx + wy;
-  out[9] = zy - wx;
-  out[10] = 1 - xx - yy;
-  out[11] = 0;
+    matrix[8] = zx + wy;
+    matrix[9] = zy - wx;
+    matrix[10] = 1 - xx - yy;
+    matrix[11] = 0;
 
-  out[12] = 0;
-  out[13] = 0;
-  out[14] = 0;
-  out[15] = 1;
+    matrix[12] = 0;
+    matrix[13] = 0;
+    matrix[14] = 0;
+    matrix[15] = 1;
 }
 
-void matrix_target_to(float* out, Vec3* eye, Vec3* target, Vec3* up) {
+void matrix_target_to(float* matrix, const Vec3* eye, const Vec3* target, const Vec3* up) {
     float eyex = eye->x,
     eyey = eye->y,
     eyez = eye->z,
@@ -132,25 +132,25 @@ void matrix_target_to(float* out, Vec3* eye, Vec3* target, Vec3* up) {
         x2 *= len;
     }
 
-    out[0] = x0;
-    out[1] = x1;
-    out[2] = x2;
-    out[3] = 0.0f;
-    out[4] = z1 * x2 - z2 * x1;
-    out[5] = z2 * x0 - z0 * x2;
-    out[6] = z0 * x1 - z1 * x0;
-    out[7] = 0.0f;
-    out[8] = z0;
-    out[9] = z1;
-    out[10] = z2;
-    out[11] = 0.0f;
-    out[12] = eyex;
-    out[13] = eyey;
-    out[14] = eyez;
-    out[15] = 1.0f;
+    matrix[0] = x0;
+    matrix[1] = x1;
+    matrix[2] = x2;
+    matrix[3] = 0.0f;
+    matrix[4] = z1 * x2 - z2 * x1;
+    matrix[5] = z2 * x0 - z0 * x2;
+    matrix[6] = z0 * x1 - z1 * x0;
+    matrix[7] = 0.0f;
+    matrix[8] = z0;
+    matrix[9] = z1;
+    matrix[10] = z2;
+    matrix[11] = 0.0f;
+    matrix[12] = eyex;
+    matrix[13] = eyey;
+    matrix[14] = eyez;
+    matrix[15] = 1.0f;
 }
 
-void matrix_multiply(float* out, float* a, float* b) {
+void matrix_multiply(const float* a, const float* b, float* out) {
     float a00 = a[0],
             a01 = a[1],
             a02 = a[2],
@@ -335,7 +335,7 @@ void matrix_camera_look_at(float* out, Vec3* eye, Vec3* center, Vec3* up) {
     out[15] = 1;
 }
 
-void matrix_get_scaling(float* mat, Vec3* out) {
+void matrix_get_scaling(const float* mat, Vec3* out) {
     float m11 = mat[0];
     float m12 = mat[1];
     float m13 = mat[2];
@@ -351,7 +351,7 @@ void matrix_get_scaling(float* mat, Vec3* out) {
     out->z = hypot3(m31, m32, m33);
 }
 
-void matrix_get_rotation(float* mat, Quat* out) {
+void matrix_get_rotation(const float* mat, Quat* out) {
     Vec3 scaling;
     matrix_get_scaling(mat, &scaling);
 
@@ -426,7 +426,7 @@ void matrix_transpose(float* matrix) {
     matrix[14] = a23;
 }
 
-int matrix_invert(float* out, float* a) {
+int matrix_invert(const float* a, float* out) {
     float a00 = a[0],
     a01 = a[1],
     a02 = a[2],

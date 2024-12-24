@@ -96,7 +96,7 @@ void fw64_camera_extract_frustum_planes(fw64Camera* camera, fw64Frustum* frustum
     guMtxCatL(&camera->view, &camera->projection, &projViewMatrix);
     guMtxL2F((void*)&projScreenMatrix[0], &projViewMatrix);
     #else
-    matrix_multiply(&projScreenMatrix[0], &camera->projection.m[0], &camera->view.m[0]);
+    matrix_multiply(&camera->projection.m[0], &camera->view.m[0], &projScreenMatrix[0]);
     #endif
 
     fw64_frustum_set_from_matrix(frustum, &projScreenMatrix[0]);
