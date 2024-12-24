@@ -15,7 +15,7 @@ extern "C" {
 void quat_ident(Quat* q);
 void quat_set(Quat* q, float x, float y, float z, float w);
 void quat_set_axis_angle(Quat* q, float x, float y, float z, float rad);
-void quat_transform_vec3(Vec3* out, Quat* q, Vec3* a);
+void quat_transform_vec3(const Quat* q, const Vec3* a, Vec3* out);
 void quat_normalize(Quat* q);
 
 /** Equivalent to the inverse of the quaternion.  
@@ -23,10 +23,10 @@ void quat_normalize(Quat* q);
   */
 void quat_conjugate(Quat* q);
 
-Vec3 quat_to_euler(Quat* q);
+Vec3 quat_to_euler(const Quat* q);
 
 void quat_from_euler(Quat* q, float x, float y, float z);
-void quat_slerp(Quat* out, Quat* a, Quat* b, float t);
+void quat_slerp(const Quat* a, const Quat* b, float t, Quat* out);
 
 #ifdef __cplusplus
 }

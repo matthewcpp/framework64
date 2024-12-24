@@ -34,7 +34,7 @@ void quat_set_axis_angle(Quat* out, float x, float y, float z, float rad) {
     out->w = fw64_cosf(rad);
 }
 
-void quat_transform_vec3(Vec3* out, Quat* q, Vec3* a) {
+void quat_transform_vec3(const Quat* q, const Vec3* a, Vec3* out) {
     float qx = q->x, qy = q->y, qz = q->z, qw = q->w;
     float x = a->x, y =a->y, z = a->z;
 
@@ -105,7 +105,7 @@ void quat_from_euler(Quat* q, float x, float y, float z) {
 }
 
 // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Source_code_2
-Vec3 quat_to_euler(Quat* q) {
+Vec3 quat_to_euler(const Quat* q) {
     Vec3 angles;
 
     // roll (x-axis rotation)
@@ -126,19 +126,20 @@ Vec3 quat_to_euler(Quat* q) {
     return angles;
 }
 
-void quat_slerp(Quat* out, Quat* a, Quat* b, float t) {
+void quat_slerp(const Quat* a, const Quat* b_in, float t, Quat* out) {
     float omega, cosom, sinom, scale0, scale1;
+    Quat b = *b_in;
 
     // calc cosine
-    cosom = a->x * b->x + a->y * b->y + a->z * b->z + a->w * b->w;
+    cosom = a->x * b.x + a->y * b.y + a->z * b.z + a->w * b.w;
 
     // adjust signs (if necessary)
     if (cosom < 0.0) {
         cosom = -cosom;
-        b->x = -b->x;
-        b->y = -b->y;
-        b->z = -b->z;
-        b->w = -b->w;
+        b.x = -b.x;
+        b.y = -b.y;
+        b.z = -b.z;
+        b.w = -b.w;
     }
 
     // calculate coefficients
@@ -156,8 +157,8 @@ void quat_slerp(Quat* out, Quat* a, Quat* b, float t) {
     }
 
     // calculate final values
-    out->x = scale0 * a->x + scale1 * b->x;
-    out->y = scale0 * a->y + scale1 * b->y;
-    out->z = scale0 * a->z + scale1 * b->z;
-    out->w = scale0 * a->w + scale1 * b->w;
+    out->x = scale0 * a->x + scale1 * b.x;
+    out->y = scale0 * a->y + scale1 * b.y;
+    out->z = scale0 * a->z + scale1 * b.z;
+    out->w = scale0 * a->w + scale1 * b.w;
 }

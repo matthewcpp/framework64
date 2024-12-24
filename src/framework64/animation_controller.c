@@ -184,7 +184,7 @@ static void compute_quat_value(fw64AnimationController* controller, uint16_t inp
         uint32_t b = keyframe_index;
 
         float t = (controller->current_time - input_buffer->times[a]) / (input_buffer->times[b] - input_buffer->times[a]);
-        quat_slerp(value, QUAT_KEYFRAME(value_buffer->values, a), QUAT_KEYFRAME(value_buffer->values, b), t);
+        quat_slerp(QUAT_KEYFRAME(value_buffer->values, a), QUAT_KEYFRAME(value_buffer->values, b), t, value);
     }
 }
 
