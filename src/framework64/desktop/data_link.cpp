@@ -1,11 +1,18 @@
 #include "framework64/desktop/data_link.hpp"
 
+
+#include <IXNetSystem.h>
 #define NOMINMAX
 #include <IXWebSocketServer.h>
 
 #include <algorithm>
 #include <iostream>
 #include <memory>
+
+fw64DataLink::fw64DataLink() {
+    // Required on Windows
+    ix::initNetSystem();
+}
 
 fw64DataLink::~fw64DataLink() {
     if (websocket_server) {
@@ -37,6 +44,7 @@ bool fw64DataLink::initialize(int port) {
     auto result = websocket_server->listen();
     if (!result.first) {
         status = Status::Failed;
+        std::cout << "websocket datalink initialize failed: " << result.second << std::endl;
         return false;
     }
 

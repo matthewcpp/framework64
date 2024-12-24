@@ -52,7 +52,7 @@ struct IncommingMessage {
 
 struct fw64DataLink {
 public:
-    fw64DataLink() = default;
+    fw64DataLink();
     ~fw64DataLink();
     bool initialize(int port);
 
