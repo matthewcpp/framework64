@@ -26,9 +26,9 @@ int box_contains_point(Box* box, Vec3* pt);
 /**
  * Compute Point on or in AABB that is closest to supplied point p
  */
-void box_closest_point(Box* box, Vec3* point, Vec3* out);
+void box_closest_point(Box* box, const Vec3* point, Vec3* out);
 
-void matrix_transform_box(float* matrix, Box* box, Box* out);
+void matrix_transform_box(const float* matrix, const Box* box, Box* out);
 
 #ifdef __cplusplus
 }
