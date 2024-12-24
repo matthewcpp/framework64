@@ -27,7 +27,7 @@ void fw64_billboard_nodes_update(fw64BillboardNodes* system) {
         fw64_transform_forward(&billboard->camera->node->transform, &camera_forward);
         fw64_transform_up(&billboard->camera->node->transform, &camera_up);
 
-        vec3_add(&target, &billboard->node->transform.position, &camera_forward);
+        vec3_add(&billboard->node->transform.position, &camera_forward, &target);
         fw64_transform_look_at(&billboard->node->transform, &target, &camera_up);
 
         fw64_node_update(billboard->node);

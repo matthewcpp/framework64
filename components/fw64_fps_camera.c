@@ -52,29 +52,29 @@ static void move_camera(fw64FpsCamera* fps, float time_delta, Vec2* stick) {
     if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         Vec3 move;
         fps_cam_right(fps, &move);
-        vec3_scale(&move, &move, fps->movement_speed * time_delta);
-        vec3_add(&transform->position, &transform->position, &move);
+        vec3_scale(&move, fps->movement_speed * time_delta, &move);
+        vec3_add(&transform->position, &move, &transform->position);
     }
 
     if (fw64_input_controller_button_down(fps->_input, fps->player_index, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
         Vec3 move;
         fps_cam_left(fps, &move);
-        vec3_scale(&move, &move, fps->movement_speed * time_delta);
-        vec3_add(&transform->position, &transform->position, &move);
+        vec3_scale(&move, fps->movement_speed * time_delta, &move);
+        vec3_add(&transform->position, &move, &transform->position);
     }
 
     if (stick->y > STICK_THRESHOLD) {
         Vec3 move;
         fps_cam_forward(fps, &move);
-        vec3_scale(&move, &move, fps->movement_speed * time_delta * stick->y);
-        vec3_add(&transform->position, &transform->position, &move);
+        vec3_scale(&move, fps->movement_speed * time_delta * stick->y, &move);
+        vec3_add(&transform->position, &move, &transform->position);
     }
 
     if (stick->y < -STICK_THRESHOLD) {
         Vec3 move;
         fps_cam_back(fps, &move);
-        vec3_scale(&move, &move, fps->movement_speed * time_delta * -stick->y);
-        vec3_add(&transform->position, &transform->position, &move);
+        vec3_scale(&move, fps->movement_speed * time_delta * -stick->y, &move);
+        vec3_add(&transform->position, &move, &transform->position);
     }
 }
 
@@ -117,7 +117,7 @@ void fw64_fps_camera_update(fw64FpsCamera* fps, float time_delta) {
     Vec3 forward = { 0.0f, 0.0f, -1.0f };
     Vec3 tar;
     quat_transform_vec3(&tar, &q, &forward);
-    vec3_add(&tar, &transform->position, &tar);
+    vec3_add(&transform->position, &tar, &tar);
 
     Vec3 up = {0.0f, 1.0f, 0.0f};
 

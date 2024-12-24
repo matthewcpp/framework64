@@ -101,7 +101,7 @@ void player_update(Player* player) {
     fw64_node_update(player->node);
 
     Vec3 velocity;
-    vec3_subtract(&velocity, &player->node->transform.position, &player->prev_pos);
+    vec3_subtract(&player->node->transform.position, &player->prev_pos, &velocity);
 
     fw64IntersectMovingBoxQuery query;
     fw64_intersect_moving_box_query_init(&query);
@@ -162,7 +162,7 @@ void tiles_load_next_tile(Tiles* tiles, int scene_index){
     box_invalidate(&offset_bounding);
     for (uint32_t i = 0; i < fw64_scene_get_node_count(tile->scene); i++) {
         fw64Node* node = fw64_scene_get_node(tile->scene, i);
-        vec3_add(&node->transform.position, &node->transform.position, &tiles->next_scene_pos);
+        vec3_add(&node->transform.position, &tiles->next_scene_pos, &node->transform.position);
         fw64_node_update(node);
 
         if (node->collider) {
@@ -202,7 +202,7 @@ void follow_camera_init(FollowCamera* follow_cam, fw64Engine* engine, Tiles* til
 }
 
 void follow_camera_update(FollowCamera* follow_cam) {
-    vec3_add(&follow_cam->camera.node->transform.position, &follow_cam->target->transform.position, &follow_cam->offset);
+    vec3_add(&follow_cam->target->transform.position, &follow_cam->offset, &follow_cam->camera.node->transform.position);
     follow_cam->camera.node->transform.position.x = 0.0f;
     
     Vec3 target, extents, up = {0.0f, 1.0f, 0.0f};

@@ -37,10 +37,10 @@ void _arcball_update_camera_position(fw64ArcballCamera* arcball) {
     Vec3 orbit_pos = {0.0f, 0.0f, 1.0f};
     quat_transform_vec3(&orbit_pos, &q, &orbit_pos);
     vec3_normalize(&orbit_pos);
-    vec3_scale(&orbit_pos, &orbit_pos, arcball->_distance);
+    vec3_scale(&orbit_pos, arcball->_distance, &orbit_pos);
 
     fw64Transform* transform = &arcball->camera->node->transform;
-    vec3_add(&transform->position, &arcball->_target, &orbit_pos);
+    vec3_add(&arcball->_target, &orbit_pos, &transform->position);
 
     fw64_transform_look_at(transform, &arcball->_target, &up);
     fw64_camera_update_view_matrix(arcball->camera);

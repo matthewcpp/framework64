@@ -14,8 +14,8 @@ void box_set_center_extents(Box* box, Vec3* center, Vec3* extents) {
 }
 
 void box_center(Box* box, Vec3* out) {
-    vec3_add(out, &box->min, &box->max);
-    vec3_scale(out, out, 0.5f);
+    vec3_add(&box->min, &box->max, out);
+    vec3_scale(out, 0.5f, out);
 }
 
 void box_size(Box* box, Vec3* out) {
@@ -26,7 +26,7 @@ void box_size(Box* box, Vec3* out) {
 
 void box_extents(Box* box, Vec3* out) {
     box_size(box, out);
-    vec3_scale(out, out, 0.5f);
+    vec3_scale(out, 0.5f, out);
 }
 
 void box_invalidate(Box* box) {
