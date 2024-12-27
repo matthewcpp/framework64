@@ -9,7 +9,7 @@ void fw64_transform_init(fw64Transform* transform) {
 }
 
 void fw64_transform_forward(const fw64Transform* transform, Vec3* out) {
-    Vec3 forward = {0.0f, 0.0f, -1.0f};
+    Vec3 forward =  fw64_vec3_forward();
     quat_transform_vec3(&transform->rotation, &forward, out);
     vec3_normalize(out);
 }
@@ -20,7 +20,7 @@ void fw64_transform_back(const fw64Transform* transform, Vec3* out) {
 }
 
 void fw64_transform_up(const fw64Transform* transform, Vec3* out) {
-    Vec3 up = {0.0f, 1.0f, 0.0f};
+    Vec3 up = fw64_vec3_up();
     quat_transform_vec3(&transform->rotation, &up, out);
     vec3_normalize(out);
 }
@@ -31,7 +31,7 @@ void fw64_transform_down(const fw64Transform* transform, Vec3* out) {
 }
 
 void fw64_transform_right(const fw64Transform* transform, Vec3* out) {
-    Vec3 right = {1.0f, 0.0f, 0.0f};
+    Vec3 right = fw64_vec3_right();
     quat_transform_vec3(&transform->rotation, &right, out);
     vec3_normalize(out);
 }
@@ -43,7 +43,7 @@ void fw64_transform_left(const fw64Transform* transform, Vec3* out) {
 
 void fw64_transform_look_at(fw64Transform* transform, const Vec3* target, const Vec3* up) {
     float matrix[16];
-    matrix_target_to(&matrix[0], &transform->position, target, up);
+    matrix_target_to(&matrix[0], target, &transform->position, up);
 
     matrix_get_rotation(matrix, &transform->rotation);
     quat_normalize( &transform->rotation);
