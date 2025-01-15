@@ -24,11 +24,6 @@ async function prepareGameAssets(platform, target) {
     const assetManifest = path.join(assetDirectory, "assets.json");
     const platformBuildDir = path.join(gameDirectory, `build_${platform}`);
 
-    const gameBinDirectory = path.join(platformBuildDir,  "bin", target);
-    const gameBuildDirectory = path.join(platformBuildDir, "src", "CMakeFiles", `${target}.dir`);
-    const outputDirectory = path.join(gameBinDirectory, "assets");
-    const pluginManifestPath = path.join(gameDirectory, "pipeline", "plugins.json");
-
     // read game name from package manifest if not specified
     if (!target) {
         const packageJsonPath = path.join(gameDirectory, "package.json");
@@ -36,6 +31,11 @@ async function prepareGameAssets(platform, target) {
         target = packageJson.name;
         console.log(`No target specified. using default target: ${packageJson.name}`);
     }
+
+    const gameBinDirectory = path.join(platformBuildDir,  "bin", target);
+    const gameBuildDirectory = path.join(platformBuildDir, "src", "CMakeFiles", `${target}.dir`);
+    const outputDirectory = path.join(gameBinDirectory, "assets");
+    const pluginManifestPath = path.join(gameDirectory, "pipeline", "plugins.json");
 
     preparePlatform(platform, gameBuildDirectory, gameBinDirectory);
     await Pipeline.prepareAssets(assetManifest, assetDirectory, platform, outputDirectory, fse.existsSync(pluginManifestPath) ? pluginManifestPath: null);
