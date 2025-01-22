@@ -1,12 +1,12 @@
 const AudioConvert = require("./AudioConvert");
 const Environment = require("../Environment");
-const FontConvert = require("./ProcessFont");
 const N64LibUltraAssetBundle = require("./AssetBundle");
 
 const processMesh = require("./ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
 const processFile = require("./ProcessFile");
+const processFont = require("./ProcessFont");
 const processLevel = require("./ProcessLevel");
 const processLayers = require("../ProcessLayers");
 const Util = require("../Util");
@@ -59,7 +59,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
             else
                 console.log(`Processing Image Font: ${font.name}`);
             
-            await FontConvert.convertFont(assetDirectory, outputDirectory, font, archive);
+            await processFont(assetDirectory, outputDirectory, font, archive);
         }
     }
 

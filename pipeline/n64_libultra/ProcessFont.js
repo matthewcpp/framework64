@@ -1,7 +1,6 @@
 const Util = require("../Util");
 const Font = require("./Font");
 const FontUtils = require("../FontUtils");
-const DesktopFont = require("../desktop/Font");
 const FontWriter = require("./FontWriter");
 const ImageWriter = require("./ImageWriter");
 const processImage = require("./ProcessImage");
@@ -28,13 +27,14 @@ async function processFontFile(manifestDirectory, outputDir, fontJson, archive) 
     const sourceFile = path.join(manifestDirectory, fontJson.src);
     const options = _initOptions(sourceFile, fontJson);
 
-    const font = new Font(options.name);
+    const safeFontName = Util.safeDefineName(fontJson.name);
+    const font = new Font(safeFontName);
     const fontData = await font.generateSpriteFont(sourceFile, options.sourceString, options.size, options.imageFormat);
     const hslices = fontData.image.width / fontData.tileWidth;
     const vslices = fontData.image.height / fontData.tileHeight;
     const imageBuffer = ImageWriter.writeBuffer(fontData.image, hslices, vslices);
 
-    const fontFileName = Util.safeDefineName(font.name) + ".font";
+    const fontFileName = safeFontName + ".font";
     const fontPath = path.join(outputDir, fontFileName);
     FontWriter.write(fontData, imageBuffer, fontPath);
 
@@ -46,6 +46,9 @@ async function processImageFont(manifestDirectory, outputDir, fontJson, archive)
         throw new Error("image fonts must specify a sourceString");
     }
 
+    /* this will create an image containing all the characters.  If each character has it's own file then they will be assembled
+       into a single sprite using the combination facilities of the image processing code.
+    */
     const imageInfo = await processImage(fontJson.image, null, manifestDirectory, null);
 
     const frameCount = imageInfo.hslices * imageInfo.vslices;
@@ -56,17 +59,18 @@ async function processImageFont(manifestDirectory, outputDir, fontJson, archive)
     const tileWidth = imageInfo.width / imageInfo.hslices;
     const tileHeight = imageInfo.height / imageInfo.vslices;
 
-    const f = new DesktopFont();
+    const safeFontName = Util.safeDefineName(fontJson.name);
+    const f = new Font(safeFontName);
     f.loadImageFontGlyphs(fontJson.name, fontJson.sourceString, tileWidth, tileHeight);
 
-    const fontName = Util.safeDefineName(fontJson.name) + ".font";
+    const fontName = safeFontName + ".font";
     const fontPath = path.join(outputDir, fontName);
     FontWriter.write(f, imageInfo.assetBuffer, fontPath);
 
-    archive.addFont(fontPath, fontJson.name);
+    archive.addFont(fontPath, safeFontName);
 }
 
-async function convertFont(manifestDirectory, outputDir, fontJson, archive) {
+async function processFont(manifestDirectory, outputDir, fontJson, archive) {
     if (fontJson.sourceFile) {
         const sourceFilePath = path.join(manifestDirectory, fontJson.sourceFile);
         fontJson.sourceString = FontUtils.sourceStringFromFile(sourceFilePath);
@@ -80,6 +84,4 @@ async function convertFont(manifestDirectory, outputDir, fontJson, archive) {
     }
 }
 
-module.exports = {
-    convertFont: convertFont
-}
+module.exports = processFont;

@@ -15,7 +15,7 @@ class FontBase {
     tileWidth = 0;
     tileHeight = 0;
 
-    glyphs;
+    glyphs = null;
 
     /** Generic glyph info class which holds codepoint metrics*/
     static GlyphInfo = class {
@@ -93,6 +93,25 @@ class FontBase {
         this.tileHeight = Math.max(this.tileHeight, glyphInfo.height);
 
         this.glyphs.push(glyphInfo);
+    }
+
+    loadImageFontGlyphs(name, sourceString, tileWidth, tileHeight) {
+        this.name = name;
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
+        this.size = tileHeight;
+        this.lineHeight = tileHeight;
+
+        this.glyphs = [];
+        for (let i = 0; i < sourceString.length; i++) {
+            this.glyphs.push({
+                codepoint: sourceString.charCodeAt(i),
+                top: 0,
+                left: 0,
+                advance: tileWidth,
+                height: tileHeight
+            });
+        }
     }
 }
 
