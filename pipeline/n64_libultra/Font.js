@@ -1,28 +1,11 @@
 const FontBase = require("../FontBase");
-
 const Image = require("./Image")
-const Util = require("../Util")
 
 const { createCanvas } = require("canvas");
 
 class Font extends FontBase{
     constructor(name) {
         super(name);
-    }
-
-    async generateSpriteFont(path, sourceString, size, imageFormat) {
-        await this.loadGlyphs(path, sourceString, size);
-        const image = await this.createFontImage(imageFormat);
-
-        return  {
-            name: this.name,
-            size: this.size,
-            lineHeight: this.lineHeight,
-            glyphs: this.glyphs,
-            image: image,
-            tileWidth: this.tileWidth,
-            tileHeight: this.tileHeight
-        };
     }
 
     async createFontImage(imageFormat) {

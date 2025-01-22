@@ -27,16 +27,18 @@ async function processFontFile(manifestDirectory, outputDir, fontJson, archive) 
     const sourceFile = path.join(manifestDirectory, fontJson.src);
     const options = _initOptions(sourceFile, fontJson);
 
-    const safeFontName = Util.safeDefineName(fontJson.name);
+    const safeFontName = Util.safeDefineName(options.name);
     const font = new Font(safeFontName);
-    const fontData = await font.generateSpriteFont(sourceFile, options.sourceString, options.size, options.imageFormat);
-    const hslices = fontData.image.width / fontData.tileWidth;
-    const vslices = fontData.image.height / fontData.tileHeight;
-    const imageBuffer = ImageWriter.writeBuffer(fontData.image, hslices, vslices);
+    await font.loadGlyphs(sourceFile, options.sourceString, options.size);
+    const image = await font.createFontImage(options.imageFormat);
+
+    const hslices = image.width / font.tileWidth;
+    const vslices = image.height / font.tileHeight;
+    const imageBuffer = ImageWriter.writeBuffer(image, hslices, vslices);
 
     const fontFileName = safeFontName + ".font";
     const fontPath = path.join(outputDir, fontFileName);
-    FontWriter.write(fontData, imageBuffer, fontPath);
+    FontWriter.write(font, imageBuffer, fontPath);
 
     archive.addFont(fontPath, font.name);
 }

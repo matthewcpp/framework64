@@ -7,6 +7,7 @@ class FontBase {
     name = null;
     _fontFile = null;
 
+    size = 0;
     scale = 0;
     ascender = 0;
     descender = 0;

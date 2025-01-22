@@ -10,9 +10,7 @@ const defaultSourceString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXY
 
 async function processFontFile(fontInfo, bundle, baseDirectory, outputDirectory) {
     const fontName = determineFontName(fontInfo);
-
     const srcPath = path.join(baseDirectory, fontInfo.src);
-
     const sourceString = fontInfo.sourceString ? fontInfo.sourceString : defaultSourceString;
 
     const font = new Font(fontName);
