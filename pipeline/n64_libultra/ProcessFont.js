@@ -29,9 +29,7 @@ async function processFontFile(manifestDirectory, outputDir, fontJson, archive) 
     const options = _initOptions(sourceFile, fontJson);
 
     const font = new Font(options.name);
-    await font.load(sourceFile);
-
-    const fontData = await font.generateSpriteFont(options.sourceString, options.size, options.imageFormat);
+    const fontData = await font.generateSpriteFont(sourceFile, options.sourceString, options.size, options.imageFormat);
     const hslices = fontData.image.width / fontData.tileWidth;
     const vslices = fontData.image.height / fontData.tileHeight;
     const imageBuffer = ImageWriter.writeBuffer(fontData.image, hslices, vslices);

@@ -1,70 +1,41 @@
+const FontBase = require("../FontBase");
+
 const Image = require("./Image")
 const Util = require("../Util")
 
-const opentype = require("opentype.js");
 const { createCanvas } = require("canvas");
 
-class Font {
-    name;
-    _font = null;
-
+class Font extends FontBase{
     constructor(name) {
-        this.name = name;
+        super(name);
     }
 
-    async load(path) {
-        this._font = await opentype.load(path);
+    async generateSpriteFont(path, sourceString, size, imageFormat) {
+        await this.loadGlyphs(path, sourceString, size);
+        const image = await this.createFontImage(imageFormat);
+
+        return  {
+            name: this.name,
+            size: this.size,
+            lineHeight: this.lineHeight,
+            glyphs: this.glyphs,
+            image: image,
+            tileWidth: this.tileWidth,
+            tileHeight: this.tileHeight
+        };
     }
 
-    async generateSpriteFont(sourceString, size, imageFormat) {
-        const scale = 1.0 / this._font.unitsPerEm * size;
-        const codepoints = [...new Set(Array.from(sourceString))];
-        codepoints.sort();
-
-        const ascender = Math.ceil(this._font.ascender * scale);
-        const descender = Math.ceil(this._font.descender * scale);
-        const lineHeight = ascender + Math.abs(descender);
-
-        const glyphData = [];
-
-        let tileWidth = 0;
-        let tileHeight = 0;
-
-        for (const codepoint of codepoints) {
-            const glyph = this._font.charToGlyph(codepoint);
-
-            const xMin = typeof (glyph.xMin) == "undefined" ? 0 : glyph.xMin;
-            const xMax = typeof (glyph.xMin) == "undefined" ? 0 : glyph.xMax;
-            const yMin = typeof (glyph.yMin) == "undefined" ? 0 : glyph.yMin;
-            const yMax = typeof (glyph.yMax) == "undefined" ? 0 : glyph.yMax;
-
-            const glyphInfo = {
-                codepoint: codepoint.charCodeAt(0),
-                top: ascender - Math.ceil(yMax * scale),
-                left: Math.floor(xMin * scale),
-                advance: Math.ceil(glyph.advanceWidth * scale),
-                height: Math.ceil((yMax - yMin) * scale),
-            }
-
-            tileWidth = Math.max(tileWidth, Math.ceil((xMax - xMin) * scale));
-            tileHeight = Math.max(tileHeight, glyphInfo.height);
-
-            glyphData.push(glyphInfo);
-        }
-
-        tileWidth = Util.nextPowerOf2(tileWidth);
-        tileHeight = Util.nextPowerOf2(tileHeight);
-
-        const imageWidth = tileWidth;
-        const imageHeight = codepoints.length * tileHeight;
-        const canvas = createCanvas(tileWidth, imageHeight);
+    async createFontImage(imageFormat) {
+        const imageWidth = this.tileWidth;
+        const imageHeight = this.glyphs.length * this.tileHeight;
+        const canvas = createCanvas(this.tileWidth, imageHeight);
         const ctx = canvas.getContext("2d");
 
-        for (let i = 0; i < glyphData.length; i++) {
-            const glyphInfo = glyphData[i];
-            const glyph = this._font.charToGlyph(String.fromCharCode(glyphInfo.codepoint));
+        for (let i = 0; i < this.glyphs.length; i++) {
+            const glyphInfo = this.glyphs[i];
+            const glyph = glyphInfo.opentypeGlyph;
             const yMax = typeof (glyph.yMax) == "undefined" ? 0 : glyph.yMax;
-            const path = glyph.getPath(-glyphInfo.left, (i * tileHeight) + Math.ceil(yMax* scale), size);
+            const path = glyph.getPath(-glyphInfo.left, (i * this.tileHeight) + Math.ceil(yMax* this.scale), this.size);
 
             path.fill = "white";
             path.draw(ctx);
@@ -76,15 +47,7 @@ class Font {
         await image.loadBuffer(imageBuffer, imageWidth, imageHeight);
         this.undoPreMultipliedAlpha(image);
 
-        return  {
-            name: this.name,
-            size: size,
-            lineHeight: lineHeight,
-            glyphs: glyphData,
-            image: image,
-            tileWidth: tileWidth,
-            tileHeight: tileHeight
-        };
+        return image;
     }
 
     undoPreMultipliedAlpha(image) {

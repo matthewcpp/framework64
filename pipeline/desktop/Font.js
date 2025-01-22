@@ -1,52 +1,18 @@
+const FontBase = require("../FontBase");
+
 const Image = require("./Image");
 const Util = require("../Util");
 
-const opentype = require("opentype.js");
 const { createCanvas } = require("canvas");
 
-const fs = require("fs");
-
-class Font {
-    _font = null;
-
-    name = null;
+class Font extends FontBase{
     size = 0;
     glyphs = null;
     image = null;
-    tileWidth = 0;
-    tileHeight = 0;
-    scale = 0;
-    ascender = 0;
-    descender = 0;
-    lineHeight = 0;
+
 
     constructor(name) {
-        this.name = name;
-    }
-
-    async loadGlyphs(path, sourceString, size) {
-        this._font = await opentype.load(path);
-        this.size = size;
-
-        this.scale = 1.0 / this._font.unitsPerEm * size;
-        this.ascender = Math.ceil(this._font.ascender * this.scale);
-        this.descender = Math.ceil(this._font.descender * this.scale);
-        this.lineHeight = this.ascender + Math.abs(this.descender);
-
-        const codepoints = [...new Set(Array.from(sourceString))];
-        codepoints.sort();
-
-        this.tileWidth = 0;
-        this.tileHeight = 0;
-        this.glyphs = [];
-
-        const missingCharacter = this._font.glyphs.get(0);
-        this._parseGlyphData(missingCharacter, 0);
-
-        for (const codepoint of codepoints) {
-            const glyph = this._font.charToGlyph(codepoint);
-            this._parseGlyphData(glyph);
-        }
+        super(name)
     }
 
     loadImageFontGlyphs(name, sourceString, tileWidth, tileHeight) {
@@ -68,32 +34,8 @@ class Font {
         }
     }
 
-    _parseGlyphData(glyph) {
-        const xMin = typeof (glyph.xMin) == "undefined" ? 0 : glyph.xMin;
-        const xMax = typeof (glyph.xMin) == "undefined" ? 0 : glyph.xMax;
-        const yMin = typeof (glyph.yMin) == "undefined" ? 0 : glyph.yMin;
-        const yMax = typeof (glyph.yMax) == "undefined" ? 0 : glyph.yMax;
-
-        const glyphInfo = {
-            codepoint: glyph.unicodes.length > 0 ? glyph.unicodes[0] : 0,
-            top: this.ascender - Math.ceil(yMax * this.scale),
-            left: Math.floor(xMin * this.scale),
-            advance: Math.ceil(glyph.advanceWidth * this.scale),
-            height: Math.ceil((yMax - yMin) * this.scale),
-            glyph: glyph
-        }
-
-        this.tileWidth = Math.max(this.tileWidth, Math.ceil((xMax - xMin) * this.scale));
-        this.tileHeight = Math.max(this.tileHeight, glyphInfo.height);
-
-        this.glyphs.push(glyphInfo);
-    }
-
     async createGlImage() {
-        this.tileWidth = Util.nextPowerOf2(this.tileWidth);
-        this.tileHeight = Util.nextPowerOf2(this.tileHeight);
-
-        const scale = 1.0 / this._font.unitsPerEm * this.size;
+        const scale = 1.0 / this._fontFile.unitsPerEm * this.size;
         const imageDimensions = this._calculateGlTextureSize(this.tileWidth, this.tileHeight, this.glyphs.length);
         const imageWidth = imageDimensions.width;
         const imageHeight = imageDimensions.height;
@@ -104,7 +46,7 @@ class Font {
 
         for (let i = 0; i < this.glyphs.length; i++) {
             const glyphInfo = this.glyphs[i];
-            const glyph = glyphInfo.glyph;
+            const glyph = glyphInfo.opentypeGlyph;
             const yMax = typeof (glyph.yMax) == "undefined" ? 0 : glyph.yMax;
             const path = glyph.getPath(x + -glyphInfo.left, y + Math.ceil(yMax* scale), this.size);
 
