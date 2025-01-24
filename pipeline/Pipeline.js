@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
+const runInDocker = require("./RunInDocker");
 const Util = require("./Util");
 
-const { program } = require('commander');
+
 const rimraf = require("rimraf");
 
 const fse = require("fs-extra");
@@ -18,6 +19,12 @@ const path = require("path");
  * @param pluginManifest the path pointing to the plugin manifest for this build
  */
 async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest) {
+    platform = platform.toLowerCase();
+
+    if (await runInDocker(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest)) {
+        return;
+    }
+
     if (!fse.existsSync(manifestFile)) {
         throw new Error(`Manifest file does not exist: ${manifestFile}`);
     }
@@ -25,8 +32,6 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     if (fse.existsSync(outputDirectory)) {
         rimraf.sync(outputDirectory);
     }
-
-    platform = platform.toLowerCase();
 
     const pluginMap = loadPlugins(pluginManifest);
 

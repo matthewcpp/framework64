@@ -1,29 +1,40 @@
-const ImageConvert = require("./ImageConvert");
 const Util = require("../Util");
 
 const fs = require("fs");
 const path = require("path");
+const util = require("util");
 
-async function processImage(imageJson, dfsBundle, assetDirectory, outputDirectory, pluginMap) {
-    const runingInDocker = Object.hasOwn(process.env, "FW64_N64_LIBDRAGON_DOCKER_CONTAINER");
+const execFile = util.promisify(require('child_process').execFile);
 
-    if (runingInDocker) {
-        throw new Error("docker not supported, yet");
-    }
+const mkspritePath = "/opt/libdragon/bin/mksprite";
 
-    const name = Util.safeDefineName(!!imageJson.name ? imageJson.name : path.basename(imageJson.src, path.extname(imageJson.src)));
-    const assetId = dfsBundle.addImage(path.join(assetDirectory, imageJson.src), name);
-
+async function processImage(imageJson, dfsBundle, assetDirectory, outputDirectory) {
+    const name = Util.safeDefineName(Object.hasOwn(imageJson, "name") ? imageJson.name : path.basename(imageJson.src, path.extname(imageJson.src)));
     const format = Object.hasOwn(imageJson, "format") ? imageJson.format.toUpperCase() : "RGBA16";
+    const sourcePath = path.join(assetDirectory, imageJson.src);
+    const assetId = dfsBundle.addImage(sourcePath, name);
 
-    const convertedName = await ImageConvert.convertLibdragonSprite(imageJson.src, format, assetDirectory, outputDirectory);
-    const renamedAssetPath = path.join(outputDirectory, assetId.toString());
+    const mkspriteArgs = [
+        "--output", outputDirectory,
+        "--compress", "0",
+        "-f", format,
+        sourcePath
+    ];
 
-    if (!fs.existsSync(convertedName)) {
-        throw new Error(`Unable to locate libdragon converted sprite: ${convertedName}`);
+    // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>> mksprite");
+    // console.log(mkspriteArgs.join(' '));
+    // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>> mksprite");
+    
+    await execFile(mkspritePath, mkspriteArgs);
+
+    const convertedSpriteFile = path.join(outputDirectory, path.basename(sourcePath, path.extname(sourcePath)) + ".sprite");
+    const convertedAssetIdFile = path.join(outputDirectory, assetId.toString());
+
+    if (!fs.existsSync(convertedSpriteFile)) {
+        throw new Error(`Error converting sprite: ${sourcePath}`);
     }
 
-    fs.renameSync(convertedName, renamedAssetPath);
+    fs.renameSync(convertedSpriteFile, convertedAssetIdFile);
 
     return assetId;
 }

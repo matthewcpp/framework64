@@ -1,5 +1,5 @@
-# Build with: docker build -t matthewcpp/framework64-n64-libdragon .
-# On Apple silicon: docker build -t matthewcpp/framework64-n64-libdragon --platform linux/amd64 .
+# Build with: docker build -t matthewcpp/framework64_n64_libdragon .
+# On Apple silicon: docker build -t matthewcpp/framework64_n64_libdragon --platform linux/amd64 .
 
 FROM ubuntu:jammy
 
