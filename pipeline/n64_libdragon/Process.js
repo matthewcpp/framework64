@@ -24,10 +24,10 @@ async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory
     if (manifest.images) {
         for (const image of manifest.images) {
             console.log(`Processing Image: ${image.src}`);
-            await processImage(image, dfsAssets, assetDirectory, dfsDirectory, pluginMap);
+            await processImage(image, dfsAssets, assetDirectory, dfsDirectory);
         }
     }
-
+/*
     if (manifest.meshes) {
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`);
@@ -55,12 +55,13 @@ async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory
             await processFile(file, dfsAssets, assetDirectory, dfsDirectory, includeDirectory, pluginMap);
         }
     }
+*/
 
     // create the DFS asset bundle and write out the header and manifest
     const headerPath = path.join(Util.assetIncludeDirectory(outputDirectory), "assets.h");
     dfsAssets.writeHeader(headerPath);
     dfsAssets.writeManifest(path.join(outputDirectory, "dfs_manifest.txt"));
-    await dfsAssets.makeBundle(dfsDirectory, outputDirectory);
+    await dfsAssets.makeBundle(dfsDirectory, path.join(outputDirectory, "assets.dfs"));
 }
 
 module.exports = processN64Libdragon;

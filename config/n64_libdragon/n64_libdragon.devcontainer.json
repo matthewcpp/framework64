@@ -1,5 +1,5 @@
 {
-    "image": "matthewcpp/framework64-n64-libdragon",
+    "image": "matthewcpp/framework64_n64_libdragon",
     "runArgs": [
         "--net=host"
     ],
