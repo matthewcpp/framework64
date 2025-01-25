@@ -10,12 +10,8 @@
 typedef struct {
     fw64Engine* engine;
     fw64RenderPass* renderpass;
-
-    fw64Scene scene;
-    fw64ArcballCamera arcball;
-    fw64Camera camera;
-    size_t asset_index;
-    int music;
+    fw64SpriteBatch* spritebatch;
+    fw64Texture* test_texture;
 } Game;
 
 #ifdef __cplusplus
