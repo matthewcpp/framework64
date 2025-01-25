@@ -1,38 +1,7 @@
 {
-    "meshes": [
+    "images": [
         {
-            "src": "n64_logo_model/n64_logo.gltf"
-        },
-        {
-            "src": "controller_cube/controller_cube.gltf"
-        }
-    ],
-    "skinnedMeshes": [
-        {
-            "src": "temp/zombie/zombie.gltf"
-        }
-    ],
-    "files": [
-        {
-            "src": "temp/robot10.m1v"
-        },
-        {
-            "src": "temp/washable1.m1v"
-        },
-        {
-            "src": "temp/ninja2.m1v"
-        },
-        {
-            "src": "temp/water1.m1v"
-        },
-        {
-            "src": "temp/wires1.m1v"
-        },
-        {
-            "src": "temp/moonlight_shadow1.wav64"
-        },
-        {
-            "src": "temp/moonlight_shadow3.wav64"
+            "src": "pyoro64.png"
         }
     ]
 }
