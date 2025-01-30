@@ -1,3 +1,17 @@
+/* This File is not currently in use */
+
+/* Example JSON:
+{
+    "name": "letter_texture",
+    "atlas": {
+        "rows": [
+            ["image_font/048.png", "image_font/049.png"],
+            ["image_font/050.png", "image_font/051.png"]
+        ],
+        "frameSize": "16x16"
+    }
+}
+*/
 const Jimp = require("jimp");
 
 const fs = require("fs");
