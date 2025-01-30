@@ -1,6 +1,7 @@
 const Image = require("./Image")
 const ImageWriter = require("./ImageWriter");
 const ImageAtlasDefines = require("../ImageAtlasDefines");
+const ProcessImageUtils = require("../ProcessImageUtils");
 
 const Jimp = require("jimp");
 
@@ -8,11 +9,11 @@ const fs = require("fs");
 const path = require("path");
 
 async function processImage(imageJson, archive, manifestDirectory, outputDirectory) {
-    if (imageJson.src) {
+    if (Object.hasOwn(imageJson, "src")) {
         return convertSprite(manifestDirectory, outputDirectory, imageJson, archive);
     }
-    else if (imageJson.frames || imageJson.frameDir){
-        return assembleSpriteAtlas(manifestDirectory, outputDirectory, imageJson, archive);
+    else if (Object.hasOwn(imageJson, "frames") || Object.hasOwn(imageJson, "frameDir")){
+        return assembleSpriteAtlas(imageJson, manifestDirectory, outputDirectory, archive);
     }
 }
 
@@ -26,7 +27,7 @@ async function convertSprite(manifestDirectory, outDir, imageJson, archive) {
     }
     Object.assign(options, imageJson);
 
-    const name = !!imageJson.name ? imageJson.name : path.basename(imagePath, path.extname(imagePath));
+    const name = Object.hasOwn(imageJson, "name") ? imageJson.name : path.basename(imagePath, path.extname(imagePath));
 
     const image = new Image(name, Image.Format[options.format.toUpperCase()]);
     await image.load(imagePath);
@@ -34,64 +35,30 @@ async function convertSprite(manifestDirectory, outDir, imageJson, archive) {
     return finalizeImage(image, manifestDirectory, outDir, options, archive, imageJson.name)
 }
 
-async function assembleSpriteAtlas(rootDir, outDir, imageJson, archive) {
+async function assembleSpriteAtlas(imageJson, rootDir, outDir, archive) {
+    if (!Object.hasOwn(imageJson, "name")) {
+        throw new Error("Sprite Atlas elements must specify a name");
+    }
+
     const options = {
         format: "RGBA16"
     }
+
     Object.assign(options, imageJson);
 
     const image = new Image(imageJson.name, Image.Format[options.format.toUpperCase()]);
 
-    const frames = getFrameArray(imageJson, rootDir);
-    const atlas = await buildSpriteAtlas(frames, rootDir, imageJson);
-    await image.assign(atlas);
+    const framePaths = ProcessImageUtils.getFramePathArray(imageJson, rootDir);
+    const frameSize = imageJson.frameSize.split('x');
+    await image.loadAtlas(framePaths, imageJson.hslices, imageJson.vslices, parseInt(frameSize[0]), parseInt(frameSize[1]));
 
-    // if we do not have outdir then we are writing an internal image and these defines would not be needed
-    if (!!outDir)
+    // If we do not have outdir then we are writing an internal image and these defines would not be needed
+    // This will be the case when writing materials for meshes
+    if (!!outDir){
         ImageAtlasDefines.writeHeaderFile(imageJson, rootDir, outDir);
+    }
 
     return finalizeImage(image, rootDir, outDir, imageJson, archive, imageJson.name)
-}
-
-function getDimension(imageJson) {
-    const frameSize = imageJson.frameSize.split('x');
-    return [parseInt(frameSize[0]), parseInt(frameSize[1])];
-}
-
-function createNewImage(width, height) {
-    return new Promise((resolve) => {
-        new Jimp(width, height, (err, img) => {
-            resolve(img);
-        })
-    });
-}
-
-async function buildSpriteAtlas(frames, rootDir, imagejson) {
-    const [frameWidth, frameHeight] = getDimension(imagejson);
-
-    const atlas = await createNewImage(imagejson.hslices * frameWidth, imagejson.vslices * frameHeight);
-
-    for (let y = 0; y < imagejson.vslices; y++) {
-        for (let x = 0; x < imagejson.hslices; x++) {
-            const framePath = path.join(rootDir, frames[y * imagejson.hslices + x]);
-            const frame = await Jimp.read(framePath);
-
-            atlas.blit(frame, x * frameWidth, y * frameHeight);
-        }
-    }
-
-    return atlas
-}
-
-function getFrameArray(imageJson, rootDir) {
-    if (imageJson.frames) {
-        return imageJson.frames;
-    }
-    else {
-        const frameSrcDir = path.join(rootDir, imageJson.frameDir);
-        const files = fs.readdirSync(frameSrcDir);
-        return files.map(file => path.join(imageJson.frameDir, file));
-    }
 }
 
 async function finalizeImage(image, assetDir, outDir, imageJson, archive) {

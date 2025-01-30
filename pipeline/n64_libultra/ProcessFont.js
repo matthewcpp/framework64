@@ -1,8 +1,10 @@
-const Util = require("../Util");
 const Font = require("./Font");
 const FontUtils = require("../FontUtils");
 const FontWriter = require("./FontWriter");
+const Image = require("./Image");
 const ImageWriter = require("./ImageWriter");
+const Util = require("../Util");
+
 const processImage = require("./ProcessImage");
 
 const path = require("path")
@@ -20,7 +22,7 @@ function _initOptions(sourceFile, params) {
 }
 
 async function processFontFile(manifestDirectory, outputDir, fontJson, archive) {
-    if (!fontJson.size) {
+    if (!Object.hasOwn(fontJson, "size") || fontJson.size <= 0) {
         throw new Error("Font elements must have specify a size > 0.");
     }
 
@@ -30,7 +32,7 @@ async function processFontFile(manifestDirectory, outputDir, fontJson, archive) 
     const safeFontName = Util.safeDefineName(options.name);
     const font = new Font(safeFontName);
     await font.loadGlyphs(sourceFile, options.sourceString, options.size);
-    const image = await font.createFontImage(options.imageFormat);
+    const image = await font.createFontImage(Image.Format[options.imageFormat.toUpperCase()]);
 
     const hslices = image.width / font.tileWidth;
     const vslices = image.height / font.tileHeight;

@@ -1,90 +1,18 @@
-const Jimp = require("jimp");
-const path = require("path");
+const ImageBase = require("../ImageBase");
 
-class Image {
-    name;
-    hslices = 1;
-    vslices = 1;
+const Jimp = require("jimp");
+
+class Image extends ImageBase {
     isIndexed = false;
     additionalPalettes = [];
 
     constructor(name, jimpImage = null) {
-        this.name = name;
+        super(name);
         this._data = jimpImage;
-    }
-
-    async load(path) {
-        this._data = await Jimp.read(path);
-    }
-
-    loadEmpty(width, height) {
-        return new Promise((resolve) => {
-            new Jimp(width, height, (error, image) => {
-                this._data = image;
-                resolve();
-            })
-        })
-    }
-
-    async loadAtlas(frames, hslices, vslices, frameWidth, frameHeight) {
-        await this.loadEmpty(hslices * frameWidth, vslices * frameHeight);
-
-        for (let y = 0; y < vslices; y++) {
-            for (let x = 0; x < hslices; x++) {
-                const frame = await Jimp.read(frames[y * hslices + x]);
-                this._data.blit(frame, x * frameWidth, y * frameHeight);
-            }
-        }
-    }
-
-    loadBuffer(buffer, width, height) {
-        return new Promise((resolve) => {
-            return new Jimp({data: buffer, width: width, height: height}, (error, image) => {
-                this._data = image;
-                resolve();
-            })
-        });
-    }
-
-    assign(jimpData) {
-        this._data = jimpData;
-    }
-
-    crop(x, y, w, h) {
-        this._data.crop(x, y, w, h);
-    }
-
-    async writeToFile(path) {
-        await this._data.writeAsync(path);
     }
 
     async getPrimaryFileBuffer() {
         return await this._data.getBufferAsync(Jimp.MIME_PNG);
-    }
-
-    get width() {
-        return this._data.bitmap.width;
-    }
-
-    get height() {
-        return this._data.bitmap.height;
-    }
-
-    get data() {
-        return this._data.bitmap.data;
-    }
-
-    get hasAlpha() {
-        return this._data.hasAlpha();
-    }
-
-    resize(width, height) {
-        this._data.resize(width, height);
-    }
-
-    setSliceCounts(hslices, vslices) {
-        this.hslices = hslices;
-        this.vslices = vslices;
     }
 }
 
