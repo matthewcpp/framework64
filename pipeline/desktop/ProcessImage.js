@@ -1,17 +1,13 @@
 const Image = require("./Image");
 const ImageAtlasDefines = require("../ImageAtlasDefines");
+const ProcessImageUtils = require("../ProcessImageUtils");
 
 const fs = require("fs-extra");
 const path = require("path");
 const ImageWriter = require("./ImageWriter");
 const Util = require("../Util");
-const AtlasImage = require("../AtlasImage");
 
 async function processImage(imageJson, bundle, baseDirectory, outputDirectory) {
-    if (Object.hasOwn(imageJson, "atlas")) {
-        return _processAtlas(imageJson, bundle, baseDirectory, outputDirectory);
-    }
-
     if (imageJson.frames || imageJson.frameDir) {
         ImageAtlasDefines.writeHeaderFile(imageJson, baseDirectory, outputDirectory);
         return buildAtlasFromFrames(imageJson, bundle, baseDirectory, outputDirectory);
@@ -19,23 +15,6 @@ async function processImage(imageJson, bundle, baseDirectory, outputDirectory) {
     else {
         return _processSprite(imageJson, bundle, baseDirectory, outputDirectory)
     }
-}
-
-async function _processAtlas(imageJson, bundle, baseDirectory, outputDirectory) {
-    if (!Object.hasOwn(imageJson, "name")) {
-        throw new Error("Image atlas must specify a 'name' property.");
-    }
-
-    if (Object.hasOwn(imageJson, "additionalPalettes")) {
-        throw new Error("Image atlas does not currently support multiple palettes.")
-    }
-
-    const atlasImage = await AtlasImage.build(imageJson.atlas, baseDirectory);
-    const image = new Image(imageJson.name, atlasImage);
-
-    await _processImage(image, imageJson, bundle, outputDirectory)
-
-    return image;
 }
 
 async function _processSprite(imageJson, bundle, baseDirectory, outputDirectory) {
@@ -69,30 +48,18 @@ function resizeImage(image, sprite) {
     image.resize(width, height);
 }
 
-function getFrameArray(imageJson, baseDirectory) {
-    if (imageJson.frames) {
-        return imageJson.frames;
-    }
-    else {
-        const frameSrcDir = path.join(baseDirectory, imageJson.frameDir);
-        const files = fs.readdirSync(frameSrcDir);
-        return files.map(file => path.join(imageJson.frameDir, file));
-    }
-}
-
 // todo: validate sprite params
 async function buildAtlasFromFrames(imageJson, bundle, baseDirectory, outputDirectory) {
-    if (!imageJson.name) {
+    if (!Object.hasOwn(imageJson, "name")) {
         throw new Error("Sprite Atlas elements must specify a name");
     }
 
-    const frames = getFrameArray(imageJson, baseDirectory);
-    const frameSize = imageJson.frameSize.split('x');
-    const framePaths = frames.map(framePath => path.join(baseDirectory, framePath));
-
     const image = new Image(Util.safeDefineName(imageJson.name));
+    
+    const framePaths = ProcessImageUtils.getFramePathArray(imageJson, baseDirectory);
+    const frameSize = imageJson.frameSize.split('x');
     await image.loadAtlas(framePaths, imageJson.hslices, imageJson.vslices, parseInt(frameSize[0]), parseInt(frameSize[1]));
-    image.setSliceCounts(imageJson.hslices, imageJson.vslices);
+    
     image.isIndexed = imageIndexModes.has(imageJson.format);
 
     if (imageJson.resize)
