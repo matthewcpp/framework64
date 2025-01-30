@@ -26,7 +26,7 @@ class Font extends FontBase{
 
         // note this actualy dumps image in BRGA but since we write everything as 255 white no swapping is needed
         const imageBuffer = canvas.toBuffer("raw");
-        const image = new Image(this.name, imageFormat); // TODO: This can probably change to use IA Tex
+        const image = new Image(this.name, imageFormat); // TODO: This can probably change to always use IA Tex?
         await image.loadBuffer(imageBuffer, imageWidth, imageHeight);
         this.undoPreMultipliedAlpha(image);
 

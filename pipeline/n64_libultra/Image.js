@@ -1,10 +1,8 @@
-const Jimp = require("jimp");
+const ImageBase = require("../ImageBase");
 const ColorIndexImage = require("../ColorIndexImage");
 
-class Image {
-    name;
+class Image extends ImageBase {
     format;
-    _data = null;
     colorIndexImage = null;
 
     /** This should align with include/n64/image.h */
@@ -19,109 +17,24 @@ class Image {
         CI4: 7,
     };
 
-    constructor(name, format) {
-        this.name = name;
-
-        if (typeof(format) === "string") {
-            format = Image.Format[format.toUpperCase()];
-        }
+    constructor(name, /* Image.Format */ format) {
+        super(name);
 
         if (format === null || format === undefined) {
-            throw new Error(`Invalid Image format: ${format}`);
+            throw new Error(`Must specify format when creating Image`);
         }
 
         this.format = format;
     }
 
-    async load(path) {
-        this._data = await Jimp.read(path);
-    }
-
-    loadBuffer(buffer, width, height) {
-        return new Promise((resolve) => {
-            return new Jimp({data: buffer, width: width, height: height}, (error, image) => {
-                this._data = image;
-                resolve();
-            })
-        });
-    }
-
     assign(jimpData) {
-        this._data = jimpData;
+        super.assign(jimpData);
         this.colorIndexImage = null;
     }
 
     createColorIndexImage() {
         this.colorIndexImage = new ColorIndexImage();
         this.colorIndexImage.createfromBuffer(this.data, this.width, this.height);
-    }
-
-    crop(x, y, w, h) {
-        this._data.crop(x, y, w, h);
-    }
-
-    get hasAlpha() {
-        return this._data.hasAlpha();
-    }
-
-    writeToFile(path) {
-        return this._data.writeAsync(path);
-    }
-
-    get width() {
-        return this._data.bitmap.width;
-    }
-
-    get height() {
-        return this._data.bitmap.height;
-    }
-
-    get data() {
-        return this._data.bitmap.data;
-    }
-
-    resize(width, height) {
-        this._data.resize(width, height);
-    }
-
-    _createSlice(originX, originY, sliceWidth, sliceHeight) {
-        const data = this._data.bitmap.data;
-        const slice = [];
-
-        for (let y = 0; y < sliceHeight; y++) {
-            for (let x = 0; x < sliceWidth; x++) {
-                const index = ((originY + y) * this.width + (originX + x)) * 4;
-                slice.push(data[index], data[index + 1], data[index+2], data[index + 3]);
-            }
-        }
-
-        return slice;
-    }
-
-    slice(horizontalSlices, verticalSlices) {
-        let slices = [];
-
-        const sliceWidth = this.width / horizontalSlices;
-        const sliceHeight = this.height / verticalSlices;
-
-        for (let sliceY = 0; sliceY < verticalSlices; sliceY++) {
-            for (let sliceX = 0; sliceX < horizontalSlices; sliceX++) {
-                const originX = sliceX * sliceWidth;
-                const originY = sliceY * sliceHeight;
-
-                const currentSliceWidth = Math.min(sliceWidth, this.width - originX);
-                const currentSliceHeight = Math.min(sliceHeight, this.height - originY);
-
-                const slice = this._createSlice(originX, originY, currentSliceWidth, currentSliceHeight);
-                slices.push(slice);
-            }
-        }
-
-        return {
-            hslices: horizontalSlices,
-            vslices: verticalSlices,
-            images: slices
-        };
     }
 }
 
