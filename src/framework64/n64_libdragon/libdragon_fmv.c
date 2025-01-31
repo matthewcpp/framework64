@@ -1,5 +1,7 @@
 #include "libdragon_fmv.h"
 
+#include "framework64/n64_libdragon/libdragon_asset_database.h"
+
 void fw64_libdragon_fmv_init(fw64Fmv* fmv, fw64Displays* displays) {
     fmv->displays = displays;
     fmv->status = FW64_FMV_CLOSED;
@@ -16,7 +18,9 @@ int fw64_fmv_open(fw64Fmv* fmv, fw64AssetId asset_id) {
     }
 
     // Open the movie using the mpeg2 module and create a YUV blitter to draw it.
-    fmv->video_track = mpeg2_open(asset_id);
+    char fmv_path[16];
+    fw64_libdragon_asset_database_filepath(asset_id, fmv_path);
+    fmv->video_track = mpeg2_open(fmv_path);
 
     if (!fmv->video_track) {
         return 0;
@@ -66,7 +70,7 @@ void fw64_libdragon_fmv_update(fw64Fmv* fmv) {
 }
 
 void fw64_libdragon_fmv_draw(fw64Fmv* fmv) {
-    if (fmv->status == FW64_FMV_PLAYBACK_COMPLETE) {
+    if (fmv->status == FW64_FMV_CLOSED || fmv->status == FW64_FMV_PLAYBACK_COMPLETE) {
         return;
     }
 

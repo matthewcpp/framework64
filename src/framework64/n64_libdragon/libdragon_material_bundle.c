@@ -15,12 +15,10 @@ fw64MaterialBundle* fw64_material_bundle_load_from_datasource(fw64DataSource* da
     if (material_bundle->info.image_count > 0) {
         material_bundle->images = allocator->malloc(allocator, sizeof(fw64Image) * material_bundle->info.image_count);
 
-        char asset_id[16];
         uint32_t image_id;
         for (uint32_t i = 0; i < material_bundle->info.image_count; i++) {
             fw64_data_source_read(data_source, &image_id, sizeof(uint32_t), 1);
-            sprintf(asset_id, "rom:/%u", image_id);
-            sprite_t* sprite = fw64_assets_load_sprite(assets, asset_id, allocator);
+            sprite_t* sprite = fw64_assets_load_sprite(assets, image_id, allocator);
             fw64_libdragon_image_init(material_bundle->images + i, sprite);
         }
     }

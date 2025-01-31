@@ -10,10 +10,17 @@ void fw64_libdragon_asset_database_init(fw64AssetDatabase* asset_database) {
     memset(asset_database, 0, sizeof(fw64AssetDatabase));
 }
 
+void fw64_libdragon_asset_database_filepath(fw64AssetId asset_id, char* buffer) {
+    sprintf(buffer, "rom:/%u", asset_id);
+}
+
 fw64DfsDataSource* fw64_libdragon_asset_database_open_asset(fw64AssetDatabase* asset_database, fw64AssetId asset_id) {
+    char asset_path[16];
+    fw64_libdragon_asset_database_filepath(asset_id, asset_path);
+
     for (size_t i = 0; i < DATASOURCE_COUNT; i++) {
         fw64DfsDataSource* datasource = &asset_database->datasources[i];
-        if (fw64_dfs_datasource_open(datasource, asset_id)) {
+        if (fw64_dfs_datasource_open(datasource, asset_path)) {
             return datasource;
         }
     }
@@ -22,26 +29,40 @@ fw64DfsDataSource* fw64_libdragon_asset_database_open_asset(fw64AssetDatabase* a
 }
 
 sprite_t* fw64_assets_load_sprite(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
+    (void)asset_database;
     (void)allocator;
-    return sprite_load(asset_id);
+
+    char frame_path[16];
+    fw64_libdragon_asset_database_filepath(asset_id, frame_path);
+
+    return sprite_load(frame_path);
 }
 
-#if 1
-
 fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
-    (void)asset_database;
-
-    sprite_t* sprite = fw64_assets_load_sprite(asset_database, asset_id, allocator);
-    if (!sprite) {
+    fw64DfsDataSource* image_info_asset = fw64_libdragon_asset_database_open_asset(asset_database, asset_id);
+    if (!image_info_asset) {
         return NULL;
     }
 
     fw64Image* image = fw64_allocator_malloc(allocator, sizeof(fw64Image));
-    fw64_libdragon_image_init(image, sprite);
+    fw64_dfs_datasource_read(&image_info_asset->interface, &image->info, sizeof(fw64LibdragonImageInfo), 1);
+
+    const uint32_t frame_count = image->info.hslices * image->info.vslices;
+    
+    for (uint32_t i  = 1; i <= frame_count; i++) {
+        fw64AssetId frame_id = asset_id + i;
+        image->sprite = fw64_assets_load_sprite(asset_database, frame_id, allocator);
+    }
+
+    if (!image->sprite) {
+        return NULL;
+    }
+
+    fw64_libdragon_image_init(image, image->sprite);
 
     return image;
 }
-#endif
+
 
 fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     fw64DfsDataSource* datasource = fw64_libdragon_asset_database_open_asset(asset_database, asset_id);
