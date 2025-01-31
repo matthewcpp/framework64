@@ -5,7 +5,15 @@
 
 #include "framework64/image.h"
 
+/** This needs to be kpt in touch with pipeline/n64_libdragon/processImage.js */
+typedef struct {
+    uint32_t hslices;
+    uint32_t vslices;
+} fw64LibdragonImageInfo;
+
+
 struct fw64Image {
+    fw64LibdragonImageInfo info;
     sprite_t* sprite;
     GLuint gl_handle;
 };

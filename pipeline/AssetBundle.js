@@ -87,12 +87,18 @@ class AssetBundle {
         this.defineAssets = true;
     }
 
-    _addAsset(assetType, assetPath, assetName = null) {
-        throw new Error("Dervied asset bundle should override the addAsset method");
+    get nextId() {
+        return this.entries.length;
     }
 
-    /** Protected method for adding an asset into the bundle. All dervied classes should call this from their own AddAsset function*/
-    _addAssetBase(assetType, assetId, assetPath, assetName) {
+    /** Default method for adding an asset into the bundle. 
+     * Derived class should override this method if they need extra functionality */
+    _addAsset(assetType, assetPath, assetName = null) {
+        if (assetName === null) {
+            assetName = path.basename(assetPath, path.extname(assetPath));
+        }
+
+        const assetId = this.entries.length;
         this.entries.push(new AssetBundleEntry(assetType, assetId, assetPath, Util.safeDefineName(assetName), this.defineAssets));
         
         return assetId;

@@ -1,8 +1,13 @@
 #include "libdragon_audio.h"
 
+#include "framework64/n64_libdragon/libdragon_asset_database.h"
+
 int fw64_audio_load_soundbank_asset(fw64Audio* audio, fw64AssetDatabase* asset_database, fw64AssetId asset_id) {
     audio->audio_track;
-    wav64_open(&audio->audio_track, asset_id);
+
+    char audio_path[16];
+    fw64_libdragon_asset_database_filepath(asset_id, audio_path);
+    wav64_open(&audio->audio_track, audio_path);
 
     (void)asset_database;
 }
