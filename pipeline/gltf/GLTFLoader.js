@@ -1,4 +1,5 @@
-const GLTFVertexIndex = require("./GLTFVertexIndex")
+const GLTFVertexIndex = require("./GLTFVertexIndex");
+const GLTFSource = require("./GLTFSource");
 const Material = require("./Material");
 const Mesh = require("./Mesh");
 const Primitive = require("./Primitive");
@@ -30,6 +31,8 @@ class GLTFLoader {
     textures = [];
     materials = [];
     meshes = [];
+
+    source = GLTFSource.Blender;
 
     static SupportedPrimitiveModes = new Set(Object.values(Primitive.ElementType));
 
@@ -307,6 +310,14 @@ class GLTFLoader {
             offset += byteStride;
 
             primitive.hasPositions = true;
+        }
+
+        // vector (x,y,z) in blender becomes (x,z,-y) in gltf
+        // we want to preserve original sign of blender's y / our z
+        if (this.source == GLTFSource.Blender) {
+            for (const vertex of primitive.vertices) {
+                vertex[GLTFVertexIndex.PositionZ] *= -1;
+            }
         }
     }
 

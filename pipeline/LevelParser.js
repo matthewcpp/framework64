@@ -1,5 +1,6 @@
 const Bounding = require("./gltf/Bounding");
 const GLTFLoader = require("./gltf/GLTFLoader");
+const GLTFSource = require("./gltf/GLTFSource");
 const MaterialBundle = require("./gltf/MaterialBundle");
 const N64Node = require("./gltf/Node");
 const Scene = require("./gltf/Scene");
@@ -10,6 +11,8 @@ class LevelParser {
     scenes = [];
     collisonMeshMap = new Map();
     transformCustomBoundingBoxIndex = -1;
+
+    source = GLTFSource.Blender;
 
     /** Index into the gltf node array that represents current scne mesh collider root*/
     _meshColliderNodeIndex = GLTFLoader.InvalidNodeIndex;
@@ -155,6 +158,14 @@ class LevelParser {
             scene.nodes.push(node);
         }
 
+        if (this.source == GLTFSource.Blender) {
+            // vector (x,y,z) in blender becomes (x,z,-y) in gltf
+            // we want to preserve original sign of blender's y / our z
+            for (const node of scene.nodes) {
+                node.position[2] *= -1;
+            }
+        }
+
         return scene;
     }
 
@@ -233,14 +244,17 @@ class LevelParser {
     }
 
     _extractNodeTransform(gltfNode, node) {
-        if (gltfNode.translation)
+        if (gltfNode.translation) {
             node.position = gltfNode.translation.slice();
+        }
 
-        if (gltfNode.rotation)
+        if (gltfNode.rotation) {
             node.rotation = gltfNode.rotation.slice();
+        }
 
-        if (gltfNode.scale)
+        if (gltfNode.scale) {
             node.scale = gltfNode.scale.slice();
+        }
     }
 
     /** Precondition: node has its trasnform values set*/

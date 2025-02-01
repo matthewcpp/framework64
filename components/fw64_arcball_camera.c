@@ -12,7 +12,7 @@ void fw64_arcball_init(fw64ArcballCamera* arcball, fw64Input* input, fw64Camera*
     arcball->_diagonal = 1.0f;
 
     fw64_arcball_reset(arcball);
-    vec3_zero(&arcball->_target);
+    vec3_set(&arcball->_target, 0.0f, 0.0f, 0.0f);
 }
 
 void fw64_arcball_reset(fw64ArcballCamera* arcball) {

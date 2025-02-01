@@ -15,7 +15,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Display* display = fw64_displays_get_primary(engine->displays);
 
     game->engine = engine;
-    vec3_zero(&game->translate);
+    vec3_set(&game->translate, 0.0f, 0.0f, 0.0f);
 
     fw64AssetId fontAssets[FONT_COUNT] = {FW64_ASSET_font_Consolas12, FW64_ASSET_font_basicLAZER, FW64_ASSET_font_Mario64};
     for (size_t i = 0; i < FONT_COUNT; i++) {

@@ -10,8 +10,6 @@ typedef struct {
     float x, y, z;
 } Vec3;
 
-void vec3_zero(Vec3* v);
-void vec3_one(Vec3* v);
 void vec3_set(Vec3* v, float x, float y, float z);
 void vec3_set_all(Vec3* v, float val);
 void vec3_copy(const Vec3* src, Vec3* dest);
@@ -35,12 +33,15 @@ float vec3_dot(const Vec3* a, const Vec3* b);
 void vec3_smoothstep(const Vec3* a, const Vec3* b, float t, Vec3* out);
 void vec3_lerp(const Vec3* a, const Vec3* b, float t, Vec3* out);
 
-#define fw64_vec3_forward() {0.0f, 0.0f, 1.0f}
-#define fw64_vec3_back() {0.0f, 0.0f, -1.0f}
+#define fw64_vec3_forward() {0.0f, 0.0f, -1.0f}
+#define fw64_vec3_back() {0.0f, 0.0f, 1.0f}
 #define fw64_vec3_right() {1.0f, 0.0f, 0.0f}
 #define fw64_vec3_left() {-1.0f, 0.0f, 0.0f}
 #define fw64_vec3_up() {0.0f, 1.0f, 0.0f}
 #define fw64_vec3_down() {0.0f, -1.0f, 0.0f}
+
+#define fw64_vec3_zero() {0.0f, 0.0f, 0.0f}
+#define fw64_vec3_one() {1.0f, 1.0f, 1.0f}
 
 #ifdef __cplusplus
 }

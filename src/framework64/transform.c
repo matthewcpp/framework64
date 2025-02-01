@@ -2,9 +2,9 @@
 #include "framework64/matrix.h"
 
 void fw64_transform_init(fw64Transform* transform) {
-    vec3_zero(&transform->position);
+    vec3_set(&transform->position, 0.0f, 0.0f, 0.0f);
     quat_ident(&transform->rotation);
-    vec3_one(&transform->scale);
+    vec3_set(&transform->scale, 1.0f, 1.0f, 1.0f);
     matrix_set_identity(transform->world_matrix);
 }
 
@@ -43,7 +43,7 @@ void fw64_transform_left(const fw64Transform* transform, Vec3* out) {
 
 void fw64_transform_look_at(fw64Transform* transform, const Vec3* target, const Vec3* up) {
     float matrix[16];
-    matrix_target_to(&matrix[0], target, &transform->position, up);
+    matrix_target_to(&matrix[0], &transform->position, target, up);
 
     matrix_get_rotation(matrix, &transform->rotation);
     quat_normalize( &transform->rotation);
