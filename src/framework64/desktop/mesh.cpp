@@ -36,14 +36,14 @@ fw64Primitive& fw64Mesh::createPrimitive(framework64::PrimitiveData&& data, fw64
     return primitive;
 }
 
-/// Note this should coorespond to pipeline/desktop/GLMeshWriter.js _writeMeshInfo
+/// Note this should coorespond to pipeline/desktop/MeshWriter.js _writeMeshInfo
 struct MeshInfo {
     uint32_t primitive_count;
     uint32_t material_bundle_count;
     Box bounding_box;
 };
 
-/// Note this should coorespond to pipeline/GLMeshWriter.js _writePimitiveInfo
+/// Note this should coorespond to pipeline/MeshWriter.js _writePimitiveInfo
 struct PrimitiveInfo {
     uint32_t vertex_count;
     uint32_t vertex_attributes;
