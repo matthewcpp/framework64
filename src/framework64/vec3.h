@@ -29,12 +29,13 @@ void vec3_normalize(Vec3* v);
 void vec3_negate(Vec3* v);
 void vec3_cross(const Vec3* a, const Vec3* b, Vec3* out);
 float vec3_dot(const Vec3* a, const Vec3* b);
+float vec3_length(const Vec3* v);
 
 void vec3_smoothstep(const Vec3* a, const Vec3* b, float t, Vec3* out);
 void vec3_lerp(const Vec3* a, const Vec3* b, float t, Vec3* out);
 
-#define fw64_vec3_forward() {0.0f, 0.0f, -1.0f}
-#define fw64_vec3_back() {0.0f, 0.0f, 1.0f}
+#define fw64_vec3_forward() {0.0f, 0.0f, 1.0f}
+#define fw64_vec3_back() {0.0f, 0.0f, -1.0f}
 #define fw64_vec3_right() {1.0f, 0.0f, 0.0f}
 #define fw64_vec3_left() {-1.0f, 0.0f, 0.0f}
 #define fw64_vec3_up() {0.0f, 1.0f, 0.0f}

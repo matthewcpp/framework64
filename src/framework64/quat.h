@@ -28,6 +28,8 @@ Vec3 quat_to_euler(const Quat* q);
 void quat_from_euler(Quat* q, float x, float y, float z);
 void quat_slerp(const Quat* a, const Quat* b, float t, Quat* out);
 
+void quat_rotation_to(const Vec3* a, const Vec3* b, Quat* out);
+
 #ifdef __cplusplus
 }
 #endif

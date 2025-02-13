@@ -41,9 +41,10 @@ void fw64_transform_left(const fw64Transform* transform, Vec3* out) {
     vec3_negate(out);
 }
 
+// TODO: https://community.khronos.org/t/implement-unity-transform-lookat-function/72397
 void fw64_transform_look_at(fw64Transform* transform, const Vec3* target, const Vec3* up) {
     float matrix[16];
-    matrix_target_to(&matrix[0], &transform->position, target, up);
+    matrix_target_to(&matrix[0], target, &transform->position, up);
 
     matrix_get_rotation(matrix, &transform->rotation);
     quat_normalize( &transform->rotation);
@@ -59,7 +60,6 @@ void fw64_transform_inv_mult_point(const fw64Transform* transform, const Vec3* p
 
     vec3_subtract(point, &transform->position, out);
     quat_transform_vec3(&inv_rot, out, out);
-
 }
 
 void fw64_transform_mult_point(const fw64Transform* transform, const Vec3* point, Vec3* out) {

@@ -162,3 +162,28 @@ void quat_slerp(const Quat* a, const Quat* b_in, float t, Quat* out) {
     out->z = scale0 * a->z + scale1 * b.z;
     out->w = scale0 * a->w + scale1 * b.w;
 }
+
+void quat_rotation_to(const Vec3* a, const Vec3* b, Quat* out) {
+    Vec3 tmpvec3;
+    Vec3 xUnitVec3 = fw64_vec3_right();
+    Vec3 yUnitVec3 = fw64_vec3_up();
+
+
+    const float dot = vec3_dot(a, b);
+    if (dot < -0.999999f) {
+        vec3_cross(&xUnitVec3, a, &tmpvec3);
+
+        if (vec3_length(&tmpvec3) < 0.000001){ 
+            vec3_cross(&yUnitVec3, a, &tmpvec3);
+        }
+
+        vec3_normalize(&tmpvec3);
+        quat_set_axis_angle(out, tmpvec3.x, tmpvec3.y, tmpvec3.z, M_PI);
+    } else if (dot > 0.999999) {
+        quat_ident(out);
+    } else {
+        vec3_cross(a, b, &tmpvec3);
+        quat_set(out, tmpvec3.x, tmpvec3.y, tmpvec3.z, 1.0f + dot);
+        quat_normalize(out);  
+    }
+}
