@@ -57,7 +57,7 @@ void fw64Display::swap() {
 
 // C-API
 
-fw64Display* fw64_displays_get_primary(const fw64Displays* displays) {
+fw64Display* fw64_displays_get_primary(fw64Displays* displays) {
     return displays->primary;
 }
 

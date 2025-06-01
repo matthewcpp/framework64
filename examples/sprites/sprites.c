@@ -66,7 +66,7 @@ void elapsed_time_draw(ElapsedTime* elapsed_time, fw64SpriteBatch* sprite_batch)
 
 void typewriter_text_init(TypewriterText* text, const char* str, fw64Font* font) {
     text->string = str;
-    text->str_length = strlen(str);
+    text->str_length = (uint32_t)strlen(str);
     text->font = font;
 
     text->current_length = 1;
