@@ -14,7 +14,7 @@ TEST(RayBox, Hit) {
 
     int hit = fw64_collision_test_ray_box(&origin, &direction, &box, &hit_point, &t);
 
-    Vec3 expected_point = {0.0f, 1.0f, 0.0f};
+    Vec3 expected_point = vec3_up();
     float expected_distance = 9.0f;
 
     ASSERT_TRUE(hit);
@@ -26,7 +26,7 @@ TEST(RayBox, Miss) {
     Box box = {{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}};
 
     Vec3 origin = {0.0f, 10.0f, 0.0f};
-    Vec3 direction = {1.0f, 0.0f, 0.0f};
+    Vec3 direction = vec3_right();
 
     Vec3 hit_point;
     float t;
@@ -38,7 +38,7 @@ TEST(RayBox, Miss) {
 
 TEST(RayTriangle, Hit) {
     Vec3 origin = {0.0f, 0.5f, 10.0f};
-    Vec3 direction = {0.0f, 0.0f, -1.0f};
+    Vec3 direction = vec3_forward();
 
     Vec3 a = {-1.0f, -1.0f, 1.0f};
     Vec3 b = {0.0f, 1.0f, 1.0f};
@@ -59,7 +59,7 @@ TEST(RayTriangle, Hit) {
 
 TEST(RayTriangle, Miss) {
     Vec3 origin = {0.0f, 0.5f, 10.0f};
-    Vec3 direction = {0.0f, 0.0f, 1.0f};
+    Vec3 direction = vec3_back();
 
     Vec3 a = {-1.0f, -1.0f, 1.0f};
     Vec3 b = {0.0f, 1.0f, 1.0f};

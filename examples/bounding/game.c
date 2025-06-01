@@ -172,7 +172,7 @@ void setup_camera(Game* game) {
     game->camera.far = 500.0f;
     fw64_camera_update_projection_matrix(&game->camera);
 
-    Vec3 center = {0.0f, 0.0f, 0.0f}, up = {0.0f, 1.0f, 0.0f};
+    Vec3 center = vec3_zero(), up = vec3_up();
     fw64_transform_look_at(&camera_node->transform, &center, &up);
     fw64_camera_update_view_matrix(&game->camera);
 }

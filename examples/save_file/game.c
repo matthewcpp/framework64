@@ -42,7 +42,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Camera camera;
     fw64_camera_init(&camera, camera_node, display);
     fw64_renderpass_set_camera(game->renderpasses[RENDER_PASS_SCENE], &camera);
-    Vec3 light_dir = {0.0f, 0.0f, -1.0f};
+    Vec3 light_dir = vec3_forward();
     fw64_renderpass_set_light_direction(game->renderpasses[RENDER_PASS_SCENE], 0, &light_dir);
 
     game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);

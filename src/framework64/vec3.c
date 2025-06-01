@@ -8,18 +8,6 @@
 
 // Implementation based on: https://glmatrix.net/docs/vec3.js.html
 
-void vec3_zero(Vec3* v) {
-    v->x = 0.0f;
-    v->y = 0.0f;
-    v->z = 0.0f;
-}
-
-void vec3_one(Vec3* v) {
-    v->x = 1.0f;
-    v->y = 1.0f;
-    v->z = 1.0f;
-}
-
 void vec3_set(Vec3* v, float x, float y, float z) {
     v->x = x;
     v->y = y;
@@ -104,6 +92,10 @@ void vec3_cross(const Vec3* a, const Vec3* b, Vec3* out) {
 
 float vec3_dot(const Vec3* a, const Vec3* b) {
     return a->x * b->x + a->y * b->y + a->z * b->z;
+}
+
+float vec3_length(const Vec3* v) {
+    return fw64_sqrtf(v->x * v->x + v->y * v->y + v->z * v->z);
 }
 
 int vec3_equals(const Vec3* a, const Vec3* b, float epsilon) {

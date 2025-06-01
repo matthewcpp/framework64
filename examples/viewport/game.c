@@ -52,7 +52,7 @@ void setup_initial_viewport(Game* game) {
     fw64Node* camera_node = fw64_scene_create_node(&game->scene);
     vec3_set(&camera_node->transform.position, 0.0f, 7.5f, 18.0f);
     Vec3 target = {0.0f, 0.0f, 0.0f};
-    Vec3 up = {0.0f, 1.0f, 0.0f};
+    Vec3 up = vec3_up();
     fw64_transform_look_at(&camera_node->transform, &target, &up);
 
     fw64_camera_init(&game->camera, camera_node, primary_display);

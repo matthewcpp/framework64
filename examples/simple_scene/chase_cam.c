@@ -31,7 +31,7 @@ static void chase_camera_update_position(ChaseCamera* chase_cam) {
     if (!chase_cam->target) return;
 
     Vec3 back, forward, camera_pos, camera_target;
-    Vec3 up = {0.0f, 1.0f, 0.0f};
+    Vec3 up = vec3_up();
     fw64_transform_back(chase_cam->target, &back);
     vec3_copy(&back, &forward);
     vec3_negate(&forward);
