@@ -22,8 +22,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_billboard_nodes_init(&game->billboard_nodes, allocator);
 
     game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_billboard_example, allocator);
-    fw64Node* camera_node = fw64_scene_create_node(game->scene);
-    vec3_set(&camera_node->transform.position, 0.6f, 12.0f, 40.0f);
+    fw64Node* camera_node = fw64_scene_get_node(game->scene, FW64_scene_billboard_example_node_player);
 
     fw64_camera_init(&game->camera, camera_node, display);
     game->camera.near = 1.0f;
