@@ -39,7 +39,7 @@ TEST(Camera, ViewMatrix) {
     fw64_camera_init(&camera, &camera_node, &display);
 
     Vec3 target = {0.0f, 0.0f, 0.0f};
-    Vec3 up = {0.0f, 1.0f, 0.0f};
+    Vec3 up = vec3_up();
     fw64_transform_up(&camera_node.transform, &up);
     fw64_transform_look_at(&camera_node.transform, &target, &up);
 

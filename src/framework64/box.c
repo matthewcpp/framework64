@@ -14,8 +14,8 @@ void box_set_center_extents(Box* box, Vec3* center, Vec3* extents) {
 }
 
 void box_center(Box* box, Vec3* out) {
-    vec3_add(out, &box->min, &box->max);
-    vec3_scale(out, out, 0.5f);
+    vec3_add(&box->min, &box->max, out);
+    vec3_scale(out, 0.5f, out);
 }
 
 void box_size(Box* box, Vec3* out) {
@@ -26,7 +26,7 @@ void box_size(Box* box, Vec3* out) {
 
 void box_extents(Box* box, Vec3* out) {
     box_size(box, out);
-    vec3_scale(out, out, 0.5f);
+    vec3_scale(out, 0.5f, out);
 }
 
 void box_invalidate(Box* box) {
@@ -61,9 +61,9 @@ void box_encapsulate_box(Box* box, const Box* to_encapsulate) {
 }
 
 // Based on code from: https://github.com/erich666/GraphicsGems/blob/master/gems/TransBox.c
-void matrix_transform_box(float* matrix, Box* box, Box* out) {
-    float* box_min = &box->min.x;
-    float* box_max = &box->max.x;
+void matrix_transform_box(const float* matrix, const Box* box, Box* out) {
+    const float* box_min = &box->min.x;
+    const float* box_max = &box->max.x;
 
     float* out_min = &out->min.x;
     float* out_max = &out->max.x;
@@ -97,7 +97,7 @@ int box_intersection(Box* a, Box* b) {
 }
 
 // Real Time Collision Detection 5.1.3
-void box_closest_point(Box* b, Vec3* p, Vec3* q) {
+void box_closest_point(Box* b, const Vec3* p, Vec3* q) {
     float* p_el = (float*)p;
     float* q_el = (float*)q;
     float* b_min_el = (float*)&b->min;

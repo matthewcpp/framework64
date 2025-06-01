@@ -20,7 +20,7 @@ extern "C" {
 void fw64_viewport_set(fw64Viewport* viewport, const IVec2* position, const IVec2* size);
 
 /** Set Viewport rect proportional to the screen. position and size values should be in the range [0, 1]*/
-void fw64_viewport_set_relative_to_display(fw64Viewport* viewport, fw64Display* display, Vec2* position, Vec2* size);
+void fw64_viewport_set_relative_to_display(fw64Viewport* viewport, const fw64Display* display, const Vec2* position, const Vec2* size);
 
 #ifdef __cplusplus
 }

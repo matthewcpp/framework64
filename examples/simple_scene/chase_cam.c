@@ -31,17 +31,17 @@ static void chase_camera_update_position(ChaseCamera* chase_cam) {
     if (!chase_cam->target) return;
 
     Vec3 back, forward, camera_pos, camera_target;
-    Vec3 up = {0.0f, 1.0f, 0.0f};
+    Vec3 up = vec3_up();
     fw64_transform_back(chase_cam->target, &back);
-    vec3_copy(&forward, &back);
+    vec3_copy(&back, &forward);
     vec3_negate(&forward);
 
-    vec3_scale(&back, &back, chase_cam->target_follow_dist);
-    vec3_add(&camera_pos, &chase_cam->target->position, &back);
+    vec3_scale(&back, chase_cam->target_follow_dist, &back);
+    vec3_add(&chase_cam->target->position, &back, &camera_pos);
     camera_pos.y += chase_cam->target_follow_height;
 
-    vec3_scale(&forward, &forward, chase_cam->target_forward_dist);
-    vec3_add(&camera_target, &chase_cam->target->position, &forward);
+    vec3_scale(&forward, chase_cam->target_forward_dist, &forward);
+    vec3_add(&chase_cam->target->position, &forward, &camera_target);
     forward.y += chase_cam->target_forward_height;
 
     chase_cam->camera.node->transform.position = camera_pos;

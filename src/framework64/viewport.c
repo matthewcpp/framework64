@@ -7,7 +7,7 @@ void fw64_viewport_set(fw64Viewport* viewport, const IVec2* position, const IVec
     viewport->size = *size;
 }
 
-void fw64_viewport_set_relative_to_display(fw64Viewport* viewport, fw64Display* display, Vec2* position, Vec2* size) {
+void fw64_viewport_set_relative_to_display(fw64Viewport* viewport, const fw64Display* display, const Vec2* position, const Vec2* size) {
     Vec2 screen_size = fw64_display_get_size_f(display);
 
     viewport->position.x = (int)(screen_size.x * position->x);

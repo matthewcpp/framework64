@@ -3,14 +3,12 @@
 // https://stackoverflow.com/questions/1528298/get-path-of-executable
 // https://stackoverflow.com/questions/22675457/what-is-the-equivalent-of-proc-self-exe-on-macintosh-os-x-mavericks
 
+#include <filesystem>
+#include <stdlib.h>
 
 #ifdef __APPLE__
 
 #include <mach-o/dyld.h>
-
-#include <filesystem>
-
-#include <stdlib.h>
 
 static std::string get_executable_path_impl() {
     char* exe_path_buffer = NULL;

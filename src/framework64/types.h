@@ -19,6 +19,7 @@ typedef Mtx fw64Matrix;
 #define fw64_tanf tanf
 #define fw64_sqrtf _nsqrtf
 #define fw64_acosf acosf
+#define fw64_asinf asinf
 #define fw64_fabsf fabsf
 #define fw64_floorf floorf
 #define fw64_ceilf ceilf
@@ -46,6 +47,7 @@ typedef struct {
 #define fw64_cosf cosf
 #define fw64_tanf tanf
 #define fw64_sqrtf sqrtf
+#define fw64_acosf acosf
 #define fw64_acosf acosf
 #define fw64_fabsf fabsf
 #define fw64_floorf floorf

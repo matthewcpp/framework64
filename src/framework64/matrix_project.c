@@ -33,7 +33,7 @@ int fw64_matrix_project(Vec3* pt, float* modelview, float* projection, IVec2* vi
 
 int fw64_matrix_unproject(Vec3* pt, float* modelview, float* projection, IVec2* view_pos, IVec2* view_size, Vec3* result) {
     float inverse[16];
-    matrix_multiply(inverse, projection, modelview);
+    matrix_multiply(projection, modelview, inverse);
 
     if (!matrix_invert(inverse, inverse)) {
         return 0;

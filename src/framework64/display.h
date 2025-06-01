@@ -13,8 +13,8 @@ extern "C" {
 
 fw64Display* fw64_displays_get_primary(fw64Displays* displays);
 
-IVec2 fw64_display_get_size(fw64Display* display);
-Vec2 fw64_display_get_size_f(fw64Display* display);
+IVec2 fw64_display_get_size(const fw64Display* display);
+Vec2 fw64_display_get_size_f(const fw64Display* display);
 
 #ifdef __cplusplus
 }

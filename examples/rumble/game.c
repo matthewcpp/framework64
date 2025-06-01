@@ -85,7 +85,7 @@ void game_update(Game* game){
     }
     else {
         fw64Node* node = fw64_scene_get_node(&game->scene, 0);
-        vec3_zero(&node->transform.position);
+        vec3_set_zero(&node->transform.position);
         fw64_node_update(node);
     }
 }
