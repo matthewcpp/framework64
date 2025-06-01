@@ -1,7 +1,7 @@
 # Build with: docker build -t matthewcpp/framework64_n64_libdragon .
 # On Apple silicon: docker build -t matthewcpp/framework64_n64_libdragon --platform linux/amd64 .
 
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 # install libdragon toolchain
 

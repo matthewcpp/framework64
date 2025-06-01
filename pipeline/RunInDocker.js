@@ -39,9 +39,9 @@ async function runPipelineInContainer(assetManifestFile, assetDirectory, platfor
 
     const pipelineDir = path.dirname(__filename);
     const assetManifestDir = path.dirname(assetManifestFile);
-    
 
-    const containerAssetManifestFile = path.join("/manifest_dir", path.basename(assetManifestFile));
+    // note we specifically use posix here to get the '/' separator so that path will be correct if performing build on windows.
+    const containerAssetManifestFile = path.posix.join("/manifest_dir", path.basename(assetManifestFile));
 
     const bindMounts = [
         "-v", `${pipelineDir}:/opt/framework64/pipeline`,

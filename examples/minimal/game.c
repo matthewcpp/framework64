@@ -20,9 +20,9 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->spritebatch = fw64_spritebatch_create(1, allocator);
 
-    // fw64_spritebatch_begin(game->spritebatch);
-    // fw64_spritebatch_draw_sprite(game->spritebatch, game->test_texture, 50, 50);
-    // fw64_spritebatch_end(game->spritebatch);
+    fw64_spritebatch_begin(game->spritebatch);
+    fw64_spritebatch_draw_sprite(game->spritebatch, game->test_texture, 50, 50);
+    fw64_spritebatch_end(game->spritebatch);
 }
 
 void game_update(Game* game){
@@ -34,10 +34,10 @@ void game_update(Game* game){
 
 void game_draw(Game* game) {
     fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL );
-    // fw64_renderpass_begin(game->renderpass);
-    // fw64_renderpass_draw_sprite_batch(game->renderpass, game->spritebatch);
-    // fw64_renderpass_end(game->renderpass);
-    // fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
+    fw64_renderpass_begin(game->renderpass);
+    fw64_renderpass_draw_sprite_batch(game->renderpass, game->spritebatch);
+    fw64_renderpass_end(game->renderpass);
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
     fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 

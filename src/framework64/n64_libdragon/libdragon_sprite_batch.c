@@ -39,3 +39,8 @@ void fw64_spritebatch_draw_sprite_slice(fw64SpriteBatch* spritebatch, fw64Textur
     info->pos.x = (float)x;
     info->pos.y = (float)y;
 }
+
+// TEMP
+void fw64_spritebatch_draw_sprite(fw64SpriteBatch* sprite_batch, fw64Texture* texture, int x, int y) {
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, texture, 0, x, y);
+}
