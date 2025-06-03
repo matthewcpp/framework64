@@ -28,7 +28,7 @@ fw64DfsDataSource* fw64_libdragon_asset_database_open_asset(fw64AssetDatabase* a
     return NULL;
 }
 
-sprite_t* fw64_assets_load_sprite(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
+sprite_t* fw64_libdragon_assets_load_dfs_sprite(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
     (void)asset_database;
     (void)allocator;
 
@@ -44,6 +44,7 @@ fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId
         return NULL;
     }
 
+    // the image info specifies the hslices and vslices from the manifest
     fw64Image* image = fw64_allocator_malloc(allocator, sizeof(fw64Image));
     fw64_dfs_datasource_read(&image_info_asset->interface, &image->info, sizeof(fw64LibdragonImageInfo), 1);
 
@@ -51,7 +52,7 @@ fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId
     
     for (uint32_t i  = 1; i <= frame_count; i++) {
         fw64AssetId frame_id = asset_id + i;
-        image->sprite = fw64_assets_load_sprite(asset_database, frame_id, allocator);
+        image->sprite = fw64_libdragon_assets_load_dfs_sprite(asset_database, frame_id, allocator);
     }
 
     if (!image->sprite) {

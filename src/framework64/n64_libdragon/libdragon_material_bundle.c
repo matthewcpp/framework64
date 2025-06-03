@@ -18,7 +18,7 @@ fw64MaterialBundle* fw64_material_bundle_load_from_datasource(fw64DataSource* da
         uint32_t image_id;
         for (uint32_t i = 0; i < material_bundle->info.image_count; i++) {
             fw64_data_source_read(data_source, &image_id, sizeof(uint32_t), 1);
-            sprite_t* sprite = fw64_assets_load_sprite(assets, image_id, allocator);
+            sprite_t* sprite = fw64_libdragon_assets_load_dfs_sprite(assets, image_id, allocator);
             fw64_libdragon_image_init(material_bundle->images + i, sprite);
         }
     }
