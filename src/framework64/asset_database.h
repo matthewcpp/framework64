@@ -13,6 +13,7 @@ typedef struct fw64Image fw64Image;
 typedef struct fw64Font fw64Font;
 typedef struct fw64Mesh fw64Mesh;
 typedef struct fw64Scene fw64Scene;
+typedef struct fw64SceneLoadOptions fw64SceneLoadOptions;
 
 typedef uint64_t fw64AssetId;
 
@@ -49,7 +50,7 @@ fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, fw64AssetId a
 /** Loads a mesh from the asset bundle. */
 fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
 
-fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
+fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_id, const fw64SceneLoadOptions* options, fw64Allocator* allocator);
 
 fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
 

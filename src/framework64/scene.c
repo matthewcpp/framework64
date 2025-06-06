@@ -12,25 +12,32 @@ void fw64_scene_info_init(fw64SceneInfo* info) {
     memset(info, 0, sizeof(fw64SceneInfo));
 }
 
-static void init_static_vectors(fw64Scene* scene, fw64SceneInfo* info) {
-    fw64_static_vector_init(&scene->meshes, sizeof(fw64Mesh*), info->mesh_count + info->extra_mesh_count, scene->allocator);
+void fw64_scene_load_options_init(fw64SceneLoadOptions* options) {
+    memset(options, 0, sizeof(fw64SceneLoadOptions));
+}
+
+static void init_static_vectors(fw64Scene* scene, const fw64SceneInfo* info, const fw64SceneExtras* extras) {
+    fw64_static_vector_init(&scene->meshes, sizeof(fw64Mesh*), info->mesh_count + info->extra_mesh_count + extras->mesh_count, scene->allocator);
     fw64_static_vector_init(&scene->skinned_meshes, sizeof(fw64SkinnedMesh*), info->skinned_mesh_count, scene->allocator);
-    fw64_static_vector_init(&scene->mesh_instances, sizeof(fw64MeshInstance), info->mesh_instance_count, scene->allocator);
+    fw64_static_vector_init(&scene->mesh_instances, sizeof(fw64MeshInstance), info->mesh_instance_count + extras->mesh_instance_count, scene->allocator);
     fw64_static_vector_init(&scene->skinned_mesh_instances, sizeof(fw64SkinnedMeshInstance), info->skinned_mesh_instance_count, scene->allocator);
-    fw64_static_vector_init(&scene->colliders, sizeof(fw64Collider), info->collider_count, scene->allocator);
+    fw64_static_vector_init(&scene->colliders, sizeof(fw64Collider), info->collider_count + extras->collider_count, scene->allocator);
     fw64_static_vector_init(&scene->collision_meshes, sizeof(fw64CollisionMesh), info->collision_mesh_count, scene->allocator);
-    fw64_static_vector_init(&scene->nodes, sizeof(fw64Node), info->node_count + info->extra_node_count, scene->allocator);
+    fw64_static_vector_init(&scene->nodes, sizeof(fw64Node), info->node_count + info->extra_node_count + extras->node_count, scene->allocator);
 }
 
 void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* assets, fw64Allocator* allocator) {
     scene->allocator = allocator;
     scene->assets = assets;
-    scene->material_bundle = NULL; // TODO should this be supported?
+    scene->material_bundle = NULL; // TODO: This should be able to be configured by load options?
 
-    init_static_vectors(scene, info);
+    fw64SceneLoadOptions load_options;
+    fw64_scene_load_options_init(&load_options);
+
+    init_static_vectors(scene, info, &load_options.extras);
 }
 
-fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase* assets, fw64Allocator* allocator) {
+fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase* assets, const fw64SceneLoadOptions* options, fw64Allocator* allocator) {
     fw64SceneInfo scene_info;
     fw64_data_source_read(data_source, &scene_info, sizeof(fw64SceneInfo), 1);
 
@@ -49,7 +56,7 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
     scene->assets = assets;
     scene->material_bundle = material_bundle;
 
-    init_static_vectors(scene, &scene_info);
+    init_static_vectors(scene, &scene_info, &options->extras);
 
     for (uint32_t i = 0; i < scene_info.mesh_count; i++) {
         fw64Mesh* mesh = fw64_mesh_load_from_datasource_with_bundle(assets, data_source, scene->material_bundle, allocator);

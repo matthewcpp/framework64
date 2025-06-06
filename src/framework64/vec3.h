@@ -34,6 +34,13 @@ float vec3_length(const Vec3* v);
 void vec3_smoothstep(const Vec3* a, const Vec3* b, float t, Vec3* out);
 void vec3_lerp(const Vec3* a, const Vec3* b, float t, Vec3* out);
 
+#define _vec3_forward_vals 0.0f, 0.0f, -1.0f
+#define _vec3_back_vals 0.0f, 0.0f, 1.0f
+#define _vec3_right_vals 1.0f, 0.0f, 0.0f
+#define _vec3_left_vals -1.0f, 0.0f, 0.0f
+#define _vec3_up_vals 0.0f, 1.0f, 0.0f
+#define _vec3_down_vals 0.0f, -1.0f, 0.0f
+
 #define vec3_forward() {0.0f, 0.0f, -1.0f}
 #define vec3_back() {0.0f, 0.0f, 1.0f}
 #define vec3_right() {1.0f, 0.0f, 0.0f}
@@ -46,6 +53,13 @@ void vec3_lerp(const Vec3* a, const Vec3* b, float t, Vec3* out);
 
 #define vec3_set_zero(vec) vec3_set((vec), 0.0f, 0.0f, 0.0f)
 #define vec3_set_one(vec) vec3_set((vec), 1.0f, 1.0f, 1.0f)
+
+#define vec3_set_forward(vec) vec3_set((vec), _vec3_forward_vals)
+#define vec3_set_back(vec) vec3_set((vec), _vec3_back_vals)
+#define vec3_set_right(vec) vec3_set((vec), _vec3_right_vals)
+#define vec3_set_left(vec) vec3_set((vec), _vec3_left_vals)
+#define vec3_set_up(vec) vec3_set((vec), _vec3_up_vals)
+#define vec3_set_down(vec) vec3_set((vec), _vec3_down_vals)
 
 #ifdef __cplusplus
 }

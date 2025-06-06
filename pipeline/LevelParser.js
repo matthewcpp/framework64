@@ -134,6 +134,11 @@ class LevelParser {
             return null;
         }
 
+        if (!Object.hasOwn(gltfSceneNodeRoot, "children")) {
+            console.log(`Warning: ${gltfSceneNodeRoot.name} does not have any childen.  No nodes will be created.`)
+            return scene;
+        }
+
         for (const child_index of gltfSceneNodeRoot.children) {
             const gltfNode = gltf.nodes[child_index];
 

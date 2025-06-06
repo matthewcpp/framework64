@@ -31,6 +31,13 @@ typedef struct {
     uint32_t material_bundle_count;
 } fw64SceneInfo;
 
+typedef struct {
+    uint32_t node_count;
+    uint32_t mesh_count;
+    uint32_t mesh_instance_count;
+    uint32_t collider_count;
+} fw64SceneExtras;
+
 struct fw64Scene {
     fw64StaticVector meshes;
     fw64StaticVector mesh_instances;
@@ -46,15 +53,20 @@ struct fw64Scene {
     Box bounding_box;
 };
 
+struct fw64SceneLoadOptions {
+    fw64SceneExtras extras;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase* assets, fw64Allocator* allocator);
+fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64AssetDatabase* assets, const fw64SceneLoadOptions* options, fw64Allocator* allocator);
 void fw64_scene_uninit(fw64Scene* scene);
 void fw64_scene_delete(fw64Scene* scene);
 
 void fw64_scene_info_init(fw64SceneInfo* info);
+void fw64_scene_load_options_init(fw64SceneLoadOptions* options);
 void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* assets, fw64Allocator* allocator);
 
 /** 
