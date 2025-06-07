@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 
 option(Fw64_BUILD_TESTS "Builds the gtest based test applications" ON)
 option(FW64_BUILD_EXAMPLES "Builds the example applications" ON)

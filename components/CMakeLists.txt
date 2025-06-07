@@ -4,6 +4,7 @@ set(components_source_files
     fw64_billboard_node.h fw64_billboard_node.c
     fw64_debug_boxes.h fw64_debug_boxes.c
     fw64_file_downloader_message.h fw64_file_downloader.h fw64_file_downloader.c
+    fw64_fly_camera.h fw64_fly_camera.c
     fw64_fps_camera.h fw64_fps_camera.c
     fw64_headlight.h fw64_headlight.c
     fw64_media_file_picker.h fw64_media_file_picker.c
