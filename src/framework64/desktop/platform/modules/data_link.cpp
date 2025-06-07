@@ -1,4 +1,4 @@
-#include "framework64/desktop/data_link.hpp"
+#include "modules/data_link.h"
 
 
 #include <IXNetSystem.h>
@@ -116,7 +116,21 @@ void fw64DataLink::onWebsocketMessage(const std::string& payload) {
 }
 
  // C API
- void fw64_data_link_set_connected_callback(fw64DataLink* data_link, fw64DataLinkConnectedCallback callback, void* arg) {
+fw64DataLink* _fw64_data_link_init(void* arg) {
+    const int* port_num = reinterpret_cast<int*>(arg);
+    auto data_link = std::make_unique<fw64DataLink>();
+    if (data_link->initialize(*port_num)) {
+        return data_link.release();
+    } else {
+        return nullptr;
+    }
+ }
+
+void _fw64_data_link_update(fw64DataLink* data_link) {
+    data_link->update();
+}
+
+void fw64_data_link_set_connected_callback(fw64DataLink* data_link, fw64DataLinkConnectedCallback callback, void* arg) {
     data_link->setConnectedCallback(callback, arg);
 }
 

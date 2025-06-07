@@ -65,9 +65,26 @@ set(common_source_files
     controller_mapping/n64.h
 )
 
-
 add_library(framework64 STATIC ${common_source_files})
 target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
+# create default module libraries.  These are used for games which do not require
+# specific capabilities
+set(default_media_sources 
+    default/modules/media.h 
+    default/modules/media.c
+)
+add_library(framework64_default_media STATIC ${default_media_sources})
+target_link_libraries(framework64_default_media PRIVATE framework64)
+target_include_directories(framework64_default_media PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/default)
+
+set(default_datalink_sources 
+    default/modules/data_link.h 
+    default/modules/data_link.c
+)
+add_library(framework64_default_datalink STATIC ${default_datalink_sources})
+target_link_libraries(framework64_default_datalink PRIVATE framework64)
+target_include_directories(framework64_default_datalink PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/default)
 
 if (FW64_PLATFORM_DESKTOP)
     add_subdirectory(desktop)

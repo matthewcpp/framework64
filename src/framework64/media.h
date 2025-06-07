@@ -19,6 +19,9 @@ typedef enum {
     FW64_MEDIA_ITEM_DIRECTORY
 } fw64MediaItemType;
 
+/** Private method used for intialization.  This should not be used by clients. */
+fw64Media* _fw64_media_init(void* param);
+
 /** 
  * Indicates whether removable media is present.
  * For N64: indicates that a SD card has been detected
