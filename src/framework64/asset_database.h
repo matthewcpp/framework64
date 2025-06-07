@@ -50,7 +50,8 @@ fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, fw64AssetId a
 /** Loads a mesh from the asset bundle. */
 fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
 
-fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_id, const fw64SceneLoadOptions* options, fw64Allocator* allocator);
+fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
+fw64Scene* fw64_assets_load_scene_with_options(fw64AssetDatabase* asset_database, fw64AssetId asset_id, const fw64SceneLoadOptions* options, fw64Allocator* allocator);
 
 fw64AnimationData* fw64_assets_load_animation_data(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator);
 

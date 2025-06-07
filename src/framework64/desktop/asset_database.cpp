@@ -49,7 +49,14 @@ fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, fw64AssetId a
     return mesh;
 }
 
-fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_id, const fw64SceneLoadOptions* options, fw64Allocator* allocator) {
+fw64Scene* fw64_assets_load_scene(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
+    fw64SceneLoadOptions options;
+    fw64_scene_load_options_init(&options);
+
+    return fw64_assets_load_scene_with_options(asset_database, asset_id, &options, allocator);
+}
+
+fw64Scene* fw64_assets_load_scene_with_options(fw64AssetDatabase* asset_database, fw64AssetId asset_id, const fw64SceneLoadOptions* options, fw64Allocator* allocator) {
     auto* file_datasource = asset_database->openAssetFile(asset_id);
 
     if (!file_datasource)
