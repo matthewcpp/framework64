@@ -2,7 +2,6 @@
 set(platform_source_files
     asset_database.hpp asset_database.cpp
     audio.hpp audio.cpp
-    data_link.hpp data_link.cpp
     display.hpp display.cpp
     engine.hpp engine.cpp
     filesystem.hpp filesystem.cpp
@@ -17,7 +16,6 @@ set(platform_source_files
     log.cpp
     material.hpp material.cpp
     material_bundle.hpp material_bundle.cpp
-    media.hpp media.cpp
     mesh.hpp mesh.cpp
     mesh_builder.hpp mesh_builder.cpp
     mesh_data_itr.cpp
@@ -40,6 +38,25 @@ set(platform_source_files
 )
 
 target_sources(framework64 PRIVATE ${platform_source_files})
+
+set(deskop_media_sources
+    platform/modules/media.h platform/modules/media.cpp
+)
+
+add_library(framework64_desktop_media STATIC ${deskop_media_sources})
+target_link_libraries(framework64_desktop_media PRIVATE framework64)
+target_include_directories(framework64_desktop_media PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/platform)
+
+set(desktop_datalink_sources
+    platform/modules/data_link.h platform/modules/data_link.cpp
+)
+
+find_package(ixwebsocket CONFIG REQUIRED)
+
+add_library(framework64_desktop_datalink STATIC ${desktop_datalink_sources})
+target_link_libraries(framework64_desktop_datalink PRIVATE framework64)
+target_include_directories(framework64_desktop_datalink PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/platform)
+target_link_libraries(framework64_desktop_datalink PRIVATE ixwebsocket::ixwebsocket)
 
 if (FW64_MEDIA_ENABLED)
     target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)

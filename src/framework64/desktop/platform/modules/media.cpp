@@ -1,6 +1,18 @@
-#include "framework64/desktop/media.hpp"
+#include "modules/media.h"
 
 #include <iostream>
+#include <memory>
+
+fw64Media* _fw64_media_init(void* param) {
+    auto media_dir = reinterpret_cast<std::string*>(param);
+
+    auto media = std::make_unique<fw64Media>();
+    if (media->init(*media_dir)) {
+        return media.release();
+    } else {
+        return nullptr;
+    }
+}
 
 bool fw64Media::init(std::string const & media_dir) {
     base_path = media_dir;
