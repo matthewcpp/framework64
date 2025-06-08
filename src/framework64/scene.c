@@ -180,12 +180,24 @@ void fw64_scene_update(fw64Scene* scene, float time_delta) {
     }
 }
 
-void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
+void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass, uint32_t layer_mask) {
     for (uint32_t i = 0 ; i < fw64_scene_get_mesh_instance_count(scene); i++) {
-        fw64_renderpass_draw_static_mesh(rendererpass, fw64_scene_get_mesh_instance(scene,i));
+        fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(scene, i);
+
+        if (!(mesh_instance->node->layer_mask & layer_mask)) {
+            continue;
+        }
+
+        fw64_renderpass_draw_static_mesh(rendererpass, mesh_instance);
     }
 
     for (uint32_t i = 0 ; i < fw64_scene_get_skinned_mesh_instance_count(scene); i++) {
+        fw64SkinnedMeshInstance* skinned_mesh_instance = fw64_scene_get_skinned_mesh_instance(scene, i);
+
+        if (!(skinned_mesh_instance->mesh_instance.node->layer_mask & layer_mask)) {
+            continue;
+        }
+
         fw64_renderpass_draw_skinned_mesh(rendererpass, fw64_scene_get_skinned_mesh_instance(scene, i));
     }
 }

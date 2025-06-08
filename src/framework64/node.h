@@ -9,9 +9,11 @@
 
 #include <limits.h>
 
-#ifndef FW64_DEFAULT_LAYER_MASK
-#define FW64_DEFAULT_LAYER_MASK 1U
+#ifndef FW64_LAYER_MASK_DEFAULT
+#define FW64_LAYER_MASK_DEFAULT 1U
 #endif
+
+#define FW64_LAYER_MASK_ALL_NONZERO (~0U)
 
 struct fw64Node {
     fw64Transform transform;

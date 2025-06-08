@@ -6,7 +6,7 @@ void fw64_node_init(fw64Node* node) {
     fw64_transform_init(&node->transform);
     node->mesh_instance = NULL;
     node->collider = NULL;
-    node->layer_mask = FW64_DEFAULT_LAYER_MASK;
+    node->layer_mask = FW64_LAYER_MASK_DEFAULT;
     node->data = 0;
 }
 
