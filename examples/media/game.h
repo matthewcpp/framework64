@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/engine.h"
+#include "framework64/media.h"
 
 #include "fw64_asset_viewer.h"
 #include "fw64_media_file_picker.h"
@@ -35,6 +36,7 @@ typedef struct {
 
 typedef struct {
     fw64Engine* engine;
+    fw64Media* media;
     GameState state;
     MediaFileExplorer file_explorer;
     MediaAssetViewer asset_viewer;

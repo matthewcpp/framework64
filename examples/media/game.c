@@ -26,9 +26,10 @@ static void no_media_present_draw(NoMediaPresent* no_media);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
+    game->media = fw64_media_init(engine);
     fw64Font* font = fw64_assets_load_font(game->engine->assets, FW64_ASSET_font_Consolas14, fw64_default_allocator());
 
-    if (fw64_media_is_present(game->engine->media)) {
+    if (fw64_media_is_present(game->media)) {
         game->state = STATE_PICKING_FILE;
         media_file_explorer_init(&game->file_explorer, engine, font, on_file_picked, game);
         media_asset_viewer_init(&game->asset_viewer, engine, font);

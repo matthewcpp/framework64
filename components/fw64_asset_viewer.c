@@ -17,9 +17,9 @@ static void mesh_state_draw(fw64AssetViewerMeshState* state);
 
 static void uninit_current_state(fw64AssetViewer* file_viewer);
 
-void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64Media* media, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size) {
+void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size) {
     file_viewer->state.base.engine = engine;
-    file_viewer->state.base.media = media;
+    file_viewer->state.base.media = fw64_modules_get_static(engine->modules, FW64_MEDIA_MODULE_ID);
     file_viewer->state.base.font = font;
     file_viewer->state.base.renderpass = renderpass;
     

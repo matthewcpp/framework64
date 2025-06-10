@@ -55,7 +55,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64Media* media, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size);
+void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size);
 void fw64_asset_viewer_uninit(fw64AssetViewer* file_viewer);
 void fw64_asset_viewer_update(fw64AssetViewer* file_viewer);
 void fw64_asset_viewer_draw(fw64AssetViewer* file_viewer);

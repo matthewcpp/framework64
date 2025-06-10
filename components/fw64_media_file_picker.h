@@ -61,7 +61,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, fw64Media* media, int max_page_item_size);
+void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, int max_page_item_size);
 void fw64_media_file_picker_uninit(fw64MediaFilePicker* explorer);
 void fw64_media_file_picker_update(fw64MediaFilePicker* explorer);
 void fw64_media_file_picker_draw(fw64MediaFilePicker* explorer);

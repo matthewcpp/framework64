@@ -17,7 +17,7 @@ void* fw64_modules_get_static(fw64Modules* modules, fw64StaticModuleId id) {
         return record.id == id;
     });
 
-    return result == modules->static_modules.end() ? nullptr : &(*result);
+    return result == modules->static_modules.end() ? nullptr : result->module;
 }
 
 void fw64Modules::update() {
