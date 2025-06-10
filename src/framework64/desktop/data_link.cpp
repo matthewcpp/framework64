@@ -1,5 +1,7 @@
-#include "modules/data_link.h"
+#include "framework64/desktop/data_link.hpp"
+#include "framework64/desktop/engine.hpp"
 
+#include "framework64/modules.h"
 
 #include <IXNetSystem.h>
 #define NOMINMAX
@@ -116,19 +118,30 @@ void fw64DataLink::onWebsocketMessage(const std::string& payload) {
 }
 
  // C API
-fw64DataLink* _fw64_data_link_init(void* arg) {
-    const int* port_num = reinterpret_cast<int*>(arg);
+ static void fw64_data_link_update(void* data_link, void* arg) {
+    (void)arg;
+    reinterpret_cast<fw64DataLink*>(data_link)->update();
+}
+
+fw64DataLink* fw64_data_link_init(fw64Engine* engine) {
+    const auto desktop_engine = reinterpret_cast<framework64::Engine*>(engine);
+    if (!desktop_engine) {
+        return nullptr;
+    }
+
     auto data_link = std::make_unique<fw64DataLink>();
-    if (data_link->initialize(*port_num)) {
+    if (! _fw64_modules_register_static(engine->modules, FW64_DATALINK_MODULE_ID, data_link.get(), fw64_data_link_update, NULL)) {
+        std::cout << "Failed to initialize websocket datalink" << std::endl;
+        return nullptr;
+    }
+
+    
+    if (data_link->initialize(desktop_engine->settings.data_link_port)) {
         return data_link.release();
     } else {
         return nullptr;
     }
  }
-
-void _fw64_data_link_update(fw64DataLink* data_link) {
-    data_link->update();
-}
 
 void fw64_data_link_set_connected_callback(fw64DataLink* data_link, fw64DataLinkConnectedCallback callback, void* arg) {
     data_link->setConnectedCallback(callback, arg);

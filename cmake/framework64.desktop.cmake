@@ -55,7 +55,7 @@ endfunction()
 
 # performs platform specific configuration of a framework64 game
 function(create_game)
-    set(options ALL_WARNINGS_AS_ERRORS ENABLE_MEDIA ENABLE_DATALINK)
+    set(options ALL_WARNINGS_AS_ERRORS)
     set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
     set(multiValueArgs SOURCES EXTRA_LIBS)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -78,18 +78,6 @@ function(create_game)
 
     if (${DESKTOP_GAME_ALL_WARNINGS_AS_ERRORS})
         enable_all_warnings_as_errors(TARGET ${target_name})
-    endif()
-
-    if (${DESKTOP_GAME_ENABLE_MEDIA})
-        target_link_libraries(${target_name} PRIVATE framework64_desktop_media)
-    else()
-        target_link_libraries(${target_name} PRIVATE framework64_default_media)
-    endif()
-
-    if (${DESKTOP_GAME_ENABLE_DATALINK})
-        target_link_libraries(${target_name} PRIVATE framework64_desktop_datalink)
-    else()
-        target_link_libraries(${target_name} PRIVATE framework64_default_datalink)
     endif()
 
     # Configure target specific output directories

@@ -20,6 +20,7 @@ set(platform_source_files
     mesh_builder.hpp mesh_builder.cpp
     mesh_data_itr.cpp
     mesh_editor.cpp
+    modules.hpp modules.cpp
     n64_input_interface.hpp n64_input_interface.cpp
     primitive_data.hpp primitive_data.cpp
     render_pass.hpp render_pass.cpp
@@ -38,28 +39,3 @@ set(platform_source_files
 )
 
 target_sources(framework64 PRIVATE ${platform_source_files})
-
-set(deskop_media_sources
-    platform/modules/media.h platform/modules/media.cpp
-)
-
-add_library(framework64_desktop_media STATIC ${deskop_media_sources})
-target_link_libraries(framework64_desktop_media PRIVATE framework64)
-target_include_directories(framework64_desktop_media PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/platform)
-
-set(desktop_datalink_sources
-    platform/modules/data_link.h platform/modules/data_link.cpp
-)
-
-find_package(ixwebsocket CONFIG REQUIRED)
-
-add_library(framework64_desktop_datalink STATIC ${desktop_datalink_sources})
-target_link_libraries(framework64_desktop_datalink PRIVATE framework64)
-target_include_directories(framework64_desktop_datalink PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/platform)
-target_link_libraries(framework64_desktop_datalink PRIVATE ixwebsocket::ixwebsocket)
-
-if (FW64_MEDIA_ENABLED)
-    target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)
-else()
-    message("Building without media support")
-endif()

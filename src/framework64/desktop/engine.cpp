@@ -1,12 +1,10 @@
 #include "framework64/desktop/engine.hpp"
 
-#include "framework64/data_link.h"
-#include "framework64/media.h"
-
 #include "framework64/desktop/asset_database.hpp"
 #include "framework64/desktop/audio.hpp"
 #include "framework64/desktop/filesystem.hpp"
 #include "framework64/desktop/input.hpp"
+#include "framework64/desktop/modules.hpp"
 #include "framework64/desktop/renderer.hpp"
 
 #include <SDL2/SDL_image.h>
@@ -15,7 +13,8 @@
 #include <iostream>
 
 namespace framework64 {
-bool Engine::init(Settings const & settings) {
+bool Engine::init(Settings const & app_settings) {
+    settings = app_settings;
     application_name = settings.application_name;
 
     if (settings.save_file_type == fw64SaveFile::SaveFileType::Unknown) {
@@ -66,6 +65,7 @@ bool Engine::init(Settings const & settings) {
     assets = new fw64AssetDatabase(asset_dir_path, *shader_cache);
     audio = new fw64Audio();
     input = new fw64Input();
+    modules = new fw64Modules();
 
     time = new fw64Time();
     memset(time, 0, sizeof(fw64Time));
@@ -83,17 +83,11 @@ bool Engine::init(Settings const & settings) {
     input->init(*n64_input_interface, *time);
     save_file->init(save_file_path, settings.save_file_type);
 
-    media = _fw64_media_init(const_cast<std::string*>(&media_dir));
-    if (!media) {
-        std::cout << "Failed to initialize media" << std::endl;
-        return false;
-    }
-
-    data_link = _fw64_data_link_init(const_cast<int*>(&settings.data_link_port));
-    if (!data_link) {
-        std::cout << "Failed to initialize websocket datalink" << std::endl;
-        return false;
-    }
+    // media = _fw64_media_init(const_cast<std::string*>(&media_dir));
+    // if (!media) {
+    //     std::cout << "Failed to initialize media" << std::endl;
+    //     return false;
+    // }
 
     Filesystem::init(asset_dir_path, *assets);
 
@@ -102,7 +96,8 @@ bool Engine::init(Settings const & settings) {
 
 void Engine::update(float time_delta) {
     input->update();
-    _fw64_data_link_update(data_link);
+    modules->update();
+
     time->time_delta = time_delta;
     time->total_time += time_delta;
 

@@ -1,10 +1,9 @@
-
+#include "fw64_file_downloader.h"
+#include "fw64_file_downloader_message.h"
 
 #include "framework64/asset_database.h"
 #include "framework64/log.h"
-
-#include "fw64_file_downloader.h"
-#include "fw64_file_downloader_message.h"
+#include "framework64/media.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -18,16 +17,17 @@ static void fw64_file_downloader_init_media_dir(fw64FileDownloader* file_downloa
 static void fw64_file_downloader_begin(fw64FileDownloader* file_downloader, fw64DataSource* message);
 static void fw64_file_downloader_continue(fw64FileDownloader* file_downloader, fw64DataSource* message);
 
-void fw64_file_downloader_init(fw64FileDownloader* file_downloader, fw64Engine* engine) {
+void fw64_file_downloader_init(fw64FileDownloader* file_downloader, fw64Engine* engine, fw64Media* media) {
     memset(file_downloader, 0, sizeof(fw64FileDownloader));
     file_downloader->engine = engine;
+    file_downloader->media = media;
     fw64_file_downloader_init_media_dir(file_downloader);
     fw64_bump_allocator_init(&file_downloader->bump_allocator, BUMP_ALLOCATOR_SIZE);
 }
 
 void fw64_file_downloader_uninit(fw64FileDownloader* file_downloader) {
     if (file_downloader->data_writer) {
-        fw64_media_close_data_writer(file_downloader->engine->media, file_downloader->data_writer);
+        fw64_media_close_data_writer(file_downloader->media, file_downloader->data_writer);
     }
 }
 
@@ -72,7 +72,7 @@ void fw64_file_downloader_begin(fw64FileDownloader* file_downloader, fw64DataSou
     file_downloader->current_asset_size = message_header.file_data_size;
     file_downloader->current_asset_received = 0;
 
-    file_downloader->data_writer = fw64_media_open_data_writer(file_downloader->engine->media, &file_downloader->current_asset_filepath[0]);
+    file_downloader->data_writer = fw64_media_open_data_writer(file_downloader->media, &file_downloader->current_asset_filepath[0]);
 
     fw64_debug_log("Saving file: %s", &file_downloader->current_asset_filepath[0]);
 
@@ -101,7 +101,7 @@ void fw64_file_downloader_continue(fw64FileDownloader* file_downloader, fw64Data
     }
 
     if (file_downloader->current_asset_received == file_downloader->current_asset_size) {
-        fw64_media_close_data_writer(file_downloader->engine->media, file_downloader->data_writer);
+        fw64_media_close_data_writer(file_downloader->media, file_downloader->data_writer);
         file_downloader->data_writer = NULL;
 
         if (file_downloader->callbacks.complete) {
@@ -114,12 +114,12 @@ void fw64_file_downloader_continue(fw64FileDownloader* file_downloader, fw64Data
 }
 
 void fw64_file_downloader_init_media_dir(fw64FileDownloader* file_downloader) {
-    if (fw64_media_get_path_type(file_downloader->engine->media, FW64_ROOT_MEDIA_DIR) == FW64_MEDIA_ITEM_NONE) {
-        fw64_media_create_directory(file_downloader->engine->media, FW64_ROOT_MEDIA_DIR);
+    if (fw64_media_get_path_type(file_downloader->media, FW64_ROOT_MEDIA_DIR) == FW64_MEDIA_ITEM_NONE) {
+        fw64_media_create_directory(file_downloader->media, FW64_ROOT_MEDIA_DIR);
     }
 
-    if (fw64_media_get_path_type(file_downloader->engine->media, FW64_DATA_LINK_EXAMPLE_DIR) == FW64_MEDIA_ITEM_NONE) {
-        fw64_media_create_directory(file_downloader->engine->media, FW64_DATA_LINK_EXAMPLE_DIR);
+    if (fw64_media_get_path_type(file_downloader->media, FW64_DATA_LINK_EXAMPLE_DIR) == FW64_MEDIA_ITEM_NONE) {
+        fw64_media_create_directory(file_downloader->media, FW64_DATA_LINK_EXAMPLE_DIR);
     }
 }
 

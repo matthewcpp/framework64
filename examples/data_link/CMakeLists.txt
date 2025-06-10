@@ -6,3 +6,5 @@ create_game(
     SOURCES ${src_files}
     EXTRA_LIBS fw64_components
     ALL_WARNINGS_AS_ERRORS)
+
+add_game_modules(TARGET data_link MODULES datalink)

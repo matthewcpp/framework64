@@ -3,6 +3,7 @@
 /** \file media.h */
 
 #include "framework64/data_io.h"
+#include "framework64/engine.h"
 
 #include <stdint.h>
 
@@ -19,8 +20,8 @@ typedef enum {
     FW64_MEDIA_ITEM_DIRECTORY
 } fw64MediaItemType;
 
-/** Private method used for intialization.  This should not be used by clients. */
-fw64Media* _fw64_media_init(void* param);
+/** This method should be called once during game initialization. */
+fw64Media* fw64_media_init(fw64Engine* engine);
 
 /** 
  * Indicates whether removable media is present.

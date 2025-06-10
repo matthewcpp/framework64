@@ -15,8 +15,9 @@ static void read_next_page(fw64MediaFilePicker* explorer);
 static void read_path(fw64MediaFilePicker* explorer);
 
 
-void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, int max_page_item_size) {
+void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, fw64Media* media, int max_page_item_size) {
     explorer->engine = engine;
+    explorer->media = media;
     explorer->max_page_item_size = max_page_item_size;
     explorer->flags = FW64_MEDIA_FILEPICKER_FLAG_NONE;
 
@@ -39,10 +40,10 @@ void fw64_media_file_picker_uninit(fw64MediaFilePicker* explorer) {
 
 void read_path(fw64MediaFilePicker* explorer) {
     if (explorer->dir_itr) {
-        fw64_media_close_dir(explorer->engine->media, explorer->dir_itr);
+        fw64_media_close_dir(explorer->media, explorer->dir_itr);
     }
 
-    explorer->dir_itr = fw64_media_open_dir(explorer->engine->media, explorer->dir_stack.path);
+    explorer->dir_itr = fw64_media_open_dir(explorer->media, explorer->dir_stack.path);
 
     fw64_bump_allocator_reset(&explorer->dir_allocator);
     reset_dir_data(explorer);

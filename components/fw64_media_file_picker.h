@@ -3,6 +3,8 @@
 #include "framework64/engine.h"
 #include "framework64/util/bump_allocator.h"
 
+#include "framework64/media.h"
+
 #include "fw64_ui_navigation.h"
 
 #define fw64_media_file_picker_MAX_DEPTH 8
@@ -43,6 +45,7 @@ typedef void (*fw64MediaFilePickerFilePickedFunc)(const char* path, void* arg);
 
 typedef struct {
     fw64Engine* engine;
+    fw64Media* media;
     fw64MediaDirItr* dir_itr;
     fw64FileExplorerDirStack dir_stack;
     fw64FileExplorerDirData dir_data;
@@ -58,7 +61,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, int max_page_item_size);
+void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, fw64Media* media, int max_page_item_size);
 void fw64_media_file_picker_uninit(fw64MediaFilePicker* explorer);
 void fw64_media_file_picker_update(fw64MediaFilePicker* explorer);
 void fw64_media_file_picker_draw(fw64MediaFilePicker* explorer);

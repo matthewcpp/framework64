@@ -1,12 +1,17 @@
-#include "modules/data_link.h"
+#include "framework64/data_link.h"
+
+struct fw64DataLink {
+    int is_active;
+};
+
 
 static fw64DataLink default_data_link;
 
-fw64DataLink* _fw64_data_link_init(void* arg) {
+fw64DataLink* fw64_data_link_init(void* arg) {
     return &default_data_link;
 }
 
-void _fw64_data_link_update(fw64DataLink* data_link) {
+void fw64_data_link_update(fw64DataLink* data_link) {
 
 }
 

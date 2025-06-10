@@ -4,7 +4,8 @@
 
 #include <stdint.h>
 
-#include "framework64/data_io.h"
+#include <framework64/data_io.h>
+#include <framework64/engine.h>
 
 typedef enum {
     FW64_DATA_LINK_MESSAGE_BINARY,
@@ -13,6 +14,8 @@ typedef enum {
 
 typedef struct fw64DataLink fw64DataLink;
 
+#define FW64_DATALINK_MODULE_ID 1
+
 typedef void(*fw64DataLinkConnectedCallback)(void* arg);
 typedef void(*fw64DataLinkMessageCallback)(fw64DataSource* message, void* arg);
 
@@ -20,11 +23,8 @@ typedef void(*fw64DataLinkMessageCallback)(fw64DataSource* message, void* arg);
 extern "C" {
 #endif
 
-/** Private method used for initialization. Should not be used by callers. */
-fw64DataLink* _fw64_data_link_init(void* arg);
-
-/** Private method used for updating. Should not be used by callers. */
-void _fw64_data_link_update(fw64DataLink* data_link);
+/** This method should be called once during game initialization. */
+fw64DataLink* fw64_data_link_init(fw64Engine* engine);
 
 void fw64_data_link_set_connected_callback(fw64DataLink* data_link, fw64DataLinkConnectedCallback callback, void* arg);
 void fw64_data_link_set_mesage_callback(fw64DataLink* data_link, fw64DataLinkMessageCallback callback, void* arg);

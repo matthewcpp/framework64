@@ -170,6 +170,11 @@
         "skinned_mesh_instance.h": "c",
         "scene_playground.h": "c",
         "scene_billboard_example.h": "c",
-        "log.h": "c"
+        "log.h": "c",
+        "bump_allocator.h": "c",
+        "__verbose_abort": "cpp",
+        "csetjmp": "cpp",
+        "execution": "cpp",
+        "print": "cpp"
     }
 }

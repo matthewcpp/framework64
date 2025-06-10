@@ -2,6 +2,7 @@
 
 #include <framework64/data_io.h>
 #include <framework64/engine.h>
+#include <framework64/media.h>
 #include <framework64/scene.h>
 #include <framework64/util/bump_allocator.h>
 
@@ -15,6 +16,7 @@ typedef enum {
 typedef struct {
     fw64AssetType type;
     fw64Engine* engine;
+    fw64Media* media;
     fw64Font* font;
     fw64RenderPass* renderpass;
     fw64BumpAllocator allocator;
@@ -53,7 +55,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size);
+void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64Media* media, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size);
 void fw64_asset_viewer_uninit(fw64AssetViewer* file_viewer);
 void fw64_asset_viewer_update(fw64AssetViewer* file_viewer);
 void fw64_asset_viewer_draw(fw64AssetViewer* file_viewer);

@@ -29,3 +29,9 @@ set(platform_source_files
 )
 
 target_sources(framework64 PRIVATE ${platform_source_files})
+
+set(deskop_media_sources
+    platform/modules/media.h platform/modules/media.cpp
+)
+
+add_library(framework64_n64_libultra_media STATIC ${deskop_media_sources})
