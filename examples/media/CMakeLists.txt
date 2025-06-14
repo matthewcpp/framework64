@@ -5,10 +5,9 @@ create_game(
     TARGET media
     ENABLE_MEDIA
     SOURCES ${src_files}
+    STATIC_MODULES media
     EXTRA_LIBS fw64_components
     ALL_WARNINGS_AS_ERRORS)
-
-add_game_modules(TARGET media MODULES media)
 
 # Note this is used here to avoid a clash with the media directory having the same name as the example executable
 if (FW64_PLATFORM_DESKTOP)

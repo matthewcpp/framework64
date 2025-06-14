@@ -74,7 +74,7 @@ void fw64_file_downloader_begin(fw64FileDownloader* file_downloader, fw64DataSou
 
     file_downloader->data_writer = fw64_media_open_data_writer(file_downloader->media, &file_downloader->current_asset_filepath[0]);
 
-    fw64_debug_log("Saving file: %s", &file_downloader->current_asset_filepath[0]);
+    fw64_log_message("Saving file: %s", &file_downloader->current_asset_filepath[0]);
 
     if (file_downloader->callbacks.begin) {
         file_downloader->callbacks.begin(file_downloader, file_downloader->callbacks_arg);

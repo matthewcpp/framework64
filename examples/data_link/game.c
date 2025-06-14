@@ -50,7 +50,7 @@ void game_init(Game* game, fw64Engine* engine) {
 
 void game_update(Game* game){
     if (fw64_input_controller_button_pressed(game->engine->input, 0 , FW64_N64_CONTROLLER_BUTTON_START)) {
-        fw64_debug_log("Total Messages: %u Data: %u", game->total_message_count, game->total_message_data);
+        fw64_log_message("Total Messages: %u Data: %u", game->total_message_count, game->total_message_data);
     }
 }
 

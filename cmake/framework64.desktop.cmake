@@ -1,6 +1,8 @@
 set(FW64_PLATFORM_DESKTOP ON)
 set(CMAKE_CXX_STANDARD 17)
 
+include("cmake/add_game_modules.cmake")
+
 function (enable_all_warnings_as_errors)
     set(options)
     set(oneValueArgs TARGET)
@@ -57,7 +59,7 @@ endfunction()
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
     set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
-    set(multiValueArgs SOURCES EXTRA_LIBS)
+    set(multiValueArgs SOURCES EXTRA_LIBS STATIC_MODULES)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     set(target_name ${DESKTOP_GAME_TARGET})
@@ -75,6 +77,8 @@ function(create_game)
 
     add_executable(${target_name} ${game_sources} ${main_file_dest})
     target_link_libraries(${target_name} PUBLIC framework64)
+
+    add_game_modules(TARGET ${target_name} MODULES ${N64_ROM_STATIC_MODULES})
 
     if (${DESKTOP_GAME_ALL_WARNINGS_AS_ERRORS})
         enable_all_warnings_as_errors(TARGET ${target_name})
