@@ -31,7 +31,7 @@ struct fw64FileDownloader{
 extern "C" {
 #endif
 
-void fw64_file_downloader_init(fw64FileDownloader* file_downloader, fw64Engine* engine, fw64Media* media);
+void fw64_file_downloader_init(fw64FileDownloader* file_downloader, fw64Engine* engine);
 void fw64_file_downloader_uninit(fw64FileDownloader* file_downloader);
 uint32_t fw64_file_downloader_receive_message(fw64FileDownloader* file_downloader, fw64DataSource* message);
 void fw64_file_downloader_set_callbacks(fw64FileDownloader* file_downloader, fw64FileDownloaderCallbacks* callbacks, void* arg);

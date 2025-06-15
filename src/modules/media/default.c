@@ -7,6 +7,7 @@ struct fw64Media {
 static fw64Media default_media;
 
 fw64Media* _fw64_media_init(void* param) {
+    default_media.is_present = 0;
     return &default_media;
 }
 

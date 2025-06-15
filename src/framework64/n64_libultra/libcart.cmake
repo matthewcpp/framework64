@@ -74,8 +74,12 @@ set(ff_src_files
     ${libcart_ff_dir}/ffunicode.c
 )
 
+# Note although this is part of the media module, we add the source files to the core library
+# This avoids linker errors having to do with the linkerscript
+# TODO: investigate if we can avoid doing this.
 target_compile_definitions(framework64_media PRIVATE -D_ULTRA64)
 target_include_directories(framework64_media PRIVATE ${libcart_include_dir} ${libcart_ff_dir})
+
 target_sources(framework64_media PRIVATE 
     ${libcart_include_file}
     ${libcart_src_files}

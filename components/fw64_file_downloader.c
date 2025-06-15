@@ -17,10 +17,10 @@ static void fw64_file_downloader_init_media_dir(fw64FileDownloader* file_downloa
 static void fw64_file_downloader_begin(fw64FileDownloader* file_downloader, fw64DataSource* message);
 static void fw64_file_downloader_continue(fw64FileDownloader* file_downloader, fw64DataSource* message);
 
-void fw64_file_downloader_init(fw64FileDownloader* file_downloader, fw64Engine* engine, fw64Media* media) {
+void fw64_file_downloader_init(fw64FileDownloader* file_downloader, fw64Engine* engine) {
     memset(file_downloader, 0, sizeof(fw64FileDownloader));
     file_downloader->engine = engine;
-    file_downloader->media = media;
+    file_downloader->media = fw64_modules_get_static(engine->modules, FW64_MEDIA_MODULE_ID);
     fw64_file_downloader_init_media_dir(file_downloader);
     fw64_bump_allocator_init(&file_downloader->bump_allocator, BUMP_ALLOCATOR_SIZE);
 }

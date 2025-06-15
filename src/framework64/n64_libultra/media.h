@@ -34,6 +34,3 @@ struct fw64Media {
     fw64N64MediaDataReader data_reader;
     fw64N64MediaDataWriter data_writer;
 };
-
-void fw64_n64_media_init(fw64Media* media);
-

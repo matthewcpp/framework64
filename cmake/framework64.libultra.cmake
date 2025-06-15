@@ -1,7 +1,5 @@
 # Note: Helpful resource: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
 
-include("cmake/add_game_modules.cmake")
-
 set(CMAKE_C_COMPILER mips-n64-gcc)
 
 set(CMAKE_SYSTEM_NAME Generic)

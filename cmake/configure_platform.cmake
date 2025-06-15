@@ -6,6 +6,9 @@ else()
     set(FW64_ROOT_DIR ${CMAKE_SOURCE_DIR}/lib/framework64 CACHE INTERNAL "FW64_ROOT_DIR")
 endif()
 
+# Add cmake files that are needed by all platforms
+include(${FW64_ROOT_DIR}/cmake/add_game_modules.cmake)
+
 # configure the target platform
 if (FW64_PLATFORM_N64_LIBULTRA)
     message("Configuring for Platform: N64_libultra")

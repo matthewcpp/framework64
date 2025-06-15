@@ -4,19 +4,23 @@
 
 #include "cart.h"
 
-void fw64_n64_media_init(fw64Media* media) {
+fw64Media _media;
+
+fw64Media* fw64_media_init(fw64Engine* engine) {
     int error = cart_init();
 
     if (error != 0) {
-        media->is_present = 0;
-        return;
+        _media.is_present = 0;
+        return NULL;
     }
 
-    FRESULT result = f_mount(&media->fs, "", 0);
-    media->is_present = (result == FR_OK);
+    FRESULT result = f_mount(&_media.fs, "", 0);
+    _media.is_present = (result == FR_OK);
 
-    fw64_n64_media_data_reader_init(&media->data_reader);
-    fw64_n64_media_data_writer_init(&media->data_writer);
+    fw64_n64_media_data_reader_init(&_media.data_reader);
+    fw64_n64_media_data_writer_init(&_media.data_writer);
+
+    return &_media;
 }
 
 int fw64_media_is_present(fw64Media* media) {
