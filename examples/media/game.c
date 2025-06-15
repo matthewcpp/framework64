@@ -112,7 +112,10 @@ void media_file_explorer_update_spritebatch(MediaFileExplorer* explorer) {
     int x_pos = 20;
     int y_pos = 20;
 
-    fw64_spritebatch_draw_string(explorer->spritebatch, explorer->font, explorer->file_picker.dir_stack.path, x_pos, y_pos);
+    char cwd_str[fw64_media_file_picker_MAX_PATH_LENGTH + 16];
+    sprintf(cwd_str, "cwd: %s", explorer->file_picker.dir_stack.path);
+
+    fw64_spritebatch_draw_string(explorer->spritebatch, explorer->font, cwd_str, x_pos, y_pos);
 
     fw64FileExplorerItemPage* page = explorer->file_picker.dir_data.pages[explorer->file_picker.dir_data.current_page_index];
 
