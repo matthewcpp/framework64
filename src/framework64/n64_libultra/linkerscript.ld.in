@@ -55,9 +55,10 @@ SECTIONS
 	${entry_path}(.start);
       /usr/lib/n64/nusys/nusys_rom.o(.text);
       *c.obj(.text);
+      *.obj(.text);
 
       */libframework64.a:*.o(.text);
-      */libframework64.a:*.obj(.text); /* note: libcart's assembly file is linked in and had extension .obj */
+      */libframework64.a:*.obj(.text);
 
       */libultra_rom.a:*.o(.text);
       */libnusys.a:*.o(.text);
@@ -80,6 +81,7 @@ SECTIONS
       /* data */
       /usr/lib/n64/nusys/nusys_rom.o(.data*);
       *c.obj(.data*);
+      *.obj(.data*);
 
       */libultra_rom.a:*.o(.data*);
       */libnusys.a:*.o(.data*);
@@ -101,6 +103,7 @@ SECTIONS
       /* rodata */
       /usr/lib/n64/nusys/nusys_rom.o(.*rodata*);
       *c.obj(.*rodata*);
+      *.obj(.*rodata*);
 
       */libframework64.a:*.o(.*rodata*);
 
@@ -120,6 +123,7 @@ SECTIONS
       /usr/lib/n64/nusys/nusys_rom.o(.scommon);
       /usr/lib/n64/nusys/nusys_rom.o(.*bss*);
       *c.obj(.*bss*);
+      *.obj(.*bss*);
 
       */libframework64.a:*.o(COMMON);
       */libframework64.a:*.o(.scommon);
