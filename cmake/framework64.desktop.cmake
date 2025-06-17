@@ -1,6 +1,8 @@
 set(FW64_PLATFORM_DESKTOP ON)
 set(CMAKE_CXX_STANDARD 17)
 
+set(FW64_PLATFORM_NAME "desktop")
+
 function (enable_all_warnings_as_errors)
     set(options)
     set(oneValueArgs TARGET)
@@ -30,7 +32,7 @@ function (configure_core_library)
     find_package(CLI11 CONFIG REQUIRED)
     find_package(CURL CONFIG REQUIRED)
     find_package(GLEW REQUIRED)
-    find_package(ixwebsocket CONFIG REQUIRED)
+
     find_package(nlohmann_json CONFIG REQUIRED)
     find_package(SDL2 CONFIG REQUIRED)
     find_package(SDL2_mixer CONFIG REQUIRED)
@@ -38,7 +40,6 @@ function (configure_core_library)
 
     target_link_libraries(framework64 PUBLIC CLI11::CLI11)
     target_link_libraries(framework64 PUBLIC GLEW::GLEW)
-    target_link_libraries(framework64 PUBLIC ixwebsocket::ixwebsocket)
     target_link_libraries(framework64 PUBLIC CURL::libcurl)
     target_link_libraries(framework64 PUBLIC SDL2::SDL2 SDL2::SDL2main)
     target_link_libraries(framework64 PUBLIC $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
@@ -58,7 +59,7 @@ endfunction()
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
     set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
-    set(multiValueArgs SOURCES EXTRA_LIBS)
+    set(multiValueArgs SOURCES EXTRA_LIBS STATIC_MODULES)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     set(target_name ${DESKTOP_GAME_TARGET})
@@ -76,6 +77,8 @@ function(create_game)
 
     add_executable(${target_name} ${game_sources} ${main_file_dest})
     target_link_libraries(${target_name} PUBLIC framework64)
+
+    add_game_modules(TARGET ${target_name} MODULES ${DESKTOP_GAME_STATIC_MODULES})
 
     if (${DESKTOP_GAME_ALL_WARNINGS_AS_ERRORS})
         enable_all_warnings_as_errors(TARGET ${target_name})

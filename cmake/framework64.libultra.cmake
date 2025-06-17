@@ -1,5 +1,7 @@
 # Note: Helpful resource: https://gcc.gnu.org/onlinedocs/gcc/Option-Summary.html
 
+set(FW64_PLATFORM_NAME "n64_libultra")
+
 set(CMAKE_C_COMPILER mips-n64-gcc)
 
 set(CMAKE_SYSTEM_NAME Generic)
@@ -51,7 +53,7 @@ endfunction()
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
     set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
-    set(multiValueArgs SOURCES EXTRA_LIBS)
+    set(multiValueArgs SOURCES EXTRA_LIBS STATIC_MODULES)
     cmake_parse_arguments(N64_ROM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
     # set the correct EEPROM type for the rom
@@ -113,6 +115,8 @@ function(create_game)
 
     set(elf_output_name ${target_name}.elf)
     set_target_properties(${target_name} PROPERTIES OUTPUT_NAME ${elf_output_name})
+
+    add_game_modules(TARGET ${target_name} MODULES ${N64_ROM_STATIC_MODULES})
 
     # configure assembly compile options
     set(asm_compile_options "-x;assembler-with-cpp;-MMD;-Wa,-I${asm_dest_dir}")

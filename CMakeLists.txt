@@ -7,8 +7,6 @@ option(FW64_BUILD_TOOLS "Builds the companion tools" ON)
 
 option(FW64_BUILD_DATALINK_CLIENT_N64 "Builds the datalink client for n64" ON)
 
-option(FW64_MEDIA_ENABLED "Enables fw64 media module" ON)
-
 if (NOT DEFINED FW64_PLATFORM_CONFIGURED)
     include(cmake/configure_platform.cmake REQUIRED)
 endif()
@@ -20,6 +18,7 @@ else()
 endif()
 
 add_subdirectory(src/framework64)
+add_subdirectory(src/modules)
 add_subdirectory(components)
 
 if (FW64_BUILD_EXAMPLES)
