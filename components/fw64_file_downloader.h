@@ -1,4 +1,5 @@
 #include "framework64/engine.h"
+#include "framework64/media.h"
 #include "framework64/util/bump_allocator.h"
 
 typedef struct fw64FileDownloader fw64FileDownloader;
@@ -15,6 +16,7 @@ typedef struct {
 
 struct fw64FileDownloader{
     fw64Engine* engine;
+    fw64Media* media;
     fw64DataWriter* data_writer;
     fw64BumpAllocator bump_allocator;
     char* current_asset_filename;

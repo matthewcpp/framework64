@@ -3,6 +3,8 @@
 #include "framework64/engine.h"
 #include "framework64/util/bump_allocator.h"
 
+#include "framework64/media.h"
+
 #include "fw64_ui_navigation.h"
 
 #define fw64_media_file_picker_MAX_DEPTH 8
@@ -11,7 +13,8 @@
 typedef enum {
     FW64_MEDIA_FILEPICKER_FLAG_NONE,
     FW64_MEDIA_FILEPICKER_FLAG_SELECTION_CHANGED = 1 << 0,
-    FW64_MEDIA_FILEPCIKER_FLAG_PICKED_FILE       = 1 << 1
+    FW64_MEDIA_FILEPCIKER_FLAG_PICKED_FILE       = 1 << 1,
+    FW64_MEDIA_FILEPCIKER_FLAG_DIR_CHANGED       = 1 << 2
 } fw64MediaFilePickerFlags;
 
 typedef struct {
@@ -43,6 +46,7 @@ typedef void (*fw64MediaFilePickerFilePickedFunc)(const char* path, void* arg);
 
 typedef struct {
     fw64Engine* engine;
+    fw64Media* media;
     fw64MediaDirItr* dir_itr;
     fw64FileExplorerDirStack dir_stack;
     fw64FileExplorerDirData dir_data;
@@ -65,6 +69,8 @@ void fw64_media_file_picker_draw(fw64MediaFilePicker* explorer);
 void fw64_media_file_picker_set_file_picked_callback(fw64MediaFilePicker* explorer, fw64MediaFilePickerFilePickedFunc func, void* arg);
 
 #define fw64_media_file_picker_did_change_selection(picker) ((picker)->flags & FW64_MEDIA_FILEPICKER_FLAG_SELECTION_CHANGED)
+#define fw64_media_file_picker_did_change_directory(picker) ((picker)->flags & FW64_MEDIA_FILEPCIKER_FLAG_DIR_CHANGED)
+#define fw64_media_file_picker_did_change(picker) ((picker)->flags & (FW64_MEDIA_FILEPCIKER_FLAG_DIR_CHANGED | FW64_MEDIA_FILEPICKER_FLAG_SELECTION_CHANGED))
 #define fw64_media_file_picker_did_pick_file(picker) ((picker)->flags & FW64_MEDIA_FILEPCIKER_FLAG_PICKED_FILE)
 
 #ifdef __cplusplus
