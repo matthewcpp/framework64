@@ -45,8 +45,8 @@ struct fw64DataLink {
 
     fw64DataLinkConnectedCallback connected_callback;
     void* connected_callback_arg;
+    int should_trigger_connection_callback;
 };
 
 int fw64_n64_data_link_init(fw64DataLink* data_link);
 void fw64_n64_data_link_start(fw64DataLink* data_link);
-void fw64_n64_data_link_update(fw64DataLink* data_link);
