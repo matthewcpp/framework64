@@ -11,7 +11,6 @@ set(common_source_files
     collider.h collider.c
     color.h color.c
     data_io.h data_io.c
-    data_link.h
     display.h
     engine.h
     filesystem.h
@@ -25,9 +24,9 @@ set(common_source_files
     math.h math.c
     matrix.h matrix.c
     matrix_project.h matrix_project.c
-    media.h
     mesh.h
     mesh_instance.h mesh_instance.c
+    modules.h
     node.h node.c
     plane.h plane.c
     quat.h quat.c
@@ -65,7 +64,6 @@ set(common_source_files
     controller_mapping/n64.h
 )
 
-
 add_library(framework64 STATIC ${common_source_files})
 target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
@@ -76,14 +74,3 @@ elseif(FW64_PLATFORM_N64_LIBULTRA)
 endif()
 
 configure_core_library()
-
-if (FW64_MEDIA_ENABLED)
-    target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)
-    
-    if(FW64_PLATFORM_N64_LIBULTRA)
-        include(n64_libultra/libcart.cmake)
-    endif()
-
-else()
-    message("Building without media support")
-endif()

@@ -2,7 +2,6 @@
 set(platform_source_files
     asset_database.hpp asset_database.cpp
     audio.hpp audio.cpp
-    data_link.hpp data_link.cpp
     display.hpp display.cpp
     engine.hpp engine.cpp
     filesystem.hpp filesystem.cpp
@@ -17,11 +16,11 @@ set(platform_source_files
     log.cpp
     material.hpp material.cpp
     material_bundle.hpp material_bundle.cpp
-    media.hpp media.cpp
     mesh.hpp mesh.cpp
     mesh_builder.hpp mesh_builder.cpp
     mesh_data_itr.cpp
     mesh_editor.cpp
+    modules.hpp modules.cpp
     n64_input_interface.hpp n64_input_interface.cpp
     primitive_data.hpp primitive_data.cpp
     render_pass.hpp render_pass.cpp
@@ -40,9 +39,3 @@ set(platform_source_files
 )
 
 target_sources(framework64 PRIVATE ${platform_source_files})
-
-if (FW64_MEDIA_ENABLED)
-    target_compile_definitions(framework64 PRIVATE -DFW64_MEDIA_ENABLED)
-else()
-    message("Building without media support")
-endif()
