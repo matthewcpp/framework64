@@ -2,23 +2,25 @@
 
 // reference for Filesystem module: http://elm-chan.org/fsw/ff/00index_e.html
 
-#ifdef FW64_MEDIA_ENABLED
-
 #include "cart.h"
 
-void fw64_n64_media_init(fw64Media* media) {
+fw64Media _media;
+
+fw64Media* fw64_media_init(fw64Engine* engine) {
     int error = cart_init();
 
     if (error != 0) {
-        media->is_present = 0;
-        return;
+        _media.is_present = 0;
+        return NULL;
     }
 
-    FRESULT result = f_mount(&media->fs, "", 0);
-    media->is_present = (result == FR_OK);
+    FRESULT result = f_mount(&_media.fs, "", 0);
+    _media.is_present = (result == FR_OK);
 
-    fw64_n64_media_data_reader_init(&media->data_reader);
-    fw64_n64_media_data_writer_init(&media->data_writer);
+    fw64_n64_media_data_reader_init(&_media.data_reader);
+    fw64_n64_media_data_writer_init(&_media.data_writer);
+
+    return &_media;
 }
 
 int fw64_media_is_present(fw64Media* media) {
@@ -151,63 +153,3 @@ static size_t fw64_n64_media_data_writer_write(fw64DataWriter* interface, const 
 void fw64_n64_media_data_writer_init(fw64N64MediaDataWriter* writer) {
     writer->interface.write = fw64_n64_media_data_writer_write;
 }
-
-#else
-
-void fw64_n64_media_init(fw64Media* media) {
-    media->is_present = 0;
-}
-
-int fw64_media_is_present(fw64Media* media) {
-    return 0;
-}
-
-fw64MediaDirItr* fw64_media_open_dir(fw64Media* media, const char* path) {
-    return NULL;
-}
-
-void fw64_media_close_dir(fw64Media* media, fw64MediaDirItr* itr) {
-
-}
-
-int fw64_media_dir_itr_next(fw64MediaDirItr* itr) {
-    return 0;
-}
-
-const char* fw64_media_dir_itr_name(fw64MediaDirItr* itr) {
-    return NULL;
-}
-
-fw64DataSource* fw64_media_open_data_source(fw64Media* media, const char* path) {
-    return NULL;
-}
-
-void fw64_media_close_data_source(fw64Media* media, fw64DataSource* data_source) {
-
-}
-
-fw64DataWriter* fw64_media_open_data_writer(fw64Media* media, const char* path) {
-    return NULL;
-}
-
-void fw64_media_close_data_writer(fw64Media* media, fw64DataWriter* data_writer) {
-
-}
-
-fw64MediaItemType fw64_media_get_path_type(fw64Media* media, const char* path) {
-    return FW64_MEDIA_ITEM_NONE;
-}
-
-fw64MediaItemType fw64_media_dir_itr_type(fw64MediaDirItr* itr) {
-    return FW64_MEDIA_ITEM_NONE;
-}
-
-int fw64_media_create_directory(fw64Media* media, const char* path) {
-    return 0;
-}
-
-int fw64_media_remove(fw64Media* media, const char* path) {
-    return 0;
-}
-
-#endif
