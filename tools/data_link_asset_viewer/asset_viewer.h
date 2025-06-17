@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/data_link.h"
 #include "framework64/engine.h"
 
 #include "fw64_asset_viewer.h"
@@ -7,6 +8,7 @@
 
 typedef struct {
     fw64Engine* engine;
+    fw64DataLink* data_link;
     fw64Font* font;
     fw64RenderPass* renderpass;
     fw64AssetViewer asset_viewer;
