@@ -26,8 +26,8 @@ uint32_t tiles_query(Tiles* tiles, Box* box, Vec3* velocity, fw64IntersectMoving
 #define SCENE_COUNT 6
 #define TILE_OFFSET_AMOUNT 100.0f
 
-#define PLAYER_RUN_SPEED 66.6f
-#define PLAYER_STRAFE_SPEED 75.0f
+#define PLAYER_DEFAULT_RUN_SPEED 66.6f
+#define PLAYER_STRAFE_SPEED 60.0f
 #define STICK_THRESHOLD 0.1f
 
 int tile_scenes[SCENE_COUNT] = {
@@ -70,14 +70,15 @@ void player_init(Player* player, fw64Engine* engine, Tiles* tiles) {
     player->engine = engine;
     player->node = fw64_scene_create_node(tiles->persistent);
     player->tiles = tiles;
+    player->speed = PLAYER_DEFAULT_RUN_SPEED;
 
     vec3_set_all(&player->node->transform.scale, 0.05f);
     fw64_node_update(player->node);
 
     fw64SkinnedMesh* skinned_mesh = fw64_scene_load_skinned_mesh_asset(tiles->persistent, FW64_ASSET_skinnedmesh_catherine);
-    fw64SkinnedMeshInstance* skinned_mesh_instance =  fw64_scene_create_skinned_mesh_instance(tiles->persistent, player->node, skinned_mesh, 0);
-    skinned_mesh_instance->controller.loop = 1;
-    fw64_animation_controller_play(&skinned_mesh_instance->controller);
+    player->skinned_mesh = fw64_scene_create_skinned_mesh_instance(tiles->persistent, player->node, skinned_mesh, 0);
+    player->skinned_mesh->controller.loop = 1;
+    fw64_animation_controller_play(&player->skinned_mesh->controller);
 
     Box bounding = fw64_mesh_get_bounding_box(skinned_mesh->mesh);
     fw64_scene_create_box_collider(tiles->persistent, player->node, &bounding);
@@ -88,7 +89,17 @@ void player_update(Player* player) {
     fw64_input_controller_stick(player->engine->input, 0, &stick);
 
     player->prev_pos = player->node->transform.position;
-    player->node->transform.position.z += PLAYER_RUN_SPEED * player->engine->time->time_delta;
+    if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
+        if (player->speed > 0.0f) {
+            fw64_animation_controller_pause(&player->skinned_mesh->controller);
+            player->speed = 0.0f;
+        } else {
+            fw64_animation_controller_play(&player->skinned_mesh->controller);
+            player->speed = PLAYER_DEFAULT_RUN_SPEED;
+        }
+    }
+
+    player->node->transform.position.z += player->speed * player->engine->time->time_delta;
 
     if (stick.x > STICK_THRESHOLD) {
         float x = player->node->transform.position.x - (PLAYER_STRAFE_SPEED * player->engine->time->time_delta);
@@ -158,19 +169,21 @@ void tiles_load_next_tile(Tiles* tiles, int scene_index){
 
     tile->index = scene_index;
     tile->scene = fw64_assets_load_scene(tiles->engine->assets, tile_scenes[scene_index], &tile->allocator.interface);
-    Box offset_bounding;
-    box_invalidate(&offset_bounding);
-    for (uint32_t i = 0; i < fw64_scene_get_node_count(tile->scene); i++) {
-        fw64Node* node = fw64_scene_get_node(tile->scene, i);
-        vec3_add(&node->transform.position, &tiles->next_scene_pos, &node->transform.position);
-        fw64_node_update(node);
-
-        if (node->collider) {
-            box_encapsulate_box(&offset_bounding, &node->collider->bounding);
-        }
+    fw64Node* root_node = fw64_scene_get_node(tile->scene, 0);
+    vec3_add(&root_node->transform.position, &tiles->next_scene_pos, &root_node->transform.position);
+    
+    // update transform and components
+    // TODO: is there a less manual way to accomplish this?
+    fw64_node_update(root_node);
+    for (size_t i = 0; i < fw64_scene_get_collider_count(tile->scene); i++) {
+        fw64_collider_update(fw64_scene_get_collider(tile->scene, i));
     }
 
-    tile->scene->bounding_box = offset_bounding;
+    for (size_t i = 0; i < fw64_scene_get_mesh_instance_count(tile->scene); i++) {
+        fw64_mesh_instance_update(fw64_scene_get_mesh_instance(tile->scene, i));
+    }
+
+    fw64_scene_update_bounding(tile->scene);
 
     tiles->next_scene_pos.z += TILE_OFFSET_AMOUNT;
     tiles->next_tile_index += 1;
@@ -182,6 +195,12 @@ void tiles_load_next_tile(Tiles* tiles, int scene_index){
 
 void tiles_update(Tiles* tiles) {
     fw64_scene_update(tiles->persistent, tiles->engine->time->time_delta);
+
+    for (int i = 0; i < TILE_COUNT; i++) {
+        if (tiles->tiles[i].scene != NULL) {
+            fw64_scene_update(tiles->tiles[i].scene, tiles->engine->time->time_delta);
+        }
+    }
 }
 
 void tiles_draw(Tiles* tiles, fw64RenderPass* renderpass, fw64Frustum* frustum) {

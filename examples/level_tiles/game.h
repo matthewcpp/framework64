@@ -23,8 +23,10 @@ typedef struct {
 typedef struct {
     fw64Engine* engine;
     fw64Node* node;
+    fw64SkinnedMeshInstance* skinned_mesh;
     Tiles* tiles;
     Vec3 prev_pos;
+    float speed;
 } Player;
 
 typedef struct {

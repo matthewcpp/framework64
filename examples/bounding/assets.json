@@ -8,12 +8,6 @@
     ],
     "meshes": [
         {
-            "src": "blue_cube/blue_cube.gltf"
-        },
-        {
-            "src": "blue_cube/blue_cube_wire.gltf"
-        },
-        {
             "src": "penguin/penguin.gltf"
         }
     ],
