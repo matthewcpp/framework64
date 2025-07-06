@@ -127,12 +127,12 @@ function _writeKeyframeData(file, animationData, writeInterface) {
 }
 
 function writeHeaderFile(animationData, meshName, destPath) {
-    const safeSkinnedMeshString = meshName + "_animation";
-
-    const animations = animationData.animations;
-
     const file = fs.openSync(destPath, 'w');
     fs.writeSync(file, "#pragma once\n\n");
+
+    let safeSkinnedMeshString = meshName + "_animation";
+    const animations = animationData.animations;
+
     fs.writeSync(file, `#define ${safeSkinnedMeshString}__count__ ${animations.length}\n\n`);
 
     for (let i = 0; i < animations.length; i++) {
@@ -140,6 +140,19 @@ function writeHeaderFile(animationData, meshName, destPath) {
         const safeAnimationName = Util.safeDefineName(animation.name);
         fs.writeSync(file, `#define ${safeSkinnedMeshString}_${safeAnimationName} ${i}\n`);
         fs.writeSync(file, `#define ${safeSkinnedMeshString}_${safeAnimationName}_name "${animation.name}"\n`);
+    }
+
+    fs.writeSync(file, "\n\n");
+
+    safeSkinnedMeshString = meshName + "_joint";
+    const joints = animationData.joints;
+    fs.writeSync(file, `#define ${safeSkinnedMeshString}__count__ ${joints.length}\n\n`);
+
+    for (let i = 0; i < joints.length; i++) {
+        const joint = joints[i];
+        const safeJointName = Util.safeDefineName(joint.name);
+        fs.writeSync(file, `#define ${safeSkinnedMeshString}_${safeJointName} ${i}\n`);
+        fs.writeSync(file, `#define ${safeSkinnedMeshString}_${safeJointName}_name "${joint.name}"\n`);
     }
 
     fs.closeSync(file);

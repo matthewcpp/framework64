@@ -556,3 +556,13 @@ void mat2_transform_vec2(const float* mat, Vec2* vec) {
     vec->x = in.x * mat[0] + in.y * mat[2];
     vec->y = in.x * mat[1] + in.y * mat[3];
 }
+
+int matrix_equals(const float* a, const float* b, float epsilon) {
+    for (int i = 0; i < 16; i++) {
+        if (fabsf(a[i] - b[i]) > epsilon * fmaxf(1.0f, fmaxf(fabsf(a[i]), fabsf(b[i])))) {
+            return 0;
+        }
+    }
+
+    return 1;
+}

@@ -2,10 +2,17 @@
 #include "framework64/matrix.h"
 
 void fw64_transform_init(fw64Transform* transform) {
+    fw64_transform_reset(transform);
+    transform->parent = NULL;
+    transform->first_child = NULL;
+    transform->next_sibling = NULL;
+    matrix_set_identity(transform->world_matrix);
+}
+
+void fw64_transform_reset(fw64Transform* transform) {
     vec3_set_zero(&transform->position);
     quat_ident(&transform->rotation);
     vec3_set_one(&transform->scale);
-    matrix_set_identity(transform->world_matrix);
 }
 
 void fw64_transform_forward(const fw64Transform* transform, Vec3* out) {
@@ -50,8 +57,20 @@ void fw64_transform_look_at(fw64Transform* transform, const Vec3* target, const 
     quat_normalize( &transform->rotation);
 }
 
-void fw64_transform_update_matrix(fw64Transform* transform) {
-    matrix_from_trs(transform->world_matrix, &transform->position, &transform->rotation, &transform->scale);
+void fw64_transform_update_matrix(fw64Transform* transform) {    
+    if (transform->parent) {
+        float local_matrix[16];
+        matrix_from_trs(local_matrix, &transform->position, &transform->rotation, &transform->scale);
+        matrix_multiply(transform->parent->world_matrix, local_matrix, transform->world_matrix);
+    } else {
+        matrix_from_trs(transform->world_matrix, &transform->position, &transform->rotation, &transform->scale);
+    }
+
+    fw64Transform* child = transform->first_child;
+    while (child) {
+        fw64_transform_update_matrix(child);
+        child = child->next_sibling;
+    }
 }
 
 void fw64_transform_inv_mult_point(const fw64Transform* transform, const Vec3* point, Vec3* out) {
@@ -69,4 +88,46 @@ void fw64_transform_mult_point(const fw64Transform* transform, const Vec3* point
 
 void fw64_transform_xform_box(const fw64Transform* transform, const Box* source, Box* target) {
      matrix_transform_box(transform->world_matrix, source, target);
+}
+
+void fw64_transform_add_child(fw64Transform* parent, fw64Transform* child) {
+    if (child->parent) {
+        fw64_transform_remove_child(child->parent, child);
+    }
+
+    if (parent->first_child) {
+        child->next_sibling = parent->first_child;
+    } else {
+        child->next_sibling = NULL;
+    }
+
+    parent->first_child = child;
+    child->parent = parent;
+}
+
+int fw64_transform_remove_child(fw64Transform* parent, fw64Transform* child) {
+    // are we removing first child?
+    if (parent->first_child == child) {
+        parent->first_child = child->next_sibling;
+        child->next_sibling = NULL;
+        child->parent = NULL;
+        return 1;
+    }
+
+    fw64Transform* prev_child = parent->first_child ;
+    fw64Transform* current_child = parent->first_child->next_sibling;
+
+    while (current_child) {
+        if (current_child == child) {
+            prev_child->next_sibling = current_child->next_sibling;
+            child->next_sibling = NULL;
+            child->parent = NULL;
+            return 1;
+        }
+
+        prev_child = current_child;
+        current_child = current_child->next_sibling;
+    }
+    
+    return 0;
 }

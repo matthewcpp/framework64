@@ -9,6 +9,7 @@ set(test_files
         test_frustum.cpp
         test_ray.cpp
         test_sparse_set.hpp test_sparse_set.cpp
+        test_transform.cpp
         test_vec3.cpp)
 
 add_executable(framework64_tests ${test_files} ${source_files})

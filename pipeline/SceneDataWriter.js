@@ -1,4 +1,5 @@
 const Bounding = require("./gltf/Bounding");
+const N64Node = require("./gltf/Node");
 
 const fs = require("fs");
 const Environment = require("./Environment");
@@ -26,7 +27,7 @@ function writeSceneInfo(scene, file, writer) {
 function writeNodes(environment, scene, writer, file) {
     const is64Bit = environment.architecture === Environment.Architecture.Arch64;
     const sizeOfVoidPtr = is64Bit ? 8 : 4;
-    const transformBuffer = Buffer.allocUnsafe(40);
+    const transformBuffer = Buffer.allocUnsafe(40 + (3 * sizeOfVoidPtr));
     const propertiesBuffer = Buffer.allocUnsafe(4 * sizeOfVoidPtr);
     // matrix buffer is currently left empty as it is calculated at runtime
     // this could probably be calulated here and written to file
@@ -35,7 +36,8 @@ function writeNodes(environment, scene, writer, file) {
     for (const node of scene.nodes) {
         let index = 0;
 
-        // write the transform data
+        // write the transform data. The order that this data is written needs to match up with
+        // fw64Transfrom in transform.h
         for (const val of node.position)
             index = writer.writeFloat(transformBuffer, val, index);
 
@@ -44,6 +46,22 @@ function writeNodes(environment, scene, writer, file) {
 
         for (const val of node.scale)
             index = writer.writeFloat(transformBuffer, val, index);
+
+        // write node hierarchy data
+        const parentNodeIndex = node.parentNode !== null ? node.parentNode.index : N64Node.InvalidNodeIndex;
+        const firstChildNodeIndex = node.firstChildNode !== null ? node.firstChildNode.index :  N64Node.InvalidNodeIndex;
+        const nextSiblingNodeIndex = node.nextSiblingNode !== null ? node.nextSiblingNode.index : N64Node.InvalidNodeIndex;
+        
+        // TODO: add function to write pointer sized int?
+        if (is64Bit) {
+            index = writer.writeUInt64(transformBuffer, parentNodeIndex, index);
+            index = writer.writeUInt64(transformBuffer, firstChildNodeIndex, index);
+            index = writer.writeUInt64(transformBuffer, nextSiblingNodeIndex, index);
+        } else {
+            index = writer.writeUInt32(transformBuffer, parentNodeIndex, index);
+            index = writer.writeUInt32(transformBuffer, firstChildNodeIndex, index);
+            index = writer.writeUInt32(transformBuffer, nextSiblingNodeIndex, index);
+        }
 
         index = 0
 
@@ -93,7 +111,8 @@ function writeCollisionMeshes(environment, scene, writer, file) {
         index = writer.writeUInt32(infoBuffer, primitive.elements.length * 3, index); // primitive elements are stored as triangles, but we want the total index count
         index = primitive.bounding.write(writer, infoBuffer, index);
 
-        // write empty data for pointers - these will be filled in at runtime
+        // write empty data for the points and elements array pointers
+        // these will be filled in at runtime with correct pointers into the data buffer written below
         if (environment.architecture == Environment.Architecture.Arch64) {
             index = writer.writeUInt64(infoBuffer, 0, index);
             index = writer.writeUInt64(infoBuffer, 0, index);

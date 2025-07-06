@@ -119,6 +119,48 @@ class LevelParser {
         }
     }
 
+    _parseNode(scene, parentNode, gltfNode) {
+        const node = this._createAndAddNode(scene, parentNode);
+        node.name = parentNode === null ? "root" : gltfNode.name; 
+
+        const gltf = this.gltfData.gltf;
+
+        this._extractNodeTransform(gltfNode, node);
+        this._parseNodeExtras(scene, gltfNode, node);
+        this._parseNodeMesh(scene, gltfNode, node);
+
+        if (Object.hasOwn(gltfNode, "children")) {
+            for (const childIndex of gltfNode.children) {
+                const gltfChildNode = gltf.nodes[childIndex];
+                const nodeHasName = Object.hasOwn(gltfChildNode, "name");
+
+                // Note: currently custom bounding boxes are set using child nodes beginning with _boundingBox.
+                // We do not want to parse that node in this case
+                if (nodeHasName && gltfChildNode.name.startsWith("_boundingBox")) {
+                    this._getCustomBoundingBoxForNode(scene, gltfChildNode, node);
+                    continue;
+                }
+
+                this._parseNode(scene, node, gltfChildNode);
+            }
+        }
+
+        if (node.collider != N64Node.NoCollider) {
+            scene.colliderCount += 1;
+        }
+    }
+
+    _createAndAddNode(scene, parentNode) {
+        const node = new N64Node(scene.nodes.length, parentNode);
+        scene.nodes.push(node);
+
+        if (parentNode) {
+            parentNode.childNodes.push(node);
+        }
+
+        return node;
+    }
+
     _parseScene(sceneRootNodeIndex) {
         const gltf = this.gltfData.gltf;
         const gltfRootNode = gltf.nodes[sceneRootNodeIndex];
@@ -134,25 +176,21 @@ class LevelParser {
             return null;
         }
 
-        for (const child_index of gltfSceneNodeRoot.children) {
-            const gltfNode = gltf.nodes[child_index];
+        this._parseNode(scene, null, gltfSceneNodeRoot);
 
-            const node = new N64Node();
-            
-            if (Object.hasOwn(gltfNode, "name")) {
-                node.name = gltfNode.name;
+        // Assign Node Children pointers
+        for (const node of scene.nodes) {
+            if (node.childNodes.length === 0) {
+                continue;
             }
 
-            this._extractNodeTransform(gltfNode, node);
-            this._getCustomBoundingBoxForNode(scene, gltfNode, node);
-            this._parseNodeExtras(scene, gltfNode, node);
-            this._parseNodeMesh(scene, gltfNode, node);
+            let currentChild = node.childNodes[0];
+            node.firstChildNode = currentChild;
 
-            if (node.collider != N64Node.NoCollider) {
-                scene.colliderCount += 1;
+            for (let i = 1; i < node.childNodes.length; i++) {
+                currentChild.nextSiblingNode = node.childNodes[i];
+                currentChild = node.childNodes[i];
             }
-
-            scene.nodes.push(node);
         }
 
         return scene;
@@ -171,7 +209,7 @@ class LevelParser {
 
             for (const layerName of layerNames) {
                 if (!this.layerMap.has(layerName))
-                    throw new Error(`Node ${gltfNode.name}: No layer map value found for layer: ${layerName}`);
+                    throw new Error(`Node ${node.name}: No layer map value found for layer: ${layerName}`);
 
                 layerMask |= this.layerMap.get(layerName);
             }
@@ -183,7 +221,7 @@ class LevelParser {
             const dataValue = parseInt(extras.data);
             
             if (isNaN(dataValue)) {
-                throw new Error(`Unable to parse data value for node: ${node.name}`);
+                throw new Error(`${node.name}: Unable to parse int value for data '${extras.data}'`);
             }
 
             node.data = dataValue;
@@ -204,20 +242,9 @@ class LevelParser {
             if (colliderName === "none") {
                 node.collider = N64Node.NoCollider;
             }
-            else if (colliderName === "transform") {
-                if (scene.transformCustomBoundingBoxIndex < 0) {
-                    const box = new Bounding();
-                    box.setFromCenterAndExtents([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]);
-        
-                    scene.transformCustomBoundingBoxIndex = scene.customBoundingBoxes.length;
-                    scene.customBoundingBoxes.push(box);
-                }
-
-                node.collider = N64Node.ColliderType.Box | (scene.transformCustomBoundingBoxIndex << 16)
-            }
             else {
                 if (!this.collisonMeshMap.has(colliderName)) {
-                    throw new Error(`Invalid collion mesh name specified: ${colliderName}`);
+                    throw new Error(`Node ${node.name}: invalid collion mesh name specified: ${colliderName}`);
                 }
 
                 const collisionMeshIndex = this.collisonMeshMap.get(colliderName);
@@ -233,45 +260,33 @@ class LevelParser {
     }
 
     _extractNodeTransform(gltfNode, node) {
-        if (gltfNode.translation)
+        if (gltfNode.translation) {
             node.position = gltfNode.translation.slice();
+        }
 
-        if (gltfNode.rotation)
+        if (gltfNode.rotation) {
             node.rotation = gltfNode.rotation.slice();
+        }
 
-        if (gltfNode.scale)
+        if (gltfNode.scale) {
             node.scale = gltfNode.scale.slice();
+        }
+
+        // Note: node's parent should always be parsed before any child.
+        node.computeWorldMatrix();
     }
 
     /** Precondition: node has its trasnform values set*/
-    _getCustomBoundingBoxForNode(scene, gltfNode, node) {
-        if (!Object.hasOwn(gltfNode, "children")) {
-            return;
-        }
+    _getCustomBoundingBoxForNode(scene, gltfBoundingNode, node) {
+        const center = Object.hasOwn(gltfBoundingNode, "translation") ? gltfBoundingNode.translation : [0.0, 0.0, 0.0];
+        const extents = Object.hasOwn(gltfBoundingNode, "scale") ? gltfBoundingNode.scale : [1.0, 1.0, 1.0];
+        
+        const bounding = new Bounding();
+        bounding.setFromCenterAndExtents(center, extents);
 
-        for (const childIndex of gltfNode.children) {
-            const childNode =  this.gltfData.gltf.nodes[childIndex];
-
-            if (childNode.name.indexOf("Box") === -1)
-                continue;
-
-            const parentInvScale = node.scale.map(v => v != 0 ? 1.0 / v : 0);
-            const localScale = childNode.scale.slice();
-
-            const center = childNode.hasOwnProperty("translation") ? childNode.translation.slice() : [0.0, 0.0, 0.0];
-            const extents = [0.0, 0.0, 0.0];
-            for (let i = 0; i < 3; i++)
-                extents[i] = (parentInvScale[i] * localScale[i]);
-            
-            const box = new Bounding();
-            box.setFromCenterAndExtents(center, extents);
-
-            const boundingBoxIndex = scene.customBoundingBoxes.length;
-            scene.customBoundingBoxes.push(box);
-            node.collider = N64Node.ColliderType.Box | (boundingBoxIndex << 16)
-
-            break;
-        }
+        const boundingBoxIndex = scene.customBoundingBoxes.length;
+        scene.customBoundingBoxes.push(bounding);
+        node.collider = N64Node.ColliderType.Box | (boundingBoxIndex << 16)
     }
 
     _parseNodeMesh(scene, gltfNode, node) {
@@ -287,32 +302,9 @@ class LevelParser {
         node.mesh = scene.bundleMeshIndex(gltfNode.mesh);
         scene.meshInstanceCount += 1;
 
-        if (node.collider === N64Node.NoCollider)
+        if (node.collider === N64Node.NoCollider) {
             node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
-    }
-
-    _parseCollisionMap(name) {
-        if (this._meshColliderNodeIndex === -1)
-            throw new Error("No collision mesh root node present in scene.");
-
-        const collisionMeshParentNode = this.gltf.nodes[this._meshColliderNodeIndex];
-        let collisionMeshIndex = -1;
-
-        for (const child of collisionMeshParentNode.children) {
-            const gltfNode = this.gltf.nodes[child];
-
-            if (gltfNode.name !== name)
-                continue;
-
-            if (gltfNode.hasOwnProperty("mesh"))
-                collisionMeshIndex = gltfNode.mesh;
         }
-
-        if (collisionMeshIndex === -1)
-            throw new Error(`Unable to locate collision mesh with name: ${name}`)
-
-        return gltfNode;
-
     }
 }
 
