@@ -27,7 +27,23 @@ static std::string get_executable_path_impl() {
 
     return std::string(real_path);
 }
+#elif _WIN32
+#include <Windows.h>
 
+static std::string get_executable_path_impl() {
+    std::vector<char> path_buffer;
+    DWORD last_error = ERROR_INSUFFICIENT_BUFFER;
+
+    while (last_error != ERROR_SUCCESS) {
+        path_buffer.resize(path_buffer.empty() ? 128 : path_buffer.size() * 2);
+        GetModuleFileNameA(NULL, path_buffer.data(), static_cast<DWORD>(path_buffer.size()));
+        last_error = GetLastError();
+    }
+
+    return std::string(path_buffer.data());
+}
+#else
+#error Please provide implementation of get_executable_path_impl
 #endif
 
 namespace framework64::service {
@@ -60,6 +76,5 @@ const std::string get_framework64_dir() {
 
     return framework64_dir_path.string();
 }
-// "/Users/mlarocca/development/repos/framework64/build_desktop/tools/asset_transfer_webservice"
 
 }
