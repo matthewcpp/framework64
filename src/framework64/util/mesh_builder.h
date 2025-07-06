@@ -23,7 +23,7 @@ fw64MeshBuilder* fw64_mesh_builder_create(fw64AssetDatabase* assets, size_t prim
 
 /**
  * Resets the mesh builder.
- * This should be called after \ref fw64_mesh_builder_commit if you intend to re-use it
+ * This should be called after fw64_mesh_builder_commit if you intend to re-use it
 */
 void fw64_mesh_builder_reset(fw64MeshBuilder* mesh_builder, size_t primitive_count, size_t image_count);
 
@@ -45,7 +45,7 @@ fw64Material* fw64_mesh_builder_get_material(fw64MeshBuilder* mesh_builder, size
 /**
  * Allocates the underlying vertex data and element indices for Quads at the given index.
  * This is a convenience method for setting up basic grid-like meshes.
- * If you need more fine grained control refer to \ref fw64_mesh_builder_allocate_primitive_data
+ * If you need more fine grained control refer to fw64_mesh_builder_allocate_primitive_data
  * Vertex elements are specified in a counter clockwise winding order.
  * If allocation fails, the data has already been allocated, or the index is out of range returns 0.
 */
@@ -53,7 +53,7 @@ int fw64_mesh_builder_allocate_primitive_quad_data(fw64MeshBuilder* mesh_builder
 
 /**
  * Allocates the underlying vertex data and element indices for the primitive at the given index.
- * Unline \ref fw64_mesh_builder_allocate_primitive_element_data you will need to specify the vertex indices for each element manually using \ref fw64_mesh_builder_set_triangle_vertex_indices or \ref fw64_mesh_builder_set_line_vertex_indices based on the primitive mode specified to this function.
+ * Unline fw64_mesh_builder_allocate_primitive_element_data you will need to specify the vertex indices for each element manually using fw64_mesh_builder_set_triangle_vertex_indices or \ref fw64_mesh_builder_set_line_vertex_indices based on the primitive mode specified to this function.
  * Note for N64-libultra this method is currently limitied to 32 vertices.  If you need more, then you will need to create additional primitives.
  * Vertex elements are expected to be specified in a counter clockwise winding order.
  * If allocation fails, the data has already been allocated, or the index is out of range returns 0.
@@ -91,14 +91,15 @@ void fw64_mesh_builder_set_vertex_texcoords_f(fw64MeshBuilder* mesh_builder, siz
 
 /**
  * Manually sets the bounding box of the mesh.
- * If this has not been called before \ref fw64_mesh_builder_commit then the bounding will be calculated.
+ * If this has not been called before fw64_mesh_builder_commit then the bounding will be calculated.
 */
 void fw64_mesh_builder_set_bounding(fw64MeshBuilder* mesh_builder, const Box* bounding);
 
 /**
  * Creates a mesh from the specified data.
  * Note: after this function call the state of the builder will be invalid.
- * Please call \ref fw64_mesh_builder_reset if you intend to use it again
+ * Please call fw64_mesh_builder_reset if you intend to use it again
+ * This call will not free resources used by the mesh builder.  fw64_mesh_builder_delete should be used when the builder is no longer needed.
 */
 fw64Mesh* fw64_mesh_builder_commit(fw64MeshBuilder* mesh_builder);
 
