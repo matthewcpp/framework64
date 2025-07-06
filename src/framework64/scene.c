@@ -8,6 +8,8 @@
 #define FW64_N64_NODE_NO_COLLIDER UINT32_MAX
 #define FW64_N64_NODE_COLLIDER_FROM_TRANSFORM (UINT32_MAX - 1)
 
+#define FW64_N64_NODE_INVALID_INDEX UINT32_MAX
+
 void fw64_scene_info_init(fw64SceneInfo* info) {
     memset(info, 0, sizeof(fw64SceneInfo));
 }
@@ -66,6 +68,23 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 
         fw64_static_vector_resize(&scene->nodes, scene_info.node_count);
         fw64_data_source_read(data_source, scene->nodes.data, sizeof(fw64Node), scene_info.node_count);
+
+        // fixup transform hierarchy pointers
+        for (uint32_t i = 0; i < fw64_static_vector_size(&scene->nodes); i++) {
+            fw64Node* node = fw64_static_vector_get_item(&scene->nodes, i);
+
+            uintptr_t node_handle = (uintptr_t)node->transform.parent;
+            node->transform.parent = node_handle != FW64_N64_NODE_INVALID_INDEX ? fw64_static_vector_get_item(&scene->nodes, (uint32_t)node_handle) : NULL;
+
+            node_handle = (uintptr_t)node->transform.first_child;
+            node->transform.first_child = node_handle != FW64_N64_NODE_INVALID_INDEX ? fw64_static_vector_get_item(&scene->nodes, (uint32_t)node_handle) : NULL;
+
+            node_handle = (uintptr_t)node->transform.next_sibling;
+            node->transform.next_sibling = node_handle != FW64_N64_NODE_INVALID_INDEX ? fw64_static_vector_get_item(&scene->nodes, (uint32_t)node_handle) : NULL;
+        }
+
+        // update all the node matrices.  Note the root node will always be at position 0
+        fw64_transform_update_matrix(fw64_static_vector_get_item(&scene->nodes, 0));
     } else {
         vec3_set_all(&scene->bounding_box.min, -1.0f);
         vec3_set_all(&scene->bounding_box.max, 1.0f);
@@ -80,7 +99,6 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 
     for (uint32_t i = 0; i < scene_info.node_count; i++) {
         fw64Node* node = fw64_scene_get_node(scene, i);
-        fw64_transform_update_matrix(&node->transform);
 
         // read the mesh index written to the node
         uintptr_t mesh_index = (uintptr_t)node->mesh_instance;
@@ -96,23 +114,23 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
         // read the collider info written to the node
         uintptr_t collider_value = (uintptr_t)node->collider;
         uintptr_t collider_type = collider_value & 0xFFFF;
-        uintptr_t collision_mesh_index = collider_value >> 16;
+        uintptr_t collider_index = collider_value >> 16;
         node->collider = NULL;
         
         if (collider_value != FW64_N64_NODE_NO_COLLIDER) {
             fw64Collider* collider = fw64_static_vector_alloc_back(&scene->colliders);
 
             if (collider_type == FW64_COLLIDER_BOX) {
-                if (collision_mesh_index == FW64_N64_BOX_COLLIDER_USE_MESH_BOUNDING) {
+                if (collider_index == FW64_N64_BOX_COLLIDER_USE_MESH_BOUNDING) {
                     Box bounding_box = fw64_mesh_get_bounding_box(node->mesh_instance->mesh);
                     fw64_collider_init_box(collider, node, &bounding_box);
                 }
                 else {
-                    fw64_collider_init_box(collider, node, custom_bounding_boxes + collision_mesh_index);
+                    fw64_collider_init_box(collider, node, custom_bounding_boxes + collider_index);
                 }
             }
             else if (collider_type == FW64_COLLIDER_COLLISION_MESH) {
-                fw64CollisionMesh* collision_mesh = fw64_static_vector_get_item(&scene->collision_meshes, (uint32_t)collision_mesh_index);
+                fw64CollisionMesh* collision_mesh = fw64_static_vector_get_item(&scene->collision_meshes, (uint32_t)collider_index);
                 fw64_collider_init_collision_mesh(collider, node, collision_mesh);
             }
 
@@ -142,6 +160,10 @@ void fw64_scene_uninit(fw64Scene* scene) {
 
     for (uint32_t i = 0; i < fw64_scene_get_skinned_mesh_count(scene); i++) {
         fw64_skinned_mesh_delete(fw64_scene_get_skinned_mesh(scene, i), scene->assets, scene->allocator);
+    }
+
+    for (uint32_t i = 0; i < fw64_static_vector_size(&scene->skinned_mesh_instances); i++) {
+        fw64_skinned_mesh_instance_uninit(fw64_static_vector_get_item(&scene->skinned_mesh_instances, i), scene->allocator);
     }
 
     for (uint32_t i = 0; i < fw64_static_vector_size(&scene->collision_meshes); i++) {
@@ -398,16 +420,32 @@ uint32_t fw64_scene_get_skinned_mesh_count(fw64Scene* scene) {
 }
 
 fw64Node* fw64_scene_create_node(fw64Scene* scene) {
+    return fw64_scene_create_node_with_parent(scene, NULL);
+}
+
+fw64Node* fw64_scene_create_node_with_parent(fw64Scene* scene, fw64Node* parent) {
     fw64Node* node = fw64_static_vector_alloc_back(&scene->nodes);
 
-    if (node) {
-        fw64_node_init(node);
+    if (!node) {
+        return NULL;
+    }
+
+    fw64_node_init(node);
+    if (parent) {
+        fw64_transform_add_child(&parent->transform, &node->transform);
+        fw64_transform_update_matrix(&node->transform);
     }
 
     return node;
 }
 
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index) {
+    #ifndef NDEBUG
+    if (index >= fw64_static_vector_size(&scene->nodes)) {
+        return NULL;
+    }
+    #endif
+
     return fw64_static_vector_get_item(&scene->nodes, index);
 }
 
@@ -443,10 +481,6 @@ fw64Collider* fw64_scene_create_box_collider(fw64Scene* scene, fw64Node* node, B
     }
 
     return collider;
-}
-
-Box* fw64_scene_get_initial_bounds(fw64Scene* scene) {
-    return &scene->bounding_box;
 }
 
 fw64Allocator* fw64_scene_get_allocator(fw64Scene* scene) {
