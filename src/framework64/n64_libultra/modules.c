@@ -32,7 +32,7 @@ int _fw64_modules_register_static(fw64Modules* modules, fw64StaticModuleId id, v
 void* fw64_modules_get_static(fw64Modules* modules, fw64StaticModuleId id) {
     for (uint32_t i = 0; i < modules->static_module_count; i++) {
         if (modules->static_modules[i].id == id) {
-            return &modules[i];
+            return &modules->static_modules[i];
         }
     }
 

@@ -11,7 +11,7 @@ fw64Media* fw64_media_init(fw64Engine* engine) {
 
     if (error != 0) {
         _media.is_present = 0;
-        return NULL;
+        return &_media;
     }
 
     FRESULT result = f_mount(&_media.fs, "", 0);

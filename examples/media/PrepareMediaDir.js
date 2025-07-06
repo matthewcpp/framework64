@@ -22,11 +22,6 @@ async function prepareDir(platform, mediaDirName) {
     const assetDirectory = path.resolve(path.join(__dirname, "..", "..", "assets"));
     const outputDirectory = path.resolve(path.join(__dirname, "..", "..", "build_" + platform, "bin", "media", mediaDirName), );
 
-    console.log(">>> Prepare Media Dir: ");
-
-    console.log(assetManifestFile);
-    console.log(assetDirectory);
-    console.log(outputDirectory);
-
+    console.log(`>>> Prepare Media Example Dir: ${outputDirectory}`);
     Pipeline.prepareAssets(assetManifestFile, assetDirectory, platform, outputDirectory, null);
 }

@@ -12,9 +12,9 @@ create_game(
 set(media_dir_name "media_root")
 if (FW64_PLATFORM_DESKTOP)
     target_compile_definitions(media PRIVATE FW64_MEDIA_DIR_NAME="${media_dir_name}")
+
+    #TODO: this should be moved out once the n64_libultra container has node enabled
+    add_custom_command(TARGET media POST_BUILD
+        COMMAND node ${CMAKE_CURRENT_SOURCE_DIR}/PrepareMediaDir.js ${FW64_PLATFORM_NAME} ${media_dir_name}
+    )
 endif()
-
-
-add_custom_command(TARGET media POST_BUILD
-    COMMAND node ${CMAKE_CURRENT_SOURCE_DIR}/PrepareMediaDir.js ${FW64_PLATFORM_NAME} ${media_dir_name}
-)
