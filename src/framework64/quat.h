@@ -23,8 +23,14 @@ void quat_normalize(Quat* q);
   */
 void quat_conjugate(Quat* q);
 
+/** Returns a vec3 containing euler angles as (x = pitch, y = yaw, z = roll) 
+ *  Note: the angles in the returned Vec3 are expressed in radians.
+*/
 Vec3 quat_to_euler(const Quat* q);
 
+/** Sets the specified quat from the provided euler angles.
+ *  Note: the angles passed into this function should be specified in degrees.
+ */
 void quat_from_euler(Quat* q, float x, float y, float z);
 void quat_slerp(const Quat* a, const Quat* b, float t, Quat* out);
 
