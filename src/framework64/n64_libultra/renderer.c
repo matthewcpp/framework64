@@ -261,19 +261,15 @@ static void fw64_renderer_draw_lit_skinned_primitive(fw64Renderer* renderer, Lig
     fw64Primitive* primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives + draw_info->index;
     fw64Material* material = fw64_material_collection_get_material(draw_info->instance->mesh_instance.materials, draw_info->index);
 
-    // when using lighting the view matrix is actually placed on the projection matrix stack, so we just load the model matrix
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&skinned_mesh_instance->mesh_instance.n64_matrix), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
-
     if (lighting_info->active_count > 0) {
         fw64_n64_renderer_configure_mesh_lighting_info(renderer, lighting_info, material);
     }
 
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
+    // when using lighting the view matrix is actually placed on the projection matrix stack, so we just load the model matrix
+    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_LOAD|G_MTX_NOPUSH);
     
     gSPDisplayList(renderer->display_list++, primitive->display_list);
     gDPPipeSync(renderer->display_list++);
-
-    gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 
     // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix due
     // to the fact that the camera view matrix is included on the projection matrix stack.
@@ -317,7 +313,6 @@ static void fw64_renderer_draw_unlit_skinned_primitive(fw64Renderer* renderer, f
     fw64AnimationController* controller = &skinned_mesh_instance->controller;
     fw64Primitive* primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives + draw_info->index;
 
-    gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(&skinned_mesh_instance->mesh_instance.n64_matrix), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     gSPMatrix(renderer->display_list++,OS_K0_TO_PHYSICAL(controller->matrices + primitive->joint_index), G_MTX_MODELVIEW|G_MTX_MUL|G_MTX_PUSH);
     gSPDisplayList(renderer->display_list++, primitive->display_list);
     gDPPipeSync(renderer->display_list++);
