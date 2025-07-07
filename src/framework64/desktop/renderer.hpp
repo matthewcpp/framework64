@@ -86,11 +86,11 @@ private:
 
 private:
 
-struct LightingData {
-    std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
-    std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
-    int light_count;
-};
+    struct LightingData {
+        std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
+        std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+        int light_count;
+    };
 
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
     framework64::UniformBlock<MeshTransformData> mesh_transform_uniform_block;
@@ -108,13 +108,7 @@ public:
     fw64Material sprite_material;
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
 
-    // Note: This is not currently implemented for desktop rendering
-    bool anti_aliasing_enabled = true;
-
     fw64Camera* current_camera = nullptr;
-
-    bool sprite_scissor_enabled = false;
-
 private:
     fw64Display& display;
     framework64::ShaderCache& shader_cache;

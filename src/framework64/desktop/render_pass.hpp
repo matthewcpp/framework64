@@ -67,4 +67,5 @@ public:
     float fog_end = 1.0f;
     bool fog_enabled = 0;
     bool depth_testing_enabled = true;
+    bool anti_aliasing_enabled = true;
 };

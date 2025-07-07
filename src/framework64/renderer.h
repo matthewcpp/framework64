@@ -35,9 +35,6 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags);
 
-void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled);
-int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
-
 #ifdef __cplusplus
 }
 #endif

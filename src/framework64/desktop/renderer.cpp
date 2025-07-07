@@ -352,14 +352,6 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags flags) {
     renderer->end(flags);
 }
 
-void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled) {
-    renderer->anti_aliasing_enabled = static_cast<bool>(enabled);
-}
-
-int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
-    return static_cast<int>(renderer->anti_aliasing_enabled);
-}
-
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
     renderer->drawRenderPass(renderpass);
 }

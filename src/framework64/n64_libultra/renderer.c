@@ -275,17 +275,6 @@ static void fw64_renderer_draw_lit_skinned_primitive(fw64Renderer* renderer, Lig
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
-void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled){
-    if (enabled)
-        SET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
-    else
-        UNSET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
-}
-
-int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
-    return GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
-}
-
 static void fw64_renderer_draw_unlit_primitive(fw64Renderer* renderer, fw64StaticDrawInfo* draw_info) {
     fw64MeshInstance* mesh_instance = draw_info->instance;
     fw64Primitive* primitive = mesh_instance->mesh->primitives + draw_info->index;
