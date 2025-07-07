@@ -95,15 +95,16 @@ function writeCustomBoundingBoxes(scene, writer, file) {
     }
 }
 
-/** The write order of this function needs to correspond to in fw64CollisionMesh collider.h */
+/** The write order of this function needs to correspond to in fw64CollisionMesh collision_mesh.h */
 function writeCollisionMeshes(environment, scene, writer, file) {
     const sizeOfVoidPtr = environment.architecture === Environment.Architecture.Arch64 ? 8 : 4;
     const infoBuffer = Buffer.allocUnsafe(8 + (2 * sizeOfVoidPtr) + Bounding.SizeOf);
 
     for (const collisionMesh of scene.collisionMeshes) {
         if (collisionMesh.primitives.length > 1) {
-            throw new Error(`Collision meshes should have a single primitive: ${collisionMesh.name}`)
+            throw new Error(`Collision mesh ${collisionMesh.name} should have only a single primitive`);
         }
+
         const primitive = collisionMesh.primitives[0];
 
         let index = 0;
