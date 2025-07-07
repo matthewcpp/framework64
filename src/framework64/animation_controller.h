@@ -2,7 +2,12 @@
 
 /** \file animation_controller.h */
 
+#include "transform.h"
 #include "animation_data.h"
+
+#ifdef FW64_PLATFORM_N64_LIBULTRA
+#include <nusys.h>
+#endif
 
 typedef enum {
     FW64_ANIMATION_STATE_STOPPED,
@@ -12,6 +17,8 @@ typedef enum {
 
 typedef struct {
     fw64AnimationData* animation_data;
+    fw64Transform* parent_transform;
+    fw64Transform* joint_transforms;
     fw64Matrix* matrices;
     fw64Animation* current_animation;
     float current_time;
@@ -33,7 +40,7 @@ extern "C" {
 /** initializes the animation controller
  * \param initial_animation the index of the initial animation to load from the underlying animation data.  If this value is negative, no initial animation will be loaded
  * */
-void fw64_animation_controller_init(fw64AnimationController *controller, fw64AnimationData *animation_data, int initial_animation, fw64Allocator *allocator);
+void fw64_animation_controller_init(fw64AnimationController *controller, fw64AnimationData *animation_data, int initial_animation, fw64Transform* parent_transform, fw64Allocator *allocator);
 
 /** frees all resourced used by this animation controller.
  *  note: this will not free the underlying animation data.
@@ -57,6 +64,11 @@ void fw64_animation_controller_pause(fw64AnimationController* controller);
 
 /** stops animation playback and resets the current animation time to 0 */
 void fw64_animation_controller_stop(fw64AnimationController* controller);
+
+#define fw64_animation_controller_get_joint_transform(controller, index) ((controller)->joint_transforms + (index))
+#define fw64_animation_controller_is_playing(controller) ((controller)->state == FW64_ANIMATION_STATE_PLAYING)
+#define fw64_animation_controller_is_stopped(controller) ((controller)->state == FW64_ANIMATION_STATE_STOPPED)
+#define fw64_animation_controller_is_paused(controller) ((controller)->state == FW64_ANIMATION_STATE_PAUSED)
 
 #ifdef __cplusplus
 }

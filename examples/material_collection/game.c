@@ -112,9 +112,12 @@ void setup_camera(Game* game) {
 }
 
 void game_update(Game* game){
+    for (size_t i = 0; i < fw64_scene_get_skinned_mesh_instance_count(&game->scene); i++) {
+        fw64_skinned_mesh_instance_update(fw64_scene_get_skinned_mesh_instance(&game->scene, i), game->engine->time->time_delta);
+    }
+    
     fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
     fw64_headlight_update(&game->headlight);
-    fw64_scene_update(&game->scene, game->engine->time->time_delta);
 
     if (fw64_input_controller_button_released(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_UP) || 
         fw64_input_controller_button_released(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN))

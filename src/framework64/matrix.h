@@ -31,6 +31,8 @@ void matrix_ortho(float* out, float left, float right, float bottom, float top, 
 void matrix_ortho2d(float* out, float left, float right, float bottom, float top);
 void matrix_camera_look_at(float* out, Vec3* eye, Vec3* target, Vec3* up);
 
+int matrix_equals(const float* a, const float* b, float epsilon);
+
 // 3x3 matrix
 
 void mat3_set_from_mat4(float* mat3, const float* mat4);

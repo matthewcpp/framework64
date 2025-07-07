@@ -57,18 +57,10 @@ void fw64_scene_delete(fw64Scene* scene);
 void fw64_scene_info_init(fw64SceneInfo* info);
 void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* assets, fw64Allocator* allocator);
 
-/** 
- * Gets the original bounding box for the scene as it was authored. 
- * This result may be inaccurate if nodes are transformed from their initial state
- * */
-Box* fw64_scene_get_initial_bounds(fw64Scene* scene);
-
 /**
- * Recalculates the scene's bounding based on the transform of all child nodes.
+ * Recalculates the scene's bounding based on the colliders of all child nodes.
  */
 void fw64_scene_update_bounding(fw64Scene* scene);
-
-void fw64_scene_update(fw64Scene* scene, float time_delta);
 
 void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask);
@@ -83,6 +75,7 @@ fw64SkinnedMesh* fw64_scene_get_skinned_mesh(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_skinned_mesh_count(fw64Scene* scene);
 
 fw64Node* fw64_scene_create_node(fw64Scene* scene);
+fw64Node* fw64_scene_create_node_with_parent(fw64Scene* scene, fw64Node* parent);
 fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
 
@@ -98,6 +91,9 @@ int fw64_scene_overlap_sphere(fw64Scene* scene, Vec3* center, float radius, uint
 int fw64_scene_overlap_box(fw64Scene* scene, Box* box, uint32_t mask, fw64OverlapBoxQueryResult* result);
 int fw64_scene_moving_sphere_intersection(fw64Scene* scene, Vec3* center, float radius, Vec3* velocity, uint32_t mask, fw64IntersectMovingSphereQuery* result);
 int fw64_scene_moving_box_intersection(fw64Scene* scene, Box* box, Vec3* velocity, uint32_t mask, fw64IntersectMovingBoxQuery* result);
+
+#define fw64_scene_get_collider_count(scene) (fw64_static_vector_size(&((scene)->colliders)))
+#define fw64_scene_get_collider(scene, index) ((fw64Collider*)fw64_static_vector_get_item(&(scene)->colliders, (index)))
 
 #define fw64_scene_get_mesh_instance_count(scene) (fw64_static_vector_size(&((scene)->mesh_instances)))
 #define fw64_scene_get_mesh_instance(scene, index) ((fw64MeshInstance*)fw64_static_vector_get_item(&(scene)->mesh_instances, (index)))

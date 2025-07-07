@@ -25,7 +25,7 @@ void fw64_collision_mesh_uninit(fw64CollisionMesh* collision_mesh, fw64Allocator
     fw64_allocator_free(allocator, collision_mesh->points);
 }
 
-int fw64_collision_mesh_test_sphere(fw64CollisionMesh* collision_mesh, fw64Transform* transform, Vec3* center, float radius, Vec3* out_point) {
+int fw64_collision_mesh_test_sphere(const fw64CollisionMesh* collision_mesh, fw64Transform* transform, Vec3* center, float radius, Vec3* out_point) {
     int result = 0;
 
     // transform query sphere into mesh local space
@@ -40,8 +40,7 @@ int fw64_collision_mesh_test_sphere(fw64CollisionMesh* collision_mesh, fw64Trans
     Vec3* points = collision_mesh->points;
     uint16_t* elements = collision_mesh->elements;
 
-    uint32_t triangle_count = collision_mesh->element_count / 3;
-
+    const uint32_t triangle_count = fw64_collision_mesh_get_triangle_count(collision_mesh);
     for (uint32_t i = 0; i < triangle_count; i++) {
         Vec3 local_hit;
         uint32_t index = i * 3;
@@ -53,8 +52,9 @@ int fw64_collision_mesh_test_sphere(fw64CollisionMesh* collision_mesh, fw64Trans
         if (fw64_collision_test_sphere_triangle(&local_center, local_radius, a, b, c, &local_hit)) {
             float distance = vec3_distance_squared(&local_center, &local_hit);
 
-            if (distance >= closest_distance)
+            if (distance >= closest_distance){
                 continue;
+            }
 
             closest_distance = distance;
             closest_hit = local_hit;
@@ -70,7 +70,7 @@ int fw64_collision_mesh_test_sphere(fw64CollisionMesh* collision_mesh, fw64Trans
     return result;
 }
 
-int fw64_collision_mesh_test_ray(fw64CollisionMesh* collision_mesh, fw64Transform* transform, Vec3* origin, Vec3* direction, Vec3* out_point, float* out_dist) {
+int fw64_collision_mesh_test_ray(const fw64CollisionMesh* collision_mesh, fw64Transform* transform, Vec3* origin, Vec3* direction, Vec3* out_point, float* out_dist) {
     int result = 0;
 
     // transform the ray into local space
@@ -81,14 +81,14 @@ int fw64_collision_mesh_test_ray(fw64CollisionMesh* collision_mesh, fw64Transfor
     fw64_transform_inv_mult_point(transform, origin, &local_origin);
     quat_transform_vec3(&inv_rotation, direction, &local_direction);
 
-    // check for collision of sphere and mesh triangles
+    // check for collision of ray and mesh triangles
     float closest_distance = FLT_MAX;
     Vec3 closest_hit;
 
     Vec3* points = collision_mesh->points;
     uint16_t* elements = collision_mesh->elements;
 
-    uint32_t triangle_count = collision_mesh->element_count / 3;
+    const uint32_t triangle_count = fw64_collision_mesh_get_triangle_count(collision_mesh);
 
     for (uint32_t i = 0; i < triangle_count; i++) {
         Vec3 local_hit;
@@ -101,8 +101,9 @@ int fw64_collision_mesh_test_ray(fw64CollisionMesh* collision_mesh, fw64Transfor
 
         if (fw64_collision_test_ray_triangle(&local_origin, &local_direction, a, b, c, &local_hit, &local_dist)) {
 
-            if (local_dist >= closest_distance)
+            if (local_dist >= closest_distance) {
                 continue;
+            }
 
             closest_distance = local_dist;
             closest_hit = local_hit;

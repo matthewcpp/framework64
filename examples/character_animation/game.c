@@ -35,7 +35,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_scene_init(&game->scene, &scene_info, engine->assets, allocator);
     fw64Node* node = fw64_scene_create_node(&game->scene);
     fw64SkinnedMesh* skinned_mesh = fw64_scene_load_skinned_mesh_asset(&game->scene, FW64_ASSET_skinnedmesh_catherine);
-    fw64SkinnedMeshInstance* skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(&game->scene, node, skinned_mesh, game->current_animation);
+    game->skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(&game->scene, node, skinned_mesh, game->current_animation);
     
     fw64Node* camera_node = fw64_scene_create_node(&game->scene);
     fw64_camera_init(&game->camera, camera_node, display);
@@ -44,21 +44,21 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_update_projection_matrix(&game->camera);
 
     fw64_arcball_init(&game->arcball, engine->input, &game->camera);
-    fw64_arcball_set_initial(&game->arcball, &skinned_mesh_instance->mesh_instance.render_bounds);
+    fw64_arcball_set_initial(&game->arcball, &game->skinned_mesh_instance->mesh_instance.render_bounds);
 
 
-    fw64_animation_controller_play(&skinned_mesh_instance->controller);
+    fw64_animation_controller_play(&game->skinned_mesh_instance->controller);
 
     game->renderpass = fw64_renderpass_create(display, allocator);
-    ui_init(&game->ui, engine, skinned_mesh_instance);
+    ui_init(&game->ui, engine, game->skinned_mesh_instance);
     ui_update(&game->ui, game->current_animation);
 
     fw64_headlight_init(&game->headlight, game->renderpass, 0, &game->camera.node->transform);
 }
 
 void game_update(Game* game) {
+    fw64_skinned_mesh_instance_update(game->skinned_mesh_instance, game->engine->time->time_delta);
     fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
-    fw64_scene_update(&game->scene, game->engine->time->time_delta);
     fw64_headlight_update(&game->headlight);
 
     if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {

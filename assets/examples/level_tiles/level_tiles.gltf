@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.0.44",
+		"generator":"Khronos glTF Blender I/O v4.2.60",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -8,12 +8,12 @@
 		{
 			"name":"Scene",
 			"nodes":[
-				15,
-				21,
-				31,
-				41,
-				47,
-				53
+				16,
+				23,
+				34,
+				45,
+				52,
+				59
 			]
 		}
 	],
@@ -271,28 +271,34 @@
 			]
 		},
 		{
-			"extras":{
-				"layers":"ground"
-			},
-			"mesh":2,
-			"name":"Ground"
-		},
-		{
-			"extras":{
-				"layers":"triggers",
-				"collider":"transform"
-			},
-			"name":"Trigger",
+			"name":"_boundingBox.004",
 			"scale":[
 				50,
 				20,
 				5
+			]
+		},
+		{
+			"children":[
+				12
 			],
+			"extras":{
+				"layers":"triggers",
+				"data":"2"
+			},
+			"name":"Arch Trigger",
 			"translation":[
 				0,
 				20,
 				0
 			]
+		},
+		{
+			"extras":{
+				"layers":"ground"
+			},
+			"mesh":2,
+			"name":"Ground"
 		},
 		{
 			"children":[
@@ -308,14 +314,14 @@
 				9,
 				10,
 				11,
-				12,
-				13
+				13,
+				14
 			],
 			"name":"Scene"
 		},
 		{
 			"children":[
-				14
+				15
 			],
 			"name":"tile_arches"
 		},
@@ -350,23 +356,22 @@
 			]
 		},
 		{
-			"extras":{
-				"layers":"ground"
-			},
-			"mesh":2,
-			"name":"Ground.001"
-		},
-		{
-			"extras":{
-				"layers":"triggers",
-				"collider":"transform"
-			},
-			"name":"Trigger.001",
+			"name":"_boundingBox.005",
 			"scale":[
 				50,
 				20,
 				5
+			]
+		},
+		{
+			"children":[
+				19
 			],
+			"extras":{
+				"layers":"triggers",
+				"data":"1"
+			},
+			"name":"Cubes Trigger",
 			"translation":[
 				0,
 				20,
@@ -374,17 +379,24 @@
 			]
 		},
 		{
+			"extras":{
+				"layers":"ground"
+			},
+			"mesh":2,
+			"name":"Ground.001"
+		},
+		{
 			"children":[
-				16,
 				17,
 				18,
-				19
+				20,
+				21
 			],
 			"name":"Scene.001"
 		},
 		{
 			"children":[
-				20
+				22
 			],
 			"name":"tile_cubes",
 			"translation":[
@@ -401,7 +413,7 @@
 			"name":"Ground.002"
 		},
 		{
-			"name":"Bounding.001",
+			"name":"_boundingBox.001",
 			"scale":[
 				4.060000419616699,
 				21.119998931884766,
@@ -415,7 +427,7 @@
 		},
 		{
 			"children":[
-				23
+				25
 			],
 			"extras":{
 				"layers":"obstacles"
@@ -435,7 +447,7 @@
 			]
 		},
 		{
-			"name":"Bounding",
+			"name":"_boundingBox.002",
 			"scale":[
 				4.059999942779541,
 				21.119998931884766,
@@ -449,7 +461,7 @@
 		},
 		{
 			"children":[
-				25
+				27
 			],
 			"extras":{
 				"layers":"obstacles"
@@ -469,7 +481,7 @@
 			]
 		},
 		{
-			"name":"Bounding.002",
+			"name":"_boundingBox",
 			"scale":[
 				4.060000419616699,
 				21.119998931884766,
@@ -483,7 +495,7 @@
 		},
 		{
 			"children":[
-				27
+				29
 			],
 			"extras":{
 				"layers":"obstacles"
@@ -503,16 +515,22 @@
 			]
 		},
 		{
-			"extras":{
-				"layers":"triggers",
-				"collider":"transform"
-			},
-			"name":"Trigger.005",
+			"name":"_boundingBox.003",
 			"scale":[
 				50,
 				20,
 				5
+			]
+		},
+		{
+			"children":[
+				31
 			],
+			"extras":{
+				"layers":"triggers",
+				"data":"3"
+			},
+			"name":"Trees Trigger",
 			"translation":[
 				0,
 				20,
@@ -521,17 +539,17 @@
 		},
 		{
 			"children":[
-				22,
 				24,
 				26,
 				28,
-				29
+				30,
+				32
 			],
 			"name":"Scene.002"
 		},
 		{
 			"children":[
-				30
+				33
 			],
 			"name":"tile_trees",
 			"translation":[
@@ -643,23 +661,22 @@
 			]
 		},
 		{
-			"extras":{
-				"layers":"ground"
-			},
-			"mesh":2,
-			"name":"Ground.003"
-		},
-		{
-			"extras":{
-				"layers":"triggers",
-				"collider":"transform"
-			},
-			"name":"Trigger.002",
+			"name":"_boundingBox.006",
 			"scale":[
 				50,
 				20,
 				5
+			]
+		},
+		{
+			"children":[
+				41
 			],
+			"extras":{
+				"layers":"triggers",
+				"data":"4"
+			},
+			"name":"Cylinders Trigger",
 			"translation":[
 				0,
 				20,
@@ -667,21 +684,28 @@
 			]
 		},
 		{
+			"extras":{
+				"layers":"ground"
+			},
+			"mesh":2,
+			"name":"Ground.003"
+		},
+		{
 			"children":[
-				32,
-				33,
-				34,
 				35,
 				36,
 				37,
 				38,
-				39
+				39,
+				40,
+				42,
+				43
 			],
 			"name":"Scene.003"
 		},
 		{
 			"children":[
-				40
+				44
 			],
 			"name":"tile_cylinders",
 			"translation":[
@@ -715,6 +739,9 @@
 			]
 		},
 		{
+			"extras":{
+				"collider":"none"
+			},
 			"mesh":6,
 			"name":"Icosphere.001",
 			"scale":[
@@ -729,16 +756,22 @@
 			]
 		},
 		{
-			"extras":{
-				"layers":"triggers",
-				"collider":"transform"
-			},
-			"name":"Trigger.003",
+			"name":"_boundingBox.007",
 			"scale":[
 				50,
 				20,
 				5
+			]
+		},
+		{
+			"children":[
+				49
 			],
+			"extras":{
+				"layers":"triggers",
+				"data":"5"
+			},
+			"name":"Spheres Trigger",
 			"translation":[
 				0,
 				20,
@@ -747,16 +780,16 @@
 		},
 		{
 			"children":[
-				42,
-				43,
-				44,
-				45
+				46,
+				47,
+				48,
+				50
 			],
 			"name":"Scene.004"
 		},
 		{
 			"children":[
-				46
+				51
 			],
 			"name":"tile_spheres",
 			"translation":[
@@ -796,6 +829,29 @@
 			]
 		},
 		{
+			"name":"_boundingBox.008",
+			"scale":[
+				50,
+				20,
+				5
+			]
+		},
+		{
+			"children":[
+				55
+			],
+			"extras":{
+				"layers":"triggers",
+				"data":"6"
+			},
+			"name":"Torus Trigger",
+			"translation":[
+				0,
+				20,
+				0
+			]
+		},
+		{
 			"extras":{
 				"layers":"obstacles"
 			},
@@ -819,34 +875,17 @@
 			]
 		},
 		{
-			"extras":{
-				"layers":"triggers",
-				"collider":"transform"
-			},
-			"name":"Trigger.004",
-			"scale":[
-				50,
-				20,
-				5
-			],
-			"translation":[
-				0,
-				20,
-				0
-			]
-		},
-		{
 			"children":[
-				48,
-				49,
-				50,
-				51
+				53,
+				54,
+				56,
+				57
 			],
 			"name":"Scene.005"
 		},
 		{
 			"children":[
-				52
+				58
 			],
 			"name":"tile_torus",
 			"translation":[

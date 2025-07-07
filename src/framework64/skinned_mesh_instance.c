@@ -5,10 +5,10 @@ void fw64_skinned_mesh_instance_init(fw64SkinnedMeshInstance* instance, fw64Node
     instance->skinned_mesh = skinned_mesh;
     instance->mesh_instance.flags |= FW64_MESH_INSTANCE_FLAG_SKINNED;
     
-    fw64_animation_controller_init(&instance->controller, skinned_mesh->animation_data, initial_animation, allocator);
+    fw64_animation_controller_init(&instance->controller, skinned_mesh->animation_data, initial_animation, &node->transform, allocator);
 }
 
-void fw64_skinned_mesh_uninit(fw64SkinnedMeshInstance* instance, fw64Allocator* allocator) {
+void fw64_skinned_mesh_instance_uninit(fw64SkinnedMeshInstance* instance, fw64Allocator* allocator) {
     fw64_animation_controller_uninit(&instance->controller, allocator);
 }
 

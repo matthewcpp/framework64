@@ -177,10 +177,7 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         if (primitive.mode != primitive_type)
             continue;
 
-        float transform_matrix[16];
-        matrix_multiply(skinned_mesh_instance->mesh_instance.node->transform.world_matrix, &skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0], transform_matrix);
-        updateMeshTransformBlock(transform_matrix);
-
+        updateMeshTransformBlock(&skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0]);
         drawPrimitive(primitive, material);
     }
 }

@@ -15,16 +15,14 @@ class KeyframeBuffer {
 
 class Joint {
     name; // used only for debugging purposes.  this is extracted from the corresponding gltf node
-    id; // the MAPPED index of this node
-    originalIndex; // the original index in the skin's 'joints' array
+    id; // the MAPPED index of this node aka position in the animationData.joints array
     children = []; // MAPPED indices of all child joints
     inverseBindMatrix = null; // extracted from the skin's inverseBindMatrices buffer
     parent = null; // the MAPPED index of this joint's parent
 
-    constructor(name, id, originalIndex) {
+    constructor(name, id) {
         this.name = name;
         this.id = id;
-        this.originalIndex = originalIndex;
     }
 }
 
@@ -61,6 +59,7 @@ class Parser {
     options = null;
 
     animationFilter = null;
+    jointFilters = [];
     buffers = new BufferInfo();
 
     // maps an index into the gltf node array to a Joint object
@@ -74,7 +73,7 @@ class Parser {
 
         this.data = new AnimationData();
         this._setupAnimationFilter();
-
+        this._setupJointFilters();
         this.parseSkin();
         this.parseAnimations();
 
@@ -92,6 +91,49 @@ class Parser {
         }
     }
 
+    _setupJointFilters() {
+        if (!Object.hasOwn(this.options, "excludeJoints")) {
+            return;
+        }
+
+        for (const exp of this.options.excludeJoints) {
+            this.jointFilters.push(new RegExp(exp));
+        }
+    }
+
+    _shouldFilterJoint(jointName) {
+        for(const regex of this.jointFilters) {
+            if (regex.test(jointName))
+                return true;
+        }
+
+        return false;
+    }
+
+    _parseJoint(jointNodeIndex, parent) {
+        const jointNode = this.gltf.nodes[jointNodeIndex];
+
+        if (this._shouldFilterJoint(jointNode.name)) {
+            return;
+        }
+
+        const jointArrayIndex = this.data.joints.length;
+        const joint = new Joint(jointNode.name, jointArrayIndex);
+        parent.children.push(joint.id);
+        joint.parent = parent.id;
+
+        this.data.joints.push(joint);
+        this.nodeIndexToJointMap.set(jointNodeIndex, joint);
+
+        if (!jointNode.children) {
+            return;
+        }
+
+        for (const childNodeIndex of jointNode.children) {
+            this._parseJoint(childNodeIndex, joint);
+        }
+    }
+
     parseSkin() {
         const sizeOfMatrix = 64;
         const skin = this.gltf.skins[0];
@@ -100,7 +142,7 @@ class Parser {
 
         //we will use a singular root node for the skin
         // todo: this is not necessary if the skin contains a 'skeleton' property
-        const rootJoint = new Joint("Skeleton Root", 0, 255);
+        const rootJoint = new Joint("Skeleton Root", 0);
         rootJoint.inverseBindMatrix = Util.mat4IdentityBuffer();
         this.data.jointIdMap.set(this.data.joints.length, 255);
         this.data.joints.push(rootJoint);
@@ -108,45 +150,31 @@ class Parser {
         // create a object for each joint and add it to map
         // this will map the original index of the joint to the filterd joint array
         for (let i = 0; i < skin.joints.length; i++) {
-            // todo: filter out unnecessary joints from the array
-            const jointNode = this.gltf.nodes[skin.joints[i]];
-            const joint = new Joint(jointNode.name, this.data.joints.length, i);
+            const jointNodeIndex =skin.joints[i];
+
+            // if there is an entry in the joint index map, then it is a descendant of a previously processed
+            // node and can be skipped.
+            if (this.nodeIndexToJointMap.has(jointNodeIndex)) {
+                continue;
+            }
+
+            this._parseJoint(jointNodeIndex, rootJoint);
+        }
+
+        for (let i = 0; i < skin.joints.length; i++) {
+            const jointNodeIndex = skin.joints[i];
+            if (!this.nodeIndexToJointMap.has(jointNodeIndex)) {
+                continue;
+            }
+
+            const joint = this.nodeIndexToJointMap.get(jointNodeIndex);
+
+            // create an entry in the joint id map.  this will be used by the mesh class to map
+            // the joint index data from its offset in the gltf skin array to our processed joint array
+            this.data.jointIdMap.set(i, joint.id);
 
             const matrixIndex = ibmBufferView.byteOffset + (i * sizeOfMatrix);
             joint.inverseBindMatrix = this.buffer.slice(matrixIndex, matrixIndex + sizeOfMatrix);
-
-            this.data.joints.push(joint);
-            this.data.jointIdMap.set(joint.originalIndex, joint.id);
-            this.nodeIndexToJointMap.set(skin.joints[i], joint);
-        }
-
-        // build the joint hierarchy by creating the child list for each node
-        for (const joint of this.data.joints) {
-            if (joint.originalIndex > skin.joints.length) // skip our fake skeleton root node
-                continue;
-
-            const jointNodeIndex = skin.joints[joint.originalIndex];
-            const jointNode = this.gltf.nodes[jointNodeIndex];
-
-            if (!jointNode.children)
-                continue;
-
-            for (const childNodeIndex of jointNode.children) {
-                const childJoint = this.nodeIndexToJointMap.get(childNodeIndex);
-                childJoint.parent = jointNode.id;
-                joint.children.push(childJoint.id);
-            }
-        }
-
-        // assign all top level nodes as children of the skeleton root
-        //todo: this not necessary if the skeleton property specified in the joint
-        for (let i = 1; i < this.data.joints.length; i++) {
-            const joint = this.data.joints[i];
-
-            if (joint.parent === null) {
-                joint.parent = rootJoint.id;
-                rootJoint.children.push(joint.id);
-            }
         }
     }
 

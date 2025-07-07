@@ -26,6 +26,10 @@ static void ui_draw(Ui* ui);
 
 float stick_adjust[4];
 
+#define DEBUG_BOX_COUNT 4
+// used to display the mesh collider for the blue box
+#define WIRE_MESH_COUNT 1
+
 void game_init(Game* game, fw64Engine* engine) {
     fw64Allocator* allocator =fw64_default_allocator();
     fw64Display* display = fw64_displays_get_primary(engine->displays);
@@ -36,10 +40,18 @@ void game_init(Game* game, fw64Engine* engine) {
     penguin_init(&game->penguin, engine, game->scene);
     ui_init(&game->ui, engine, &game->penguin, game->scene);
 
-    fw64Mesh* mesh = fw64_scene_load_mesh_asset(game->scene, FW64_ASSET_mesh_blue_cube_wire);
-    fw64_debug_boxes_init(&game->debug_boxes, 1, game->scene, mesh, allocator);
-    fw64Node* bounding_node = fw64_debug_boxes_add(&game->debug_boxes, game->penguin.node->mesh_instance);
-    bounding_node->layer_mask = FW64_layer_lines;
+    fw64_debug_boxes_init(&game->debug_boxes, DEBUG_BOX_COUNT, WIRE_MESH_COUNT, game->scene, allocator);
+    fw64Node* bounding_nodes[DEBUG_BOX_COUNT] = {
+        game->penguin.node,
+        fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Collision_Mesh),
+        fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Custom_Bounding_Box),
+        fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Mesh_Bounding)
+    };
+
+    for (int i = 0; i < DEBUG_BOX_COUNT; i++) {
+        fw64Node* bounding_node = fw64_debug_boxes_add(&game->debug_boxes, bounding_nodes[i]);
+        bounding_node->layer_mask = FW64_layer_lines;
+    }
 
     mat2_set_rotation(stick_adjust, M_PI / 2.0f);
 
@@ -47,12 +59,13 @@ void game_init(Game* game, fw64Engine* engine) {
         game->renderpass[i] = fw64_renderpass_create(display, allocator);
         fw64_renderpass_set_camera(game->renderpass[i], &game->camera);
     }
+
+    fw64_renderpass_set_depth_testing_enabled( game->renderpass[RENDERPASS_SCENE_LINES], 0);
 }
 
 void game_update(Game* game) {
     penguin_update(&game->penguin);
     ui_update(&game->ui);
-    fw64_debug_boxes_update(&game->debug_boxes);
     (void)game;
 }
 
@@ -142,7 +155,7 @@ void ui_init(Ui* ui, fw64Engine* engine, Penguin* penguin, fw64Scene* scene) {
     fw64_renderpass_util_ortho2d(ui->renderpass);
 }
 
-static const char* node_names[4] = {"Mesh Bounding", "Green", "Yellow", "Transform"};
+static const char* node_names[4] = {"Mesh Bounding", "None", "Custom Bounding", "Mesh Collider"};
 
 void ui_update(Ui* ui) {
     fw64_spritebatch_begin(ui->spritebatch);

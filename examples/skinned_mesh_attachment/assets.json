@@ -1,0 +1,31 @@
+{
+    "meshes": [
+        {
+            "src": "examples/skinned_mesh_attachment/sword.gltf"
+        },
+                {
+            "src": "examples/skinned_mesh_attachment/mace.gltf"
+        },
+                {
+            "src": "examples/skinned_mesh_attachment/kite_shield.gltf"
+        },
+                {
+            "src": "examples/skinned_mesh_attachment/buckler.gltf"
+        }
+    ],
+    "fonts": [
+        {
+            "src": "consolas.ttf",
+            "size": 12,
+            "sourceString1": "Weapon: Sword Mace Shield: Kite Buckler"
+        }
+    ],
+        "skinnedMeshes": [
+        {
+            "src": "examples/skinned_mesh_attachment/figure.gltf",
+            "excludeJoints": [
+                ".*_end$"
+            ]
+        }
+    ]
+}
