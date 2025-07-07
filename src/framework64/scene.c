@@ -196,12 +196,6 @@ void fw64_scene_update_bounding(fw64Scene* scene) {
     }
 }
 
-void fw64_scene_update(fw64Scene* scene, float time_delta) {
-    for (uint32_t i = 0; i < fw64_scene_get_skinned_mesh_instance_count(scene); i++) {
-        fw64_skinned_mesh_instance_update(fw64_scene_get_skinned_mesh_instance(scene, i), time_delta);
-    }
-}
-
 void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
     for (uint32_t i = 0 ; i < fw64_scene_get_mesh_instance_count(scene); i++) {
         fw64_renderpass_draw_static_mesh(rendererpass, fw64_scene_get_mesh_instance(scene,i));

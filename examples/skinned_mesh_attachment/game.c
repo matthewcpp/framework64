@@ -79,6 +79,16 @@ void game_init(Game* game, fw64Engine* engine) {
 
 void game_update(Game* game){
     update_selection(game);
+
+    for (size_t i = 0; i < fw64_scene_get_skinned_mesh_instance_count(&game->scene); i++) {
+        fw64_skinned_mesh_instance_update(fw64_scene_get_skinned_mesh_instance(&game->scene, i), game->engine->time->time_delta);
+    }
+
+    // ensure that the meshes attached to the skeleton are updated each frame
+    for (size_t i = 0; i < SELECT_COUNT; i++) {
+        fw64_mesh_instance_update(game->select_nodes[i]->mesh_instance);
+    }
+
     fw64_arcball_update(&game->arcball, game->engine->time->time_delta);
     
     if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
@@ -88,8 +98,6 @@ void game_update(Game* game){
             fw64_animation_controller_pause(&game->character->controller);
         }
     }
-    
-    fw64_scene_update(&game->scene, game->engine->time->time_delta);
 }
 
 void game_draw(Game* game) {

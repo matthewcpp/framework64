@@ -18,7 +18,6 @@ void follow_camera_update(FollowCamera* follow_cam);
 void tiles_init(Tiles* tiles, fw64Engine* engine, fw64SceneInfo* persistent_info);
 void tiles_load_next_tile(Tiles* tiles, int tile_index);
 void tiles_load_next_random_tile(Tiles* tiles);
-void tiles_update(Tiles* tiles);
 void tiles_draw(Tiles* tiles, fw64RenderPass* renderpass, fw64Frustum* frustum);
 uint32_t tiles_query(Tiles* tiles, Box* box, Vec3* velocity, fw64IntersectMovingBoxQuery* query);
 
@@ -123,7 +122,9 @@ void player_update(Player* player) {
                 tiles_load_next_random_tile(player->tiles);
             }
         }
-    } 
+    }
+
+    fw64_skinned_mesh_instance_update(player->skinned_mesh, player->engine->time->time_delta);
 }
 
 void tiles_init(Tiles* tiles, fw64Engine* engine, fw64SceneInfo* persistent_info) {
@@ -193,16 +194,6 @@ void tiles_load_next_tile(Tiles* tiles, int scene_index){
     }
 }
 
-void tiles_update(Tiles* tiles) {
-    fw64_scene_update(tiles->persistent, tiles->engine->time->time_delta);
-
-    for (int i = 0; i < TILE_COUNT; i++) {
-        if (tiles->tiles[i].scene != NULL) {
-            fw64_scene_update(tiles->tiles[i].scene, tiles->engine->time->time_delta);
-        }
-    }
-}
-
 void tiles_draw(Tiles* tiles, fw64RenderPass* renderpass, fw64Frustum* frustum) {
     fw64_scene_draw_frustrum(tiles->persistent, renderpass, frustum, ~0U);
 
@@ -235,7 +226,6 @@ void follow_camera_update(FollowCamera* follow_cam) {
 
 void game_update(Game* game){
     player_update(&game->player);
-    tiles_update(&game->tiles);
     follow_camera_update(&game->follow_camera);
 }
 

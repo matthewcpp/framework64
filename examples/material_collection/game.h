@@ -9,7 +9,6 @@
 typedef struct {
     fw64ColorRGBA8 hairColor, skinColor;
     fw64Texture* textures[4];
-    
 } AlternatePalette;
 
 typedef struct {

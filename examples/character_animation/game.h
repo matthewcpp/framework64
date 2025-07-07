@@ -24,7 +24,9 @@ typedef struct {
     fw64ArcballCamera arcball;
     fw64Headlight headlight;
     fw64Scene scene;
+    fw64SkinnedMeshInstance* skinned_mesh_instance;
     fw64RenderPass* renderpass;
+
 
     int current_animation;
     float current_speed;
