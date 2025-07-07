@@ -108,8 +108,7 @@ IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera
     return viewport_size;
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags clear_flags) {
-    renderer->primitive_mode = primitive_mode;
+void fw64_renderer_begin(fw64Renderer* renderer, fw64ClearFlags clear_flags) {
     fw64_texture_state_default(&renderer->active_texture);
 
     if (renderer->starting_new_frame) {
@@ -509,7 +508,20 @@ static void fw64_renderer_setup_projection_matrix(fw64Renderer* renderer, fw64Re
     gSPPerspNormalize(renderer->display_list++, renderpass->persp_norm);
 }
 
+static void fw64_renderer_draw_lines(fw64Renderer* renderer, fw64RenderPass* renderpass) {
+    if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST)) {
+        gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_XLU_LINE, G_RM_AA_ZB_XLU_LINE2);
+        gSPSetGeometryMode(renderer->display_list++, G_SHADE | G_ZBUFFER );
+    } else {
+        gDPSetRenderMode(renderer->display_list++, G_RM_AA_XLU_LINE, G_RM_AA_XLU_LINE2);
+        gSPClearGeometryMode(renderer->display_list++, G_ZBUFFER );
+    }
+
+    fw64_renderer_draw_unlit_queue_impl(renderer, renderpass, FW64_SHADING_MODE_LINE);
+}
+
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
+    renderer->primitive_mode = renderpass->primitive_mode;
     gSPViewport(renderer->display_list++, &renderpass->n64_viewport);
 
     fw64Viewport* viewport = &renderpass->viewport;
@@ -535,6 +547,11 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
     }
 
     fw64_renderer_setup_projection_matrix(renderer, renderpass);
+
+    if (renderpass->primitive_mode == FW64_PRIMITIVE_MODE_LINES) {
+        fw64_renderer_draw_lines(renderer, renderpass);
+        return;
+    }
 
     if (fw64_render_queue_has_items(&renderpass->render_queue, FW64_SHADING_MODE_UNLIT)) {
         fw64_renderer_draw_unlit_queue(renderer, renderpass);

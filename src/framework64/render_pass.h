@@ -25,6 +25,9 @@ extern "C" {
 #endif
 
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator);
+
+void fw64_renderpass_set_primitive_mode(fw64RenderPass* renderpass, fw64PrimitiveMode primitive_mode);
+
 void fw64_renderpass_delete(fw64RenderPass* renderpass);
 
 void fw64_renderpass_begin(fw64RenderPass* renderpass);

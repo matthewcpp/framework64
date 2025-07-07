@@ -32,7 +32,7 @@ public:
     bool init(int width, int height);
 
     void setClearColor(float r, float g, float b, float a);
-    void begin(fw64PrimitiveMode primitive_mode, fw64ClearFlags flags);
+    void begin(fw64ClearFlags flags);
     void setCamera(fw64Camera* cam);
     void setViewMatrices(float* projection, float* view);
     void setViewport(fw64Viewport const * viewport);
@@ -81,10 +81,6 @@ private:
     };
 
 private:
-    enum DrawingMode { None, Mesh, Rect };
-    void setDrawingMode(DrawingMode mode);
-
-private:
     struct ViewportRect{ GLint x, y; GLsizei width, height; };
     ViewportRect getViewportRect(fw64Viewport const * viewport) const;
 
@@ -110,9 +106,6 @@ struct LightingData {
 
 public:
     fw64Material sprite_material;
-    fw64Primitive::Mode primitive_type;
-    DrawingMode drawing_mode = DrawingMode::None;
-    
     std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
 
     // Note: This is not currently implemented for desktop rendering

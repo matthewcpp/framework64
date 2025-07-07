@@ -28,7 +28,7 @@ typedef struct fw64Renderer fw64Renderer;
 extern "C" {
 #endif
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags clear_flags);
+void fw64_renderer_begin(fw64Renderer* renderer, fw64ClearFlags clear_flags);
 
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass);
 

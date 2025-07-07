@@ -58,7 +58,7 @@ void fw64Renderer::endFrame() {
     display.swap();
 }
 
-void fw64Renderer::begin(fw64PrimitiveMode mode, fw64ClearFlags flags) {
+void fw64Renderer::begin(fw64ClearFlags flags) {
     GLbitfield clear_bits = 0;
     if (flags & FW64_CLEAR_FLAG_COLOR) {
         clear_bits |= GL_COLOR_BUFFER_BIT;
@@ -69,17 +69,6 @@ void fw64Renderer::begin(fw64PrimitiveMode mode, fw64ClearFlags flags) {
     }
 
     glClear(clear_bits);
-
-    switch(mode) {
-        case FW64_PRIMITIVE_MODE_TRIANGLES:
-            primitive_type = fw64Primitive::Mode::Triangles;
-            break;
-        case FW64_PRIMITIVE_MODE_LINES:
-            primitive_type = fw64Primitive::Mode::Lines;
-            break;
-        default:
-            break;
-    }
 }
 
 fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Viewport const * viewport) const {
@@ -147,8 +136,6 @@ static inline fw64PrimitiveMode getFw64PrimitiveMode(fw64Primitive::Mode mode) {
 }
 
 void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index) {
-    setDrawingMode(DrawingMode::Mesh);
-
     fw64DynamicVector* queue = &renderpass->render_queue.buckets[index].static_;
     for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
         fw64StaticDrawInfo* draw_info = (fw64StaticDrawInfo*)fw64_dynamic_vector_item(queue, i);
@@ -157,8 +144,9 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         const auto& primitive = draw_info->instance->mesh->primitives[draw_info->index];
         const fw64Material* material = fw64_material_collection_get_material(draw_info->instance->materials, draw_info->index);
 
-        if (primitive.mode != primitive_type)
+        if (getFw64PrimitiveMode(primitive.mode) != renderpass->primitive_mode) {
             continue;
+        }
 
         drawPrimitive(primitive, material);
     }
@@ -171,8 +159,10 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         const auto & primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives[draw_info->index];
         const fw64Material* material = fw64_material_collection_get_material(skinned_mesh_instance->mesh_instance.materials, draw_info->index);
 
-        if (primitive.mode != primitive_type)
+        if (getFw64PrimitiveMode(primitive.mode) != renderpass->primitive_mode) {
             continue;
+        }
+
 
         updateMeshTransformBlock(&skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0]);
         drawPrimitive(primitive, material);
@@ -221,7 +211,6 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
     drawMeshesFromQueue(renderpass, FW64_SHADING_MODE_UNLIT_TRANSPARENT_TEXTURED);
 
     if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.sprite_batches)) {
-        setDrawingMode(DrawingMode::Rect);
         glDisable(GL_DEPTH_TEST);
 
         for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.sprite_batches); i++){
@@ -252,11 +241,8 @@ void fw64Renderer::drawSpriteBatch(fw64SpriteBatch* sprite_batch) {
 }
 
 void fw64Renderer::end(fw64RendererSwapFlags) {
-    setDrawingMode(DrawingMode::None);
-
     current_camera = nullptr;
     active_shader = nullptr;
-    primitive_type = primitive_type = fw64Primitive::Mode::Unknown;
 }
 
 void fw64Renderer::updateMeshTransformBlock(float* matrix) {
@@ -321,27 +307,6 @@ void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
     lighting_data_uniform_block.update();
 }
 
-void fw64Renderer::setDrawingMode(DrawingMode mode) {
-    if (mode == drawing_mode)
-        return;
-
-    drawing_mode = mode;
-
-    // begin new drawing mode
-    // TODO: can this be removed?
-    switch (drawing_mode) {
-        case DrawingMode::Mesh:
-            setGlDepthTestingState();
-            break;
-
-        case DrawingMode::Rect:
-            break;
-
-        case DrawingMode::None:
-            break;
-    };
-}
-
 void fw64Renderer::setFogEnabled(bool enabled) {
     fog_enabled = enabled;
 
@@ -371,8 +336,8 @@ void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g,
     renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
 }
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags flags) {
-    renderer->begin(primitive_mode, flags);
+void fw64_renderer_begin(fw64Renderer* renderer,fw64ClearFlags flags) {
+    renderer->begin(flags);
 }
 
 void fw64_renderer_set_view_matrices(fw64Renderer* renderer, fw64Matrix* projection, uint16_t*, fw64Matrix* view) {
