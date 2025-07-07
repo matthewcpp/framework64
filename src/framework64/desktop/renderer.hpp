@@ -51,9 +51,6 @@ public:
     void drawSpriteBatch(fw64SpriteBatch* spritebatch);
     void drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index);
     void drawRenderPass(fw64RenderPass* renderpass);
-public:
-    void setDepthTestingEnabled(bool enabled);
-    [[nodiscard]] inline bool depthTestingEnabled() const { return depth_testing_enabled; }
 
 public:
     void setFogEnabled(bool enabled);
@@ -65,7 +62,6 @@ private:
     void updateMeshTransformBlock(float* matrix);
     void updateLightingBlock(const LightingInfo& lighting_info);
     void setActiveShader(framework64::ShaderProgram* shader);
-    void setGlDepthTestingState();
     void drawPrimitive(fw64Primitive const & primitive, const fw64Material* material);
 
     void fogValuesChanged();
@@ -110,7 +106,6 @@ struct LightingData {
     float fog_min_distance = 0.4f;
     float fog_max_distance = 0.8f;
 
-    bool depth_testing_enabled = true;
     bool fog_enabled = false;
 
 public:

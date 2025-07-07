@@ -142,11 +142,8 @@ void fw64Renderer::clearViewport(fw64Viewport const & viewport, fw64ClearFlags f
     }
 }
 
-void fw64Renderer::setGlDepthTestingState() {
-    if (depth_testing_enabled)
-        glEnable(GL_DEPTH_TEST);
-    else
-        glDisable(GL_DEPTH_TEST);
+static inline fw64PrimitiveMode getFw64PrimitiveMode(fw64Primitive::Mode mode) {
+    return mode == fw64Primitive::Mode::Lines ? FW64_PRIMITIVE_MODE_LINES : FW64_PRIMITIVE_MODE_TRIANGLES;
 }
 
 void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index) {
@@ -298,13 +295,6 @@ void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
     }
 }
 
-void fw64Renderer::setDepthTestingEnabled(bool enabled) {
-    depth_testing_enabled = enabled;
-
-    if (drawing_mode == DrawingMode::Mesh)
-        setGlDepthTestingState();
-}
-
 void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
     int block_index = 0;
 
@@ -395,14 +385,6 @@ void fw64_renderer_set_viewport(fw64Renderer* renderer, fw64Viewport* viewport) 
 
 void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags flags) {
     renderer->end(flags);
-}
-
-void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
-    renderer->setDepthTestingEnabled(enabled);
-}
-
-int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
-    return renderer->depthTestingEnabled();
 }
 
 void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled) {

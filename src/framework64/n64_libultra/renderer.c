@@ -276,17 +276,6 @@ static void fw64_renderer_draw_lit_skinned_primitive(fw64Renderer* renderer, Lig
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
 }
 
-void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
-    if (enabled)
-        SET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST);
-    else
-        UNSET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST);
-}
-
-int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
-    return GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST);
-}
-
 void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled){
     if (enabled)
         SET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
