@@ -5,6 +5,7 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
+    fw64_renderer_set_clear_color(engine->renderer, 0, 200, 0);
 }
 
 void game_update(Game* game){

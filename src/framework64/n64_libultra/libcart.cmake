@@ -2,7 +2,7 @@ message("Configuring libcart")
 
 # Note When upgrading: If a file has a .c and .s version then then .s should be used for libultra and .c used for libdragon
 
-set(libcart_dir ${CMAKE_CURRENT_SOURCE_DIR}/n64_libultra/libcart)
+set(libcart_dir ${n64_libultra_dir}/libcart)
 set(libcart_include_dir ${libcart_dir}/include)
 set(libcart_src_dir ${libcart_dir}/src)
 set(libcart_ff_dir ${libcart_dir}/ff)
@@ -74,9 +74,10 @@ set(ff_src_files
     ${libcart_ff_dir}/ffunicode.c
 )
 
-target_compile_definitions(framework64 PRIVATE -D_ULTRA64)
-target_include_directories(framework64 PRIVATE ${libcart_include_dir} ${libcart_ff_dir})
-target_sources(framework64 PRIVATE 
+target_compile_definitions(framework64_media PRIVATE -D_ULTRA64)
+target_include_directories(framework64_media PRIVATE ${libcart_include_dir} ${libcart_ff_dir})
+
+target_sources(framework64_media PRIVATE 
     ${libcart_include_file}
     ${libcart_src_files}
     ${libcart_assembly_files}

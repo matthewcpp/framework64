@@ -19,6 +19,7 @@ static void uninit_current_state(fw64AssetViewer* file_viewer);
 
 void fw64_asset_viewer_init(fw64AssetViewer* file_viewer, fw64Engine* engine, fw64RenderPass* renderpass, fw64Font* font, uint32_t data_size) {
     file_viewer->state.base.engine = engine;
+    file_viewer->state.base.media = fw64_modules_get_static(engine->modules, FW64_MEDIA_MODULE_ID);
     file_viewer->state.base.font = font;
     file_viewer->state.base.renderpass = renderpass;
     
@@ -89,15 +90,14 @@ void fw64_asset_viewer_load_from_media(fw64AssetViewer* file_viewer, const char*
         return;
     }
 
-    fw64Media* media = file_viewer->state.base.engine->media;
-    fw64DataSource* data_reader = fw64_media_open_data_source(media, path);
+    fw64DataSource* data_reader = fw64_media_open_data_source(file_viewer->state.base.media, path);
 
     if (!data_reader) {
         fw64_asset_viewer_set_empty_state(file_viewer, "File open failed:", path);
         return;
     }
     fw64_asset_viewer_load_data(file_viewer, data_reader, type);
-    fw64_media_close_data_source(media, data_reader);
+    fw64_media_close_data_source(file_viewer->state.base.media, data_reader);
 }
 
 void fw64_asset_viewer_load_data(fw64AssetViewer* file_viewer, fw64DataSource* data_reader, fw64AssetType type) {

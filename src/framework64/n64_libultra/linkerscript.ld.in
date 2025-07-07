@@ -57,7 +57,9 @@ SECTIONS
       *c.obj(.text);
 
       */libframework64.a:*.o(.text);
-      */libframework64.a:*.obj(.text); /* note: libcart's assembly file is linked in and had extension .obj */
+      */libframework64_media.a:*.o(.text);
+      */libframework64_media.a:*.s.obj(.text); /* this is needed for the assembly files that are part of libcart */
+      */libframework64_datalink.a:*.o(.text);
 
       */libultra_rom.a:*.o(.text);
       */libnusys.a:*.o(.text);
@@ -103,6 +105,9 @@ SECTIONS
       *c.obj(.*rodata*);
 
       */libframework64.a:*.o(.*rodata*);
+      */libframework64_media.a:*.o(.*rodata*);
+      */libframework64_media.a:*.s.obj(.*rodata*);
+      */libframework64_datalink.a:*.o(.*rodata*);
 
       */libultra_rom.a:*.o(.*rodata*);
       */libnusys.a:*.o(.*rodata*);
@@ -124,6 +129,17 @@ SECTIONS
       */libframework64.a:*.o(COMMON);
       */libframework64.a:*.o(.scommon);
       */libframework64.a:*.o(.*bss*);
+
+      */libframework64_media.a:*.o(COMMON);
+      */libframework64_media.a:*.o(.scommon);
+      */libframework64_media.a:*.o(.*bss*);
+      */libframework64_media.a:*.s.obj(COMMON);
+      */libframework64_media.a:*.s.obj(.scommon);
+      */libframework64_media.a:*.s.obj(.*bss*);
+
+      */libframework64_datalink.a:*.o(COMMON);
+      */libframework64_datalink.a:*.o(.scommon);
+      */libframework64_datalink.a:*.o(.*bss*);
 
       */libultra_rom.a:*.o(COMMON);
       */libultra_rom.a:*.o(.scommon);

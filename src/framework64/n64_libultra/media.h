@@ -3,8 +3,6 @@
 #include "framework64/media.h"
 #include "framework64/data_io.h"
 
-#if FW64_MEDIA_ENABLED
-
 #include "ff.h"
 
 struct fw64MediaDirItr {
@@ -36,13 +34,3 @@ struct fw64Media {
     fw64N64MediaDataReader data_reader;
     fw64N64MediaDataWriter data_writer;
 };
-#else
-
-struct fw64Media {
-    int is_present;
-};
-
-#endif
-
-void fw64_n64_media_init(fw64Media* media);
-

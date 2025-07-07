@@ -3,12 +3,11 @@
 /** \file media.h */
 
 #include "framework64/data_io.h"
+#include "framework64/engine.h"
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define FW64_MEDIA_MODULE_ID 2
 
 typedef struct fw64Media fw64Media;
 typedef struct fw64MediaDirItr fw64MediaDirItr;
@@ -18,6 +17,13 @@ typedef enum {
     FW64_MEDIA_ITEM_FILE,
     FW64_MEDIA_ITEM_DIRECTORY
 } fw64MediaItemType;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** This method should be called once during game initialization. */
+fw64Media* fw64_media_init(fw64Engine* engine);
 
 /** 
  * Indicates whether removable media is present.

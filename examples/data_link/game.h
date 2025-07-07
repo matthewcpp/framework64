@@ -1,5 +1,6 @@
 #pragma once
 
+#include "framework64/data_link.h"
 #include "framework64/engine.h"
 
 #define MESSAGE_LIST_COUNT 5
@@ -23,6 +24,7 @@ typedef struct {
     char** message_list;
     fw64RenderPass* renderpass;
     fw64SpriteBatch* spritebatch;
+    fw64DataLink* data_link;
 } Game;
 
 #ifdef __cplusplus

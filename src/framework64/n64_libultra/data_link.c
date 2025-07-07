@@ -1,12 +1,23 @@
 #include "framework64/n64_libultra/data_link.h"
+#include "framework64/n64_libultra/log.h"
 
 #include "usb/usb.h"
 
 #include <ultra64.h> 
 
+#include <stdio.h>
 #include <string.h>
 
-int fw64_n64_data_link_init(fw64DataLink* data_link) {
+fw64DataLink _dl;
+
+static void fw64_n64_data_link_update(void* data_link, void* arg);
+static void fw64_n64_data_link_log(const char* message, va_list args);
+
+fw64DataLink* fw64_data_link_init(fw64Engine* engine) {
+    fw64DataLink* data_link = &_dl;
+
+    _fw64_modules_register_static(engine->modules, FW64_DATALINK_MODULE_ID, data_link, fw64_n64_data_link_update, NULL);
+
     data_link->message_callback = NULL;
     data_link->message_callback_arg = NULL;
 
@@ -17,14 +28,13 @@ int fw64_n64_data_link_init(fw64DataLink* data_link) {
     fw64_n64_usb_message_stream_init(&data_link->message_stream);
 
     data_link->connected = usb_initialize();
+    data_link->should_trigger_connection_callback = 1;
 
-    return data_link->connected;
-}
+    #ifndef NDEBUG
+    fw64_n64libultra_log_set_func(fw64_n64_data_link_log);
+    #endif
 
-void fw64_n64_data_link_start(fw64DataLink* data_link) {
-    if (data_link->connected && data_link->connected_callback ) {
-        data_link->connected_callback(data_link->connected_callback_arg);
-    }
+    return data_link;
 }
 
 void fw64_data_link_set_connected_callback(fw64DataLink* data_link, fw64DataLinkConnectedCallback callback, void* arg) {
@@ -45,7 +55,18 @@ void fw64_data_link_send_message(fw64DataLink* data_link, fw64DataLinkMessageTyp
     fw64_n64_usb_outgoing_message_queue_enqueue(&data_link->outgoing, message_type, data_size, (char*)data);
 }
 
-void fw64_n64_data_link_update(fw64DataLink* data_link) {
+void fw64_n64_data_link_update(void* dl, void* arg) {
+    fw64DataLink* data_link = (fw64DataLink*)dl;
+    (void)arg;
+
+    if (data_link->should_trigger_connection_callback && data_link->connected) {
+        if (data_link->connected_callback) {
+            data_link->connected_callback(data_link->connected_callback_arg);
+        }
+
+        data_link->should_trigger_connection_callback = 0;
+    }
+
     // read and process any data that has arrived over the wire
     uint32_t incomming_message = usb_poll();
 
@@ -132,3 +153,20 @@ size_t fw64_n64_usb_message_stream_read(fw64DataSource* stream, void* buffer, si
 
     return bytes_to_read;
 }
+
+#ifndef NDEBUG
+extern int _Printf(void *(*copyfunc)(void *, const char *, size_t), void*, const char*, va_list);
+static void* printf_handler(void *buf, const char *str, size_t len)
+{
+    return ((char *) memcpy(buf, str, len) + len);
+}
+
+#define FW64_DATA_LINK_MESSAGE_SIZE 128
+
+void fw64_n64_data_link_log(const char* message, va_list args) {
+    char message_buffer[FW64_DATA_LINK_MESSAGE_SIZE];
+    int message_length = _Printf(printf_handler, message_buffer, message, args);
+    fw64_data_link_send_message(&_dl, Fw64_DATA_LINK_MESSAGE_TEXT, &message_buffer[0], message_length);
+}
+
+#endif

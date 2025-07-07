@@ -3,9 +3,9 @@
 
 #include "framework64/controller_mapping/n64.h"
 #include "framework64/log.h"
-#include "framework64/n64_libultra/data_link.h"
 
 #include "framework64/data_link.h"
+#include "framework64/media.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +23,10 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Display* display = fw64_displays_get_primary(engine->displays);
     fw64Allocator* allocator = fw64_default_allocator();
 
+    fw64_media_init(engine);
+
     game->engine = engine;
+    game->data_link = fw64_data_link_init(engine);
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas14, allocator);
     game->renderpass = fw64_renderpass_create(display, allocator);
 
@@ -36,8 +39,8 @@ void game_init(Game* game, fw64Engine* engine) {
     callbacks.complete = on_file_download_complete;
     fw64_file_downloader_set_callbacks(&game->file_downloader, &callbacks, game);
 
-    fw64_data_link_set_connected_callback(engine->data_link, on_data_link_connected, game);
-    fw64_data_link_set_mesage_callback(engine->data_link, on_data_link_message, game);
+    fw64_data_link_set_connected_callback(game->data_link, on_data_link_connected, game);
+    fw64_data_link_set_mesage_callback(game->data_link, on_data_link_message, game);
 
     fw64_asset_viewer_set_empty_state(&game->asset_viewer, "No data link connection", NULL);
 }

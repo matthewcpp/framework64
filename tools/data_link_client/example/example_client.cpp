@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     n64_command->add_option("--rom", settings.n64_rom_path, "Path to data_link rom that will be loaded on N64");
     n64_command->callback([&settings](){ settings.platform = Platform::N64; });
 
-    auto* desktop_command = app.add_subcommand("desktop", "transfer assets to Desktop");
+    auto* desktop_command = app.add_subcommand("desktop", "connect to desktop example");
     desktop_command->add_option("--uri", settings.desktop_websocket_uri, "Optional URI of data link server to connect to");
     desktop_command->callback([&settings](){ settings.platform = Platform::Desktop; });
 
@@ -41,6 +41,7 @@ int main(int argc, char** argv) {
 
     // wait for the connection message coming from the example
     wait_for_message(*client);
+    std::cout << "Type 'exit' to close the application." << std::endl;
 
     std::string message;
     for(;;) {

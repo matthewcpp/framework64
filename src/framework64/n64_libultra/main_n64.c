@@ -19,7 +19,6 @@ void nusys_game_tick(int pendingGfx) {
 void mainproc(void) {
     fw64_n64_engine_init(&engine, FW64_ASSET_COUNT);
     game_init(&game, &engine);
-    fw64_n64_engine_post_game_init(&engine);
     nuGfxFuncSet((NUGfxFunc)nusys_game_tick);
     nuGfxDisplayOn();
 }

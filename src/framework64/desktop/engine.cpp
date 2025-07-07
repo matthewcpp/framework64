@@ -2,10 +2,9 @@
 
 #include "framework64/desktop/asset_database.hpp"
 #include "framework64/desktop/audio.hpp"
-#include "framework64/desktop/data_link.hpp"
 #include "framework64/desktop/filesystem.hpp"
 #include "framework64/desktop/input.hpp"
-#include "framework64/desktop/media.hpp"
+#include "framework64/desktop/modules.hpp"
 #include "framework64/desktop/renderer.hpp"
 
 #include <SDL2/SDL_image.h>
@@ -14,7 +13,8 @@
 #include <iostream>
 
 namespace framework64 {
-bool Engine::init(Settings const & settings) {
+bool Engine::init(Settings const & app_settings) {
+    settings = app_settings;
     application_name = settings.application_name;
 
     if (settings.save_file_type == fw64SaveFile::SaveFileType::Unknown) {
@@ -65,8 +65,7 @@ bool Engine::init(Settings const & settings) {
     assets = new fw64AssetDatabase(asset_dir_path, *shader_cache);
     audio = new fw64Audio();
     input = new fw64Input();
-    media = new fw64Media();
-    data_link = new fw64DataLink();
+    modules = new fw64Modules();
 
     time = new fw64Time();
     memset(time, 0, sizeof(fw64Time));
@@ -84,15 +83,11 @@ bool Engine::init(Settings const & settings) {
     input->init(*n64_input_interface, *time);
     save_file->init(save_file_path, settings.save_file_type);
 
-    if (!media->init(media_dir)) {
-        std::cout << "Failed to initialize media" << std::endl;
-        return false;
-    }
-
-    if (!data_link->initialize(settings.data_link_port)) {
-        std::cout << "Failed to initialize websocket datalink" << std::endl;
-        return false;
-    }
+    // media = _fw64_media_init(const_cast<std::string*>(&media_dir));
+    // if (!media) {
+    //     std::cout << "Failed to initialize media" << std::endl;
+    //     return false;
+    // }
 
     Filesystem::init(asset_dir_path, *assets);
 
@@ -101,7 +96,8 @@ bool Engine::init(Settings const & settings) {
 
 void Engine::update(float time_delta) {
     input->update();
-    data_link->update();
+    modules->update();
+
     time->time_delta = time_delta;
     time->total_time += time_delta;
 

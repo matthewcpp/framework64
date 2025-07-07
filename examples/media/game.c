@@ -26,9 +26,10 @@ static void no_media_present_draw(NoMediaPresent* no_media);
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
+    game->media = fw64_media_init(engine);
     fw64Font* font = fw64_assets_load_font(game->engine->assets, FW64_ASSET_font_Consolas14, fw64_default_allocator());
 
-    if (fw64_media_is_present(game->engine->media)) {
+    if (fw64_media_is_present(game->media)) {
         game->state = STATE_PICKING_FILE;
         media_file_explorer_init(&game->file_explorer, engine, font, on_file_picked, game);
         media_asset_viewer_init(&game->asset_viewer, engine, font);
@@ -99,11 +100,9 @@ void media_file_explorer_init(MediaFileExplorer* explorer, fw64Engine* engine, f
 void media_file_explorer_update(MediaFileExplorer* explorer) {
     fw64_media_file_picker_update(&explorer->file_picker);
 
-    if (!fw64_media_file_picker_did_change_selection(&explorer->file_picker)) {
-        return;
+    if (fw64_media_file_picker_did_change(&explorer->file_picker)) {
+        media_file_explorer_update_spritebatch(explorer);
     }
-
-    media_file_explorer_update_spritebatch(explorer);
 }
 
 void media_file_explorer_update_spritebatch(MediaFileExplorer* explorer) {
@@ -111,7 +110,10 @@ void media_file_explorer_update_spritebatch(MediaFileExplorer* explorer) {
     int x_pos = 20;
     int y_pos = 20;
 
-    fw64_spritebatch_draw_string(explorer->spritebatch, explorer->font, explorer->file_picker.dir_stack.path, x_pos, y_pos);
+    char cwd_str[fw64_media_file_picker_MAX_PATH_LENGTH + 16];
+    sprintf(cwd_str, "cwd: %s", explorer->file_picker.dir_stack.path);
+
+    fw64_spritebatch_draw_string(explorer->spritebatch, explorer->font, cwd_str, x_pos, y_pos);
 
     fw64FileExplorerItemPage* page = explorer->file_picker.dir_data.pages[explorer->file_picker.dir_data.current_page_index];
 

@@ -17,6 +17,7 @@ static void read_path(fw64MediaFilePicker* explorer);
 
 void fw64_media_file_picker_init(fw64MediaFilePicker* explorer, fw64Engine* engine, int max_page_item_size) {
     explorer->engine = engine;
+    explorer->media = fw64_modules_get_static(engine->modules, FW64_MEDIA_MODULE_ID);
     explorer->max_page_item_size = max_page_item_size;
     explorer->flags = FW64_MEDIA_FILEPICKER_FLAG_NONE;
 
@@ -39,10 +40,10 @@ void fw64_media_file_picker_uninit(fw64MediaFilePicker* explorer) {
 
 void read_path(fw64MediaFilePicker* explorer) {
     if (explorer->dir_itr) {
-        fw64_media_close_dir(explorer->engine->media, explorer->dir_itr);
+        fw64_media_close_dir(explorer->media, explorer->dir_itr);
     }
 
-    explorer->dir_itr = fw64_media_open_dir(explorer->engine->media, explorer->dir_stack.path);
+    explorer->dir_itr = fw64_media_open_dir(explorer->media, explorer->dir_stack.path);
 
     fw64_bump_allocator_reset(&explorer->dir_allocator);
     reset_dir_data(explorer);
@@ -59,6 +60,8 @@ void push_directory(fw64MediaFilePicker* explorer, const char* path) {
     if (!dir_appended)
         return;
 
+    explorer->flags |= FW64_MEDIA_FILEPCIKER_FLAG_DIR_CHANGED;
+
     read_path(explorer);
 }
 
@@ -70,6 +73,8 @@ static void pop_directory(fw64MediaFilePicker* explorer) {
 
     dir_stack->path_len -= dir_stack->component_lengths[dir_stack->current_index--];
     dir_stack->path[dir_stack->path_len] = 0;
+
+    explorer->flags |= FW64_MEDIA_FILEPCIKER_FLAG_DIR_CHANGED;
 
     read_path(explorer);
 }

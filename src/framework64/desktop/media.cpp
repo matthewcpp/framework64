@@ -1,6 +1,24 @@
-#include "framework64/desktop/media.hpp"
+#include "media.hpp"
+
+#include "framework64/desktop/engine.hpp"
 
 #include <iostream>
+#include <memory>
+
+fw64Media* fw64_media_init(fw64Engine* engine) {
+    auto* desktop_engine = reinterpret_cast<framework64::Engine*>(engine);
+
+    auto media = std::make_unique<fw64Media>();
+    if (! _fw64_modules_register_static(engine->modules, FW64_MEDIA_MODULE_ID, media.get(), nullptr, nullptr)) {
+        return nullptr;
+    }
+
+    if (media->init(desktop_engine->settings.media_dir_name)) {
+        return media.release();
+    } else {
+        return nullptr;
+    }
+}
 
 bool fw64Media::init(std::string const & media_dir) {
     base_path = media_dir;
