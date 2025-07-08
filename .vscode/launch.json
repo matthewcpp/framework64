@@ -60,7 +60,7 @@
             ],
             // "args":["shading_modes", "n64_libultra"]
             //"args":["spin_n64", "n64_libdragon"]
-            "args":["shading_modes", "desktop"]
+            "args":["split_screen", "desktop"]
         },
         {
             "name": "GDB Debug Rom",

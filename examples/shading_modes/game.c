@@ -11,6 +11,7 @@ typedef enum {
     MESH_CONTROLLER_CUBE,
     MESH_SUZANNE,
     MESH_PENGUIN,
+    MESH_WIRE_CUBE,
     MESH_COUNT
 } Meshes;
 
@@ -19,7 +20,15 @@ static const char* shading_mode_text[] = {
     "UnlitTextured",
     "Lit",
     "LitTextured",
-    "UnlitTextured"
+    "Lines"
+};
+
+float mesh_scale [] = {
+    0.1f,
+    1.0f,
+    1.0f,
+    0.1f,
+    1.0f
 };
 
 static void load_next_mesh(Game* game, int direction);
@@ -31,7 +40,6 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->engine = engine;
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
-    game->button_sprite = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
     game->mesh_node = NULL;
 
     fw64SceneInfo info;
@@ -45,11 +53,12 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_controller_cube);
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_suzanne);
     fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_penguin);
+    fw64_scene_load_mesh_asset(&game->scene, FW64_ASSET_mesh_blue_cube_wire);
 
     fw64Node* camera_node = fw64_scene_create_node(&game->scene);
     fw64_camera_init(&game->camera, camera_node, display);
     game->camera.near = 1.0f;
-    game->camera.far = 1000.0f;
+    game->camera.far = 150.0f;
     fw64_camera_update_projection_matrix(&game->camera);
 
     fw64_arcball_init(&game->arcball, engine->input, &game->camera);
@@ -78,13 +87,19 @@ static void load_next_mesh(Game* game, int direction) {
 
     if (game->mesh_node == NULL) {
         game->mesh_node = fw64_scene_create_node(&game->scene);
+    }
+
+    vec3_set_all(&game->mesh_node->transform.scale, mesh_scale[game->current_mesh]);
+    fw64_transform_update_matrix(&game->mesh_node->transform);
+    fw64_renderpass_set_primitive_mode(game->renderpasses[RENDER_PASS_SCENE], fw64_mesh_primitive_get_mode(mesh, 0));
+
+    if (game->mesh_node->mesh_instance == NULL) {
         fw64_scene_create_mesh_instance(&game->scene, game->mesh_node, mesh);
     } else {
         fw64_mesh_instance_set_mesh(game->mesh_node->mesh_instance, mesh);
     }
 
-    Box bounding_box = fw64_mesh_get_bounding_box(mesh);
-    fw64_arcball_set_initial(&game->arcball, &bounding_box);
+    fw64_arcball_set_initial(&game->arcball, &game->mesh_node->mesh_instance->render_bounds);
 
     update_spritebatch(game);
 }
@@ -93,10 +108,14 @@ void game_update(Game* game) {
     if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
         load_next_mesh(game, 1);
     }
-    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_LEFT) ||
+             fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT))
+    {
         load_next_mesh(game, -1);
     }
-    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
+    else if (fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) ||
+             fw64_input_controller_button_pressed(game->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT))
+    {
         load_next_mesh(game, 1);
     }
 
@@ -123,18 +142,6 @@ void update_spritebatch(Game* game) {
     IVec2 screen_size = fw64_display_get_size(fw64_displays_get_primary(game->engine->displays));
 
     fw64_spritebatch_begin(game->spritebatch);
-
-    int button_width = fw64_texture_slice_width(game->button_sprite);
-    int draw_pos_x = 10;
-    int draw_pos_y = screen_size.y - 40;
-
-    fw64_spritebatch_draw_sprite_slice(game->spritebatch, game->button_sprite, 4, draw_pos_x, draw_pos_y);
-    draw_pos_x += button_width + 4;
-
-    fw64_spritebatch_draw_sprite_slice(game->spritebatch, game->button_sprite, 5, draw_pos_x, draw_pos_y);
-    draw_pos_x += button_width + 4;
-
-    fw64_spritebatch_draw_string(game->spritebatch, game->font, "Switch Model", draw_pos_x, draw_pos_y);
 
     IVec2 center_pos = fw64_text_util_center_string(game->font, shading_mode_text[game->current_mesh], &screen_size);
     fw64_spritebatch_draw_string(game->spritebatch, game->font, shading_mode_text[game->current_mesh], center_pos.x, 10);

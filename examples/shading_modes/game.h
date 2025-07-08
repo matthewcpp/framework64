@@ -19,7 +19,6 @@ typedef struct {
     fw64Headlight headlight;
 
     fw64Font* font;
-    fw64Texture* button_sprite;
 
     fw64Scene scene;
     fw64Node* mesh_node;
