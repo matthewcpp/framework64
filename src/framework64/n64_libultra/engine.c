@@ -39,7 +39,7 @@ fw64Time time;
 fw64SaveFile save_file;
 u64 _previous_update_time = 0;
 
-static void fw64_n64_engine_update_time(fw64Engine* engine) {
+static void fw64_n64_libultra_engine_update_time(fw64Engine* engine) {
     u64 current_ms = OS_CYCLES_TO_USEC(osGetTime()) / 1000;
 
     if (current_ms < _previous_update_time)
@@ -52,7 +52,7 @@ static void fw64_n64_engine_update_time(fw64Engine* engine) {
     _previous_update_time = current_ms;
 }
 
-int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
+int fw64_n64_libultra_engine_init(fw64Engine* engine, int asset_count) {
     engine->audio = &audio;
     engine->assets = &assets;
     engine->displays = &displays;
@@ -85,12 +85,14 @@ int fw64_n64_engine_init(fw64Engine* engine, int asset_count) {
     return 1;
 }
 
-void fw64_n64_engine_update(fw64Engine* engine) {
-    fw64_n64_engine_update_time(engine);
+void fw64_n64_libultra_engine_update(fw64Engine* engine) {
+    fw64_n64_libultra_engine_update_time(engine);
     fw64_n64_input_update(engine->input);
     fw64_n64_audio_update(engine->audio);
     fw64_n64_libultra_modules_update(engine->modules);
-
-    engine->renderer->starting_new_frame = 1;
 }
 
+void fw64_n64_libultra_engine_finalize_frame(fw64Engine* engine) {
+    (void)engine;
+    fw64_n64_renderer_end_frame(&renderer);
+}

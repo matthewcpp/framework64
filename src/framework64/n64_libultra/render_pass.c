@@ -17,7 +17,7 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
     guMtxIdent(&renderpass->view_matrix);
 
     renderpass->persp_norm = FW64_N64_LIBULTRA_DEFAULT_PERSPNORM;
-    renderpass->clear_flags = FW64_CLEAR_FLAG_NONE;
+    renderpass->clear_flags = FW64_CLEAR_FLAG_DEFAULT;
     renderpass->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
 
     renderpass->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;

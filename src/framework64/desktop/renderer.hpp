@@ -32,13 +32,13 @@ public:
     bool init(int width, int height);
 
     void setClearColor(float r, float g, float b, float a);
-    void begin(fw64ClearFlags flags);
     void setCamera(fw64Camera* cam);
     void setViewMatrices(float* projection, float* view);
     void setViewport(fw64Viewport const * viewport);
-    void end(fw64RendererSwapFlags flags);
 
     void clearViewport(fw64Viewport const & viewport, fw64ClearFlags flags);
+
+    void submitRenderpass(fw64RenderPass* renderpass);
 
     void beginFrame();
     void endFrame();
@@ -47,10 +47,11 @@ private:
     bool initDisplay(int width, int height);
     bool initFramebuffer(int width, int height);
 
-public:
+private:
     void drawSpriteBatch(fw64SpriteBatch* spritebatch);
     void drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index);
     void drawRenderPass(fw64RenderPass* renderpass);
+    
 
 public:
     void setFogEnabled(bool enabled);
@@ -113,5 +114,8 @@ private:
     fw64Display& display;
     framework64::ShaderCache& shader_cache;
     framework64::Framebuffer framebuffer;
-    
+    std::vector<fw64RenderPass*> renderpasses;
+
+    /** holds the index of the renderpass currently being processed. */
+    size_t renderpass_index;
 };

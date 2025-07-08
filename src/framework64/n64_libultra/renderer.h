@@ -11,6 +11,8 @@
 /* The maximum length of the display list of one task  */
 #define GFX_DLIST_LEN 4096
 
+#define MAX_RENDERPASS_COUNT 16
+
 struct fw64Renderer{
     // holds the current command insertion point of the display list
     Gfx* display_list;
@@ -27,11 +29,19 @@ struct fw64Renderer{
     fw64PrimitiveMode primitive_mode;
     fw64ShadingMode shading_mode;
 
-    uint32_t starting_new_frame;
-
     fw64TextureState active_texture;
     Light empty_light; // this is used in the case where only an ambient light is set
+
+    fw64RenderPass* renderpasses[MAX_RENDERPASS_COUNT];
+    size_t renderpass_count;
+
+    /** the index of the renderpass currently being drawn */
+    size_t renderpass_index;
 };
+
+/** called by the n64_libultra engine which will render all the submitted renderpasses */
+void fw64_n64_renderer_end_frame(fw64Renderer* renderer);
+void fw64_n64_renderer_draw_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass);
 
 void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen_height);
 

@@ -28,12 +28,10 @@ typedef struct fw64Renderer fw64Renderer;
 extern "C" {
 #endif
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64ClearFlags clear_flags);
 
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass);
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags);
 
 #ifdef __cplusplus
 }

@@ -46,6 +46,18 @@ void fw64Renderer::beginFrame() {
 }
 
 void fw64Renderer::endFrame() {
+    renderpass_index = 0;
+
+    for (auto* renderpass : renderpasses) {
+        drawRenderPass(renderpass);
+        renderpass_index += 1;
+    }
+
+    current_camera = nullptr;
+    active_shader = nullptr;
+
+    renderpasses.clear();
+
     glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer.framebuffer_handle);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
@@ -56,19 +68,6 @@ void fw64Renderer::endFrame() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     display.swap();
-}
-
-void fw64Renderer::begin(fw64ClearFlags flags) {
-    GLbitfield clear_bits = 0;
-    if (flags & FW64_CLEAR_FLAG_COLOR) {
-        clear_bits |= GL_COLOR_BUFFER_BIT;
-    }
-
-    if (flags & FW64_CLEAR_FLAG_DEPTH) {
-        clear_bits |= GL_DEPTH_BUFFER_BIT;
-    }
-
-    glClear(clear_bits);
 }
 
 fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Viewport const * viewport) const {
@@ -170,9 +169,15 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
 }
 
 void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
-    if (renderpass->clear_flags) {
+    fw64ClearFlags clear_flags = renderpass->clear_flags;
+    if (clear_flags == FW64_CLEAR_FLAG_DEFAULT) {
+        clear_flags = renderpass_index == 0 ? FW64_CLEAR_FLAG_ALL : FW64_CLEAR_FLAG_NONE;
+    }
+    if (clear_flags) {
         glClearColor(renderpass->clear_color[0], renderpass->clear_color[1], renderpass->clear_color[2], 1.0f);
-        clearViewport(renderpass->viewport, renderpass->clear_flags);
+        clearViewport(renderpass->viewport, clear_flags);
+
+        // TODO: remove this call when clear_color api is removed
         glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
     }
 
@@ -238,11 +243,6 @@ void fw64Renderer::drawSpriteBatch(fw64SpriteBatch* sprite_batch) {
             glBindVertexArray(0);
         }
     }
-}
-
-void fw64Renderer::end(fw64RendererSwapFlags) {
-    current_camera = nullptr;
-    active_shader = nullptr;
 }
 
 void fw64Renderer::updateMeshTransformBlock(float* matrix) {
@@ -330,14 +330,14 @@ void fw64Renderer::setFogColor(float r, float g, float b) {
     fog_data_uniform_block.data.fog_color[2] = b;
 }
 
+void fw64Renderer::submitRenderpass(fw64RenderPass* renderpass) {
+    renderpasses.push_back(renderpass);
+}
+
 // Public C interface
 
 void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
     renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
-}
-
-void fw64_renderer_begin(fw64Renderer* renderer,fw64ClearFlags flags) {
-    renderer->begin(flags);
 }
 
 void fw64_renderer_set_view_matrices(fw64Renderer* renderer, fw64Matrix* projection, uint16_t*, fw64Matrix* view) {
@@ -348,10 +348,6 @@ void fw64_renderer_set_viewport(fw64Renderer* renderer, fw64Viewport* viewport) 
     renderer->setViewport(viewport);
 }
 
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags flags) {
-    renderer->end(flags);
-}
-
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
-    renderer->drawRenderPass(renderpass);
+    renderer->submitRenderpass(renderpass);
 }

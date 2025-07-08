@@ -17,6 +17,12 @@ typedef enum {
     FW64_CLEAR_FLAG_NONE = 0,
     FW64_CLEAR_FLAG_COLOR = 1,
     FW64_CLEAR_FLAG_DEPTH = 2,
+
+    /** Instructs the system to determine which buffers should be cleard.
+     *  In the first submitted renderpass the default value will be equivalent to FW64_CLEAR_FLAG_ALL.
+     *  In all other cases the default value will be equivalent to FW64_CLEAR_FLAG_NONE.
+     */
+    FW64_CLEAR_FLAG_DEFAULT = 4,
     FW64_CLEAR_FLAG_ALL = FW64_CLEAR_FLAG_COLOR | FW64_CLEAR_FLAG_DEPTH
 } fw64ClearFlags;
 

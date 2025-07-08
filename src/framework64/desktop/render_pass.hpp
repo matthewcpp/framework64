@@ -55,7 +55,7 @@ public:
     std::array<float, 16> projection_matrix, view_matrix;
 
     fw64PrimitiveMode primitive_mode = FW64_PRIMITIVE_MODE_TRIANGLES;
-    fw64ClearFlags clear_flags = FW64_CLEAR_FLAG_NONE;
+    fw64ClearFlags clear_flags = FW64_CLEAR_FLAG_DEFAULT;
     std::array<float, 3> clear_color = {0.0f, 0.0f, 0.0f};
     float camera_near = 0, camera_far = 1;
 
