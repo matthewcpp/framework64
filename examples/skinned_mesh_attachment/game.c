@@ -107,10 +107,8 @@ void game_draw(Game* game) {
     fw64_scene_draw_all(&game->scene, renderpass);
     fw64_renderpass_end(renderpass);
 
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass[RENDERPASS_SCENE]);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass[RENDERPASS_UI]);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void update_selection(Game* game) {

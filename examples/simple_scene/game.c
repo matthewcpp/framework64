@@ -43,8 +43,6 @@ void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->chase_cam.camera, &frustum);
 
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_begin(renderpass);
     fw64_renderpass_set_camera(renderpass, &game->chase_cam.camera);
@@ -57,6 +55,4 @@ void game_draw(Game* game) {
     fw64_renderpass_draw_sprite_batch(renderpass, game->ui.spritebatch);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

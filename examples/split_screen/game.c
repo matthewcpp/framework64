@@ -11,9 +11,6 @@ static void init_player(Game* player, int index, int node_id, float view_x, floa
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-
-    fw64_renderer_set_clear_color(engine->renderer, 100, 149, 237);
-
     game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_Split_Screen, fw64_default_allocator());
 
     init_weapon(&game->weapon, fw64_scene_load_mesh_asset(game->scene, FW64_ASSET_mesh_us_ar33));
@@ -31,7 +28,6 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     for (int i  = 0; i < 4; i++) {
          player_draw_view(&game->players[i]);
     }
@@ -39,8 +35,6 @@ void game_draw(Game* game) {
     for (int i  = 0; i < 4; i++) {
          player_draw_weapon(&game->players[i]);
     }
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void init_player(Game* game, int index, int node_id, float view_x, float view_y, float rot_y) {

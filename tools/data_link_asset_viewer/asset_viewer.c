@@ -50,10 +50,9 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, fw64_asset_viewer_determine_primitive_mode(&game->asset_viewer), FW64_CLEAR_FLAG_ALL);
+    fw64_renderpass_set_primitive_mode(game->renderpass, fw64_asset_viewer_determine_primitive_mode(&game->asset_viewer));
     fw64_asset_viewer_draw(&game->asset_viewer);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void on_data_link_connected(void* arg) {
@@ -77,11 +76,11 @@ static void on_file_download_progress(fw64FileDownloader* file_downloader, void*
     (void)file_downloader;
     Game* game = (Game*)arg;
 
-    fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 100);
+    fw64_renderpass_set_clear_color(game->renderpass, 0, 0, 100);
 }
 
 static void on_file_download_complete(fw64FileDownloader* file_downloader, void* arg) {
     Game* game = (Game*)arg;
-    fw64_renderer_set_clear_color(game->engine->renderer, 0, 100, 0);
+    fw64_renderpass_set_clear_color(game->renderpass, 0, 100, 0);
     fw64_asset_viewer_load_from_media(&game->asset_viewer, file_downloader->current_asset_filepath);
 }

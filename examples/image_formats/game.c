@@ -19,11 +19,11 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_ui_navigation_init(&game->ui_nav, engine->input, 0);
     fw64_bump_allocator_init(&game->tex_allocator, 5120);
-    fw64_renderer_set_clear_color(engine->renderer, 100, 100, 100);
 
     game->spritebatch = fw64_spritebatch_create(1, allocator);
     game->renderpass = fw64_renderpass_create(display, allocator);
     fw64_renderpass_util_ortho2d(game->renderpass);
+    fw64_renderpass_set_clear_color(game->renderpass, 100, 100, 100);
 
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_header, allocator);
     game->image_format = IMAGE_FORMAT_NONE;
@@ -46,15 +46,11 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-
     fw64_renderpass_begin(game->renderpass);
     fw64_renderpass_draw_sprite_batch(game->renderpass, game->spritebatch);
     fw64_renderpass_end(game->renderpass);
 
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 static void update_spritebatch(Game* game);

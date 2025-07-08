@@ -24,8 +24,6 @@ void game_init(Game* game, fw64Engine* engine) {
     game->current_animation = 0;
     game->current_speed = 1.0f;
 
-    fw64_renderer_set_clear_color(engine->renderer, 100,149,237);
-
     fw64SceneInfo scene_info;
     fw64_scene_info_init(&scene_info);
     scene_info.node_count = 2;
@@ -34,22 +32,25 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_scene_init(&game->scene, &scene_info, engine->assets, allocator);
     fw64Node* node = fw64_scene_create_node(&game->scene);
+    vec3_set_all(&node->transform.scale, 0.1f);
+    fw64_node_update(node);
     fw64SkinnedMesh* skinned_mesh = fw64_scene_load_skinned_mesh_asset(&game->scene, FW64_ASSET_skinnedmesh_catherine);
     game->skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(&game->scene, node, skinned_mesh, game->current_animation);
     
     fw64Node* camera_node = fw64_scene_create_node(&game->scene);
     fw64_camera_init(&game->camera, camera_node, display);
-    game->camera.near = 150.0f;
-    game->camera.far = 750.0f;
+    game->camera.near = 15.0f;
+    game->camera.far = 75.0f;
     fw64_camera_update_projection_matrix(&game->camera);
 
     fw64_arcball_init(&game->arcball, engine->input, &game->camera);
     fw64_arcball_set_initial(&game->arcball, &game->skinned_mesh_instance->mesh_instance.render_bounds);
 
-
     fw64_animation_controller_play(&game->skinned_mesh_instance->controller);
 
     game->renderpass = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_set_clear_color(game->renderpass, 100, 149, 237);
+
     ui_init(&game->ui, engine, game->skinned_mesh_instance);
     ui_update(&game->ui, game->current_animation);
 
@@ -85,14 +86,12 @@ void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(game->arcball.camera, &frustum);
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_set_camera(game->renderpass, game->arcball.camera);
     fw64_renderpass_begin(game->renderpass);
     fw64_scene_draw_frustrum(&game->scene, game->renderpass, &frustum, ~0U);
     fw64_renderpass_end(game->renderpass);
     fw64_renderer_submit_renderpass(renderer, game->renderpass);
     ui_draw(&game->ui);
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 static void set_animation(Game* game, int animation) {

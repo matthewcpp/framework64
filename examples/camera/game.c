@@ -130,9 +130,7 @@ void game_update(Game* game){
 void game_draw(Game* game) {
     fw64Renderer* renderer = game->engine->renderer;
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     view_draw(&game->persp_view);
     view_draw(&game->ortho_view);
     fw64_renderer_submit_renderpass(renderer, game->overlay.renderpass);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

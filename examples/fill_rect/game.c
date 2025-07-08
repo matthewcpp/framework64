@@ -16,11 +16,11 @@ void game_init(Game* game, fw64Engine* engine) {
     game->logo_texture = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_n64_logo, allocator), allocator);
     game->fill_texture = fw64_texture_util_create_from_loaded_image(engine->assets, FW64_ASSET_image_fill, allocator);
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
-    fw64_renderer_set_clear_color(engine->renderer, 100, 149, 237);
 
     game->sprite_batch = fw64_spritebatch_create(LAYER_COUNT, allocator);
 
     game->renderpass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), allocator);
+    fw64_renderpass_set_clear_color(game->renderpass, 100, 149, 237);
     fw64_renderpass_set_depth_testing_enabled(game->renderpass, 0);
 
     fw64_renderpass_util_ortho2d(game->renderpass);
@@ -130,12 +130,9 @@ void game_draw(Game* game) {
     draw_progress_text(game, &screen_size);
     fw64_spritebatch_end(game->sprite_batch);
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_begin(game->renderpass);
     fw64_renderpass_draw_sprite_batch(game->renderpass, game->sprite_batch);
     fw64_renderpass_end(game->renderpass);
 
     fw64_renderer_submit_renderpass(renderer, game->renderpass);
-    
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }

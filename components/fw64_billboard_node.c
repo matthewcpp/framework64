@@ -23,11 +23,11 @@ void fw64_billboard_nodes_update(fw64BillboardNodes* system) {
     for (fw64_sparse_set_itr_init(&itr, &system->components); fw64_sparse_set_itr_has_next(&itr); fw64_sparse_set_itr_next(&itr)) {
         fw64BillboardNode* billboard = (fw64BillboardNode*)fw64_sparse_set_itr_get_item(&itr);
 
-        Vec3 camera_forward, camera_up, target;
-        fw64_transform_forward(&billboard->camera->node->transform, &camera_forward);
+        Vec3 camera_back, camera_up, target;
+        fw64_transform_back(&billboard->camera->node->transform, &camera_back);
         fw64_transform_up(&billboard->camera->node->transform, &camera_up);
 
-        vec3_add(&billboard->node->transform.position, &camera_forward, &target);
+        vec3_add(&billboard->node->transform.position, &camera_back, &target);
         fw64_transform_look_at(&billboard->node->transform, &target, &camera_up);
 
         fw64_node_update(billboard->node);

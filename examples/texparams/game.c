@@ -33,6 +33,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_init(&camera, camera_node, display);
 
     game->renderpasses[RENDER_PASS_SCENE] = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_set_clear_color(game->renderpasses[RENDER_PASS_SCENE], 39, 58, 93);
     fw64_renderpass_set_camera(game->renderpasses[RENDER_PASS_SCENE], &camera);
 
     game->renderpasses[RENDER_PASS_UI] = fw64_renderpass_create(display, allocator);
@@ -40,7 +41,6 @@ void game_init(Game* game, fw64Engine* engine) {
 
     fw64_bump_allocator_init(&game->mesh_allocator, 5120);
     fw64_ui_navigation_init(&game->ui_nav, engine->input, 0);
-    fw64_renderer_set_clear_color(engine->renderer, 39, 58, 93);
     set_next_wrap_mode(game, 1);
 }
 
@@ -127,20 +127,15 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
-
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_begin(renderpass);
     fw64_scene_draw_all(&game->scene, renderpass);
     fw64_renderpass_end(renderpass);
-    fw64_renderer_submit_renderpass(renderer, renderpass);
+    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 
     renderpass = game->renderpasses[RENDER_PASS_UI];
     fw64_renderpass_begin(renderpass);
     fw64_renderpass_draw_sprite_batch(renderpass, game->spritebatch);
     fw64_renderpass_end(renderpass);
-    fw64_renderer_submit_renderpass(renderer, renderpass);
-
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
+    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 }

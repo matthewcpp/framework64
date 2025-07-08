@@ -11,7 +11,6 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
 
     scene_view_init(&game->scene_view, engine);
     controller_init(&game->controller, engine, &game->audio_state);
@@ -24,10 +23,8 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     scene_view_draw(&game->scene_view);
     ui_draw(&game->ui);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 // --- Scene View

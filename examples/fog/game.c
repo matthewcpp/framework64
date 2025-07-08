@@ -96,9 +96,6 @@ void game_draw(Game* game) {
     fw64Frustum view_frustum;
     fw64_camera_extract_frustum_planes(game->fps_camera.camera, &view_frustum);
 
-    fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 1);
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-    
     fw64_renderpass_begin(game->renderpass);
     fw64_renderpass_set_camera(game->renderpass, game->fps_camera.camera);
     fw64_scene_draw_frustrum(game->scene, game->renderpass, &view_frustum, ~0U);
@@ -108,8 +105,6 @@ void game_draw(Game* game) {
     if (game->mode == GAME_MODE_PAUSED) {
         ui_draw(&game->ui);
     }
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void ui_init(Ui* ui, fw64Engine* engine, FogSettings* settings) {
@@ -230,6 +225,6 @@ static void fog_settings_init(FogSettings* settings, fw64Renderer* renderer, fw6
 static void fog_settings_update(FogSettings* settings) {
     fw64_renderpass_set_fog_positions(settings->renderpass, settings->begin, settings->end);
     fw64_renderpass_set_fog_color(settings->renderpass, settings->color.r, settings->color.b, settings->color.a);
-    fw64_renderer_set_clear_color(settings->renderer, settings->color.r, settings->color.b, settings->color.a);
+    fw64_renderpass_set_clear_color(settings->renderpass, settings->color.r, settings->color.b, settings->color.a);
     fw64_renderpass_set_fog_enabled(settings->renderpass, settings->enabled);
 }

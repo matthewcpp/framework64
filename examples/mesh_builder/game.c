@@ -210,12 +210,10 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64PrimitiveMode primitive_mode = fw64_mesh_primitive_get_mode(game->mesh, 0);
+    fw64_renderpass_set_primitive_mode(game->renderpass, fw64_mesh_primitive_get_mode(game->mesh, 0));
 
-    fw64_renderer_begin(game->engine->renderer, primitive_mode, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_begin(game->renderpass);
     fw64_scene_draw_all(&game->scene, game->renderpass);
     fw64_renderpass_end(game->renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

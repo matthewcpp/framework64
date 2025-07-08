@@ -4,6 +4,7 @@
 
 typedef struct {
     fw64Engine* engine;
+    fw64RenderPass* renderpass;
 } Game;
 
 #ifdef __cplusplus

@@ -13,12 +13,9 @@ void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
     game->render_pass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), allocator);
     fw64_renderpass_util_ortho2d(game->render_pass);
+    fw64_renderpass_set_clear_color(game->render_pass, 0, 0, 255);
 
     game->sprite_batch = fw64_spritebatch_create(2, allocator);
-
-    fw64_renderer_set_clear_color(game->engine->renderer, 0, 0, 255);
-
-    fw64_renderer_set_anti_aliasing_enabled(game->engine->renderer, 0);
 
     n64_logo_sprite_init(&game->n64logo, fw64_assets_load_image(game->engine->assets, FW64_ASSET_image_n64_logo, allocator));
     game->n64logo.position.x = 10;
@@ -66,13 +63,9 @@ void draw_sprites(Game* game) {
 }
 
 void game_draw(Game* game){
-    fw64Renderer* renderer = game->engine->renderer;
-
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_begin(game->render_pass);
     draw_sprites(game);
     fw64_renderpass_draw_sprite_batch(game->render_pass, game->sprite_batch);
     fw64_renderpass_end(game->render_pass);
-    fw64_renderer_submit_renderpass(renderer, game->render_pass);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->render_pass);
 }

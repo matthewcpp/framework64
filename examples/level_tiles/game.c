@@ -233,11 +233,9 @@ void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->follow_camera.camera, &frustum);
 
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_begin(game->renderpass);
     fw64_renderpass_set_camera(game->renderpass, &game->follow_camera.camera);
     tiles_draw(&game->tiles, game->renderpass, &frustum);
     fw64_renderpass_end(game->renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
