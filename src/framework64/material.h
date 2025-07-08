@@ -15,10 +15,10 @@ extern "C" {
 typedef enum {
     FW64_SHADING_MODE_UNSET,
 
-    /** Vertex color * material color */
+    /** vertex color * material color */
     FW64_SHADING_MODE_UNLIT = 1,
 
-    /** Vertex color * material color */
+    /** vertex color * texture color */
     FW64_SHADING_MODE_UNLIT_TEXTURED = 2,
 
     /** Gouraud Shaded: Untextured */
@@ -29,9 +29,10 @@ typedef enum {
 
     FW64_SHADING_MODE_DECAL_TEXTURE = 5,
 
+    /** Line Rendering: vertex color */
     FW64_SHADING_MODE_LINE = 6,
 
-    /** Currently only used for N64...THis will go away with transparency support */
+    /** Currently only used for N64...This will go away with transparency support */
     FW64_SHADING_MODE_UNLIT_TRANSPARENT_TEXTURED = 7,
 
     FW64_SHADING_MODE_COUNT
