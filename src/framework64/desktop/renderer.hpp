@@ -31,7 +31,6 @@ public:
 public:
     bool init(int width, int height);
 
-    void setClearColor(float r, float g, float b, float a);
     void setCamera(fw64Camera* cam);
     void setViewMatrices(float* projection, float* view);
     void setViewport(fw64Viewport const * viewport);
@@ -107,7 +106,6 @@ private:
 
 public:
     fw64Material sprite_material;
-    std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
 
     fw64Camera* current_camera = nullptr;
 private:

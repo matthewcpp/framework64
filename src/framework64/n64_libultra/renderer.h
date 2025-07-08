@@ -21,8 +21,6 @@ struct fw64Renderer{
     // display list for drawing commands
     Gfx gfx_list[GFX_DLIST_LEN];
 
-    u16 clear_color;
-
     fw64N64RendererFeature enabled_features;
 
     IVec2 screen_size;

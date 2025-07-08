@@ -23,14 +23,9 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
     renderer->renderpass_count = 0;
 
-    renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
     memset(&renderer->empty_light, 0, sizeof(Light));
 
     renderer->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
-}
-
-void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
-    renderer->clear_color = GPACK_RGBA5551(r, g, b, 1);
 }
 
 static Gfx _rdp_init_static_dl[] = {

@@ -13,7 +13,6 @@ bool fw64Renderer::init(int width, int height) {
         return false;
     }
 
-    glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -34,11 +33,6 @@ bool fw64Renderer::initFramebuffer(int width, int height) {
         return false;
     }
     return true;
-}
-
-void fw64Renderer::setClearColor(float r, float g, float b, float a) {
-    clear_color = {r, g, b, a};
-    glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
 }
 
 void fw64Renderer::beginFrame() {
@@ -176,9 +170,6 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
     if (clear_flags) {
         glClearColor(renderpass->clear_color[0], renderpass->clear_color[1], renderpass->clear_color[2], 1.0f);
         clearViewport(renderpass->viewport, clear_flags);
-
-        // TODO: remove this call when clear_color api is removed
-        glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
     }
 
     setViewport(&renderpass->viewport);
@@ -335,18 +326,6 @@ void fw64Renderer::submitRenderpass(fw64RenderPass* renderpass) {
 }
 
 // Public C interface
-
-void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
-    renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
-}
-
-void fw64_renderer_set_view_matrices(fw64Renderer* renderer, fw64Matrix* projection, uint16_t*, fw64Matrix* view) {
-    renderer->setViewMatrices(projection->m, view->m);
-}
-
-void fw64_renderer_set_viewport(fw64Renderer* renderer, fw64Viewport* viewport) {
-    renderer->setViewport(viewport);
-}
 
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
     renderer->submitRenderpass(renderpass);
