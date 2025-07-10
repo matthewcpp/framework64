@@ -3,6 +3,7 @@
 /** \file scene.h */
 
 #include "framework64/collision.h"
+#include "framework64/collision_geometry.h"
 #include "framework64/data_io.h"
 #include "framework64/material_bundle.h"
 #include "framework64/mesh.h"
@@ -28,7 +29,8 @@ typedef struct {
     uint32_t collider_count;
     uint32_t collision_mesh_count;
     uint32_t custom_bounding_box_count;
-    uint32_t material_bundle_count;
+    uint16_t material_bundle_count;
+    uint16_t collision_geometry_count;
 } fw64SceneInfo;
 
 struct fw64Scene {
@@ -40,6 +42,7 @@ struct fw64Scene {
     fw64StaticVector collision_meshes;
     fw64StaticVector nodes;
 
+    fw64CollisionGeometry* collision_geometry;
     fw64MaterialBundle* material_bundle;
     fw64Allocator* allocator;
     fw64AssetDatabase* assets;

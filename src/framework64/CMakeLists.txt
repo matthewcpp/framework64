@@ -8,6 +8,7 @@ set(common_source_files
     camera.h camera.c
     collision.h collision.c
     collision_mesh.h collision_mesh.c
+    collision_geometry.h collision_geometry.c
     collider.h collider.c
     color.h color.c
     data_io.h data_io.c

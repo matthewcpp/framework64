@@ -11,6 +11,7 @@ class Scene {
     transformCustomBoundingBoxIndex = -1;
     customBoundingBoxes = [];
     materialBundle = null;
+    collisionGeometry = null;
     extraMeshCount = 0;
     extraNodeCount = 0;
 

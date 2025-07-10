@@ -1,3 +1,4 @@
+const CollisionGeometry = require("./CollisionGeometry");
 const Bounding = require("./gltf/Bounding");
 const GLTFLoader = require("./gltf/GLTFLoader");
 const MaterialBundle = require("./gltf/MaterialBundle");
@@ -28,6 +29,8 @@ class LevelParser {
 
         for (const sceneIndex of rootNode.nodes) {
             const scene = this._parseScene(sceneIndex);
+
+            scene.collisionGeometry = CollisionGeometry.createFromScene(scene, this.gltfData);
 
             if (scene) {
                 this.scenes.push(scene);
@@ -173,7 +176,7 @@ class LevelParser {
         this._parseCollisionMeshes(scene, gltfRootNode);
         const gltfSceneNodeRoot = this._findChildNodeStartingWith(gltfRootNode, "Scene");
         if (!gltfSceneNodeRoot) {
-            return null;
+            throw new Error(`Invalid Scene structure detected for root node: ${gltfRootNode.name}`);
         }
 
         this._parseNode(scene, null, gltfSceneNodeRoot);
@@ -249,6 +252,12 @@ class LevelParser {
 
                 const collisionMeshIndex = this.collisonMeshMap.get(colliderName);
                 node.collider = N64Node.ColliderType.CollisionMesh | (collisionMeshIndex << 16);
+            }
+        }
+
+        if (Object.hasOwn.extras, "collisionType") {
+            if (extras.collisionType.toLowerCase() === "dynamic") {
+                node.collisionType = N64Node.CollisionType.Dynamic;
             }
         }
     }

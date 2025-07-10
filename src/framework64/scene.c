@@ -53,6 +53,12 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 
     init_static_vectors(scene, &scene_info);
 
+    if (scene_info.collision_geometry_count == 1) {
+        scene->collision_geometry = fw64_collision_geometry_load_from_datasource(data_source, allocator);
+    } else {
+        scene->collision_geometry = NULL;
+    }
+
     for (uint32_t i = 0; i < scene_info.mesh_count; i++) {
         fw64Mesh* mesh = fw64_mesh_load_from_datasource_with_bundle(assets, data_source, scene->material_bundle, allocator);
         fw64_static_vector_push_back(&scene->meshes, &mesh);
@@ -140,7 +146,6 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
             node->collider = NULL;
         }
     }
-    
 
     if (custom_bounding_boxes) {
         fw64_allocator_free(allocator, custom_bounding_boxes);

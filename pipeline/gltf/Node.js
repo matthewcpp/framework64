@@ -8,6 +8,14 @@ class N64Node {
         CollisionMesh: 1
     };
 
+    static CollisionType = {
+        /** stationary world geometry */
+        Static: 0,
+
+        /** synamic, movable geometry */
+        Dynamic: 1
+    };
+
     static InvalidNodeIndex = 0xFFFFFFFF;
 
     static NoMesh = 0xFFFFFFFF;
@@ -39,9 +47,11 @@ class N64Node {
 
     mesh = N64Node.NoMesh;
     collider = N64Node.NoCollider;
+    collisionType = N64Node.CollisionType.Static;
     data = 0;
     layerMask = 1;
 
+    /** This is the node's own index in the scene's node array */
     index = N64Node.InvalidNode;
 
     constructor(index, parentNode) {
