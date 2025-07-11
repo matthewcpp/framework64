@@ -41,10 +41,11 @@ class CollisionGeometryWriter {
         const triangleCount = collisionGeometry.triangleCount;
 
         // this needs to line up with CollisionGeometryHeader in collision_geometry.c
-        const headerBuffer = Buffer.alloc(8 + Bounding.SizeOf);
+        const headerBuffer = Buffer.alloc(12 + Bounding.SizeOf);
         let headerIndex = 0;
         headerIndex = this.writer.writeUInt32(headerBuffer, triangleCount, headerIndex);
-        headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cells.length, headerIndex);
+        headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountX, headerIndex);
+        headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountZ, headerIndex);
         headerIndex = collisionGeometry.boundingBox.write(this.writer, headerBuffer, headerIndex);
 
         this.triangleBuffer = Buffer.alloc(CollisionGeometryWriter.triangleSize * triangleCount);

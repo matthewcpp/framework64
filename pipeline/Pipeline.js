@@ -2,11 +2,11 @@
 
 const Util = require("./Util");
 
-const { program } = require('commander');
 const rimraf = require("rimraf");
 
 const fse = require("fs-extra");
 const path = require("path");
+const { glMatrix } = require("gl-matrix");
 
 /**
  * 
@@ -18,6 +18,8 @@ const path = require("path");
  * @param pluginManifest the path pointing to the plugin manifest for this build
  */
 async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest) {
+    glMatrix.setMatrixArrayType(Array);
+
     if (!fse.existsSync(manifestFile)) {
         throw new Error(`Manifest file does not exist: ${manifestFile}`);
     }

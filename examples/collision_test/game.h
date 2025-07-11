@@ -1,11 +1,13 @@
 #pragma once
 
 #include "framework64/engine.h"
+#include "framework64/scene.h"
 
 typedef struct {
     fw64Engine* engine;
     fw64RenderPass* renderpass;
     fw64Scene* scene;
+    fw64Camera camera;
 } Game;
 
 #ifdef __cplusplus

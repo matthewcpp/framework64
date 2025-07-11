@@ -22,7 +22,8 @@ typedef struct {
 
 typedef struct {
     uint32_t triangle_count;
-    uint32_t cell_count;
+    uint32_t cell_count_x;
+    uint32_t cell_count_z;
     Box bounding_box;
 } fw64CollisionGeometryInfo;
 
@@ -33,6 +34,11 @@ typedef struct {
     fw64CollisionGeometryCell* cells;
 } fw64CollisionGeometry;
 
+typedef struct {
+    fw64CollisionGeometryCell* cells[4];
+    int cell_count;
+} fw64CollisionGeometryQuery;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,6 +48,8 @@ void fw64_collision_geometry_init_from_datasource(fw64CollisionGeometry* geometr
 
 void fw64_collision_geometry_uninit(fw64CollisionGeometry* geometry, fw64Allocator* allocator);
 void fw64_collision_geometry_delete(fw64CollisionGeometry* geometry, fw64Allocator* allocator);
+
+int fw64_collision_geometry_query_vec3(fw64CollisionGeometry* geometry, const Vec3* vec, fw64CollisionGeometryQuery* query);
 
 #ifdef __cplusplus
 }

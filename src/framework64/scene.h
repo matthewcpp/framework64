@@ -16,6 +16,8 @@
 #include "framework64/static_vector.h"
 #include "framework64/vec3.h"
 
+#define FW64_LAYER_MASK_ALL_LAYERS (~0U)
+
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
 typedef struct {

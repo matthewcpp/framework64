@@ -2,7 +2,7 @@
 
 #include "framework64/scene.h"
 
-#define Fw64_CHARACTER_ENV_DEFAULT_GRAVITY -9.81
+#define Fw64_CHARACTER_ENV_DEFAULT_GRAVITY -9.81f
 
 typedef struct {
     Vec3 gravity;
