@@ -1,3 +1,4 @@
+const Bounding = require("./gltf/Bounding");
 const N64Node = require("./gltf/Node")
 const glMatrix = require("gl-matrix");
 
@@ -13,6 +14,7 @@ class CollisionGeometryCell {
 
 class CollisionGeometry {
     cells = [];
+    boundingBox = new Bounding();
 
     get triangleCount() {
         let total = 0;
@@ -48,6 +50,9 @@ class CollisionGeometry {
             }
 
             const mesh = gltfData.meshes[node.mesh];
+            const meshBounding = mesh.bounding;
+            const worldBounding = Bounding.transformByMatrix(meshBounding, node.worldMatrix);
+            geometry.boundingBox.encapsulateBox(worldBounding);
             
             for (const primitive of mesh.primitives) {
                 for (const element of primitive.elements) {
@@ -64,6 +69,9 @@ class CollisionGeometry {
                     const triangle = [A, B, C, normal];
 
                     // TODO: find all cells this triangle would fit in
+                    // https://jtsorlinis.github.io/rendering-tutorial/
+                    // https://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
+                    // https://www.jb101.co.uk/2008/08/09/partitioning-triangles-into-a-uniform-grid.html
 
                     const upDot = glMatrix.vec3.dot(normal, up);
                     if (upDot > tolerance) {

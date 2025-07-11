@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/allocator.h"
+#include "framework64/box.h"
 #include "framework64/data_io.h"
 #include "framework64/vec3.h"
 
@@ -22,6 +23,7 @@ typedef struct {
 typedef struct {
     uint32_t triangle_count;
     uint32_t cell_count;
+    Box bounding_box;
 } fw64CollisionGeometryInfo;
 
 typedef struct {

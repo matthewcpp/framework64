@@ -1,5 +1,6 @@
 const fs = require("fs");
 const CollisionGeometry = require("./CollisionGeometry");
+const Bounding = require("./gltf/Bounding");
 
 class CollisionGeometryWriter {
     /** This needs to be kept in sync with fw64CollisionTriangle in collision_geometry.h */
@@ -40,10 +41,11 @@ class CollisionGeometryWriter {
         const triangleCount = collisionGeometry.triangleCount;
 
         // this needs to line up with CollisionGeometryHeader in collision_geometry.c
-        const headerBuffer = Buffer.alloc(8);
+        const headerBuffer = Buffer.alloc(8 + Bounding.SizeOf);
         let headerIndex = 0;
         headerIndex = this.writer.writeUInt32(headerBuffer, triangleCount, headerIndex);
         headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cells.length, headerIndex);
+        headerIndex = collisionGeometry.boundingBox.write(this.writer, headerBuffer, headerIndex);
 
         this.triangleBuffer = Buffer.alloc(CollisionGeometryWriter.triangleSize * triangleCount);
         this.cellBuffer = Buffer.alloc(CollisionGeometryWriter.cellSize * collisionGeometry.cells.length);
