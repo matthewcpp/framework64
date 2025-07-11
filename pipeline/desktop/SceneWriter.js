@@ -1,9 +1,8 @@
-const SceneDataWriter = require("../SceneDataWriter");
+const CollisionGeometryWriter = require("../CollisionGeometryWriter");
 const MaterialBundleWriter = require("./MaterialBundleWriter");
 const MeshWriter = require("./MeshWriter")
+const SceneDataWriter = require("../SceneDataWriter");
 const WriteInterface = require("../WriteInterface");
-
-const CollisionGeometryWriter = require("../CollisionGeometryWriter");
 
 const fs = require("fs");
 

@@ -29,9 +29,10 @@ void fw64_collision_geometry_uninit(fw64CollisionGeometry* geometry, fw64Allocat
 int fw64_collision_geometry_query_vec3(fw64CollisionGeometry* geometry, const Vec3* vec, fw64CollisionGeometryQuery* query) {
     query->cell_count = 0;
 
+    // ensure the query point is in the grid.
     if (vec->x < geometry->info.bounding_box.min.x || vec->x > geometry->info.bounding_box.max.x ||
         vec->z < geometry->info.bounding_box.min.z || vec->x > geometry->info.bounding_box.max.z) {
-            query->cell_count;
+        return query->cell_count;
     }
 
     return query->cell_count;
