@@ -205,9 +205,10 @@ int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const 
 
     // Sphere and triangle intersect if the (squared) distance from sphere
     // center to point p is less than the (squared) sphere radius
-    Vec3 v;
-    vec3_subtract(point, center, &v);
-    return vec3_dot(&v, &v) <= radius * radius;
+    //return vec3_distance_squared(point, center) <= radius * radius;
+
+    float dist_squared = vec3_distance_squared(point, center);
+    return dist_squared <= radius * radius;
 }
 
 // Moller-Trumbore algorithm: wikipedia
@@ -221,31 +222,33 @@ int fw64_collision_test_ray_triangle(const Vec3* origin, const Vec3* direction, 
     vec3_cross(direction, &edge2, &h);
     a = vec3_dot(&edge1, &h);
 
-    if (a > -EPSILON && a < EPSILON)
+    if (a > -EPSILON && a < EPSILON){
         return 0;    // This ray is parallel to this triangle.
+    }
 
     f = 1.0f / a;
     vec3_subtract(origin, vertex0, &s);
     u = f * vec3_dot(&s, &h);
-    if (u < 0.0 || u > 1.0)
+    if (u < 0.0 || u > 1.0) {
         return 0;
+    }
 
     vec3_cross(&s, &edge1, &q);
     v = f * vec3_dot(direction, &q);
-    if (v < 0.0 || u + v > 1.0)
+    if (v < 0.0 || u + v > 1.0) {
         return 0;
-
+    }
 
     // At this stage we can compute t to find out where the intersection point is on the line.
     float t = f * vec3_dot(&edge2, &q);
-    if (t > EPSILON) // ray intersection
-    {
+    if (t > EPSILON) {// ray intersection
         vec3_add_and_scale(origin, direction, t, out_point);
         *out_t = t;
         return 1;
     }
-    else // This means that there is a line intersection but not a ray intersection.
+    else {// This means that there is a line intersection but not a ray intersection.
         return 0;
+    }
 }
 
 // Real Time Collision Detection 5.5.8

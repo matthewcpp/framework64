@@ -5,8 +5,13 @@
 /** gravity constant in meters per second */
 #define Fw64_CHARACTER_ENV_DEFAULT_GRAVITY -9.81f
 
+#define FW64_CHARACTER_ENV_MAX_SUBSTEPS 5
+
+#define FW64_CHARACTER_DEFAULT_MAX_SPEED 7.5
+
 typedef struct {
     Vec3 gravity;
+    int max_substeps;
 } fw64CharacterEnvironment;
 
 void fw64_character_envionment_init(fw64CharacterEnvironment* env);
@@ -28,8 +33,8 @@ typedef struct {
     /* The size of the character in each dimension*/
     Vec3 size;
 
-    /* The height that a player can "step up "*/
-    float step_height;
+    /* The maximum distance a character can move in one second*/
+    float max_speed;
 } fw64Character;
 
 #ifdef __cplusplus
@@ -38,6 +43,8 @@ extern "C" {
 
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Scene* scene);
 void fw64_character_fixed_update(fw64Character* character, float time_delta);
+
+void vw64_character_reset_position(fw64Character* character, const Vec3* position);
 
 #define fw64_character_is_on_ground(character) ((character)->state == FW64_CHARACTER_ON_GROUND)
 

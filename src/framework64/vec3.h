@@ -30,6 +30,7 @@ void vec3_negate(Vec3* v);
 void vec3_cross(const Vec3* a, const Vec3* b, Vec3* out);
 float vec3_dot(const Vec3* a, const Vec3* b);
 float vec3_length(const Vec3* v);
+float vec3_length_squared(const Vec3* v);
 
 void vec3_smoothstep(const Vec3* a, const Vec3* b, float t, Vec3* out);
 void vec3_lerp(const Vec3* a, const Vec3* b, float t, Vec3* out);
