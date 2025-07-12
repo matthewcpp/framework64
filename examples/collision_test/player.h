@@ -12,3 +12,4 @@ typedef struct {
 
 void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* env, fw64Scene* scene, fw64Node* node);
 void player_update(Player* player);
+void player_fixed_update(Player* player);

@@ -76,7 +76,8 @@ int main(int argc, char** argv) {
             accumulator -= fixed_timestep_ms;
         }
 
-        engine.update(static_cast<float>(frame_delta_ms) / 1000.0f);
+        float accumulator_progress = static_cast<float>(accumulator) / static_cast<float>(fixed_timestep_ms);
+        engine.update(static_cast<float>(frame_delta_ms) / 1000.0f, accumulator_progress);
         game_update(&game);
 
         // todo: time to next step?

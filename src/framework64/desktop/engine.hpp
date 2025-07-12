@@ -15,7 +15,7 @@ public:
     Engine() = default;
 
     bool init(Settings const & app_settings);
-    void update(float time_delta);
+    void update(float time_delta, float accumulator_progress);
 
 public:
     std::unique_ptr<ShaderCache> shader_cache;

@@ -89,11 +89,12 @@ bool Engine::init(Settings const & app_settings) {
     return true;
 }
 
-void Engine::update(float time_delta) {
+void Engine::update(float time_delta, float accumulator_progress) {
     input->update();
     modules->update();
 
     time->time_delta = time_delta;
+    time->accumulator_progress = accumulator_progress;
     time->total_time += time_delta;
 
     save_file->update(time_delta);

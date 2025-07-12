@@ -2,6 +2,8 @@ set(components_source_files
     fw64_arcball_camera.h fw64_arcball_camera.c
     fw64_asset_viewer.h fw64_asset_viewer.c
     fw64_billboard_node.h fw64_billboard_node.c
+    fw64_character.h fw64_character.c
+    fw64_character_info.h fw64_character_info.c
     fw64_debug_boxes.h fw64_debug_boxes.c
     fw64_file_downloader_message.h fw64_file_downloader.h fw64_file_downloader.c
     fw64_fps_camera.h fw64_fps_camera.c

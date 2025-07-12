@@ -6,6 +6,11 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     player->engine = engine;
     player->node = node;
     fw64_character_init(&player->character, env, scene);
+
+    player->character.previous_position = player->node->transform.position;
+    player->character.position = player->node->transform.position;
+    box_size(&player->node->collider->bounding, &player->character.size);
+    player->character.step_height = player->character.size.z * 0.1f;
 }
 
 static void player_do_jump(Player* player) {
@@ -13,7 +18,7 @@ static void player_do_jump(Player* player) {
         return;
     }
 
-    player->character.velocity.x = 5.0f;
+    player->character.velocity.y = 5.0f;
 }
 
 void player_update(Player* player) {
@@ -21,5 +26,10 @@ void player_update(Player* player) {
         player_do_jump(player);
     }
 
-    fw64_character_update(&player->character, player->engine->time->time_delta);
+    vec3_lerp(&player->character.previous_position, &player->character.position, player->engine->time->accumulator_progress, &player->node->transform.position);
+    fw64_node_update(player->node);
+}
+
+void player_fixed_update(Player* player) {
+    fw64_character_fixed_update(&player->character, player->engine->time->fixed_time_delta);
 }

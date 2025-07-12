@@ -2,6 +2,7 @@
 
 #include "framework64/scene.h"
 
+/** gravity constant in meters per second */
 #define Fw64_CHARACTER_ENV_DEFAULT_GRAVITY -9.81f
 
 typedef struct {
@@ -17,10 +18,18 @@ typedef enum {
 
 typedef struct {
     fw64CharacterEnvironment* environment;
-    Vec3 position;
     Vec3 velocity;
     fw64CharacterState state;
     fw64Scene* scene;
+
+    /** This is interpreted as the bottom center of the character. */
+    Vec3 previous_position, position;
+
+    /* The size of the character in each dimension*/
+    Vec3 size;
+
+    /* The height that a player can "step up "*/
+    float step_height;
 } fw64Character;
 
 #ifdef __cplusplus
@@ -28,7 +37,7 @@ extern "C" {
 #endif
 
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Scene* scene);
-void fw64_character_update(fw64Character* character, float time_delta);
+void fw64_character_fixed_update(fw64Character* character, float time_delta);
 
 #define fw64_character_is_on_ground(character) ((character)->state == FW64_CHARACTER_ON_GROUND)
 

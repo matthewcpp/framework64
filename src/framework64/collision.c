@@ -128,7 +128,7 @@ int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p
 }
 
 // Real Time Collision Detection 5.1.5
-void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* out) {
+void fw64_closest_point_to_triangle(const Vec3* p, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* out) {
     // Check if P in vertex region outside A
     Vec3 ab, ac, ap;
     vec3_subtract(b, a, &ab);
@@ -199,7 +199,7 @@ void fw64_closest_point_to_triangle(Vec3* p, Vec3* a, Vec3* b, Vec3* c, Vec3* ou
 }
 
 // Real Time Collision Detection 5.2.7
-int fw64_collision_test_sphere_triangle(Vec3* center, float radius, Vec3* a, Vec3* b, Vec3* c, Vec3* point) {
+int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point) {
     // Find point P on triangle ABC closest to sphere center
     fw64_closest_point_to_triangle(center, a, b, c, point);
 
@@ -211,7 +211,7 @@ int fw64_collision_test_sphere_triangle(Vec3* center, float radius, Vec3* a, Vec
 }
 
 // Moller-Trumbore algorithm: wikipedia
-int fw64_collision_test_ray_triangle(Vec3* origin, Vec3* direction, Vec3* vertex0, Vec3* vertex1, Vec3* vertex2, Vec3* out_point, float* out_t) {
+int fw64_collision_test_ray_triangle(const Vec3* origin, const Vec3* direction, const Vec3* vertex0, const Vec3* vertex1, const Vec3* vertex2, Vec3* out_point, float* out_t) {
     Vec3 edge1, edge2, h, s, q;
     float a,f,u,v;
 

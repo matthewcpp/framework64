@@ -16,16 +16,20 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_init(&game->camera, camera_node, display);
     fw64_renderpass_set_camera(game->renderpass, &game->camera);
 
+    fw64_character_envionment_init(&game->character_environment);
+    player_init(&game->player, engine, &game->character_environment, game->scene, fw64_scene_get_node(game->scene, FW64_scene_CollisionTest_node_Player));
+
     fw64Font* font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
-    ui_init(&game->ui, engine, font, allocator);
+    ui_init(&game->ui, engine, font, &game->player, allocator);
 }
 
 void game_update(Game* game){
+    player_update(&game->player);
     ui_update(&game->ui);
 }
 
 void game_fixed_update(Game* game) {
-    (void)game;
+    player_fixed_update(&game->player);
 }
 
 void game_draw(Game* game) {

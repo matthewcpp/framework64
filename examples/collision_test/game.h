@@ -1,5 +1,6 @@
 #pragma once
 
+#include "player.h"
 #include "ui.h"
 
 #include "framework64/engine.h"
@@ -11,6 +12,8 @@ typedef struct {
     fw64Scene* scene;
     fw64Camera camera;
     UI ui;
+    fw64CharacterEnvironment character_environment;
+    Player player;
 } Game;
 
 #ifdef __cplusplus

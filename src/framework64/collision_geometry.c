@@ -1,4 +1,5 @@
 #include "framework64/collision_geometry.h"
+#include "framework64/types.h"
 
 #include <string.h>
 
@@ -34,6 +35,12 @@ int fw64_collision_geometry_query_vec3(fw64CollisionGeometry* geometry, const Ve
         vec->z < geometry->info.bounding_box.min.z || vec->x > geometry->info.bounding_box.max.z) {
         return query->cell_count;
     }
+
+    uint32_t cell_x = 0;//fw64_floorf((vec->x - geometry->info.bounding_box.min.x) / (float)geometry->info.cell_count_x);
+    uint32_t cell_z = 0;//fw64_floorf((vec->z - geometry->info.bounding_box.min.z) / (float)geometry->info.cell_count_z);
+
+    uint32_t cell_index = cell_z * geometry->info.cell_count_z + cell_x;
+    query->cells[query->cell_count++] = geometry->cells + cell_index;
 
     return query->cell_count;
 }

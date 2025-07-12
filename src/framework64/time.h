@@ -13,4 +13,6 @@ typedef struct {
 
     /** Time the application has been running. */
     float total_time;
+
+    float accumulator_progress;
 } fw64Time;

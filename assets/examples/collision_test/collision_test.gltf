@@ -56,6 +56,10 @@
 			"children":[
 				3
 			],
+			"extras":{
+				"extraNodes":"4",
+				"extraMeshInstances":"4"
+			},
 			"name":"CollisionTest"
 		}
 	],
