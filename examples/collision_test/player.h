@@ -8,6 +8,7 @@ typedef struct {
     fw64Engine* engine;
     fw64Node* node;
     fw64Character character;
+    int run_character_update;
 } Player;
 
 void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* env, fw64Scene* scene, fw64Node* node);

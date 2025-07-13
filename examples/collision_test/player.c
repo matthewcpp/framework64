@@ -7,12 +7,18 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     player->node = node;
     fw64_character_init(&player->character, env, scene);
 
+    player->run_character_update = 1;
+
     player->character.previous_position = player->node->transform.position;
     player->character.position = player->node->transform.position;
     box_size(&player->node->collider->bounding, &player->character.size);
 }
 
 void player_update(Player* player) {
+    if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
+        player->run_character_update = !player->run_character_update;
+    }
+
     if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_A)) {
         player->character.attempt_to_jump = 1;
     }

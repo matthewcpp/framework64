@@ -23,7 +23,7 @@ class CollisionGeometry {
     /** In order to be a floor, the Y component of a triangle's normal must be greater than this value
      *  In order to be a ceiling, the Y component of a triangle's normal must be less than -1 * this value
     */
-    floorAndCeilingTolerance = 0.9;
+    floorAndCeilingTolerance = 0.05;
 
 
     constructor(countX, countZ) {
@@ -51,12 +51,11 @@ class CollisionGeometry {
         // https://www.sunshine2k.de/coding/java/TriangleRasterization/TriangleRasterization.html
         // https://www.jb101.co.uk/2008/08/09/partitioning-triangles-into-a-uniform-grid.html
         const cell = this.cells[0];
+        const normal = triangle[3];
 
-        const upDot = glMatrix.vec3.dot(triangle[3], CollisionGeometry._up);
-
-        if (upDot > this.floorAndCeilingTolerance) {
+        if (normal[1] > this.floorAndCeilingTolerance) {
             cell.floors.push(triangle);
-        } else if (upDot < -this.floorAndCeilingTolerance) {
+        } else if (normal[1] < -this.floorAndCeilingTolerance) {
             cell.ceilings.push(triangle);
         } else {
             cell.walls.push(triangle);

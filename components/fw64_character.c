@@ -33,31 +33,37 @@ void vw64_character_reset_position(fw64Character* character, const Vec3* positio
 static void fw64_character_check_floor_collision(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
     // check floor collisions
     // TODO: https://brendankeesing.com/blog/character_controller_stairs/
+    
+    Vec3 hit_point, ground_point = {0, -FLT_MAX, 0.0};
+
     for (int c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
 
-        Vec3 hit_point;
-
         for (uint32_t t = 0; t < cell->floor_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
             if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
-                character->position.y = hit_point.y;
-                character->velocity.y = 0.0f;
-                character->state = FW64_CHARACTER_STATE_ON_GROUND;
-
-                return;
+                if (hit_point.y > ground_point.y) {
+                    ground_point = hit_point;
+                }
             }
         }
     }
 
-    character->state = FW64_CHARACTER_STATE_IN_AIR;
+    if (ground_point.y > -FLT_MAX) {
+        character->position.y = ground_point.y;
+        character->velocity.y = 0.0f;
+        character->state = FW64_CHARACTER_STATE_ON_GROUND;
+    } else {
+        character->state = FW64_CHARACTER_STATE_IN_AIR;
+    }
 }
 
 void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     character->previous_position = character->position;
 
-    // handle ground movement
+    // handle horizontal movement
+    // TODO: handle air movement slightly differently?
     vec3_scale(&character->attempt_to_move, character->max_speed, &character->attempt_to_move);
     character->velocity.x = character->attempt_to_move.x;
     character->velocity.z = character->attempt_to_move.z;
