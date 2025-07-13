@@ -26,7 +26,7 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
 void vw64_character_reset_position(fw64Character* character, const Vec3* position) {
     character->previous_position = *position;
     character->position = *position;
-    character->state = FW64_CHARACTER_ON_GROUND;
+    character->state = FW64_CHARACTER_STATE_ON_GROUND;
     vec3_set_zero(&character->velocity);
 }
 
@@ -42,16 +42,16 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
         for (uint32_t t = 0; t < cell->floor_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
             if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
-                character->position = hit_point;
+                character->position.y = hit_point.y;
                 character->velocity.y = 0.0f;
-                character->state = FW64_CHARACTER_ON_GROUND;
+                character->state = FW64_CHARACTER_STATE_ON_GROUND;
 
                 return;
             }
         }
     }
 
-    character->state = FW64_CHARACTER_IN_AIR;
+    character->state = FW64_CHARACTER_STATE_IN_AIR;
 }
 
 void fw64_character_fixed_update(fw64Character* character, float time_delta) {
@@ -66,7 +66,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     // handle jumping
     if (character->attempt_to_jump && fw64_character_is_on_ground(character)) {
         character->velocity.y += character->jump_speed;
-        character->state = FW64_CHARACTER_IN_AIR;
+        character->state = FW64_CHARACTER_STATE_IN_AIR;
         character->attempt_to_jump = 0;
     }
 
@@ -75,7 +75,6 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     if (character->velocity.y < 0.0f) {
         character->velocity.y = fw64_maxf(character->velocity.y, character->environment->max_fall_speed);
     }
-    
 
     // constrain character's horizontal speed (if necessary)
     Vec2 horizontal_movement = {character->velocity.x, character->velocity.z};

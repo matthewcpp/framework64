@@ -18,4 +18,15 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
     draw_pos.y += fw64_font_line_height(info->font);
     sprintf(buffer, "v: %.2f, %.2f, %.2f", info->character->velocity.x, info->character->velocity.y, info->character->velocity.z);
     fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
+
+    draw_pos.y += fw64_font_line_height(info->font);
+    switch (info->character->state){
+        case FW64_CHARACTER_STATE_ON_GROUND:
+            fw64_spritebatch_draw_string(spritebatch, info->font, "Ground", draw_pos.x, draw_pos.y);
+            break;
+
+        case FW64_CHARACTER_STATE_IN_AIR:
+            fw64_spritebatch_draw_string(spritebatch, info->font, "Air", draw_pos.x, draw_pos.y);
+            break;
+    }
 }

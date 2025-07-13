@@ -20,8 +20,8 @@ typedef struct {
 void fw64_character_envionment_init(fw64CharacterEnvironment* env);
 
 typedef enum {
-    FW64_CHARACTER_ON_GROUND,
-    FW64_CHARACTER_IN_AIR
+    FW64_CHARACTER_STATE_ON_GROUND,
+    FW64_CHARACTER_STATE_IN_AIR
 } fw64CharacterState;
 
 typedef struct {
@@ -53,8 +53,8 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta);
 
 void vw64_character_reset_position(fw64Character* character, const Vec3* position);
 
-#define fw64_character_is_on_ground(character) ((character)->state == FW64_CHARACTER_ON_GROUND)
-
+#define fw64_character_is_on_ground(character) ((character)->state == FW64_CHARACTER_STATE_ON_GROUND)
+#define fw64_character_is_in_air(character) ((character)->state == FW64_CHARACTER_STATE_IN_AIR)
 #ifdef __cplusplus
 }
 #endif

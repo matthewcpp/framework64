@@ -13,7 +13,7 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
 }
 
 void player_update(Player* player) {
-    if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
+    if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_A)) {
         player->character.attempt_to_jump = 1;
     }
 
