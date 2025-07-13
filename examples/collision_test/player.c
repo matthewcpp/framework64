@@ -12,23 +12,20 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     box_size(&player->node->collider->bounding, &player->character.size);
 }
 
-static void player_do_jump(Player* player) {
-    if (!fw64_character_is_on_ground(&player->character)) {
-        return;
-    }
-
-    player->character.velocity.y = 5.0f;
-}
-
 void player_update(Player* player) {
     if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
-        player_do_jump(player);
+        player->character.attempt_to_jump = 1;
     }
 
     if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
         Vec3 pos = {0.0f, 7.0f, 0.0f};
         vw64_character_reset_position(&player->character, &pos);
     }
+
+    // TODO: need to actually figure this out based on camera
+    Vec2 stick;
+    fw64_input_controller_stick(player->engine->input, 0, &stick);
+    vec3_set(&player->character.attempt_to_move, stick.x, 0.0f, -stick.y);
 
     vec3_lerp(&player->character.previous_position, &player->character.position, player->engine->time->accumulator_progress, &player->node->transform.position);
     fw64_node_update(player->node);
