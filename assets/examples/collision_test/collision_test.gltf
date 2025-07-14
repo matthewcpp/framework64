@@ -24,11 +24,14 @@
 			],
 			"translation":[
 				0,
-				29,
-				50
+				22,
+				27.999998092651367
 			]
 		},
 		{
+			"extras":{
+				"layers":"world"
+			},
 			"mesh":0,
 			"name":"ground",
 			"scale":[
@@ -39,12 +42,21 @@
 		},
 		{
 			"extras":{
-				"collisionType":"dynamic"
+				"collisionType":"dynamic",
+				"layers":"player"
 			},
 			"mesh":1,
-			"name":"Player"
+			"name":"Player",
+			"translation":[
+				0,
+				11,
+				0
+			]
 		},
 		{
+			"extras":{
+				"layers":"world"
+			},
 			"mesh":2,
 			"name":"ramp",
 			"scale":[
@@ -182,35 +194,35 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":4,
+			"count":16,
 			"max":[
-				12.5,
+				39.166664123535156,
 				0,
 				12.5
 			],
 			"min":[
-				-12.5,
+				-40.83332824707031,
 				0,
-				-12.5
+				-40.83332824707031
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":4,
+			"count":16,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":4,
+			"count":16,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":6,
+			"count":24,
 			"type":"SCALAR"
 		},
 		{
@@ -285,80 +297,80 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":48,
+			"byteLength":192,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
+			"byteLength":192,
+			"byteOffset":192,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":128,
+			"byteOffset":384,
+			"target":34962
+		},
+		{
+			"buffer":0,
 			"byteLength":48,
-			"byteOffset":48,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":32,
-			"byteOffset":96,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":12,
-			"byteOffset":128,
+			"byteOffset":512,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":140,
+			"byteOffset":560,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":288,
-			"byteOffset":428,
+			"byteOffset":848,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":192,
-			"byteOffset":716,
+			"byteOffset":1136,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":72,
-			"byteOffset":908,
+			"byteOffset":1328,
 			"target":34963
 		},
 		{
 			"buffer":0,
 			"byteLength":144,
-			"byteOffset":980,
+			"byteOffset":1400,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":144,
-			"byteOffset":1124,
+			"byteOffset":1544,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":96,
-			"byteOffset":1268,
+			"byteOffset":1688,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":36,
-			"byteOffset":1364,
+			"byteOffset":1784,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":1400,
+			"byteLength":1820,
 			"uri":"collision_test.bin"
 		}
 	]

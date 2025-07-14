@@ -4,8 +4,9 @@
 
 void fw64_character_envionment_init(fw64CharacterEnvironment* env) {
     vec3_set(&env->gravity, 0.0f, Fw64_CHARACTER_ENV_DEFAULT_GRAVITY, 0.0f);
-    env->max_fall_speed = FW64_CHARACTER_MAX_FALL_SPEED;
+    env->max_fall_speed = FW64_CHARACTER_ENV_MAX_FALL_SPEED;
     env->max_substeps = FW64_CHARACTER_ENV_MAX_SUBSTEPS;
+    env->horizontal_move_threshold = FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD;
 }
 
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Scene* scene) {
@@ -14,19 +15,22 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
 
     Vec3 zero = vec3_zero();
     character->attempt_to_move = zero;
-    vw64_character_reset_position(character, &zero);
+    fw64_character_reset_position(character, &zero);
 
     vec3_set_one(&character->size);
     character->max_speed = FW64_CHARACTER_DEFAULT_MAX_SPEED;
     character->jump_speed = FW64_CHARACTER_DEFAULT_JUMP_SPEED;
+    character->jump_fall_gravity_scale = FW64_CHARACTER_DEFAULT_JUMP_FALL_GRAVITY_SCALE;
+    character->gravity_scale = FW64_CHARACTER_DEFAULT_GRAVITY_SCALE;
 
     character->attempt_to_jump = 0;
 }
 
-void vw64_character_reset_position(fw64Character* character, const Vec3* position) {
+void fw64_character_reset_position(fw64Character* character, const Vec3* position) {
     character->previous_position = *position;
     character->position = *position;
-    character->state = FW64_CHARACTER_STATE_ON_GROUND;
+    character->previous_state = FW64_CHARACTER_STATE_IN_AIR;
+    character->state = FW64_CHARACTER_STATE_IN_AIR;
     vec3_set_zero(&character->velocity);
 }
 
@@ -36,6 +40,7 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
     
     Vec3 hit_point, correction_vector = vec3_zero(), query_v0;
     int hit_count = 0;
+    float total_penetration = 0.0f;
 
     for (int c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
@@ -54,6 +59,7 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
                     float penetration = query_radius - distance;
                     vec3_add_and_scale(&correction_vector, &triangle->N, penetration, &correction_vector);
                     hit_count += 1;
+                    total_penetration += penetration;
                 }
             }
         }
@@ -61,7 +67,15 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
 
     // resolve all collisions
     if (hit_count) {
+        vec3_normalize(&correction_vector);
+        vec3_scale(&correction_vector, total_penetration / (float)hit_count, &correction_vector);
         vec3_add(&character->position, &correction_vector, &character->position);
+
+        //attempt to prevent jittering by skipping slight movement that may arise due to floating point effects
+        // if (vec3_distance_squared(&character->previous_position, &character->position) < character->environment->horizontal_move_threshold) {
+        //     character->position = character->previous_position;
+        // }
+
         character->velocity.y = 0.0f;
         character->state = FW64_CHARACTER_STATE_ON_GROUND;
     } else {
@@ -70,6 +84,7 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
 }
 
 void fw64_character_fixed_update(fw64Character* character, float time_delta) {
+    character->previous_state = character->state;
     character->previous_position = character->position;
 
     // handle horizontal movement
@@ -87,7 +102,12 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     }
 
     // apply gravity to character's velocity
-    vec3_add_and_scale(&character->velocity, &character->environment->gravity, time_delta, &character->velocity);
+    Vec3 gravity = character->environment->gravity;
+    vec3_scale(&gravity, character->gravity_scale, &gravity);
+    if (character->velocity.y < 0.0f) {
+        vec3_scale(&gravity, character->jump_fall_gravity_scale, &gravity);
+    }
+    vec3_add_and_scale(&character->velocity, &gravity, time_delta, &character->velocity);
     if (character->velocity.y < 0.0f) {
         character->velocity.y = fw64_maxf(character->velocity.y, character->environment->max_fall_speed);
     }
@@ -95,6 +115,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     // constrain character's horizontal speed (if necessary)
     Vec2 horizontal_movement = {character->velocity.x, character->velocity.z};
     float speed = vec2_length(&horizontal_movement);
+
     if (speed > character->max_speed) {
         speed = character->max_speed;
 

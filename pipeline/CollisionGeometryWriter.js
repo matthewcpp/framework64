@@ -77,21 +77,6 @@ class CollisionGeometryWriter {
 
         this.triangleArrayIndex += triangles.length;
     }
-
-    writeDebugTextFile(collisionGeometry, filePath) {
-        const file = fs.openSync(filePath, "w");
-
-        fs.writeSync(file, `cells: ${collisionGeometry.cells.length} triangles: ${collisionGeometry.triangleCount}\n`);
-
-        for (const cell of collisionGeometry.cells) {
-            fs.writeSync(file, "    floors:\n")
-            for (const t of cell.floors) {
-                fs.writeSync(file, `        a: [${t[0][0]}, ${t[0][1]}, ${t[0][2]}] b: [${t[1][0]}, ${t[1][1]}, ${t[1][2]}] c: [${t[2][0]}, ${t[2][1]}, ${t[2][2]}]\n`);
-            }
-        }
-
-        fs.closeSync(file);
-    }
 }
 
 

@@ -123,7 +123,7 @@ class LevelParser {
     }
 
     _parseNode(scene, parentNode, gltfNode) {
-        const node = this._createAndAddNode(scene, parentNode);
+        const node = LevelParser.createAndAddNode(scene, parentNode);
         node.name = parentNode === null ? "root" : gltfNode.name; 
 
         const gltf = this.gltfData.gltf;
@@ -153,7 +153,7 @@ class LevelParser {
         }
     }
 
-    _createAndAddNode(scene, parentNode) {
+    static createAndAddNode(scene, parentNode) {
         const node = new N64Node(scene.nodes.length, parentNode);
         scene.nodes.push(node);
 
@@ -181,7 +181,15 @@ class LevelParser {
 
         this._parseNode(scene, null, gltfSceneNodeRoot);
 
-        // Assign Node Children pointers
+        LevelParser.assignNodeChildPointers(scene);
+
+        return scene;
+    }
+
+    /** Parent is assigned via AddOrCreate, however the children pointers need
+     *  to be setup before writing.
+     */
+    static assignNodeChildPointers(scene) {
         for (const node of scene.nodes) {
             if (node.childNodes.length === 0) {
                 continue;
@@ -195,8 +203,6 @@ class LevelParser {
                 currentChild = node.childNodes[i];
             }
         }
-
-        return scene;
     }
 
     _parseNodeExtras(scene, gltfNode, node) {
@@ -255,7 +261,7 @@ class LevelParser {
             }
         }
 
-        if (Object.hasOwn.extras, "collisionType") {
+        if (Object.hasOwn(extras, "collisionType")) {
             if (extras.collisionType.toLowerCase() === "dynamic") {
                 node.collisionType = N64Node.CollisionType.Dynamic;
             }

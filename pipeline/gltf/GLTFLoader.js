@@ -185,11 +185,13 @@ class GLTFLoader {
                     this._readNormals(gltfPrimitive, primitive);
                 }
     
-                if (Object.hasOwn(gltfPrimitive.attributes, "TEXCOORD_0"))
+                if (Object.hasOwn(gltfPrimitive.attributes, "TEXCOORD_0")) {
                     this._readTexCoords(gltfPrimitive, primitive, gltfMesh.name);
+                }
     
-                if (Object.hasOwn(gltfPrimitive.attributes, "JOINTS_0"))
+                if (Object.hasOwn(gltfPrimitive.attributes, "JOINTS_0")) {
                     this._readJointIndices(gltfPrimitive, primitive);
+                }
     
                 this._readIndices(gltfPrimitive, primitive);
     

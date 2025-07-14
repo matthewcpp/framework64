@@ -76,6 +76,10 @@ async function write(materialBundle, desktopImages, gltfData, file) {
 }
 
 async function createDesktopImages(gltfData) {
+    if (gltfData.images.length === 0) {
+        return [];
+    }
+
     const desktopImages = [];
     const gltfDir = path.dirname(gltfData.gltfPath);
 

@@ -205,10 +205,7 @@ int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const 
 
     // Sphere and triangle intersect if the (squared) distance from sphere
     // center to point p is less than the (squared) sphere radius
-    //return vec3_distance_squared(point, center) <= radius * radius;
-
-    float dist_squared = vec3_distance_squared(point, center);
-    return dist_squared <= radius * radius;
+    return vec3_distance_squared(point, center) <= radius * radius;
 }
 
 // Moller-Trumbore algorithm: wikipedia
