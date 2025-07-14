@@ -34,7 +34,8 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
     // check floor collisions
     // TODO: https://brendankeesing.com/blog/character_controller_stairs/
     
-    Vec3 hit_point, ground_point = {0, -FLT_MAX, 0.0};
+    Vec3 hit_point, correction_vector = vec3_zero(), query_v0;
+    int hit_count = 0;
 
     for (int c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
@@ -42,16 +43,25 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
 
         for (uint32_t t = 0; t < cell->floor_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
-            if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
-                if (hit_point.y > ground_point.y) {
-                    ground_point = hit_point;
+
+            // initial filter: check penetration with triangle plane
+            vec3_subtract(query_pos, &triangle->A, &query_v0);
+            float distance = vec3_dot(&triangle->N, &query_v0);
+            if (distance < query_radius) {
+                // precision check
+                if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
+                    // correct position along collision normal
+                    float penetration = query_radius - distance;
+                    vec3_add_and_scale(&correction_vector, &triangle->N, penetration, &correction_vector);
+                    hit_count += 1;
                 }
             }
         }
     }
 
-    if (ground_point.y > -FLT_MAX) {
-        character->position.y = ground_point.y;
+    // resolve all collisions
+    if (hit_count) {
+        vec3_add(&character->position, &correction_vector, &character->position);
         character->velocity.y = 0.0f;
         character->state = FW64_CHARACTER_STATE_ON_GROUND;
     } else {
