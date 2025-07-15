@@ -25,22 +25,35 @@ void fw64_collision_geometry_uninit(fw64CollisionGeometry* geometry, fw64Allocat
     if (geometry->triangles) {
         fw64_allocator_free(allocator, geometry->triangles);
     }
+
+    if (geometry->cells) {
+        fw64_allocator_free(allocator, geometry->cells);
+    }
+}
+
+int fw64_collision_geometry_get_cell_coordinates_vec3(const fw64CollisionGeometry* geometry, const Vec3* vec, IVec2* out) {
+    // ensure the query point is in the grid.
+    if (vec->x < geometry->info.bounds_min.x || vec->x > geometry->info.bounds_max.x ||
+        vec->z < geometry->info.bounds_min.y || vec->z > geometry->info.bounds_max.y) {
+        return 0;
+    }
+
+    const float cell_size_x = (geometry->info.bounds_max.x - geometry->info.bounds_min.x) / geometry->info.cell_count_x;
+    const float cell_size_z = (geometry->info.bounds_max.y - geometry->info.bounds_min.y) / geometry->info.cell_count_z;
+
+    out->x = fw64_floorf((vec->x - geometry->info.bounds_min.x) / cell_size_x);
+    out->y = fw64_floorf((vec->z - geometry->info.bounds_min.y) / cell_size_z);
+
+    return 1;
 }
 
 int fw64_collision_geometry_query_vec3(fw64CollisionGeometry* geometry, const Vec3* vec, fw64CollisionGeometryQuery* query) {
     query->cell_count = 0;
-
-    // ensure the query point is in the grid.
-    if (vec->x < geometry->info.bounding_box.min.x || vec->x > geometry->info.bounding_box.max.x ||
-        vec->z < geometry->info.bounding_box.min.z || vec->z > geometry->info.bounding_box.max.z) {
-        return query->cell_count;
+    IVec2 coords;
+    if (fw64_collision_geometry_get_cell_coordinates_vec3(geometry, vec, &coords)) {
+        query->cells[0] = geometry->cells + coords.y * geometry->info.cell_count_x + coords.x;
+        query->cell_count = 1;
     }
-
-    uint32_t cell_x = 0;//fw64_floorf((vec->x - geometry->info.bounding_box.min.x) / (float)geometry->info.cell_count_x);
-    uint32_t cell_z = 0;//fw64_floorf((vec->z - geometry->info.bounding_box.min.z) / (float)geometry->info.cell_count_z);
-
-    uint32_t cell_index = cell_z * geometry->info.cell_count_z + cell_x;
-    query->cells[query->cell_count++] = geometry->cells + cell_index;
 
     return query->cell_count;
 }

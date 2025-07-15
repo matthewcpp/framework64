@@ -11,10 +11,11 @@ const Mesh = require("./gltf/Mesh");
 function writeTextFile(collisionGeometry, filePath) {
     const file = fs.openSync(filePath, "w");
 
-    fs.writeSync(file, `cells: ${collisionGeometry.cells.length} triangles: ${collisionGeometry.triangleCount}\n`);
+    fs.writeSync(file, `cells: ${collisionGeometry.cells.length}\n triangle array size: ${collisionGeometry.triangleCount}\n`);
+    fs.writeSync(file, `unique triangles: ${collisionGeometry.numUniqueTriangles}\nsingle cell triangles: ${collisionGeometry.numSingleCellTriangles}\nmulti cell triangles: ${collisionGeometry.numMultiCellTriangles}\n`);
 
     for (const cell of collisionGeometry.cells) {
-        fs.writeSync(file, "    floors:\n")
+        fs.writeSync(file, `    ${cell.floors.length} floors:\n`)
         for (const t of cell.floors) {
             fs.writeSync(file, `        a: [${t[0][0]}, ${t[0][1]}, ${t[0][2]}] b: [${t[1][0]}, ${t[1][1]}, ${t[1][2]}] c: [${t[2][0]}, ${t[2][1]}, ${t[2][2]}]\n`);
         }

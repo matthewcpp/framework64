@@ -33,7 +33,6 @@ set(common_source_files
     quat.h quat.c
     query.h query.c
     random.h random.c
-    rect.h rect.c
     render_pass.h
     render_queue.h render_queue.c
     renderer.h

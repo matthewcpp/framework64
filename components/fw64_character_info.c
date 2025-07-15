@@ -9,7 +9,7 @@ void fw64_character_info_init(fw64CharacterInfo* info, fw64Font* font, fw64Chara
 }
 
 void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch* spritebatch) {
-    IVec2 draw_pos = info->position;
+    IVec2 draw_pos = info->position, grid_pos;
     char buffer[64];
 
     sprintf(buffer, "p: %.2f, %.2f, %2.f", info->character->position.x, info->character->position.y, info->character->position.z);
@@ -29,4 +29,9 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
             fw64_spritebatch_draw_string(spritebatch, info->font, "Air", draw_pos.x, draw_pos.y);
             break;
     }
+
+    draw_pos.y += fw64_font_line_height(info->font);
+    fw64_collision_geometry_get_cell_coordinates_vec3(info->character->scene->collision_geometry, &info->character->position, &grid_pos);
+    sprintf(buffer, "grid: %d,%d", grid_pos.x, grid_pos.y);
+    fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
 }

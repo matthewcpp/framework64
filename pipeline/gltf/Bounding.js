@@ -96,12 +96,12 @@ class Bounding {
         corners[7] = [box.max[0], box.min[1], box.max[2]];
             
         // transform the first corner
-        const tmin = [0, 0, 0];
+        const tmin = glMatrix.vec3.create();
         glMatrix.vec3.transformMat4(tmin, corners[0], matrix);
-        const tmax = tmin.slice();
+        const tmax = glMatrix.vec3.clone(tmin);
         
         // transform the other 7 corners and compute the result AABB
-        const xformedPoint = [0, 0, 0];
+        const xformedPoint = glMatrix.vec3.create();
         for(let i = 1; i < 8; i++)
         {
             glMatrix.vec3.transformMat4(xformedPoint, corners[i], matrix);

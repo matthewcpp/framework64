@@ -1,10 +1,10 @@
+const CollisionGeometryDebug = require("../CollisionGeometryDebug");
 const LevelParser = require("../LevelParser");
 const SceneWriter = require("./SceneWriter");
 const SceneDefines = require("../SceneDefines");
 const Util = require("../Util");
 
 const path = require("path");
-const CollisionGeometryDebug = require("../CollisionGeometryDebug");
 
 async function _processScene(environment, scene, levelParser, bundle, outputDirectory, includeDirectory) {
     const safeSceneName =  Util.safeDefineName(scene.name);
@@ -23,6 +23,15 @@ async function processLevel(environment, level, layerMap, bundle, baseDirectory,
     const srcPath = path.join(baseDirectory, level.src);
     const levelParser = new LevelParser();
     await levelParser.parse(srcPath, layerMap);
+
+    if (Object.hasOwn(level, "collisionGeometry") && level.collisionGeometry === true) {
+        levelParser.createCollisionGeometry();
+
+        for (const scene of levelParser.scenes) {
+            const collisionDebugFile = path.join(path.dirname(outputDirectory), Util.safeDefineName(scene.name) +"_collision_info.txt");
+            CollisionGeometryDebug.writeTextFile(scene.collisionGeometry, collisionDebugFile);
+        }
+    }
 
     for (const scene of levelParser.scenes) {
         await _processScene(environment, scene, levelParser, bundle, outputDirectory, includeDirectory);

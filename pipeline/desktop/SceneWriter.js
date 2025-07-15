@@ -1,5 +1,4 @@
 const CollisionGeometryWriter = require("../CollisionGeometryWriter");
-const CollisionGeometryDebug = require("../CollisionGeometryDebug");
 const MaterialBundleWriter = require("./MaterialBundleWriter");
 const MeshWriter = require("./MeshWriter")
 const SceneDataWriter = require("../SceneDataWriter");
@@ -20,11 +19,7 @@ async function write(environment, scene, gltfData, destPath) {
     }
 
     if (scene.collisionGeometry) {
-        // TEMP
-        const path = require("path");
-        const collisionDebugFile = path.join(path.dirname(destPath), path.basename(destPath) +"_collision.txt");
         const collisionGeometryWriter = new CollisionGeometryWriter(writer);
-        CollisionGeometryDebug.writeTextFile(scene.collisionGeometry, collisionDebugFile);
         collisionGeometryWriter.writeData(scene.collisionGeometry, file);
     }
 
@@ -37,9 +32,6 @@ async function write(environment, scene, gltfData, destPath) {
     SceneDataWriter.writeCollisionMeshes(environment, scene, writer, file);
     SceneDataWriter.writeNodes(environment, scene, writer, file);
     SceneDataWriter.writeCustomBoundingBoxes(scene, writer, file);
-
-
-    
 
     fs.closeSync(file);
 }

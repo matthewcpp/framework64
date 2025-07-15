@@ -30,11 +30,15 @@ class LevelParser {
         for (const sceneIndex of rootNode.nodes) {
             const scene = this._parseScene(sceneIndex);
 
-            scene.collisionGeometry = CollisionGeometry.createFromScene(scene, this.gltfData);
-
             if (scene) {
                 this.scenes.push(scene);
             }
+        }
+    }
+
+    createCollisionGeometry() {
+        for (const scene of this.scenes) {
+            scene.collisionGeometry = CollisionGeometry.createFromScene(scene, this.gltfData);
         }
     }
 

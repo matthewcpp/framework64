@@ -3,6 +3,7 @@
 #include "framework64/allocator.h"
 #include "framework64/box.h"
 #include "framework64/data_io.h"
+#include "framework64/vec2.h"
 #include "framework64/vec3.h"
 
 #include <stdint.h>
@@ -24,7 +25,8 @@ typedef struct {
     uint32_t triangle_count;
     uint32_t cell_count_x;
     uint32_t cell_count_z;
-    Box bounding_box;
+    Vec2 bounds_min;
+    Vec2 bounds_max;
 } fw64CollisionGeometryInfo;
 
 typedef struct {
@@ -49,6 +51,7 @@ void fw64_collision_geometry_init_from_datasource(fw64CollisionGeometry* geometr
 void fw64_collision_geometry_uninit(fw64CollisionGeometry* geometry, fw64Allocator* allocator);
 void fw64_collision_geometry_delete(fw64CollisionGeometry* geometry, fw64Allocator* allocator);
 
+int fw64_collision_geometry_get_cell_coordinates_vec3(const fw64CollisionGeometry* geometry, const Vec3* vec, IVec2* out);
 int fw64_collision_geometry_query_vec3(fw64CollisionGeometry* geometry, const Vec3* vec, fw64CollisionGeometryQuery* query);
 
 #ifdef __cplusplus

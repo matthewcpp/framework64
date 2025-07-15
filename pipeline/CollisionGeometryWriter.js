@@ -40,13 +40,16 @@ class CollisionGeometryWriter {
 
         const triangleCount = collisionGeometry.triangleCount;
 
-        // this needs to line up with CollisionGeometryHeader in collision_geometry.c
-        const headerBuffer = Buffer.alloc(12 + Bounding.SizeOf);
+        // this needs to line up with fw64CollisionGeometryInfo in collision_geometry.c
+        const headerBuffer = Buffer.alloc(7 * 4);
         let headerIndex = 0;
         headerIndex = this.writer.writeUInt32(headerBuffer, triangleCount, headerIndex);
         headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountX, headerIndex);
         headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountZ, headerIndex);
-        headerIndex = collisionGeometry.boundingBox.write(this.writer, headerBuffer, headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.min[0], headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.min[1], headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.max[0], headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.max[1], headerIndex);
 
         this.triangleBuffer = Buffer.alloc(CollisionGeometryWriter.triangleSize * triangleCount);
         this.cellBuffer = Buffer.alloc(CollisionGeometryWriter.cellSize * collisionGeometry.cells.length);
