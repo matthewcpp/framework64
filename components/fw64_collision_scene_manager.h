@@ -15,6 +15,7 @@ typedef struct {
     uint32_t static_gemoetry_layer_id;
 
     fw64Scene* scene;
+    fw64RenderPass* static_scene_renderpass;
     fw64RenderPass* scene_renderpass;
 
     fw64Scene* collision_wireframe;
@@ -38,7 +39,6 @@ fw64Scene* fw64_collision_scene_manager_load_scene(fw64CollisionSceneManager* ma
 void fw64_collision_scene_manager_set_camera(fw64CollisionSceneManager* manager, fw64Camera* camera);
 
 void fw64_collision_scene_manager_draw_scene(fw64CollisionSceneManager* manager);
-void fw64_collision_scene_manager_draw_wireframe(fw64CollisionSceneManager* manager);
 #ifdef __cplusplus
 }
 #endif

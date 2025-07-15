@@ -127,6 +127,7 @@ int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p
     return vec3_dot(&v, &v) < radius * radius;
 }
 
+#if 1
 // Real Time Collision Detection 5.1.5
 void fw64_closest_point_to_triangle(const Vec3* p, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* out) {
     // Check if P in vertex region outside A
@@ -197,6 +198,90 @@ void fw64_closest_point_to_triangle(const Vec3* p, const Vec3* a, const Vec3* b,
     vec3_add_and_scale(a, &ab, v, out);
     vec3_add_and_scale(out, &ac, w, out);
 }
+#else
+
+
+// Compute closest point on triangle ABC to point P
+void fw64_closest_point_to_triangle(const Vec3* p, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* out) {
+    Vec3 ab, ac, ap;
+    vec3_subtract(b, a, &ab);
+    vec3_subtract(c, a, &ac);
+    vec3_subtract(p, a, &ap);
+
+    float d1 = vec3_dot(&ab, &ap);
+    float d2 = vec3_dot(&ac, &ap);
+
+    // Corner A
+    if (d1 <= 0 && d2 <= 0) {
+        *out = *a;
+        return;
+    }
+
+    Vec3 bp;
+    vec3_subtract(p, b, &bp);
+    float d3 = vec3_dot(&ab, &bp);
+    float d4 = vec3_dot(&ac, &bp);
+
+    // Corner B
+    if (d3 >= 0 && d4 <= d3) {
+        *out = *b;
+        return;
+    }
+
+    float vc = d1 * d4 - d3 * d2;
+    if (vc <= 0 && d1 >= 0 && d3 <= 0) {
+        float v = d1 / (d1 - d3);
+        Vec3 scaled_ab;
+        vec3_scale(&ab, v, &scaled_ab);
+        vec3_add(a, &scaled_ab, out);
+        return;
+    }
+
+    Vec3 cp;
+    vec3_subtract(p, c, &cp);
+    float d5 = vec3_dot(&ab, &cp);
+    float d6 = vec3_dot(&ac, &cp);
+
+    // Corner C
+    if (d6 >= 0 && d5 <= d6) {
+        *out = *c;
+        return;
+    }
+
+    float vb = d5 * d2 - d1 * d6;
+    if (vb <= 0 && d2 >= 0 && d6 <= 0) {
+        float w = d2 / (d2 - d6);
+        Vec3 scaled_ac;
+        vec3_scale(&ac, w, &scaled_ac);
+        vec3_add(a, &scaled_ac, out);
+        return;
+    }
+
+    float va = d3 * d6 - d5 * d4;
+    if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) {
+        Vec3 bc;
+        vec3_subtract(c, b, &bc);
+        float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+        Vec3 scaled_bc;
+        vec3_scale(&bc, w, &scaled_bc);
+        vec3_add(b, &scaled_bc, out);
+        return;
+    }
+
+    // Inside face
+    float denom = 1.0f / (va + vb + vc);
+    float v = vb * denom;
+    float w = vc * denom;
+
+    Vec3 scaled_ab, scaled_ac;
+    vec3_scale(&ab, v, &scaled_ab);
+    vec3_scale(&ac, w, &scaled_ac);
+
+    Vec3 temp;
+    vec3_add(&scaled_ab, &scaled_ac, &temp);
+    vec3_add(a, &temp, out);
+}
+#endif
 
 // Real Time Collision Detection 5.2.7
 int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point) {
@@ -205,7 +290,10 @@ int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const 
 
     // Sphere and triangle intersect if the (squared) distance from sphere
     // center to point p is less than the (squared) sphere radius
-    return vec3_distance_squared(point, center) <= radius * radius;
+    //return vec3_distance_squared(point, center) <= radius * radius;
+
+    float distance_squared = vec3_distance_squared(point, center);
+    return distance_squared < radius * radius;
 }
 
 // Moller-Trumbore algorithm: wikipedia

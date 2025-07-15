@@ -8,6 +8,7 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     fw64_character_init(&player->character, env, scene);
 
     player->run_character_update = 1;
+    player->initial_pos = player->node->transform.position;
 
     fw64_character_reset_position(&player->character, &player->node->transform.position);
     box_size(&player->node->collider->bounding, &player->character.size);
@@ -23,8 +24,7 @@ void player_update(Player* player) {
     }
 
     if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
-        Vec3 pos = {0.0f, 7.0f, 0.0f};
-        fw64_character_reset_position(&player->character, &pos);
+        fw64_character_reset_position(&player->character, &player->initial_pos);
     }
 
     // TODO: need to actually figure this out based on camera

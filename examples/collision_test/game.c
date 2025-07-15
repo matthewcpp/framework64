@@ -41,6 +41,5 @@ void game_fixed_update(Game* game) {
 void game_draw(Game* game) {
     fw64_collision_scene_manager_set_camera(&game->collision_scene_manager, &game->camera);
     fw64_collision_scene_manager_draw_scene(&game->collision_scene_manager);
-    fw64_collision_scene_manager_draw_wireframe(&game->collision_scene_manager);
     ui_draw(&game->ui);
 }
