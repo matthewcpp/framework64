@@ -6,6 +6,7 @@ void fw64_collision_scene_manager_init(fw64CollisionSceneManager* manager, fw64E
     manager->engine = engine;
     manager->allocator = allocator;
     manager->static_gemoetry_layer_id = 1;
+    manager->show_grid = 1;
     manager->display_mode = FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_DEFAULT;
 
     manager->scene = NULL;
@@ -56,8 +57,13 @@ void fw64_collision_scene_manager_draw_scene(fw64CollisionSceneManager* manager)
     fw64_scene_draw_frustrum(manager->scene, manager->scene_renderpass, &manager->view_frustum, ~manager->static_gemoetry_layer_id);
     fw64_renderpass_end(manager->scene_renderpass);
 
+    uint32_t wire_layer_mask = FW64_COLLISION_SCENE_DEBUG_LAYER_WIRE_TRIANGLES;
+    if (manager->show_grid) {
+        wire_layer_mask |= FW64_COLLISION_SCENE_DEBUG_LAYER_GRID;
+    }
+
     fw64_renderpass_begin(manager->wireframe_renderpass);
-    fw64_scene_draw_frustrum(manager->collision_wireframe, manager->wireframe_renderpass, &manager->view_frustum, FW64_LAYER_MASK_ALL_LAYERS);
+    fw64_scene_draw_frustrum(manager->collision_wireframe, manager->wireframe_renderpass, &manager->view_frustum, wire_layer_mask);
     fw64_renderpass_end(manager->wireframe_renderpass);
 
     fw64_renderer_submit_renderpass(manager->engine->renderer, manager->static_scene_renderpass);

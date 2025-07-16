@@ -3,21 +3,6 @@ const N64Node = require("./gltf/Node")
 const glMatrix = require("gl-matrix");
 const Intersect2d = require("./Intersect2d");
 
-class CollisionGeometryCell {
-    boundingRect;
-    walls = [];
-    floors = [];
-    ceilings = [];
-
-    constructor(boundingRect) {
-        this.boundingRect = boundingRect;
-    }
-
-    get triangleCount () {
-        return this.walls.length + this.floors.length + this.ceilings.length;
-    }
-}
-
 class BoundingRect {
     min = glMatrix.vec2.fromValues(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
     max = glMatrix.vec2.fromValues(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
@@ -27,6 +12,25 @@ class BoundingRect {
             glMatrix.vec2.copy(this.min, min);
             glMatrix.vec2.copy(this.max, max);
         }
+    }
+}
+
+class CollisionGeometryCell {
+    posX;
+    posZ;
+    boundingRect;
+    walls = [];
+    floors = [];
+    ceilings = [];
+
+    constructor(cellX, cellZ, boundingRect) {
+        this.posX = cellX;
+        this.posZ = cellZ;
+        this.boundingRect = boundingRect;
+    }
+
+    get triangleCount () {
+        return this.walls.length + this.floors.length + this.ceilings.length;
     }
 }
 
@@ -75,7 +79,7 @@ class CollisionGeometry {
             for (let x = 0; x < this.cellCountX; x++) {
                 glMatrix.vec2.set(cellMaxPos, cellMinPos[0] + this.cellSizeX, cellMinPos[1] + this.cellSizeZ);
                 const cellBounding = new BoundingRect(cellMinPos, cellMaxPos);
-                this.cells.push(new CollisionGeometryCell(cellBounding));
+                this.cells.push(new CollisionGeometryCell(x, z, cellBounding));
             }
 
             // update the min pos for the next cell

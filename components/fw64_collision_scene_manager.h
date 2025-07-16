@@ -8,6 +8,12 @@ typedef enum {
     FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME_ONLY
 } fw64CollisionSceneManagerDisplayMode;
 
+/** This needs to be kept in sync with CollisionDebugLayers in CollisionGeometryDebug.js */
+typedef enum {
+    FW64_COLLISION_SCENE_DEBUG_LAYER_WIRE_TRIANGLES = 1,
+    FW64_COLLISION_SCENE_DEBUG_LAYER_GRID = 2
+} fw64CollisionSceneManagerLayers;
+
 typedef struct {
     fw64Engine* engine;
     fw64Allocator* allocator;
@@ -21,6 +27,8 @@ typedef struct {
     fw64Scene* collision_wireframe;
     fw64RenderPass* wireframe_renderpass;
     fw64Frustum view_frustum;
+
+    int show_grid;
 } fw64CollisionSceneManager;
 
 #ifdef __cplusplus
