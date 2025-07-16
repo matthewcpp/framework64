@@ -54,6 +54,9 @@ void fw64_collision_geometry_delete(fw64CollisionGeometry* geometry, fw64Allocat
 int fw64_collision_geometry_get_cell_coordinates_vec3(const fw64CollisionGeometry* geometry, const Vec3* vec, IVec2* out);
 int fw64_collision_geometry_query_vec3(fw64CollisionGeometry* geometry, const Vec3* vec, fw64CollisionGeometryQuery* query);
 
+#define fw64_collision_geometry_get_cell_count(geometry) ((geometry)->info.cell_count_x * (geometry)->info.cell_count_z)
+#define fw64_collision_geometry_get_cell_index(geometry, x, z) ((z) * (geometry)->info.cell_count_x + (x))
+
 #ifdef __cplusplus
 }
 #endif

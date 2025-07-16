@@ -174,39 +174,17 @@ function createWireScene(collisionGeometry, namePrefix) {
     const wireframeRootNode = LevelParser.createAndAddNode(wireframeScene, sceneRootNode);
     wireframeRootNode.name = "wireframe triangles";
 
+    for (const cell of collisionGeometry.cells) {
+        const [wireNode, wirePrim] = _createWireMeshNode(gltfLoader, wireframeScene, wireframeRootNode, `${namePrefix}_${cell.posX}_${cell.posZ}_wire_triangles`);
+        _createTriangleWireframesInPrim(wirePrim, cell.floors, [0.0, 0.0, 0.8, 1.0]);
+        wireNode.layerMask = CollisionDebugLayers.DebugSceneWireTriangleLayer;
+    }
+
     const gridRootNode = LevelParser.createAndAddNode(wireframeScene, sceneRootNode);
     gridRootNode.name = "grid";
 
     for (const cell of collisionGeometry.cells) {
-        // // create the cell node
-        // const cellName = `${namePrefix}_wire_triangles_${cell.posX}_${cell.posZ}`;
-        // const cellNode = LevelParser.createAndAddNode(wireframeScene, wireframeRootNode);
-        // cellNode.name = cellName;
-        // cellNode.layerMask = DebugSceneWireTriangleLayer;
-
-        // // create the mesh which holds the triangles for the collision geometry in this cell
-        // // each mesh will only have 1 primitive in this case
-        // const cellMesh = new Mesh(`cellName` + "_mesh");
-        // const prim = new Primitive(Primitive.ElementType.Lines);
-        
-        // prim.hasPositions = true;
-        // prim.hasVertexColors = true;
-        // prim.material = 0;
-        // cellMesh.primitives.push(prim);
-
-        // // bundle the mesh in the scene
-        // wireframeScene.meshBundle.push(gltfLoader.meshes.length)
-
-        // // assign the mesh and reserve a mesh instance for it
-        // cellNode.mesh = gltfLoader.meshes.length
-        // wireframeScene.meshInstanceCount += 1;
-        // gltfLoader.meshes.push(cellMesh);
-
-        const [wireNode, wirePrim] = _createWireMeshNode(gltfLoader, wireframeScene, wireframeRootNode, `${namePrefix}_${cell.posX}_${cell.posZ}_wire_triangles`);
-        _createTriangleWireframesInPrim(wirePrim, cell.floors, [0.0, 0.0, 0.8, 1.0]);
-        wireNode.layerMask = CollisionDebugLayers.DebugSceneWireTriangleLayer;
-
-        const [gridNode, gridPrim] = _createWireMeshNode(gltfLoader, wireframeScene, wireframeRootNode, `${namePrefix}_${cell.posX}_${cell.posZ}_grid`);
+        const [gridNode, gridPrim] = _createWireMeshNode(gltfLoader, wireframeScene, gridRootNode, `${namePrefix}_${cell.posX}_${cell.posZ}_grid`);
         _createCellBoundingWireframe(gridPrim, collisionGeometry, cell);
         gridNode.layerMask = CollisionDebugLayers.DebugSceneWireGridLayer;
     }

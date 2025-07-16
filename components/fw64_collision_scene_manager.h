@@ -1,11 +1,14 @@
 #pragma once
 
 #include <framework64/engine.h>
+#include <framework64/scene.h>
 
 typedef enum {
+    /** Displays only the original Scene */
     FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_DEFAULT,
+    FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME,
     FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME_OVERLAY,
-    FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME_ONLY
+    FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_ACTIVE_CELL_WIREFRAME_OVERLAY
 } fw64CollisionSceneManagerDisplayMode;
 
 /** This needs to be kept in sync with CollisionDebugLayers in CollisionGeometryDebug.js */
@@ -18,11 +21,12 @@ typedef struct {
     fw64Engine* engine;
     fw64Allocator* allocator;
     fw64CollisionSceneManagerDisplayMode display_mode;
-    uint32_t static_gemoetry_layer_id;
+    fw64LayerMask static_gemoetry_layer_mask;
 
     fw64Scene* scene;
     fw64RenderPass* static_scene_renderpass;
     fw64RenderPass* scene_renderpass;
+    fw64Transform* target;
 
     fw64Scene* collision_wireframe;
     fw64RenderPass* wireframe_renderpass;
@@ -38,7 +42,7 @@ extern "C" {
 void fw64_collision_scene_manager_init(fw64CollisionSceneManager* manager, fw64Engine* engine, fw64Display* display, fw64Allocator* allocator);
 void fw64_collision_scene_manager_uninit(fw64CollisionSceneManager* manager);
 
-fw64Scene* fw64_collision_scene_manager_load_scene(fw64CollisionSceneManager* manager, fw64AssetId scene_id, fw64AssetId wire_scene_id, uint32_t static_gemoetry_layer_id);
+fw64Scene* fw64_collision_scene_manager_load_scene(fw64CollisionSceneManager* manager, fw64AssetId scene_id, fw64AssetId wire_scene_id, fw64LayerMask static_gemoetry_layer_mask);
 
 /** Sets the camera for the renderpasses.
  *  Note, when this function is called the camera's view frutum will be calculated and used for subsequent draw calls.

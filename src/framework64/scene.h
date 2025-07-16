@@ -16,8 +16,6 @@
 #include "framework64/static_vector.h"
 #include "framework64/vec3.h"
 
-#define FW64_LAYER_MASK_ALL_LAYERS (~0U)
-
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
 typedef struct {
@@ -68,7 +66,7 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
 void fw64_scene_update_bounding(fw64Scene* scene);
 
 void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
-void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask);
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, fw64LayerMask layer_mask);
 
 fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId);
 int fw64_scene_insert_mesh(fw64Scene* scene, fw64Mesh* mesh);
