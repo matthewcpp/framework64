@@ -8,6 +8,22 @@ class Bounding {
         this.max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
     }
 
+    get extents() {
+        const extents = glMatrix.vec3.create();
+        glMatrix.vec3.sub(extents, this.max, this.min);
+        glMatrix.vec3.scale(extents, extents, 0.5);
+
+        return extents;
+    }
+
+    get center() {
+        const center = glMatrix.vec3.create();
+        glMatrix.vec3.add(center, this.min, this.max);
+        glMatrix.vec3.scale(center, center, 0.5);
+
+        return center;
+    }
+
     setFromCenterAndExtents(center, extents) {
         glMatrix.vec3.subtract(this.min, center, extents);
         glMatrix.vec3.add(this.max, center, extents);
@@ -79,6 +95,19 @@ class Bounding {
         const boundingBox = new Bounding();
         glMatrix.vec3.copy(boundingBox.min, min);
         glMatrix.vec3.copy(boundingBox.max, max);
+
+        return boundingBox;
+    }
+
+    static createFromTriangle(a, b, c) {
+        const boundingBox = new Bounding();
+        glMatrix.vec3.copy(boundingBox.min, a);
+        glMatrix.vec3.copy(boundingBox.max, a);
+
+        glMatrix.vec3.min(boundingBox.min, boundingBox.min, b);
+        glMatrix.vec3.max(boundingBox.max, boundingBox.max, b);
+        glMatrix.vec3.min(boundingBox.min, boundingBox.min, c);
+        glMatrix.vec3.min(boundingBox.max, boundingBox.max, c);
 
         return boundingBox;
     }

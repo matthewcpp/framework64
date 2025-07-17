@@ -46,10 +46,10 @@ class CollisionGeometryWriter {
         headerIndex = this.writer.writeUInt32(headerBuffer, triangleCount, headerIndex);
         headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountX, headerIndex);
         headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountZ, headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.min[0], headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.min[1], headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.max[0], headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingRect.max[1], headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.min[0], headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.min[2], headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.max[0], headerIndex);
+        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.max[2], headerIndex);
 
         this.triangleBuffer = Buffer.alloc(CollisionGeometryWriter.triangleSize * triangleCount);
         this.cellBuffer = Buffer.alloc(CollisionGeometryWriter.cellSize * collisionGeometry.cells.length);

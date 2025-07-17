@@ -20,7 +20,7 @@ function writeTextFile(collisionGeometry, filePath) {
 
     for (const cell of collisionGeometry.cells) {
         fs.writeSync(file, `cell ${cell.posX},${cell.posZ}\n`);
-        fs.writeSync(file, `    min: [x: ${cell.boundingRect.min[0]}, z: ${cell.boundingRect.min[1]}] max [x: ${cell.boundingRect.max[0]}, z: ${cell.boundingRect.max[1]}]\n`);
+        fs.writeSync(file, `    min: [x: ${cell.boundingBox.min[0]}, z: ${cell.boundingBox.min[2]}] max [x: ${cell.boundingBox.max[0]}, z: ${cell.boundingBox.max[2]}]\n`);
         fs.writeSync(file, `    floors: ${cell.floors.length} walls: ${cell.walls.length} ceilings: ${cell.ceilings.length}\n`);
         fs.writeSync(file, "\n");
     }
@@ -62,42 +62,42 @@ function _createCellBoundingWireframe(prim, geometry, cell) {
     const boundingColor = [1.0, 1.0, 1.0, 1.0];
 
     const t000 = prim.vertices.length;
-    const p000 = [cell.boundingRect.min[0], geometry.boundingBox.min[1], cell.boundingRect.min[1], 0, 0, 0, ...boundingColor];
+    const p000 = [cell.boundingBox.min[0], geometry.boundingBox.min[1], cell.boundingBox.min[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p000);
     prim.bounding.encapsulatePoint(p000);
 
     const t100 = prim.vertices.length;
-    const p100 = [cell.boundingRect.max[0], geometry.boundingBox.min[1], cell.boundingRect.min[1], 0, 0, 0, ...boundingColor];
+    const p100 = [cell.boundingBox.max[0], geometry.boundingBox.min[1], cell.boundingBox.min[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p100);
     prim.bounding.encapsulatePoint(p100);
 
     const t101 = prim.vertices.length;
-    const p101 = [cell.boundingRect.max[0], geometry.boundingBox.min[1], cell.boundingRect.max[1], 0, 0, 0, ...boundingColor];
+    const p101 = [cell.boundingBox.max[0], geometry.boundingBox.min[1], cell.boundingBox.max[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p101);
     prim.bounding.encapsulatePoint(p101);
 
     const t001 = prim.vertices.length;
-    const p001 = [cell.boundingRect.min[0], geometry.boundingBox.min[1], cell.boundingRect.max[1], 0, 0, 0, ...boundingColor];
+    const p001 = [cell.boundingBox.min[0], geometry.boundingBox.min[1], cell.boundingBox.max[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p001);
     prim.bounding.encapsulatePoint(p001);
 
     const t010 = prim.vertices.length;
-    const p010 = [cell.boundingRect.min[0], geometry.boundingBox.max[1], cell.boundingRect.min[1], 0, 0, 0, ...boundingColor];
+    const p010 = [cell.boundingBox.min[0], geometry.boundingBox.max[1], cell.boundingBox.min[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p010);
     prim.bounding.encapsulatePoint(p010);
 
     const t110 = prim.vertices.length;
-    const p110 = [cell.boundingRect.max[0], geometry.boundingBox.max[1], cell.boundingRect.min[1], 0, 0, 0, ...boundingColor];
+    const p110 = [cell.boundingBox.max[0], geometry.boundingBox.max[1], cell.boundingBox.min[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p110);
     prim.bounding.encapsulatePoint(p110);
 
     const t111 = prim.vertices.length;
-    const p111 = [cell.boundingRect.max[0], geometry.boundingBox.max[1], cell.boundingRect.max[1], 0, 0, 0, ...boundingColor];
+    const p111 = [cell.boundingBox.max[0], geometry.boundingBox.max[1], cell.boundingBox.max[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p111);
     prim.bounding.encapsulatePoint(p111);
 
     const t011 = prim.vertices.length;
-    const p011 = [cell.boundingRect.min[0], geometry.boundingBox.max[1], cell.boundingRect.max[1], 0, 0, 0, ...boundingColor];
+    const p011 = [cell.boundingBox.min[0], geometry.boundingBox.max[1], cell.boundingBox.max[2], 0, 0, 0, ...boundingColor];
     prim.vertices.push(p011);
     prim.bounding.encapsulatePoint(p011);
 

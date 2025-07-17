@@ -1,32 +1,20 @@
 const Bounding = require("./gltf/Bounding");
 const N64Node = require("./gltf/Node")
 const glMatrix = require("gl-matrix");
-const Intersect2d = require("./Intersect2d");
-
-class BoundingRect {
-    min = glMatrix.vec2.fromValues(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
-    max = glMatrix.vec2.fromValues(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
-
-    constructor(min, max) {
-        if (typeof(min) !== "undefined" && typeof(max) !== "undefined") {
-            glMatrix.vec2.copy(this.min, min);
-            glMatrix.vec2.copy(this.max, max);
-        }
-    }
-}
+const Intersect = require("./Intersect");
 
 class CollisionGeometryCell {
     posX;
     posZ;
-    boundingRect;
+    boundingBox;
     walls = [];
     floors = [];
     ceilings = [];
 
-    constructor(cellX, cellZ, boundingRect) {
+    constructor(cellX, cellZ, boundingBox) {
         this.posX = cellX;
         this.posZ = cellZ;
-        this.boundingRect = boundingRect;
+        this.boundingBox = boundingBox;
     }
 
     get triangleCount () {
@@ -37,7 +25,6 @@ class CollisionGeometryCell {
 class CollisionGeometry {
     cells = [];
     boundingBox;
-    boundingRect;
 
     cellCountX;
     cellCountZ;
@@ -56,34 +43,29 @@ class CollisionGeometry {
     */
     floorAndCeilingTolerance = 0.05;
 
-    constructor(bounding, countX, countZ) {
-        this.boundingBox = bounding;
+    constructor(sceneBounding, countX, countZ) {
+        this.boundingBox = sceneBounding;
 
-        // set our bounding rect to the XZ bounding of the supplied AABB
-        this.boundingRect = new BoundingRect(
-            glMatrix.vec2.fromValues(bounding.min[0], bounding.min[2]),
-            glMatrix.vec2.fromValues(bounding.max[0], bounding.max[2]));
-
-        // partition the bounding into our grid
+        // partition the bounding into a uniform grid
         this.cellCountX = countX;
         this.cellCountZ = countZ;
 
         // determine cell size
-        this.cellSizeX = (this.boundingRect.max[0] - this.boundingRect.min[0]) / this.cellCountX;
-        this.cellSizeZ = (this.boundingRect.max[1] - this.boundingRect.min[1]) / this.cellCountZ;
+        this.cellSizeX = (this.boundingBox.max[0] - this.boundingBox.min[0]) / this.cellCountX;
+        this.cellSizeZ = (this.boundingBox.max[2] - this.boundingBox.min[2]) / this.cellCountZ;
 
-        const cellMinPos = glMatrix.vec2.clone(this.boundingRect.min);
-        const cellMaxPos = glMatrix.vec2.create();
+        const cellMinPos = glMatrix.vec3.clone(this.boundingBox.min);
+        const cellMaxPos = glMatrix.vec3.create();
 
         for (let z = 0; z < this.cellCountZ; z++) {
             for (let x = 0; x < this.cellCountX; x++) {
-                glMatrix.vec2.set(cellMaxPos, cellMinPos[0] + this.cellSizeX, cellMinPos[1] + this.cellSizeZ);
-                const cellBounding = new BoundingRect(cellMinPos, cellMaxPos);
+                glMatrix.vec3.set(cellMaxPos, cellMinPos[0] + this.cellSizeX, this.boundingBox.max[1], cellMinPos[2] + this.cellSizeZ);
+                const cellBounding = Bounding.createFromMinMax(cellMinPos, cellMaxPos);
                 this.cells.push(new CollisionGeometryCell(x, z, cellBounding));
             }
 
             // update the min pos for the next cell
-            glMatrix.vec2.set(cellMinPos, this.boundingRect.min[0], cellMinPos[1] + this.cellSizeZ);
+            glMatrix.vec3.set(cellMinPos, this.boundingBox.min[0], this.boundingBox.min[1], cellMinPos[2] + this.cellSizeZ);
         }
     }
 
@@ -97,35 +79,35 @@ class CollisionGeometry {
         return total;
     }
 
+    /** The basic approach we will take here is to create a bounding box for the triangle and then check all the
+     *  cells that intersect that box.
+     *  TODO: investigate a more efficient approach such as the one outlined here: https://www.jb101.co.uk/2008/08/09/partitioning-triangles-into-a-uniform-grid.html
+     */
     getOverlappingCells(triangle) {
-        // create the 2d xz triangle
-        const a = glMatrix.vec2.fromValues(triangle[0][0], triangle[0][2]);
-        const b = glMatrix.vec2.fromValues(triangle[1][0], triangle[1][2]);
-        const c = glMatrix.vec2.fromValues(triangle[2][0], triangle[2][2]);
-
         // create a bounding rectangle
-        const min = glMatrix.vec2.clone(a);
-        const max = glMatrix.vec2.clone(b);
+        const A = triangle[0];
+        const B = triangle[1];
+        const C = triangle[2];
 
-        glMatrix.vec2.min(min, min, b);
-        glMatrix.vec2.max(max, max, b);
-        glMatrix.vec2.min(min, min, c);
-        glMatrix.vec2.max(max, max, c);
+        const bounding = new Bounding();
+        bounding.encapsulatePoint(A);
+        bounding.encapsulatePoint(B);
+        bounding.encapsulatePoint(C);
 
         // determine the range of cells to query.
         // Precondition: all triangles fit in the grid.
-        const minCellX = Math.floor((min[0] - this.boundingRect.min[0]) / this.cellSizeX);
-        const maxCellX = Math.ceil((max[0] - this.boundingRect.min[0]) / this.cellSizeX);
+        const minCellX = Math.floor((bounding.min[0] - this.boundingBox.min[0]) / this.cellSizeX);
+        const maxCellX = Math.ceil((bounding.max[0] - this.boundingBox.min[0]) / this.cellSizeX);
 
-        const minCellZ = Math.floor((min[1] - this.boundingRect.min[1]) / this.cellSizeZ);
-        const maxCellZ = Math.ceil((max[1] - this.boundingRect.min[1]) / this.cellSizeZ);
+        const minCellZ = Math.floor((bounding.min[2] - this.boundingBox.min[2]) / this.cellSizeZ);
+        const maxCellZ = Math.ceil((bounding.max[2] - this.boundingBox.min[2]) / this.cellSizeZ);
 
         const overlappingCells = [];
         for (let z = minCellZ; z < maxCellZ; z++) {
             for (let x = minCellX; x < maxCellX; x++) {
                 const cellIndex = z * this.cellCountX + x;
                 const cell = this.cells[cellIndex];
-                if (Intersect2d.triangleAABB(a, b, c, cell.boundingRect.min, cell.boundingRect.max)) {
+                if (Intersect.triangleAabb(A, B, C, cell.boundingBox)) {
                     overlappingCells.push(cell);
                 }
             }
