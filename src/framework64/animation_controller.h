@@ -33,14 +33,17 @@ typedef struct {
     fw64AnimationState state;
 } fw64AnimationController;
 
+typedef uint32_t fw64AnimationId;
+#define FW64_INVALID_ANIMATION_ID UINT32_MAX
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** initializes the animation controller
- * \param initial_animation the index of the initial animation to load from the underlying animation data.  If this value is negative, no initial animation will be loaded
+ * \param initial_animation the id of the initial animation to load from the underlying animation data. If you do not want to load an initial animation pass FW64_INVALID_ANIMATION_ID
  * */
-void fw64_animation_controller_init(fw64AnimationController *controller, fw64AnimationData *animation_data, int initial_animation, fw64Transform* parent_transform, fw64Allocator *allocator);
+void fw64_animation_controller_init(fw64AnimationController *controller, fw64AnimationData *animation_data, fw64AnimationId initial_animation, fw64Transform* parent_transform, fw64Allocator *allocator);
 
 /** frees all resourced used by this animation controller.
  *  note: this will not free the underlying animation data.
@@ -48,7 +51,7 @@ void fw64_animation_controller_init(fw64AnimationController *controller, fw64Ani
 void fw64_animation_controller_uninit(fw64AnimationController *controller, fw64Allocator *allocator);
 
 /** sets the currently active animation from the underlying animation data. */
-void fw64_animation_controller_set_animation(fw64AnimationController *controller, int index);
+void fw64_animation_controller_set_animation(fw64AnimationController *controller, fw64AnimationId index);
 
 /** sets the current animation time.  The passed in value will be clamped between 0 and the total length of the current animation. */
 void fw64_animation_controller_set_time(fw64AnimationController *controller, float time);

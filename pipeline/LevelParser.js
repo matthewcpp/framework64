@@ -96,33 +96,41 @@ class LevelParser {
         if (Object.hasOwn(extras, "extraColliders")) {
             const extraColliders = parseInt(extras["extraColliders"]);
 
-            if (!isNaN(extraColliders)) {
-                scene.colliderCount += extraColliders;
+            if (isNaN(extraColliders)) {
+                throw new Error(`Unable to parse extraColliders value for scene: ${scene.name}`);
             }
+
+            scene.colliderCount += extraColliders;
         }
 
-        if (Object.hasOwn(extras, "extraMeshInstances")) {
-            const extraMeshInstances = parseInt(extras["extraMeshInstances"]);
+        if (Object.hasOwn(extras, "extraSkinnedMeshInstances")) {
+            const extraSkinnedMeshInstances = parseInt(extras["extraSkinnedMeshInstances"]);
 
-            if (!isNaN(extraMeshInstances)) {
-                scene.meshInstanceCount += extraMeshInstances;
+            if (isNaN(extraSkinnedMeshInstances)) {
+                throw new Error(`Unable to parse extraSkinnedMeshInstances value for scene: ${scene.name}`);
             }
+
+            scene.skinnedMeshInstanceCount += extraSkinnedMeshInstances;
         }
 
         if (Object.hasOwn(extras, "extraMeshes")) {
             const extraMeshes = parseInt(extras["extraMeshes"]);
 
-            if (!isNaN(extraMeshes)) {
-                scene.extraMeshCount += extraMeshes;
+            if (isNaN(extraMeshes)) {
+                throw new Error(`Unable to parse extraMeshes value for scene: ${scene.name}`);
             }
+
+            scene.extraMeshCount += extraMeshes;
         }
 
         if (Object.hasOwn(extras, "extraNodes")) {
             const extraNodes = parseInt(extras["extraNodes"]);
 
-            if (!isNaN(extraNodes)) {
-                scene.extraNodeCount += extraNodes;
+            if (isNaN(extraNodes)) {
+                throw new Error(`Unable to parse extraNodes value for scene: ${scene.name}`);
             }
+
+            scene.extraNodeCount += extraNodes;
         }
     }
 
@@ -240,12 +248,14 @@ class LevelParser {
             node.data = dataValue;
         }
 
+        // Node extras may specify that the mesh attached to the node should be ignored.
+        // This is useful for creating stand in geometry in blender that will be replaced
+        // by something else at runtime.
         if (Object.hasOwn(extras, "mesh")) {
             scene.meshInstanceCount += 1;
             // if the mesh is ignored just set an empty collider
-            if (extras.mesh === "ignore"){
+            if (extras.mesh === "ignore" || extras.mesh === "none"){
                 node.mesh = N64Node.MeshIgnored;
-                node.collider = N64Node.ColliderType.None
             }
         }
 
@@ -257,7 +267,7 @@ class LevelParser {
             }
             else {
                 if (!this.collisonMeshMap.has(colliderName)) {
-                    throw new Error(`Node ${node.name}: invalid collion mesh name specified: ${colliderName}`);
+                    throw new Error(`Node ${node.name}: invalid collision mesh name specified: ${colliderName}`);
                 }
 
                 const collisionMeshIndex = this.collisonMeshMap.get(colliderName);
@@ -309,6 +319,7 @@ class LevelParser {
     }
 
     _parseNodeMesh(scene, gltfNode, node) {
+        // This was set when parsing node extras
         if (node.mesh == N64Node.MeshIgnored) {
             node.mesh = N64Node.NoMesh;
             return;

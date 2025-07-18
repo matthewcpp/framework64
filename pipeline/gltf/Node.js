@@ -19,6 +19,9 @@ class N64Node {
     static InvalidNodeIndex = 0xFFFFFFFF;
 
     static NoMesh = 0xFFFFFFFF;
+    /** Temporary value for the mesh field to indicate to the parse that the mesh for this node was explicity skipped
+     *  and any value present in the gltf should not be processed.
+     */
     static MeshIgnored = 0xFFFFFFFE;
     static NoCollider = 0xFFFFFFFF;
 

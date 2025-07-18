@@ -55,7 +55,7 @@ static void setup_joint_hierarchy(fw64AnimationController* controller, fw64Trans
     prev_child_transform->next_sibling = NULL;
 }
 
-void fw64_animation_controller_init(fw64AnimationController* controller, fw64AnimationData* animation_data, int initial_animation, fw64Transform* parent_transform, fw64Allocator* allocator) {
+void fw64_animation_controller_init(fw64AnimationController* controller, fw64AnimationData* animation_data, fw64AnimationId initial_animation, fw64Transform* parent_transform, fw64Allocator* allocator) {
     controller->animation_data = animation_data;
     controller->parent_transform = parent_transform;
     controller->joint_transforms = fw64_allocator_malloc(allocator, sizeof(fw64Transform) * animation_data->skin.joint_count);
@@ -74,7 +74,7 @@ void fw64_animation_controller_init(fw64AnimationController* controller, fw64Ani
     }
 #endif
 
-    if (initial_animation >= 0) {
+    if (initial_animation != FW64_INVALID_ANIMATION_ID) {
         fw64_animation_controller_set_animation(controller, initial_animation);
     }
     else {
@@ -102,7 +102,7 @@ void fw64_animation_controller_stop(fw64AnimationController* controller) {
     fw64_animation_controller_set_time(controller, 0.0f);
 }
 
-void fw64_animation_controller_set_animation(fw64AnimationController* controller, int index) {
+void fw64_animation_controller_set_animation(fw64AnimationController* controller, fw64AnimationId index) {
     controller->current_animation = controller->animation_data->animations + index;
     fw64_animation_controller_set_time(controller, 0.0f);
 }
