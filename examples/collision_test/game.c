@@ -18,7 +18,7 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_init(&game->camera, camera_node, display);
 
     fw64_character_envionment_init(&game->character_environment);
-    player_init(&game->player, engine, &game->character_environment, scene, fw64_scene_get_node(scene, FW64_scene_CollisionTest_node_Player));
+    player_init(&game->player, engine, &game->character_environment, scene, fw64_scene_get_node(scene, FW64_scene_CollisionTest_node_Player), allocator);
     game->collision_scene_manager.target = &game->player.node->transform;
     fw64_third_person_camera_init(&game->third_person_cam, &game->player.node->transform, &game->camera);
     fw64_headlight_init(&game->headlight, game->collision_scene_manager.scene_renderpass, 0, &game->camera.node->transform);

@@ -7,6 +7,7 @@
 
 typedef struct {
     fw64AnimationId idle;
+    fw64AnimationId run;
     fw64AnimationId jump_up;
     fw64AnimationId jump_fall;
     fw64AnimationId jump_land;
