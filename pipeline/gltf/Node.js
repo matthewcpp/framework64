@@ -48,6 +48,7 @@ class N64Node {
     /* this will be filled in at the end of scene processing */
     nextSiblingNode = null;
 
+    /** This holds the index into the parsed gltf data's mesh array */
     mesh = N64Node.NoMesh;
     collider = N64Node.NoCollider;
     collisionType = N64Node.CollisionType.Static;

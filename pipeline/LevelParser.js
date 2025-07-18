@@ -248,12 +248,11 @@ class LevelParser {
             node.data = dataValue;
         }
 
-        // Node extras may specify that the mesh attached to the node should be ignored.
-        // This is useful for creating stand in geometry in blender that will be replaced
-        // by something else at runtime.
+
         if (Object.hasOwn(extras, "mesh")) {
-            scene.meshInstanceCount += 1;
-            // if the mesh is ignored just set an empty collider
+            // Node extras may specify that the mesh attached to the node should be ignored.
+            // This is useful for creating stand in geometry in blender that will be replaced
+            // by something else at runtime.
             if (extras.mesh === "ignore" || extras.mesh === "none"){
                 node.mesh = N64Node.MeshIgnored;
             }
@@ -320,12 +319,8 @@ class LevelParser {
 
     _parseNodeMesh(scene, gltfNode, node) {
         // This was set when parsing node extras
-        if (node.mesh == N64Node.MeshIgnored) {
+        if (node.mesh == N64Node.MeshIgnored || !Object.hasOwn(gltfNode, "mesh")) {
             node.mesh = N64Node.NoMesh;
-            return;
-        }
-
-        if (!Object.hasOwn(gltfNode, "mesh")) {
             return;
         }
 

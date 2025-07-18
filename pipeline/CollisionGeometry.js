@@ -152,7 +152,8 @@ class CollisionGeometry {
             if (node.mesh === N64Node.NoMesh || node.collider == N64Node.NoCollider || node.collisionType == N64Node.CollisionType.Dynamic) {
                 continue;
             }
-            const mesh = gltfData.meshes[node.mesh];
+
+            const mesh = gltfData.meshes[scene.meshBundle[node.mesh]];
             const meshBounding = mesh.bounding;
             const worldBounding = Bounding.transformByMatrix(meshBounding, node.worldMatrix);
             sceneBounding.encapsulateBox(worldBounding);
@@ -166,7 +167,7 @@ class CollisionGeometry {
         const AC = glMatrix.vec3.create();
 
         for (const node of worldGeometryNodes) {
-            const mesh = gltfData.meshes[node.mesh];
+            const mesh = gltfData.meshes[scene.meshBundle[node.mesh]];
 
             for (const primitive of mesh.primitives) {
                 for (const element of primitive.elements) {

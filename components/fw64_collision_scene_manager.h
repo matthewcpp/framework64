@@ -26,6 +26,8 @@ typedef struct {
     fw64Scene* scene;
     fw64RenderPass* static_scene_renderpass;
     fw64RenderPass* scene_renderpass;
+
+    /** When drawing the overlay grid, this target's position will be used to determine which grid to draw */
     fw64Transform* target;
 
     fw64Scene* collision_wireframe;
@@ -45,7 +47,7 @@ void fw64_collision_scene_manager_uninit(fw64CollisionSceneManager* manager);
 fw64Scene* fw64_collision_scene_manager_load_scene(fw64CollisionSceneManager* manager, fw64AssetId scene_id, fw64AssetId wire_scene_id, fw64LayerMask static_gemoetry_layer_mask);
 
 /** Sets the camera for the renderpasses.
- *  Note, when this function is called the camera's view frutum will be calculated and used for subsequent draw calls.
+ *  Note, when this function is called the camera's view frustum will be calculated and used for subsequent draw calls.
  *  Ensure that it has been fully updated before this method is called.
  */
 void fw64_collision_scene_manager_set_camera(fw64CollisionSceneManager* manager, fw64Camera* camera);
