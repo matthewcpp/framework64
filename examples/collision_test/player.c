@@ -49,6 +49,7 @@ void player_update(Player* player) {
 
     if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
         fw64_character_reset_position(&player->character, &player->initial_pos);
+        player->animation_controller.animation_state = FW64_INVALID_ANIMATION_ID; // temp
     }
 
     // TODO: need to actually figure this out based on camera
@@ -61,7 +62,8 @@ void player_update(Player* player) {
 
     player->node2->transform.position = player->node->transform.position;
     fw64_node_update(player->node2);
-    fw64_skinned_mesh_instance_update(fw64_scene_get_skinned_mesh_instance(player->scene, 0), player->engine->time->time_delta);
+
+    fw64_character_animation_controller_update(&player->animation_controller, player->engine->time->time_delta);
 }
 
 void player_fixed_update(Player* player) {

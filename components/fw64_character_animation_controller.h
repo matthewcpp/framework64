@@ -17,6 +17,7 @@ typedef struct {
     fw64CharacterAnimationIds animations;
     fw64Character* character;
     fw64SkinnedMeshInstance* skinned_mesh_instance;
+    fw64AnimationId animation_state;
 } fw64CharacterAnimationController;
 
 #ifdef __cplusplus
