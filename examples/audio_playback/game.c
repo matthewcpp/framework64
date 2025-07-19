@@ -45,13 +45,8 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
-
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     scene_view_draw(&game->scene_view);
     ui_draw(&game->ui);
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 static void scene_view_init(SceneView* scene_view, fw64Engine* engine) {

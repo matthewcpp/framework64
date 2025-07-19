@@ -42,7 +42,6 @@ void game_init(Game* game, fw64Engine* engine) {
     message_list_init(game);
 
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas14, fw64_default_allocator());
-    fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
 
     fw64_data_link_set_connected_callback(game->data_link, on_data_link_connected, game);
     fw64_data_link_set_mesage_callback(game->data_link, on_data_link_message, game);
@@ -55,8 +54,6 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-
     fw64_spritebatch_begin(game->spritebatch);
     if (fw64_data_link_connected(game->data_link)) {
         draw_data_link_messages(game);
@@ -71,8 +68,6 @@ void game_draw(Game* game) {
     fw64_renderpass_end(game->renderpass);
 
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void draw_data_link_messages(Game* game) {

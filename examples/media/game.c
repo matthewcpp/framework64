@@ -136,13 +136,11 @@ void media_file_explorer_update_spritebatch(MediaFileExplorer* explorer) {
 }
 
 void media_file_explorer_draw(MediaFileExplorer* explorer) {
-    fw64_renderer_begin(explorer->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderpass_begin(explorer->renderpass);
     fw64_renderpass_draw_sprite_batch(explorer->renderpass, explorer->spritebatch);
     fw64_renderpass_end(explorer->renderpass);
     
     fw64_renderer_submit_renderpass(explorer->engine->renderer, explorer->renderpass);
-    fw64_renderer_end(explorer->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 static void media_asset_viewer_init(MediaAssetViewer* asset_viewer, fw64Engine* engine, fw64Font* font) {
@@ -157,10 +155,9 @@ static void media_asset_viewer_update(MediaAssetViewer* asset_viewer) {
 
 static void media_asset_viewer_draw(MediaAssetViewer* asset_viewer) {
     fw64PrimitiveMode primitive_mode = fw64_asset_viewer_determine_primitive_mode(&asset_viewer->view);
-    fw64_renderer_begin(asset_viewer->engine->renderer, primitive_mode, FW64_CLEAR_FLAG_ALL);
+    fw64_renderpass_set_primitive_mode(asset_viewer->renderpass, primitive_mode);
     fw64_asset_viewer_draw(&asset_viewer->view);
     fw64_renderer_submit_renderpass(asset_viewer->engine->renderer, asset_viewer->renderpass);
-    fw64_renderer_end(asset_viewer->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void no_media_present_init(NoMediaPresent* no_media, fw64Engine* engine, fw64Font* font) {
@@ -185,7 +182,5 @@ void no_media_present_init(NoMediaPresent* no_media, fw64Engine* engine, fw64Fon
 }
 
 void no_media_present_draw(NoMediaPresent* no_media) {
-    fw64_renderer_begin(no_media->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderer_submit_renderpass(no_media->engine->renderer, no_media->renderpass);
-    fw64_renderer_end(no_media->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

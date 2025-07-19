@@ -91,8 +91,6 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_set_camera(renderpass, &game->camera);
     fw64_renderpass_begin(renderpass);
@@ -105,8 +103,6 @@ void game_draw(Game* game) {
     fw64_renderpass_draw_sprite_batch(renderpass, game->spritebatch);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 #define CROSSHAIR_SPEED 100.0f

@@ -18,7 +18,6 @@ void game_init(Game* game, fw64Engine* engine) {
 
     game->engine = engine;
 
-    fw64_renderer_set_clear_color(engine->renderer, 0, 17, 51);
     fw64_billboard_nodes_init(&game->billboard_nodes, allocator);
 
     game->scene = fw64_assets_load_scene(engine->assets, FW64_ASSET_scene_billboard_example, allocator);
@@ -33,6 +32,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->fps.movement_speed = 70.0f;
 
     game->renderpass[RENDERPASS_DEPTH_ENABLED] = fw64_renderpass_create(display, allocator);
+    fw64_renderpass_set_clear_color(game->renderpass[RENDERPASS_DEPTH_ENABLED], 0, 17, 51);
     game->renderpass[RENDERPASS_DEPTH_DISABLED] = fw64_renderpass_create(display, allocator);
     fw64_renderpass_set_depth_testing_enabled(game->renderpass[RENDERPASS_DEPTH_DISABLED], 0);
 
@@ -84,8 +84,6 @@ void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(game->fps.camera, &frustum);
 
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-
     fw64RenderPass* renderpass = game->renderpass[RENDERPASS_DEPTH_ENABLED];
     fw64_renderpass_begin(renderpass);
     fw64_renderpass_set_camera(renderpass, game->fps.camera);
@@ -99,6 +97,4 @@ void game_draw(Game* game) {
     fw64_scene_draw_frustrum(game->scene, renderpass, &frustum, FW64_layer_flame);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(renderer, renderpass);
-
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
 }

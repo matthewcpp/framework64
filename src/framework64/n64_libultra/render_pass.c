@@ -17,11 +17,11 @@ fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allo
     guMtxIdent(&renderpass->view_matrix);
 
     renderpass->persp_norm = FW64_N64_LIBULTRA_DEFAULT_PERSPNORM;
-    renderpass->clear_flags = FW64_CLEAR_FLAG_NONE;
+    renderpass->clear_flags = FW64_CLEAR_FLAG_DEFAULT;
     renderpass->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
 
     renderpass->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
-
+    renderpass->primitive_mode = FW64_PRIMITIVE_MODE_TRIANGLES;
     fw64ColorRGBA8 light_color = {255, 255, 255, 255};
     fw64ColorRGBA8 ambient_light_color = {25, 25, 25, 255};
     Vec3 light_dir = {0.57735f, -0.57735f, 0.57735};
@@ -50,6 +50,10 @@ void fw64_renderpass_begin(fw64RenderPass* renderpass) {
 
 void fw64_renderpass_end(fw64RenderPass* renderpass) {
     (void)renderpass;
+}
+
+void fw64_renderpass_set_primitive_mode(fw64RenderPass* renderpass, fw64PrimitiveMode primitive_mode) {
+    renderpass->primitive_mode = primitive_mode;
 }
 
 void fw64_renderpass_set_view_matrix(fw64RenderPass* pass, float* view) {
@@ -126,6 +130,10 @@ static void fw64_n64_renderpass_toggle_feature(fw64RenderPass* renderpass, fw64N
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled) {
     fw64_n64_renderpass_toggle_feature(renderpass, N64_RENDERER_FEATURE_DEPTH_TEST, enabled);
+}
+
+void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int enabled) {
+    fw64_n64_renderpass_toggle_feature(renderpass, N64_RENDERER_FEATURE_AA, enabled);
 }
 
 void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled) {

@@ -5,7 +5,8 @@
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
-    fw64_renderer_set_clear_color(engine->renderer, 0, 200, 0);
+    game->renderpass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), fw64_default_allocator());
+    fw64_renderpass_set_clear_color(game->renderpass, 0, 200, 0);
 }
 
 void game_update(Game* game){
@@ -13,6 +14,5 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
 }

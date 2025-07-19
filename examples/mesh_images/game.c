@@ -82,24 +82,18 @@ void change_palette(Game* game, int direction) {
 }
 
 void game_draw(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
-
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_set_camera(renderpass, game->arcball.camera);
     fw64_renderpass_begin(renderpass);
     fw64_scene_draw_all(&game->scene, renderpass);
     fw64_renderpass_end(renderpass);
-    fw64_renderer_submit_renderpass(renderer, renderpass);
+    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 
     renderpass = game->renderpasses[RENDER_PASS_UI];
     fw64_renderpass_begin(renderpass);
     fw64_renderpass_draw_sprite_batch(renderpass, game->spritebatch);
     fw64_renderpass_end(renderpass);
-    fw64_renderer_submit_renderpass(renderer, renderpass);
-
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
+    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 }
 
 #define SELCTION_COUNT 6

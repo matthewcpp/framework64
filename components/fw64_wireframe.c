@@ -59,9 +59,12 @@ fw64Mesh* fw64_wireframe_build_box(const Box* box, fw64AssetDatabase* assets, fw
 }
 
 fw64Mesh* fw64_wireframe_build_collision_mesh(const fw64CollisionMesh* collision_mesh, fw64AssetDatabase* assets, fw64Allocator* allocator) {
+    const uint16_t triangle_count = (uint16_t)fw64_collision_mesh_get_triangle_count(collision_mesh);
+
     fw64MeshBuilder* mesh_builder = fw64_mesh_builder_create(assets, 1, 0, allocator);
     fw64VertexAttributes attributes = FW64_VERTEX_ATTRIBUTE_POSITION | FW64_VERTEX_ATTRIBUTE_COLOR;
-    fw64_mesh_builder_allocate_primitive_data(mesh_builder, 0, FW64_PRIMITIVE_MODE_LINES, attributes, collision_mesh->point_count, collision_mesh->element_count * 3);
+
+    fw64_mesh_builder_allocate_primitive_data(mesh_builder, 0, FW64_PRIMITIVE_MODE_LINES, attributes, collision_mesh->point_count, triangle_count * 3);
     fw64_mesh_builder_set_active_primitive(mesh_builder, 0);
     fw64_material_set_shading_mode(fw64_mesh_builder_get_material(mesh_builder, 0), FW64_SHADING_MODE_LINE);
 
@@ -72,13 +75,13 @@ fw64Mesh* fw64_wireframe_build_collision_mesh(const fw64CollisionMesh* collision
         fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder,i, 255, 255, 255, 255);
     }
 
-    const uint16_t triangle_count = (uint16_t)fw64_collision_mesh_get_triangle_count(collision_mesh);
+    
     size_t line_index = 0;
     for (uint16_t i = 0; i < triangle_count; i++) {
         const uint16_t index = i * 3;
-        fw64_mesh_builder_set_line_vertex_indices(mesh_builder, line_index++, index, index + 1);
-        fw64_mesh_builder_set_line_vertex_indices(mesh_builder, line_index++, index, index + 2);
-        fw64_mesh_builder_set_line_vertex_indices(mesh_builder, line_index++, index + 1, index + 2);
+        fw64_mesh_builder_set_line_vertex_indices(mesh_builder, line_index++, collision_mesh->elements[index], collision_mesh->elements[index + 1]);
+        fw64_mesh_builder_set_line_vertex_indices(mesh_builder, line_index++, collision_mesh->elements[index], collision_mesh->elements[index + 2]);
+        fw64_mesh_builder_set_line_vertex_indices(mesh_builder, line_index++, collision_mesh->elements[index + 1], collision_mesh->elements[index + 2]);
     }
 
     fw64Mesh* mesh = fw64_mesh_builder_commit(mesh_builder);

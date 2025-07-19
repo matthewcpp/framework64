@@ -20,8 +20,7 @@ void game_init(Game* game, fw64Engine* engine) {
     game->spritebatch = fw64_spritebatch_create(2, allocator);
     game->renderpass = fw64_renderpass_create(display, allocator);
     fw64_renderpass_util_ortho2d(game->renderpass);
-
-    fw64_renderer_set_clear_color(engine->renderer, 225, 225, 225);
+    fw64_renderpass_set_clear_color(game->renderpass, 225, 225, 225);
 
     game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_consolas, allocator);
     game->fill_tex = fw64_texture_util_create_from_loaded_image(engine->assets, FW64_ASSET_image_fill, allocator);
@@ -64,7 +63,5 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }

@@ -21,6 +21,8 @@ void fw64_debug_boxes_uninit(fw64DebugBoxes* debug_boxes);
 
 fw64Node* fw64_debug_boxes_add(fw64DebugBoxes* debug_boxes, fw64Node* node);
 
+void fw64_debug_boxes_update(fw64DebugBoxes* debug_boxes);
+
 #ifdef __cplusplus
 }
 #endif

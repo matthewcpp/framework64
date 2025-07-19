@@ -17,6 +17,12 @@ typedef enum {
     FW64_CLEAR_FLAG_NONE = 0,
     FW64_CLEAR_FLAG_COLOR = 1,
     FW64_CLEAR_FLAG_DEPTH = 2,
+
+    /** Instructs the system to determine which buffers should be cleard.
+     *  In the first submitted renderpass the default value will be equivalent to FW64_CLEAR_FLAG_ALL.
+     *  In all other cases the default value will be equivalent to FW64_CLEAR_FLAG_NONE.
+     */
+    FW64_CLEAR_FLAG_DEFAULT = 4,
     FW64_CLEAR_FLAG_ALL = FW64_CLEAR_FLAG_COLOR | FW64_CLEAR_FLAG_DEPTH
 } fw64ClearFlags;
 
@@ -25,6 +31,9 @@ extern "C" {
 #endif
 
 fw64RenderPass* fw64_renderpass_create(fw64Display* display, fw64Allocator* allocator);
+
+void fw64_renderpass_set_primitive_mode(fw64RenderPass* renderpass, fw64PrimitiveMode primitive_mode);
+
 void fw64_renderpass_delete(fw64RenderPass* renderpass);
 
 void fw64_renderpass_begin(fw64RenderPass* renderpass);
@@ -37,6 +46,7 @@ const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass);
 void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera);
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled);
+void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int enabled);
 
 void fw64_renderpass_set_clear_flags(fw64RenderPass* pass, fw64ClearFlags flags);
 void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g, uint8_t b);

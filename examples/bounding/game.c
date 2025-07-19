@@ -27,6 +27,7 @@ static void ui_draw(Ui* ui);
 float stick_adjust[4];
 
 #define DEBUG_BOX_COUNT 4
+
 // used to display the mesh collider for the blue box
 #define WIRE_MESH_COUNT 1
 
@@ -60,13 +61,14 @@ void game_init(Game* game, fw64Engine* engine) {
         fw64_renderpass_set_camera(game->renderpass[i], &game->camera);
     }
 
+    fw64_renderpass_set_primitive_mode(game->renderpass[RENDERPASS_SCENE_LINES], FW64_PRIMITIVE_MODE_LINES);
     fw64_renderpass_set_depth_testing_enabled( game->renderpass[RENDERPASS_SCENE_LINES], 0);
 }
 
 void game_update(Game* game) {
     penguin_update(&game->penguin);
+    fw64_debug_boxes_update(&game->debug_boxes);
     ui_update(&game->ui);
-    (void)game;
 }
 
 static void draw_scene_layer(Game* game, fw64RenderPass* renderpass, fw64Frustum* frustum, uint32_t layer_mask) {
@@ -78,19 +80,12 @@ static void draw_scene_layer(Game* game, fw64RenderPass* renderpass, fw64Frustum
 }
 
 void game_draw(Game* game) {
-    (void)game;
-
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->camera, &frustum);
 
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
     draw_scene_layer(game, game->renderpass[RENDERPASS_SCENE_TRIANGLES], &frustum, FW64_layer_triangles);
     ui_draw(&game->ui);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_NOSWAP);
-
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_LINES, FW64_CLEAR_FLAG_NONE);
     draw_scene_layer(game, game->renderpass[RENDERPASS_SCENE_LINES], &frustum, FW64_layer_lines);
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void penguin_init(Penguin* penguin, fw64Engine* engine, fw64Scene* scene) {
@@ -182,7 +177,7 @@ void setup_camera(Game* game) {
     
     fw64_camera_init(&game->camera, camera_node, fw64_displays_get_primary(game->engine->displays));
     game->camera.near = 10.0f;
-    game->camera.far = 500.0f;
+    game->camera.far = 225.0f;
     fw64_camera_update_projection_matrix(&game->camera);
 
     Vec3 center = vec3_zero(), up = vec3_up();

@@ -31,14 +31,13 @@ public:
 public:
     bool init(int width, int height);
 
-    void setClearColor(float r, float g, float b, float a);
-    void begin(fw64PrimitiveMode primitive_mode, fw64ClearFlags flags);
     void setCamera(fw64Camera* cam);
     void setViewMatrices(float* projection, float* view);
     void setViewport(fw64Viewport const * viewport);
-    void end(fw64RendererSwapFlags flags);
 
     void clearViewport(fw64Viewport const & viewport, fw64ClearFlags flags);
+
+    void submitRenderpass(fw64RenderPass* renderpass);
 
     void beginFrame();
     void endFrame();
@@ -47,13 +46,11 @@ private:
     bool initDisplay(int width, int height);
     bool initFramebuffer(int width, int height);
 
-public:
+private:
     void drawSpriteBatch(fw64SpriteBatch* spritebatch);
     void drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index);
     void drawRenderPass(fw64RenderPass* renderpass);
-public:
-    void setDepthTestingEnabled(bool enabled);
-    [[nodiscard]] inline bool depthTestingEnabled() const { return depth_testing_enabled; }
+    
 
 public:
     void setFogEnabled(bool enabled);
@@ -65,7 +62,6 @@ private:
     void updateMeshTransformBlock(float* matrix);
     void updateLightingBlock(const LightingInfo& lighting_info);
     void setActiveShader(framework64::ShaderProgram* shader);
-    void setGlDepthTestingState();
     void drawPrimitive(fw64Primitive const & primitive, const fw64Material* material);
 
     void fogValuesChanged();
@@ -85,20 +81,16 @@ private:
     };
 
 private:
-    enum DrawingMode { None, Mesh, Rect };
-    void setDrawingMode(DrawingMode mode);
-
-private:
     struct ViewportRect{ GLint x, y; GLsizei width, height; };
     ViewportRect getViewportRect(fw64Viewport const * viewport) const;
 
 private:
 
-struct LightingData {
-    std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
-    std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
-    int light_count;
-};
+    struct LightingData {
+        std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
+        std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
+        int light_count;
+    };
 
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
     framework64::UniformBlock<MeshTransformData> mesh_transform_uniform_block;
@@ -110,26 +102,18 @@ struct LightingData {
     float fog_min_distance = 0.4f;
     float fog_max_distance = 0.8f;
 
-    bool depth_testing_enabled = true;
     bool fog_enabled = false;
 
 public:
     fw64Material sprite_material;
-    fw64Primitive::Mode primitive_type;
-    DrawingMode drawing_mode = DrawingMode::None;
-    
-    std::array<float, 4> clear_color = {0.0f, 0.0f, 0.0f, 1.0f};
-
-    // Note: This is not currently implemented for desktop rendering
-    bool anti_aliasing_enabled = true;
 
     fw64Camera* current_camera = nullptr;
-
-    bool sprite_scissor_enabled = false;
-
 private:
     fw64Display& display;
     framework64::ShaderCache& shader_cache;
     framework64::Framebuffer framebuffer;
-    
+    std::vector<fw64RenderPass*> renderpasses;
+
+    /** holds the index of the renderpass currently being processed. */
+    size_t renderpass_index;
 };

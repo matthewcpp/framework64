@@ -28,18 +28,7 @@ typedef struct fw64Renderer fw64Renderer;
 extern "C" {
 #endif
 
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags clear_flags);
-
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass);
-
-void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b);
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags);
-
-void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled);
-int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer);
-
-void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled);
-int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer);
 
 #ifdef __cplusplus
 }

@@ -54,7 +54,8 @@ public:
     fw64Viewport viewport;
     std::array<float, 16> projection_matrix, view_matrix;
 
-    fw64ClearFlags clear_flags = FW64_CLEAR_FLAG_NONE;
+    fw64PrimitiveMode primitive_mode = FW64_PRIMITIVE_MODE_TRIANGLES;
+    fw64ClearFlags clear_flags = FW64_CLEAR_FLAG_DEFAULT;
     std::array<float, 3> clear_color = {0.0f, 0.0f, 0.0f};
     float camera_near = 0, camera_far = 1;
 
@@ -66,4 +67,5 @@ public:
     float fog_end = 1.0f;
     bool fog_enabled = 0;
     bool depth_testing_enabled = true;
+    bool anti_aliasing_enabled = true;
 };

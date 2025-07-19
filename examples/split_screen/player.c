@@ -11,6 +11,7 @@ void player_init(Player* player, fw64Engine* engine, fw64Scene* scene, int node_
 
     player->weapon = NULL;
     player->scene_renderpass = fw64_renderpass_create(display, fw64_default_allocator());
+    fw64_renderpass_set_clear_color(player->scene_renderpass, 100, 149, 237);
 
     player->weapon_renderpass = fw64_renderpass_create(display, fw64_default_allocator());
     fw64_renderpass_set_clear_flags(player->weapon_renderpass, FW64_CLEAR_FLAG_DEPTH);

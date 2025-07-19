@@ -13,9 +13,7 @@
 typedef struct {
     uint32_t point_count;
 
-    /** This is the total number of items in elements
-     *  The total number of triangles is element_count / 3
-     */
+    /** This is the total number of items in elements The total number of triangles is element_count / 3 */
     uint32_t element_count;
     Box box;
     Vec3* points;

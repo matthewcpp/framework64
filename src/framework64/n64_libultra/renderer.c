@@ -21,17 +21,11 @@ void fw64_n64_renderer_init(fw64Renderer* renderer, int screen_width, int screen
     renderer->display_list = NULL;
     renderer->primitive_mode = FW64_PRIMITIVE_MODE_UNSET;
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
+    renderer->renderpass_count = 0;
 
-    renderer->clear_color = GPACK_RGBA5551(0, 0, 0, 1);
     memset(&renderer->empty_light, 0, sizeof(Light));
 
     renderer->enabled_features = N64_RENDERER_FEATURE_AA | N64_RENDERER_FEATURE_DEPTH_TEST;
-
-    renderer->starting_new_frame = 1;
-}
-
-void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
-    renderer->clear_color = GPACK_RGBA5551(r, g, b, 1);
 }
 
 static Gfx _rdp_init_static_dl[] = {
@@ -99,35 +93,19 @@ void fw64_n64_renderer_clear_viewport(fw64Renderer* renderer, fw64Viewport* view
     renderer->shading_mode = FW64_SHADING_MODE_UNSET;
 }
 
-IVec2 fw64_renderer_get_viewport_size(fw64Renderer* renderer, fw64Camera* camera) {
-    IVec2 viewport_size = {
-        (int)(renderer->screen_size.x * camera->viewport.size.x),
-        (int)(renderer->screen_size.y * camera->viewport.size.y)
-    };
 
-    return viewport_size;
-}
-
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags clear_flags) {
-    renderer->primitive_mode = primitive_mode;
+static void fw64_n64_renderer_start_task(fw64Renderer* renderer) {
     fw64_texture_state_default(&renderer->active_texture);
 
-    if (renderer->starting_new_frame) {
-        renderer->display_list = &renderer->gfx_list[0];
-    }
-    
+    renderer->display_list = &renderer->gfx_list[0];
     renderer->display_list_start = renderer->display_list;
 
     gSPSegment(renderer->display_list++, 0, 0x0);
     fw64_renderer_init_rdp(renderer);
     fw64_renderer_init_rsp(renderer);
-
-    if (clear_flags) {
-        fw64_n64_renderer_clear_rect(renderer, 0, 0, renderer->screen_size.x, renderer->screen_size.y, renderer->clear_color, clear_flags);
-    }
 }
 
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags) {
+static void fw64_n64_renderer_end_task(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, int swap) {
     gDPFullSync(renderer->display_list++);
     gSPEndDisplayList(renderer->display_list++);
 
@@ -135,8 +113,30 @@ void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags swap_flags)
 
     nuGfxTaskStart(renderer->display_list_start, 
         (s32)(renderer->display_list - renderer->display_list_start) * sizeof (Gfx), 
-        (renderer->primitive_mode == FW64_PRIMITIVE_MODE_LINES) ? NU_GFX_UCODE_L3DEX2 : NU_GFX_UCODE_F3DEX, 
-        (swap_flags & FW64_RENDERER_FLAG_SWAP) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
+        (primitive_mode == FW64_PRIMITIVE_MODE_LINES) ? NU_GFX_UCODE_L3DEX2 : NU_GFX_UCODE_F3DEX, 
+        (swap) ? NU_SC_SWAPBUFFER : NU_SC_NOSWAPBUFFER);
+}
+
+void fw64_n64_renderer_end_frame(fw64Renderer* renderer) {
+    fw64_n64_renderer_start_task(renderer);
+
+    fw64PrimitiveMode primitive_mode = renderer->renderpasses[0]->primitive_mode;
+
+    for (renderer->renderpass_index = 0; renderer->renderpass_index < renderer->renderpass_count; renderer->renderpass_index++) {
+        fw64RenderPass* renderpass = renderer->renderpasses[renderer->renderpass_index];
+        
+        if (renderpass->primitive_mode != primitive_mode) {
+            fw64_n64_renderer_end_task(renderer, primitive_mode, 1);
+            primitive_mode = renderpass->primitive_mode;
+            fw64_n64_renderer_start_task(renderer);
+        }
+
+        fw64_n64_renderer_draw_renderpass(renderer, renderpass);
+    }
+
+    fw64_n64_renderer_end_task(renderer, primitive_mode, 1);
+
+    renderer->renderpass_count = 0;
 }
 
 static inline void n64_renderer_set_render_mode_opaque(fw64Renderer* renderer) {
@@ -274,28 +274,6 @@ static void fw64_renderer_draw_lit_skinned_primitive(fw64Renderer* renderer, Lig
     // note: pop is not necessary here...we are simply overwriting the MODELVIEW matrix due
     // to the fact that the camera view matrix is included on the projection matrix stack.
     //gSPPopMatrix(renderer->display_list++, G_MTX_MODELVIEW);
-}
-
-void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
-    if (enabled)
-        SET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST);
-    else
-        UNSET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST);
-}
-
-int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
-    return GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST);
-}
-
-void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled){
-    if (enabled)
-        SET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
-    else
-        UNSET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
-}
-
-int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
-    return GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_AA);
 }
 
 static void fw64_renderer_draw_unlit_primitive(fw64Renderer* renderer, fw64StaticDrawInfo* draw_info) {
@@ -520,7 +498,24 @@ static void fw64_renderer_setup_projection_matrix(fw64Renderer* renderer, fw64Re
     gSPPerspNormalize(renderer->display_list++, renderpass->persp_norm);
 }
 
+static void fw64_renderer_draw_lines(fw64Renderer* renderer, fw64RenderPass* renderpass) {
+    if (GET_RENDERER_FEATURE(renderer, N64_RENDERER_FEATURE_DEPTH_TEST)) {
+        gDPSetRenderMode(renderer->display_list++, G_RM_AA_ZB_XLU_LINE, G_RM_AA_ZB_XLU_LINE2);
+        gSPSetGeometryMode(renderer->display_list++, G_SHADE | G_ZBUFFER );
+    } else {
+        gDPSetRenderMode(renderer->display_list++, G_RM_AA_XLU_LINE, G_RM_AA_XLU_LINE2);
+        gSPClearGeometryMode(renderer->display_list++, G_ZBUFFER );
+    }
+
+    fw64_renderer_draw_unlit_queue_impl(renderer, renderpass, FW64_SHADING_MODE_LINE);
+}
+
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
+    renderer->renderpasses[renderer->renderpass_count++] = renderpass;
+}
+
+void fw64_n64_renderer_draw_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
+    renderer->primitive_mode = renderpass->primitive_mode;
     gSPViewport(renderer->display_list++, &renderpass->n64_viewport);
 
     fw64Viewport* viewport = &renderpass->viewport;
@@ -528,8 +523,13 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
     viewport->position.x, viewport->position.y, 
     viewport->position.x + viewport->size.x, viewport->position.y + viewport->size.y);
 
-    if (renderpass->clear_flags) {
-        fw64_n64_renderer_clear_viewport(renderer, &renderpass->viewport, renderpass->clear_color, renderpass->clear_flags);
+    fw64ClearFlags clear_flags = renderpass->clear_flags;
+    if (clear_flags == FW64_CLEAR_FLAG_DEFAULT) {
+        clear_flags = renderer->renderpass_index == 0 ? FW64_CLEAR_FLAG_ALL : FW64_CLEAR_FLAG_NONE;
+    }
+
+    if (clear_flags) {
+        fw64_n64_renderer_clear_viewport(renderer, &renderpass->viewport, renderpass->clear_color, clear_flags);
     }
 
     renderer->enabled_features = renderpass->enabled_features;
@@ -546,6 +546,10 @@ void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* ren
     }
 
     fw64_renderer_setup_projection_matrix(renderer, renderpass);
+
+    if (renderpass->primitive_mode == FW64_PRIMITIVE_MODE_LINES) {
+        fw64_renderer_draw_lines(renderer, renderpass);
+    }
 
     if (fw64_render_queue_has_items(&renderpass->render_queue, FW64_SHADING_MODE_UNLIT)) {
         fw64_renderer_draw_unlit_queue(renderer, renderpass);

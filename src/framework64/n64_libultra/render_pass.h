@@ -42,6 +42,7 @@ struct fw64RenderPass {
     fw64RenderQueue render_queue;
     fw64ClearFlags clear_flags;
     fw64N64RendererFeature enabled_features;
+    fw64PrimitiveMode primitive_mode;
     u16 clear_color;
     fw64ColorRGBA8 fog_color;
     s32 fog_min, fog_max;

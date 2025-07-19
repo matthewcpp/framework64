@@ -21,8 +21,6 @@ void game_init(Game* game, fw64Engine* engine) {
     controller_info_init(&game->controller_infos[2], engine, &game->assets, 2, 0.0f, 0.5f);
     controller_info_init(&game->controller_infos[3], engine, &game->assets, 3, 0.5f, 0.5f);
 
-    fw64_renderer_set_anti_aliasing_enabled(engine->renderer, 0);
-
     game->assets.buttons = fw64_texture_create_from_image(fw64_assets_load_image(engine->assets, FW64_ASSET_image_buttons, allocator), allocator);
     game->assets.font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     not_connected_text_dimensions = fw64_font_measure_text(game->assets.font, "Not Connected");
@@ -35,13 +33,9 @@ void game_update(Game* game){
 }
 
 void game_draw(Game* game) {
-    fw64_renderer_begin(game->engine->renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-
     for (int i = 0; i < FW64_MAX_CONTROLLER_COUNT; i++) {
         controller_info_draw(&game->controller_infos[i]);
     }
-
-    fw64_renderer_end(game->engine->renderer, FW64_RENDERER_FLAG_SWAP);
 }
 
 void controller_info_init(ControllerInfo* info, fw64Engine* engine, Assets* assets, int index, float viewport_x, float viewport_y) {

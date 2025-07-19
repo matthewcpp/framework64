@@ -50,6 +50,10 @@ void fw64_renderpass_end(fw64RenderPass* renderpass) {
     renderpass->end();
 }
 
+void fw64_renderpass_set_primitive_mode(fw64RenderPass* renderpass, fw64PrimitiveMode primitive_mode) {
+    renderpass->primitive_mode = primitive_mode;
+}
+
 void fw64_renderpass_set_view_matrix(fw64RenderPass* pass, float* view) {
     pass->setViewMatrix(view);
 }
@@ -99,6 +103,10 @@ void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* renderpass, fw64SkinnedMe
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled) {
     renderpass->depth_testing_enabled = static_cast<bool>(enabled);
+}
+
+void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int enabled) {
+    renderpass->anti_aliasing_enabled = static_cast<bool>(enabled);
 }
 
 void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled) {

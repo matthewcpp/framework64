@@ -13,7 +13,6 @@ bool fw64Renderer::init(int width, int height) {
         return false;
     }
 
-    glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -36,16 +35,23 @@ bool fw64Renderer::initFramebuffer(int width, int height) {
     return true;
 }
 
-void fw64Renderer::setClearColor(float r, float g, float b, float a) {
-    clear_color = {r, g, b, a};
-    glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
-}
-
 void fw64Renderer::beginFrame() {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.framebuffer_handle);
 }
 
 void fw64Renderer::endFrame() {
+    renderpass_index = 0;
+
+    for (auto* renderpass : renderpasses) {
+        drawRenderPass(renderpass);
+        renderpass_index += 1;
+    }
+
+    current_camera = nullptr;
+    active_shader = nullptr;
+
+    renderpasses.clear();
+
     glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer.framebuffer_handle);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
@@ -56,30 +62,6 @@ void fw64Renderer::endFrame() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     display.swap();
-}
-
-void fw64Renderer::begin(fw64PrimitiveMode mode, fw64ClearFlags flags) {
-    GLbitfield clear_bits = 0;
-    if (flags & FW64_CLEAR_FLAG_COLOR) {
-        clear_bits |= GL_COLOR_BUFFER_BIT;
-    }
-
-    if (flags & FW64_CLEAR_FLAG_DEPTH) {
-        clear_bits |= GL_DEPTH_BUFFER_BIT;
-    }
-
-    glClear(clear_bits);
-
-    switch(mode) {
-        case FW64_PRIMITIVE_MODE_TRIANGLES:
-            primitive_type = fw64Primitive::Mode::Triangles;
-            break;
-        case FW64_PRIMITIVE_MODE_LINES:
-            primitive_type = fw64Primitive::Mode::Lines;
-            break;
-        default:
-            break;
-    }
 }
 
 fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Viewport const * viewport) const {
@@ -142,16 +124,11 @@ void fw64Renderer::clearViewport(fw64Viewport const & viewport, fw64ClearFlags f
     }
 }
 
-void fw64Renderer::setGlDepthTestingState() {
-    if (depth_testing_enabled)
-        glEnable(GL_DEPTH_TEST);
-    else
-        glDisable(GL_DEPTH_TEST);
+static inline fw64PrimitiveMode getFw64PrimitiveMode(fw64Primitive::Mode mode) {
+    return mode == fw64Primitive::Mode::Lines ? FW64_PRIMITIVE_MODE_LINES : FW64_PRIMITIVE_MODE_TRIANGLES;
 }
 
 void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index) {
-    setDrawingMode(DrawingMode::Mesh);
-
     fw64DynamicVector* queue = &renderpass->render_queue.buckets[index].static_;
     for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
         fw64StaticDrawInfo* draw_info = (fw64StaticDrawInfo*)fw64_dynamic_vector_item(queue, i);
@@ -160,8 +137,9 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         const auto& primitive = draw_info->instance->mesh->primitives[draw_info->index];
         const fw64Material* material = fw64_material_collection_get_material(draw_info->instance->materials, draw_info->index);
 
-        if (primitive.mode != primitive_type)
+        if (getFw64PrimitiveMode(primitive.mode) != renderpass->primitive_mode) {
             continue;
+        }
 
         drawPrimitive(primitive, material);
     }
@@ -174,8 +152,10 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
         const auto & primitive = skinned_mesh_instance->skinned_mesh->mesh->primitives[draw_info->index];
         const fw64Material* material = fw64_material_collection_get_material(skinned_mesh_instance->mesh_instance.materials, draw_info->index);
 
-        if (primitive.mode != primitive_type)
+        if (getFw64PrimitiveMode(primitive.mode) != renderpass->primitive_mode) {
             continue;
+        }
+
 
         updateMeshTransformBlock(&skinned_mesh_instance->controller.matrices[primitive.joint_index].m[0]);
         drawPrimitive(primitive, material);
@@ -183,10 +163,13 @@ void fw64Renderer::drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMo
 }
 
 void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
-    if (renderpass->clear_flags) {
+    fw64ClearFlags clear_flags = renderpass->clear_flags;
+    if (clear_flags == FW64_CLEAR_FLAG_DEFAULT) {
+        clear_flags = renderpass_index == 0 ? FW64_CLEAR_FLAG_ALL : FW64_CLEAR_FLAG_NONE;
+    }
+    if (clear_flags) {
         glClearColor(renderpass->clear_color[0], renderpass->clear_color[1], renderpass->clear_color[2], 1.0f);
-        clearViewport(renderpass->viewport, renderpass->clear_flags);
-        glClearColor(clear_color[0], clear_color[1], clear_color[2], 1.0f);
+        clearViewport(renderpass->viewport, clear_flags);
     }
 
     setViewport(&renderpass->viewport);
@@ -224,7 +207,6 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
     drawMeshesFromQueue(renderpass, FW64_SHADING_MODE_UNLIT_TRANSPARENT_TEXTURED);
 
     if (!fw64_dynamic_vector_is_empty(&renderpass->render_queue.sprite_batches)) {
-        setDrawingMode(DrawingMode::Rect);
         glDisable(GL_DEPTH_TEST);
 
         for (size_t i = 0; i < fw64_dynamic_vector_size(&renderpass->render_queue.sprite_batches); i++){
@@ -252,14 +234,6 @@ void fw64Renderer::drawSpriteBatch(fw64SpriteBatch* sprite_batch) {
             glBindVertexArray(0);
         }
     }
-}
-
-void fw64Renderer::end(fw64RendererSwapFlags) {
-    setDrawingMode(DrawingMode::None);
-
-    current_camera = nullptr;
-    active_shader = nullptr;
-    primitive_type = primitive_type = fw64Primitive::Mode::Unknown;
 }
 
 void fw64Renderer::updateMeshTransformBlock(float* matrix) {
@@ -298,13 +272,6 @@ void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
     }
 }
 
-void fw64Renderer::setDepthTestingEnabled(bool enabled) {
-    depth_testing_enabled = enabled;
-
-    if (drawing_mode == DrawingMode::Mesh)
-        setGlDepthTestingState();
-}
-
 void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
     int block_index = 0;
 
@@ -331,27 +298,6 @@ void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
     lighting_data_uniform_block.update();
 }
 
-void fw64Renderer::setDrawingMode(DrawingMode mode) {
-    if (mode == drawing_mode)
-        return;
-
-    drawing_mode = mode;
-
-    // begin new drawing mode
-    // TODO: can this be removed?
-    switch (drawing_mode) {
-        case DrawingMode::Mesh:
-            setGlDepthTestingState();
-            break;
-
-        case DrawingMode::Rect:
-            break;
-
-        case DrawingMode::None:
-            break;
-    };
-}
-
 void fw64Renderer::setFogEnabled(bool enabled) {
     fog_enabled = enabled;
 
@@ -375,44 +321,12 @@ void fw64Renderer::setFogColor(float r, float g, float b) {
     fog_data_uniform_block.data.fog_color[2] = b;
 }
 
+void fw64Renderer::submitRenderpass(fw64RenderPass* renderpass) {
+    renderpasses.push_back(renderpass);
+}
+
 // Public C interface
 
-void fw64_renderer_set_clear_color(fw64Renderer* renderer, uint8_t r, uint8_t g, uint8_t b) {
-    renderer->setClearColor( r / 255.0f, g / 255.0f, b /255.0f, 1.0f);
-}
-
-void fw64_renderer_begin(fw64Renderer* renderer, fw64PrimitiveMode primitive_mode, fw64ClearFlags flags) {
-    renderer->begin(primitive_mode, flags);
-}
-
-void fw64_renderer_set_view_matrices(fw64Renderer* renderer, fw64Matrix* projection, uint16_t*, fw64Matrix* view) {
-    renderer->setViewMatrices(projection->m, view->m);
-}
-
-void fw64_renderer_set_viewport(fw64Renderer* renderer, fw64Viewport* viewport) {
-    renderer->setViewport(viewport);
-}
-
-void fw64_renderer_end(fw64Renderer* renderer, fw64RendererSwapFlags flags) {
-    renderer->end(flags);
-}
-
-void fw64_renderer_set_depth_testing_enabled(fw64Renderer* renderer, int enabled) {
-    renderer->setDepthTestingEnabled(enabled);
-}
-
-int fw64_renderer_get_depth_testing_enabled(fw64Renderer* renderer) {
-    return renderer->depthTestingEnabled();
-}
-
-void fw64_renderer_set_anti_aliasing_enabled(fw64Renderer* renderer, int enabled) {
-    renderer->anti_aliasing_enabled = static_cast<bool>(enabled);
-}
-
-int fw64_renderer_get_anti_aliasing_enabled(fw64Renderer* renderer) {
-    return static_cast<int>(renderer->anti_aliasing_enabled);
-}
-
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
-    renderer->drawRenderPass(renderpass);
+    renderer->submitRenderpass(renderpass);
 }

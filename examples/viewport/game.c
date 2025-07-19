@@ -135,22 +135,16 @@ void update_viewport_info(Game* game) {
 }
 
 void game_draw(Game* game) {
-    fw64Renderer* renderer = game->engine->renderer;
-
-    fw64_renderer_begin(renderer, FW64_PRIMITIVE_MODE_TRIANGLES, FW64_CLEAR_FLAG_ALL);
-    
     fw64RenderPass* pass = game->renderpasses[RENDER_PASS_VIEW];
     fw64_renderpass_set_camera(pass, &game->camera);
     fw64_renderpass_begin(pass);
     fw64_scene_draw_all(&game->scene, pass);
     fw64_renderpass_end(pass);
-    fw64_renderer_submit_renderpass(renderer, pass);
+    fw64_renderer_submit_renderpass(game->engine->renderer, pass);
 
     pass = game->renderpasses[RENDER_PASS_INFO];
     fw64_renderpass_begin(pass);
     fw64_renderpass_draw_sprite_batch(pass, game->spritebatch);
     fw64_renderpass_end(pass);
-    fw64_renderer_submit_renderpass(renderer, pass);
-
-    fw64_renderer_end(renderer, FW64_RENDERER_FLAG_SWAP);
+    fw64_renderer_submit_renderpass(game->engine->renderer, pass);
 }
