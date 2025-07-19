@@ -25,7 +25,6 @@ typedef struct {
 
     fw64Scene* scene;
     fw64RenderPass* static_scene_renderpass;
-    fw64RenderPass* scene_renderpass;
 
     /** When drawing the overlay grid, this target's position will be used to determine which grid to draw */
     fw64Transform* target;

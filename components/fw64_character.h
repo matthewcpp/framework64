@@ -69,6 +69,8 @@ void fw64_character_reset_position(fw64Character* character, const Vec3* positio
 
 #define fw64_character_is_on_ground(character) ((character)->state == FW64_CHARACTER_STATE_ON_GROUND)
 #define fw64_character_is_in_air(character) ((character)->state == FW64_CHARACTER_STATE_IN_AIR)
+
+#define fw64_character_is_moving_horizontally(character) ((character)->velocity.x != 0.0f || (character)->velocity.z != 0.0f)
 #ifdef __cplusplus
 }
 #endif

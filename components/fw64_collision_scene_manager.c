@@ -11,7 +11,6 @@ void fw64_collision_scene_manager_init(fw64CollisionSceneManager* manager, fw64E
     manager->display_mode = FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_ACTIVE_CELL_WIREFRAME_OVERLAY;
 
     manager->scene = NULL;
-    manager->scene_renderpass = fw64_renderpass_create(display, allocator);
     manager->static_scene_renderpass = fw64_renderpass_create(display, allocator);
 
     manager->collision_wireframe = NULL;
@@ -20,7 +19,6 @@ void fw64_collision_scene_manager_init(fw64CollisionSceneManager* manager, fw64E
 }
 
 void fw64_collision_scene_manager_uninit(fw64CollisionSceneManager* manager) {
-    fw64_renderpass_delete(manager->scene_renderpass);
     fw64_renderpass_delete(manager->static_scene_renderpass);
     fw64_renderpass_delete(manager->wireframe_renderpass);
 
@@ -42,7 +40,6 @@ fw64Scene* fw64_collision_scene_manager_load_scene(fw64CollisionSceneManager* ma
 }
 
 void fw64_collision_scene_manager_set_camera(fw64CollisionSceneManager* manager, fw64Camera* camera) {
-    fw64_renderpass_set_camera(manager->scene_renderpass, camera);
     fw64_renderpass_set_camera(manager->static_scene_renderpass, camera);
     fw64_renderpass_set_camera(manager->wireframe_renderpass, camera);
 

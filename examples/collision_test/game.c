@@ -21,8 +21,7 @@ void game_init(Game* game, fw64Engine* engine) {
     player_init(&game->player, engine, &game->character_environment, scene, fw64_scene_get_node(scene, FW64_scene_CollisionTest_node_Player), allocator);
     game->collision_scene_manager.target = &game->player.node->transform;
     fw64_third_person_camera_init(&game->third_person_cam, &game->player.node->transform, &game->camera);
-    fw64_headlight_init(&game->headlight, game->collision_scene_manager.scene_renderpass, 0, &game->camera.node->transform);
-
+    fw64_headlight_init(&game->headlight, game->collision_scene_manager.static_scene_renderpass, 0, &game->camera.node->transform);
     fw64Font* font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     ui_init(&game->ui, engine, font, &game->player, allocator);
 }
