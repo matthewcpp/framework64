@@ -186,7 +186,7 @@ function adjustN64VertexNormals(mesh) {
 
 /** adjusts tex coords from GLTF (float) to work with N64 tex coord system */
 function adjustN64TexCoordinates(mesh, gltfData, n64Images) {
-    /** ensure that the tex coord value will sit in a signed 16 bit integer */
+    /** ensure that the tex coord value will fit in a signed 16 bit integer */
     const validateTexCoord = (val) => {
         return val >= -32768 && val <= 32767;
     }
@@ -210,6 +210,9 @@ function adjustN64TexCoordinates(mesh, gltfData, n64Images) {
             let s = vertex[4];
             let t = vertex[5];
 
+            const origS = s;
+            const origT = t;
+
             s *= image.width * 2;
             t *= image.height * 2;
 
@@ -220,13 +223,13 @@ function adjustN64TexCoordinates(mesh, gltfData, n64Images) {
             const textCoordsAreValid = validateTexCoord(vertex[4]) && validateTexCoord(vertex[5]);
 
             if (!textCoordsAreValid) {
-                throw new Error(`Mesh ${mesh.name}: Detected a tex coord value outside of S10.5 format range.  Check model source data.`);
+                throw new Error(`Mesh ${mesh.name}: vertex: [${vertex[0]}, ${vertex[1]}, ${vertex[2]}] [${origS}, ${origT}] contains tex coord value outside of S10.5 format range.  Check model source data.`);
             }
         }
     }
 }
 
-/** adjusts tex coords from GLTF (float) 0.0-1.0 to uint8 0-255 */
+/** adjusts vertex colors from GLTF (float) 0.0-1.0 to uint8 0-255 */
 function adjustN64VertexColors(mesh) {
     for (const primitive of mesh.primitives) {
         if (!primitive.hasVertexColors) {
