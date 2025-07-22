@@ -184,3 +184,7 @@ void setup_camera(Game* game) {
     fw64_transform_look_at(&camera_node->transform, &center, &up);
     fw64_camera_update_view_matrix(&game->camera);
 }
+
+void game_fixed_update(Game* game) {
+    (void)game;
+}

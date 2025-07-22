@@ -22,12 +22,12 @@ async function write(environment, scene, gltfData, destPath) {
     }
 
     if (scene.collisionGeometry) {
-        // TEMP
+        const collisionGeometryWriter = new CollisionGeometryWriter(writer);
+        collisionGeometryWriter.writeData(scene.collisionGeometry, file);
+
         const path = require("path");
         const collisionDebugFile = path.join(path.dirname(destPath), path.basename(destPath) +"_collision.txt");
-        const collisionGeometryWriter = new CollisionGeometryWriter(writer);
         CollisionGeometryDebug.writeTextFile(scene.collisionGeometry, collisionDebugFile);
-        collisionGeometryWriter.writeData(scene.collisionGeometry, file);
     }
 
     for (const gltfMeshIndex of scene.meshBundle) {

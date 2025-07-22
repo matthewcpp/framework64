@@ -85,7 +85,8 @@ class LevelParser {
     }
 
     _parseSceneCollisionGeometryConfig(scene, sceneGltfNode){
-        if (!Object.hasOwn(sceneGltfNode, "extras") && Object.hasOwn(sceneGltfNode.extras, "gridSize")) {
+        const hasCollisionGeometryConfig = Object.hasOwn(sceneGltfNode, "extras") && Object.hasOwn(sceneGltfNode.extras, "gridSize");
+        if (!hasCollisionGeometryConfig) {
             return;
         }
 
@@ -114,6 +115,16 @@ class LevelParser {
             }
 
             scene.colliderCount += extraColliders;
+        }
+
+        if (Object.hasOwn(extras, "extraMeshInstances")) {
+            const extraMeshInstances = parseInt(extras["extraMeshInstances"]);
+
+            if (isNaN(extraMeshInstances)) {
+                throw new Error(`Unable to parse extraMeshInstances value for scene: ${scene.name}`);
+            }
+
+            scene.meshInstanceCount += extraMeshInstances;
         }
 
         if (Object.hasOwn(extras, "extraSkinnedMeshInstances")) {

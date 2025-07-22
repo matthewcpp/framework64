@@ -246,6 +246,10 @@ function adjustN64VertexColors(mesh) {
 }
 
 async function createN64Images(gltfData) {
+    if (gltfData.images.length === 0) {
+        return [];
+    }
+
     const n64Images = [];
     const gltfDir = path.dirname(gltfData.gltfPath);
 

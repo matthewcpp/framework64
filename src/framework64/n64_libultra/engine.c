@@ -43,7 +43,7 @@ static void fw64_n64_libultra_engine_update_time(fw64Engine* engine) {
     u64 current_time = osGetTime();
 
     u64 delta_time = current_time - _previous_time;
-    engine->time->time_delta = ((float)OS_CYCLES_TO_USEC(delta_time)) / 1000.0f;
+    engine->time->time_delta = ((float)OS_CYCLES_TO_USEC(delta_time)) / 1000000.0f;
     engine->time->total_time += engine->time->time_delta;
 
     _previous_time = current_time;
