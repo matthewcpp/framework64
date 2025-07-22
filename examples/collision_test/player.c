@@ -35,8 +35,9 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
 
     fw64_animation_controller_play(&skinned_mesh_instance->controller);
     fw64_character_animation_controller_init(&player->animation_controller, &player->character, skinned_mesh_instance, &ids);
-    fw64_third_person_input_controller_init(&player->third_person_input, engine->input, &player->character, node, camera, 0);
     fw64_third_person_camera_init(&player->third_person_cam, &node->transform, camera);
+    fw64_third_person_input_controller_init(&player->third_person_input, engine->input, &player->character, node, &player->third_person_cam, 0);
+    
 }
 
 void player_update(Player* player) {
@@ -49,7 +50,7 @@ void player_update(Player* player) {
         player->animation_controller.animation_state = FW64_INVALID_ANIMATION_ID; // temp
     }
 
-    fw64_third_person_input_controller_update(&player->third_person_input);
+    fw64_third_person_input_controller_update(&player->third_person_input, player->engine->time->time_delta);
     fw64_third_person_camera_update(&player->third_person_cam);
 
     vec3_lerp(&player->character.previous_position, &player->character.position, player->engine->time->accumulator_progress, &player->node->transform.position);

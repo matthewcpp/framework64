@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fw64_character.h"
+#include "fw64_third_person_camera.h"
 
 #include <framework64/camera.h>
 #include <framework64/input.h>
@@ -11,11 +12,11 @@ typedef struct {
     fw64Input* input;
     fw64Character* character;
     fw64Node* node;
-    fw64Camera* camera;
+    fw64ThirdPersonCamera* cam;
 
     int port;
     float stick_threshold;
 } fw64ThirdPersonInputController;
 
-void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* controller, fw64Input* input, fw64Character* character, fw64Node* node, fw64Camera* camera, int port);
-void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* controller);
+void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* controller, fw64Input* input, fw64Character* character, fw64Node* node, fw64ThirdPersonCamera* cam, int port);
+void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* controller, float time_delta);
