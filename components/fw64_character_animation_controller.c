@@ -28,6 +28,8 @@ static void fw64_character_animation_controller_update_jump_up_state(fw64Charact
     // did the character reach the jump apex?
     if (controller->character->velocity.y < 0.0f) {
         fw64_character_animation_controller_set_animation(controller, controller->animations.jump_fall, 0);
+    } else if (fw64_character_is_on_ground(controller->character)) {
+        fw64_character_animation_controller_set_animation(controller, controller->animations.jump_land, 0);
     }
 }
 

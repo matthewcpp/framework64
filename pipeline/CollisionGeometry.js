@@ -3,6 +3,17 @@ const N64Node = require("./gltf/Node")
 const glMatrix = require("gl-matrix");
 const Intersect = require("./Intersect");
 
+class CollisionGeometryNode {
+    id;
+    walls = [];
+    floors = [];
+    ceilings = [];
+
+    constructor(id) {
+        this.id = id;
+    }
+}
+
 class CollisionGeometryCell {
     posX;
     posZ;
@@ -62,6 +73,7 @@ class CollisionGeometry {
                 glMatrix.vec3.set(cellMaxPos, cellMinPos[0] + this.cellSizeX, this.boundingBox.max[1], cellMinPos[2] + this.cellSizeZ);
                 const cellBounding = Bounding.createFromMinMax(cellMinPos, cellMaxPos);
                 this.cells.push(new CollisionGeometryCell(x, z, cellBounding));
+                cellMinPos[0] += this.cellSizeX;
             }
 
             // update the min pos for the next cell
@@ -144,6 +156,10 @@ class CollisionGeometry {
     }
 
     static createFromScene(scene, gltfData) {
+        if (scene.gridSize === null) {
+            throw new Error(`Could not create collision geometry for ${scene.name}: grid size not specified`)
+        }
+
         // first determine nodes we will need to process and compute the scene's world space bounding box
         const worldGeometryNodes = [];
         const sceneBounding = new Bounding();
@@ -161,7 +177,7 @@ class CollisionGeometry {
             worldGeometryNodes.push(node);
         }
 
-        const geometry = new CollisionGeometry(sceneBounding, 1, 3);
+        const geometry = new CollisionGeometry(sceneBounding, scene.gridSize[0], scene.gridSize[1]);
 
         const AB = glMatrix.vec3.create();
         const AC = glMatrix.vec3.create();

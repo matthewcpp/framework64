@@ -202,13 +202,12 @@ class GLTFLoader {
             }
     
             mesh.prunePrimitiveVertices();
-            this._validateMeshPrimitives(mesh);
             mesh.sortPrimitives(this.materials);
             this.meshes.push(mesh);
         }
     }
 
-    _validateMeshPrimitives(mesh) {
+    validateMeshPrimitives(mesh) {
         for (let i = 0; i < mesh.primitives.length; i++) {
             const primitive = mesh.primitives[i];
             const material = this.materials[primitive.material];

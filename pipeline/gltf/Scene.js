@@ -15,6 +15,8 @@ class Scene {
     extraMeshCount = 0;
     extraNodeCount = 0;
 
+    gridSize = null;
+
     meshBundle = [];
 
     /** Gets or assigns a bundled mesh index for the GLTF mesh index in this scene */

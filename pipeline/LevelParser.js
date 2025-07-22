@@ -84,6 +84,19 @@ class LevelParser {
         }
     }
 
+    _parseSceneCollisionGeometryConfig(scene, sceneGltfNode){
+        if (!Object.hasOwn(sceneGltfNode, "extras") && Object.hasOwn(sceneGltfNode.extras, "gridSize")) {
+            return;
+        }
+
+        const dimensions = sceneGltfNode.extras.gridSize.split("x");
+        if (dimensions.length !== 2) {
+            throw new Error(`${sceneGltfNode.name}: Unable to determine parse grid dimensions: ${sceneGltfNode.extras.gridSize.split}`);
+        }
+
+        scene.gridSize = [parseInt(dimensions[0]), parseInt(dimensions[1])];
+    }
+
     _parseSceneExtras(scene, sceneGltfNode) {
         // TODO: Add more supported Extra fields
 
@@ -149,11 +162,16 @@ class LevelParser {
                 const gltfChildNode = gltf.nodes[childIndex];
                 const nodeHasName = Object.hasOwn(gltfChildNode, "name");
 
-                // Note: currently custom bounding boxes are set using child nodes beginning with _boundingBox.
+                // Note: currently custom bounding volumes are set using child nodes beginning with _boundingXXX.
                 // We do not want to parse that node in this case
-                if (nodeHasName && gltfChildNode.name.startsWith("_boundingBox")) {
-                    this._getCustomBoundingBoxForNode(scene, gltfChildNode, node);
-                    continue;
+                if (nodeHasName) {
+                    if (gltfChildNode.name.startsWith("_boundingBox")) {
+                        this._getCustomBoundingBoxForNode(scene, gltfChildNode, node);
+                        continue;
+                    } else if (gltfChildNode.name.startsWith("_boundingSphere")) {
+                        this._getCustomBoundingSphereForNode(scene, gltfChildNode, node);
+                        continue
+                    }
                 }
 
                 this._parseNode(scene, node, gltfChildNode);
@@ -185,6 +203,7 @@ class LevelParser {
         scene.materialBundle = new MaterialBundle(this.gltfData);
 
         this._parseSceneExtras(scene, gltfRootNode);
+        this._parseSceneCollisionGeometryConfig(scene, gltfRootNode);
         this._parseCollisionMeshes(scene, gltfRootNode);
         const gltfSceneNodeRoot = this._findChildNodeStartingWith(gltfRootNode, "Scene");
         if (!gltfSceneNodeRoot) {
@@ -194,6 +213,10 @@ class LevelParser {
         this._parseNode(scene, null, gltfSceneNodeRoot);
 
         LevelParser.assignNodeChildPointers(scene);
+
+        for (const meshIndex of scene.meshBundle) {
+            this.gltfData.validateMeshPrimitives(this.gltfData.meshes[meshIndex]);
+        }
 
         return scene;
     }
@@ -317,6 +340,17 @@ class LevelParser {
         node.collider = N64Node.ColliderType.Box | (boundingBoxIndex << 16)
     }
 
+    /** bounding spheres will use the same storage as boxes just to keep things simpler, result is two extra non used floats */
+    _getCustomBoundingSphereForNode(scene, gltfBoundingNode, node) {
+        const center = Object.hasOwn(gltfBoundingNode, "translation") ? gltfBoundingNode.translation : [0.0, 0.0, 0.0];
+        const scale = Object.hasOwn(gltfBoundingNode, "scale") ? gltfBoundingNode.scale : [1.0, 1.0, 1.0];
+
+        const radius = Math.max(scale[0], scale[1], scale[2]);
+        const boundingBoxIndex = scene.customBoundingBoxes.length;
+        scene.customBoundingBoxes.push(Bounding.createFromMinMax(center, [radius, radius, radius]));
+        node.collider = N64Node.ColliderType.Sphere | (boundingBoxIndex << 16);
+    }
+
     _parseNodeMesh(scene, gltfNode, node) {
         // This was set when parsing node extras
         if (node.mesh == N64Node.MeshIgnored || !Object.hasOwn(gltfNode, "mesh")) {
@@ -327,6 +361,7 @@ class LevelParser {
         node.mesh = scene.bundleMeshIndex(gltfNode.mesh);
         scene.meshInstanceCount += 1;
 
+        // TODO: do we actually want to do this? this should maybe be done explicitly?
         if (node.collider === N64Node.NoCollider) {
             node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
         }

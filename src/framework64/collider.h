@@ -11,6 +11,7 @@ typedef struct fw64Node fw64Node;
 // This enum needs to be kept in sync wit pipeline/gltf/Node.js
 typedef enum {
     FW64_COLLIDER_BOX,
+    FW64_COLLIDER_SPHERE,
     FW64_COLLIDER_COLLISION_MESH
 } fw64ColliderType;
 

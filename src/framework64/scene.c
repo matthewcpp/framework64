@@ -134,13 +134,17 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
                 else {
                     fw64_collider_init_box(collider, node, custom_bounding_boxes + collider_index);
                 }
+                box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
+            }
+            else if (collider_type == FW64_COLLIDER_SPHERE) {
+                // TODO: grab sphere out of the custom bounding volumes
+                // center stored in min, radius is max[0]
             }
             else if (collider_type == FW64_COLLIDER_COLLISION_MESH) {
                 fw64CollisionMesh* collision_mesh = fw64_static_vector_get_item(&scene->collision_meshes, (uint32_t)collider_index);
                 fw64_collider_init_collision_mesh(collider, node, collision_mesh);
+                box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
             }
-
-            box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
         }
         else {
             node->collider = NULL;

@@ -8,7 +8,7 @@
     ],
     "levels": [
         {
-            "src": "examples/collision_test/collision_test.gltf",
+            "src": "examples/collision_test/bomb_omb_battlefield.gltf",
             "collisionGeometry": true
         }
     ],

@@ -13,7 +13,7 @@ static const fw64CharacterAnimationIds ids = {
     character_animation_RunJumpLand
 };
 
-void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* env, fw64Scene* scene, fw64Node* node, fw64Allocator* allocator) {
+void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* env, fw64Scene* scene, fw64Node* node, fw64Camera* camera, fw64Allocator* allocator) {
     player->engine = engine;
     player->node = node;
     player->scene = scene;
@@ -27,15 +27,16 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     fw64_character_reset_position(&player->character, &player->node->transform.position);
 
 
-    player->node2 = fw64_scene_create_node_with_parent(scene, fw64_scene_get_node(scene, 0));
-    vec3_set_all(&player->node2->transform.scale, 0.020);
-    quat_from_euler(&player->node2->transform.rotation, 0, 180.0f, 0.0f);
-    fw64_node_update(player->node2);
+    vec3_set_all(&player->node->transform.scale, 0.020);
+    quat_from_euler(&player->node->transform.rotation, 0, 270.0f, 0.0f);
+    fw64_node_update(player->node);
     fw64SkinnedMesh* skinned_mesh = fw64_assets_load_skinned_mesh(engine->assets, FW64_ASSET_skinnedmesh_character, allocator);
-    fw64SkinnedMeshInstance* skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(scene, player->node2, skinned_mesh, character_animation_RunForward);
+    fw64SkinnedMeshInstance* skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(scene, player->node, skinned_mesh, character_animation_RunForward);
 
     fw64_animation_controller_play(&skinned_mesh_instance->controller);
     fw64_character_animation_controller_init(&player->animation_controller, &player->character, skinned_mesh_instance, &ids);
+    fw64_third_person_input_controller_init(&player->third_person_input, engine->input, &player->character, node, camera, 0);
+    fw64_third_person_camera_init(&player->third_person_cam, &node->transform, camera);
 }
 
 void player_update(Player* player) {
@@ -43,25 +44,16 @@ void player_update(Player* player) {
         player->run_character_update = !player->run_character_update;
     }
 
-    if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_A)) {
-        player->character.attempt_to_jump = 1;
-    }
-
     if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
         fw64_character_reset_position(&player->character, &player->initial_pos);
         player->animation_controller.animation_state = FW64_INVALID_ANIMATION_ID; // temp
     }
 
-    // TODO: need to actually figure this out based on camera
-    Vec2 stick;
-    fw64_input_controller_stick(player->engine->input, 0, &stick);
-    vec3_set(&player->character.attempt_to_move, stick.x, 0.0f, -stick.y);
+    fw64_third_person_input_controller_update(&player->third_person_input);
+    fw64_third_person_camera_update(&player->third_person_cam);
 
     vec3_lerp(&player->character.previous_position, &player->character.position, player->engine->time->accumulator_progress, &player->node->transform.position);
     fw64_node_update(player->node);
-
-    player->node2->transform.position = player->node->transform.position;
-    fw64_node_update(player->node2);
 
     fw64_character_animation_controller_update(&player->animation_controller, player->engine->time->time_delta);
 }

@@ -6,7 +6,6 @@
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
-#include "fw64_third_person_camera.h"
 #include "fw64_collision_scene_manager.h"
 #include "fw64_headlight.h"
 
@@ -16,7 +15,6 @@ typedef struct {
     UI ui;
     fw64CharacterEnvironment character_environment;
     Player player;
-    fw64ThirdPersonCamera third_person_cam;
     fw64CollisionSceneManager collision_scene_manager;
     fw64Headlight headlight;
 } Game;

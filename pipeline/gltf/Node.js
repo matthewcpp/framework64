@@ -5,7 +5,8 @@ class N64Node {
     // this needs to correspond to fw64ColliderType in collider.h
     static ColliderType = {
         Box: 0,
-        CollisionMesh: 1
+        Sphere: 1,
+        CollisionMesh: 2
     };
 
     static CollisionType = {
