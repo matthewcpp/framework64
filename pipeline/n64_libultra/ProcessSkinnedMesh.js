@@ -1,6 +1,7 @@
 const AnimationParser = require("../animation/Parser");
 const GLTFLoader = require("../gltf/GLTFLoader");
 const MaterialBundle = require("../gltf/MaterialBundle");
+const MeshCustomBounding = require("../gltf/MeshCustomBounding");
 const SkinnedMeshWriter = require("./SkinnedMeshWriter");
 const Util = require("../Util");
 
@@ -25,6 +26,8 @@ async function processSkinnedMesh(skinnedMesh, archive, manifestDirectory, outpu
         path.basename(skinnedMesh.src, path.extname(skinnedMesh.src)));
 
     const mesh = gltfLoader.meshes[0];
+    MeshCustomBounding.setForStaticMesh(mesh, gltfLoader);
+
     mesh.name = meshName;
     mesh.splitPrimitivesForSkinning();
     mesh.remapJointIndices(animationData.jointIdMap);

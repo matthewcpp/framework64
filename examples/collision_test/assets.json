@@ -23,5 +23,11 @@
                 "RunJumpLand"
             ]
         }
+    ],
+    "musicBanks": [
+        {
+            "name": "music",
+            "dir": "examples/collision_test/music"
+        }
     ]
 }

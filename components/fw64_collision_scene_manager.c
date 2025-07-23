@@ -33,7 +33,11 @@ void fw64_collision_scene_manager_uninit(fw64CollisionSceneManager* manager) {
 
 fw64Scene* fw64_collision_scene_manager_load_scene(fw64CollisionSceneManager* manager, fw64AssetId scene_id, fw64AssetId wire_scene_id, fw64LayerMask static_gemoetry_layer_mask) {
     manager->scene = fw64_assets_load_scene(manager->engine->assets, scene_id, manager->allocator);
-    manager->collision_wireframe = fw64_assets_load_scene(manager->engine->assets, wire_scene_id, manager->allocator);
+
+    if (wire_scene_id != FW64_INVALID_ASSET_ID) {
+        manager->collision_wireframe = fw64_assets_load_scene(manager->engine->assets, wire_scene_id, manager->allocator);
+    }
+
     manager->static_gemoetry_layer_mask = static_gemoetry_layer_mask;
 
     return manager->scene;
@@ -93,6 +97,11 @@ static void fw64_collision_scene_manager_draw_mode_active_cell_wireframe(fw64Col
 }
 
 void fw64_collision_scene_manager_draw_scene(fw64CollisionSceneManager* manager){
+    if (!manager->collision_wireframe) {
+        fw64_collision_scene_manager_draw_default_scene(manager, FW64_LAYER_MASK_ALL_LAYERS);
+        return;
+    }
+
     switch(manager->display_mode) {
         case FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_DEFAULT:
             fw64_collision_scene_manager_draw_default_scene(manager, FW64_LAYER_MASK_ALL_LAYERS);
