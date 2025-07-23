@@ -6,11 +6,12 @@
 #define FW64_THIRD_PERSON_INPUT_CAM_DEFAULT_ROTATION_SPEED 60.0f
 #define FW64_THIRD_PERSON_INPUT_CAM_DEFAULT_DISTANCE_SPEED 5.0f
 
-void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* controller, fw64Input* input, fw64Character* character, fw64Node* node, fw64ThirdPersonCamera* cam, int port) {
+void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* controller, fw64Input* input, fw64Character* character, fw64Node* node, fw64ThirdPersonCamera* cam, fw64CharacterAnimationController* anim, int port) {
     controller->input = input;
     controller->character = character;
     controller->node = node;
     controller->cam = cam;
+    controller->anim = anim;
 
     controller->port = port;
     controller->stick_threshold = FW64_THIRD_PERSON_INPUT_STICK_THRESHOLD;
@@ -50,6 +51,8 @@ void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* c
 
     if (fw64_input_controller_button_pressed(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_A)) {
         controller->character->attempt_to_jump = 1;
+    } else if (fw64_input_controller_button_pressed(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_B)) {
+        fw64_character_animation_controller_start_primary_action(controller->anim);
     }
 
     if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {

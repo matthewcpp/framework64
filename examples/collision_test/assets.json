@@ -20,7 +20,9 @@
                 "RunForward",
                 "RunJumpUp",
                 "RunJumpDown",
-                "RunJumpLand"
+                "RunJumpLand",
+                "Punch",
+                "Kick"
             ]
         }
     ],
