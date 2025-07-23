@@ -14,9 +14,13 @@ static void fw64_third_person_camera_update_cam_pos(fw64ThirdPersonCamera* cam) 
     // Calculate the camera's new offset position based on the rotation angles
     Quat q;
     quat_from_euler(&q, cam->rotation_x, cam->rotation_y, 0.0);
+
+    quat_transform_vec3(&q, &up, &up);
+    vec3_normalize(&up);
+
     quat_transform_vec3(&q, &forward, &forward);
     vec3_scale(&forward, cam->follow_dist, &forward);
-    forward.y = cam->offset_height;
+    vec3_add(&forward, &cam->target_offset, &forward);
     vec3_add(&cam->target->position, &forward, &cam->camera->node->transform.position);
 
     vec3_add(&cam->target->position, &cam->target_offset, &look_at_target);
@@ -37,7 +41,6 @@ void fw64_third_person_camera_update(fw64ThirdPersonCamera* cam) {
 void fw64_third_person_camera_reset(fw64ThirdPersonCamera* cam) {
     cam->follow_dist = FW64_THIRD_PERSON_CAMERA_DEFAULT_FOLLOW_DISTANCE;
     cam->rotation_x = 0.0f; // temp pick default value
-    cam->offset_height = 5.5f;
     vec3_set_zero(&cam->target_offset);
 
     Vec3 target_back, forward = vec3_forward();

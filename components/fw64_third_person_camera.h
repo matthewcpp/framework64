@@ -15,12 +15,10 @@ typedef struct {
      *  The sum of these two vector's will be used for the camera's look at target */
     Vec3 target_offset;
 
-    float offset_height; // Temp replace with rotation z angle in future
-
-    /** degrees */
+    /** Expressed in degrees */
     float rotation_y;
 
-    /** degrees */
+    /** Expressed in degrees */
     float rotation_x;
 } fw64ThirdPersonCamera;
 
@@ -34,7 +32,7 @@ void fw64_third_person_camera_update(fw64ThirdPersonCamera* cam);
 /** Sets the camera to be behind the target at the default offset values */
 void fw64_third_person_camera_reset(fw64ThirdPersonCamera* cam);
 
-/** rotates the camera about each axis. It is preferred to use this method as opposed to setting values directly.
+/** Rotates the camera about each axis. It is preferred to use this method as opposed to setting values directly.
  *  Note: these values are deltas from the current value and are expressed in degrees.
  */
 void fw64_third_person_camera_rotate(fw64ThirdPersonCamera* cam, float x, float y);

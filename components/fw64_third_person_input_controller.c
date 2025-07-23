@@ -2,6 +2,10 @@
 
 #include "framework64/controller_mapping/n64.h"
 
+#define FW64_THIRD_PERSON_INPUT_STICK_THRESHOLD 0.1f
+#define FW64_THIRD_PERSON_INPUT_CAM_DEFAULT_ROTATION_SPEED 60.0f
+#define FW64_THIRD_PERSON_INPUT_CAM_DEFAULT_DISTANCE_SPEED 5.0f
+
 void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* controller, fw64Input* input, fw64Character* character, fw64Node* node, fw64ThirdPersonCamera* cam, int port) {
     controller->input = input;
     controller->character = character;
@@ -10,7 +14,8 @@ void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* con
 
     controller->port = port;
     controller->stick_threshold = FW64_THIRD_PERSON_INPUT_STICK_THRESHOLD;
-    controller->cam_rotation_speed = FW64_THIRD_PERSON_INPUT_CAM_ROTATION_SPEED;
+    controller->cam_rotation_speed = FW64_THIRD_PERSON_INPUT_CAM_DEFAULT_ROTATION_SPEED;
+    controller->cam_dist_speed = FW64_THIRD_PERSON_INPUT_CAM_DEFAULT_DISTANCE_SPEED;
 }
 
 void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* controller, float time_delta) {
@@ -51,5 +56,13 @@ void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* c
         fw64_third_person_camera_rotate(controller->cam, 0.0f, controller->cam_rotation_speed * time_delta);
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         fw64_third_person_camera_rotate(controller->cam, 0.0f, -controller->cam_rotation_speed * time_delta);
+    } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
+        fw64_third_person_camera_rotate(controller->cam, controller->cam_rotation_speed * time_delta, 0.0f);
+    } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
+        fw64_third_person_camera_rotate(controller->cam, -controller->cam_rotation_speed * time_delta, 0.0f);
+    } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) {
+        controller->cam->follow_dist += controller->cam_dist_speed * time_delta;
+    } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN)) {
+        controller->cam->follow_dist -= controller->cam_dist_speed * time_delta;
     }
 }
