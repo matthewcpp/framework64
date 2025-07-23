@@ -23,6 +23,9 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     character->jump_fall_gravity_scale = FW64_CHARACTER_DEFAULT_JUMP_FALL_GRAVITY_SCALE;
     character->gravity_scale = FW64_CHARACTER_DEFAULT_GRAVITY_SCALE;
 
+    character->ground_accel = FW64_CHARACTER_DEFAULT_GROUND_ACCEL;
+    character->ground_decel = FW64_CHARACTER_DEFAULT_GROUND_DECEL;
+
     character->attempt_to_jump = 0;
 }
 
@@ -72,7 +75,8 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
         vec3_add(&character->position, &correction_vector, &character->position);
 
         // attempt to prevent jittering by skipping slight movement that may arise due to floating point effects
-        if (vec3_distance_squared(&character->previous_position, &character->position) < character->environment->horizontal_move_threshold) {
+        if (vec3_distance_squared(&character->previous_position, &character->position) < character->environment->horizontal_move_threshold
+            && !(fw64_character_is_moving_horizontally(character))) {
             character->position = character->previous_position;
             vec3_set_zero(&character->velocity);
         }
@@ -88,11 +92,24 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     character->previous_state = character->state;
     character->previous_position = character->position;
 
-    // handle horizontal movement
-    // TODO: handle air movement slightly differently?
-    vec3_scale(&character->attempt_to_move, character->max_speed, &character->attempt_to_move);
-    character->velocity.x = character->attempt_to_move.x;
-    character->velocity.z = character->attempt_to_move.z;
+    // handle horizontal movement with acceleration
+    Vec3 current_ground_velocity = {character->velocity.x, 0.0f, character->velocity.z};
+    float ground_speed = vec3_length(&current_ground_velocity);
+    float desired_speed = fw64_character_is_attempting_to_move(character) ? character->max_speed : 0.0f;
+
+    // if player is accelerating, then move them the direction they are attempting to move
+    if (desired_speed >= ground_speed) {
+        ground_speed += character->ground_accel * time_delta;
+        current_ground_velocity = character->attempt_to_move;
+    } else if (desired_speed < ground_speed) {
+        ground_speed -= character->ground_decel * time_delta;
+    }
+
+    ground_speed = fw64_clamp(ground_speed, 0.0f, character->max_speed);
+    vec3_normalize(&current_ground_velocity);
+    vec3_scale(&current_ground_velocity, ground_speed, &current_ground_velocity);
+    character->velocity.x = current_ground_velocity.x;
+    character->velocity.z = current_ground_velocity.z;
     vec3_set_zero(&character->attempt_to_move);
 
     // handle jumping

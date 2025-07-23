@@ -8,11 +8,13 @@
 #define FW64_CHARACTER_ENV_MAX_SUBSTEPS 5
 #define FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD 0.01
 
-// #define FW64_CHARACTER_DEFAULT_JUMP_SPEED 4.4
 #define FW64_CHARACTER_DEFAULT_JUMP_SPEED 6.4
 #define FW64_CHARACTER_DEFAULT_MAX_SPEED 10.0
 #define FW64_CHARACTER_DEFAULT_GRAVITY_SCALE 1.5f
 #define FW64_CHARACTER_DEFAULT_JUMP_FALL_GRAVITY_SCALE 2.0f
+
+#define FW64_CHARACTER_DEFAULT_GROUND_ACCEL 15.0
+#define FW64_CHARACTER_DEFAULT_GROUND_DECEL 30.0
 
 typedef struct {
     Vec3 gravity;
@@ -53,6 +55,9 @@ typedef struct {
     float gravity_scale;
     float jump_fall_gravity_scale;
 
+    float ground_accel;
+    float ground_decel;
+
     Vec3 attempt_to_move;
     int attempt_to_jump;
 
@@ -71,7 +76,9 @@ void fw64_character_reset_position(fw64Character* character, const Vec3* positio
 #define fw64_character_is_in_air(character) ((character)->state == FW64_CHARACTER_STATE_IN_AIR)
 #define fw64_character_is_falling(character) (fw64_character_is_in_air((character)) && (character)->velocity.y < 0.0)
 
+#define fw64_character_is_attempting_to_move(character) ((character)->attempt_to_move.x != 0.0f || (character)->attempt_to_move.z != 0.0f)
 #define fw64_character_is_moving_horizontally(character) ((character)->velocity.x != 0.0f || (character)->velocity.z != 0.0f)
+
 #ifdef __cplusplus
 }
 #endif
