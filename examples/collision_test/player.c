@@ -17,27 +17,34 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     player->engine = engine;
     player->node = node;
     player->scene = scene;
-    fw64_character_init(&player->character, env, scene);
+    
 
     player->run_character_update = 1;
     player->initial_pos = player->node->transform.position;
 
-    // TODO...better way to determine this size?
-    vec3_set(&player->character.size, 1.0f, 5.0f, 0.0f);
-    fw64_character_reset_position(&player->character, &player->node->transform.position);
-
-
-    vec3_set_all(&player->node->transform.scale, 0.020);
-    quat_from_euler(&player->node->transform.rotation, 0, 270.0f, 0.0f);
-    fw64_node_update(player->node);
+    const Vec3 character_size = node->transform.scale;
     fw64SkinnedMesh* skinned_mesh = fw64_assets_load_skinned_mesh(engine->assets, FW64_ASSET_skinnedmesh_character, allocator);
     fw64SkinnedMeshInstance* skinned_mesh_instance = fw64_scene_create_skinned_mesh_instance(scene, player->node, skinned_mesh, character_animation_RunForward);
 
+    // The player height is determined by examining the initial scale of the player node
+    // When attaching the skinned mesh to the player node, the scale needs to be adjusted to match the character's size;
+    // Note this assumes that the character model's min.y is 0.0f
+    const Box mesh_bounding = fw64_mesh_get_bounding_box(skinned_mesh->mesh);
+    float node_scale = character_size.y / mesh_bounding.max.y;
+    vec3_set_all(&player->node->transform.scale, node_scale);
+    fw64_node_update(player->node);
+
+    // Initialize all of the 3rd person character controller components here
+    fw64_character_init(&player->character, env, scene);
     fw64_animation_controller_play(&skinned_mesh_instance->controller);
     fw64_character_animation_controller_init(&player->animation_controller, &player->character, skinned_mesh_instance, &ids);
     fw64_third_person_camera_init(&player->third_person_cam, &node->transform, camera);
     fw64_third_person_input_controller_init(&player->third_person_input, engine->input, &player->character, node, &player->third_person_cam, 0);
-    
+
+    // Configure 3rd person character components
+    player->character.size = character_size;
+    fw64_character_reset_position(&player->character, &player->node->transform.position);
+    vec3_set(&player->third_person_cam.target_offset, 0.0, character_size.y, 0.0f); // focus on character's head
 }
 
 void player_update(Player* player) {

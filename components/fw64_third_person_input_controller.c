@@ -10,6 +10,7 @@ void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* con
 
     controller->port = port;
     controller->stick_threshold = FW64_THIRD_PERSON_INPUT_STICK_THRESHOLD;
+    controller->cam_rotation_speed = FW64_THIRD_PERSON_INPUT_CAM_ROTATION_SPEED;
 }
 
 void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* controller, float time_delta) {
@@ -42,14 +43,13 @@ void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* c
         quat_set_axis_angle(&controller->node->transform.rotation, 0.0, 1.0, 0.0, target_yaw);
     }
 
-
     if (fw64_input_controller_button_pressed(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_A)) {
         controller->character->attempt_to_jump = 1;
     }
 
     if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
-        controller->cam->rotation_y += 45.0f * time_delta;
+        fw64_third_person_camera_rotate(controller->cam, 0.0f, controller->cam_rotation_speed * time_delta);
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
-        controller->cam->rotation_y -= 45.0f * time_delta;
+        fw64_third_person_camera_rotate(controller->cam, 0.0f, -controller->cam_rotation_speed * time_delta);
     }
 }

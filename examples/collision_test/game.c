@@ -26,8 +26,13 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64_camera_init(&game->camera, camera_node, display);
 
     fw64_character_envionment_init(&game->character_environment);
+
+    // Configure the "game specific player" which makes use of the third person character components
+    // the initial orientation is set here, but in reality this may be set on a level by level basis
     fw64Node* player_node = fw64_scene_get_node(scene, FW64_scene_Bomb_Omb_Battlefield_node_player);
+    quat_from_euler(&player_node->transform.rotation, 0, 270.0f, 0.0f);
     player_init(&game->player, engine, &game->character_environment, scene, player_node, &game->camera, allocator);
+
     game->collision_scene_manager.target = &game->player.node->transform;
 
     fw64_headlight_init(&game->headlight, game->collision_scene_manager.static_scene_renderpass, 0, &game->camera.node->transform);

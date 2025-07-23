@@ -7,6 +7,7 @@
 #include <framework64/input.h>
 
 #define FW64_THIRD_PERSON_INPUT_STICK_THRESHOLD 0.1f
+#define FW64_THIRD_PERSON_INPUT_CAM_ROTATION_SPEED 60.0f
 
 typedef struct {
     fw64Input* input;
@@ -16,6 +17,7 @@ typedef struct {
 
     int port;
     float stick_threshold;
+    float cam_rotation_speed;
 } fw64ThirdPersonInputController;
 
 void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* controller, fw64Input* input, fw64Character* character, fw64Node* node, fw64ThirdPersonCamera* cam, int port);
