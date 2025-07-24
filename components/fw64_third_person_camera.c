@@ -45,5 +45,5 @@ void fw64_third_person_camera_reset(fw64ThirdPersonCamera* cam) {
 
     Vec3 target_back, forward = vec3_forward();
     fw64_transform_back(cam->target, &target_back);
-    cam->rotation_y = (atan2f(target_back.z, target_back.x) - atan2f(forward.z, forward.x)) * (180.0 / M_PI);
+    cam->rotation_y = (atan2f(target_back.z, target_back.x) - atan2f(forward.z, forward.x)) * (180.0f / M_PI);
 }

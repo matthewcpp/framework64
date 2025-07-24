@@ -163,6 +163,7 @@ class CollisionGeometry {
         // first determine nodes we will need to process and compute the scene's world space bounding box
         const worldGeometryNodes = [];
         const sceneBounding = new Bounding();
+        let degenerateCount = 0;
         for (const node of scene.nodes) {
             // we can filter out nodes which do not need static geometry built.
             if (node.mesh === N64Node.NoMesh || node.collider == N64Node.NoCollider || node.collisionType == N64Node.CollisionType.Dynamic) {
@@ -179,22 +180,40 @@ class CollisionGeometry {
 
         const geometry = new CollisionGeometry(sceneBounding, scene.gridSize[0], scene.gridSize[1]);
 
+
         const AB = glMatrix.vec3.create();
         const AC = glMatrix.vec3.create();
+
+        // It is possible that degenrate triangles may result in a divide by zero exception at runtime.
+        // This likely occurs due to the rounding of vertices that occurs when converting to N64 vertex format
+        // We attempt to guard against this by filtering out these triangles here.
+        // TODO: look into detecting / fixing this at a higher level?
+        const _triangleIsDegenerate = (a, b, c) => {
+            return glMatrix.vec3.exactEquals(a,b) || glMatrix.vec3.exactEquals(b,c) || glMatrix.vec3.exactEquals(a,c);
+        }
 
         for (const node of worldGeometryNodes) {
             const mesh = gltfData.meshes[scene.meshBundle[node.mesh]];
 
             for (const primitive of mesh.primitives) {
                 for (const element of primitive.elements) {
+                    const a = primitive.vertices[element[0]];
+                    const b = primitive.vertices[element[1]]
+                    const c = primitive.vertices[element[2]]
+
                     const A = glMatrix.vec3.create();
                     const B = glMatrix.vec3.create();
                     const C = glMatrix.vec3.create();
                     const N = glMatrix.vec3.create();
 
-                    glMatrix.vec3.transformMat4(A, primitive.vertices[element[0]], node.worldMatrix);
-                    glMatrix.vec3.transformMat4(B, primitive.vertices[element[1]], node.worldMatrix);
-                    glMatrix.vec3.transformMat4(C, primitive.vertices[element[2]], node.worldMatrix);
+                    if (_triangleIsDegenerate(a, b, c)) {
+                        degenerateCount += 1;
+                        continue;
+                    }
+
+                    glMatrix.vec3.transformMat4(A, a, node.worldMatrix);
+                    glMatrix.vec3.transformMat4(B, b, node.worldMatrix);
+                    glMatrix.vec3.transformMat4(C, c, node.worldMatrix);
                     
                     glMatrix.vec3.subtract(AB, B, A);
                     glMatrix.vec3.subtract(AC, C, A);
@@ -206,6 +225,10 @@ class CollisionGeometry {
                     geometry.insertTriangle(triangle);
                 }
             }
+        }
+
+        if (degenerateCount > 0) {
+            console.log(`Warning: ${degenerateCount} degenerate trigangles filtered when creating collision geometry in scene: ${scene.name}.`);
         }
 
         return geometry;

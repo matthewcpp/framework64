@@ -198,7 +198,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     float query_radius = fw64_maxf(character->size.x, character->size.z);
 
     // determine how many substeps we will need to avoid tunneling
-    const float max_step = query_radius * 0.5;
+    const float max_step = query_radius * 0.5f;
     int num_substeps = fw64_clampi((int)fw64_ceilf(move_distance / max_step), 1, character->environment->max_substeps);
 
     // update character's position over each substep

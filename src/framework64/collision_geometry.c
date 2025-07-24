@@ -41,8 +41,8 @@ int fw64_collision_geometry_get_cell_coordinates_vec3(const fw64CollisionGeometr
     const float cell_size_x = (geometry->info.bounds_max.x - geometry->info.bounds_min.x) / geometry->info.cell_count_x;
     const float cell_size_z = (geometry->info.bounds_max.y - geometry->info.bounds_min.y) / geometry->info.cell_count_z;
 
-    out->x = fw64_floorf((vec->x - geometry->info.bounds_min.x) / cell_size_x);
-    out->y = fw64_floorf((vec->z - geometry->info.bounds_min.y) / cell_size_z);
+    out->x = (int)fw64_floorf((vec->x - geometry->info.bounds_min.x) / cell_size_x);
+    out->y = (int)fw64_floorf((vec->z - geometry->info.bounds_min.y) / cell_size_z);
 
     return 1;
 }
