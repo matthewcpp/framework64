@@ -88,6 +88,52 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
     }
 }
 
+static void fw64_character_check_wall_collision(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
+    Vec3 hit_point, correction_vector = vec3_zero(), query_v0;
+    int hit_count = 0;
+    float total_penetration = 0.0f;
+
+    for (int c = 0; c < query->cell_count; c++) {
+        fw64CollisionGeometryCell* cell = query->cells[c];
+        fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->wall_index;
+
+        for (uint32_t t = 0; t < cell->wall_count; t++) {
+            fw64CollisionTriangle* triangle = triangles + t;
+
+            // initial filter: check penetration with triangle plane
+            vec3_subtract(query_pos, &triangle->A, &query_v0);
+            float distance = vec3_dot(&triangle->N, &query_v0);
+            if (distance < query_radius) {
+                // precision check
+                if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
+                    // correct position along collision normal
+                    float penetration = query_radius - distance;
+                    vec3_add_and_scale(&correction_vector, &triangle->N, penetration, &correction_vector);
+                    hit_count += 1;
+                    total_penetration += penetration;
+                }
+            }
+        }
+    }
+
+    // resolve all collisions
+    if (hit_count) {
+        vec3_normalize(&correction_vector);
+        vec3_scale(&correction_vector, total_penetration / (float)hit_count, &correction_vector);
+        vec3_add(&character->position, &correction_vector, &character->position);
+
+        // attempt to prevent jittering by skipping slight movement that may arise due to floating point effects
+        if (vec3_distance_squared(&character->previous_position, &character->position) < character->environment->horizontal_move_threshold
+            && !(fw64_character_is_moving_horizontally(character))) {
+            character->position = character->previous_position;
+            vec3_set_zero(&character->velocity);
+        }
+
+        character->velocity.y = 0.0f;
+    } else {
+    }
+}
+
 void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     character->previous_state = character->state;
     character->previous_position = character->position;
@@ -168,5 +214,6 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &query_pos, &query);
 
         fw64_character_check_floor_collision(character, &query_pos, query_radius, &query);
+        fw64_character_check_wall_collision(character, &query_pos, query_radius, &query);
     }
 }
