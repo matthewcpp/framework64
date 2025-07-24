@@ -24,6 +24,8 @@ class N64Node {
      *  and any value present in the gltf should not be processed.
      */
     static MeshIgnored = 0xFFFFFFFE;
+
+    static UnspecifiedCollider = 0xFFFFFFFE;
     static NoCollider = 0xFFFFFFFF;
 
     name;
@@ -51,7 +53,7 @@ class N64Node {
 
     /** This holds the index into the parsed gltf data's mesh array */
     mesh = N64Node.NoMesh;
-    collider = N64Node.NoCollider;
+    collider = N64Node.UnspecifiedCollider;
     collisionType = N64Node.CollisionType.Static;
     data = 0;
     layerMask = 1;

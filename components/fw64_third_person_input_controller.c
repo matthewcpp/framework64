@@ -19,7 +19,7 @@ void fw64_third_person_input_controller_init(fw64ThirdPersonInputController* con
     controller->cam_dist_speed = FW64_THIRD_PERSON_INPUT_CAM_DEFAULT_DISTANCE_SPEED;
 }
 
-void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* controller, float time_delta) {
+static void fw64_third_person_input_controller_process_movement(fw64ThirdPersonInputController* controller) {
     Vec2 stick;
     fw64_input_controller_stick(controller->input, controller->port, &stick);
 
@@ -52,16 +52,24 @@ void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* c
     if (fw64_input_controller_button_pressed(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_A)) {
         controller->character->attempt_to_jump = 1;
     } else if (fw64_input_controller_button_pressed(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_B)) {
-        fw64_character_animation_controller_start_primary_action(controller->anim);
+        if (fw64_character_animation_controller_state_is_idle(controller->anim) || fw64_character_animation_controller_state_is_running(controller->anim)) {
+            fw64_character_animation_controller_start_primary_action(controller->anim);
+        }
+    }
+}
+
+void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* controller, float time_delta) {
+    if (!fw64_character_animation_controller_state_is_primary_action(controller->anim)) {
+        fw64_third_person_input_controller_process_movement(controller);
     }
 
     if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_LEFT)) {
         fw64_third_person_camera_rotate(controller->cam, 0.0f, controller->cam_rotation_speed * time_delta);
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_RIGHT)) {
         fw64_third_person_camera_rotate(controller->cam, 0.0f, -controller->cam_rotation_speed * time_delta);
-    } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
-        fw64_third_person_camera_rotate(controller->cam, controller->cam_rotation_speed * time_delta, 0.0f);
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_DOWN)) {
+        fw64_third_person_camera_rotate(controller->cam, controller->cam_rotation_speed * time_delta, 0.0f);
+    } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
         fw64_third_person_camera_rotate(controller->cam, -controller->cam_rotation_speed * time_delta, 0.0f);
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) {
         controller->cam->follow_dist += controller->cam_dist_speed * time_delta;

@@ -189,6 +189,10 @@ class LevelParser {
             }
         }
 
+        if (node.collider === N64Node.UnspecifiedCollider) {
+            node.collider = N64Node.NoCollider
+        }
+
         if (node.collider != N64Node.NoCollider) {
             scene.colliderCount += 1;
         }
@@ -373,7 +377,7 @@ class LevelParser {
         scene.meshInstanceCount += 1;
 
         // TODO: do we actually want to do this? this should maybe be done explicitly?
-        if (node.collider === N64Node.NoCollider) {
+        if (node.collider === N64Node.UnspecifiedCollider) {
             node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
         }
     }

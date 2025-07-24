@@ -41,6 +41,10 @@ void fw64_character_animation_controller_update(fw64CharacterAnimationController
 void fw64_character_animation_controller_start_primary_action(fw64CharacterAnimationController* controller);
 void fw64_character_animation_controller_set_transition_func(fw64CharacterAnimationController* controller, fw64CharacterAnimationControllerStateFunc transition_func, void* transition_arg);
 
+#define fw64_character_animation_controller_state_is_idle(controller) ((controller)->animation_state == (controller)->animations.idle)
+#define fw64_character_animation_controller_state_is_running(controller) ((controller)->animation_state == (controller)->animations.run)
+#define fw64_character_animation_controller_state_is_primary_action(controller) ((controller)->animation_state == (controller)->animations.primary_action)
+
 #ifdef __cplusplus
 }
 #endif

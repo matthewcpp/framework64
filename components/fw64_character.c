@@ -110,14 +110,15 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     vec3_scale(&current_ground_velocity, ground_speed, &current_ground_velocity);
     character->velocity.x = current_ground_velocity.x;
     character->velocity.z = current_ground_velocity.z;
-    vec3_set_zero(&character->attempt_to_move);
 
     // handle jumping
     if (character->attempt_to_jump && fw64_character_is_on_ground(character)) {
         character->velocity.y += character->jump_speed;
         character->state = FW64_CHARACTER_STATE_IN_AIR;
-        character->attempt_to_jump = 0;
     }
+
+    vec3_set_zero(&character->attempt_to_move);
+    character->attempt_to_jump = 0;
 
     // apply gravity to character's velocity
     Vec3 gravity = character->environment->gravity;
