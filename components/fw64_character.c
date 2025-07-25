@@ -1,6 +1,7 @@
 #include "fw64_character.h"
 
 #include "framework64/math.h"
+#include <framework64/types.h>
 
 void fw64_character_envionment_init(fw64CharacterEnvironment* env) {
     vec3_set(&env->gravity, 0.0f, Fw64_CHARACTER_ENV_DEFAULT_GRAVITY, 0.0f);
@@ -35,6 +36,48 @@ void fw64_character_reset_position(fw64Character* character, const Vec3* positio
     character->previous_state = FW64_CHARACTER_STATE_IN_AIR;
     character->state = FW64_CHARACTER_STATE_IN_AIR;
     vec3_set_zero(&character->velocity);
+}
+
+static int _fw64_character_attempt_sticky_ground(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
+    float closest_t = FLT_MAX;
+    const Vec3 ray_origin = {query_pos->x, query_pos->y + query_radius, query_pos->z};
+    const Vec3 ray_dir = vec3_down();
+    Vec3 sticky_pos;
+    
+    for (int c = 0; c < query->cell_count; c++) {
+        fw64CollisionGeometryCell* cell = query->cells[c];
+        fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
+
+        for (uint32_t t = 0; t < cell->floor_count; t++) {
+            fw64CollisionTriangle* triangle = triangles + t;
+            float t;
+            Vec3 ray_pos;
+
+            if (fw64_collision_test_ray_triangle(&ray_origin, &ray_dir, &triangle->A, &triangle->B, &triangle->C, &ray_pos, &t)) {
+                if (t < closest_t) {
+                    closest_t = t;
+                    sticky_pos = ray_pos;
+                }
+            }
+        }
+    }
+
+    if (closest_t == FLT_MAX) {
+        character->state = FW64_CHARACTER_STATE_IN_AIR;
+        return 0;
+    }
+
+    float y_delta = fw64_fabsf(character->position.y - sticky_pos.y);
+
+    // sticky ground threshold
+    if (y_delta <= 0.07) {
+        character->position = sticky_pos;
+        character->state = FW64_CHARACTER_STATE_ON_GROUND;
+        return 1;
+    } else {
+        character->state = FW64_CHARACTER_STATE_IN_AIR;
+        return 0;
+    }
 }
 
 static void fw64_character_check_floor_collision(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
@@ -81,10 +124,20 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
             vec3_set_zero(&character->velocity);
         }
 
-        character->velocity.y = 0.0f;
         character->state = FW64_CHARACTER_STATE_ON_GROUND;
     } else {
-        character->state = FW64_CHARACTER_STATE_IN_AIR;
+        // if we were on the ground and not jumping, we would like to attempt to stick to the ground
+        // if we are close to a ground triangle.  This should help prevent the case where we are running slightly
+        // faster than gravity can pull us down
+        if (fw64_character_is_on_ground(character) &&  character->velocity.y <= 0.0f) {
+            _fw64_character_attempt_sticky_ground(character, query_pos, query_radius, query);
+        } else {
+            character->state = FW64_CHARACTER_STATE_IN_AIR;
+        }
+    }
+
+    if (fw64_character_is_on_ground(character)) {
+        character->velocity.y = 0.0f;
     }
 }
 
@@ -208,6 +261,8 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &query_pos, &query);
 
         fw64_character_check_floor_collision(character, &query_pos, query_radius, &query);
+
+        vec3_add_and_scale(&character->position, &up, query_radius, &query_pos);
         fw64_character_check_wall_collision(character, &query_pos, query_radius, &query);
     }
 }
