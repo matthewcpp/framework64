@@ -33,7 +33,7 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
     draw_pos.y += fw64_font_line_height(info->font);
     int on_grid = fw64_collision_geometry_get_cell_coordinates_vec3(info->character->scene->collision_geometry, &info->character->position, &grid_pos);
     if (on_grid) {
-        sprintf(buffer, "grid: %d,%d", grid_pos.x, grid_pos.y);
+        sprintf(buffer, "Grid: %d,%d", grid_pos.x, grid_pos.y);
         fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
     }
 }

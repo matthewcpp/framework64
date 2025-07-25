@@ -39,6 +39,8 @@ void game_init(Game* game, fw64Engine* engine) {
     fw64Font* font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
     ui_init(&game->ui, engine, font, &game->player, allocator);
 
+    fw64_skybox_init(&game->skybox, engine, scene, FW64_ASSET_mesh_skybox, &game->player.third_person_cam.camera->node->transform, allocator);
+
 #ifndef COLLISION_TEST_NO_MUSIC
     fw64_audio_play_music(engine->audio, 0);
 #endif
@@ -47,6 +49,7 @@ void game_init(Game* game, fw64Engine* engine) {
 void game_update(Game* game){
     player_update(&game->player);
     fw64_headlight_update(&game->headlight);
+    fw64_skybox_update(&game->skybox);
     ui_update(&game->ui);
 }
 
@@ -55,6 +58,7 @@ void game_fixed_update(Game* game) {
 }
 
 void game_draw(Game* game) {
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->skybox.renderpass);
     fw64_collision_scene_manager_set_camera(&game->collision_scene_manager, &game->camera);
     fw64_collision_scene_manager_draw_scene(&game->collision_scene_manager);
     ui_draw(&game->ui);

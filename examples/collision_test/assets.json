@@ -3,13 +3,19 @@
         {
             "src": "Consolas.ttf",
             "size": 12,
-            "name": "Consolas12"
+            "name": "Consolas12",
+            "sourceString": "Grid Air Ground tpv ,.-: 0123456789"
         }
     ],
     "levels": [
         {
             "src": "examples/collision_test/bomb_omb_battlefield/bomb_omb_battlefield.gltf",
             "collisionGeometry": true
+        }
+    ],
+    "meshes": [
+        {
+            "src": "examples/collision_test/skybox/skybox.gltf"
         }
     ],
     "skinnedMeshes": [

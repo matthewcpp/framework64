@@ -21,12 +21,22 @@ struct fw64Primitive {
 
 #define FW64_MESH_FLAGS_IMAGES_ARE_SHARED 1
 
+typedef enum {
+    FW64_N64_LIBULTRA_MESH_FLAG_NONE = 0,
+
+    /** Indiciates that each primitive has it's own individual graphics data.
+      * When the mesh is loaded from assets all the data is tightly packed in buffers and this flag will be unset.
+      * When the mesh is created using meshbuilder, each primitive's graphics data is allocated individually.
+     */
+    FW64_N64_LIBULTRA_MESH_FLAG_INDIVIDUAL_PRIM_GRAPHICS_DATA = 1
+} fw64N64LibultraMeshFlags;
+
 /// this needs to line up with pipeline/n64_libultra/MeshWriter.js
 typedef struct {
     uint16_t primitive_count;
     uint16_t vertex_count;
     uint16_t display_list_count;
-    uint16_t unused;
+    uint16_t flags;
     uint16_t _vertex_pointer_data_size; // only used during loading
     uint16_t _material_bundle_count;
     Box bounding_box;

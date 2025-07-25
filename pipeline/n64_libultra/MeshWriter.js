@@ -135,7 +135,7 @@ class MeshInfo {
         index = buff.writeUInt16BE(this.primitiveCount, index);
         index = buff.writeUInt16BE(this.vertexCount, index);
         index = buff.writeUInt16BE(this.displayListCount, index);
-        index = buff.writeUInt16BE(0 /* unused */, index);
+        index = buff.writeUInt16BE(0 /* flags */, index);
         index = buff.writeUInt16BE(this.vertexPointerDataSize, index);
         index = buff.writeUInt16BE(this.materialBundle != null ? 1 : 0, index);
         index = this.bounding.writeToBuffer(buff, index);
@@ -202,7 +202,10 @@ function adjustN64TexCoordinates(mesh, gltfData, n64Images) {
         const texture = gltfData.textures[material.texture];
         const image = n64Images[texture.image];
 
-        if (!Util.isPowerOf2(image.width) || !Util.isPowerOf2(image.height)) {
+        const sliceWidth = image.width / image.hslices;
+        const sliceHeight = image.height / image.vslices;
+
+        if (!Util.isPowerOf2(sliceWidth) || !Util.isPowerOf2(sliceHeight)) {
             throw new Error(`image: ${image.name} has non power of 2 dimensions: ${image.width}x${image.height}`);
         }
 
@@ -213,8 +216,9 @@ function adjustN64TexCoordinates(mesh, gltfData, n64Images) {
             const origS = s;
             const origT = t;
 
-            s *= image.width * 2;
-            t *= image.height * 2;
+            // Although uncommon for meshes, we want use slice width/height here
+            s *= sliceWidth * 2;
+            t *= sliceHeight * 2;
 
             // Note that the texture coordinates (s,t) are encoded in S10.5 format.
             vertex[4] = Math.round(s * (1 << 5));

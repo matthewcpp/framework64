@@ -183,6 +183,8 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
         glDisable(GL_DEPTH_TEST);
     }
 
+    glDepthMask(renderpass->depth_writing_enabled);
+
     if (renderpass->fog_enabled) {
         setFogEnabled(renderpass->fog_enabled);
         setFogPositions(renderpass->fog_begin, renderpass->fog_end);

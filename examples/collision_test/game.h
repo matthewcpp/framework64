@@ -8,6 +8,7 @@
 
 #include "fw64_collision_scene_manager.h"
 #include "fw64_headlight.h"
+#include "fw64_skybox.h"
 
 typedef struct {
     fw64Engine* engine;
@@ -17,6 +18,7 @@ typedef struct {
     Player player;
     fw64CollisionSceneManager collision_scene_manager;
     fw64Headlight headlight;
+    fw64Skybox skybox;
 } Game;
 
 #ifdef __cplusplus

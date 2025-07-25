@@ -105,6 +105,10 @@ void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int e
     renderpass->depth_testing_enabled = static_cast<bool>(enabled);
 }
 
+void fw64_renderpass_set_depth_writing_enabled(fw64RenderPass* renderpass, int enabled) {
+    renderpass->depth_writing_enabled = static_cast<bool>(enabled);
+}
+
 void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int enabled) {
     renderpass->anti_aliasing_enabled = static_cast<bool>(enabled);
 }

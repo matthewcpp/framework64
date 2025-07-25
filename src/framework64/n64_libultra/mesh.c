@@ -126,12 +126,16 @@ void fw64_n64_mesh_init(fw64Mesh* mesh) {
 }
 
 void fw64_n64_mesh_uninit(fw64Mesh* mesh, fw64Allocator* allocator) {
-    if (mesh->vertex_buffer) {
-        fw64_allocator_free(allocator, mesh->vertex_buffer);
-    }
+    if ((mesh->info.flags & FW64_N64_LIBULTRA_MESH_FLAG_INDIVIDUAL_PRIM_GRAPHICS_DATA)) { // built with mesh builder
 
-    if (mesh->display_list) {
-        fw64_allocator_free(allocator, mesh->display_list);
+    } else { // loaded from assets
+        if (mesh->vertex_buffer) {
+            fw64_allocator_free(allocator, mesh->vertex_buffer);
+        }
+
+        if (mesh->display_list) {
+            fw64_allocator_free(allocator, mesh->display_list);
+        }
     }
 
     if (mesh->primitives) {
