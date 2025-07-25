@@ -122,14 +122,8 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
         vec3_scale(&correction_vector, total_penetration / (float)hit_count, &correction_vector);
         vec3_add(&character->position, &correction_vector, &character->position);
 
-        // attempt to prevent jittering by skipping slight movement that may arise due to floating point effects
-        if (vec3_distance_squared(&character->previous_position, &character->position) < character->environment->horizontal_move_threshold
-            && !(fw64_character_is_moving_horizontally(character))) {
-            character->position = character->previous_position;
-            vec3_set_zero(&character->velocity);
-        }
-
-        character->velocity.y = 0.0f;
+        character->velocity.x = 0.0f;
+        character->velocity.z = 0.0f;
     } else {
     }
 }
