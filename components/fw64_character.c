@@ -16,7 +16,7 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
 
     Vec3 zero = vec3_zero();
     character->attempt_to_move = zero;
-    fw64_character_reset_position(character, &zero);
+    fw64_character_set_position(character, &zero);
 
     vec3_set_one(&character->size);
     character->max_speed = FW64_CHARACTER_DEFAULT_MAX_SPEED;
@@ -30,7 +30,7 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     character->attempt_to_jump = 0;
 }
 
-void fw64_character_reset_position(fw64Character* character, const Vec3* position) {
+void fw64_character_set_position(fw64Character* character, const Vec3* position) {
     character->previous_position = *position;
     character->position = *position;
     character->previous_state = FW64_CHARACTER_STATE_IN_AIR;
@@ -184,6 +184,10 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
 void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     character->previous_state = character->state;
     character->previous_position = character->position;
+
+    if (!fw64_character_is_enabled(character)) {
+        return;
+    }
 
     // handle horizontal movement with acceleration
     Vec3 current_ground_velocity = {character->velocity.x, 0.0f, character->velocity.z};

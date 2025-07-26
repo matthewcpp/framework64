@@ -9,6 +9,8 @@
 #include "fw64_headlight.h"
 #include "fw64_skybox.h"
 #include "fw64_collision_scene_manager.h"
+#include "star.h"
+#include "star_collected.h"
 
 typedef struct {
     Player player;
@@ -16,6 +18,8 @@ typedef struct {
     fw64CollisionSceneManager collision_scene_manager;
     fw64Headlight headlight;
     fw64Skybox skybox;
+    StarCollected star_collected;
+    Star star;
     fw64Engine* engine;
 } BombOmbBattlefield;
 

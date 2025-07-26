@@ -32,6 +32,7 @@ typedef struct {
 void fw64_character_envionment_init(fw64CharacterEnvironment* env);
 
 typedef enum {
+    FW64_CHARACTER_STATE_DISABLED,
     FW64_CHARACTER_STATE_ON_GROUND,
     FW64_CHARACTER_STATE_IN_AIR
 } fw64CharacterState;
@@ -70,7 +71,7 @@ extern "C" {
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Scene* scene);
 void fw64_character_fixed_update(fw64Character* character, float time_delta);
 
-void fw64_character_reset_position(fw64Character* character, const Vec3* position);
+void fw64_character_set_position(fw64Character* character, const Vec3* position);
 
 #define fw64_character_is_on_ground(character) ((character)->state == FW64_CHARACTER_STATE_ON_GROUND)
 #define fw64_character_is_in_air(character) ((character)->state == FW64_CHARACTER_STATE_IN_AIR)
@@ -78,6 +79,10 @@ void fw64_character_reset_position(fw64Character* character, const Vec3* positio
 
 #define fw64_character_is_attempting_to_move(character) ((character)->attempt_to_move.x != 0.0f || (character)->attempt_to_move.z != 0.0f)
 #define fw64_character_is_moving_horizontally(character) ((character)->velocity.x != 0.0f || (character)->velocity.z != 0.0f)
+
+#define fw64_character_disable(character) ((character)->state = FW64_CHARACTER_STATE_DISABLED)
+#define fw64_character_enable(character) ((character)->state = FW64_CHARACTER_STATE_IN_AIR)
+#define fw64_character_is_enabled(character) ((character)->state != FW64_CHARACTER_STATE_DISABLED)
 
 #ifdef __cplusplus
 }

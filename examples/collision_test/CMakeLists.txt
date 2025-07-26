@@ -2,6 +2,8 @@ set(src_files
     game.h game.c
     bomb_omb_battlefield.h bomb_omb_battlefield.c
     player.h player.c
+    star.h star.c
+    star_collected.h star_collected.c
     ui.h ui.c
     )
 

@@ -20,9 +20,8 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     player->engine = engine;
     player->node = node;
     player->scene = scene;
-    
+    player->character_control_enabled = 1;
 
-    player->run_character_update = 1;
     player->initial_pos = player->node->transform.position;
 
     const Vec3 character_size = node->transform.scale;
@@ -48,34 +47,35 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
 
     // Configure 3rd person character components
     player->character.size = character_size;
-    fw64_character_reset_position(&player->character, &player->node->transform.position);
+    fw64_character_set_position(&player->character, &player->node->transform.position);
     vec3_set(&player->third_person_cam.target_offset, 0.0, character_size.y, 0.0f); // focus on character's head
     fw64_character_animation_controller_set_transition_func(&player->animation_controller, player_on_animation_state_changed, NULL);
 }
 
+void player_set_character_control_enabled(Player* player, int enabled) {
+    player->character_control_enabled = enabled;
+
+    if (enabled) {
+        fw64_character_enable(&player->character);
+    } else {
+        fw64_character_disable(&player->character);
+    }
+}
+
 void player_update(Player* player) {
-    if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
-        player->run_character_update = !player->run_character_update;
-    }
-
-    if (fw64_input_controller_button_pressed(player->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
-        fw64_character_reset_position(&player->character, &player->initial_pos);
-        player->animation_controller.animation_state = FW64_INVALID_ANIMATION_ID; // temp
-    }
-
-    fw64_third_person_input_controller_update(&player->third_person_input, player->engine->time->time_delta);
-    fw64_third_person_camera_update(&player->third_person_cam);
-
     vec3_lerp(&player->character.previous_position, &player->character.position, player->engine->time->accumulator_progress, &player->node->transform.position);
     fw64_node_update(player->node);
 
-    fw64_character_animation_controller_update(&player->animation_controller, player->engine->time->time_delta);
+    if (player->character_control_enabled) {
+        fw64_third_person_input_controller_update(&player->third_person_input, player->engine->time->time_delta);
+        fw64_third_person_camera_update(&player->third_person_cam);
+        fw64_character_animation_controller_update(&player->animation_controller, player->engine->time->time_delta);
+    }
+
 }
 
 void player_fixed_update(Player* player) {
-    if (player->run_character_update) {
-        fw64_character_fixed_update(&player->character, player->engine->time->fixed_time_delta);
-    }
+    fw64_character_fixed_update(&player->character, player->engine->time->fixed_time_delta);
 }
 
 void player_on_animation_state_changed(fw64CharacterAnimationController* controller, fw64AnimationId prev, void* arg) {

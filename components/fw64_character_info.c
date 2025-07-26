@@ -21,6 +21,10 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
 
     draw_pos.y += fw64_font_line_height(info->font);
     switch (info->character->state){
+        case FW64_CHARACTER_STATE_DISABLED:
+        fw64_spritebatch_draw_string(spritebatch, info->font, "Off", draw_pos.x, draw_pos.y);
+            break;
+
         case FW64_CHARACTER_STATE_ON_GROUND:
             fw64_spritebatch_draw_string(spritebatch, info->font, "Ground", draw_pos.x, draw_pos.y);
             break;

@@ -4,7 +4,7 @@
             "src": "Consolas.ttf",
             "size": 12,
             "name": "Consolas12",
-            "sourceString": "Grid Air Ground tpv mem /,.-: 0123456789"
+            "sourceString": "Grid Air Ground Off tpv mem /,.-: 0123456789"
         }
     ],
     "levels": [
@@ -28,7 +28,8 @@
                 "RunJumpDown",
                 "RunJumpLand",
                 "Punch",
-                "Kick"
+                "Kick",
+                "Dance"
             ]
         }
     ],

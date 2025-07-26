@@ -2,6 +2,9 @@
 #include "assets/assets.h"
 #include "assets/layers.h"
 #include "assets/scene_Bomb_Omb_Battlefield.h"
+#include "assets/music_bank_bomb_omb_battlefield_music.h"
+
+static void bomb_om_battlefield_on_star_triggered(void* arg);
 
 void bomb_omb_battlefield_init(BombOmbBattlefield* battlefield, fw64Engine* engine, fw64Allocator* allocator) {
     battlefield->engine = engine;
@@ -34,14 +37,41 @@ void bomb_omb_battlefield_init(BombOmbBattlefield* battlefield, fw64Engine* engi
     // setup music
     fw64_audio_load_musicbank_asset(engine->audio, engine->assets, FW64_ASSET_musicbank_bomb_omb_battlefield_music);
     #ifndef COLLISION_TEST_NO_MUSIC
-        fw64_audio_play_music(engine->audio, 0);
+        fw64_audio_play_music(engine->audio, music_bank_bomb_omb_battlefield_music_bomb_omb);
     #endif
+
+    // setup star
+    fw64Node* star_node = fw64_scene_get_node(scene, FW64_scene_Bomb_Omb_Battlefield_node_star);
+    star_init(&battlefield->star, star_node, &battlefield->player, bomb_om_battlefield_on_star_triggered, battlefield);
+    star_collected_init(&battlefield->star_collected, engine, &battlefield->player);
 }
 
+#include "framework64/controller_mapping/n64.h"
+
 void bomb_omb_battlefield_update(BombOmbBattlefield* battlefield) {
+    // debug
+    if (fw64_input_controller_button_pressed(battlefield->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_Z)) {
+        battlefield->star_collected.state = STAR_COLLECTED_STATE_INACTIVE;
+        if (fw64_input_controller_button_down(battlefield->engine->input, 0, FW64_N64_CONTROLLER_BUTTON_START)) {
+            Vec3 debug_pos = {-8.34f, 30.0f, 31.0f};
+            fw64_character_set_position(&battlefield->player.character, &debug_pos);
+        } else {
+            fw64_character_set_position(&battlefield->player.character, &battlefield->player.initial_pos);
+        }
+        
+        battlefield->player.animation_controller.animation_state = FW64_INVALID_ANIMATION_ID; // temp
+        player_set_character_control_enabled(&battlefield->player, 1);
+        battlefield->star.triggered = 0;
+    }
+
     player_update(&battlefield->player);
     fw64_headlight_update(&battlefield->headlight);
     fw64_skybox_update(&battlefield->skybox);
+    star_update(&battlefield->star, battlefield->engine->time->time_delta);
+
+    if (star_collected_is_active(&battlefield->star_collected)) {
+        star_collected_update(&battlefield->star_collected);
+    }
 }
 
 void bomb_omb_battlefield_fixed_update(BombOmbBattlefield* battlefield) {
@@ -52,4 +82,10 @@ void bomb_omb_battlefield_draw(BombOmbBattlefield* battlefield) {
     fw64_renderer_submit_renderpass(battlefield->engine->renderer, battlefield->skybox.renderpass);
     fw64_collision_scene_manager_set_camera(&battlefield->collision_scene_manager, &battlefield->player.camera);
     fw64_collision_scene_manager_draw_scene(&battlefield->collision_scene_manager, ~FW64_layer_skybox);
+}
+
+static void bomb_om_battlefield_on_star_triggered(void* arg) {
+    BombOmbBattlefield* battlefield = (BombOmbBattlefield*)arg;
+
+    star_collected_start(&battlefield->star_collected, music_bank_bomb_omb_battlefield_music_courseclear);
 }
