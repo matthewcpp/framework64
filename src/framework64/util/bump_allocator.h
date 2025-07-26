@@ -19,8 +19,8 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_bump_allocator_init(fw64BumpAllocator* bump, size_t size);
-void fw64_bump_allocator_init_from_buffer(fw64BumpAllocator* bump, char* buffer, size_t size);
+fw64Allocator* fw64_bump_allocator_init(fw64BumpAllocator* bump, size_t size);
+fw64Allocator* fw64_bump_allocator_init_from_buffer(fw64BumpAllocator* bump, char* buffer, size_t size);
 void fw64_bump_allocator_reset(fw64BumpAllocator* bump);
 void fw64_bump_allocator_uninit(fw64BumpAllocator* bump);
 

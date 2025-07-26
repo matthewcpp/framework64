@@ -9,13 +9,13 @@
     ],
     "levels": [
         {
-            "src": "examples/collision_test/bomb_omb_battlefield/bomb_omb_battlefield.gltf",
+            "src": "examples/collision_test/bomb_omb_battlefield/level/bomb_omb_battlefield.gltf",
             "collisionGeometry": true
         }
     ],
     "meshes": [
         {
-            "src": "examples/collision_test/skybox/skybox.gltf"
+            "src": "examples/collision_test/bomb_omb_battlefield/skybox/skybox.gltf"
         }
     ],
     "skinnedMeshes": [
@@ -34,8 +34,8 @@
     ],
     "musicBanks": [
         {
-            "name": "music",
-            "dir": "examples/collision_test/music"
+            "name": "bomb_omb_battlefield_music",
+            "dir": "examples/collision_test/bomb_omb_battlefield/music"
         }
     ]
 }

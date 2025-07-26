@@ -58,19 +58,6 @@ static void fw64_collision_scene_manager_draw_default_scene(fw64CollisionSceneMa
     fw64_renderer_submit_renderpass(manager->engine->renderer, manager->static_scene_renderpass);
 }
 
-static void fw64_collision_scene_manager_draw_wireframe_overlay(fw64CollisionSceneManager* manager) {
-    uint32_t wire_layer_mask = FW64_COLLISION_SCENE_DEBUG_LAYER_WIRE_TRIANGLES;
-    if (manager->show_grid) {
-        wire_layer_mask |= FW64_COLLISION_SCENE_DEBUG_LAYER_GRID;
-    }
-
-    fw64_renderpass_begin(manager->wireframe_renderpass);
-    fw64_scene_draw_frustrum(manager->collision_wireframe, manager->wireframe_renderpass, &manager->view_frustum, wire_layer_mask);
-    fw64_renderpass_end(manager->wireframe_renderpass);
-
-    fw64_renderer_submit_renderpass(manager->engine->renderer, manager->wireframe_renderpass);
-}
-
 #define DEBUG_SCENE_COLLISION_GEOMETRY_GEOMETRY_NODES_START 2
 
 static void fw64_collision_scene_manager_draw_mode_active_cell_wireframe(fw64CollisionSceneManager* manager) {
@@ -96,29 +83,19 @@ static void fw64_collision_scene_manager_draw_mode_active_cell_wireframe(fw64Col
     fw64_renderer_submit_renderpass(manager->engine->renderer, manager->wireframe_renderpass);
 }
 
-void fw64_collision_scene_manager_draw_scene(fw64CollisionSceneManager* manager){
+void fw64_collision_scene_manager_draw_scene(fw64CollisionSceneManager* manager, fw64LayerMask layer_mask){
     if (!manager->collision_wireframe) {
-        fw64_collision_scene_manager_draw_default_scene(manager, FW64_LAYER_MASK_ALL_LAYERS);
+        fw64_collision_scene_manager_draw_default_scene(manager, layer_mask);
         return;
     }
 
     switch(manager->display_mode) {
         case FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_DEFAULT:
-            fw64_collision_scene_manager_draw_default_scene(manager, FW64_LAYER_MASK_ALL_LAYERS);
-            break;
-
-        case FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME:
-            fw64_collision_scene_manager_draw_default_scene(manager, ~manager->static_gemoetry_layer_mask);
-            fw64_collision_scene_manager_draw_wireframe_overlay(manager);
-            break;
-
-        case FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME_OVERLAY:
-            fw64_collision_scene_manager_draw_default_scene(manager, FW64_LAYER_MASK_ALL_LAYERS);
-            fw64_collision_scene_manager_draw_wireframe_overlay(manager);
+            fw64_collision_scene_manager_draw_default_scene(manager, layer_mask);
             break;
 
         case FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_ACTIVE_CELL_WIREFRAME_OVERLAY:
-            fw64_collision_scene_manager_draw_default_scene(manager, FW64_LAYER_MASK_ALL_LAYERS);
+            fw64_collision_scene_manager_draw_default_scene(manager, layer_mask);
             fw64_collision_scene_manager_draw_mode_active_cell_wireframe(manager);
             break;
     }

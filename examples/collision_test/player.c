@@ -16,7 +16,7 @@ static const fw64CharacterAnimationIds ids = {
 
 static void player_on_animation_state_changed(fw64CharacterAnimationController* controller, fw64AnimationId prev, void* arg);
 
-void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* env, fw64Scene* scene, fw64Node* node, fw64Camera* camera, fw64Allocator* allocator) {
+void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* env, fw64Scene* scene, fw64Node* node, fw64Node* camera_node, fw64Allocator* allocator) {
     player->engine = engine;
     player->node = node;
     player->scene = scene;
@@ -37,11 +37,13 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     vec3_set_all(&player->node->transform.scale, node_scale);
     fw64_node_update(player->node);
 
+    fw64_camera_init(&player->camera, camera_node, fw64_displays_get_primary(engine->displays));
+
     // Initialize all of the 3rd person character controller components here
     fw64_character_init(&player->character, env, scene);
     fw64_animation_controller_play(&skinned_mesh_instance->controller);
     fw64_character_animation_controller_init(&player->animation_controller, &player->character, skinned_mesh_instance, &ids);
-    fw64_third_person_camera_init(&player->third_person_cam, &node->transform, camera);
+    fw64_third_person_camera_init(&player->third_person_cam, &node->transform, &player->camera);
     fw64_third_person_input_controller_init(&player->third_person_input, engine->input, &player->character, node, &player->third_person_cam, &player->animation_controller, 0);
 
     // Configure 3rd person character components

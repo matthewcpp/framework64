@@ -1,24 +1,19 @@
 #pragma once
 
-#include "player.h"
+#include "bomb_omb_battlefield.h"
 #include "ui.h"
-
-#include "framework64/engine.h"
-#include "framework64/scene.h"
 
 #include "fw64_collision_scene_manager.h"
 #include "fw64_headlight.h"
 #include "fw64_skybox.h"
 
+#include <framework64/util/bump_allocator.h>
+
 typedef struct {
     fw64Engine* engine;
-    fw64Camera camera;
+    BombOmbBattlefield battlefield;
+    fw64BumpAllocator bump_allocator;
     UI ui;
-    fw64CharacterEnvironment character_environment;
-    Player player;
-    fw64CollisionSceneManager collision_scene_manager;
-    fw64Headlight headlight;
-    fw64Skybox skybox;
 } Game;
 
 #ifdef __cplusplus

@@ -6,8 +6,6 @@
 typedef enum {
     /** Displays only the original Scene */
     FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_DEFAULT,
-    FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME,
-    FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_WIREFRAME_OVERLAY,
     FW64_COLLISION_SCENE_MANAGER_DISPLAY_MODE_ACTIVE_CELL_WIREFRAME_OVERLAY
 } fw64CollisionSceneManagerDisplayMode;
 
@@ -51,7 +49,7 @@ fw64Scene* fw64_collision_scene_manager_load_scene(fw64CollisionSceneManager* ma
  */
 void fw64_collision_scene_manager_set_camera(fw64CollisionSceneManager* manager, fw64Camera* camera);
 
-void fw64_collision_scene_manager_draw_scene(fw64CollisionSceneManager* manager);
+void fw64_collision_scene_manager_draw_scene(fw64CollisionSceneManager* manager, fw64LayerMask layer_mask);
 #ifdef __cplusplus
 }
 #endif
