@@ -16,6 +16,10 @@ void ui_init(UI* ui, fw64Engine* engine, fw64Font* font, Player* player, fw64Bum
     ivec2_set(&ui->timing_info.position, 10, y_pos);
 
     y_pos += fw64_font_line_height(font);
+    fw64_bump_allocator_info_init(&ui->bump_info, bump_allocator, font);
+    ivec2_set(&ui->bump_info.position, 10, y_pos);
+
+    y_pos += fw64_font_line_height(font);
     fw64_character_info_init(&ui->character_info, font, &player->character);
     ivec2_set(&ui->character_info.position, 10, y_pos);
 }
@@ -23,6 +27,7 @@ void ui_init(UI* ui, fw64Engine* engine, fw64Font* font, Player* player, fw64Bum
 void ui_update(UI* ui) {
     fw64_spritebatch_begin(ui->spritebatch);
     fw64_timing_info_to_spritebatch(&ui->timing_info, ui->spritebatch);
+    fw64_bump_allocator_info_to_spritebatch(&ui->bump_info, ui->spritebatch);
     fw64_character_info_to_spritebatch(&ui->character_info, ui->spritebatch);
     fw64_spritebatch_end(ui->spritebatch);
 }

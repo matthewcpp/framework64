@@ -114,6 +114,3 @@ void fw64_bump_allocator_uninit(fw64BumpAllocator* bump) {
         fw64_free(bump->start);
 }
 
-uint32_t fw64_bump_allocator_committed(fw64BumpAllocator* bump) {
-    return (uint32_t)(bump->next - bump->start);
-}

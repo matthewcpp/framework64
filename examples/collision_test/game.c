@@ -5,7 +5,7 @@
 
 #include "framework64/controller_mapping/n64.h"
 
- #define BOMB_OMB_BATTLEFIELD_BUMP_ALLOCATOR_SIZE (400 * 1024)
+ #define BOMB_OMB_BATTLEFIELD_BUMP_ALLOCATOR_SIZE (500 * 1024)
 
 void game_init(Game* game, fw64Engine* engine) {
     game->engine = engine;
