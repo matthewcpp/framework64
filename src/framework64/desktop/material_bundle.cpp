@@ -49,6 +49,7 @@ fw64MaterialBundle* fw64MaterialBundle::loadFromDatasource(fw64DataSource* data_
         uint32_t texture_index, shading_mode;
         fw64_data_source_read(data_source, &texture_index, sizeof(uint32_t), 1);
         fw64_data_source_read(data_source, &shading_mode, sizeof(uint32_t), 1);
+        fw64_data_source_read(data_source, &material->texture_frame, sizeof(uint32_t), 1);
         fw64_data_source_read(data_source, material->color.data(), sizeof(float), 4);
 
         material->shading_mode = static_cast<fw64ShadingMode>(shading_mode);
