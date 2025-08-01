@@ -2,6 +2,8 @@
 
 #include "framework64/node.h"
 
+#define FW64_ROTATE_NODE_DEFAULT_SPEED 75.0f
+
 typedef struct {
     fw64Node* node;
     Vec3 axis;
