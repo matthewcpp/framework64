@@ -13,6 +13,9 @@ typedef struct {
 void vec2_set(Vec2 *v, float x, float y);
 void vec2_add(const Vec2* a, const Vec2* b, Vec2* out);
 void vec2_scale(const Vec2* v, float k, Vec2* out);
+void vec2_normalize(Vec2* v);
+float vec2_length(const Vec2* v);
+float vec2_length_squared(const Vec2* v);
 
 typedef struct {
     int x, y;
