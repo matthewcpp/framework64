@@ -63,6 +63,8 @@ void fw64_transform_add_child(fw64Transform* parent, fw64Transform* child);
  * Returns non-zero value if the operation was successfull */
 int fw64_transform_remove_child(fw64Transform* parent, fw64Transform* child);
 
+void fw64_transform_get_world_position(fw64Transform* transform, Vec3* out);
+
 #ifdef __cplusplus
 }
 #endif
