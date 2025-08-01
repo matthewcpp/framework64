@@ -1,3 +1,4 @@
+const CollisionGeometry = require("./CollisionGeometry");
 const Bounding = require("./gltf/Bounding");
 const GLTFLoader = require("./gltf/GLTFLoader");
 const MaterialBundle = require("./gltf/MaterialBundle");
@@ -32,6 +33,12 @@ class LevelParser {
             if (scene) {
                 this.scenes.push(scene);
             }
+        }
+    }
+
+    createCollisionGeometry() {
+        for (const scene of this.scenes) {
+            scene.collisionGeometry = CollisionGeometry.createFromScene(scene, this.gltfData);
         }
     }
 
@@ -77,6 +84,20 @@ class LevelParser {
         }
     }
 
+    _parseSceneCollisionGeometryConfig(scene, sceneGltfNode){
+        const hasCollisionGeometryConfig = Object.hasOwn(sceneGltfNode, "extras") && Object.hasOwn(sceneGltfNode.extras, "gridSize");
+        if (!hasCollisionGeometryConfig) {
+            return;
+        }
+
+        const dimensions = sceneGltfNode.extras.gridSize.split("x");
+        if (dimensions.length !== 2) {
+            throw new Error(`${sceneGltfNode.name}: Unable to determine parse grid dimensions: ${sceneGltfNode.extras.gridSize.split}`);
+        }
+
+        scene.gridSize = [parseInt(dimensions[0]), parseInt(dimensions[1])];
+    }
+
     _parseSceneExtras(scene, sceneGltfNode) {
         // TODO: Add more supported Extra fields
 
@@ -89,38 +110,56 @@ class LevelParser {
         if (Object.hasOwn(extras, "extraColliders")) {
             const extraColliders = parseInt(extras["extraColliders"]);
 
-            if (!isNaN(extraColliders)) {
-                scene.colliderCount += extraColliders;
+            if (isNaN(extraColliders)) {
+                throw new Error(`Unable to parse extraColliders value for scene: ${scene.name}`);
             }
+
+            scene.colliderCount += extraColliders;
         }
 
         if (Object.hasOwn(extras, "extraMeshInstances")) {
             const extraMeshInstances = parseInt(extras["extraMeshInstances"]);
 
-            if (!isNaN(extraMeshInstances)) {
-                scene.meshInstanceCount += extraMeshInstances;
+            if (isNaN(extraMeshInstances)) {
+                throw new Error(`Unable to parse extraMeshInstances value for scene: ${scene.name}`);
             }
+
+            scene.meshInstanceCount += extraMeshInstances;
+        }
+
+        if (Object.hasOwn(extras, "extraSkinnedMeshInstances")) {
+            const extraSkinnedMeshInstances = parseInt(extras["extraSkinnedMeshInstances"]);
+
+            if (isNaN(extraSkinnedMeshInstances)) {
+                throw new Error(`Unable to parse extraSkinnedMeshInstances value for scene: ${scene.name}`);
+            }
+
+            scene.skinnedMeshInstanceCount += extraSkinnedMeshInstances;
         }
 
         if (Object.hasOwn(extras, "extraMeshes")) {
             const extraMeshes = parseInt(extras["extraMeshes"]);
 
-            if (!isNaN(extraMeshes)) {
-                scene.extraMeshCount += extraMeshes;
+            if (isNaN(extraMeshes)) {
+                throw new Error(`Unable to parse extraMeshes value for scene: ${scene.name}`);
             }
+
+            scene.extraMeshCount += extraMeshes;
         }
 
         if (Object.hasOwn(extras, "extraNodes")) {
             const extraNodes = parseInt(extras["extraNodes"]);
 
-            if (!isNaN(extraNodes)) {
-                scene.extraNodeCount += extraNodes;
+            if (isNaN(extraNodes)) {
+                throw new Error(`Unable to parse extraNodes value for scene: ${scene.name}`);
             }
+
+            scene.extraNodeCount += extraNodes;
         }
     }
 
     _parseNode(scene, parentNode, gltfNode) {
-        const node = this._createAndAddNode(scene, parentNode);
+        const node = LevelParser.createAndAddNode(scene, parentNode);
         node.name = parentNode === null ? "root" : gltfNode.name; 
 
         const gltf = this.gltfData.gltf;
@@ -134,15 +173,24 @@ class LevelParser {
                 const gltfChildNode = gltf.nodes[childIndex];
                 const nodeHasName = Object.hasOwn(gltfChildNode, "name");
 
-                // Note: currently custom bounding boxes are set using child nodes beginning with _boundingBox.
+                // Note: currently custom bounding volumes are set using child nodes beginning with _boundingXXX.
                 // We do not want to parse that node in this case
-                if (nodeHasName && gltfChildNode.name.startsWith("_boundingBox")) {
-                    this._getCustomBoundingBoxForNode(scene, gltfChildNode, node);
-                    continue;
+                if (nodeHasName) {
+                    if (gltfChildNode.name.startsWith("_boundingBox")) {
+                        this._getCustomBoundingBoxForNode(scene, gltfChildNode, node);
+                        continue;
+                    } else if (gltfChildNode.name.startsWith("_boundingSphere")) {
+                        this._getCustomBoundingSphereForNode(scene, gltfChildNode, node);
+                        continue
+                    }
                 }
 
                 this._parseNode(scene, node, gltfChildNode);
             }
+        }
+
+        if (node.collider === N64Node.UnspecifiedCollider) {
+            node.collider = N64Node.NoCollider
         }
 
         if (node.collider != N64Node.NoCollider) {
@@ -150,7 +198,7 @@ class LevelParser {
         }
     }
 
-    _createAndAddNode(scene, parentNode) {
+    static createAndAddNode(scene, parentNode) {
         const node = new N64Node(scene.nodes.length, parentNode);
         scene.nodes.push(node);
 
@@ -170,15 +218,28 @@ class LevelParser {
         scene.materialBundle = new MaterialBundle(this.gltfData);
 
         this._parseSceneExtras(scene, gltfRootNode);
+        this._parseSceneCollisionGeometryConfig(scene, gltfRootNode);
         this._parseCollisionMeshes(scene, gltfRootNode);
         const gltfSceneNodeRoot = this._findChildNodeStartingWith(gltfRootNode, "Scene");
         if (!gltfSceneNodeRoot) {
-            return null;
+            throw new Error(`Invalid Scene structure detected for root node: ${gltfRootNode.name}`);
         }
 
         this._parseNode(scene, null, gltfSceneNodeRoot);
 
-        // Assign Node Children pointers
+        LevelParser.assignNodeChildPointers(scene);
+
+        for (const meshIndex of scene.meshBundle) {
+            this.gltfData.validateMeshPrimitives(this.gltfData.meshes[meshIndex]);
+        }
+
+        return scene;
+    }
+
+    /** Parent is assigned via AddOrCreate, however the children pointers need
+     *  to be setup before writing.
+     */
+    static assignNodeChildPointers(scene) {
         for (const node of scene.nodes) {
             if (node.childNodes.length === 0) {
                 continue;
@@ -192,8 +253,6 @@ class LevelParser {
                 currentChild = node.childNodes[i];
             }
         }
-
-        return scene;
     }
 
     _parseNodeExtras(scene, gltfNode, node) {
@@ -227,12 +286,13 @@ class LevelParser {
             node.data = dataValue;
         }
 
+
         if (Object.hasOwn(extras, "mesh")) {
-            scene.meshInstanceCount += 1;
-            // if the mesh is ignored just set an empty collider
-            if (extras.mesh === "ignore"){
+            // Node extras may specify that the mesh attached to the node should be ignored.
+            // This is useful for creating stand in geometry in blender that will be replaced
+            // by something else at runtime.
+            if (extras.mesh === "ignore" || extras.mesh === "none"){
                 node.mesh = N64Node.MeshIgnored;
-                node.collider = N64Node.ColliderType.None
             }
         }
 
@@ -244,11 +304,17 @@ class LevelParser {
             }
             else {
                 if (!this.collisonMeshMap.has(colliderName)) {
-                    throw new Error(`Node ${node.name}: invalid collion mesh name specified: ${colliderName}`);
+                    throw new Error(`Node ${node.name}: invalid collision mesh name specified: ${colliderName}`);
                 }
 
                 const collisionMeshIndex = this.collisonMeshMap.get(colliderName);
                 node.collider = N64Node.ColliderType.CollisionMesh | (collisionMeshIndex << 16);
+            }
+        }
+
+        if (Object.hasOwn(extras, "collisionType")) {
+            if (extras.collisionType.toLowerCase() === "dynamic") {
+                node.collisionType = N64Node.CollisionType.Dynamic;
             }
         }
     }
@@ -289,20 +355,29 @@ class LevelParser {
         node.collider = N64Node.ColliderType.Box | (boundingBoxIndex << 16)
     }
 
-    _parseNodeMesh(scene, gltfNode, node) {
-        if (node.mesh == N64Node.MeshIgnored) {
-            node.mesh = N64Node.NoMesh;
-            return;
-        }
+    /** bounding spheres will use the same storage as boxes just to keep things simpler, result is two extra non used floats */
+    _getCustomBoundingSphereForNode(scene, gltfBoundingNode, node) {
+        const center = Object.hasOwn(gltfBoundingNode, "translation") ? gltfBoundingNode.translation : [0.0, 0.0, 0.0];
+        const scale = Object.hasOwn(gltfBoundingNode, "scale") ? gltfBoundingNode.scale : [1.0, 1.0, 1.0];
 
-        if (!Object.hasOwn(gltfNode, "mesh")) {
+        const radius = Math.max(scale[0], scale[1], scale[2]);
+        const boundingBoxIndex = scene.customBoundingBoxes.length;
+        scene.customBoundingBoxes.push(Bounding.createFromMinMax(center, [radius, radius, radius]));
+        node.collider = N64Node.ColliderType.Sphere | (boundingBoxIndex << 16);
+    }
+
+    _parseNodeMesh(scene, gltfNode, node) {
+        // This was set when parsing node extras
+        if (node.mesh == N64Node.MeshIgnored || !Object.hasOwn(gltfNode, "mesh")) {
+            node.mesh = N64Node.NoMesh;
             return;
         }
 
         node.mesh = scene.bundleMeshIndex(gltfNode.mesh);
         scene.meshInstanceCount += 1;
 
-        if (node.collider === N64Node.NoCollider) {
+        // TODO: do we actually want to do this? this should maybe be done explicitly?
+        if (node.collider === N64Node.UnspecifiedCollider) {
             node.collider = N64Node.ColliderType.Box | (GLTFLoader.BoxColliderUseMeshBounding);
         }
     }
