@@ -28,7 +28,7 @@ void game_init(Game* game, fw64Engine* engine) {
     ui_init(&game->ui, engine, &game->player);
 }
 
-void game_update(Game* game){
+void game_update(Game* game) {
     player_update(&game->player);
     chase_camera_update(&game->chase_cam);
 
@@ -46,7 +46,7 @@ void game_draw(Game* game) {
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_begin(renderpass);
     fw64_renderpass_set_camera(renderpass, &game->chase_cam.camera);
-    fw64_scene_draw_frustrum(game->scene, renderpass, &frustum, ~0U);
+    fw64_scene_draw_frustrum(game->scene, renderpass, &frustum, FW64_LAYER_MASK_ALL_LAYERS);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 
@@ -55,4 +55,8 @@ void game_draw(Game* game) {
     fw64_renderpass_draw_sprite_batch(renderpass, game->ui.spritebatch);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
+}
+
+void game_fixed_update(Game* game) {
+    (void)game;
 }

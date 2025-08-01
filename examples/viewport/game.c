@@ -117,6 +117,10 @@ void game_update(Game* game){
     update_viewport_info(game);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void update_viewport_info(Game* game) {
     fw64Viewport* vp = &game->camera.viewport;
     char viewport_info_txt[32];

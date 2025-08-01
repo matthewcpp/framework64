@@ -49,6 +49,10 @@ void game_draw(Game* game) {
     ui_draw(&game->ui);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 static void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
     fw64Display* display = fw64_displays_get_primary(engine->displays);

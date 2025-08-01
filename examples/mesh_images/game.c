@@ -61,6 +61,10 @@ void game_update(Game* game){
         change_palette(game, -1);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void change_palette(Game* game, int direction) {
     fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(&game->scene, 0);
     fw64Material* material = fw64_material_collection_get_material(mesh_instance->materials, game->selected_material);

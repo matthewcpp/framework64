@@ -53,6 +53,10 @@ void game_update(Game* game){
     }
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void game_draw(Game* game) {
     fw64_spritebatch_begin(game->spritebatch);
     if (fw64_data_link_connected(game->data_link)) {

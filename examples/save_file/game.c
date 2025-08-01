@@ -75,6 +75,10 @@ void game_update(Game* game){
     update_spritebatch(game);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void game_draw(Game* game) {
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_begin(renderpass);

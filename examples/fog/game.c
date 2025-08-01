@@ -62,6 +62,10 @@ void game_update(Game* game){
     }
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void set_camera_ypos(Game* game) {
     Vec3 origin = game->fps_camera.camera->node->transform.position;
     origin.y = 1000.0f;

@@ -71,6 +71,10 @@ void game_update(Game* game) {
     ui_update(&game->ui);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 static void draw_scene_layer(Game* game, fw64RenderPass* renderpass, fw64Frustum* frustum, uint32_t layer_mask) {
     fw64_renderpass_begin(renderpass);
     fw64_scene_draw_frustrum(game->scene, renderpass, frustum, layer_mask);
