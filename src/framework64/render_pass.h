@@ -46,6 +46,7 @@ const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass);
 void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera);
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled);
+void fw64_renderpass_set_depth_writing_enabled(fw64RenderPass* renderpass, int enabled);
 void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int enabled);
 
 void fw64_renderpass_set_clear_flags(fw64RenderPass* pass, fw64ClearFlags flags);
