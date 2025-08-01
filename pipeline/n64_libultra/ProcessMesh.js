@@ -1,5 +1,6 @@
 const GLTFLoader = require("../gltf/GLTFLoader");
 const MaterialBundle = require("../gltf/MaterialBundle");
+const MeshCustomBounding = require("../gltf/MeshCustomBounding");
 const MeshWriter = require("./MeshWriter");
 
 const path = require("path");
@@ -14,6 +15,8 @@ async function processMesh(meshJson, archive, baseDirectory, outputDirectory) {
     }
 
     const staticMesh = gltfLoader.meshes[0];
+    MeshCustomBounding.setForStaticMesh(staticMesh, gltfLoader);
+
     const meshName = !!meshJson.name ? meshJson.name : path.basename(meshJson.src, path.extname(meshJson.src));
     staticMesh.name = meshName;
 

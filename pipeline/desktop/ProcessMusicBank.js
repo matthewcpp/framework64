@@ -34,7 +34,7 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
         const file = files[i];
         const ext = path.extname(file);
 
-        const destFile = `${i}.ogg`;  path.join(destDir, );
+        const destFile = `${musicBankFiles.length}.ogg`;  path.join(destDir, );
 
         if (midiFileExtensions.has(ext)) {
             await convertMidiToOgg(sourceDir, file, destDir, destFile);

@@ -6,11 +6,16 @@ class Mesh {
     primitives = [];
     materialBundle = null;
 
+    customBoundingBox = null;
+
     constructor(name) {
         this.name = name;
     }
 
     get bounding() {
+        if (this.customBoundingBox !== null) {
+            return this.customBoundingBox;
+        }
         const bounding = new Bounding();
 
         for (const mesh of this.primitives) {
