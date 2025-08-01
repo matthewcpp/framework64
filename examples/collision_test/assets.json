@@ -1,0 +1,47 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12",
+            "sourceString": "Grid Air Ground Off Hang Climb up tpv mem /,.-: 0123456789"
+        }
+    ],
+    "levels": [
+        {
+            "src": "examples/collision_test/bomb_omb_battlefield/level/bomb_omb_battlefield.gltf",
+            "collisionGeometry": true
+        }
+    ],
+    "meshes": [
+        {
+            "src": "examples/collision_test/bomb_omb_battlefield/skybox/skybox.gltf"
+        }
+    ],
+    "skinnedMeshes": [
+        {
+            "src": "examples/collision_test/character/character.gltf",
+            "animations": [
+                "Idle",
+                "RunForward",
+                "RunJumpUp",
+                "RunJumpDown",
+                "RunJumpLand",
+                "Punch",
+                "Kick",
+                "Dance",
+                "HangIdle",
+                "LedgeClimbUp"
+            ],
+            "excludeJoints": [
+                ".*_end$"
+            ]
+        }
+    ],
+    "musicBanks": [
+        {
+            "name": "bomb_omb_battlefield_music",
+            "dir": "examples/collision_test/bomb_omb_battlefield/music"
+        }
+    ]
+}

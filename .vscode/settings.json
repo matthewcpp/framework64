@@ -177,6 +177,7 @@
         "execution": "cpp",
         "print": "cpp",
         "fw64_media_file_picker.h": "c",
-        "modules.h": "c"
+        "modules.h": "c",
+        "scene_collisiontest.h": "c"
     }
 }
