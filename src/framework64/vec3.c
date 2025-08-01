@@ -98,6 +98,10 @@ float vec3_length(const Vec3* v) {
     return fw64_sqrtf(v->x * v->x + v->y * v->y + v->z * v->z);
 }
 
+float vec3_length_squared(const Vec3* v) {
+    return v->x * v->x + v->y * v->y + v->z * v->z;
+}
+
 int vec3_equals(const Vec3* a, const Vec3* b, float epsilon) {
     float dx = fabsf(a->x - b->x);
     float dy = fabsf(a->y - b->y);
