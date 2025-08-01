@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-void box_set_center_extents(Box* box, Vec3* center, Vec3* extents) {
+void box_set_center_extents(Box* box, const Vec3* center, const Vec3* extents) {
     box->min.x = center->x - extents->x;
     box->min.y = center->y - extents->y;
     box->min.z = center->z - extents->z;
@@ -13,18 +13,18 @@ void box_set_center_extents(Box* box, Vec3* center, Vec3* extents) {
     box->max.z = center->z + extents->z;
 }
 
-void box_center(Box* box, Vec3* out) {
+void box_center(const Box* box, Vec3* out) {
     vec3_add(&box->min, &box->max, out);
     vec3_scale(out, 0.5f, out);
 }
 
-void box_size(Box* box, Vec3* out) {
+void box_size(const Box* box, Vec3* out) {
     out->x = fabsf(box->max.x - box->min.x);
     out->y = fabsf(box->max.y - box->min.y);
     out->z = fabsf(box->max.z - box->min.z);
 }
 
-void box_extents(Box* box, Vec3* out) {
+void box_extents(const Box* box, Vec3* out) {
     box_size(box, out);
     vec3_scale(out, 0.5f, out);
 }
@@ -88,7 +88,7 @@ void matrix_transform_box(const float* matrix, const Box* box, Box* out) {
         }
 }
 
-int box_intersection(Box* a, Box* b) {
+int box_intersection(const Box* a, const Box* b) {
     if (a->max.x < b->min.x || a->min.x > b->max.x) return 0;
     if (a->max.y < b->min.y || a->min.y > b->max.y) return 0;
     if (a->max.z < b->min.z || a->min.z > b->max.z) return 0;
@@ -97,7 +97,7 @@ int box_intersection(Box* a, Box* b) {
 }
 
 // Real Time Collision Detection 5.1.3
-void box_closest_point(Box* b, const Vec3* p, Vec3* q) {
+void box_closest_point(const Box* b, const Vec3* p, Vec3* q) {
     float* p_el = (float*)p;
     float* q_el = (float*)q;
     float* b_min_el = (float*)&b->min;
@@ -111,7 +111,7 @@ void box_closest_point(Box* b, const Vec3* p, Vec3* q) {
     }
 }
 
-int box_contains_point(Box* box, Vec3* pt) {
+int box_contains_point(const Box* box, const Vec3* pt) {
     return  pt->x >= box->min.x && pt->x <= box->max.x &&
             pt->y >= box->min.y && pt->y <= box->max.y &&
             pt->z >= box->min.z && pt->z <= box->max.z;
