@@ -19,7 +19,8 @@ function writeSceneInfo(scene, file, writer) {
     index = writer.writeUInt32(sceneInfoBuffer, scene.colliderCount, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.collisionMeshes.length, index);
     index = writer.writeUInt32(sceneInfoBuffer, scene.customBoundingBoxes.length, index);
-    index = writer.writeUInt32(sceneInfoBuffer, !!scene.materialBundle ? 1 : 0, index);
+    index = writer.writeUInt16(sceneInfoBuffer, !!scene.materialBundle ? 1 : 0, index);
+    index = writer.writeUInt16(sceneInfoBuffer, !!scene.collisionGeometry ? 1 : 0, index);
 
     fs.writeSync(file, sceneInfoBuffer);
 }

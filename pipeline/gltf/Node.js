@@ -5,13 +5,27 @@ class N64Node {
     // this needs to correspond to fw64ColliderType in collider.h
     static ColliderType = {
         Box: 0,
-        CollisionMesh: 1
+        Sphere: 1,
+        CollisionMesh: 2
+    };
+
+    static CollisionType = {
+        /** stationary world geometry */
+        Static: 0,
+
+        /** synamic, movable geometry */
+        Dynamic: 1
     };
 
     static InvalidNodeIndex = 0xFFFFFFFF;
 
     static NoMesh = 0xFFFFFFFF;
+    /** Temporary value for the mesh field to indicate to the parse that the mesh for this node was explicity skipped
+     *  and any value present in the gltf should not be processed.
+     */
     static MeshIgnored = 0xFFFFFFFE;
+
+    static UnspecifiedCollider = 0xFFFFFFFE;
     static NoCollider = 0xFFFFFFFF;
 
     name;
@@ -37,11 +51,14 @@ class N64Node {
     /* this will be filled in at the end of scene processing */
     nextSiblingNode = null;
 
+    /** This holds the index into the parsed gltf data's mesh array */
     mesh = N64Node.NoMesh;
-    collider = N64Node.NoCollider;
+    collider = N64Node.UnspecifiedCollider;
+    collisionType = N64Node.CollisionType.Static;
     data = 0;
     layerMask = 1;
 
+    /** This is the node's own index in the scene's node array */
     index = N64Node.InvalidNode;
 
     constructor(index, parentNode) {

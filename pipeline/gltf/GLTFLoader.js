@@ -133,21 +133,27 @@ class GLTFLoader {
                 material.texture = pbr.baseColorTexture.index;
             }
 
-            // Applies a specific shading mode to this material.  In this case mode will not be determined later.
-            if (gltfMaterial.extras && gltfMaterial.extras.shadingMode) {
+            if (Object.hasOwn(gltfMaterial, "extras")) {
                 const extras = gltfMaterial.extras;
 
-                if (extras.shadingMode) {
+                // Applies a specific shading mode to this material.  In this case mode will not be determined later.
+                if (Object.hasOwn(extras, "shadingMode")) {
                     if (Material.ShadingMode.hasOwnProperty(gltfMaterial.extras.shadingMode)) {
                         material.shadingMode = Material.ShadingMode[gltfMaterial.extras.shadingMode];
                     }
                     else {
-                        throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${gltfMaterial.extras.shadingMode}`);
+                        throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${extras.shadingMode}`);
                     }
                 }
 
-                if (extras.baseColorFactor) {
-                    material.setColorFromFloatArray(extras.baseColorFactor);
+                if (Object.hasOwn(extras, "textureFrame")) {
+                    const textureFrame = parseInt(extras.textureFrame);
+
+                    if (isNaN(textureFrame)) {
+                        throw new Error(`Could not parse texture frame in in Material: ${gltfMaterial.name}: ${extras.textureFrame}`);
+                    }
+
+                    material.textureFrame = textureFrame;
                 }
             }
 
@@ -185,11 +191,13 @@ class GLTFLoader {
                     this._readNormals(gltfPrimitive, primitive);
                 }
     
-                if (Object.hasOwn(gltfPrimitive.attributes, "TEXCOORD_0"))
+                if (Object.hasOwn(gltfPrimitive.attributes, "TEXCOORD_0")) {
                     this._readTexCoords(gltfPrimitive, primitive, gltfMesh.name);
+                }
     
-                if (Object.hasOwn(gltfPrimitive.attributes, "JOINTS_0"))
+                if (Object.hasOwn(gltfPrimitive.attributes, "JOINTS_0")) {
                     this._readJointIndices(gltfPrimitive, primitive);
+                }
     
                 this._readIndices(gltfPrimitive, primitive);
     
@@ -200,13 +208,12 @@ class GLTFLoader {
             }
     
             mesh.prunePrimitiveVertices();
-            this._validateMeshPrimitives(mesh);
             mesh.sortPrimitives(this.materials);
             this.meshes.push(mesh);
         }
     }
 
-    _validateMeshPrimitives(mesh) {
+    validateMeshPrimitives(mesh) {
         for (let i = 0; i < mesh.primitives.length; i++) {
             const primitive = mesh.primitives[i];
             const material = this.materials[primitive.material];

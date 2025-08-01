@@ -25,12 +25,11 @@ class MaterialBundle {
         if (bundledIndex < 0) {
             bundledIndex = this.materials.length;
             this.materials.push(gltfMaterialIndex);
-        }
+            const material = this.gltfData.materials[gltfMaterialIndex];
 
-        const material = this.gltfData.materials[gltfMaterialIndex];
-
-        if (material.hasTexture()) {
-            this.bundleTexture(material.texture);
+            if (material.hasTexture()) {
+                this.bundleTexture(material.texture);
+            }
         }
 
         return bundledIndex;
@@ -41,11 +40,11 @@ class MaterialBundle {
         let bundledIndex = this.getBundledTextureIndex(gltfTextureIndex);
         if (bundledIndex < 0) {
             bundledIndex = this.textures.length;
-            this.textures.push(bundledIndex);
+            this.textures.push(gltfTextureIndex);
+
+            const texture = this.gltfData.textures[gltfTextureIndex];
+            this.bundleImage(texture.image);
         }
-        
-        const texture = this.gltfData.textures[gltfTextureIndex];
-        this.bundleImage(texture.image);
 
         return bundledIndex;
     }
