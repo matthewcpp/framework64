@@ -19,8 +19,8 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_bump_allocator_init(fw64BumpAllocator* bump, size_t size);
-void fw64_bump_allocator_init_from_buffer(fw64BumpAllocator* bump, char* buffer, size_t size);
+fw64Allocator* fw64_bump_allocator_init(fw64BumpAllocator* bump, size_t size);
+fw64Allocator* fw64_bump_allocator_init_from_buffer(fw64BumpAllocator* bump, char* buffer, size_t size);
 void fw64_bump_allocator_reset(fw64BumpAllocator* bump);
 void fw64_bump_allocator_uninit(fw64BumpAllocator* bump);
 
@@ -31,7 +31,7 @@ void fw64_bump_allocator_free(fw64BumpAllocator* allocator, void* ptr);
 /** Note: this implementation will call \ref fw64_bump_allocator_free on ptr and return NULL if size is 0. */
 void* fw64_bump_allocator_realloc(fw64BumpAllocator* allocator, void* ptr, size_t size);
 
-uint32_t fw64_bump_allocator_committed(fw64BumpAllocator* bump);
+#define fw64_bump_allocator_committed(bump) ((uint32_t)((bump)->next - (bump)->start))
 
 #ifdef __cplusplus
 }
