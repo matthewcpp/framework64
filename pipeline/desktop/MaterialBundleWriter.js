@@ -6,6 +6,8 @@ const Material = require("../gltf/Material");
 const fs = require("fs");
 const path = require("path");
 
+// Note: the write order of the objects in this file needs to match up with the reading order in src/framework64/desktop/material_bundle.cpp
+
 async function writeBundleImages(materialBundle, desktopImages, file) {
     for (const imageIndex of materialBundle.images) {
         await ImageWriter.writeToOpenStream(desktopImages[imageIndex], file);
@@ -29,7 +31,7 @@ function writeBundleTextures(gltfData, materialBundle, file) {
 }
 
 function writeBundleMaterials(gltfData, materialBundle, file) {
-    const materialBuffer = Buffer.alloc(24);
+    const materialBuffer = Buffer.alloc(28);
 
     for (const materialIndex of materialBundle.materials) {
         const material = gltfData.materials[materialIndex]
@@ -38,6 +40,7 @@ function writeBundleMaterials(gltfData, materialBundle, file) {
         let index = 0;
         index = materialBuffer.writeUInt32LE(bundledTextureIndex, index);
         index = materialBuffer.writeUInt32LE(material.shadingMode, index);
+        index = materialBuffer.writeUInt32LE(material.textureFrame, index);
 
         for (let i = 0; i < 4; i++) {
             index = materialBuffer.writeFloatLE(material.color[i] / 255.0, index);
@@ -76,6 +79,10 @@ async function write(materialBundle, desktopImages, gltfData, file) {
 }
 
 async function createDesktopImages(gltfData) {
+    if (gltfData.images.length === 0) {
+        return [];
+    }
+
     const desktopImages = [];
     const gltfDir = path.dirname(gltfData.gltfPath);
 
