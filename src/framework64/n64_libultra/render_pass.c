@@ -132,6 +132,11 @@ void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int e
     fw64_n64_renderpass_toggle_feature(renderpass, N64_RENDERER_FEATURE_DEPTH_TEST, enabled);
 }
 
+void fw64_renderpass_set_depth_writing_enabled(fw64RenderPass* renderpass, int enabled) {
+    (void)renderpass;
+    (void)enabled;
+}
+
 void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int enabled) {
     fw64_n64_renderpass_toggle_feature(renderpass, N64_RENDERER_FEATURE_AA, enabled);
 }
