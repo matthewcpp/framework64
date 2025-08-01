@@ -61,7 +61,7 @@ fw64Node* fw64_debug_boxes_add(fw64DebugBoxes* debug_boxes, fw64Node* node) {
 }
 
 void fw64_debug_boxes_update(fw64DebugBoxes* debug_boxes) {
-    for (size_t i = 0; i < fw64_static_vector_size(&debug_boxes->entries); i++) {
+    for (uint32_t i = 0; i < fw64_static_vector_size(&debug_boxes->entries); i++) {
         fw64Node* node = *((fw64Node**)fw64_static_vector_get_item(&debug_boxes->entries, i));
         fw64_mesh_instance_update(node->mesh_instance);
     }

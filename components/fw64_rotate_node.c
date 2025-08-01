@@ -1,11 +1,11 @@
 #include "fw64_rotate_node.h"
 
-#define DEFAULT_ROTATION_SPEED = 75.0f
+
 
 void fw64_rotate_node_init(fw64RotateNode* component, fw64Node* node) {
     component->node = node;
     vec3_set(&component->axis, 0.0f, 1.0f, 0.0f);
-    component->speed = 75.0f;
+    component->speed = FW64_ROTATE_NODE_DEFAULT_SPEED;
     component->direction = 1.0f;
     component->rotation = 0.0f;
     component->enabled = 1;
