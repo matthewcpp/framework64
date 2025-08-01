@@ -69,6 +69,7 @@ bool Engine::init(Settings const & app_settings) {
 
     time = new fw64Time();
     memset(time, 0, sizeof(fw64Time));
+    time->fixed_time_delta = 1.0f / static_cast<float>(settings.fixed_update_rate);
 
     if (!assets->init()) {
         std::cout << "Failed to initialize Asset Database" << std::endl;
@@ -83,22 +84,17 @@ bool Engine::init(Settings const & app_settings) {
     input->init(*n64_input_interface, *time);
     save_file->init(save_file_path, settings.save_file_type);
 
-    // media = _fw64_media_init(const_cast<std::string*>(&media_dir));
-    // if (!media) {
-    //     std::cout << "Failed to initialize media" << std::endl;
-    //     return false;
-    // }
-
     Filesystem::init(asset_dir_path, *assets);
 
     return true;
 }
 
-void Engine::update(float time_delta) {
+void Engine::update(float time_delta, float accumulator_progress) {
     input->update();
     modules->update();
 
     time->time_delta = time_delta;
+    time->accumulator_progress = accumulator_progress;
     time->total_time += time_delta;
 
     save_file->update(time_delta);
