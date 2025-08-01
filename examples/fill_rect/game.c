@@ -57,6 +57,10 @@ void game_update(Game* game){
         game->progress_bar.progress = 0.0f;
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 static void draw_background(Game* game, IVec2* screen_size) {
     int pos_x = (screen_size->x / 2) - (fw64_texture_width(game->logo_texture) / 2);
     int pos_y = (screen_size->y / 2) - (fw64_texture_height(game->logo_texture) / 2);

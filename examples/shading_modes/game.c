@@ -148,3 +148,7 @@ void update_spritebatch(Game* game) {
 
     fw64_spritebatch_end(game->spritebatch);
 }
+
+void game_fixed_update(Game* game) {
+    (void)game;
+}

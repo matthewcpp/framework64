@@ -43,6 +43,10 @@ void game_update(Game* game){
     typewriter_text_update(&game->typewriter_text, time_delta);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void draw_sprites(Game* game) {
     fw64SpriteBatch* sprite_batch = game->sprite_batch;
 

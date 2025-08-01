@@ -73,7 +73,7 @@ static void flame_update(Flame* flame, float time_delta) {
     }
 }
 
-void game_update(Game* game){
+void game_update(Game* game) {
     fw64_fps_camera_update(&game->fps, game->engine->time->time_delta);
     flame_update(&game->flame, game->engine->time->time_delta);
     fw64_billboard_nodes_update(&game->billboard_nodes);
@@ -97,4 +97,8 @@ void game_draw(Game* game) {
     fw64_scene_draw_frustrum(game->scene, renderpass, &frustum, FW64_layer_flame);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(renderer, renderpass);
+}
+
+void game_fixed_update(Game* game) {
+    (void)game;
 }

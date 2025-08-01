@@ -77,6 +77,10 @@ void game_update(Game* game){
     }
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void game_draw(Game* game) {
     fw64_renderpass_begin(game->renderpass);
     fw64_scene_draw_all(&game->scene, game->renderpass);

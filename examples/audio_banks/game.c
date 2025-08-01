@@ -17,9 +17,13 @@ void game_init(Game* game, fw64Engine* engine) {
     ui_init(&game->ui, engine, &game->audio_state);
 }
 
-void game_update(Game* game){
+void game_update(Game* game) {
     scene_view_update(&game->scene_view);
     controller_update(&game->controller);
+}
+
+void game_fixed_update(Game* game) {
+    (void)game;
 }
 
 void game_draw(Game* game) {

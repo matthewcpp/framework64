@@ -27,6 +27,10 @@ void game_update(Game* game){
     }
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void game_draw(Game* game) {
     for (int i  = 0; i < 4; i++) {
          player_draw_view(&game->players[i]);

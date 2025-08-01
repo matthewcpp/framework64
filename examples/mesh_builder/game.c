@@ -96,7 +96,7 @@ static fw64Mesh* build_wire_pyramid(Game* game) {
     fw64_material_set_shading_mode(fw64_mesh_builder_get_material(mesh_builder, 0), FW64_SHADING_MODE_LINE);
 
     fw64_mesh_builder_set_vertex_position_f(mesh_builder, 0, 0.0f, 2.0f, 0.0f);
-    fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder,0, 255, 255, 0, 255);
+    fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder, 0, 255, 255, 0, 255);
 
     fw64_mesh_builder_set_vertex_position_f(mesh_builder, 1, -1.0f, -1.0f, 1.0f);
     fw64_mesh_builder_set_vertex_color_rgba8(mesh_builder, 1, 255, 255, 0, 255);
@@ -207,6 +207,10 @@ void game_update(Game* game){
     } else if (fw64_ui_navigation_moved_right(&game->ui_nav)) {
         next_game_state(game, 1);
     }
+}
+
+void game_fixed_update(Game* game) {
+    (void)game;
 }
 
 void game_draw(Game* game) {
