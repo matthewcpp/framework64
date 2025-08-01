@@ -7,7 +7,10 @@
 #include "framework64/mesh_instance.h"
 #include "framework64/transform.h"
 
-#include <limits.h>
+#include <stdint.h>
+
+typedef uint32_t fw64LayerMask;
+#define FW64_LAYER_MASK_ALL_LAYERS (~0U)
 
 #ifndef FW64_DEFAULT_LAYER_MASK
 #define FW64_DEFAULT_LAYER_MASK 1U
@@ -18,7 +21,7 @@ struct fw64Node {
     fw64Collider* collider;
     fw64MeshInstance* mesh_instance;
     uintptr_t data;
-    uint32_t layer_mask;
+    fw64LayerMask layer_mask;
 
     #ifdef FW64_PLATFORM_IS_64_BIT
     uint32_t _align;
