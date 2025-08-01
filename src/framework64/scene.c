@@ -53,6 +53,12 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
 
     init_static_vectors(scene, &scene_info);
 
+    if (scene_info.collision_geometry_count == 1) {
+        scene->collision_geometry = fw64_collision_geometry_load_from_datasource(data_source, allocator);
+    } else {
+        scene->collision_geometry = NULL;
+    }
+
     for (uint32_t i = 0; i < scene_info.mesh_count; i++) {
         fw64Mesh* mesh = fw64_mesh_load_from_datasource_with_bundle(assets, data_source, scene->material_bundle, allocator);
         fw64_static_vector_push_back(&scene->meshes, &mesh);
@@ -128,19 +134,22 @@ fw64Scene* fw64_scene_load_from_datasource(fw64DataSource* data_source, fw64Asse
                 else {
                     fw64_collider_init_box(collider, node, custom_bounding_boxes + collider_index);
                 }
+                box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
+            }
+            else if (collider_type == FW64_COLLIDER_SPHERE) {
+                // TODO: grab sphere out of the custom bounding volumes
+                // center stored in min, radius is max[0]
             }
             else if (collider_type == FW64_COLLIDER_COLLISION_MESH) {
                 fw64CollisionMesh* collision_mesh = fw64_static_vector_get_item(&scene->collision_meshes, (uint32_t)collider_index);
                 fw64_collider_init_collision_mesh(collider, node, collision_mesh);
+                box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
             }
-
-            box_encapsulate_box(&scene->bounding_box, &node->collider->bounding);
         }
         else {
             node->collider = NULL;
         }
     }
-    
 
     if (custom_bounding_boxes) {
         fw64_allocator_free(allocator, custom_bounding_boxes);
@@ -206,7 +215,7 @@ void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass) {
     }
 }
 
-void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask) {
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, fw64LayerMask layer_mask) {
     for (uint32_t i = 0 ; i < fw64_scene_get_mesh_instance_count(scene); i++) {
         fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(scene, i);
 
