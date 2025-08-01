@@ -8,6 +8,7 @@ set(common_source_files
     camera.h camera.c
     collision.h collision.c
     collision_mesh.h collision_mesh.c
+    collision_geometry.h collision_geometry.c
     collider.h collider.c
     color.h color.c
     data_io.h data_io.c
@@ -32,7 +33,6 @@ set(common_source_files
     quat.h quat.c
     query.h query.c
     random.h random.c
-    rect.h rect.c
     render_pass.h
     render_queue.h render_queue.c
     renderer.h

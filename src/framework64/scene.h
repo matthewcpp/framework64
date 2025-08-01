@@ -3,6 +3,7 @@
 /** \file scene.h */
 
 #include "framework64/collision.h"
+#include "framework64/collision_geometry.h"
 #include "framework64/data_io.h"
 #include "framework64/material_bundle.h"
 #include "framework64/mesh.h"
@@ -28,7 +29,8 @@ typedef struct {
     uint32_t collider_count;
     uint32_t collision_mesh_count;
     uint32_t custom_bounding_box_count;
-    uint32_t material_bundle_count;
+    uint16_t material_bundle_count;
+    uint16_t collision_geometry_count;
 } fw64SceneInfo;
 
 struct fw64Scene {
@@ -40,6 +42,7 @@ struct fw64Scene {
     fw64StaticVector collision_meshes;
     fw64StaticVector nodes;
 
+    fw64CollisionGeometry* collision_geometry;
     fw64MaterialBundle* material_bundle;
     fw64Allocator* allocator;
     fw64AssetDatabase* assets;
@@ -63,7 +66,7 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
 void fw64_scene_update_bounding(fw64Scene* scene);
 
 void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
-void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask);
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, fw64LayerMask layer_mask);
 
 fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId);
 int fw64_scene_insert_mesh(fw64Scene* scene, fw64Mesh* mesh);
