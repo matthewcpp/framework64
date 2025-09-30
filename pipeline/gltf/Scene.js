@@ -19,6 +19,11 @@ class Scene {
 
     meshBundle = [];
 
+    /** maps string of nodeType to a list of nodes which decalre that type.
+     * Note: the scene class itself does not perform any special processing of these nodes and recursive traversal will halt when one is encountered.
+     */
+    nodeTypes = new Map();
+
     /** Gets or assigns a bundled mesh index for the GLTF mesh index in this scene */
     bundleMeshIndex(gltfMeshIndex) {
         let bundledIndex = this.getBundledMeshIndex(gltfMeshIndex);

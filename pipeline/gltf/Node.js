@@ -61,11 +61,20 @@ class N64Node {
     /** This is the node's own index in the scene's node array */
     index = N64Node.InvalidNode;
 
-    constructor(index, parentNode) {
+    /** pointer to the source gltf node structure */
+    gltfNode;
+
+    /** The specific type of this node.  eg. "ladder"
+     * The default value is null, indicating this node is not special.
+     * This value is not specifially used by the level parser itself, but is checked by collision geometry builder.
+     */
+    nodeType = null;
+
+    constructor(index, parentNode, gltfNode) {
         this.index = index;
         this.parentNode = parentNode;
+        this.gltfNode = gltfNode;
     }
-
 
     computeWorldMatrix() {
         glMatrix.mat4.fromRotationTranslationScale(this.localMatrix, this.rotation, this.position, this.scale);

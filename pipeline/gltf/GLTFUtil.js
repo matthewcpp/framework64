@@ -18,6 +18,35 @@ function getSceneRootNode(gltf, rootNode) {
     return null;
 }
 
+/** Returns the first child of the supplied node whose name begins with the supplied string.
+ * If no node is found, returns null.
+ */
+function findChildNodeStartingWith(gltfData, gltfNode, str, ignoreCase = false) {
+    if (!Object.hasOwn(gltfNode, "children")) {
+        return null;
+    }
+
+    if (ignoreCase) {
+        str = str.toLowerCase();
+    }
+
+    for (const nodeIndex of gltfNode.children) {
+        const node = gltfData.gltf.nodes[nodeIndex];
+
+        if (!Object.hasOwn(node, "name")) {
+            continue;
+        }
+
+        const nodeName = ignoreCase ? node.name.toLowerCase() : node.name;
+
+        if (nodeName.startsWith(str)) {
+            return node;
+        }
+    }
+
+    return null;
+}
+
 /** Gets the top level nodes that represent discreet scenes in a level. */
 function extractTopLevelSceneNodeIndices(gltf) {
     const sceneNode = gltf.scenes[gltf.scene];
@@ -36,5 +65,6 @@ function extractTopLevelSceneNodeIndices(gltf) {
 
 module.exports = {
     extractTopLevelSceneNodeIndices: extractTopLevelSceneNodeIndices,
+    findChildNodeStartingWith: findChildNodeStartingWith,
     getSceneRootNode: getSceneRootNode
 }

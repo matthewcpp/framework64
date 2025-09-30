@@ -1,6 +1,7 @@
 const CollisionGeometry = require("./CollisionGeometry");
 const Bounding = require("./gltf/Bounding");
 const GLTFLoader = require("./gltf/GLTFLoader");
+const GLTFUtil = require("./gltf/GLTFUtil");
 const MaterialBundle = require("./gltf/MaterialBundle");
 const N64Node = require("./gltf/Node");
 const Scene = require("./gltf/Scene");
@@ -42,28 +43,8 @@ class LevelParser {
         }
     }
 
-    _findChildNodeStartingWith(gltfNode, str) {
-        if (!Object.hasOwn(gltfNode, "children")) {
-            return null;
-        }
-
-        for (const nodeIndex of gltfNode.children) {
-            const node = this.gltfData.gltf.nodes[nodeIndex];
-
-            if (!Object.hasOwn(node, "name")) {
-                continue;
-            }
-
-            if (node.name.startsWith(str)) {
-                return node;
-            }
-        }
-
-        return null;
-    }
-
     _parseCollisionMeshes(scene, gltfRootNode) {
-        const gltfCollidersNodeRoot = this._findChildNodeStartingWith(gltfRootNode, "Colliders");
+        const gltfCollidersNodeRoot = GLTFUtil.findChildNodeStartingWith(this.gltfData, gltfRootNode, "Colliders");
         if (!gltfCollidersNodeRoot) {
             return null;
         }
@@ -159,7 +140,7 @@ class LevelParser {
     }
 
     _parseNode(scene, parentNode, gltfNode) {
-        const node = LevelParser.createAndAddNode(scene, parentNode);
+        const node = LevelParser.createAndAddNode(scene, parentNode, gltfNode);
         node.name = parentNode === null ? "root" : gltfNode.name; 
 
         const gltf = this.gltfData.gltf;
@@ -168,7 +149,9 @@ class LevelParser {
         this._parseNodeExtras(scene, gltfNode, node);
         this._parseNodeMesh(scene, gltfNode, node);
 
-        if (Object.hasOwn(gltfNode, "children")) {
+        // if this node has a specific type we will not recusrively parse it.
+        // Dealing with it's hierarchy will be left as an exersice to a downstream class or pplugin
+        if (Object.hasOwn(gltfNode, "children") && node.nodeType === null) {
             for (const childIndex of gltfNode.children) {
                 const gltfChildNode = gltf.nodes[childIndex];
                 const nodeHasName = Object.hasOwn(gltfChildNode, "name");
@@ -198,8 +181,8 @@ class LevelParser {
         }
     }
 
-    static createAndAddNode(scene, parentNode) {
-        const node = new N64Node(scene.nodes.length, parentNode);
+    static createAndAddNode(scene, parentNode, gltfNode) {
+        const node = new N64Node(scene.nodes.length, parentNode, gltfNode);
         scene.nodes.push(node);
 
         if (parentNode) {
@@ -220,7 +203,7 @@ class LevelParser {
         this._parseSceneExtras(scene, gltfRootNode);
         this._parseSceneCollisionGeometryConfig(scene, gltfRootNode);
         this._parseCollisionMeshes(scene, gltfRootNode);
-        const gltfSceneNodeRoot = this._findChildNodeStartingWith(gltfRootNode, "Scene");
+        const gltfSceneNodeRoot = GLTFUtil.findChildNodeStartingWith(this.gltfData, gltfRootNode, "Scene");
         if (!gltfSceneNodeRoot) {
             throw new Error(`Invalid Scene structure detected for root node: ${gltfRootNode.name}`);
         }
@@ -315,6 +298,16 @@ class LevelParser {
         if (Object.hasOwn(extras, "collisionType")) {
             if (extras.collisionType.toLowerCase() === "dynamic") {
                 node.collisionType = N64Node.CollisionType.Dynamic;
+            }
+        }
+
+        if (Object.hasOwn(extras, "nodeType")) {
+            node.nodeType = extras.nodeType.toLowerCase();
+
+            if (scene.nodeTypes.has(node.nodeType)) {
+                scene.nodeTypes.get(node.nodeType).push(node);
+            } else {
+                scene.nodeTypes.set(node.nodeType, [node]);
             }
         }
     }

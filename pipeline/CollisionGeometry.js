@@ -1,18 +1,8 @@
 const Bounding = require("./gltf/Bounding");
 const N64Node = require("./gltf/Node")
+const GLTFUtil = require("./gltf/GLTFUtil");
 const glMatrix = require("gl-matrix");
 const Intersect = require("./Intersect");
-
-class CollisionGeometryNode {
-    id;
-    walls = [];
-    floors = [];
-    ceilings = [];
-
-    constructor(id) {
-        this.id = id;
-    }
-}
 
 class CollisionGeometryCell {
     posX;
@@ -21,6 +11,7 @@ class CollisionGeometryCell {
     walls = [];
     floors = [];
     ceilings = [];
+    ladders = [];
 
     constructor(cellX, cellZ, boundingBox) {
         this.posX = cellX;
@@ -30,6 +21,20 @@ class CollisionGeometryCell {
 
     get triangleCount () {
         return this.walls.length + this.floors.length + this.ceilings.length;
+    }
+}
+
+class CollisionGeometryLadder {
+    entrance;
+    exit;
+    normal;
+    radius;
+
+    constructor(entrance, exit, normal, radius) {
+        this.entrance = entrance;
+        this.exit = exit;
+        this.normal = normal;
+        this.radius = radius;
     }
 }
 
@@ -91,23 +96,18 @@ class CollisionGeometry {
         return total;
     }
 
-    /** The basic approach we will take here is to create a bounding box for the triangle and then check all the
-     *  cells that intersect that box.
-     *  TODO: investigate a more efficient approach such as the one outlined here: https://www.jb101.co.uk/2008/08/09/partitioning-triangles-into-a-uniform-grid.html
-     */
-    getOverlappingCells(triangle) {
-        // create a bounding rectangle
-        const A = triangle[0];
-        const B = triangle[1];
-        const C = triangle[2];
+    get ladderCount() {
+        let total = 0;
 
-        const bounding = new Bounding();
-        bounding.encapsulatePoint(A);
-        bounding.encapsulatePoint(B);
-        bounding.encapsulatePoint(C);
+        for (const cell of this.cells) {
+            total += cell.ladders.length;
+        }
 
+        return total;
+    }
+
+    _getOverlappingCells(bounding) {
         // determine the range of cells to query.
-        // Precondition: all triangles fit in the grid.
         const minCellX = Math.floor((bounding.min[0] - this.boundingBox.min[0]) / this.cellSizeX);
         const maxCellX = Math.ceil((bounding.max[0] - this.boundingBox.min[0]) / this.cellSizeX);
 
@@ -118,12 +118,31 @@ class CollisionGeometry {
         for (let z = minCellZ; z < maxCellZ; z++) {
             for (let x = minCellX; x < maxCellX; x++) {
                 const cellIndex = z * this.cellCountX + x;
-                const cell = this.cells[cellIndex];
-                if (Intersect.triangleAabb(A, B, C, cell.boundingBox)) {
-                    overlappingCells.push(cell);
-                }
+                overlappingCells.push(this.cells[cellIndex]);
             }
         }
+
+        return overlappingCells;
+    }
+
+    /** The basic approach we will take here is to create a bounding box for the triangle and then check all the
+     *  cells that intersect that box.
+     *  TODO: investigate a more efficient approach such as the one outlined here: https://www.jb101.co.uk/2008/08/09/partitioning-triangles-into-a-uniform-grid.html
+     */
+    _getGridCellsForTriangle(triangle) {
+        // create a bounding rectangle
+        const A = triangle[0];
+        const B = triangle[1];
+        const C = triangle[2];
+
+        const bounding = new Bounding();
+        bounding.encapsulatePoint(A);
+        bounding.encapsulatePoint(B);
+        bounding.encapsulatePoint(C);
+
+        const overlappingCells = this._getOverlappingCells(bounding).filter((cell) => {
+            return Intersect.triangleAabb(A, B, C, cell.boundingBox);
+        });
 
         if (overlappingCells.length > 1) {
             this.numMultiCellTriangles +=1;
@@ -135,8 +154,13 @@ class CollisionGeometry {
     }
 
     insertTriangle(triangle) {
-        const cells = this.getOverlappingCells(triangle);
+        const cells = this._getGridCellsForTriangle(triangle);
         const normal = triangle[3];
+
+        const minY = Math.min(triangle[0][1], triangle[1][1], triangle[2][1]);
+        const maxY = Math.max(triangle[0][1], triangle[1][1], triangle[2][1]);
+        triangle.push(minY);
+        triangle.push(maxY);
 
         if (normal[1] > this.floorAndCeilingTolerance) {
             for (const cell of cells) {
@@ -147,6 +171,9 @@ class CollisionGeometry {
                 cell.ceilings.push(triangle);
             }
         } else {
+            // TODO: is there a reasonable extent for walls?
+            const extent = 0.0;
+            triangle.push(extent);
             for (const cell of cells) {
                 cell.walls.push(triangle);
             }
@@ -231,7 +258,62 @@ class CollisionGeometry {
             console.log(`Warning: ${degenerateCount} degenerate trigangles filtered when creating collision geometry in scene: ${scene.name}.`);
         }
 
+        CollisionGeometry._processLadders(geometry, scene, gltfData);
+
         return geometry;
+    }
+
+    insertLadder(entrance, exit, normal, radius) {
+        const ladder = new CollisionGeometryLadder(entrance, exit, normal, radius);
+
+        const bounding = new Bounding();
+        bounding.encapsulatePoint(entrance);
+        bounding.encapsulatePoint(exit);
+
+        for (const cell of this._getOverlappingCells(bounding)) {
+            cell.ladders.push(ladder);
+        }
+    }
+
+    static _processLadders(geometry, scene, gltfData) {
+        if (!scene.nodeTypes.has("ladder")) {
+            return;
+        }
+
+        const ladderNodes = scene.nodeTypes.get("ladder");
+
+        const ladderNormalMatrix = glMatrix.mat3.create();
+        const forward = glMatrix.vec3.fromValues(0.0, 0.0, -1.0);
+
+        for (const ladderNode of ladderNodes) {
+            // get the entrance and exit position of the ladder
+            const entranceNode = GLTFUtil.findChildNodeStartingWith(gltfData, ladderNode.gltfNode, "_entrance");
+            const exitNode = GLTFUtil.findChildNodeStartingWith(gltfData, ladderNode.gltfNode, "_exit");
+
+            if (entranceNode === null || exitNode === null) {
+                throw new Error(`Ladder Node: ${ladderNode.name} must have child nodes '_entrance' and '_exit'`);
+            }
+
+            if (!Object.hasOwn(ladderNode.gltfNode.extras, "ladderRadius")) {
+                throw new Error(`Ladder Node: ${ladderNode.name} must have a 'ladderRadius' custom property.`);
+            }
+
+            const radius = parseFloat(ladderNode.gltfNode.extras.ladderRadius);
+
+            const entrancePos = glMatrix.vec3.create();
+            glMatrix.vec3.transformMat4(entrancePos, entranceNode.translation, ladderNode.worldMatrix);
+
+            const exitPos = glMatrix.vec3.create();
+            glMatrix.vec3.transformMat4(exitPos, exitNode.translation, ladderNode.worldMatrix);
+
+            const normal = glMatrix.vec3.create();
+            
+            glMatrix.mat3.fromMat4(ladderNormalMatrix, ladderNode.worldMatrix);
+            glMatrix.vec3.transformMat3(normal, forward, ladderNormalMatrix);
+            glMatrix.vec3.normalize(normal, normal);
+
+            geometry.insertLadder(entrancePos, exitPos, normal, radius);
+        }
     }
 }
 
