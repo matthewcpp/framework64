@@ -131,7 +131,7 @@ void fw64_animation_controller_update(fw64AnimationController* controller, float
         next_time = fw64_clamp(next_time, 0.0f, controller->current_animation->total_time);
 
         // did we just reach the end of the animation?
-        if (next_time >= controller->current_animation->total_time) {
+        if ((controller->speed > 0.0f && next_time >= controller->current_animation->total_time) || (controller->speed < 0.0f && next_time <= 0.0f)) {
             controller->state = FW64_ANIMATION_STATE_STOPPED;
         }
     }
