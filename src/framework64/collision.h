@@ -12,6 +12,8 @@ extern "C" {
 
 void fw64_closest_point_to_triangle(const Vec3* point, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* out);
 
+void fw64_closest_point_on_line_segment(const Vec3* point, const Vec3* a, const Vec3* b, Vec3* out);
+
 /**
  * Returns true if sphere s intersects triangle ABC, false otherwise.
  * The point p on abc closest to the sphere center is also returned

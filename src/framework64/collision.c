@@ -198,6 +198,20 @@ void fw64_closest_point_to_triangle(const Vec3* p, const Vec3* a, const Vec3* b,
     vec3_add_and_scale(out, &ac, w, out);
 }
 
+void fw64_closest_point_on_line_segment(const Vec3* point, const Vec3* a, const Vec3* b, Vec3* out) {
+    const float line_dist = vec3_distance_squared(a, b);
+    if (line_dist <= EPSILON) {
+        vec3_copy(a, out);
+        return;
+    }
+
+    float t = ((point->x - a->x) * (b->x - a->x) + (point->y - a->y) * (b->y - a->y) + (point->z - a->z) * (b->z - a->z)) / line_dist;
+    t = fw64_clamp(t, 0.0f, 1.0f);
+    out->x = a->x + t * (b->x - a->x);
+    out->y = a->y + t * (b->y - a->y); 
+    out->z = a->z + t * (b->z - a->z);
+}
+
 // Real Time Collision Detection 5.2.7
 int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point) {
     // Find point P on triangle ABC closest to sphere center
