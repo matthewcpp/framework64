@@ -16,6 +16,9 @@ void fw64_collision_geometry_init_from_datasource(fw64CollisionGeometry* geometr
     geometry->triangles = fw64_allocator_malloc(allocator, sizeof(fw64CollisionTriangle) * geometry->info.triangle_count);
     fw64_data_source_read(data_source, geometry->triangles, sizeof(fw64CollisionTriangle), geometry->info.triangle_count);
 
+    geometry->ladders = fw64_allocator_malloc(allocator, sizeof(fw64CollisionLadder) * geometry->info.ladder_count);
+    fw64_data_source_read(data_source, geometry->ladders, sizeof(fw64CollisionLadder), geometry->info.ladder_count);
+
     const size_t cell_count = geometry->info.cell_count_x * geometry->info.cell_count_z;
     geometry->cells = fw64_allocator_malloc(allocator, sizeof(fw64CollisionGeometryCell) * cell_count);
     fw64_data_source_read(data_source, geometry->cells, sizeof(fw64CollisionGeometryCell), cell_count);

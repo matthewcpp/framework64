@@ -50,6 +50,8 @@ static void fw64_character_animation_controller_update_jump_up_state(fw64Charact
         fw64_character_animation_controller_set_animation(controller, controller->animations.jump_land, 0);
     } else if (fw64_character_is_hanging_on_ledge(controller->character)) {
         fw64_character_animation_controller_set_animation(controller, controller->animations.ledge_hang_idle, 1);
+    } else if (fw64_character_is_on_ladder(controller->character)) {
+        fw64_character_animation_controller_set_animation(controller, controller->animations.ladder_climb, 1);
     }
 }
 
@@ -59,6 +61,8 @@ static void fw64_character_animation_controller_update_falling_state(fw64Charact
         fw64_character_animation_controller_set_animation(controller, controller->animations.jump_land, 0);
     } else if (fw64_character_is_hanging_on_ledge(controller->character)) {
         fw64_character_animation_controller_set_animation(controller, controller->animations.ledge_hang_idle, 1);
+    } else if (fw64_character_is_on_ladder(controller->character)) {
+        fw64_character_animation_controller_set_animation(controller, controller->animations.ladder_climb, 1);
     }
 }
 
@@ -74,10 +78,16 @@ static void fw64_character_animation_controller_update_running_state(fw64Charact
     if (!fw64_character_is_moving_horizontally(controller->character)) {
         controller->flags &= ~FW64_CHARACTER_ANIMATION_CONTROLLER_FLAG_RUNNING_IN_AIR;
         fw64_character_animation_controller_set_animation(controller, controller->animations.idle, 1);
+    } else if (controller->character->state == FW64_CHARACTER_STATE_LADDER_ENTER_TOP) {
+        controller->flags &= ~FW64_CHARACTER_ANIMATION_CONTROLLER_FLAG_RUNNING_IN_AIR;
+        fw64_character_animation_controller_set_animation(controller, controller->animations.ladder_enter_top, 0);
+    } else if (fw64_character_is_on_ladder(controller->character)) {
+        controller->flags &= ~FW64_CHARACTER_ANIMATION_CONTROLLER_FLAG_RUNNING_IN_AIR;
+        fw64_character_animation_controller_set_animation(controller, controller->animations.ladder_climb, 1);
     } else if (controller->character->velocity.y > 0.0f) {
         controller->flags &= ~FW64_CHARACTER_ANIMATION_CONTROLLER_FLAG_RUNNING_IN_AIR;
         fw64_character_animation_controller_set_animation(controller, controller->animations.jump_up, 0);
-    } if (fw64_character_is_falling(controller->character)) {
+    } else if (fw64_character_is_falling(controller->character)) {
         // we want to allow a grace perid before we trigger a new animation
         if ((controller->flags & FW64_CHARACTER_ANIMATION_CONTROLLER_FLAG_RUNNING_IN_AIR)) {
             const float fall_height = controller->fall_start_height - controller->character->position.y;
@@ -99,6 +109,10 @@ static void fw64_character_animation_controller_update_idle_state(fw64CharacterA
         fw64_character_animation_controller_set_animation(controller, controller->animations.run, 1);
     } else if (controller->character->velocity.y > 0.0f) {
         fw64_character_animation_controller_set_animation(controller, controller->animations.jump_up, 0);
+    } else if (controller->character->state == FW64_CHARACTER_STATE_LADDER_ENTER_TOP) {
+        fw64_character_animation_controller_set_animation(controller, controller->animations.ladder_enter_top, 0);
+    } else if (fw64_character_is_on_ladder(controller->character)) {
+        fw64_character_animation_controller_set_animation(controller, controller->animations.ladder_climb, 1);
     }
 }
 
@@ -116,7 +130,9 @@ static void fw64_character_animation_controller_update_ledge_hang_idle(fw64Chara
     }
 }
 
-static void fw64_character_animation_controller_climbing_up_ledge(fw64CharacterAnimationController* controller) {
+typedef void (*FinishNoInputAnimFunc)(fw64Character* character, const Vec3* new_pos);
+
+static void fw64_character_animation_controller_update_no_input_animation(fw64CharacterAnimationController* controller, FinishNoInputAnimFunc finish_func) {
     fw64AnimationController* anim_controller = &controller->skinned_mesh_instance->controller;
 
     // if the animation is finished we want to transition to idle and adjust the character
@@ -126,9 +142,52 @@ static void fw64_character_animation_controller_climbing_up_ledge(fw64CharacterA
         Vec3 ref_pos = vec3_zero();
         const fw64Transform* root_transform = fw64_animation_controller_get_joint_transform(anim_controller, controller->foot_reference_joint_index);
         matrix_transform_vec3(root_transform->world_matrix, &ref_pos);
-        fw64_character_finish_climbing_up_ledge(controller->character, &ref_pos);
+        finish_func(controller->character, &ref_pos);
         fw64_character_animation_controller_set_animation(controller, controller->animations.idle, 1);
     } 
+}
+
+static void fw64_character_animation_controller_climbing_up_ledge(fw64CharacterAnimationController* controller) {
+    fw64_character_animation_controller_update_no_input_animation(controller, fw64_character_finish_climbing_up_ledge);
+}
+
+static void fw64_character_animation_controller_climb_ladder(fw64CharacterAnimationController* controller) {
+    fw64AnimationController* anim_controller = &controller->skinned_mesh_instance->controller;
+
+    if (fw64_character_is_exiting_ladder(controller->character)) {
+        anim_controller->speed = 1.0f;
+        fw64_character_animation_controller_set_animation(controller, controller->animations.ladder_exit, 0);
+        return;
+    } else if (fw64_character_is_falling(controller->character)) {
+        fw64_character_animation_controller_set_animation(controller, controller->animations.jump_fall, 0);
+    }
+
+    switch(controller->character->state) {
+        case FW64_CHARACTER_STATE_CLIMB_LADDER_IDLE:
+            fw64_animation_controller_pause(anim_controller);
+            break;
+
+        case FW64_CHARACTER_STATE_CLIMB_LADDER_DOWN:
+            anim_controller->speed = -1.0f;
+            fw64_animation_controller_play(anim_controller);
+            break;
+
+        case FW64_CHARACTER_STATE_CLIMB_LADDER_UP:
+            anim_controller->speed = 1.0f;
+            fw64_animation_controller_play(anim_controller);
+            break;
+
+        default:
+            break;
+    }
+}
+
+static void fw64_character_animation_controller_exiting_ladder(fw64CharacterAnimationController* controller) {
+    fw64_character_animation_controller_update_no_input_animation(controller, fw64_character_finish_exiting_ladder);
+}
+
+static void fw64_character_animation_controller_entering_ladder(fw64CharacterAnimationController* controller) {
+    fw64_character_animation_controller_update_no_input_animation(controller, fw64_character_finish_entering_ladder);
 }
 
 void fw64_character_animation_controller_update(fw64CharacterAnimationController* controller, float time_delta) {
@@ -150,7 +209,14 @@ void fw64_character_animation_controller_update(fw64CharacterAnimationController
         fw64_character_animation_controller_update_ledge_hang_idle(controller);
     } else if (controller->animation_state == controller->animations.ledge_climb) {
         fw64_character_animation_controller_climbing_up_ledge(controller);
+    } else if (controller->animation_state == controller->animations.ladder_climb) {
+        fw64_character_animation_controller_climb_ladder(controller);
+    } else if (controller->animation_state == controller->animations.ladder_exit) {
+        fw64_character_animation_controller_exiting_ladder(controller);
+    } else if (controller->animation_state == controller->animations.ladder_enter_top) {
+        fw64_character_animation_controller_entering_ladder(controller);
     }
+
 
     fw64_skinned_mesh_instance_update(controller->skinned_mesh_instance, time_delta);
 }

@@ -10,7 +10,14 @@
 
 typedef struct {
     Vec3 A, B, C, N;
+    float minY, maxY;
 } fw64CollisionTriangle;
+
+typedef struct {
+    Vec3 entrance, exit;
+    Vec3 normal;
+    float radius;
+} fw64CollisionLadder;
 
 typedef struct {
     uint32_t wall_index;
@@ -19,10 +26,13 @@ typedef struct {
     uint32_t floor_count;
     uint32_t ceiling_index;
     uint32_t ceiling_count;
+    uint32_t ladder_index;
+    uint32_t ladder_count;
 } fw64CollisionGeometryCell;
 
 typedef struct {
     uint32_t triangle_count;
+    uint32_t ladder_count;
     uint32_t cell_count_x;
     uint32_t cell_count_z;
     Vec2 bounds_min;
@@ -33,6 +43,7 @@ typedef struct {
     fw64CollisionGeometryInfo info;
 
     fw64CollisionTriangle* triangles;
+    fw64CollisionLadder* ladders;
     fw64CollisionGeometryCell* cells;
 } fw64CollisionGeometry;
 

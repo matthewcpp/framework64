@@ -1,8 +1,10 @@
 #include "fw64_character.h"
 
 #include <framework64/log.h>
-#include "framework64/math.h"
+#include <framework64/math.h>
 #include <framework64/types.h>
+
+#include <string.h>
 
 void fw64_character_envionment_init(fw64CharacterEnvironment* env) {
     vec3_set(&env->gravity, 0.0f, Fw64_CHARACTER_ENV_DEFAULT_GRAVITY, 0.0f);
@@ -10,6 +12,14 @@ void fw64_character_envionment_init(fw64CharacterEnvironment* env) {
     env->max_substeps = FW64_CHARACTER_ENV_MAX_SUBSTEPS;
     env->horizontal_move_threshold = FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD;
 }
+
+#ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+
+void fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugInfo* debug) {
+    memset(debug, 0, sizeof(fw64CharacterEnvironmentDebugInfo));
+}
+
+#endif
 
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Node* node, fw64Scene* scene) {
     character->environment = env;
@@ -25,6 +35,8 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     character->hang_vertical_offset = 0.0f;
     character->max_speed = FW64_CHARACTER_DEFAULT_MAX_SPEED;
     character->jump_speed = FW64_CHARACTER_DEFAULT_JUMP_SPEED;
+    character->ladder_climb_speed = FW64_CHARACTER_DEFAULT_LADDER_CLIMB_SPEED;
+    character->ladder_exit_height_adjustment = FW64_CHARACTER_DEFAULT_LADDER_HEIGHT_ADJUSTMENT;
     character->jump_fall_gravity_scale = FW64_CHARACTER_DEFAULT_JUMP_FALL_GRAVITY_SCALE;
     character->gravity_scale = FW64_CHARACTER_DEFAULT_GRAVITY_SCALE;
 
@@ -40,6 +52,7 @@ void fw64_character_set_position(fw64Character* character, const Vec3* position)
     character->previous_state = FW64_CHARACTER_STATE_IN_AIR;
     character->state = FW64_CHARACTER_STATE_IN_AIR;
     vec3_set_zero(&character->velocity);
+    character->active_ladder = NULL;
 }
 
 static int _fw64_character_attempt_sticky_ground(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
@@ -51,6 +64,10 @@ static int _fw64_character_attempt_sticky_ground(fw64Character* character, const
     for (uint32_t c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
+
+        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+        character->environment->debug_info.ray_triangles_checked += cell->floor_count;
+        #endif
 
         for (uint32_t t = 0; t < cell->floor_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
@@ -91,18 +108,39 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
     Vec3 hit_point, correction_vector = vec3_zero(), query_v0;
     int hit_count = 0;
     float total_penetration = 0.0f;
+    const float query_min = query_pos->y - query_radius;
+    const float query_max = query_pos->y + query_radius;
+
+    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+    uint32_t triangles_considered = 0, triangles_skipped = 0, triangles_checked = 0;
+    #endif
 
     for (uint32_t c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
 
+        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+            triangles_considered += cell->floor_count;
+        #endif
+
         for (uint32_t t = 0; t < cell->floor_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
 
-            // initial filter: check penetration with triangle plane
+            // filter triangles that are vertically outside of our query radius
+            if (query_min > triangle->maxY || query_max < triangle->minY) {
+                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+                    triangles_skipped += 1;
+                #endif
+                continue;
+            }
+
+            // check penetration with triangle plane
             vec3_subtract(query_pos, &triangle->A, &query_v0);
             float distance = vec3_dot(&triangle->N, &query_v0);
             if (distance < query_radius) {
+                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+                    triangles_checked += 1;
+                #endif
                 // precision check
                 if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
                     // correct position along collision normal
@@ -114,6 +152,12 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
             }
         }
     }
+
+    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+    character->environment->debug_info.sphere_triangles_considered += triangles_considered;
+    character->environment->debug_info.sphere_triangles_skipped += triangles_skipped;
+    character->environment->debug_info.sphere_triangles_checked += triangles_checked;
+    #endif
 
     // resolve all collisions
     if (hit_count) {
@@ -129,19 +173,6 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
         }
 
         character->state = FW64_CHARACTER_STATE_ON_GROUND;
-    } else {
-        // if we were on the ground and not jumping, we would like to attempt to stick to the ground
-        // if we are close to a ground triangle.  This should help prevent the case where we are running slightly
-        // faster than gravity can pull us down
-        if (fw64_character_is_on_ground(character) &&  character->velocity.y <= 0.0f) {
-            _fw64_character_attempt_sticky_ground(character, query_pos, query_radius, query);
-        } else {
-            character->state = FW64_CHARACTER_STATE_IN_AIR;
-        }
-    }
-
-    if (fw64_character_is_on_ground(character)) {
-        character->velocity.y = 0.0f;
     }
 }
 
@@ -199,6 +230,10 @@ static fw64CollisionTriangle* fw64_character_get_closest_triangle_for_ray(fw64Ch
                 break;
         }
 
+        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+            character->environment->debug_info.ray_triangles_checked += triangle_count;
+        #endif
+
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + triangle_index;
 
         for (uint32_t t = 0; t < triangle_count; t++) {
@@ -215,6 +250,18 @@ static fw64CollisionTriangle* fw64_character_get_closest_triangle_for_ray(fw64Ch
     }
 
     return closest_triangle;
+}
+
+/** Updates the character's node such that they are looking in the direction of the supplied normal
+ * Used to snap the character to the wall when ledge hanging or to the ladder when climbing.
+ */
+static void fw64_character_rotate_to_face_normal(fw64Character* character, const Vec3* normal) {
+    Vec3 character_forward = {normal->x, 0.0f, normal->z};
+    vec3_normalize(&character_forward);
+    vec3_negate(&character_forward);
+    float yaw = atan2f(character_forward.x, character_forward.z);
+    quat_set_axis_angle(&character->node->transform.rotation, 0.0f, 1.0f, 0.0f, yaw);
+    fw64_node_update(character->node);
 }
 
 /**
@@ -249,12 +296,7 @@ int fw64_character_attempt_ledge_grab(fw64Character* character, float query_radi
         character->position.y = closest_pt.y - character->size.y + character->hang_vertical_offset;
 
         // rotate the character to face the wall
-        Vec3 character_forward = {wall_triangle->N.x, 0.0f, wall_triangle->N.z};
-        vec3_normalize(&character_forward);
-        vec3_negate(&character_forward);
-        float yaw = atan2f(character_forward.x, character_forward.z);
-        quat_set_axis_angle(&character->node->transform.rotation, 0.0f, 1.0f, 0.0f, yaw);
-        fw64_node_update(character->node);
+        fw64_character_rotate_to_face_normal(character, &wall_triangle->N);
 
         return 1;
     }
@@ -279,22 +321,52 @@ void fw64_character_finish_climbing_up_ledge(fw64Character* character, const Vec
     fw64_character_set_position(character, new_pos);
 }
 
+void fw64_character_finish_exiting_ladder(fw64Character* character, const Vec3* new_pos){
+    character->active_ladder = NULL;
+    fw64_character_set_position(character, new_pos);
+}
+
+void fw64_character_finish_entering_ladder(fw64Character* character, const Vec3* new_pos) {
+    fw64_character_set_position(character, new_pos);
+}
+
 static void fw64_character_check_wall_collision(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
     Vec3 hit_point, correction_vector = vec3_zero(), query_v0;
     int hit_count = 0;
     float total_penetration = 0.0f;
+    const float query_min = query_pos->y - query_radius;
+    const float query_max = query_pos->y + query_radius;
+
+    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+    uint32_t triangles_considered = 0, triangles_skipped = 0, triangles_checked = 0;
+    #endif
 
     for (uint32_t c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->wall_index;
 
+        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+        triangles_considered += cell->wall_count;
+        #endif
+
         for (uint32_t t = 0; t < cell->wall_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
 
-            // initial filter: check penetration with triangle plane
+            // filter triangles that are vertically outside of our query radius
+            if (query_min > triangle->maxY || query_max < triangle->minY) {
+                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+                triangles_skipped += 1;
+                #endif
+                continue;
+            }
+
+            // check penetration with triangle plane
             vec3_subtract(query_pos, &triangle->A, &query_v0);
             float distance = vec3_dot(&triangle->N, &query_v0);
             if (distance < query_radius) {
+                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+                triangles_checked += 1;
+                #endif
                 // precision check
                 if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
                     // correct position along collision normal
@@ -307,6 +379,12 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
         }
     }
 
+    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+    character->environment->debug_info.sphere_triangles_considered += triangles_considered;
+    character->environment->debug_info.sphere_triangles_skipped += triangles_skipped;
+    character->environment->debug_info.sphere_triangles_checked += triangles_checked;
+    #endif
+
     // resolve all collisions
     if (hit_count) {
         vec3_normalize(&correction_vector);
@@ -318,11 +396,105 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
     }
 }
 
+static int fw64_character_attempt_ladder_grab(fw64Character* character, float query_radius) {
+    fw64CollisionGeometryQuery query;
+    if (!fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &character->position, &query)) {
+        return 0;
+    }
+
+    fw64CollisionGeometryCell* cell = query.cells[0];
+    fw64CollisionLadder* ladders = character->scene->collision_geometry->ladders + cell->ladder_index;
+
+    float closest_distance = FLT_MAX;
+    fw64CollisionLadder* closest_ladder = NULL;
+    Vec3 closest_point;
+
+    for (uint32_t i = 0; i < cell->ladder_count; i++) {
+        fw64CollisionLadder* ladder = ladders + i;
+        Vec3 current_point;
+        fw64_closest_point_on_line_segment(&character->position, &ladder->entrance, &ladder->exit, &current_point);
+        float distance = vec3_distance_squared(&character->position, &current_point);
+        if (distance <= ladder->radius * ladder->radius && distance < closest_distance) {
+            closest_distance = distance;
+            closest_ladder = ladder;
+            closest_point = current_point;
+        }
+    }
+
+    if (!closest_ladder) {
+        return 0;
+    }
+
+    // if we are entering the ladder from the ground, determine if it is the bottom or top
+    // if we are entering from the top we need to play the enter ladder from top animation
+    fw64CharacterState initial_ladder_state = FW64_CHARACTER_STATE_CLIMB_LADDER_IDLE;
+    if (fw64_character_is_on_ground(character)) {
+        const float dist_to_exit = vec3_distance_squared(&character->position, &closest_ladder->exit);
+        const float dist_to_entrance = vec3_distance_squared(&character->position, &closest_ladder->entrance);
+
+        if (dist_to_exit < dist_to_entrance) {
+            initial_ladder_state= FW64_CHARACTER_STATE_LADDER_ENTER_TOP;
+        }
+    }
+
+    character->state = initial_ladder_state;
+    character->active_ladder = closest_ladder;
+    fw64_character_rotate_to_face_normal(character, &closest_ladder->normal);
+    vec3_add_and_scale(&closest_point, &closest_ladder->normal, query_radius, &character->position);
+
+    return 1;
+}
+
+void fw64_character_drop_from_ladder(fw64Character* character) {
+    if (!character->active_ladder || character->state == FW64_CHARACTER_STATE_CLIMB_LADDER_EXIT) {
+        return;
+    }
+
+    Vec3 target_pos = character->active_ladder->normal;
+    // TODO: determine a better push back amount;
+    vec3_scale(&target_pos, character->active_ladder->radius * 2.0f, &target_pos);
+    vec3_add(&character->position, &target_pos, &target_pos);
+
+    fw64_character_set_position(character, &target_pos);
+}
+
+static void fw64_character_fixed_update_ladder(fw64Character* character, float time_delta) {
+    if (fw64_character_is_entering_ladder(character) || fw64_character_is_exiting_ladder(character)) {
+        return;
+    }
+
+    if (character->attempt_to_move.y > 0.0f) {
+        // is the character trying to climb off the top of the ladder?
+        if (character->position.y + character->head_height >= character->active_ladder->exit.y + character->ladder_exit_height_adjustment) {
+            character->state = FW64_CHARACTER_STATE_CLIMB_LADDER_EXIT;
+            return;
+        }
+
+        character->state = FW64_CHARACTER_STATE_CLIMB_LADDER_UP;
+    } else if (character->attempt_to_move.y < 0.0f) {
+        character->state = FW64_CHARACTER_STATE_CLIMB_LADDER_DOWN;
+    } else {
+        character->state = FW64_CHARACTER_STATE_CLIMB_LADDER_IDLE;
+    }
+
+    character->position.y += character->attempt_to_move.y * character->ladder_climb_speed * time_delta;
+
+    // check if the player climbed to the bottom of the ladder.
+    if (character->previous_position.y >= character->active_ladder->entrance.y && character->position.y <= character->active_ladder->entrance.y) {
+        fw64_character_drop_from_ladder(character);
+    }
+}
+
 void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     character->previous_state = character->state;
     character->previous_position = character->position;
 
     if (!fw64_character_is_enabled(character) || fw64_character_is_interacting_with_ledge(character)) {
+        return;
+    }
+
+    if (fw64_character_is_on_ladder(character)) {
+        fw64_character_fixed_update_ladder(character, time_delta);
         return;
     }
 
@@ -403,11 +575,28 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
 
         fw64_character_check_floor_collision(character, &query_pos, query_radius, &query);
 
-        const int did_grab_ledge = !fw64_character_is_on_ground(character) && fw64_character_attempt_ledge_grab(character, query_radius);
+        vec3_add_and_scale(&character->position, &up, query_radius, &query_pos);
+        fw64_character_check_wall_collision(character, &query_pos, query_radius, &query);
+    }
 
-        if (!did_grab_ledge) {
-            vec3_add_and_scale(&character->position, &up, query_radius, &query_pos);
-            fw64_character_check_wall_collision(character, &query_pos, query_radius, &query);
-        }
+    if (fw64_character_attempt_ladder_grab(character, query_radius)) {
+        return;
+    }
+
+    // if we are on the ground and not jumping, we would like to attempt to stick to the ground
+    // if we are close to a ground triangle.  This should help prevent the case where we are running slightly
+    // faster than gravity can pull us down
+    if (character->velocity.y <= 0.0f) {
+        fw64CollisionGeometryQuery query;
+        fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &character->position, &query);
+        _fw64_character_attempt_sticky_ground(character, &character->position, query_radius, &query);
+    } else {
+        character->state = FW64_CHARACTER_STATE_IN_AIR;
+    }
+
+    if (fw64_character_is_on_ground(character)) {
+        character->velocity.y = 0.0f;
+    } else {
+        fw64_character_attempt_ledge_grab(character, query_radius);
     }
 }

@@ -41,6 +41,26 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
         case FW64_CHARACTER_STATE_LEDGE_CLIMB_UP:
             status = "Climb up";
             break;
+
+        case FW64_CHARACTER_STATE_CLIMB_LADDER_UP:
+            status = "Ladder Up";
+            break;
+
+        case FW64_CHARACTER_STATE_CLIMB_LADDER_DOWN:
+            status = "Ladder Down";
+            break;
+
+        case FW64_CHARACTER_STATE_CLIMB_LADDER_IDLE:
+            status = "Ladder Idle";
+            break;
+
+        case FW64_CHARACTER_STATE_CLIMB_LADDER_EXIT:
+            status = "Ladder Exit";
+            break;
+
+        case FW64_CHARACTER_STATE_LADDER_ENTER_TOP:
+            status = "Ladder Enter";
+            break;
     }
 
     if (status) {
@@ -53,4 +73,16 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
         sprintf(buffer, "Grid: %d,%d", grid_pos.x, grid_pos.y);
         fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
     }
+
+    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+        const fw64CharacterEnvironmentDebugInfo* char_debug = &info->character->environment->debug_info;
+        draw_pos.y += fw64_font_line_height(info->font);
+        sprintf(buffer, "tri: s: %d/%d/%d r:%d", 
+            char_debug->sphere_triangles_considered, 
+            char_debug->sphere_triangles_skipped, 
+            char_debug->sphere_triangles_checked,
+            char_debug->ray_triangles_checked
+        );
+        fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
+    #endif
 }

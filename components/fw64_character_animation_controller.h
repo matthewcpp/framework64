@@ -18,6 +18,9 @@ typedef struct {
     fw64AnimationId primary_action;
     fw64AnimationId ledge_hang_idle;
     fw64AnimationId ledge_climb;
+    fw64AnimationId ladder_climb;
+    fw64AnimationId ladder_exit;
+    fw64AnimationId ladder_enter_top;
 } fw64CharacterAnimationIds;
 
 struct fw64CharacterAnimationController{

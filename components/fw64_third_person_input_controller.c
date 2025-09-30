@@ -73,10 +73,26 @@ static void _fw64_third_person_input_controller_process_ledge_input(fw64ThirdPer
     }
 }
 
+static void _fw64_third_person_input_controller_process_ladder_input(fw64ThirdPersonInputController* controller) {
+    if (fw64_character_is_entering_ladder(controller->character) || fw64_character_is_exiting_ladder(controller->character)) {
+        return;
+    }
+
+    Vec2 stick;
+    fw64_input_controller_stick(controller->input, controller->port, &stick);
+    vec3_set(&controller->character->attempt_to_move, 0.0f, stick.y, 0.0f);
+
+    if (fw64_input_controller_button_pressed(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_B)) {
+        fw64_character_drop_from_ladder(controller->character);
+    }
+}
+
 void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* controller, float time_delta) {
     if (!fw64_character_animation_controller_state_is_primary_action(controller->anim)) {
         if (fw64_character_is_interacting_with_ledge(controller->character)) {
             _fw64_third_person_input_controller_process_ledge_input(controller);
+        } else if(fw64_character_is_on_ladder(controller->character)) {
+            _fw64_third_person_input_controller_process_ladder_input(controller);
         } else {
             fw64_third_person_input_controller_process_movement(controller);
         }
