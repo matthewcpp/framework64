@@ -2,11 +2,15 @@
 
 #include <framework64/camera.h>
 
+#include "fw64_character.h"
+#include "fw64_character_animation_controller.h"
+
 #define FW64_THIRD_PERSON_CAMERA_DEFAULT_FOLLOW_DISTANCE 5.0f
 
 typedef struct {
-    fw64Transform* target;
     fw64Camera* camera;
+    fw64Character* character;
+    fw64CharacterAnimationController* anim_controller;
 
     /** The distance the camera will be from the target */
     float follow_dist;
@@ -26,7 +30,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void fw64_third_person_camera_init(fw64ThirdPersonCamera* cam, fw64Transform* target, fw64Camera* camera);
+void fw64_third_person_camera_init(fw64ThirdPersonCamera* cam,  fw64Camera* camera, fw64Character* character, fw64CharacterAnimationController* anim_controller);
 void fw64_third_person_camera_update(fw64ThirdPersonCamera* cam);
 
 /** Sets the camera to be behind the target at the default offset values */
