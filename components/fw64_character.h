@@ -74,6 +74,8 @@ typedef struct {
     /* The size of the character in each dimension*/
     Vec3 size;
 
+    float step_height;
+
     /** This the height at which forward raycasting will orginate at when attempting ledge grabbing
      * This value should be set as the height of the characters head */
     float head_height;

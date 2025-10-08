@@ -31,6 +31,7 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     fw64_character_set_position(character, &zero);
 
     vec3_set_one(&character->size);
+    character->step_height = 0.17;
     character->head_height = 0.8f;
     character->hang_vertical_offset = 0.0f;
     character->max_speed = FW64_CHARACTER_DEFAULT_MAX_SPEED;
@@ -88,10 +89,11 @@ static int _fw64_character_attempt_sticky_ground(fw64Character* character, const
         return 0;
     }
 
-    float y_delta = fw64_fabsf(character->position.y - sticky_pos.y);
+    const float y_delta = fw64_fabsf(character->position.y - sticky_pos.y);
+    const float sticky_dist = 0.35f * character->step_height;
 
     // sticky ground threshold
-    if (y_delta <= 0.07) {
+    if (y_delta <= sticky_dist) {
         character->position = sticky_pos;
         character->state = FW64_CHARACTER_STATE_ON_GROUND;
         return 1;
