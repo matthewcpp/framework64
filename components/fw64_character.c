@@ -13,13 +13,9 @@ void fw64_character_envionment_init(fw64CharacterEnvironment* env) {
     env->horizontal_move_threshold = FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD;
 }
 
-#ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-
-void fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugInfo* debug) {
+void _fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugInfo* debug) {
     memset(debug, 0, sizeof(fw64CharacterEnvironmentDebugInfo));
 }
-
-#endif
 
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Node* node, fw64Scene* scene) {
     character->environment = env;
@@ -66,9 +62,7 @@ static int _fw64_character_attempt_sticky_ground(fw64Character* character, const
         fw64CollisionGeometryCell* cell = query->cells[c];
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
 
-        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-        character->environment->debug_info.ray_triangles_checked += cell->floor_count;
-        #endif
+        fw64_character_environment_increment_ray_triangles_checked(&character->environment->debug_info, cell->floor_count);
 
         for (uint32_t t = 0; t < cell->floor_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
@@ -113,26 +107,18 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
     const float query_min = query_pos->y - query_radius;
     const float query_max = query_pos->y + query_radius;
 
-    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-    uint32_t triangles_considered = 0, triangles_skipped = 0, triangles_checked = 0;
-    #endif
-
     for (uint32_t c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
 
-        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-            triangles_considered += cell->floor_count;
-        #endif
+        fw64_character_environment_increment_sphere_triangles_considered(&character->environment->debug_info, cell->floor_count);
 
         for (uint32_t t = 0; t < cell->floor_count; t++) {
             fw64CollisionTriangle* triangle = triangles + t;
 
             // filter triangles that are vertically outside of our query radius
             if (query_min > triangle->maxY || query_max < triangle->minY) {
-                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-                    triangles_skipped += 1;
-                #endif
+                fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, 1);
                 continue;
             }
 
@@ -140,9 +126,8 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
             vec3_subtract(query_pos, &triangle->A, &query_v0);
             float distance = vec3_dot(&triangle->N, &query_v0);
             if (distance < query_radius) {
-                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-                    triangles_checked += 1;
-                #endif
+                fw64_character_environment_increment_sphere_triangles_checked(&character->environment->debug_info, 1);
+
                 // precision check
                 if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
                     // correct position along collision normal
@@ -154,12 +139,6 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
             }
         }
     }
-
-    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-    character->environment->debug_info.sphere_triangles_considered += triangles_considered;
-    character->environment->debug_info.sphere_triangles_skipped += triangles_skipped;
-    character->environment->debug_info.sphere_triangles_checked += triangles_checked;
-    #endif
 
     // resolve all collisions
     if (hit_count) {
@@ -185,7 +164,6 @@ static void fw64_character_compute_ledge_check_origin(fw64Character* character, 
     *ledge_check_origin = character->position;
     ledge_check_origin->y += character->size.y + 0.3f;
 
-
     Vec3 ledge_check_offset;
     fw64_transform_back(&character->node->transform, &ledge_check_offset); // flip should be forward
     vec3_scale(&ledge_check_offset, grab_size, &ledge_check_offset);
@@ -196,62 +174,6 @@ static void fw64_character_compute_ledge_check_origin(fw64Character* character, 
 
 void fw64_character_get_ledge_check_origin(fw64Character* character, Vec3* out) {
     fw64_character_compute_ledge_check_origin(character, out);
-}
-
-// TODO: should this go into collision geometry?
-static fw64CollisionTriangle* fw64_character_get_closest_triangle_for_ray(fw64Character* character, const Vec3* origin, const Vec3* direction, float maxt_t, fw64CollisionGeometryType geometry_type, Vec3* closest_pt) {
-    fw64CollisionGeometryQuery query;
-    if (!fw64_collision_geometry_query_vec3(character->scene->collision_geometry, origin, &query)) {
-        return 0;
-    }
-
-    float closest_t = maxt_t, current_t;
-    Vec3 current_pt;
-    fw64CollisionTriangle* closest_triangle = NULL;
-
-    for (uint32_t c = 0; c < query.cell_count; c++) {
-        fw64CollisionGeometryCell* cell = query.cells[c];
-        uint32_t triangle_index = 0;
-        uint32_t triangle_count = 0;
-
-        switch (geometry_type)
-        {
-            case FW64_COLLISION_GEOMETRY_TYPE_FLOOR:
-                triangle_index = cell->floor_index;
-                triangle_count = cell->floor_count;
-                break;
-        
-            case FW64_COLLISION_GEOMETRY_TYPE_WALL:
-                triangle_index = cell->wall_index;
-                triangle_count = cell->wall_count;
-                break;
-
-            case FW64_COLLISION_GEOMETRY_TYPE_CEILING:
-                triangle_index = cell->ceiling_index;
-                triangle_count = cell->ceiling_count;
-                break;
-        }
-
-        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
-            character->environment->debug_info.ray_triangles_checked += triangle_count;
-        #endif
-
-        fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + triangle_index;
-
-        for (uint32_t t = 0; t < triangle_count; t++) {
-            fw64CollisionTriangle* triangle = triangles + t;
-
-            if (fw64_collision_test_ray_triangle(origin, direction, &triangle->A, &triangle->B, &triangle->C, &current_pt, &current_t)) {
-                if (current_t < closest_t) {
-                    closest_t = current_t;
-                    *closest_pt = current_pt;
-                    closest_triangle = triangle;
-                }
-            }
-        }
-    }
-
-    return closest_triangle;
 }
 
 /** Updates the character's node such that they are looking in the direction of the supplied normal
@@ -277,7 +199,7 @@ int fw64_character_attempt_ledge_grab(fw64Character* character, float query_radi
     fw64_transform_back(&character->node->transform, &ledge_wall_check_direction); // todo flip vector
 
     const float ledge_wall_check_max_dist = query_radius * 1.1f;
-    fw64CollisionTriangle* wall_triangle = fw64_character_get_closest_triangle_for_ray(character, &ledge_wall_check_origin, &ledge_wall_check_direction, ledge_wall_check_max_dist, FW64_COLLISION_GEOMETRY_TYPE_WALL, &closest_pt);
+    const fw64CollisionTriangle* wall_triangle = fw64_collision_geometry_raycast_triangle(character->scene->collision_geometry, &ledge_wall_check_origin, &ledge_wall_check_direction, -FLT_MAX, ledge_wall_check_max_dist, FW64_COLLISION_GEOMETRY_TYPE_WALL, &closest_pt);
     if (!wall_triangle) {
         return 0;
     }
@@ -285,7 +207,7 @@ int fw64_character_attempt_ledge_grab(fw64Character* character, float query_radi
     Vec3 ledge_check_origin, ledge_check_dir = vec3_down();
     fw64_character_compute_ledge_check_origin(character, &ledge_check_origin);
 
-    if (!fw64_character_get_closest_triangle_for_ray(character, &ledge_check_origin, &ledge_check_dir, FLT_MAX, FW64_COLLISION_GEOMETRY_TYPE_FLOOR, &closest_pt)) {
+    if (!fw64_collision_geometry_raycast_triangle(character->scene->collision_geometry, &ledge_check_origin, &ledge_check_dir, -FLT_MAX, FLT_MAX, FW64_COLLISION_GEOMETRY_TYPE_FLOOR, &closest_pt)) {
         return 0;
     }
 
@@ -339,7 +261,7 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
     const float query_min = query_pos->y - query_radius;
     const float query_max = query_pos->y + query_radius;
 
-    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+    #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
     uint32_t triangles_considered = 0, triangles_skipped = 0, triangles_checked = 0;
     #endif
 
@@ -347,7 +269,7 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
         fw64CollisionGeometryCell* cell = query->cells[c];
         fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->wall_index;
 
-        #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+        #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
         triangles_considered += cell->wall_count;
         #endif
 
@@ -356,7 +278,7 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
 
             // filter triangles that are vertically outside of our query radius
             if (query_min > triangle->maxY || query_max < triangle->minY) {
-                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+                #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
                 triangles_skipped += 1;
                 #endif
                 continue;
@@ -366,7 +288,7 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
             vec3_subtract(query_pos, &triangle->A, &query_v0);
             float distance = vec3_dot(&triangle->N, &query_v0);
             if (distance < query_radius) {
-                #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+                #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
                 triangles_checked += 1;
                 #endif
                 // precision check
@@ -381,7 +303,7 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
         }
     }
 
-    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+    #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
     character->environment->debug_info.sphere_triangles_considered += triangles_considered;
     character->environment->debug_info.sphere_triangles_skipped += triangles_skipped;
     character->environment->debug_info.sphere_triangles_checked += triangles_checked;

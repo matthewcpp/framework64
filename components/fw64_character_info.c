@@ -2,14 +2,16 @@
 
 #include <stdio.h>
 
-void fw64_character_info_init(fw64CharacterInfo* info, fw64Font* font, fw64Character* character){
+void fw64_character_info_init(fw64CharacterInfo* info, fw64Font* font, fw64Character* character, fw64ThirdPersonCamera* cam){
     info->font = font;
     info->character = character;
+    info->cam = cam;
     ivec2_set_zero(&info->position);
 }
 
 void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch* spritebatch) {
-    IVec2 draw_pos = info->position, grid_pos;
+    IVec2 draw_pos = info->position;
+    IVec3 grid_pos;
     char buffer[64];
 
     sprintf(buffer, "p: %.2f, %.2f, %2.f", info->character->position.x, info->character->position.y, info->character->position.z);
@@ -70,19 +72,23 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
     draw_pos.y += fw64_font_line_height(info->font);
     int on_grid = fw64_collision_geometry_get_cell_coordinates_vec3(info->character->scene->collision_geometry, &info->character->position, &grid_pos);
     if (on_grid) {
-        sprintf(buffer, "Grid: %d,%d", grid_pos.x, grid_pos.y);
+        sprintf(buffer, "Grid: %d,%d", grid_pos.x, grid_pos.z);
         fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
     }
 
-    #ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+    #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
         const fw64CharacterEnvironmentDebugInfo* char_debug = &info->character->environment->debug_info;
         draw_pos.y += fw64_font_line_height(info->font);
-        sprintf(buffer, "tri: s: %d/%d/%d r:%d", 
+        sprintf(buffer, "char: s: %d/%d/%d r:%d", 
             char_debug->sphere_triangles_considered, 
             char_debug->sphere_triangles_skipped, 
             char_debug->sphere_triangles_checked,
             char_debug->ray_triangles_checked
         );
+        fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
+
+        draw_pos.y += fw64_font_line_height(info->font);
+        sprintf(buffer, "cam: r:%d", info->cam->collision_geometry_triangles_checked);
         fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
     #endif
 }

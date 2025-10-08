@@ -45,7 +45,8 @@ function (configure_core_library)
     target_include_directories(framework64 
         PUBLIC /usr/include/n64 /usr/include/n64/PR  /usr/include/n64/nusys /usr/include/n64/nustd)
 
-        enable_all_warnings_as_errors(TARGET framework64)
+    enable_all_warnings_as_errors(TARGET framework64)
+    target_compile_definitions(framework64 PUBLIC "$<$<CONFIG:Debug>:FW64_COLLISION_GEOMETRY_DEBUG_INFO>")
 
 endfunction()
 

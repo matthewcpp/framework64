@@ -4,7 +4,7 @@ const Bounding = require("./gltf/Bounding");
 
 class CollisionGeometryWriter {
     /** This needs to be kept in sync with fw64CollisionGeometryInfo in collision_geometry.h */
-    static headerSize = (4 /*element counts */  + 4 /* 2d bounding min/max */ )* 4;
+    static headerSize = ((2 /*element counts */ + 3 /* cell counts */) * 4)  + Bounding.SizeOf; /* bounding min/max */
 
     /** This needs to be kept in sync with fw64CollisionTriangle in collision_geometry.h */
     static triangleSize = ((3 * 3) /* points */ + (1 * 3) /* normal */ + 2 /* extents */) * 4;
@@ -59,11 +59,9 @@ class CollisionGeometryWriter {
         headerIndex = this.writer.writeUInt32(headerBuffer, triangleCount, headerIndex);
         headerIndex = this.writer.writeUInt32(headerBuffer, ladderCount, headerIndex);
         headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountX, headerIndex);
+        headerIndex = this.writer.writeUInt32(headerBuffer, 1, headerIndex); // grid is flat...for now
         headerIndex = this.writer.writeUInt32(headerBuffer, collisionGeometry.cellCountZ, headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.min[0], headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.min[2], headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.max[0], headerIndex);
-        headerIndex = this.writer.writeFloat(headerBuffer, collisionGeometry.boundingBox.max[2], headerIndex);
+        headerIndex = collisionGeometry.boundingBox.write(this.writer, headerBuffer, headerIndex);
 
         this.triangleBuffer = Buffer.alloc(CollisionGeometryWriter.triangleSize * triangleCount);
         this.cellBuffer = Buffer.alloc(CollisionGeometryWriter.cellSize * collisionGeometry.cells.length);

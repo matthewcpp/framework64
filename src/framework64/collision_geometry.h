@@ -34,9 +34,9 @@ typedef struct {
     uint32_t triangle_count;
     uint32_t ladder_count;
     uint32_t cell_count_x;
+    uint32_t cell_count_y;
     uint32_t cell_count_z;
-    Vec2 bounds_min;
-    Vec2 bounds_max;
+    Box bounding;
 } fw64CollisionGeometryInfo;
 
 typedef struct {
@@ -45,17 +45,24 @@ typedef struct {
     fw64CollisionTriangle* triangles;
     fw64CollisionLadder* ladders;
     fw64CollisionGeometryCell* cells;
+    Vec3 cell_size;
+
+#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
+    uint32_t last_raycast_test_count;
+#endif
 } fw64CollisionGeometry;
 
+#define FW64_COLLISION_GEOMETRY_QUERY_MAX_CELL_COUNT 8
+
 typedef struct {
-    fw64CollisionGeometryCell* cells[4];
+    fw64CollisionGeometryCell* cells[FW64_COLLISION_GEOMETRY_QUERY_MAX_CELL_COUNT];
     uint32_t cell_count;
 } fw64CollisionGeometryQuery;
 
 typedef enum {
-    FW64_COLLISION_GEOMETRY_TYPE_FLOOR,
-    FW64_COLLISION_GEOMETRY_TYPE_WALL,
-    FW64_COLLISION_GEOMETRY_TYPE_CEILING
+    FW64_COLLISION_GEOMETRY_TYPE_FLOOR      = 1 << 0,
+    FW64_COLLISION_GEOMETRY_TYPE_WALL       = 1 << 1,
+    FW64_COLLISION_GEOMETRY_TYPE_CEILING    = 1 << 2
 } fw64CollisionGeometryType;
 
 #ifdef __cplusplus
@@ -68,8 +75,20 @@ void fw64_collision_geometry_init_from_datasource(fw64CollisionGeometry* geometr
 void fw64_collision_geometry_uninit(fw64CollisionGeometry* geometry, fw64Allocator* allocator);
 void fw64_collision_geometry_delete(fw64CollisionGeometry* geometry, fw64Allocator* allocator);
 
-int fw64_collision_geometry_get_cell_coordinates_vec3(const fw64CollisionGeometry* geometry, const Vec3* vec, IVec2* out);
-int fw64_collision_geometry_query_vec3(fw64CollisionGeometry* geometry, const Vec3* vec, fw64CollisionGeometryQuery* query);
+int fw64_collision_geometry_get_cell_coordinates_vec3(const fw64CollisionGeometry* geometry, const Vec3* vec, IVec3* out);
+int fw64_collision_geometry_query_vec3(const fw64CollisionGeometry* geometry, const Vec3* vec, fw64CollisionGeometryQuery* query);
+int fw64_collision_geometry_query_ray(const fw64CollisionGeometry* geometry, const Vec3* origin, const Vec3* direction, float distance, fw64CollisionGeometryQuery* query);
+
+const fw64CollisionTriangle* fw64_collision_geometry_raycast_triangle(const fw64CollisionGeometry* geometry, const Vec3* origin, const Vec3* direction, float min_distance, float max_distance, fw64CollisionGeometryType type_mask, Vec3* out_pt);
+/** 
+ * Returns the cell from the grid with the supplied indicies. 
+ * Will return NULL if the indices are invalid
+*/
+fw64CollisionGeometryCell* fw64_collision_geometry_get_cell(const fw64CollisionGeometry* geometry, const IVec3* coords);
+
+#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
+uint32_t fw64_collision_geometry_get_last_raycast_triangle_test_count();
+#endif
 
 #define fw64_collision_geometry_get_cell_count(geometry) ((geometry)->info.cell_count_x * (geometry)->info.cell_count_z)
 #define fw64_collision_geometry_get_cell_index(geometry, x, z) ((z) * (geometry)->info.cell_count_x + (x))

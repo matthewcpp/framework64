@@ -18,7 +18,7 @@
 #define FW64_CHARACTER_DEFAULT_GROUND_ACCEL 15.0f
 #define FW64_CHARACTER_DEFAULT_GROUND_DECEL 30.0f
 
-#ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
 typedef struct {
     uint32_t sphere_triangles_considered;
     uint32_t sphere_triangles_skipped;
@@ -26,8 +26,20 @@ typedef struct {
     uint32_t ray_triangles_checked;
 } fw64CharacterEnvironmentDebugInfo;
 
-void fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugInfo* debug);
+void _fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugInfo* debug);
+#define fw64_character_environment_debug_info_reset(debug) _fw64_character_environment_debug_info_reset((debug))
+#define fw64_character_environment_increment_ray_triangles_checked(debug, count) (debug)->ray_triangles_checked += (count)
+#define fw64_character_environment_increment_sphere_triangles_considered(debug, count) (debug)->sphere_triangles_considered += (count)
+#define fw64_character_environment_increment_sphere_triangles_skipped(debug, count) (debug)->sphere_triangles_skipped += (count)
+#define fw64_character_environment_increment_sphere_triangles_checked(debug, count) (debug)->sphere_triangles_checked += (count)
+#else 
+#define fw64_character_environment_debug_info_reset(debug) 
+#define fw64_character_environment_increment_ray_triangles_checked(debug, count)
+#define fw64_character_environment_increment_sphere_triangles_considered(debug, count) 
+#define fw64_character_environment_increment_sphere_triangles_skipped(debug, count) 
+#define fw64_character_environment_increment_sphere_triangles_checked(debug, count) 
 #endif
+
 
 typedef struct {
     Vec3 gravity;
@@ -41,7 +53,7 @@ typedef struct {
     */
     float horizontal_move_threshold;
 
-#ifdef FW64_CHAR_ENVIRONMENT_DEBUG_INFO
+#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
     fw64CharacterEnvironmentDebugInfo debug_info;
 #endif
 } fw64CharacterEnvironment;

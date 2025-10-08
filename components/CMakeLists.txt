@@ -31,5 +31,3 @@ add_game_modules(TARGET fw64_components MODULES media)
 
 target_include_directories(fw64_components PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(fw64_components PUBLIC framework64)
-
-target_compile_definitions(fw64_components PUBLIC "$<$<CONFIG:Debug>:-DFW64_CHAR_ENVIRONMENT_DEBUG_INFO>")

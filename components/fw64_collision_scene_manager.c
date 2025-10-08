@@ -71,10 +71,10 @@ static void fw64_collision_scene_manager_draw_default_scene(fw64CollisionSceneMa
 
 static void fw64_collision_scene_manager_draw_mode_active_cell_wireframe(fw64CollisionSceneManager* manager) {
     const fw64CollisionGeometry* geometry = manager->scene->collision_geometry;
-    IVec2 grid_pos;
+    IVec3 grid_pos;
 
     if (manager->character && fw64_collision_geometry_get_cell_coordinates_vec3(geometry, &manager->character->node->transform.position, &grid_pos)) {
-        uint32_t cell_index = fw64_collision_geometry_get_cell_index(geometry, grid_pos.x, grid_pos.y);
+        uint32_t cell_index = fw64_collision_geometry_get_cell_index(geometry, grid_pos.x, grid_pos.z);
         fw64Node* current_geometry_node = fw64_scene_get_node(manager->collision_wireframe, DEBUG_SCENE_COLLISION_GEOMETRY_GEOMETRY_NODES_START + cell_index);
         fw64_renderpass_draw_static_mesh(manager->wireframe_renderpass, current_geometry_node->mesh_instance);
 

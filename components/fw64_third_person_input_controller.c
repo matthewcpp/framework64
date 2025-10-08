@@ -107,8 +107,8 @@ void fw64_third_person_input_controller_update(fw64ThirdPersonInputController* c
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_C_UP)) {
         fw64_third_person_camera_rotate(controller->cam, -controller->cam_rotation_speed * time_delta, 0.0f);
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_DPAD_UP)) {
-        controller->cam->follow_dist += controller->cam_dist_speed * time_delta;
+        fw64_third_person_camera_set_follow_distance(controller->cam, controller->cam->follow_dist + controller->cam_dist_speed * time_delta);
     } else if (fw64_input_controller_button_down(controller->input, controller->port, FW64_N64_CONTROLLER_BUTTON_DPAD_DOWN)) {
-        controller->cam->follow_dist -= controller->cam_dist_speed * time_delta;
+        fw64_third_person_camera_set_follow_distance(controller->cam, controller->cam->follow_dist - controller->cam_dist_speed * time_delta);
     }
 }
