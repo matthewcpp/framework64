@@ -62,6 +62,18 @@ void fw64_collision_scene_manager_set_camera(fw64CollisionSceneManager* manager,
 static void fw64_collision_scene_manager_draw_default_scene(fw64CollisionSceneManager* manager, fw64LayerMask layer_mask) {
     fw64_renderpass_begin(manager->static_scene_renderpass);
     fw64_scene_draw_frustrum(manager->scene, manager->static_scene_renderpass, &manager->view_frustum, layer_mask);
+
+    // explicitly draw player.  They may disappear when under the influence of an uninterruptable animation that changes their position
+    // The node position is not updated, but the animation is moving their geometry.  eg Ledge climb or ladder exit
+    // TODO: this is probably not the best way to accomplish there
+    if (!(manager->character->node->layer_mask & layer_mask)) {
+        if (manager->character->node->mesh_instance->flags & FW64_MESH_INSTANCE_FLAG_SKINNED) {
+            fw64_renderpass_draw_skinned_mesh(manager->static_scene_renderpass, (fw64SkinnedMeshInstance*)manager->character->node->mesh_instance);
+        } else {
+            fw64_renderpass_draw_static_mesh(manager->static_scene_renderpass, manager->character->node->mesh_instance);
+        }
+    }
+
     fw64_renderpass_end(manager->static_scene_renderpass);
 
     fw64_renderer_submit_renderpass(manager->engine->renderer, manager->static_scene_renderpass);
