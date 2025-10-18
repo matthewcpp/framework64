@@ -25,7 +25,7 @@ int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const 
  * Returns nonzero value if the sphere intersects AABB, otherwise 0
  * Additionally computes point on the AABB closest to sphere center
  */
-int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* point);
+int fw64_collision_test_box_sphere(const Box* box, const Vec3* center, float radius, Vec3* point);
 
 /**
  * Returns nonzero value if the ray intersects the triangle, otherwise 0
@@ -33,14 +33,18 @@ int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p
  */
 int fw64_collision_test_ray_triangle(const Vec3* origin, const Vec3* direction, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point, float* t);
 
-int fw64_collision_test_ray_box(Vec3* origin, Vec3* direction, Box* box, Vec3* point, float* t);
+/**
+ * Returns nonzero value if the ray intersects the box, otherwise 0
+ * Additionally computes the intersection point and distance from ray origin of the intersection
+ */
+int fw64_collision_test_ray_box(const Vec3* origin, const Vec3* direction, const Box* box, Vec3* point, float* t);
 
 /**
  * Returns nonzero value if the ray intersects the sphere, otherwise 0
  * Additionally computes the intersection point (point) and distance (t) from ray origin of the intersection
  * If no intersection, point and t are undefined
  */
-int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, float radius, Vec3* point, float* t);
+int fw64_collision_test_ray_sphere(const Vec3* origin, const Vec3* direction, const Vec3* center, float radius, Vec3* point, float* t);
 
 /**
  * Returns nonzero value if the ray intersects the capsule defined by the line between Point A and Point B, and the radius

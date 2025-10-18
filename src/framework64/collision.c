@@ -10,11 +10,11 @@ static inline void swapf(float* a, float* b) {
 }
 
 // Real Time Collision Detection 5.3.3
-int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_point, float* out_t) {
-    float* dir_el = (float*)(dir);
-    float* origin_el = (float*)origin;
-    float* box_min_el = (float*) &box->min;
-    float* box_max_el = (float*) &box->max;
+int fw64_collision_test_ray_box(const Vec3* origin, const Vec3* dir, const Box* box, Vec3* out_point, float* out_t) {
+    const float* dir_el = (const float*)(dir);
+    const float* origin_el = (const float*)origin;
+    const float* box_min_el = (const float*) &box->min;
+    const float* box_max_el = (const float*) &box->max;
 
     float tmin = 0.0f;          // set to -FLT_MAX to get first hit on line
     float tmax = FLT_MAX;       // set to max distance ray can travel (for segment)
@@ -23,22 +23,25 @@ int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_poi
     for (int i = 0; i < 3; i++) {
         if (fabsf(dir_el[i]) < EPSILON) {
             // Ray is parallel to slab. No hit if origin not within slab
-            if (origin_el[i] < box_min_el[i] || origin_el[i] > box_max_el[i])
+            if (origin_el[i] < box_min_el[i] || origin_el[i] > box_max_el[i]) {
                 return 0;
+            }
         } else {
             // Compute intersection t value of ray with near and far plane of slab
             float ood = 1.0f / dir_el[i];
             float t1 = (box_min_el[i] - origin_el[i]) * ood;
             float t2 = (box_max_el[i] - origin_el[i]) * ood;
             // Make t1 be intersection with near plane, t2 with far plane
-            if (t1 > t2)
+            if (t1 > t2) {
                 swapf(&t1, &t2);
+            }
             // Compute the intersection of slab intersections intervals
             tmin = tmin > t1 ? tmin : t1; // tmin = Max(tmin, t1);
             tmax = tmax < t2 ? tmax : t2; // tmax = Min(tmax, t2);
             // Exit with no collision as soon as slab intersection becomes empty
-            if (tmin > tmax)
+            if (tmin > tmax) {
                 return 0;
+            }
         }
     }
 
@@ -49,7 +52,7 @@ int fw64_collision_test_ray_box(Vec3* origin, Vec3* dir, Box* box, Vec3* out_poi
 }
 
 // Real Time Collision Detection 5.3.2
-int fw64_collision_test_ray_sphere(Vec3* origin, Vec3* direction, Vec3* center, float radius, Vec3* point, float* t) {
+int fw64_collision_test_ray_sphere(const Vec3* origin, const Vec3* direction, const Vec3* center, float radius, Vec3* point, float* t) {
     Vec3 m;
     vec3_subtract(origin, center, &m);
     float b = vec3_dot(&m, direction);
@@ -119,7 +122,7 @@ int fw64_collision_test_ray_capsule(Vec3* origin, Vec3* direction, // ray
 }
 
 // Real Time Collision Detection 5.2.5
-int fw64_collision_test_box_sphere(Box* box, Vec3* center, float radius, Vec3* p) {
+int fw64_collision_test_box_sphere(const Box* box, const Vec3* center, float radius, Vec3* p) {
     box_closest_point(box, center, p);
 
     Vec3 v;
