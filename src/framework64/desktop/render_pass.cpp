@@ -70,7 +70,7 @@ const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass) {
     return &renderpass->viewport;
 }
 
-void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera) {
+void fw64_renderpass_set_camera(fw64RenderPass* pass, const fw64Camera* camera) {
     pass->setViewport(camera->viewport);
     pass->setViewMatrix(camera->view.m);
     pass->setProjectionMatrix(camera->projection.m);

@@ -43,7 +43,7 @@ void fw64_renderpass_set_view_matrix(fw64RenderPass* pass, float* view);
 void fw64_renderpass_set_projection_matrix(fw64RenderPass* pass, float* projection, uint16_t* persp_norm_ptr);
 void fw64_renderpass_set_viewport(fw64RenderPass* pass, const fw64Viewport* viewport);
 const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass);
-void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera);
+void fw64_renderpass_set_camera(fw64RenderPass* pass, const fw64Camera* camera);
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled);
 void fw64_renderpass_set_depth_writing_enabled(fw64RenderPass* renderpass, int enabled);
