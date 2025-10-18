@@ -38,8 +38,14 @@ async function processLevel(environment, level, layerMap, archive, baseDirectory
         await _processScene(environment, scene, levelParser, archive, outputDirectory, includeDirectory);
 
         if (scene.collisionGeometry !== null) {
-            const collisionGeometrySceneData = CollisionGeometryDebug.createWireScene(scene.collisionGeometry, Util.safeDefineName(scene.name));
-            await _processScene(environment, collisionGeometrySceneData.scenes[0], collisionGeometrySceneData, archive, outputDirectory, includeDirectory);
+            const WriteInterface = require("../WriteInterface");
+
+            const safeSceneName =  Util.safeDefineName(scene.name) + "_collision";
+            const collisionDebugSceneFileName = safeSceneName + ".scene";
+            const collisionDebugSceneFile = path.join(outputDirectory, collisionDebugSceneFileName);
+
+            await CollisionGeometryDebug.writeCollisionGeometryDebugData(environment, scene.collisionGeometry,  WriteInterface.bigEndian(), SceneWriter, collisionDebugSceneFile);
+            archive.addFile(collisionDebugSceneFile, safeSceneName);
         }
     }
 }

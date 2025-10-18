@@ -23,6 +23,8 @@ typedef struct {
     uint32_t sphere_triangles_considered;
     uint32_t sphere_triangles_skipped;
     uint32_t sphere_triangles_checked;
+    uint32_t ray_triangles_considered;
+    uint32_t ray_triangles_skipped;
     uint32_t ray_triangles_checked;
 } fw64CharacterEnvironmentDebugInfo;
 

@@ -4,14 +4,36 @@ const GLTFUtil = require("./gltf/GLTFUtil");
 const glMatrix = require("gl-matrix");
 const Intersect = require("./Intersect");
 
+/** Represents a bounding volume around a group of triangles in a single grid cell */
+class CollisionGeometryBoundingVolume {
+    static Type = {
+        Box: 1
+    }
+
+    node;
+    type = CollisionGeometryBoundingVolume.Box;
+
+    /** currently this is assumed to be a bounding box.  it may support more primitives in the future */
+    volume = new Bounding();
+    floors = [];
+    walls = [];
+    ceilings = [];
+
+    constructor(node) {
+        this.node = node;
+    }
+
+    get triangleCount () {
+        return this.walls.length + this.floors.length + this.ceilings.length;
+    }
+}
+
 class CollisionGeometryCell {
     posX;
     posZ;
     boundingBox;
-    walls = [];
-    floors = [];
-    ceilings = [];
     ladders = [];
+    boundingVolumes = [];
 
     constructor(cellX, cellZ, boundingBox) {
         this.posX = cellX;
@@ -19,8 +41,46 @@ class CollisionGeometryCell {
         this.boundingBox = boundingBox;
     }
 
-    get triangleCount () {
-        return this.walls.length + this.floors.length + this.ceilings.length;
+    /** 
+     * Note: This implementation assumes that all of the triangles for a node are added before any from the next node.
+     * If that were to change then we would probably need to move to a map or something along those lines. */
+    _getOrCreateBoundingVolumeForNode(node) {
+        if (this.boundingVolumes.length > 0) {
+            const boundingVolume = this.boundingVolumes[this.boundingVolumes.length - 1];
+
+            if (boundingVolume.node.index == node.index) {
+                return boundingVolume;
+            }
+        }
+
+        const boundingVolume = new CollisionGeometryBoundingVolume(node);
+        this.boundingVolumes.push(boundingVolume);
+
+        return boundingVolume;
+    }
+
+    static _addTriangleToBoundingVolume(boundingVolume, triangle) {
+        boundingVolume.volume.encapsulatePoint(triangle[0]);
+        boundingVolume.volume.encapsulatePoint(triangle[1]);
+        boundingVolume.volume.encapsulatePoint(triangle[2]);
+    }
+
+    addFloor(node, triangle) {
+        const boundingVolume = this._getOrCreateBoundingVolumeForNode(node);
+        CollisionGeometryCell._addTriangleToBoundingVolume(boundingVolume, triangle);
+        boundingVolume.floors.push(triangle);
+    }
+
+    addWall(node, triangle) {
+        const boundingVolume = this._getOrCreateBoundingVolumeForNode(node);
+        CollisionGeometryCell._addTriangleToBoundingVolume(boundingVolume, triangle);
+        boundingVolume.walls.push(triangle);
+    }
+
+    addCeiling(node, triangle) {
+        const boundingVolume = this._getOrCreateBoundingVolumeForNode(node);
+        CollisionGeometryCell._addTriangleToBoundingVolume(boundingVolume, triangle);
+        boundingVolume.ceilings.push(triangle);
     }
 }
 
@@ -64,6 +124,7 @@ class CollisionGeometry {
 
         // partition the bounding into a uniform grid
         this.cellCountX = countX;
+        this.cellCountY = 1; // grid is flat...for now
         this.cellCountZ = countZ;
 
         // determine cell size
@@ -90,7 +151,9 @@ class CollisionGeometry {
         let total = 0;
 
         for (const cell of this.cells) {
-            total += cell.triangleCount;
+            for (const boundingVolume of cell.boundingVolumes) {
+                total += boundingVolume.triangleCount;
+            }
         }
 
         return total;
@@ -106,17 +169,28 @@ class CollisionGeometry {
         return total;
     }
 
+    get boundingVolumeCount() {
+        let total = 0;
+
+        for (const cell of this.cells) {
+            total += cell.boundingVolumes.length;
+        }
+
+        return total;
+    }
+
     _getOverlappingCells(bounding) {
         // determine the range of cells to query.
         const minCellX = Math.floor((bounding.min[0] - this.boundingBox.min[0]) / this.cellSizeX);
-        const maxCellX = Math.ceil((bounding.max[0] - this.boundingBox.min[0]) / this.cellSizeX);
+        const maxCellX = Math.min(Math.ceil((bounding.max[0] - this.boundingBox.min[0]) / this.cellSizeX), this.cellCountX - 1);
 
         const minCellZ = Math.floor((bounding.min[2] - this.boundingBox.min[2]) / this.cellSizeZ);
-        const maxCellZ = Math.ceil((bounding.max[2] - this.boundingBox.min[2]) / this.cellSizeZ);
+        const maxCellZ = Math.min(Math.ceil((bounding.max[2] - this.boundingBox.min[2]) / this.cellSizeZ), this.cellCountZ - 1);
 
+        // note about iteration below: we want to make sure we inlucle all cells in the min/max range so we use <=
         const overlappingCells = [];
-        for (let z = minCellZ; z < maxCellZ; z++) {
-            for (let x = minCellX; x < maxCellX; x++) {
+        for (let z = minCellZ; z <= maxCellZ; z++) {
+            for (let x = minCellX; x <= maxCellX; x++) {
                 const cellIndex = z * this.cellCountX + x;
                 overlappingCells.push(this.cells[cellIndex]);
             }
@@ -153,7 +227,7 @@ class CollisionGeometry {
         return overlappingCells;
     }
 
-    insertTriangle(triangle) {
+    insertTriangle(node, triangle) {
         const cells = this._getGridCellsForTriangle(triangle);
         const normal = triangle[3];
 
@@ -164,18 +238,15 @@ class CollisionGeometry {
 
         if (normal[1] > this.floorAndCeilingTolerance) {
             for (const cell of cells) {
-                cell.floors.push(triangle);
+                cell.addFloor(node, triangle);
             }
         } else if (normal[1] < -this.floorAndCeilingTolerance) {
             for (const cell of cells) {
-                cell.ceilings.push(triangle);
+                cell.addCeiling(node, triangle);
             }
         } else {
-            // TODO: is there a reasonable extent for walls?
-            const extent = 0.0;
-            triangle.push(extent);
             for (const cell of cells) {
-                cell.walls.push(triangle);
+                cell.addWall(node, triangle);
             }
         }
 
@@ -249,7 +320,7 @@ class CollisionGeometry {
                     glMatrix.vec3.normalize(N, N);
 
                     const triangle = [A, B, C, N];
-                    geometry.insertTriangle(triangle);
+                    geometry.insertTriangle(node, triangle);
                 }
             }
         }

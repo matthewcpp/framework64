@@ -88,7 +88,7 @@ void fw64_character_info_to_spritebatch(fw64CharacterInfo* info, fw64SpriteBatch
         fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
 
         draw_pos.y += fw64_font_line_height(info->font);
-        sprintf(buffer, "cam: r:%d", info->cam->collision_geometry_triangles_checked);
+        sprintf(buffer, "cam: r: %d/%d/%d", info->cam->collision_geometry_debug_info.triangles_considered, info->cam->collision_geometry_debug_info.triangles_skipped, info->cam->collision_geometry_debug_info.triangles_checked);
         fw64_spritebatch_draw_string(spritebatch, info->font, buffer, draw_pos.x, draw_pos.y);
     #endif
 }

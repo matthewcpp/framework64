@@ -7,11 +7,15 @@ const WriteInterface = require("../WriteInterface");
 const fs = require("fs");
 
 async function write(environment, scene, gltfData, destPath) {
+    const file = fs.openSync(destPath, "w");
+    await writeToFile(environment, scene, gltfData, file);
+    fs.closeSync(file);
+}
+
+async function writeToFile(environment, scene, gltfData, file) {
     const writer = WriteInterface.littleEndian();
     const images = await MaterialBundleWriter.createDesktopImages(gltfData);
     const materialBundle = scene.materialBundle;
-
-    const file = fs.openSync(destPath, "w");
 
     SceneDataWriter.writeSceneInfo(scene, file, writer);
     if (scene.materialBundle) {
@@ -32,10 +36,9 @@ async function write(environment, scene, gltfData, destPath) {
     SceneDataWriter.writeCollisionMeshes(environment, scene, writer, file);
     SceneDataWriter.writeNodes(environment, scene, writer, file);
     SceneDataWriter.writeCustomBoundingBoxes(scene, writer, file);
-
-    fs.closeSync(file);
 }
 
 module.exports = {
-    write : write
+    write : write,
+    writeToFile: writeToFile
 }

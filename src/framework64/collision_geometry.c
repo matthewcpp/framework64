@@ -21,7 +21,10 @@ void fw64_collision_geometry_init_from_datasource(fw64CollisionGeometry* geometr
     geometry->ladders = fw64_allocator_malloc(allocator, sizeof(fw64CollisionLadder) * geometry->info.ladder_count);
     fw64_data_source_read(data_source, geometry->ladders, sizeof(fw64CollisionLadder), geometry->info.ladder_count);
 
-    const size_t cell_count = geometry->info.cell_count_x * geometry->info.cell_count_z;
+    geometry->bounding_volumes = fw64_allocator_malloc(allocator, sizeof(fw64CollisionLadder) * geometry->info.bounding_volume_count);
+    fw64_data_source_read(data_source, geometry->bounding_volumes, sizeof(fw64CollisionGeometryBoundingVolume), geometry->info.bounding_volume_count);
+
+    const size_t cell_count = geometry->info.cell_count_x * geometry->info.cell_count_y * geometry->info.cell_count_z;
     geometry->cells = fw64_allocator_malloc(allocator, sizeof(fw64CollisionGeometryCell) * cell_count);
     fw64_data_source_read(data_source, geometry->cells, sizeof(fw64CollisionGeometryCell), cell_count);
 
@@ -174,14 +177,12 @@ static void fw64_collision_geometry_test_triangles(fw64CollisionGeometryTraingle
     }
 }
 #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-#define fw64_collision_geometry_reset_last_raycast_test_count(geometry) ((fw64CollisionGeometry*)geometry)->last_raycast_test_count = 0
-#define fw64_collision_geometry_increment_last_raycast_test_count(geometry, count) ((fw64CollisionGeometry*)geometry)->last_raycast_test_count += (count)
+#define fw64_collision_geometry_reset_last_raycast_test_count(info) memset(((fw64GeometryDataDebugInfo*)(info)), 0, sizeof(fw64GeometryDataDebugInfo))
 #else
 #define fw64_collision_geometry_reset_last_raycast_test_count(geometry)
-#define fw64_collision_geometry_increment_last_raycast_test_count(geometry, count)
 #endif
 const fw64CollisionTriangle* fw64_collision_geometry_raycast_triangle(const fw64CollisionGeometry* geometry, const Vec3* origin, const Vec3* direction, float min_distance, float max_distance, fw64CollisionGeometryType type_mask, Vec3* out_pt) {
-    fw64_collision_geometry_reset_last_raycast_test_count(geometry);
+    fw64_collision_geometry_reset_last_raycast_test_count(&geometry->last_raycast_debug_info);
 
     fw64CollisionGeometryQuery query;
     if (!fw64_collision_geometry_query_ray(geometry, origin, direction, max_distance, &query)) {
@@ -192,22 +193,40 @@ const fw64CollisionTriangle* fw64_collision_geometry_raycast_triangle(const fw64
     raycast.closest_t = max_distance;
     raycast.closest_triangle = NULL;
 
+    Vec3 box_pt; 
+    float box_t;
+
     for (uint32_t c = 0; c < query.cell_count; c++) {
         fw64CollisionGeometryCell* cell = query.cells[c];
 
-        if (type_mask & FW64_COLLISION_GEOMETRY_TYPE_FLOOR) {
-            fw64_collision_geometry_test_triangles(&raycast, geometry->triangles + cell->floor_index, cell->floor_count, origin, direction, min_distance);
-            fw64_collision_geometry_increment_last_raycast_test_count(geometry, cell->floor_count);
-        }
-
-        if (type_mask & FW64_COLLISION_GEOMETRY_TYPE_WALL) {
-             fw64_collision_geometry_test_triangles(&raycast, geometry->triangles + cell->wall_index, cell->wall_count, origin, direction, min_distance);
-            fw64_collision_geometry_increment_last_raycast_test_count(geometry, cell->wall_count);
+        for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
+            const fw64CollisionGeometryBoundingVolume* bounding_volume = geometry->bounding_volumes + cell->bounding_volume_index + i;
+            fw64_geometry_debug_info_increment_triangles_considered((fw64GeometryDataDebugInfo*)&geometry->last_raycast_debug_info, fw64_collision_geometry_bounding_volume_triangle_count(bounding_volume));
+            
+            if (!fw64_collision_test_ray_box(origin, direction, &bounding_volume->primitive, &box_pt, &box_t)) {
+                fw64_geometry_debug_info_increment_triangles_skipped((fw64GeometryDataDebugInfo*)&geometry->last_raycast_debug_info, fw64_collision_geometry_bounding_volume_triangle_count(bounding_volume));
+                continue;
             }
 
-        if (type_mask & FW64_COLLISION_GEOMETRY_TYPE_CEILING) {
-            fw64_collision_geometry_test_triangles(&raycast, geometry->triangles + cell->ceiling_index, cell->ceiling_count, origin, direction, min_distance);
-            fw64_collision_geometry_increment_last_raycast_test_count(geometry, cell->ceiling_count);
+            if (box_t > raycast.closest_t) {
+                fw64_geometry_debug_info_increment_triangles_skipped((fw64GeometryDataDebugInfo*)&geometry->last_raycast_debug_info, fw64_collision_geometry_bounding_volume_triangle_count(bounding_volume));
+                continue;
+            }
+
+            if (type_mask & FW64_COLLISION_GEOMETRY_TYPE_FLOOR) {
+                fw64_collision_geometry_test_triangles(&raycast, geometry->triangles + bounding_volume->floor_index, bounding_volume->floor_count, origin, direction, min_distance);
+                fw64_geometry_debug_info_increment_triangles_checked((fw64GeometryDataDebugInfo*)&geometry->last_raycast_debug_info, bounding_volume->floor_count);
+            }
+
+            if (type_mask & FW64_COLLISION_GEOMETRY_TYPE_WALL) {
+                fw64_collision_geometry_test_triangles(&raycast, geometry->triangles + bounding_volume->wall_index, bounding_volume->wall_count, origin, direction, min_distance);
+                fw64_geometry_debug_info_increment_triangles_checked((fw64GeometryDataDebugInfo*)&geometry->last_raycast_debug_info, bounding_volume->wall_count);
+            }
+
+            if (type_mask & FW64_COLLISION_GEOMETRY_TYPE_CEILING) {
+                fw64_collision_geometry_test_triangles(&raycast, geometry->triangles + bounding_volume->ceiling_index, bounding_volume->ceiling_count, origin, direction, min_distance);
+                fw64_geometry_debug_info_increment_triangles_checked((fw64GeometryDataDebugInfo*)&geometry->last_raycast_debug_info, bounding_volume->ceiling_count);
+            }
         }
     }
 

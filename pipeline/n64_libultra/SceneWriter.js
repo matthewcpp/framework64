@@ -1,20 +1,22 @@
 const CollisionGeometryWriter = require("../CollisionGeometryWriter");
-const CollisionGeometryDebug = require("../CollisionGeometryDebug");
 const MeshWriter = require("./MeshWriter");
 const MaterialBundleWriter = require("./MaterialBundleWriter");
 const SceneDataWriter = require("../SceneDataWriter");
-
-const fs = require("fs");
-const path = require("path");
-
 const WriteInterface = require("../WriteInterface");
 
+const fs = require("fs");
+
 async function write(environment, scene, gltfData, destPath) {
+    const file = fs.openSync(destPath, "w");
+    await writeToFile(environment, scene, gltfData, file);
+    fs.closeSync(file);
+}
+
+async function writeToFile(environment, scene, gltfData, file) {
+    // TODO: can we pass in writer/images?
     const writer = WriteInterface.bigEndian();
     const images = await MeshWriter.createN64Images(gltfData);
     const materialBundle = scene.materialBundle;
-
-    const file = fs.openSync(destPath, "w");
 
     SceneDataWriter.writeSceneInfo(scene, file, writer);
     if (scene.materialBundle) {
@@ -24,10 +26,6 @@ async function write(environment, scene, gltfData, destPath) {
     if (scene.collisionGeometry) {
         const collisionGeometryWriter = new CollisionGeometryWriter(writer);
         collisionGeometryWriter.writeData(scene.collisionGeometry, file);
-
-        const path = require("path");
-        const collisionDebugFile = path.join(path.dirname(destPath), path.basename(destPath) +"_collision.txt");
-        CollisionGeometryDebug.writeTextFile(scene.collisionGeometry, collisionDebugFile);
     }
 
     for (const gltfMeshIndex of scene.meshBundle) {
@@ -39,10 +37,9 @@ async function write(environment, scene, gltfData, destPath) {
     SceneDataWriter.writeCollisionMeshes(environment, scene, writer, file);
     SceneDataWriter.writeNodes(environment, scene, writer, file);
     SceneDataWriter.writeCustomBoundingBoxes(scene, writer, file);
-
-    fs.closeSync(file);
 }
 
 module.exports = {
-    write: write
+    write: write,
+    writeToFile: writeToFile
 }

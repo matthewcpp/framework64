@@ -24,6 +24,12 @@ void fw64_third_person_camera_set_follow_distance(fw64ThirdPersonCamera* cam, fl
 
 #define CAMERA_COLLISION_GEOMETRY_MASK (FW64_COLLISION_GEOMETRY_TYPE_FLOOR | FW64_COLLISION_GEOMETRY_TYPE_WALL | FW64_COLLISION_GEOMETRY_TYPE_CEILING)
 
+#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
+#define fw64_third_person_camera_set_collision_geometry_triangles_checked(cam, info) (cam)->collision_geometry_debug_info = (info)
+#else
+#define fw64_third_person_camera_set_collision_geometry_triangles_checked(cam, count) 
+#endif
+
 /**
  * Computes the camera final position given a base and target position
  * This is accomplished by performing a raycast against the world geometry and performing a collison response if necessary
@@ -41,7 +47,7 @@ static void fw64_third_person_camera_resolve_world_collisions(fw64ThirdPersonCam
         cam->camera->node->transform.position = *cam_pos;
     }
 
-    fw64_third_person_camera_set_collision_geometry_triangles_checked(cam, cam->character->scene->collision_geometry->last_raycast_test_count);
+    fw64_third_person_camera_set_collision_geometry_triangles_checked(cam, cam->character->scene->collision_geometry->last_raycast_debug_info);
 }
 
 static void fw64_third_person_camera_update_cam_pos(fw64ThirdPersonCamera* cam, const Vec3* target_pos) {

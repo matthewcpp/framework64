@@ -20,35 +20,65 @@ typedef struct {
 } fw64CollisionLadder;
 
 typedef struct {
-    uint32_t wall_index;
-    uint32_t wall_count;
-    uint32_t floor_index;
-    uint32_t floor_count;
-    uint32_t ceiling_index;
-    uint32_t ceiling_count;
-    uint32_t ladder_index;
-    uint32_t ladder_count;
+    uint16_t type;
+    uint16_t node_index;
+    uint16_t floor_index;
+    uint16_t floor_count;
+    uint16_t wall_index;
+    uint16_t wall_count;
+    uint16_t ceiling_index;
+    uint16_t ceiling_count;
+    Box primitive; // TODO: make this a union once additional primitives are supported
+} fw64CollisionGeometryBoundingVolume;
+
+#define fw64_collision_geometry_bounding_volume_triangle_count(volume) ((volume)->floor_count + (volume)->wall_count + (volume)->ceiling_count)
+
+typedef struct {
+    uint16_t ladder_index;
+    uint16_t ladder_count;
+    uint16_t bounding_volume_index;
+    uint16_t bounding_volume_count;
 } fw64CollisionGeometryCell;
 
 typedef struct {
     uint32_t triangle_count;
     uint32_t ladder_count;
+    uint32_t bounding_volume_count;
     uint32_t cell_count_x;
     uint32_t cell_count_y;
     uint32_t cell_count_z;
     Box bounding;
 } fw64CollisionGeometryInfo;
 
+#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
+typedef struct {
+    uint32_t triangles_considered;
+    uint32_t triangles_skipped;
+    uint32_t triangles_checked;
+} fw64GeometryDataDebugInfo;
+
+#define fw64_geometry_debug_info_increment_triangles_considered(info, count) (info)->triangles_considered += (count)
+#define fw64_geometry_debug_info_increment_triangles_skipped(info, count) (info)->triangles_skipped += (count)
+#define fw64_geometry_debug_info_increment_triangles_checked(info, count) (info)->triangles_checked += (count)
+
+#else
+
+#define fw64_geometry_debug_info_increment_triangles_considered(info, count) 
+#define fw64_geometry_debug_info_increment_triangles_skipped(info, count) 
+#define fw64_geometry_debug_info_increment_triangles_checked(info, count) 
+
+#endif
+
 typedef struct {
     fw64CollisionGeometryInfo info;
-
     fw64CollisionTriangle* triangles;
     fw64CollisionLadder* ladders;
+    fw64CollisionGeometryBoundingVolume* bounding_volumes;
     fw64CollisionGeometryCell* cells;
     Vec3 cell_size;
 
 #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-    uint32_t last_raycast_test_count;
+    fw64GeometryDataDebugInfo last_raycast_debug_info;
 #endif
 } fw64CollisionGeometry;
 
@@ -86,12 +116,8 @@ const fw64CollisionTriangle* fw64_collision_geometry_raycast_triangle(const fw64
 */
 fw64CollisionGeometryCell* fw64_collision_geometry_get_cell(const fw64CollisionGeometry* geometry, const IVec3* coords);
 
-#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-uint32_t fw64_collision_geometry_get_last_raycast_triangle_test_count();
-#endif
-
 #define fw64_collision_geometry_get_cell_count(geometry) ((geometry)->info.cell_count_x * (geometry)->info.cell_count_z)
-#define fw64_collision_geometry_get_cell_index(geometry, x, z) ((z) * (geometry)->info.cell_count_x + (x))
+#define fw64_collision_geometry_get_cell_index(geometry, x, y, z) ((z) * (geometry)->info.cell_count_x + (x))
 
 #ifdef __cplusplus
 }

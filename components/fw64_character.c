@@ -52,27 +52,39 @@ void fw64_character_set_position(fw64Character* character, const Vec3* position)
     character->active_ladder = NULL;
 }
 
+/** TODO: can this be reduced to use collision geometry raycast? */
 static int _fw64_character_attempt_sticky_ground(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
     float closest_t = FLT_MAX;
     const Vec3 ray_origin = {query_pos->x, query_pos->y + query_radius, query_pos->z};
     const Vec3 ray_dir = vec3_down();
     Vec3 sticky_pos = vec3_zero();
+
+    Vec3 box_pt;
+    float box_t;
     
     for (uint32_t c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
-        fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
 
-        fw64_character_environment_increment_ray_triangles_checked(&character->environment->debug_info, cell->floor_count);
+        for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
+            const fw64CollisionGeometryBoundingVolume* bounding_volume = character->scene->collision_geometry->bounding_volumes + cell->bounding_volume_index + i;
 
-        for (uint32_t t = 0; t < cell->floor_count; t++) {
-            fw64CollisionTriangle* triangle = triangles + t;
-            float current_t;
-            Vec3 ray_pos;
+            if (!fw64_collision_test_ray_box(&ray_origin, &ray_dir, &bounding_volume->primitive, &box_pt, &box_t)) {
+                continue;
+            }
 
-            if (fw64_collision_test_ray_triangle(&ray_origin, &ray_dir, &triangle->A, &triangle->B, &triangle->C, &ray_pos, &current_t)) {
-                if (current_t < closest_t) {
-                    closest_t = current_t;
-                    sticky_pos = ray_pos;
+            fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + bounding_volume->floor_index;
+            fw64_character_environment_increment_ray_triangles_checked(&character->environment->debug_info, bounding_volume->floor_count);
+
+            for (uint32_t t = 0; t < bounding_volume->floor_count; t++) {
+                fw64CollisionTriangle* triangle = triangles + t;
+                float current_t;
+                Vec3 ray_pos;
+
+                if (fw64_collision_test_ray_triangle(&ray_origin, &ray_dir, &triangle->A, &triangle->B, &triangle->C, &ray_pos, &current_t)) {
+                    if (current_t < closest_t) {
+                        closest_t = current_t;
+                        sticky_pos = ray_pos;
+                    }
                 }
             }
         }
@@ -109,35 +121,47 @@ static void fw64_character_check_floor_collision(fw64Character* character, const
 
     for (uint32_t c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
-        fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->floor_index;
 
-        fw64_character_environment_increment_sphere_triangles_considered(&character->environment->debug_info, cell->floor_count);
+        for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
+            const fw64CollisionGeometryBoundingVolume* bounding_volume = character->scene->collision_geometry->bounding_volumes + cell->bounding_volume_index + i;
+            fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + bounding_volume->floor_index;
+            fw64_character_environment_increment_sphere_triangles_considered(&character->environment->debug_info, bounding_volume->floor_count);
 
-        for (uint32_t t = 0; t < cell->floor_count; t++) {
-            fw64CollisionTriangle* triangle = triangles + t;
-
-            // filter triangles that are vertically outside of our query radius
-            if (query_min > triangle->maxY || query_max < triangle->minY) {
-                fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, 1);
+            if (!fw64_collision_test_box_sphere(&bounding_volume->primitive, query_pos, query_radius, &hit_point)) {
+                fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, bounding_volume->floor_count);
                 continue;
             }
 
-            // check penetration with triangle plane
-            vec3_subtract(query_pos, &triangle->A, &query_v0);
-            float distance = vec3_dot(&triangle->N, &query_v0);
-            if (distance < query_radius) {
-                fw64_character_environment_increment_sphere_triangles_checked(&character->environment->debug_info, 1);
+            for (uint32_t t = 0; t < bounding_volume->floor_count; t++) {
+                fw64CollisionTriangle* triangle = triangles + t;
 
-                // precision check
-                if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
-                    // correct position along collision normal
-                    float penetration = query_radius - distance;
-                    vec3_add_and_scale(&correction_vector, &triangle->N, penetration, &correction_vector);
-                    hit_count += 1;
-                    total_penetration += penetration;
+                // filter triangles that are vertically outside of our query radius
+                if (query_min > triangle->maxY || query_max < triangle->minY) {
+                    fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, 1);
+                    continue;
+                }
+
+                // check penetration with triangle plane
+                vec3_subtract(query_pos, &triangle->A, &query_v0);
+                float distance = vec3_dot(&triangle->N, &query_v0);
+                if (distance < query_radius) {
+                    fw64_character_environment_increment_sphere_triangles_checked(&character->environment->debug_info, 1);
+
+                    // precision check
+                    if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
+                        // correct position along collision normal
+                        float penetration = query_radius - distance;
+                        vec3_add_and_scale(&correction_vector, &triangle->N, penetration, &correction_vector);
+                        hit_count += 1;
+                        total_penetration += penetration;
+                    }
                 }
             }
         }
+
+
+
+
     }
 
     // resolve all collisions
@@ -267,37 +291,40 @@ static void fw64_character_check_wall_collision(fw64Character* character, const 
 
     for (uint32_t c = 0; c < query->cell_count; c++) {
         fw64CollisionGeometryCell* cell = query->cells[c];
-        fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + cell->wall_index;
+        for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
+            const fw64CollisionGeometryBoundingVolume* bounding_volume = character->scene->collision_geometry->bounding_volumes + cell->bounding_volume_index + i;
+            fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + bounding_volume->wall_index;
 
-        #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-        triangles_considered += cell->wall_count;
-        #endif
+            #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
+            triangles_considered += bounding_volume->wall_count;
+            #endif
 
-        for (uint32_t t = 0; t < cell->wall_count; t++) {
-            fw64CollisionTriangle* triangle = triangles + t;
+            for (uint32_t t = 0; t < bounding_volume->wall_count; t++) {
+                fw64CollisionTriangle* triangle = triangles + t;
 
-            // filter triangles that are vertically outside of our query radius
-            if (query_min > triangle->maxY || query_max < triangle->minY) {
-                #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-                triangles_skipped += 1;
-                #endif
-                continue;
-            }
+                // filter triangles that are vertically outside of our query radius
+                if (query_min > triangle->maxY || query_max < triangle->minY) {
+                    #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
+                    triangles_skipped += 1;
+                    #endif
+                    continue;
+                }
 
-            // check penetration with triangle plane
-            vec3_subtract(query_pos, &triangle->A, &query_v0);
-            float distance = vec3_dot(&triangle->N, &query_v0);
-            if (distance < query_radius) {
-                #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-                triangles_checked += 1;
-                #endif
-                // precision check
-                if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
-                    // correct position along collision normal
-                    float penetration = query_radius - distance;
-                    vec3_add_and_scale(&correction_vector, &triangle->N, penetration, &correction_vector);
-                    hit_count += 1;
-                    total_penetration += penetration;
+                // check penetration with triangle plane
+                vec3_subtract(query_pos, &triangle->A, &query_v0);
+                float distance = vec3_dot(&triangle->N, &query_v0);
+                if (distance < query_radius) {
+                    #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
+                    triangles_checked += 1;
+                    #endif
+                    // precision check
+                    if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
+                        // correct position along collision normal
+                        float penetration = query_radius - distance;
+                        vec3_add_and_scale(&correction_vector, &triangle->N, penetration, &correction_vector);
+                        hit_count += 1;
+                        total_penetration += penetration;
+                    }
                 }
             }
         }

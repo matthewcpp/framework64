@@ -31,7 +31,7 @@ typedef struct {
     float rotation_x;
 
 #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-    uint32_t collision_geometry_triangles_checked;
+    fw64GeometryDataDebugInfo collision_geometry_debug_info;
 #endif
     
 } fw64ThirdPersonCamera;
@@ -52,12 +52,6 @@ void fw64_third_person_camera_reset(fw64ThirdPersonCamera* cam);
 void fw64_third_person_camera_rotate(fw64ThirdPersonCamera* cam, float x, float y);
 
 void fw64_third_person_camera_set_follow_distance(fw64ThirdPersonCamera* cam, float follow_distance);
-
-#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
-#define fw64_third_person_camera_set_collision_geometry_triangles_checked(cam, count) (cam)->collision_geometry_triangles_checked = count
-#else
-#define fw64_third_person_camera_set_collision_geometry_triangles_checked(cam, count) 
-#endif
 
 #ifdef __cplusplus
 }

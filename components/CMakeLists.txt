@@ -6,7 +6,7 @@ set(components_source_files
     fw64_character.h fw64_character.c
     fw64_character_animation_controller.h fw64_character_animation_controller.c
     fw64_character_info.h fw64_character_info.c
-    fw64_collision_scene_manager.h fw64_collision_scene_manager.c
+    fw64_collision_geometry_debug.h fw64_collision_geometry_debug.c
     fw64_debug_boxes.h fw64_debug_boxes.c
     fw64_debug_character.h fw64_debug_character.c
     fw64_file_downloader_message.h fw64_file_downloader.h fw64_file_downloader.c
