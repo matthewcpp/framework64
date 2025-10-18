@@ -65,7 +65,7 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
  */
 void fw64_scene_update_bounding(fw64Scene* scene);
 
-void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
+void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass, fw64LayerMask layer_mask);
 void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, fw64LayerMask layer_mask);
 
 fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId);

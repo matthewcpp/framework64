@@ -217,7 +217,7 @@ void game_draw(Game* game) {
     fw64_renderpass_set_primitive_mode(game->renderpass, fw64_mesh_primitive_get_mode(game->mesh, 0));
 
     fw64_renderpass_begin(game->renderpass);
-    fw64_scene_draw_all(&game->scene, game->renderpass);
+    fw64_scene_draw_all(&game->scene, game->renderpass, FW64_LAYER_MASK_ALL_LAYERS);
     fw64_renderpass_end(game->renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass);
 }

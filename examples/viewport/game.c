@@ -142,7 +142,7 @@ void game_draw(Game* game) {
     fw64RenderPass* pass = game->renderpasses[RENDER_PASS_VIEW];
     fw64_renderpass_set_camera(pass, &game->camera);
     fw64_renderpass_begin(pass);
-    fw64_scene_draw_all(&game->scene, pass);
+    fw64_scene_draw_all(&game->scene, pass, FW64_LAYER_MASK_ALL_LAYERS);
     fw64_renderpass_end(pass);
     fw64_renderer_submit_renderpass(game->engine->renderer, pass);
 
