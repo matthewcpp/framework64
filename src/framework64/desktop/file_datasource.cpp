@@ -5,6 +5,7 @@ namespace framework64 {
 FileDataSource::FileDataSource() {
     interface.read = FileDataSource::readFunc;
     interface.size = FileDataSource::sizeFunc;
+    interface.seek = FileDataSource::seekFunc;
 }
 
 bool FileDataSource::open(std::filesystem::path const & filesystem_path) {
@@ -38,6 +39,14 @@ size_t FileDataSource::readFunc(fw64DataSource* data_source, void* buffer, size_
     file_data_source->file.read(reinterpret_cast<char*>(buffer), size * count);
 
     return static_cast<size_t>(file_data_source->file.gcount());
+}
+
+int FileDataSource::seekFunc(fw64DataSource* data_source, size_t offset) {
+    auto* file_data_source = reinterpret_cast<FileDataSource*>(data_source);
+    file_data_source->file.clear();
+    file_data_source->file.seekg(static_cast<std::streampos>(offset), std::ios::beg);
+
+    return static_cast<int>(file_data_source->file.good());
 }
 
 

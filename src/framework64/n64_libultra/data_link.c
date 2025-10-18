@@ -128,6 +128,7 @@ void fw64_n64_usb_outgoing_message_queue_send(fw64N64UsbOutgoingMessageQueue* qu
 void fw64_n64_usb_message_stream_init(fw64N64UsbMessageStream* stream) {
     stream->interface.read = fw64_n64_usb_message_stream_read;
     stream->interface.size = fw64_n64_usb_message_stream_size;
+    stream->interface.seek = NULL;
 }
 
 void fw64_n64_usb_message_stream_reset(fw64N64UsbMessageStream* stream, uint32_t size) {
