@@ -2,10 +2,8 @@ set(components_source_files
     fw64_arcball_camera.h fw64_arcball_camera.c
     fw64_asset_viewer.h fw64_asset_viewer.c
     fw64_billboard_node.h fw64_billboard_node.c
-    fw64_bump_allocator_info.h fw64_bump_allocator_info.c
     fw64_character.h fw64_character.c
     fw64_character_animation_controller.h fw64_character_animation_controller.c
-    fw64_character_info.h fw64_character_info.c
     fw64_collision_geometry_debug.h fw64_collision_geometry_debug.c
     fw64_debug_boxes.h fw64_debug_boxes.c
     fw64_debug_character.h fw64_debug_character.c
@@ -18,7 +16,6 @@ set(components_source_files
     fw64_skybox.h fw64_skybox.c
     fw64_third_person_camera.h fw64_third_person_camera.c
     fw64_third_person_input_controller.h fw64_third_person_input_controller.c
-    fw64_timing_info.h fw64_timing_info.c
     fw64_transform_editor.h fw64_transform_editor.c
     fw64_ui_navigation.h fw64_ui_navigation.c
     fw64_wireframe.h fw64_wireframe.c
