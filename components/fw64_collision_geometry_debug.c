@@ -66,7 +66,9 @@ void fw64_collision_geometry_debug_track(fw64CollisionGeometryDebug* geometry_de
 
 void fw64_collision_geometry_debug_update(fw64CollisionGeometryDebug* geometry_debug) {
     IVec3 cell_coords;
-    fw64_collision_geometry_get_cell_coordinates_vec3(geometry_debug->collision_geometry, &geometry_debug->target->position, &cell_coords);
+    if (!fw64_collision_geometry_get_cell_coordinates_vec3(geometry_debug->collision_geometry, &geometry_debug->target->position, &cell_coords)) {
+        return;
+    }
     const uint32_t active_cell_index = fw64_collision_geometry_get_cell_index(geometry_debug->collision_geometry, cell_coords.x, cell_coords.y, cell_coords.z);
 
     if (!geometry_debug->data_source || active_cell_index == geometry_debug->previous_cell_index) {

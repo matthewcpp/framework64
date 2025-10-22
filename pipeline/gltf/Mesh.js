@@ -56,6 +56,15 @@ class Mesh {
         return this.materialBundle != null;
     }
 
+    get triangleCount() {
+        let count = 0;
+        for (const primitive of this.primitives) {
+            count += primitive.elements.length;
+        }
+
+        return count;
+    }
+
     get isSkinned() {
         if (this.primitives.length === 0) {
             return false;

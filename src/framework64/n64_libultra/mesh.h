@@ -26,7 +26,7 @@ typedef struct {
     uint16_t primitive_count;
     uint16_t vertex_count;
     uint16_t display_list_count;
-    uint16_t unused;
+    uint16_t triangle_count;
     uint16_t _vertex_pointer_data_size; // only used during loading
     uint16_t _material_bundle_count;
     Box bounding_box;

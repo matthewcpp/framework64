@@ -35,6 +35,10 @@ struct fw64Renderer{
 
     /** the index of the renderpass currently being drawn */
     size_t renderpass_index;
+
+#ifdef FW64_RENDERER_DEBUG_INFO
+    fw64RendererDebugInfo debug_info;
+#endif
 };
 
 /** called by the n64_libultra engine which will render all the submitted renderpasses */

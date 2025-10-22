@@ -52,6 +52,7 @@ function (configure_core_library)
     target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_DESKTOP)
     target_compile_definitions(framework64 PUBLIC FW64_PLATFORM_IS_64_BIT)
     target_compile_definitions(framework64 PUBLIC "$<$<CONFIG:Debug>:FW64_COLLISION_GEOMETRY_DEBUG_INFO>")
+    target_compile_definitions(framework64 PUBLIC "$<$<CONFIG:Debug>:FW64_RENDERER_DEBUG_INFO>")
 
     enable_all_warnings_as_errors(TARGET framework64)
 endfunction()

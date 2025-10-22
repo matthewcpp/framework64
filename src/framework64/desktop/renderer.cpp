@@ -37,6 +37,10 @@ bool fw64Renderer::initFramebuffer(int width, int height) {
 
 void fw64Renderer::beginFrame() {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.framebuffer_handle);
+
+#ifdef FW64_RENDERER_DEBUG_INFO
+    debug_info.triangle_count = 0;
+#endif
 }
 
 void fw64Renderer::endFrame() {
@@ -255,6 +259,10 @@ void fw64Renderer::drawPrimitive(fw64Primitive const & primitive, const fw64Mate
     glBindVertexArray(primitive.gl_info.gl_vertex_array_object);
 
     glDrawElements(static_cast<GLenum>(primitive.mode), primitive.gl_info.element_count, primitive.gl_info.primitive_mode, 0);
+
+#ifdef FW64_RENDERER_DEBUG_INFO
+    debug_info.triangle_count += primitive.primitive_data.indices_array_uint16.size() / 3;
+#endif
 }
 
 void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
@@ -332,3 +340,11 @@ void fw64Renderer::submitRenderpass(fw64RenderPass* renderpass) {
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass) {
     renderer->submitRenderpass(renderpass);
 }
+
+#ifdef FW64_RENDERER_DEBUG_INFO
+
+const fw64RendererDebugInfo* fw64_renderer_get_debug_info(const fw64Renderer* renderer) {
+    return &renderer->debug_info;
+}
+
+#endif

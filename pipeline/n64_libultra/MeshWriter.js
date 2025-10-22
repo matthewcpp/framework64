@@ -51,6 +51,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
     const meshInfo = new MeshInfo();
     meshInfo.materialBundle = mesh.materialBundle;
     meshInfo.primitiveCount = mesh.primitives.length;
+    meshInfo.triangleCount = mesh.triangleCount;
     meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
     meshInfo.bounding = mesh.bounding;
 
@@ -121,6 +122,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
 class MeshInfo {
     primitiveCount = 0;
     vertexCount = 0;
+    triangleCount = 0;
     displayListCount = 0;
     vertexPointerDataSize = 0;
     materialBundle = null;
@@ -135,7 +137,7 @@ class MeshInfo {
         index = buff.writeUInt16BE(this.primitiveCount, index);
         index = buff.writeUInt16BE(this.vertexCount, index);
         index = buff.writeUInt16BE(this.displayListCount, index);
-        index = buff.writeUInt16BE(0 /* flags */, index);
+        index = buff.writeUInt16BE(this.triangleCount, index);
         index = buff.writeUInt16BE(this.vertexPointerDataSize, index);
         index = buff.writeUInt16BE(this.materialBundle != null ? 1 : 0, index);
         index = this.bounding.writeToBuffer(buff, index);

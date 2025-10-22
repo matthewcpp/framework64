@@ -118,6 +118,9 @@ static void fw64_n64_renderer_end_task(fw64Renderer* renderer, fw64PrimitiveMode
 }
 
 void fw64_n64_renderer_end_frame(fw64Renderer* renderer) {
+    #ifdef FW64_RENDERER_DEBUG_INFO
+    renderer->debug_info.triangle_count = 0;
+    #endif
     fw64_n64_renderer_start_task(renderer);
 
     fw64PrimitiveMode primitive_mode = renderer->renderpasses[0]->primitive_mode;
@@ -312,12 +315,18 @@ static void fw64_renderer_draw_unlit_queue_impl(fw64Renderer* renderer, fw64Rend
     for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
         fw64StaticDrawInfo* draw_info = (fw64StaticDrawInfo*)fw64_dynamic_vector_item(queue, i);
         fw64_renderer_draw_unlit_primitive(renderer, draw_info);
+        #ifdef FW64_RENDERER_DEBUG_INFO
+        renderer->debug_info.triangle_count += draw_info->instance->mesh->info.triangle_count;
+        #endif
     }
 
     queue = &render_queue_bucket->skinned_;
     for (size_t i = 0; i < fw64_dynamic_vector_size(queue); i++) {
         fw64SkinnedDrawInfo* draw_info = (fw64SkinnedDrawInfo*)fw64_dynamic_vector_item(queue, i);
         fw64_renderer_draw_unlit_skinned_primitive(renderer, draw_info);
+        #ifdef FW64_RENDERER_DEBUG_INFO
+        renderer->debug_info.triangle_count += draw_info->instance->mesh_instance.mesh->info.triangle_count;
+        #endif
     }
 }
 
@@ -341,6 +350,9 @@ static void fw64_renderer_draw_unlit_textured_queue_impl(fw64Renderer* renderer,
         fw64Material* material = fw64_material_collection_get_material(draw_info->instance->materials, draw_info->index);
         renderer->display_list = fw64_n64_load_texture(&renderer->active_texture, renderer->display_list, material->texture, material->texture_frame);
         fw64_renderer_draw_unlit_primitive(renderer, draw_info);
+        #ifdef FW64_RENDERER_DEBUG_INFO
+        renderer->debug_info.triangle_count += draw_info->instance->mesh->info.triangle_count;
+        #endif
     }
 
     queue = &render_queue_bucket->skinned_;
@@ -349,6 +361,9 @@ static void fw64_renderer_draw_unlit_textured_queue_impl(fw64Renderer* renderer,
         fw64Material* material = fw64_material_collection_get_material(draw_info->instance->mesh_instance.materials, draw_info->index);
         renderer->display_list = fw64_n64_load_texture(&renderer->active_texture, renderer->display_list, material->texture, material->texture_frame);
         fw64_renderer_draw_unlit_skinned_primitive(renderer, draw_info);
+        #ifdef FW64_RENDERER_DEBUG_INFO
+        renderer->debug_info.triangle_count += draw_info->instance->mesh_instance.mesh->info.triangle_count;
+        #endif
     }
 }
 
@@ -588,3 +603,11 @@ void fw64_n64_renderer_draw_renderpass(fw64Renderer* renderer, fw64RenderPass* r
         fw64_renderer_render_sprite_batches(renderer, renderpass);
     }
 }
+
+#ifdef FW64_RENDERER_DEBUG_INFO
+
+const fw64RendererDebugInfo* fw64_renderer_get_debug_info(const fw64Renderer* renderer) {
+    return &renderer->debug_info;
+}
+
+#endif

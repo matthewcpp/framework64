@@ -47,6 +47,7 @@ function (configure_core_library)
 
     enable_all_warnings_as_errors(TARGET framework64)
     target_compile_definitions(framework64 PUBLIC "$<$<CONFIG:Debug>:FW64_COLLISION_GEOMETRY_DEBUG_INFO>")
+    target_compile_definitions(framework64 PUBLIC "$<$<CONFIG:Debug>:FW64_RENDERER_DEBUG_INFO>")
 
 endfunction()
 

@@ -23,12 +23,22 @@ typedef enum {
 
 typedef struct fw64Renderer fw64Renderer;
 
+#ifdef FW64_RENDERER_DEBUG_INFO
+typedef struct {
+    uint32_t triangle_count;
+} fw64RendererDebugInfo;
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void fw64_renderer_submit_renderpass(fw64Renderer* renderer, fw64RenderPass* renderpass);
+
+#ifdef FW64_RENDERER_DEBUG_INFO
+const fw64RendererDebugInfo* fw64_renderer_get_debug_info(const fw64Renderer* renderer);
+#endif
 
 #ifdef __cplusplus
 }
