@@ -454,14 +454,14 @@ fw64Node* fw64_scene_create_node_with_parent(fw64Scene* scene, fw64Node* parent)
     return node;
 }
 
-fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index) {
+fw64Node* fw64_scene_get_node(fw64Scene* scene, fw64NodeIndex node_index) {
     #ifndef NDEBUG
-    if (index >= fw64_static_vector_size(&scene->nodes)) {
+    if (node_index >= fw64_static_vector_size(&scene->nodes)) {
         return NULL;
     }
     #endif
 
-    return fw64_static_vector_get_item(&scene->nodes, index);
+    return fw64_static_vector_get_item(&scene->nodes, node_index);
 }
 
 uint32_t fw64_scene_get_node_count(fw64Scene* scene) {

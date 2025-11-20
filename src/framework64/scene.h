@@ -18,6 +18,9 @@
 
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
+typedef uint32_t fw64NodeIndex;
+#define FW64_SCENE_INVALID_NODE_INDEX UINT32_MAX
+
 typedef struct {
     uint16_t node_count;
     uint16_t extra_node_count;
@@ -79,7 +82,7 @@ uint32_t fw64_scene_get_skinned_mesh_count(fw64Scene* scene);
 
 fw64Node* fw64_scene_create_node(fw64Scene* scene);
 fw64Node* fw64_scene_create_node_with_parent(fw64Scene* scene, fw64Node* parent);
-fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
+fw64Node* fw64_scene_get_node(fw64Scene* scene, fw64NodeIndex node_index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
 
 fw64MeshInstance* fw64_scene_create_mesh_instance(fw64Scene* scene, fw64Node* node, fw64Mesh* mesh);
