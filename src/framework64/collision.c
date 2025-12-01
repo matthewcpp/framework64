@@ -201,7 +201,7 @@ void fw64_closest_point_to_triangle(const Vec3* p, const Vec3* a, const Vec3* b,
     vec3_add_and_scale(out, &ac, w, out);
 }
 
-void fw64_closest_point_on_line_segment(const Vec3* point, const Vec3* a, const Vec3* b, Vec3* out) {
+void fw64_closest_point_on_line_segment(const Vec3* a, const Vec3* b, const Vec3* point, Vec3* out) {
     const float line_dist = vec3_distance_squared(a, b);
     if (line_dist <= EPSILON) {
         vec3_copy(a, out);
@@ -450,4 +450,96 @@ void fw64_collision_get_normal_box_point(Vec3* point, Box* box, Vec3* out_normal
             out_normal->x = 1.0f;
         }
     }
+}
+
+int fw64_collision_test_capsule_triangle(const fw64Capsule* capsule, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point) {
+    // first check the aabb of the triangle for fast rejection
+    Box triangle_aabb;
+    triangle_aabb.min = *a;
+    triangle_aabb.max = *b;
+    box_encapsulate_point(&triangle_aabb, b);
+    box_encapsulate_point(& triangle_aabb, c);
+
+    if (!box_intersection(&capsule->aabb, &triangle_aabb)) {
+        return 0;
+    }
+
+    // Compute the plane of the triangle (has to be normalized).
+    Vec3 ab, ac, plane_n;
+    vec3_subtract(b, a, &ab);
+    vec3_subtract(c, a, &ac);
+    vec3_cross(&ab, &ac, &plane_n);
+    vec3_normalize(&plane_n);
+
+    Vec3 reference_point;
+    Vec3 axis_n;
+    // can dn be replaced by caching the capsule axis?
+    vec3_subtract(&capsule->b, &capsule->a, &axis_n);
+    vec3_normalize(&axis_n);
+    if (fw64_fabsf(vec3_dot(&plane_n, &axis_n)) < EPSILON) {
+        // Capsule line cannot be intersected with triangle plane (they are parallel)
+        //	In this case, just take a point from triangle
+        reference_point = *a;
+    } else {
+        // Intersect capsule line with triangle plane:
+        Vec3 a_base, line_plane_intersection;
+        vec3_subtract(&capsule->base, a, &a_base);
+        vec3_scale(&a_base, 1.0f / fw64_fabsf(vec3_dot(&plane_n, &axis_n)), &a_base);
+        float t = vec3_dot(&plane_n, &a_base);
+        vec3_add_and_scale(&capsule->base, &plane_n, t, &line_plane_intersection);
+
+        // Compute the cross products of the vector from the base of each edge to 
+        // the point with each edge vector.
+        Vec3 c0, c1, c2;
+        Vec3 lp_p, dir_p;
+        vec3_subtract(&line_plane_intersection, a, &lp_p);
+        vec3_subtract(b, a, &dir_p);
+        vec3_cross(&lp_p, &dir_p, &c0);
+
+        vec3_subtract(&line_plane_intersection, b, &lp_p);
+        vec3_subtract(c, b, &dir_p);
+        vec3_cross(&lp_p, &dir_p, &c1);
+
+        vec3_subtract(&line_plane_intersection, c, &lp_p);
+        vec3_subtract(a, c, &dir_p);
+        vec3_cross(&lp_p, &dir_p, &c2);
+
+        // If the cross product points in the same direction as the normal the the
+        // point is inside the edge (it is zero if is on the edge).
+        int inside_all = vec3_dot(&c0, &plane_n) <= 0.0f && vec3_dot(&c1, &plane_n) <= 0.0f && vec3_dot(&c2, &plane_n) <= 0.0f;
+
+        if (inside_all) {
+            reference_point = line_plane_intersection;
+        } else {
+            // Find the nearest point on each edge.
+            Vec3 point1, point2, point3;
+
+            // Edge 0,1
+            fw64_closest_point_on_line_segment(a, b, &line_plane_intersection, &point1);
+
+            // Edge 1,2
+            fw64_closest_point_on_line_segment(b, c, &line_plane_intersection, &point2);
+
+            // Edge 2,0
+            fw64_closest_point_on_line_segment(c, a, &line_plane_intersection, &point3);
+
+            reference_point = point1;
+            float best_dist = vec3_distance_squared(&point1, &line_plane_intersection);
+            float d = vec3_distance_squared(&point2, &line_plane_intersection);
+            if (d < best_dist) {
+                best_dist = d;
+                reference_point = point2;
+            }
+            d = vec3_distance_squared(&point3, &line_plane_intersection);
+            if (d < best_dist) {
+                //best_dist = d;
+                reference_point = point3;
+            }
+        }
+    }
+        // Place a sphere on closest point on line segment to intersection:
+        Vec3 sphere_center;
+        fw64_closest_point_on_line_segment(&capsule->a, &capsule->b, &reference_point, &sphere_center);
+
+        return fw64_collision_test_sphere_triangle(&sphere_center, capsule->radius, a, b, c, point);
 }

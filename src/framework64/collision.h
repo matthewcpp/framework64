@@ -3,6 +3,7 @@
 /** \file collision.h */
 
 #include "framework64/box.h"
+#include "framework64/capsule.h"
 #include "framework64/vec3.h"
 
 #ifdef __cplusplus
@@ -12,7 +13,7 @@ extern "C" {
 
 void fw64_closest_point_to_triangle(const Vec3* point, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* out);
 
-void fw64_closest_point_on_line_segment(const Vec3* point, const Vec3* a, const Vec3* b, Vec3* out);
+void fw64_closest_point_on_line_segment(const Vec3* a, const Vec3* b, const Vec3* point, Vec3* out);
 
 /**
  * Returns true if sphere s intersects triangle ABC, false otherwise.
@@ -20,6 +21,7 @@ void fw64_closest_point_on_line_segment(const Vec3* point, const Vec3* a, const 
  */
 int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point);
 
+int fw64_collision_test_capsule_triangle(const fw64Capsule* capsule, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point);
 
 /**
  * Returns nonzero value if the sphere intersects AABB, otherwise 0

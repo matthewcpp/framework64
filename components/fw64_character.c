@@ -332,7 +332,7 @@ static int fw64_character_attempt_ladder_grab(fw64Character* character, float qu
     for (uint32_t i = 0; i < cell->ladder_count; i++) {
         fw64CollisionLadder* ladder = ladders + i;
         Vec3 current_point;
-        fw64_closest_point_on_line_segment(&character->position, &ladder->entrance, &ladder->exit, &current_point);
+        fw64_closest_point_on_line_segment(&ladder->entrance, &ladder->exit, &character->position, &current_point);
         float distance = vec3_distance_squared(&character->position, &current_point);
         if (distance <= ladder->radius * ladder->radius && distance < closest_distance) {
             closest_distance = distance;

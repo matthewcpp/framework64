@@ -1,6 +1,7 @@
 #pragma once
 
 #include "framework64/scene.h"
+#include "framework64/capsule.h"
 
 /** gravity constant in meters per second */
 #define Fw64_CHARACTER_ENV_DEFAULT_GRAVITY -9.81f

@@ -6,6 +6,7 @@ set(common_source_files
     audio.h
     box.h box.c
     camera.h camera.c
+    capsule.h capsule.c
     collision.h collision.c
     collision_mesh.h collision_mesh.c
     collision_geometry.h collision_geometry.c
