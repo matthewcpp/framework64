@@ -57,7 +57,7 @@ void fw64_transform_look_at(fw64Transform* transform, const Vec3* target, const 
     quat_normalize( &transform->rotation);
 }
 
-void fw64_transform_update_matrix(fw64Transform* transform) {    
+void fw64_transform_update_matrix_non_rec(fw64Transform* transform) {
     if (transform->parent) {
         float local_matrix[16];
         matrix_from_trs(local_matrix, &transform->position, &transform->rotation, &transform->scale);
@@ -65,6 +65,10 @@ void fw64_transform_update_matrix(fw64Transform* transform) {
     } else {
         matrix_from_trs(transform->world_matrix, &transform->position, &transform->rotation, &transform->scale);
     }
+}
+
+void fw64_transform_update_matrix(fw64Transform* transform) {    
+    fw64_transform_update_matrix_non_rec(transform);
 
     fw64Transform* child = transform->first_child;
     while (child) {

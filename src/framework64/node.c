@@ -11,7 +11,7 @@ void fw64_node_init(fw64Node* node) {
 }
 
 void fw64_node_update(fw64Node* node) {
-    fw64_transform_update_matrix(&node->transform);
+    fw64_transform_update_matrix_non_rec(&node->transform);
 
     if (node->collider) {
         fw64_collider_update(node->collider);
@@ -19,5 +19,11 @@ void fw64_node_update(fw64Node* node) {
 
     if (node->mesh_instance) {
         fw64_mesh_instance_update(node->mesh_instance);
+    }
+
+    fw64Transform* child = node->transform.first_child;
+    while (child) {
+        fw64_node_update((fw64Node*)child);
+        child = child->next_sibling;
     }
 }

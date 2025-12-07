@@ -44,6 +44,12 @@ void fw64_transform_look_at(fw64Transform* transform, const Vec3* target,const  
  *  Additionally this function will recursively update matrices of all descendants
  * */
 void fw64_transform_update_matrix(fw64Transform* transform);
+
+/** Updates the matrix for this transform with regards to it's parent.
+ *  This will not upaate matrieces of any children.
+ * */
+void fw64_transform_update_matrix_non_rec(fw64Transform* transform);
+
 void fw64_transform_xform_box(const fw64Transform* transform, const Box* source, Box* target);
 
 void fw64_transform_mult_point(const fw64Transform* transform, const Vec3* point, Vec3* out);
