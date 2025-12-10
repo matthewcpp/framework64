@@ -15,8 +15,6 @@ class Scene {
     extraMeshCount = 0;
     extraNodeCount = 0;
 
-    gridSize = null;
-
     meshBundle = [];
 
     /** maps string of nodeType to a list of nodes which decalre that type.

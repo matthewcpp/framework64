@@ -253,11 +253,7 @@ class CollisionGeometry {
         this.numUniqueTriangles += 1;
     }
 
-    static createFromScene(scene, gltfData) {
-        if (scene.gridSize === null) {
-            throw new Error(`Could not create collision geometry for ${scene.name}: grid size not specified`)
-        }
-
+    static createFromScene(scene, gltfData, cellCountX, cellCountZ) {
         // first determine nodes we will need to process and compute the scene's world space bounding box
         const worldGeometryNodes = [];
         const sceneBounding = new Bounding();
@@ -276,7 +272,7 @@ class CollisionGeometry {
             worldGeometryNodes.push(node);
         }
 
-        const geometry = new CollisionGeometry(sceneBounding, scene.gridSize[0], scene.gridSize[1]);
+        const geometry = new CollisionGeometry(sceneBounding, cellCountX, cellCountZ);
 
 
         const AB = glMatrix.vec3.create();

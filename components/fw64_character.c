@@ -27,6 +27,7 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     fw64_character_set_position(character, &zero);
 
     vec3_set_one(&character->size);
+    character->sphere_query_radius = 0.5f;
     character->step_height = 0.17;
     character->head_height = 0.8f;
     character->hang_vertical_offset = 0.0f;
@@ -216,8 +217,6 @@ static void fw64_character_compute_ledge_check_origin(fw64Character* character, 
     vec3_add(ledge_check_origin, &ledge_check_offset, ledge_check_origin);
 }
 
-#define fw64_character_get_query_radius(character) (fw64_maxf((character)->size.x, (character)->size.z))
-
 void fw64_character_get_ledge_check_origin(fw64Character* character, Vec3* out) {
     fw64_character_compute_ledge_check_origin(character, out);
 }
@@ -278,7 +277,7 @@ void fw64_character_drop_from_ledge(fw64Character* character) {
     // push character back from ledge
     Vec3 back, fall_pos;
     fw64_transform_forward(&character->node->transform, &back); // todo flip this fuc
-    vec3_scale(&back, fw64_character_get_query_radius(character), &back);
+    vec3_scale(&back, character->sphere_query_radius, &back);
     vec3_add(&character->position, &back, &fall_pos);
     fw64_character_set_position(character, &fall_pos);
 }
@@ -300,7 +299,7 @@ void fw64_character_finish_entering_ladder(fw64Character* character, const Vec3*
     fw64_character_set_position(character, new_pos);
 }
 
-static void fw64_character_check_wall_collision(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
+static void fw64_character_check_wall_collision(fw64Character* character, int subsetp, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
     fw64CollisionCheckResult result;
     fw64_collision_check_result_init(&result);
     fw64_character_check_sphere_collision(character, query_pos, query_radius, query, _get_bounding_volume_walls, & result);
@@ -475,7 +474,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
 
     // determine sphere radius for queries
     // this will also be used for max step calculation to help prevent tunneling.
-    float query_radius = fw64_character_get_query_radius(character);
+    float query_radius = character->sphere_query_radius;
 
     // determine how many substeps we will need to avoid tunneling
     const float max_step = query_radius * 0.5f;
@@ -496,7 +495,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         fw64_character_check_floor_collision(character, &query_pos, query_radius, &query);
 
         vec3_add_and_scale(&character->position, &up, query_radius, &query_pos);
-        fw64_character_check_wall_collision(character, &query_pos, query_radius, &query);
+        fw64_character_check_wall_collision(character, i, &query_pos, query_radius, &query);
     }
 
     if (fw64_character_attempt_ladder_grab(character, query_radius)) {

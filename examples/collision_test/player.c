@@ -46,6 +46,7 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     player->character.step_height = player->character.size.y * 0.17f;
     player->character.head_height = 1.5f;
     player->character.hang_vertical_offset = -0.70f;
+    player->character.sphere_query_radius = fw64_minf(player->character.size.x, player->character.size.z);
     fw64_character_set_position(&player->character, &player->node->transform.position);
     vec3_set(&player->third_person_cam.target_offset, 0.0f, player->character.size.y, 0.0f); // focus on character's head
     fw64_character_animation_controller_set_transition_func(&player->animation_controller, player_on_animation_state_changed, NULL);

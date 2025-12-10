@@ -37,9 +37,9 @@ class LevelParser {
         }
     }
 
-    createCollisionGeometry() {
+    createCollisionGeometry(cellCountX, cellCountZ) {
         for (const scene of this.scenes) {
-            scene.collisionGeometry = CollisionGeometry.createFromScene(scene, this.gltfData);
+            scene.collisionGeometry = CollisionGeometry.createFromScene(scene, this.gltfData, cellCountX, cellCountZ);
         }
     }
 
@@ -63,20 +63,6 @@ class LevelParser {
             this.collisonMeshMap.set(gltfNode.name, scene.collisionMeshes.length);
             scene.collisionMeshes.push(this.gltfData.meshes[gltfNode.mesh]);
         }
-    }
-
-    _parseSceneCollisionGeometryConfig(scene, sceneGltfNode){
-        const hasCollisionGeometryConfig = Object.hasOwn(sceneGltfNode, "extras") && Object.hasOwn(sceneGltfNode.extras, "gridSize");
-        if (!hasCollisionGeometryConfig) {
-            return;
-        }
-
-        const dimensions = sceneGltfNode.extras.gridSize.split("x");
-        if (dimensions.length !== 2) {
-            throw new Error(`${sceneGltfNode.name}: Unable to determine parse grid dimensions: ${sceneGltfNode.extras.gridSize.split}`);
-        }
-
-        scene.gridSize = [parseInt(dimensions[0]), parseInt(dimensions[1])];
     }
 
     _parseSceneExtras(scene, sceneGltfNode) {
@@ -201,7 +187,6 @@ class LevelParser {
         scene.materialBundle = new MaterialBundle(this.gltfData);
 
         this._parseSceneExtras(scene, gltfRootNode);
-        this._parseSceneCollisionGeometryConfig(scene, gltfRootNode);
         this._parseCollisionMeshes(scene, gltfRootNode);
         const gltfSceneNodeRoot = GLTFUtil.findChildNodeStartingWith(this.gltfData, gltfRootNode, "Scene");
         if (!gltfSceneNodeRoot) {

@@ -95,6 +95,9 @@ typedef struct {
      * This value should be set as the height of the characters head */
     float head_height;
 
+    float sphere_query_radius;
+    fw64Capsule capsule;
+
     /** an amount to offset the character's position by when hanging from ledges */
     float hang_vertical_offset;
 
@@ -108,6 +111,7 @@ typedef struct {
     float ground_accel;
     float ground_decel;
 
+    /* The normalized requested movement vector during the next fixed update step. */
     Vec3 attempt_to_move;
     int attempt_to_jump;
 
