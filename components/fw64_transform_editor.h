@@ -15,14 +15,25 @@ typedef enum {
 typedef struct {
     fw64Engine* engine;
     fw64Font* font;
-    fw64Transform* target;
+    fw64Node* target;
     fw64SpriteBatch* spritebatch;
     fw64UiNavigation ui_navigation;
     Vec3 euler_rotation;
     IVec2 ui_pos;
     int edit_target;
+    int did_edit;
 } fw64TransformEditor;
 
-void fw64_transform_editor_init(fw64TransformEditor* editor, fw64Engine* engine, fw64Font* font, fw64Transform* target, fw64Allocator* allocator);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void fw64_transform_editor_init(fw64TransformEditor* editor, fw64Engine* engine, fw64Font* font, fw64Node* target, fw64Allocator* allocator);
 void fw64_transform_editor_uninit(fw64TransformEditor* editor);
 void fw64_transform_editor_update(fw64TransformEditor* editor);
+
+void fw64_transform_editor_set_target(fw64TransformEditor* editor, fw64Node* target);
+
+#ifdef __cplusplus
+}
+#endif

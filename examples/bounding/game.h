@@ -3,7 +3,7 @@
 #include "framework64/engine.h"
 #include "framework64/scene.h"
 
-#include "fw64_debug_boxes.h"
+#include "fw64_debug_primitives.h"
 
 typedef enum {
     RENDERPASS_SCENE_TRIANGLES,
@@ -34,7 +34,8 @@ typedef struct {
     fw64Camera camera;
     fw64RenderPass* renderpass[RENDERPASS_COUNT];
     Penguin penguin;
-    fw64DebugBoxes debug_boxes;
+    fw64DebugPrimitives debug_primtivies;
+    uint32_t penguin_debug_handle;
     Ui ui;
 } Game;
 

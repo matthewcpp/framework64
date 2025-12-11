@@ -26,7 +26,10 @@ class LevelParser {
 
         const gltf = this.gltfData.gltf;
 
-        const rootNode = gltf.scenes[gltf.scene];
+        // blender will export with the "scene" property, but GLTF-Transform may not
+        // in the case where its not present, assume the first scene in the scenes array.
+        const gltfSceneIndex = Object.hasOwn(gltf, "scene") ? gltf.scene : 0;
+        const rootNode = gltf.scenes[gltfSceneIndex];
 
         for (const sceneIndex of rootNode.nodes) {
             const scene = this._parseScene(sceneIndex);

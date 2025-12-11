@@ -1,6 +1,7 @@
 #include "game.h"
 #include "assets/assets.h"
 #include "assets/scene_Bounding_Example.h"
+#include "assets/scene_wire_primitives.h"
 #include "assets/layers.h"
 
 #include "framework64/matrix.h"
@@ -26,8 +27,6 @@ static void ui_draw(Ui* ui);
 
 float stick_adjust[4];
 
-#define DEBUG_BOX_COUNT 4
-
 // used to display the mesh collider for the blue box
 #define WIRE_MESH_COUNT 1
 
@@ -41,18 +40,29 @@ void game_init(Game* game, fw64Engine* engine) {
     penguin_init(&game->penguin, engine, game->scene);
     ui_init(&game->ui, engine, &game->penguin, game->scene);
 
-    fw64_debug_boxes_init(&game->debug_boxes, DEBUG_BOX_COUNT, WIRE_MESH_COUNT, game->scene, allocator);
-    fw64Node* bounding_nodes[DEBUG_BOX_COUNT] = {
-        game->penguin.node,
-        fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Collision_Mesh),
-        fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Custom_Bounding_Box),
-        fw64_scene_get_node(game->scene, FW64_scene_Bounding_Example_node_Mesh_Bounding)
+    fw64DebugPrimitivesConfig config = {
+        FW64_ASSET_scene_wire_primitives,
+        FW64_scene_wire_primitives_node__capsule_stem,
+        FW64_scene_wire_primitives_node__capsule_bottom,
+        FW64_scene_wire_primitives_node__capsule_top,
+        FW64_scene_wire_primitives_node__sphere,
+        FW64_scene_wire_primitives_node__box,
+        1.0f / 10.0f,
+        5,
+        0,
+        0
     };
 
-    for (int i = 0; i < DEBUG_BOX_COUNT; i++) {
-        fw64Node* bounding_node = fw64_debug_boxes_add(&game->debug_boxes, bounding_nodes[i]);
-        bounding_node->layer_mask = FW64_layer_lines;
+    fw64_debug_primitives_init(&game->debug_primtivies, engine, &config, allocator);
+
+    for (size_t i = 0; i < fw64_scene_get_node_count(game->scene); i++) {
+        fw64Node* node = fw64_scene_get_node(game->scene, i);
+
+        if (node->layer_mask & FW64_layer_cubes && node->collider) {
+            fw64_debug_primitives_add_box(&game->debug_primtivies, &node->collider->bounding);
+        }
     }
+    game->penguin_debug_handle = fw64_debug_primitives_add_box(&game->debug_primtivies, &game->penguin.node->collider->bounding);
 
     mat2_set_rotation(stick_adjust, M_PI / 2.0f);
 
@@ -62,12 +72,12 @@ void game_init(Game* game, fw64Engine* engine) {
     }
 
     fw64_renderpass_set_primitive_mode(game->renderpass[RENDERPASS_SCENE_LINES], FW64_PRIMITIVE_MODE_LINES);
-    fw64_renderpass_set_depth_testing_enabled( game->renderpass[RENDERPASS_SCENE_LINES], 0);
+    fw64_renderpass_set_depth_testing_enabled(game->renderpass[RENDERPASS_SCENE_LINES], 0);
 }
 
 void game_update(Game* game) {
     penguin_update(&game->penguin);
-    fw64_debug_boxes_update(&game->debug_boxes);
+    fw64_debug_primitives_update_box(&game->debug_primtivies, game->penguin_debug_handle, &game->penguin.node->collider->bounding);
     ui_update(&game->ui);
 }
 
@@ -75,21 +85,22 @@ void game_fixed_update(Game* game) {
     (void)game;
 }
 
-static void draw_scene_layer(Game* game, fw64RenderPass* renderpass, fw64Frustum* frustum, uint32_t layer_mask) {
-    fw64_renderpass_begin(renderpass);
-    fw64_scene_draw_frustrum(game->scene, renderpass, frustum, layer_mask);
-    fw64_renderpass_end(renderpass);
-
-    fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
-}
-
 void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->camera, &frustum);
 
-    draw_scene_layer(game, game->renderpass[RENDERPASS_SCENE_TRIANGLES], &frustum, FW64_layer_triangles);
+    fw64_renderpass_begin(game->renderpass[RENDERPASS_SCENE_TRIANGLES]);
+    fw64_scene_draw_frustrum(game->scene, game->renderpass[RENDERPASS_SCENE_TRIANGLES], &frustum, FW64_layer_triangles);
+    fw64_renderpass_end(game->renderpass[RENDERPASS_SCENE_TRIANGLES]);
+
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass[RENDERPASS_SCENE_TRIANGLES]);
+
     ui_draw(&game->ui);
-    draw_scene_layer(game, game->renderpass[RENDERPASS_SCENE_LINES], &frustum, FW64_layer_lines);
+
+    fw64_renderpass_begin(game->renderpass[RENDERPASS_SCENE_LINES]);
+    fw64_debug_primitives_draw(&game->debug_primtivies, game->renderpass[RENDERPASS_SCENE_LINES]);
+    fw64_renderpass_end(game->renderpass[RENDERPASS_SCENE_LINES]);
+    fw64_renderer_submit_renderpass(game->engine->renderer, game->renderpass[RENDERPASS_SCENE_LINES]);
 }
 
 void penguin_init(Penguin* penguin, fw64Engine* engine, fw64Scene* scene) {

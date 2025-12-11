@@ -10,7 +10,8 @@
     "levels": [
         {
             "src": "examples/collision_test/bomb_omb_battlefield/level/bomb_omb_battlefield.gltf",
-            "collisionGeometry": true
+            "collisionGeometry": true,
+            "grid": "16x16"
         }
     ],
     "meshes": [

@@ -6,7 +6,7 @@
 /** gravity constant in meters per second */
 #define Fw64_CHARACTER_ENV_DEFAULT_GRAVITY -9.81f
 #define FW64_CHARACTER_ENV_MAX_FALL_SPEED -15.0f
-#define FW64_CHARACTER_ENV_MAX_SUBSTEPS 5
+#define FW64_CHARACTER_ENV_MAX_SUBSTEPS 4
 #define FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD 0.01f
 
 #define FW64_CHARACTER_DEFAULT_JUMP_SPEED 6.4f
@@ -52,7 +52,8 @@ typedef struct {
     float max_fall_speed;
 
     /** When grounded, the minimum amount of distance a character must attempt to move horizontally.
-      * This is intended to prevent jittering from floating point rounding 
+      * This is intended to prevent jittering from floating point rounding.
+      * Note: this value should be specified as the squared value of the threshhold.
     */
     float horizontal_move_threshold;
 

@@ -4,6 +4,7 @@
 #include "assets/character_animation.h"
 
 #include "framework64/controller_mapping/n64.h"
+#include "framework64/math.h"
 
 static const fw64CharacterAnimationIds ids = {
     character_animation_Idle,

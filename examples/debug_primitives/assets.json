@@ -3,17 +3,13 @@
         {
             "src": "Consolas.ttf",
             "size": 12,
-            "name": "Consolas12"
+            "name": "Consolas12",
+            "sourceString": "trs: -.1234567890,"
         }
     ],
-    "meshes": [
+    "levels":[
         {
-            "src": "penguin/penguin.gltf"
-        }
-    ],
-    "levels": [
-        {
-            "src": "examples/bounding/bounding.gltf"
+            "src": "examples/debug_primitives/debug_primitives.gltf"
         },
         {
             "src": "wire_primitives/wire_primitives.gltf"

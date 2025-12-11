@@ -9,27 +9,44 @@ static void update_spritebatch(fw64TransformEditor* editor);
 static void adjust_edit_target(fw64TransformEditor* editor, int direction);
 static void adjust_value(fw64TransformEditor* editor, float direction);
 
-void fw64_transform_editor_init(fw64TransformEditor* editor, fw64Engine* engine, fw64Font* font, fw64Transform* target, fw64Allocator* allocator) {
+void fw64_transform_editor_init(fw64TransformEditor* editor, fw64Engine* engine, fw64Font* font, fw64Node* target, fw64Allocator* allocator) {
     editor->engine = engine;
     editor->font = font;
     editor->spritebatch = fw64_spritebatch_create(1, allocator);
     editor->edit_target = 0; 
+    editor->did_edit = 0;
 
-    editor->target = target;
     fw64_ui_navigation_init(&editor->ui_navigation, engine->input, 0);
 
-    editor->euler_rotation = quat_to_euler(&target->rotation);
-    vec3_scale(&editor->euler_rotation, (180.0f / M_PI), &editor->euler_rotation);
-
     ivec2_set_zero(&editor->ui_pos);
-    update_spritebatch(editor);
+
+    fw64_transform_editor_set_target(editor, target);
 }
 
 void fw64_transform_editor_uninit(fw64TransformEditor* editor){
     fw64_spritebatch_delete(editor->spritebatch);
 }
 
+void fw64_transform_editor_set_target(fw64TransformEditor* editor, fw64Node* target) {
+    editor->target = target;
+
+    if (editor->target) {
+        editor->euler_rotation = quat_to_euler(&target->transform.rotation);
+        vec3_scale(&editor->euler_rotation, (180.0f / M_PI), &editor->euler_rotation);
+    } else {
+        vec3_set_zero(&editor->euler_rotation);
+    }
+
+    update_spritebatch(editor);
+    editor->did_edit = 0;
+}
+
 void fw64_transform_editor_update(fw64TransformEditor* editor) {
+    editor->did_edit = 0;
+    if (!editor->target) {
+        return;
+    }
+
     fw64_ui_navigation_update(&editor->ui_navigation, editor->engine->time->time_delta);
 
     if (fw64_ui_navigation_moved_up(&editor->ui_navigation)) {
@@ -50,9 +67,11 @@ void update_spritebatch(fw64TransformEditor* editor) {
 
     fw64_spritebatch_begin(editor->spritebatch);
 
-    sprintf(buffer, "rot: %.2f, %.2f, %.2f", editor->euler_rotation.x, editor->euler_rotation.y, editor->euler_rotation.z);
-    fw64_spritebatch_draw_string(editor->spritebatch, editor->font, buffer, editor->ui_pos.x, editor->ui_pos.y);
-    
+    if (editor->target) {
+        sprintf(buffer, "r: %.2f, %.2f, %.2f", editor->euler_rotation.x, editor->euler_rotation.y, editor->euler_rotation.z);
+        fw64_spritebatch_draw_string(editor->spritebatch, editor->font, buffer, editor->ui_pos.x, editor->ui_pos.y);
+    }
+
     fw64_spritebatch_end(editor->spritebatch);
 }
 
@@ -70,9 +89,10 @@ void adjust_value(fw64TransformEditor* editor, float direction) {
             break;
     }
 
-    quat_from_euler(&editor->target->rotation, editor->euler_rotation.x, editor->euler_rotation.y, editor->euler_rotation.z);
-    fw64_transform_update_matrix(editor->target);
+    quat_from_euler(&editor->target->transform.rotation, editor->euler_rotation.x, editor->euler_rotation.y, editor->euler_rotation.z);
+    fw64_node_update(editor->target);
     update_spritebatch(editor);
+    editor->did_edit = 1;
 }
 
 void adjust_edit_target(fw64TransformEditor* editor, int direction) {

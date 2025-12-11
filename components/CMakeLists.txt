@@ -5,8 +5,8 @@ set(components_source_files
     fw64_character.h fw64_character.c
     fw64_character_animation_controller.h fw64_character_animation_controller.c
     fw64_collision_geometry_debug.h fw64_collision_geometry_debug.c
-    fw64_debug_boxes.h fw64_debug_boxes.c
     fw64_debug_character.h fw64_debug_character.c
+    fw64_debug_primitives.h fw64_debug_primitives.c
     fw64_file_downloader_message.h fw64_file_downloader.h fw64_file_downloader.c
     fw64_fps_camera.h fw64_fps_camera.c
     fw64_headlight.h fw64_headlight.c
@@ -18,7 +18,6 @@ set(components_source_files
     fw64_third_person_input_controller.h fw64_third_person_input_controller.c
     fw64_transform_editor.h fw64_transform_editor.c
     fw64_ui_navigation.h fw64_ui_navigation.c
-    fw64_wireframe.h fw64_wireframe.c
 )
 
 add_library(fw64_components STATIC ${components_source_files})

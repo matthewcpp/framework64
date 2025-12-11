@@ -14,11 +14,15 @@ void fw64_capsule_set_points(fw64Capsule* capsule, const Vec3* base, const Vec3*
     fw64_capsule_update(capsule);
 }
 
+void fw64_capsule_compute_axis(const fw64Capsule* capsule, Vec3* axis) {
+    vec3_subtract(&capsule->tip, &capsule->base, axis);
+    vec3_normalize(axis);
+}
+
 void fw64_capsule_update(fw64Capsule* capsule) {
     // cache the capsule axis: normalized direction from base -> tip
     Vec3 axis;
-    vec3_subtract(&capsule->tip, &capsule->base, &axis);
-    vec3_normalize(&axis);
+    fw64_capsule_compute_axis(capsule, &axis);
 
     // compute points a and b, which are the centers of the spheres at each end of the capsule.
     Vec3 line_end_offset = axis;
@@ -30,8 +34,8 @@ void fw64_capsule_update(fw64Capsule* capsule) {
     Vec3 extents = {capsule->radius, capsule->radius, capsule->radius};
     box_set_center_extents(&capsule->aabb, &capsule->a, &extents);
 
-    Box bbox;
-    box_set_center_extents(&capsule->aabb, &capsule->b, &extents);
+    Box b_box;
+    box_set_center_extents(&b_box, &capsule->b, &extents);
 
-    box_encapsulate_box(&capsule->aabb, &bbox);
+    box_encapsulate_box(&capsule->aabb, &b_box);
 }
