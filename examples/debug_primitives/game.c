@@ -154,7 +154,7 @@ void ui_edit_next_node(UI* ui, int direction) {
     } else if (ui->node_edit_index < 0) {
         ui->node_edit_index = EDIT_NODES_COUNT - 1;
     }
-
+    
     fw64Node* node = fw64_scene_get_node(ui->scene, edit_nodes[ui->node_edit_index]);
     fw64_transform_editor_set_target(&ui->editor, node);
 }
