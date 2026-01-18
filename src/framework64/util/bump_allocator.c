@@ -8,8 +8,8 @@
 #define ALIGN_SIZE 8
 
 typedef enum {
-    BUMP_ALLOCATOR_FLAG_NONE,
-    BUMP_ALLOCATOR_FLAG_OWNS_BUFFER
+    BUMP_ALLOCATOR_FLAG_NONE            = 0,
+    BUMP_ALLOCATOR_FLAG_OWNS_BUFFER     = 1 << 0
 } BumpAllocatorFlags;
 
 void* fw64_bump_allocator_malloc(fw64BumpAllocator* bump, size_t size) {
@@ -17,8 +17,9 @@ void* fw64_bump_allocator_malloc(fw64BumpAllocator* bump, size_t size) {
     allocated_size -= (allocated_size % ALIGN_SIZE);
 
     uintptr_t used = bump->next - bump->start;
-    if (allocated_size > (bump->size - used))
+    if (allocated_size > (bump->size - used)) {
         return NULL;
+    }
 
     bump->previous = bump->next;
     bump->next += allocated_size;
@@ -110,7 +111,8 @@ void fw64_bump_allocator_reset(fw64BumpAllocator* bump) {
 }
 
 void fw64_bump_allocator_uninit(fw64BumpAllocator* bump) {
-    if (bump->flags & BUMP_ALLOCATOR_FLAG_OWNS_BUFFER)
+    if (bump->flags & BUMP_ALLOCATOR_FLAG_OWNS_BUFFER) {
         fw64_free(bump->start);
+    }
 }
 
