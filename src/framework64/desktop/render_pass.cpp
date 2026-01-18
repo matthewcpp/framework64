@@ -24,10 +24,11 @@ fw64RenderPass::~fw64RenderPass() {
 
 void fw64RenderPass::begin() {
     fw64_render_queue_clear(&render_queue);
+    is_active = true;
 }
 
 void fw64RenderPass::end() {
-
+    is_active = false;
 }
 
 // C-API
@@ -90,14 +91,20 @@ void fw64_renderpass_set_clear_color(fw64RenderPass* pass, uint8_t r, uint8_t g,
 }
 
 void fw64_renderpass_draw_sprite_batch(fw64RenderPass* renderpass, fw64SpriteBatch* sprite_batch) {
+    assert(renderpass->is_active);
+
     fw64_render_queue_enqueue_sprite_batch(&renderpass->render_queue, sprite_batch);
 }
 
 void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstance* mesh_instance) {
+    assert(renderpass->is_active);
+
     fw64_render_queue_enqueue_static_mesh(&renderpass->render_queue, mesh_instance);
 }
 
 void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* renderpass, fw64SkinnedMeshInstance* skinned_mesh_instance) {
+    assert(renderpass->is_active);
+
     fw64_render_queue_enqueue_skinned_mesh(&renderpass->render_queue, skinned_mesh_instance);
 }
 

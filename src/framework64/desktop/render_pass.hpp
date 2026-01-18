@@ -69,4 +69,5 @@ public:
     bool depth_testing_enabled = true;
     bool depth_writing_enabled = true;
     bool anti_aliasing_enabled = true;
+    bool is_active = false;
 };
