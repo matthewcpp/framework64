@@ -43,7 +43,8 @@ void player_init(Player* player, fw64Engine* engine, fw64CharacterEnvironment* e
     fw64_third_person_input_controller_init(&player->third_person_input, engine->input, &player->character, node, &player->third_person_cam, &player->animation_controller, 0);
 
     // Configure 3rd person character components
-    vec3_set(&player->character.size, 0.2f, 1.75f, 0.2f);
+    Vec3 character_size = {0.2f, 1.75f, 0.2f};
+    fw64_character_set_size(&player->character, &character_size);
     player->character.step_height = player->character.size.y * 0.17f;
     player->character.head_height = 1.5f;
     player->character.hang_vertical_offset = -0.70f;

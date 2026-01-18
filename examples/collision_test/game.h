@@ -3,7 +3,8 @@
 #include "bomb_omb_battlefield.h"
 #include "ui.h"
 
-#include "fw64_collision_geometry_debug.h"
+#include "fw64_character_debug.h"
+
 #include "fw64_headlight.h"
 #include "fw64_skybox.h"
 
@@ -13,7 +14,7 @@ typedef struct {
     fw64Engine* engine;
     BombOmbBattlefield battlefield;
     fw64BumpAllocator bump_allocator;
-    fw64CollisionGeometryDebug collision_geometry_debug;
+    fw64CharacterDebug character_debug;
     UI ui;
 } Game;
 
