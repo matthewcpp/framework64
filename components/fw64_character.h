@@ -134,6 +134,10 @@ extern "C" {
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Node* node, fw64Scene* scene);
 void fw64_character_fixed_update(fw64Character* character, float time_delta);
 
+/** Sets the size of the character in each dimension.
+ *  This size will be used to determine bounding volume and other movement related positions by the controller.
+*/
+void fw64_character_set_size(fw64Character* character, const Vec3* size);
 void fw64_character_set_position(fw64Character* character, const Vec3* position);
 
 /** Immediately drops the player from the ledge and sets them in an 'in air' state */

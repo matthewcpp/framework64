@@ -22,11 +22,11 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     character->node = node;
     character->scene = scene;
 
-    Vec3 zero = vec3_zero();
+    Vec3 zero = vec3_zero(), one = vec3_one();
     character->attempt_to_move = zero;
     fw64_character_set_position(character, &zero);
-
-    vec3_set_one(&character->size);
+    fw64_character_set_size(character, &one);
+    
     character->sphere_query_radius = 0.5f;
     character->step_height = 0.17;
     character->head_height = 0.8f;
@@ -44,6 +44,14 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     character->attempt_to_jump = 0;
 }
 
+static void fw64_character_update_capsule(fw64Character* character) {
+    Vec3* base = &character->position;
+    Vec3 tip = character->position;
+    tip.y += character->size.y;
+
+    fw64_capsule_set_points(&character->capsule, base, &tip);
+}
+
 void fw64_character_set_position(fw64Character* character, const Vec3* position) {
     character->previous_position = *position;
     character->position = *position;
@@ -51,6 +59,17 @@ void fw64_character_set_position(fw64Character* character, const Vec3* position)
     character->state = FW64_CHARACTER_STATE_IN_AIR;
     vec3_set_zero(&character->velocity);
     character->active_ladder = NULL;
+
+    fw64_character_update_capsule(character);
+}
+
+void fw64_character_set_size(fw64Character* character, const Vec3* size) {
+    character->size = *size;
+
+    float radius = fw64_maxf(size->x, size->z);
+    Vec3 tip = character->position;
+    tip.y += size->y;
+    fw64_capsule_init(&character->capsule, &character->position, &tip, radius);
 }
 
 /** TODO: can this be reduced to use collision geometry raycast? */
@@ -492,6 +511,8 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         vec3_add_and_scale(&character->position, &up, query_radius, &query_pos);
         fw64_character_check_wall_collision(character, i, &query_pos, query_radius, &query);
     }
+
+    fw64_character_update_capsule(character);
 
     if (fw64_character_attempt_ladder_grab(character, query_radius)) {
         return;
