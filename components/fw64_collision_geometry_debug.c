@@ -4,18 +4,15 @@
 
 #define FW64_COLLISION_GEOMETRY_DEBUG_INVALID_CELL_INDEX UINT32_MAX
 
-void fw64_collision_geometry_debug_init(fw64CollisionGeometryDebug* geometry_debug, fw64Engine* engine, size_t bump_size){
+void fw64_collision_geometry_debug_init(fw64CollisionGeometryDebug* geometry_debug, fw64Engine* engine, size_t bump_size, fw64Allocator* allocator){
     geometry_debug->engine = engine;
     geometry_debug->scene = NULL;
     geometry_debug->data_source = NULL;
     geometry_debug->previous_cell_index = FW64_COLLISION_GEOMETRY_DEBUG_INVALID_CELL_INDEX;
     geometry_debug->layer_mask = FW64_COLLISION_GEOMETRY_DEBUG_LAYER_CELL_BOUNDINGS | FW64_COLLISION_GEOMETRY_DEBUG_LAYER_MASK_TRIANGLES;
-    fw64_bump_allocator_init(&geometry_debug->bump_allocator, bump_size);
+    geometry_debug->_buffer = fw64_allocator_malloc(allocator, bump_size);
+    fw64_bump_allocator_init_from_buffer(&geometry_debug->bump_allocator, geometry_debug->_buffer, bump_size);
     fw64_collision_geometry_debug_track(geometry_debug, NULL, NULL, NULL);
-
-    geometry_debug->renderpass = fw64_renderpass_create(fw64_displays_get_primary(engine->displays), fw64_default_allocator());
-    fw64_renderpass_set_primitive_mode(geometry_debug->renderpass, FW64_PRIMITIVE_MODE_LINES);
-    //fw64_renderpass_set_clear_flags(geometry_debug->renderpass, FW64_CLEAR_FLAG_DEPTH);
 }
 
 static void fw64_collision_geometry_debug_unload(fw64CollisionGeometryDebug* geometry_debug) {
@@ -33,6 +30,7 @@ static void fw64_collision_geometry_debug_unload(fw64CollisionGeometryDebug* geo
 void fw64_collision_geometry_debug_uninit(fw64CollisionGeometryDebug* geometry_debug) {
     fw64_collision_geometry_debug_unload(geometry_debug);
     fw64_bump_allocator_uninit(&geometry_debug->bump_allocator);
+    fw64_allocator_free(geometry_debug->allocator, &geometry_debug->_buffer);
 }
 
 int fw64_collision_geometry_debug_load(fw64CollisionGeometryDebug* geometry_debug, fw64AssetId asset_id) {
@@ -86,17 +84,11 @@ void fw64_collision_geometry_debug_update(fw64CollisionGeometryDebug* geometry_d
     geometry_debug->scene = fw64_scene_load_from_datasource(geometry_debug->data_source, geometry_debug->engine->assets, &geometry_debug->bump_allocator.interface);
 
     geometry_debug->previous_cell_index = active_cell_index;
-
-    fw64_renderpass_begin(geometry_debug->renderpass);
-    fw64_scene_draw_all(geometry_debug->scene, geometry_debug->renderpass, geometry_debug->layer_mask);
-    fw64_renderpass_end(geometry_debug->renderpass);
 }
 
-void fw64_collision_geometry_debug_draw(fw64CollisionGeometryDebug* geometry_debug) {
-    if (!geometry_debug->scene) {
+void fw64_collision_geometry_debug_draw(fw64CollisionGeometryDebug* geometry_debug, fw64RenderPass* renderpass) {
+    if (geometry_debug->scene) {
+        fw64_scene_draw_all(geometry_debug->scene, renderpass, geometry_debug->layer_mask);
         return;
     }
-
-    fw64_renderpass_set_camera(geometry_debug->renderpass, geometry_debug->camera);
-    fw64_renderer_submit_renderpass(geometry_debug->engine->renderer, geometry_debug->renderpass);
 }

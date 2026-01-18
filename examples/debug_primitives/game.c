@@ -55,6 +55,7 @@ void game_init(Game* game, fw64Engine* engine) {
         1,
         1
     };
+
     fw64_debug_primitives_init(&game->debug_primitives, engine, &config, allocator);
 
     Box box;

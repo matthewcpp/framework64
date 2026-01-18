@@ -31,7 +31,8 @@ typedef struct {
     fw64Engine* engine;
     fw64Scene* scene;
     fw64DataSource* data_source;
-    fw64RenderPass* renderpass;
+    fw64Allocator* allocator;
+    char* _buffer;
 
     const fw64Transform* target;
     const fw64CollisionGeometry* collision_geometry;
@@ -51,14 +52,13 @@ typedef struct {
 extern "C" {
 #endif
 
-/** Note: currently this will allocate from the default allocator */
-void fw64_collision_geometry_debug_init(fw64CollisionGeometryDebug* geometry_debug, fw64Engine* engine, size_t bump_size);
+void fw64_collision_geometry_debug_init(fw64CollisionGeometryDebug* geometry_debug, fw64Engine* engine, size_t bump_size, fw64Allocator* allocator);
 void fw64_collision_geometry_debug_uninit(fw64CollisionGeometryDebug* geometry_debug);
 
 int fw64_collision_geometry_debug_load(fw64CollisionGeometryDebug* geometry_debug, fw64AssetId asset_id);
 void fw64_collision_geometry_debug_track(fw64CollisionGeometryDebug* geometry_debug, const fw64CollisionGeometry* collision_geometry, const fw64Transform* target, const fw64Camera* camera);
 void fw64_collision_geometry_debug_update(fw64CollisionGeometryDebug* geometry_debug);
-void fw64_collision_geometry_debug_draw(fw64CollisionGeometryDebug* geometry_debug);
+void fw64_collision_geometry_debug_draw(fw64CollisionGeometryDebug* geometry_debug, fw64RenderPass* renderpass);
 
 #ifdef __cplusplus
 }

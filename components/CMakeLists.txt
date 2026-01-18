@@ -3,6 +3,7 @@ set(components_source_files
     fw64_asset_viewer.h fw64_asset_viewer.c
     fw64_billboard_node.h fw64_billboard_node.c
     fw64_character.h fw64_character.c
+    fw64_character_debug.h fw64_character_debug.c
     fw64_character_animation_controller.h fw64_character_animation_controller.c
     fw64_collision_geometry_debug.h fw64_collision_geometry_debug.c
     fw64_debug_character.h fw64_debug_character.c
