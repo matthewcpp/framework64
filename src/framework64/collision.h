@@ -15,13 +15,22 @@ void fw64_closest_point_to_triangle(const Vec3* point, const Vec3* a, const Vec3
 
 void fw64_closest_point_on_line_segment(const Vec3* a, const Vec3* b, const Vec3* point, Vec3* out);
 
+/** Finds the closest points between segment 1 (p1 to q1) and segment 2 (p2 to q2).
+ * Stores the closest point on seg 1 in c1, and the closest point on seg 2 in c2.
+ * Returns the squared distance between c1 and c2.
+ */
+float fw64_closest_points_segment_segment(
+    const Vec3* p1, const Vec3* q1, 
+    const Vec3* p2, const Vec3* q2, 
+    Vec3* c1, Vec3* c2);
+
 /**
  * Returns true if sphere s intersects triangle ABC, false otherwise.
  * The point p on abc closest to the sphere center is also returned
  */
 int fw64_collision_test_sphere_triangle(const Vec3* center, float radius, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point);
 
-int fw64_collision_test_capsule_triangle(const fw64Capsule* capsule, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point);
+int fw64_collision_test_capsule_triangle(const fw64Capsule* capsule, const Vec3* tri_a, const Vec3* tri_b, const Vec3* tri_c, const Vec3* n, Vec3* out_tri_point, Vec3* out_capsule_point);
 
 /**
  * Returns nonzero value if the sphere intersects AABB, otherwise 0

@@ -452,94 +452,218 @@ void fw64_collision_get_normal_box_point(Vec3* point, Box* box, Vec3* out_normal
     }
 }
 
-int fw64_collision_test_capsule_triangle(const fw64Capsule* capsule, const Vec3* a, const Vec3* b, const Vec3* c, Vec3* point) {
-    // first check the aabb of the triangle for fast rejection
-    Box triangle_aabb;
-    triangle_aabb.min = *a;
-    triangle_aabb.max = *b;
-    box_encapsulate_point(&triangle_aabb, b);
-    box_encapsulate_point(& triangle_aabb, c);
+// Finds the closest points between segment 1 (p1 to q1) and segment 2 (p2 to q2).
+// Stores the closest point on seg 1 in c1, and the closest point on seg 2 in c2.
+// Returns the squared distance between c1 and c2.
+float fw64_closest_points_segment_segment(
+    const Vec3* p1, const Vec3* q1, 
+    const Vec3* p2, const Vec3* q2, 
+    Vec3* c1, Vec3* c2) 
+{
+    Vec3 d1, d2, r;
+    vec3_subtract(q1, p1, &d1); // Direction of segment 1
+    vec3_subtract(q2, p2, &d2); // Direction of segment 2
+    vec3_subtract(p1, p2, &r);
 
-    if (!box_intersection(&capsule->aabb, &triangle_aabb)) {
-        return 0;
+    float a = vec3_dot(&d1, &d1); // Squared length of segment 1
+    float e = vec3_dot(&d2, &d2); // Squared length of segment 2
+    float f = vec3_dot(&d2, &r);
+
+    // Check if both segments degenerate into points
+    if (a <= 0.00001f && e <= 0.00001f) {
+        *c1 = *p1;
+        *c2 = *p2;
+        Vec3 diff;
+        vec3_subtract(c1, c2, &diff);
+        return vec3_dot(&diff, &diff);
     }
 
-    // Compute the plane of the triangle (has to be normalized).
-    Vec3 ab, ac, plane_n;
-    vec3_subtract(b, a, &ab);
-    vec3_subtract(c, a, &ac);
-    vec3_cross(&ab, &ac, &plane_n);
-    vec3_normalize(&plane_n);
+    float s, t; // Parametric values for the closest points on the segments
 
-    Vec3 reference_point;
-    Vec3 axis_n;
-    // can dn be replaced by caching the capsule axis?
-    vec3_subtract(&capsule->b, &capsule->a, &axis_n);
-    vec3_normalize(&axis_n);
-    if (fw64_fabsf(vec3_dot(&plane_n, &axis_n)) < EPSILON) {
-        // Capsule line cannot be intersected with triangle plane (they are parallel)
-        //	In this case, just take a point from triangle
-        reference_point = *a;
+    if (a <= 0.00001f) {
+        // First segment degenerates into a point
+        s = 0.0f;
+        t = f / e;
+        t = fw64_clamp(t, 0.0f, 1.0f);
     } else {
-        // Intersect capsule line with triangle plane:
-        Vec3 a_base, line_plane_intersection;
-        vec3_subtract(&capsule->base, a, &a_base);
-        vec3_scale(&a_base, 1.0f / fw64_fabsf(vec3_dot(&plane_n, &axis_n)), &a_base);
-        float t = vec3_dot(&plane_n, &a_base);
-        vec3_add_and_scale(&capsule->base, &plane_n, t, &line_plane_intersection);
-
-        // Compute the cross products of the vector from the base of each edge to 
-        // the point with each edge vector.
-        Vec3 c0, c1, c2;
-        Vec3 lp_p, dir_p;
-        vec3_subtract(&line_plane_intersection, a, &lp_p);
-        vec3_subtract(b, a, &dir_p);
-        vec3_cross(&lp_p, &dir_p, &c0);
-
-        vec3_subtract(&line_plane_intersection, b, &lp_p);
-        vec3_subtract(c, b, &dir_p);
-        vec3_cross(&lp_p, &dir_p, &c1);
-
-        vec3_subtract(&line_plane_intersection, c, &lp_p);
-        vec3_subtract(a, c, &dir_p);
-        vec3_cross(&lp_p, &dir_p, &c2);
-
-        // If the cross product points in the same direction as the normal the the
-        // point is inside the edge (it is zero if is on the edge).
-        int inside_all = vec3_dot(&c0, &plane_n) <= 0.0f && vec3_dot(&c1, &plane_n) <= 0.0f && vec3_dot(&c2, &plane_n) <= 0.0f;
-
-        if (inside_all) {
-            reference_point = line_plane_intersection;
+        float c = vec3_dot(&d1, &r);
+        if (e <= 0.00001f) {
+            // Second segment degenerates into a point
+            t = 0.0f;
+            s = fw64_clamp(-c / a, 0.0f, 1.0f);
         } else {
-            // Find the nearest point on each edge.
-            Vec3 point1, point2, point3;
+            // General non-degenerate case
+            float b = vec3_dot(&d1, &d2);
+            float denom = a * e - b * b;
 
-            // Edge 0,1
-            fw64_closest_point_on_line_segment(a, b, &line_plane_intersection, &point1);
-
-            // Edge 1,2
-            fw64_closest_point_on_line_segment(b, c, &line_plane_intersection, &point2);
-
-            // Edge 2,0
-            fw64_closest_point_on_line_segment(c, a, &line_plane_intersection, &point3);
-
-            reference_point = point1;
-            float best_dist = vec3_distance_squared(&point1, &line_plane_intersection);
-            float d = vec3_distance_squared(&point2, &line_plane_intersection);
-            if (d < best_dist) {
-                best_dist = d;
-                reference_point = point2;
+            // If segments are not parallel, compute closest point on L1 to L2 and clamp to S1
+            if (denom != 0.0f) {
+                s = fw64_clamp((b * f - c * e) / denom, 0.0f, 1.0f);
+            } else {
+                s = 0.0f; // Arbitrary point, parallel segments
             }
-            d = vec3_distance_squared(&point3, &line_plane_intersection);
-            if (d < best_dist) {
-                //best_dist = d;
-                reference_point = point3;
+
+            // Compute point on L2 closest to S1(s)
+            t = (b * s + f) / e;
+
+            // If t is outside [0,1], clamp and recompute s
+            if (t < 0.0f) {
+                t = 0.0f;
+                s = fw64_clamp(-c / a, 0.0f, 1.0f);
+            } else if (t > 1.0f) {
+                t = 1.0f;
+                s = fw64_clamp((b - c) / a, 0.0f, 1.0f);
             }
         }
     }
-        // Place a sphere on closest point on line segment to intersection:
-        Vec3 sphere_center;
-        fw64_closest_point_on_line_segment(&capsule->a, &capsule->b, &reference_point, &sphere_center);
 
-        return fw64_collision_test_sphere_triangle(&sphere_center, capsule->radius, a, b, c, point);
+    // Calculate the closest points
+    Vec3 temp;
+    vec3_scale(&d1, s, &temp);
+    vec3_add(p1, &temp, c1);
+
+    vec3_scale(&d2, t, &temp);
+    vec3_add(p2, &temp, c2);
+
+    // Return the squared distance
+    Vec3 diff;
+    vec3_subtract(c1, c2, &diff);
+    return vec3_dot(&diff, &diff);
+}
+
+
+// Returns 1 if point p is inside triangle ABC, 0 otherwise.
+// Assumes point p is already coplanar with the triangle.
+static int fw64_point_in_triangle(const Vec3* p, const Vec3* a, const Vec3* b, const Vec3* c) {
+    Vec3 v0, v1, v2;
+    vec3_subtract(c, a, &v0);
+    vec3_subtract(b, a, &v1);
+    vec3_subtract(p, a, &v2);
+
+    float d00 = vec3_dot(&v0, &v0);
+    float d01 = vec3_dot(&v0, &v1);
+    float d11 = vec3_dot(&v1, &v1);
+    float d20 = vec3_dot(&v2, &v0);
+    float d21 = vec3_dot(&v2, &v1);
+
+    float denom = d00 * d11 - d01 * d01;
+    
+    // Check for degenerate triangle (division by zero)
+    if (denom == 0.0f) {
+        return 0; 
+    }
+
+    float invDenom = 1.0f / denom;
+    float v = (d11 * d20 - d01 * d21) * invDenom;
+    float w = (d00 * d21 - d01 * d20) * invDenom;
+
+    // Point is inside the triangle if v and w are positive and v + w <= 1
+    return (v >= 0.0f) && (w >= 0.0f) && (v + w <= 1.0f);
+}
+
+int fw64_collision_test_capsule_triangle(const fw64Capsule* capsule, const Vec3* tri_a, const Vec3* tri_b, const Vec3* tri_c, const Vec3* tri_n, Vec3* out_tri_point, Vec3* out_capsule_point) {
+float radius_sq = capsule->radius * capsule->radius;
+    float best_dist_sq = 9999999.0f; // Initialize to a large number
+    Vec3 best_tri_pt;
+    Vec3 best_cap_pt;
+
+    // 2. Compute plane 'd' for the triangle
+    // PERFORMANCE NOTE: You can speed this up by caching 'd' directly 
+    // inside fw64CollisionTriangle during your mesh processing phase.
+    float d = -vec3_dot(tri_n, tri_a);
+
+    // --- Step 3: Check Capsule Spine vs Triangle Face (Piercing) ---
+    Vec3 spine_dir;
+    vec3_subtract(&capsule->b, &capsule->a, &spine_dir);
+
+    // Distance from point to plane = dot(Normal, Point) + d
+    float dist_a = vec3_dot(tri_n, &capsule->a) + d;
+    float dist_b = vec3_dot(tri_n, &capsule->b) + d;
+
+    // If dist_a and dist_b have different signs (or are zero), the segment crosses the plane
+    if ((dist_a * dist_b) <= 0.0f) {
+        float denom = dist_a - dist_b;
+        
+        // Protect against division by zero if the spine is perfectly parallel to the plane
+        if (denom != 0.0f) { 
+            float t = dist_a / denom;
+            
+            Vec3 intersection_pt;
+            vec3_scale(&spine_dir, t, &intersection_pt);
+            vec3_add(&capsule->a, &intersection_pt, &intersection_pt);
+
+            // If the intersection point is inside the triangle boundaries, 
+            // the spine pierces the triangle directly. Distance is exactly 0.
+            if (fw64_point_in_triangle(&intersection_pt, tri_a, tri_b, tri_c)) {
+                *out_tri_point = intersection_pt;
+                *out_capsule_point = intersection_pt;
+                return 1; 
+            }
+        } else {
+            // Edge case: Spine lies exactly ON the plane. 
+            if (fw64_point_in_triangle(&capsule->a, tri_a, tri_b, tri_c)) {
+                *out_tri_point = capsule->a;
+                *out_capsule_point = capsule->a;
+                return 1;
+            }
+        }
+    }
+
+    // --- Step 4: Check Capsule Endpoints vs Triangle Surface ---
+    Vec3 pt_on_tri;
+    
+    // Endpoint A
+    fw64_closest_point_to_triangle(&capsule->a, tri_a, tri_b, tri_c, &pt_on_tri);
+    float dist_sq_a = vec3_distance_squared(&capsule->a, &pt_on_tri);
+    if (dist_sq_a < best_dist_sq) { 
+        best_dist_sq = dist_sq_a; 
+        best_tri_pt = pt_on_tri; 
+        best_cap_pt = capsule->a; // The sphere center is endpoint A
+    }
+
+    // Endpoint B
+    fw64_closest_point_to_triangle(&capsule->b, tri_a, tri_b, tri_c, &pt_on_tri);
+    float dist_sq_b = vec3_distance_squared(&capsule->b, &pt_on_tri);
+    if (dist_sq_b < best_dist_sq) { 
+        best_dist_sq = dist_sq_b; 
+        best_tri_pt = pt_on_tri; 
+        best_cap_pt = capsule->b; // The sphere center is endpoint B
+    }
+
+    // --- Step 5: Check Capsule Spine vs Triangle Edges ---
+    Vec3 c1, c2; // c1 on spine (capsule pt), c2 on triangle edge (tri pt)
+    float dist_sq_edge;
+
+    // Edge AB
+    dist_sq_edge = fw64_closest_points_segment_segment(&capsule->a, &capsule->b, tri_a, tri_b, &c1, &c2);
+    if (dist_sq_edge < best_dist_sq) { 
+        best_dist_sq = dist_sq_edge; 
+        best_tri_pt = c2; 
+        best_cap_pt = c1; 
+    }
+
+    // Edge BC
+    dist_sq_edge = fw64_closest_points_segment_segment(&capsule->a, &capsule->b, tri_b, tri_c, &c1, &c2);
+    if (dist_sq_edge < best_dist_sq) { 
+        best_dist_sq = dist_sq_edge; 
+        best_tri_pt = c2; 
+        best_cap_pt = c1; 
+    }
+
+    // Edge CA
+    dist_sq_edge = fw64_closest_points_segment_segment(&capsule->a, &capsule->b, tri_c, tri_a, &c1, &c2);
+    if (dist_sq_edge < best_dist_sq) { 
+        best_dist_sq = dist_sq_edge; 
+        best_tri_pt = c2; 
+        best_cap_pt = c1; 
+    }
+
+    // 6. Final Evaluation
+    if (best_dist_sq <= radius_sq) {
+        *out_tri_point = best_tri_pt;
+        *out_capsule_point = best_cap_pt;
+        return 1;
+    }
+
+    return 0;
 }

@@ -24,6 +24,9 @@ typedef struct {
     uint32_t sphere_triangles_considered;
     uint32_t sphere_triangles_skipped;
     uint32_t sphere_triangles_checked;
+    uint32_t capsule_triangles_considered;
+    uint32_t capsule_triangles_skipped;
+    uint32_t capsule_triangles_checked;
     uint32_t ray_triangles_considered;
     uint32_t ray_triangles_skipped;
     uint32_t ray_triangles_checked;
@@ -35,12 +38,18 @@ void _fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugI
 #define fw64_character_environment_increment_sphere_triangles_considered(debug, count) (debug)->sphere_triangles_considered += (count)
 #define fw64_character_environment_increment_sphere_triangles_skipped(debug, count) (debug)->sphere_triangles_skipped += (count)
 #define fw64_character_environment_increment_sphere_triangles_checked(debug, count) (debug)->sphere_triangles_checked += (count)
+#define fw64_character_environment_increment_capsule_triangles_considered(debug, count) (debug)->capsule_triangles_considered += (count)
+#define fw64_character_environment_increment_capsule_triangles_skipped(debug, count) (debug)->capsule_triangles_skipped += (count)
+#define fw64_character_environment_increment_capsule_triangles_checked(debug, count) (debug)->capsule_triangles_checked += (count)
 #else 
 #define fw64_character_environment_debug_info_reset(debug) 
 #define fw64_character_environment_increment_ray_triangles_checked(debug, count)
 #define fw64_character_environment_increment_sphere_triangles_considered(debug, count) 
 #define fw64_character_environment_increment_sphere_triangles_skipped(debug, count) 
 #define fw64_character_environment_increment_sphere_triangles_checked(debug, count) 
+#define fw64_character_environment_increment_capsule_triangles_considered(debug, count) 
+#define fw64_character_environment_increment_capsule_triangles_skipped(debug, count) 
+#define fw64_character_environment_increment_capsule_triangles_checked(debug, count) 
 #endif
 
 
@@ -77,6 +86,11 @@ typedef enum {
     FW64_CHARACTER_STATE_CLIMB_LADDER_EXIT
 } fw64CharacterState;
 
+typedef enum {
+    FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE,
+    FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE
+} fw64CharacterCollisionPrimitive;
+
 typedef struct {
     fw64CharacterEnvironment* environment;
     fw64Node* node;
@@ -96,6 +110,7 @@ typedef struct {
      * This value should be set as the height of the characters head */
     float head_height;
 
+    fw64CharacterCollisionPrimitive collision_primitive;
     float sphere_query_radius;
     fw64Capsule capsule;
 
@@ -112,8 +127,10 @@ typedef struct {
     float ground_accel;
     float ground_decel;
 
-    /* The normalized requested movement vector during the next fixed update step. */
+    /** The normalized requested movement vector during the next fixed update step. */
     Vec3 attempt_to_move;
+
+    /** value indiciacting whether the character is attempting to jump in the next fixed update step*/
     int attempt_to_jump;
 
     /** The speed at which the character can climb ladders*/
@@ -123,6 +140,8 @@ typedef struct {
      * Current use case is to make exit animation line up with geometry if necessary.
      */
     float ladder_exit_height_adjustment;
+
+    /** The current ladder the character is climbing (if any) */
     fw64CollisionLadder* active_ladder;
 
 } fw64Character;

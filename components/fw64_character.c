@@ -21,6 +21,7 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     character->environment = env;
     character->node = node;
     character->scene = scene;
+    character->collision_primitive = FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE;
 
     Vec3 zero = vec3_zero(), one = vec3_one();
     character->attempt_to_move = zero;
@@ -72,10 +73,11 @@ void fw64_character_set_size(fw64Character* character, const Vec3* size) {
     fw64_capsule_init(&character->capsule, &character->position, &tip, radius);
 }
 
+
 /** TODO: can this be reduced to use collision geometry raycast? */
-static int _fw64_character_attempt_sticky_ground(fw64Character* character, const Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
+static int _fw64_character_attempt_sticky_ground(fw64Character* character, float query_radius, fw64CollisionGeometryQuery* query) {
     float closest_t = FLT_MAX;
-    const Vec3 ray_origin = {query_pos->x, query_pos->y + query_radius, query_pos->z};
+    const Vec3 ray_origin = {character->position.x, character->position.y + query_radius, character->position.z};
     const Vec3 ray_dir = vec3_down();
     Vec3 sticky_pos = vec3_zero();
 
@@ -143,6 +145,10 @@ static void _resolve_triangle_collision(fw64Character* character, int substep, V
     vec3_scale(&triangle->N, penetration, &correction_vector);
     vec3_add(&character->position, &correction_vector, &character->position);
     vec3_add(query_pos, &correction_vector, query_pos);
+
+    if (character->collision_primitive == FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE) {
+        fw64_character_update_capsule(character);
+    }
 }
 
 static void _resolve_wall_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionTriangle* triangle, const Vec3* hit_point, float collision_plane_dist) {
@@ -160,7 +166,51 @@ static fw64CollisionTriangle* _get_bounding_volume_walls(const fw64CollisionGeom
 typedef fw64CollisionTriangle* (*_GetBoundingVolumeTriangleFunc)(const fw64CollisionGeometry* collision_geometry, const fw64CollisionGeometryBoundingVolume* bounding_volume, uint16_t* count);
 typedef void (*_ResolveTriangleCollisionFunc)(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionTriangle* triangle, const Vec3* hit_point, float collision_plane_dist);
 
-static int fw64_character_check_sphere_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query, _GetBoundingVolumeTriangleFunc get_bounding_volume_triangles, _ResolveTriangleCollisionFunc resolve_func) {    
+// WIP
+static int fw64_character_check_capsule_collision(fw64Character* character, int substep, fw64CollisionGeometryQuery* query, _GetBoundingVolumeTriangleFunc get_bounding_volume_triangles, _ResolveTriangleCollisionFunc resolve_func) {
+    Vec3 hit_point, capsule_pt;
+    uint16_t triangle_count;
+    int hit_count = 0;
+
+    for (uint32_t c = 0; c < query->cell_count; c++) {
+        fw64CollisionGeometryCell* cell = query->cells[c];
+
+        for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
+            const fw64CollisionGeometryBoundingVolume* bounding_volume = character->scene->collision_geometry->bounding_volumes + cell->bounding_volume_index + i;
+            fw64CollisionTriangle* triangles = get_bounding_volume_triangles(character->scene->collision_geometry, bounding_volume, &triangle_count);
+            fw64_character_environment_increment_sphere_triangles_considered(&character->environment->debug_info, triangle_count);
+
+            if (!box_intersection(&bounding_volume->primitive, &character->capsule.aabb)) {
+                fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, triangle_count);
+                continue;
+            }
+
+            fw64_character_environment_increment_sphere_triangles_checked(&character->environment->debug_info, triangle_count);
+            for (uint32_t t = 0; t < triangle_count; t++) {
+                fw64CollisionTriangle* triangle = triangles + t;
+
+                // filter triangles whose aabb does not intersect our capsule
+                #if 0
+                if (!box_intersection(&character->capsule.aabb, &tri->aabb)) {
+                    continue;
+                }
+                #endif
+
+                // precision check
+                if (fw64_collision_test_capsule_triangle(&character->capsule, &triangle->A, &triangle->B, &triangle->C, &triangle->N, &hit_point, &capsule_pt)) {
+                    float distance = vec3_distance(&hit_point, &capsule_pt);
+                    //float penetration_depth = character->capsule.radius - distance;
+                    resolve_func(character, substep, &capsule_pt, character->capsule.radius, triangle, &hit_point, distance);
+                    hit_count += 1;
+                }
+            }
+        }
+    }
+
+    return hit_count;
+}
+
+static int fw64_character_check_sphere_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query, _GetBoundingVolumeTriangleFunc get_bounding_volume_triangles, _ResolveTriangleCollisionFunc resolve_func) {
     Vec3 hit_point, query_v0;
     const float query_min = query_pos->y - query_radius;
     const float query_max = query_pos->y + query_radius;
@@ -210,7 +260,17 @@ static int fw64_character_check_sphere_collision(fw64Character* character, int s
 
 // TODO: https://brendankeesing.com/blog/character_controller_stairs/
 static void fw64_character_check_floor_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
-    int hit_count = fw64_character_check_sphere_collision(character, substep, query_pos, query_radius, query, _get_bounding_volume_floors, _resolve_triangle_collision);
+    int hit_count = 0;
+    
+    switch (character->collision_primitive) {
+        case FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE:
+            hit_count = fw64_character_check_sphere_collision(character, substep, query_pos, query_radius, query, _get_bounding_volume_floors, _resolve_triangle_collision);
+            break;
+        case FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE:
+            hit_count = fw64_character_check_capsule_collision(character, substep, query, _get_bounding_volume_floors, _resolve_triangle_collision);
+            break;
+
+    }
 
     // resolve all collisions
     if (hit_count > 0) {
@@ -320,9 +380,18 @@ void fw64_character_finish_entering_ladder(fw64Character* character, const Vec3*
 }
 
 static void fw64_character_check_wall_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
-    int hit_count = fw64_character_check_sphere_collision(character, substep, query_pos, query_radius, query, _get_bounding_volume_walls, _resolve_wall_collision);
+    int hit_count = 0;
 
-    // resolve all collisions
+    switch(character->collision_primitive) {
+        case FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE:
+            hit_count = fw64_character_check_sphere_collision(character, substep, query_pos, query_radius, query, _get_bounding_volume_walls, _resolve_wall_collision);
+            break;
+        case FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE:
+            hit_count = fw64_character_check_capsule_collision(character, substep, query, _get_bounding_volume_walls, _resolve_wall_collision);
+            break;
+    }    
+
+    // TODO: implement wall sliding
     if (hit_count > 0) {
         character->velocity.x = 0.0f;
         character->velocity.z = 0.0f;
@@ -488,7 +557,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
 
     // determine sphere radius for queries
     // this will also be used for max step calculation to help prevent tunneling.
-    float query_radius = character->sphere_query_radius;
+    float query_radius = character->collision_primitive == FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE  ? character->sphere_query_radius : character->capsule.radius;
 
     // determine how many substeps we will need to avoid tunneling
     const float max_step = query_radius * 0.5f;
@@ -500,6 +569,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         Vec3 step_move = character->velocity, query_pos, up = vec3_up();
         vec3_scale(&step_move, substep_dt, &step_move);
         vec3_add(&character->position, &step_move, &character->position);
+        fw64_character_update_capsule(character);
 
         vec3_add_and_scale(&character->position, &up, query_radius, &query_pos);
 
@@ -512,8 +582,6 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         fw64_character_check_wall_collision(character, i, &query_pos, query_radius, &query);
     }
 
-    fw64_character_update_capsule(character);
-
     if (fw64_character_attempt_ladder_grab(character, query_radius)) {
         return;
     }
@@ -524,7 +592,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     if (character->velocity.y <= 0.0f) {
         fw64CollisionGeometryQuery query;
         fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &character->position, &query);
-        _fw64_character_attempt_sticky_ground(character, &character->position, query_radius, &query);
+        _fw64_character_attempt_sticky_ground(character, query_radius, &query);
     } else {
         character->state = FW64_CHARACTER_STATE_IN_AIR;
     }
