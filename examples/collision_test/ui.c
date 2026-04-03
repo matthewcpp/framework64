@@ -71,12 +71,26 @@ void ui_update(UI* ui) {
 #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
     const fw64CharacterEnvironmentDebugInfo* char_debug = &ui->player->character.environment->debug_info;
     draw_pos.y += fw64_font_line_height(ui->font);
-    sprintf(buffer, "char: s: %d/%d/%d r:%d", 
-        char_debug->sphere_triangles_considered, 
-        char_debug->sphere_triangles_skipped, 
-        char_debug->sphere_triangles_checked,
-        char_debug->ray_triangles_checked
-    );
+    switch (ui->player->character.collision_primitive) {
+        case FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE:
+            sprintf(buffer, "char: s: %d/%d/%d r:%d", 
+                char_debug->sphere_triangles_considered, 
+                char_debug->sphere_triangles_skipped, 
+                char_debug->sphere_triangles_checked,
+                char_debug->ray_triangles_checked
+            );
+            break;
+        
+        case FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE:
+            sprintf(buffer, "char: c: %d/%d/%d r:%d", 
+                char_debug->capsule_triangles_considered, 
+                char_debug->capsule_triangles_skipped, 
+                char_debug->capsule_triangles_checked,
+                char_debug->ray_triangles_checked
+            );
+            break;
+    }
+
     fw64_spritebatch_draw_string(ui->spritebatch, ui->font, buffer, draw_pos.x, draw_pos.y);
 
     draw_pos.y += fw64_font_line_height(ui->font);

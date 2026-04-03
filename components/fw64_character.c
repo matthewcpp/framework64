@@ -178,25 +178,24 @@ static int fw64_character_check_capsule_collision(fw64Character* character, int 
         for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
             const fw64CollisionGeometryBoundingVolume* bounding_volume = character->scene->collision_geometry->bounding_volumes + cell->bounding_volume_index + i;
             fw64CollisionTriangle* triangles = get_bounding_volume_triangles(character->scene->collision_geometry, bounding_volume, &triangle_count);
-            fw64_character_environment_increment_sphere_triangles_considered(&character->environment->debug_info, triangle_count);
+            fw64_character_environment_increment_capsule_triangles_considered(&character->environment->debug_info, triangle_count);
 
             if (!box_intersection(&bounding_volume->primitive, &character->capsule.aabb)) {
-                fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, triangle_count);
+                fw64_character_environment_increment_capsule_triangles_skipped(&character->environment->debug_info, triangle_count);
                 continue;
             }
 
-            fw64_character_environment_increment_sphere_triangles_checked(&character->environment->debug_info, triangle_count);
             for (uint32_t t = 0; t < triangle_count; t++) {
                 fw64CollisionTriangle* triangle = triangles + t;
 
                 // filter triangles whose aabb does not intersect our capsule
-                #if 0
-                if (!box_intersection(&character->capsule.aabb, &tri->aabb)) {
+                if (!box_intersection(&character->capsule.aabb, &triangle->bounding)) {
+                    fw64_character_environment_increment_capsule_triangles_skipped(&character->environment->debug_info, 1);
                     continue;
                 }
-                #endif
 
                 // precision check
+                fw64_character_environment_increment_capsule_triangles_checked(&character->environment->debug_info, 1);
                 if (fw64_collision_test_capsule_triangle(&character->capsule, &triangle->A, &triangle->B, &triangle->C, &triangle->N, &hit_point, &capsule_pt)) {
                     float distance = vec3_distance(&hit_point, &capsule_pt);
                     //float penetration_depth = character->capsule.radius - distance;
@@ -212,8 +211,8 @@ static int fw64_character_check_capsule_collision(fw64Character* character, int 
 
 static int fw64_character_check_sphere_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query, _GetBoundingVolumeTriangleFunc get_bounding_volume_triangles, _ResolveTriangleCollisionFunc resolve_func) {
     Vec3 hit_point, query_v0;
-    const float query_min = query_pos->y - query_radius;
-    const float query_max = query_pos->y + query_radius;
+    // const float query_min = query_pos->y - query_radius;
+    // const float query_max = query_pos->y + query_radius;
     uint16_t triangle_count;
     int hit_count = 0;
 
@@ -234,10 +233,10 @@ static int fw64_character_check_sphere_collision(fw64Character* character, int s
                 fw64CollisionTriangle* triangle = triangles + t;
 
                 // filter triangles that are vertically outside of our query radius
-                if (query_min > triangle->maxY || query_max < triangle->minY) {
-                    fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, 1);
-                    continue;
-                }
+                // if (query_min > triangle->maxY || query_max < triangle->minY) {
+                //     fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, 1);
+                //     continue;
+                // }
 
                 // check penetration with triangle plane
                 vec3_subtract(query_pos, &triangle->A, &query_v0);

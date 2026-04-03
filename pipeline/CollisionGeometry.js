@@ -205,14 +205,8 @@ class CollisionGeometry {
      */
     _getGridCellsForTriangle(triangle) {
         // create a bounding rectangle
-        const A = triangle[0];
-        const B = triangle[1];
-        const C = triangle[2];
 
-        const bounding = new Bounding();
-        bounding.encapsulatePoint(A);
-        bounding.encapsulatePoint(B);
-        bounding.encapsulatePoint(C);
+        const bounding = triangle[4];
 
         const overlappingCells = this._getOverlappingCells(bounding).filter((cell) => {
             return Intersect.triangleAabb(A, B, C, cell.boundingBox);
@@ -230,11 +224,6 @@ class CollisionGeometry {
     insertTriangle(node, triangle) {
         const cells = this._getGridCellsForTriangle(triangle);
         const normal = triangle[3];
-
-        const minY = Math.min(triangle[0][1], triangle[1][1], triangle[2][1]);
-        const maxY = Math.max(triangle[0][1], triangle[1][1], triangle[2][1]);
-        triangle.push(minY);
-        triangle.push(maxY);
 
         if (normal[1] > this.floorAndCeilingTolerance) {
             for (const cell of cells) {
@@ -315,7 +304,12 @@ class CollisionGeometry {
                     glMatrix.vec3.cross(N, AB, AC);
                     glMatrix.vec3.normalize(N, N);
 
-                    const triangle = [A, B, C, N];
+                    const bounding = new Bounding();
+                    bounding.encapsulatePoint(A);
+                    bounding.encapsulatePoint(B);
+                    bounding.encapsulatePoint(C);
+
+                    const triangle = [A, B, C, N, bounding];
                     geometry.insertTriangle(node, triangle);
                 }
             }

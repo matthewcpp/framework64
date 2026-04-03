@@ -1,7 +1,7 @@
 const glMatrix = require("gl-matrix");
 
 class Bounding {
-    static SizeOf = 24;
+    static SizeOf = 24 /* (6 floats) * 4bytes ea. */;
 
     constructor() {
         this.min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];

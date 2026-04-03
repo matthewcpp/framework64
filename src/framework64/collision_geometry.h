@@ -10,7 +10,7 @@
 
 typedef struct {
     Vec3 A, B, C, N;
-    float minY, maxY;
+    Box bounding;
 } fw64CollisionTriangle;
 
 typedef struct {

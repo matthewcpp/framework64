@@ -7,7 +7,7 @@ class CollisionGeometryWriter {
     static headerSize = ((3 /*element counts */ + 3 /* cell counts */) * 4)  + Bounding.SizeOf; /* bounding min/max */
 
     /** This needs to be kept in sync with fw64CollisionTriangle in collision_geometry.h */
-    static triangleSize = ((3 * 3) /* points */ + (1 * 3) /* normal */ + 2 /* extents */) * 4;
+    static triangleSize = (((3 * 3) /* points */ + (1 * 3) /* normal */) * 4) + Bounding.SizeOf;
 
     /** This needs to be kept in sync with fw64CollisionLadder in collision_geometry.h */
     static ladderSize = ((3 * 2) /* points */ + 3 /* normal */ + 1 /* radius */) * 4
@@ -111,9 +111,8 @@ class CollisionGeometryWriter {
                 }
             }
 
-            // write out extents
-            this.triangleBufferIndex = this.writer.writeFloat(this.triangleBuffer, triangle[4], this.triangleBufferIndex);
-            this.triangleBufferIndex = this.writer.writeFloat(this.triangleBuffer, triangle[5], this.triangleBufferIndex);
+            // write the bounding box
+            this.triangleBufferIndex = triangle[4].write(this.writer, this.triangleBuffer, this.triangleBufferIndex);
         }
 
         this.triangleArrayIndex += triangles.length;
