@@ -24,7 +24,6 @@ void fw64_character_debug_uninit(fw64CharacterDebug* debug);
 void fw64_character_debug_track(fw64CharacterDebug* debug, fw64Character* character, fw64AssetId debug_geometry_scene, fw64Camera* camera);
 
 void fw64_character_debug_update(fw64CharacterDebug* debug);
-void fw64_character_debug_fixed_update(fw64CharacterDebug* debug);
 void fw64_character_debug_draw(fw64CharacterDebug* debug);
 
 #ifdef __cplusplus

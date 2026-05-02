@@ -34,11 +34,16 @@ void fw64_character_debug_track(fw64CharacterDebug* debug, fw64Character* charac
 
 void fw64_character_debug_update(fw64CharacterDebug* debug) {
     fw64_collision_geometry_debug_update(&debug->collision_geometry);
-}
 
-void fw64_character_debug_fixed_update(fw64CharacterDebug* debug) {
     if (debug->capsule_handle != FW64_DEBUG_PRIMITIVES_INVALID_HANDLE) {
-        fw64_debug_primitives_update_capsule(&debug->primitives, debug->capsule_handle, &debug->character->capsule);
+        Vec3 display_base, display_tip;
+        vec3_lerp(&debug->character->previous_position, &debug->character->position, debug->engine->time->accumulator_progress, &display_base);
+        display_tip = display_base;
+        display_tip.y += debug->character->size.y;
+        
+        fw64Capsule capsule;
+        fw64_capsule_init(&capsule, &display_base, &display_tip, debug->character->capsule.radius);
+        fw64_debug_primitives_update_capsule(&debug->primitives, debug->capsule_handle, &capsule);
     }
 }
 

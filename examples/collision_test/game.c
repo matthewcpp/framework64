@@ -44,7 +44,6 @@ void game_update(Game* game){
 
 void game_fixed_update(Game* game) {
     bomb_omb_battlefield_fixed_update(&game->battlefield);
-    fw64_character_debug_fixed_update(&game->character_debug);
 }
 
 void game_draw(Game* game) {
