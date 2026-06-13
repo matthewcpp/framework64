@@ -325,9 +325,10 @@ int fw64_collision_test_moving_boxes(Box* a, Vec3* va, Box* b, Vec3* vb, float* 
 }
 
 // Real Time Collision Detection 5.5.5, Intersecting Moving Sphere Against Sphere
+// TODO: Fix this s is used as undefined
 int fw64_collision_test_moving_spheres(Vec3* ca, float ra, Vec3* va, Vec3* cb, float rb, Vec3* vb, float* t)
 {
-    Vec3 s, v;
+    Vec3 s = vec3_zero(), v;
     vec3_subtract(cb, ca, &v);      // vector between the center of the 2 spheres
     vec3_subtract(vb, va, &v);      // relative motion of sphere b with respect to stationary sphere a
     float r = rb + ra;              // the sum of all spheres (radii)
@@ -564,8 +565,8 @@ static int fw64_point_in_triangle(const Vec3* p, const Vec3* a, const Vec3* b, c
 int fw64_collision_test_capsule_triangle(const fw64Capsule* capsule, const Vec3* tri_a, const Vec3* tri_b, const Vec3* tri_c, const Vec3* tri_n, Vec3* out_tri_point, Vec3* out_capsule_point) {
 float radius_sq = capsule->radius * capsule->radius;
     float best_dist_sq = 9999999.0f; // Initialize to a large number
-    Vec3 best_tri_pt;
-    Vec3 best_cap_pt;
+    Vec3 best_tri_pt = vec3_zero();
+    Vec3 best_cap_pt = vec3_zero();
 
     // 2. Compute plane 'd' for the triangle
     // PERFORMANCE NOTE: You can speed this up by caching 'd' directly 

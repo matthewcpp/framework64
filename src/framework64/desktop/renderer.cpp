@@ -261,7 +261,7 @@ void fw64Renderer::drawPrimitive(fw64Primitive const & primitive, const fw64Mate
     glDrawElements(static_cast<GLenum>(primitive.mode), primitive.gl_info.element_count, primitive.gl_info.primitive_mode, 0);
 
 #ifdef FW64_RENDERER_DEBUG_INFO
-    debug_info.triangle_count += primitive.primitive_data.indices_array_uint16.size() / 3;
+    debug_info.triangle_count += static_cast<uint32_t>(primitive.primitive_data.indices_array_uint16.size()) / 3;
 #endif
 }
 

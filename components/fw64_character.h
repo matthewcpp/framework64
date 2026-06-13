@@ -7,7 +7,9 @@
 #define Fw64_CHARACTER_ENV_DEFAULT_GRAVITY -9.81f
 #define FW64_CHARACTER_ENV_MAX_FALL_SPEED -15.0f
 #define FW64_CHARACTER_ENV_MAX_SUBSTEPS 4
-#define FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD 0.01f
+
+/** This is the minimum distance a character should move in a substep */
+#define FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD 0.015f
 
 #define FW64_CHARACTER_DEFAULT_JUMP_SPEED 6.4f
 #define FW64_CHARACTER_DEFAULT_MAX_SPEED 10.0f
@@ -15,6 +17,9 @@
 #define FW64_CHARACTER_DEFAULT_LADDER_HEIGHT_ADJUSTMENT 0.25f
 #define FW64_CHARACTER_DEFAULT_GRAVITY_SCALE 1.5f
 #define FW64_CHARACTER_DEFAULT_JUMP_FALL_GRAVITY_SCALE 2.0f
+
+/* Default step height in USA ~ 7 inches*/
+#define FW64_CHARACTER_DEFAULT_STEP_HEIGHT 0.18f
 
 #define FW64_CHARACTER_DEFAULT_GROUND_ACCEL 15.0f
 #define FW64_CHARACTER_DEFAULT_GROUND_DECEL 30.0f
@@ -64,7 +69,7 @@ typedef struct {
       * This is intended to prevent jittering from floating point rounding.
       * Note: this value should be specified as the squared value of the threshhold.
     */
-    float horizontal_move_threshold;
+    float horizontal_move_threshold_sq;
 
 #ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
     fw64CharacterEnvironmentDebugInfo debug_info;
@@ -86,11 +91,6 @@ typedef enum {
     FW64_CHARACTER_STATE_CLIMB_LADDER_EXIT
 } fw64CharacterState;
 
-typedef enum {
-    FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE,
-    FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE
-} fw64CharacterCollisionPrimitive;
-
 typedef struct {
     fw64CharacterEnvironment* environment;
     fw64Node* node;
@@ -110,8 +110,6 @@ typedef struct {
      * This value should be set as the height of the characters head */
     float head_height;
 
-    fw64CharacterCollisionPrimitive collision_primitive;
-    float sphere_query_radius;
     fw64Capsule capsule;
 
     /** an amount to offset the character's position by when hanging from ledges */

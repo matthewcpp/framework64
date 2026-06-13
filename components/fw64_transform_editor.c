@@ -118,18 +118,16 @@ void fw64_transform_editor_update(fw64TransformEditor* editor) {
     }
 }
 
-static void determine_indicators_for_target_type(fw64TransformEditor* editor, fw64TransformEditorTarget base_transform, char** indicators) {
+static void determine_indicators_for_target_type(fw64TransformEditor* editor, int base_transform, char** indicators) {
     indicators[0] = " ";
     indicators[1] = " ";
     indicators[2] = " ";
 
-    unsigned int edit_target = (unsigned int)editor->edit_target;
-
-    if (edit_target < base_transform || edit_target > base_transform + 2) {
+    if (editor->edit_target < base_transform || editor->edit_target > base_transform + 2) {
         return;
     }
 
-    indicators[edit_target - base_transform] = editor->mode == FW64_TRANSFORM_EDITOR_MODE_EDITING ? ">" : "*";
+    indicators[editor->edit_target - base_transform] = editor->mode == FW64_TRANSFORM_EDITOR_MODE_EDITING ? ">" : "*";
 }
 
 void update_spritebatch(fw64TransformEditor* editor) {

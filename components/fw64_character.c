@@ -10,7 +10,7 @@ void fw64_character_envionment_init(fw64CharacterEnvironment* env) {
     vec3_set(&env->gravity, 0.0f, Fw64_CHARACTER_ENV_DEFAULT_GRAVITY, 0.0f);
     env->max_fall_speed = FW64_CHARACTER_ENV_MAX_FALL_SPEED;
     env->max_substeps = FW64_CHARACTER_ENV_MAX_SUBSTEPS;
-    env->horizontal_move_threshold = FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD;
+    env->horizontal_move_threshold_sq = FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD * FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD;
 }
 
 void _fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugInfo* debug) {
@@ -21,15 +21,13 @@ void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env
     character->environment = env;
     character->node = node;
     character->scene = scene;
-    character->collision_primitive = FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE;
 
     Vec3 zero = vec3_zero(), one = vec3_one();
     character->attempt_to_move = zero;
     fw64_character_set_position(character, &zero);
     fw64_character_set_size(character, &one);
     
-    character->sphere_query_radius = 0.5f;
-    character->step_height = 0.17;
+    character->step_height = FW64_CHARACTER_DEFAULT_STEP_HEIGHT;
     character->head_height = 0.8f;
     character->hang_vertical_offset = 0.0f;
     character->max_speed = FW64_CHARACTER_DEFAULT_MAX_SPEED;
@@ -73,89 +71,109 @@ void fw64_character_set_size(fw64Character* character, const Vec3* size) {
     fw64_capsule_init(&character->capsule, &character->position, &tip, radius);
 }
 
-
-/** TODO: can this be reduced to use collision geometry raycast? */
-static int _fw64_character_attempt_sticky_ground(fw64Character* character, float query_radius, fw64CollisionGeometryQuery* query) {
-    float closest_t = FLT_MAX;
-    const Vec3 ray_origin = {character->position.x, character->position.y + query_radius, character->position.z};
-    const Vec3 ray_dir = vec3_down();
-    Vec3 sticky_pos = vec3_zero();
-
-    Vec3 box_pt;
-    float box_t;
-    
-    for (uint32_t c = 0; c < query->cell_count; c++) {
-        fw64CollisionGeometryCell* cell = query->cells[c];
-
-        for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
-            const fw64CollisionGeometryBoundingVolume* bounding_volume = character->scene->collision_geometry->bounding_volumes + cell->bounding_volume_index + i;
-
-            if (!fw64_collision_test_ray_box(&ray_origin, &ray_dir, &bounding_volume->primitive, &box_pt, &box_t)) {
-                continue;
-            }
-
-            fw64CollisionTriangle* triangles = character->scene->collision_geometry->triangles + bounding_volume->floor_index;
-            fw64_character_environment_increment_ray_triangles_checked(&character->environment->debug_info, bounding_volume->floor_count);
-
-            for (uint32_t t = 0; t < bounding_volume->floor_count; t++) {
-                fw64CollisionTriangle* triangle = triangles + t;
-                float current_t;
-                Vec3 ray_pos;
-
-                if (fw64_collision_test_ray_triangle(&ray_origin, &ray_dir, &triangle->A, &triangle->B, &triangle->C, &ray_pos, &current_t)) {
-                    if (current_t < closest_t) {
-                        closest_t = current_t;
-                        sticky_pos = ray_pos;
-                    }
-                }
-            }
-        }
-    }
-
-    if (closest_t == FLT_MAX) {
-        character->state = FW64_CHARACTER_STATE_IN_AIR;
-        return 0;
-    }
-
-    const float y_delta = fw64_fabsf(character->position.y - sticky_pos.y);
-    const float sticky_dist = 0.35f * character->step_height;
-
-    // sticky ground threshold
-    if (y_delta <= sticky_dist) {
-        character->position = sticky_pos;
-        character->state = FW64_CHARACTER_STATE_ON_GROUND;
-        return 1;
-    } else {
-        character->state = FW64_CHARACTER_STATE_IN_AIR;
-        return 0;
-    }
-}
-
 static fw64CollisionTriangle* _get_bounding_volume_floors(const fw64CollisionGeometry* collision_geometry, const fw64CollisionGeometryBoundingVolume* bounding_volume, uint16_t* count) {
     *count = bounding_volume->floor_count;
     return collision_geometry->triangles + bounding_volume->floor_index;
 }
 
-static void _resolve_triangle_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionTriangle* triangle, const Vec3* hit_point, float collision_plane_dist) {
-    (void)substep;
-    (void)hit_point;
-    Vec3 correction_vector;
-    // correct position along collision normal
-    float penetration = query_radius - collision_plane_dist;
-    vec3_scale(&triangle->N, penetration, &correction_vector);
-    vec3_add(&character->position, &correction_vector, &character->position);
-    vec3_add(query_pos, &correction_vector, query_pos);
+static int _resolve_triangle_collision(fw64Character* character, fw64CollisionTriangle* triangle, const Vec3* capsule_point, const Vec3* hit_point, void* arg) 
+{
+    (void)arg;
+    // The distance between the hit point on the triangle and the capsule point
+    float distance = vec3_distance(hit_point, capsule_point);
 
-    if (character->collision_primitive == FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE) {
-        fw64_character_update_capsule(character);
+    // 1. Calculate the true push-out normal
+    Vec3 push_out_normal;
+    if (distance > 0.0001f) {
+        // Vector from the hit point TO the capsule
+        vec3_subtract(capsule_point, hit_point, &push_out_normal);
+        vec3_normalize(&push_out_normal);
+    } else {
+        push_out_normal = triangle->N; 
     }
+
+    // 2. Correct position along the calculated normal
+    Vec3 correction_vector;
+    float penetration = character->capsule.radius - distance;
+    
+    float slop = 0.001f; // A tiny allowed penetration distance
+    if (penetration > slop) {
+        vec3_scale(&push_out_normal, penetration, &correction_vector);
+        vec3_add(&character->position, &correction_vector, &character->position);
+    }
+
+    // 3. Velocity Deflection (Sliding)
+    float dot_product = vec3_dot(&character->velocity, &push_out_normal);
+    
+    if (dot_product < 0.0f) {
+        float original_speed = vec3_length(&character->velocity);
+
+        Vec3 rejection;
+        vec3_scale(&push_out_normal, dot_product, &rejection);
+        vec3_subtract(&character->velocity, &rejection, &character->velocity);
+
+        // Preserve speed while running up slopes by normalizing and scaling the projected
+        // vector to have the same length as our original speed
+        if (original_speed > 0.0001f) {
+            vec3_normalize(&character->velocity);
+            vec3_scale(&character->velocity, original_speed, &character->velocity);
+        }
+    }
+
+    fw64_character_update_capsule(character);
+
+     return 1;
 }
 
-static void _resolve_wall_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionTriangle* triangle, const Vec3* hit_point, float collision_plane_dist) {
-    if (hit_point->y - character->position.y <= character->step_height) {
-        fw64_log_message("attempt step up: %f (%f)", (hit_point->y - character->position.y), character->step_height);
+static int _resolve_wall_collision(fw64Character* character, fw64CollisionTriangle* triangle, const Vec3* capsule_point, const Vec3* hit_point, void* arg) {
+(void)arg;
+
+    // TODO: Staircase / Step-up logic
+    // if (hit_point->y - character->position.y <= character->step_height) {
+        // fw64_log_message("attempt step up: %f (%f)", (hit_point->y - character->position.y), character->step_height);
+    // }
+
+    // --- STEP A: Push-Out (Position Correction) ---
+    float distance = vec3_distance(hit_point, capsule_point);
+    Vec3 push_out_normal;
+
+    if (distance > 0.0001f) {
+        vec3_subtract(capsule_point, hit_point, &push_out_normal);
+        vec3_normalize(&push_out_normal);
+    } else {
+        // Deep piercing fallback
+        push_out_normal = triangle->N; 
     }
-    _resolve_triangle_collision(character, substep, query_pos, query_radius, triangle, hit_point, collision_plane_dist);
+
+    float penetration = character->capsule.radius - distance;
+    float slop = 0.001f; // Standard allowed penetration depth
+    
+    // Correct position along the calculated normal
+    if (penetration > slop) {
+        Vec3 correction_vector;
+        vec3_scale(&push_out_normal, penetration, &correction_vector);
+        vec3_add(&character->position, &correction_vector, &character->position);
+    }
+
+
+    // --- STEP B: Horizontal Velocity Deflection (Wall Sliding) ---
+    // We calculate the dot product using ONLY X and Z.
+    // This perfectly isolates horizontal movement from gravity and jumps.
+    float dot_product = (character->velocity.x * push_out_normal.x) + 
+                        (character->velocity.z * push_out_normal.z);
+    
+    // If dot_product is negative, the character is moving INTO the wall
+    if (dot_product < 0.0f) {
+        // Subtract the rejection vector from the character's horizontal velocity.
+        // This strips away inward momentum, leaving only the sliding momentum.
+        character->velocity.x -= push_out_normal.x * dot_product;
+        character->velocity.z -= push_out_normal.z * dot_product;
+    }
+
+    // Update the capsule bounds for the next potential collision check in the substep loop
+    fw64_character_update_capsule(character);
+
+    return 1;
 }
 
 static fw64CollisionTriangle* _get_bounding_volume_walls(const fw64CollisionGeometry* collision_geometry, const fw64CollisionGeometryBoundingVolume* bounding_volume, uint16_t* count) {
@@ -164,10 +182,10 @@ static fw64CollisionTriangle* _get_bounding_volume_walls(const fw64CollisionGeom
 }
 
 typedef fw64CollisionTriangle* (*_GetBoundingVolumeTriangleFunc)(const fw64CollisionGeometry* collision_geometry, const fw64CollisionGeometryBoundingVolume* bounding_volume, uint16_t* count);
-typedef void (*_ResolveTriangleCollisionFunc)(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionTriangle* triangle, const Vec3* hit_point, float collision_plane_dist);
+typedef int (*_ResolveCapsuleTriangleCollisionFunc)(fw64Character* character, fw64CollisionTriangle* triangle, const Vec3* capsule_point, const Vec3* hit_point, void* arg);
 
 // WIP
-static int fw64_character_check_capsule_collision(fw64Character* character, int substep, fw64CollisionGeometryQuery* query, _GetBoundingVolumeTriangleFunc get_bounding_volume_triangles, _ResolveTriangleCollisionFunc resolve_func) {
+static int fw64_character_check_capsule_collision(fw64Character* character, const fw64Capsule* capsule, fw64CollisionGeometryQuery* query, _GetBoundingVolumeTriangleFunc get_bounding_volume_triangles, _ResolveCapsuleTriangleCollisionFunc resolve_func, void* resolve_func_arg) {
     Vec3 hit_point, capsule_pt;
     uint16_t triangle_count;
     int hit_count = 0;
@@ -180,7 +198,7 @@ static int fw64_character_check_capsule_collision(fw64Character* character, int 
             fw64CollisionTriangle* triangles = get_bounding_volume_triangles(character->scene->collision_geometry, bounding_volume, &triangle_count);
             fw64_character_environment_increment_capsule_triangles_considered(&character->environment->debug_info, triangle_count);
 
-            if (!box_intersection(&bounding_volume->primitive, &character->capsule.aabb)) {
+            if (!box_intersection(&bounding_volume->primitive, &capsule->aabb)) {
                 fw64_character_environment_increment_capsule_triangles_skipped(&character->environment->debug_info, triangle_count);
                 continue;
             }
@@ -189,17 +207,15 @@ static int fw64_character_check_capsule_collision(fw64Character* character, int 
                 fw64CollisionTriangle* triangle = triangles + t;
 
                 // filter triangles whose aabb does not intersect our capsule
-                if (!box_intersection(&character->capsule.aabb, &triangle->bounding)) {
+                if (!box_intersection(&capsule->aabb, &triangle->bounding)) {
                     fw64_character_environment_increment_capsule_triangles_skipped(&character->environment->debug_info, 1);
                     continue;
                 }
 
                 // precision check
                 fw64_character_environment_increment_capsule_triangles_checked(&character->environment->debug_info, 1);
-                if (fw64_collision_test_capsule_triangle(&character->capsule, &triangle->A, &triangle->B, &triangle->C, &triangle->N, &hit_point, &capsule_pt)) {
-                    float distance = vec3_distance(&hit_point, &capsule_pt);
-                    //float penetration_depth = character->capsule.radius - distance;
-                    resolve_func(character, substep, &capsule_pt, character->capsule.radius, triangle, &hit_point, distance);
+                if (fw64_collision_test_capsule_triangle(capsule, &triangle->A, &triangle->B, &triangle->C, &triangle->N, &hit_point, &capsule_pt)) {
+                    resolve_func(character, triangle, &capsule_pt, &hit_point, resolve_func_arg);
                     hit_count += 1;
                 }
             }
@@ -209,78 +225,123 @@ static int fw64_character_check_capsule_collision(fw64Character* character, int 
     return hit_count;
 }
 
-static int fw64_character_check_sphere_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query, _GetBoundingVolumeTriangleFunc get_bounding_volume_triangles, _ResolveTriangleCollisionFunc resolve_func) {
-    Vec3 hit_point, query_v0;
-    // const float query_min = query_pos->y - query_radius;
-    // const float query_max = query_pos->y + query_radius;
-    uint16_t triangle_count;
-    int hit_count = 0;
-
-    for (uint32_t c = 0; c < query->cell_count; c++) {
-        fw64CollisionGeometryCell* cell = query->cells[c];
-
-        for (uint16_t i = 0; i < cell->bounding_volume_count; i++) {
-            const fw64CollisionGeometryBoundingVolume* bounding_volume = character->scene->collision_geometry->bounding_volumes + cell->bounding_volume_index + i;
-            fw64CollisionTriangle* triangles = get_bounding_volume_triangles(character->scene->collision_geometry, bounding_volume, &triangle_count);
-            fw64_character_environment_increment_sphere_triangles_considered(&character->environment->debug_info, triangle_count);
-
-            if (!fw64_collision_test_box_sphere(&bounding_volume->primitive, query_pos, query_radius, &hit_point)) {
-                fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, triangle_count);
-                continue;
-            }
-
-            for (uint32_t t = 0; t < triangle_count; t++) {
-                fw64CollisionTriangle* triangle = triangles + t;
-
-                // filter triangles that are vertically outside of our query radius
-                // if (query_min > triangle->maxY || query_max < triangle->minY) {
-                //     fw64_character_environment_increment_sphere_triangles_skipped(&character->environment->debug_info, 1);
-                //     continue;
-                // }
-
-                // check penetration with triangle plane
-                vec3_subtract(query_pos, &triangle->A, &query_v0);
-                const float distance = vec3_dot(&triangle->N, &query_v0);
-                if (distance < query_radius) {
-                    fw64_character_environment_increment_sphere_triangles_checked(&character->environment->debug_info, 1);
-
-                    // precision check
-                    if (fw64_collision_test_sphere_triangle(query_pos, query_radius, &triangle->A, &triangle->B, &triangle->C, &hit_point)) {
-                        resolve_func(character, substep, query_pos, query_radius, triangle, &hit_point, distance);
-                        hit_count += 1;
-                    }
-                }
-            }
-        }
-    }
-
-    return hit_count;
-}
-
 // TODO: https://brendankeesing.com/blog/character_controller_stairs/
-static void fw64_character_check_floor_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
-    int hit_count = 0;
-    
-    switch (character->collision_primitive) {
-        case FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE:
-            hit_count = fw64_character_check_sphere_collision(character, substep, query_pos, query_radius, query, _get_bounding_volume_floors, _resolve_triangle_collision);
-            break;
-        case FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE:
-            hit_count = fw64_character_check_capsule_collision(character, substep, query, _get_bounding_volume_floors, _resolve_triangle_collision);
-            break;
-
-    }
+static void fw64_character_check_floor_collision(fw64Character* character, fw64CollisionGeometryQuery* query) {
+    int hit_count = fw64_character_check_capsule_collision(character, &character->capsule, query, _get_bounding_volume_floors, _resolve_triangle_collision, NULL);
 
     // resolve all collisions
     if (hit_count > 0) {
         // attempt to prevent jittering by skipping slight movement that may arise due to floating point effects
-        if (vec3_distance_squared(&character->previous_position, &character->position) < character->environment->horizontal_move_threshold
-            && !(fw64_character_is_moving_horizontally(character))) {
+        if (fw64_character_is_on_ground(character) && !fw64_character_is_attempting_to_move(character) &&
+            vec3_distance_squared(&character->previous_position, &character->position) < character->environment->horizontal_move_threshold_sq) {
             character->position = character->previous_position;
             vec3_set_zero(&character->velocity);
+            fw64_character_update_capsule(character);
         }
 
         character->state = FW64_CHARACTER_STATE_ON_GROUND;
+    } else {
+        character->state = FW64_CHARACTER_STATE_IN_AIR;
+    }
+}
+
+typedef struct {
+    Vec3 penetration_normal;
+    float min_vertical_drop;
+    int has_floor;
+} _fw64CharacterStickyGroundArg;
+
+static int _resolve_sticky_ground_collision(fw64Character* character, fw64CollisionTriangle* triangle, const Vec3* capsule_point, const Vec3* hit_point, void* arg) {
+    _fw64CharacterStickyGroundArg* sticky_ground = (_fw64CharacterStickyGroundArg*)arg;
+
+    float distance = vec3_distance(hit_point, capsule_point);
+    Vec3 push_out_normal;
+
+    if (distance > 0.0001f) {
+        vec3_subtract(capsule_point, hit_point, &push_out_normal);
+        vec3_normalize(&push_out_normal);
+    } else {
+        push_out_normal = triangle->N;
+    }
+
+    // Is the probe actually penetrating the geometry?
+    float probe_penetration = character->capsule.radius - distance;
+
+    // FILTER: We only care if the probe actually hit it
+    if (probe_penetration > 0.0f) {
+        
+        // Calculate the distance from the CHARACTER'S current feet to the contact plane
+        Vec3 diff;
+        vec3_subtract(&character->capsule.a, hit_point, &diff);
+        float current_dist_to_plane = vec3_dot(&diff, &push_out_normal);
+        
+        // Calculate the exact vertical drop required to make the character perfectly flush
+        // Dividing by push_out_normal.y perfectly accounts for the slant of slopes!
+        float vertical_drop = (current_dist_to_plane - character->capsule.radius) / push_out_normal.y;
+        
+        // Clamp to 0 just in case floating point noise makes it slightly negative
+        if (vertical_drop < 0.0f){
+            vertical_drop = 0.0f;
+        }
+
+        // We want to snap to the HIGHEST floor (which means the smallest required drop)
+        if (!sticky_ground->has_floor || vertical_drop < sticky_ground->min_vertical_drop) {
+            sticky_ground->min_vertical_drop = vertical_drop;
+            sticky_ground->penetration_normal = push_out_normal;
+            sticky_ground->has_floor = 1;
+        }
+    }
+
+    return 0;
+}
+
+static void _fw64_character_attempt_sticky_ground(fw64Character* character, float time_delta) {
+    _fw64CharacterStickyGroundArg sticky_ground_arg;
+    sticky_ground_arg.has_floor = 0;
+
+    float horizontal_vel_sq = (character->velocity.x * character->velocity.x) + 
+                            (character->velocity.z * character->velocity.z);
+
+    // We need the actual length for the threshold
+    float horizontal_speed = 0.0f;
+    if (horizontal_vel_sq > 0.0f) {
+        horizontal_speed = fw64_sqrtf(horizontal_vel_sq); 
+    }
+
+    // Convert speed to per-frame distance
+    float horizontal_movement = horizontal_speed * time_delta;
+
+    // Max Step Height + How far the ground could drop this frame + a tiny buffer
+    float sticky_threshold = character->step_height + horizontal_movement + 0.05f;
+
+    
+    fw64Capsule probe;
+    probe.radius = character->capsule.radius;
+    const Vec3 r_vec = {probe.radius, probe.radius, probe.radius};
+
+    // the top of the probe is set to the feet of the  character
+    probe.b = character->capsule.a;
+    vec3_add(&probe.b, &r_vec, &probe.aabb.max);
+
+    // the bottom of the probe is offset by the sticky ground depth
+    probe.a = character->capsule.a;
+    probe.a.y -= sticky_threshold;
+    vec3_subtract(&probe.a, &r_vec, &probe.aabb.min);
+    
+    fw64CollisionGeometryQuery query;
+    fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &probe.a, &query);
+
+    fw64_character_check_capsule_collision(character, &probe, &query, _get_bounding_volume_floors, _resolve_sticky_ground_collision, &sticky_ground_arg);
+
+    // If we found a valid floor, AND the required drop is within our allowed threshold
+    if (sticky_ground_arg.has_floor && sticky_ground_arg.min_vertical_drop <= sticky_threshold) {
+        character->position.y -= sticky_ground_arg.min_vertical_drop;
+        
+        character->state = FW64_CHARACTER_STATE_ON_GROUND;
+        character->velocity.y = 0.0f;
+        fw64_character_update_capsule(character);
+    } else {
+        character->state = FW64_CHARACTER_STATE_IN_AIR;
     }
 }
 
@@ -356,7 +417,7 @@ void fw64_character_drop_from_ledge(fw64Character* character) {
     // push character back from ledge
     Vec3 back, fall_pos;
     fw64_transform_forward(&character->node->transform, &back); // todo flip this fuc
-    vec3_scale(&back, character->sphere_query_radius, &back);
+    vec3_scale(&back, character->capsule.radius, &back);
     vec3_add(&character->position, &back, &fall_pos);
     fw64_character_set_position(character, &fall_pos);
 }
@@ -378,23 +439,8 @@ void fw64_character_finish_entering_ladder(fw64Character* character, const Vec3*
     fw64_character_set_position(character, new_pos);
 }
 
-static void fw64_character_check_wall_collision(fw64Character* character, int substep, Vec3* query_pos, float query_radius, fw64CollisionGeometryQuery* query) {
-    int hit_count = 0;
-
-    switch(character->collision_primitive) {
-        case FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE:
-            hit_count = fw64_character_check_sphere_collision(character, substep, query_pos, query_radius, query, _get_bounding_volume_walls, _resolve_wall_collision);
-            break;
-        case FW64_CHARACTER_COLLISION_PRIMITIVE_CAPSULE:
-            hit_count = fw64_character_check_capsule_collision(character, substep, query, _get_bounding_volume_walls, _resolve_wall_collision);
-            break;
-    }    
-
-    // TODO: implement wall sliding
-    if (hit_count > 0) {
-        character->velocity.x = 0.0f;
-        character->velocity.z = 0.0f;
-    }
+static void fw64_character_check_wall_collision(fw64Character* character, fw64CollisionGeometryQuery* query) {
+    fw64_character_check_capsule_collision(character, &character->capsule, query, _get_bounding_volume_walls, _resolve_wall_collision, NULL);
 }
 
 static int fw64_character_attempt_ladder_grab(fw64Character* character, float query_radius) {
@@ -519,13 +565,12 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     character->velocity.z = current_ground_velocity.z;
 
     // handle jumping
+    int character_did_jump = 0;
     if (character->attempt_to_jump && fw64_character_is_on_ground(character)) {
         character->velocity.y += character->jump_speed;
         character->state = FW64_CHARACTER_STATE_IN_AIR;
+        character_did_jump = 1;
     }
-
-    vec3_set_zero(&character->attempt_to_move);
-    character->attempt_to_jump = 0;
 
     // apply gravity to character's velocity
     Vec3 gravity = character->environment->gravity;
@@ -534,10 +579,10 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         vec3_scale(&gravity, character->jump_fall_gravity_scale, &gravity);
     }
     vec3_add_and_scale(&character->velocity, &gravity, time_delta, &character->velocity);
+
     if (character->velocity.y < 0.0f) {
         character->velocity.y = fw64_maxf(character->velocity.y, character->environment->max_fall_speed);
     }
-
     // constrain character's horizontal speed (if necessary)
     Vec2 horizontal_movement = {character->velocity.x, character->velocity.z};
     float speed = vec2_length(&horizontal_movement);
@@ -556,7 +601,7 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
 
     // determine sphere radius for queries
     // this will also be used for max step calculation to help prevent tunneling.
-    float query_radius = character->collision_primitive == FW64_CHARACTER_COLLISION_PRIMITIVE_SPHERE  ? character->sphere_query_radius : character->capsule.radius;
+    float query_radius = character->capsule.radius;
 
     // determine how many substeps we will need to avoid tunneling
     const float max_step = query_radius * 0.5f;
@@ -575,25 +620,21 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
         fw64CollisionGeometryQuery query;
         fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &query_pos, &query);
 
-        fw64_character_check_floor_collision(character, i, &query_pos, query_radius, &query);
+        fw64_character_check_floor_collision(character, &query);
 
         vec3_add_and_scale(&character->position, &up, query_radius, &query_pos);
-        fw64_character_check_wall_collision(character, i, &query_pos, query_radius, &query);
+        fw64_character_check_wall_collision(character, &query);
     }
 
     if (fw64_character_attempt_ladder_grab(character, query_radius)) {
         return;
     }
 
-    // if we are on the ground and not jumping, we would like to attempt to stick to the ground
+    // if we were on the ground and not jumping, we would like to attempt to stick to the ground
     // if we are close to a ground triangle.  This should help prevent the case where we are running slightly
     // faster than gravity can pull us down
-    if (character->velocity.y <= 0.0f) {
-        fw64CollisionGeometryQuery query;
-        fw64_collision_geometry_query_vec3(character->scene->collision_geometry, &character->position, &query);
-        _fw64_character_attempt_sticky_ground(character, query_radius, &query);
-    } else {
-        character->state = FW64_CHARACTER_STATE_IN_AIR;
+    if (character->previous_state == FW64_CHARACTER_STATE_ON_GROUND && !character_did_jump) {
+        _fw64_character_attempt_sticky_ground(character, time_delta);
     }
 
     if (fw64_character_is_on_ground(character)) {
@@ -601,4 +642,8 @@ void fw64_character_fixed_update(fw64Character* character, float time_delta) {
     } else {
         fw64_character_attempt_ledge_grab(character, query_radius);
     }
+
+    vec3_set_zero(&character->attempt_to_move);
+    character->attempt_to_jump = 0;
+
 }

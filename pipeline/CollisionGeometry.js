@@ -209,7 +209,7 @@ class CollisionGeometry {
         const bounding = triangle[4];
 
         const overlappingCells = this._getOverlappingCells(bounding).filter((cell) => {
-            return Intersect.triangleAabb(A, B, C, cell.boundingBox);
+            return Intersect.triangleAabb(triangle[0], triangle[1], triangle[2], cell.boundingBox);
         });
 
         if (overlappingCells.length > 1) {

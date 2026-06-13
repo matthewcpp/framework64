@@ -4,9 +4,11 @@
 #include "framework64/box.h"
 
 typedef struct {
+    // Represents the extreme points at each end of the capsule
     Vec3 base, tip;
     float radius;
     // points representing the center of spheres at each end of the capsule
+    // a corresponds to the 'base' and b to the 'tip'
     Vec3 a, b;
     // cached bounding box used for fast rejections
     Box aabb;

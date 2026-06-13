@@ -191,6 +191,7 @@ const fw64CollisionTriangle* fw64_collision_geometry_raycast_triangle(const fw64
 
     fw64CollisionGeometryTraingleRaycast raycast;
     raycast.closest_t = max_distance;
+    raycast.closest_pt = (Vec3)vec3_zero();
     raycast.closest_triangle = NULL;
 
     Vec3 box_pt; 
