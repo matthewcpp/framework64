@@ -12,6 +12,11 @@ typedef enum {
     FW64_UI_NAVIGATION_DIRECTION_RIGHT
 } fw64UiNavigationDirection;
 
+typedef enum {
+    FW64_UI_NAVIGATION_FLAGS_NONE        = 0,
+    FW64_UI_NAVIGATION_FLAGS_ENABLE_L_R  = 1 << 0
+} fw64UiNavigationFlags;
+
 typedef struct {
     fw64Input* input;
     int controller_index;
@@ -22,6 +27,7 @@ typedef struct {
     float nav_repeat_time;
     uint16_t nav_count;
     uint16_t did_nav;
+    fw64UiNavigationFlags flags;
 } fw64UiNavigation;
 
 #ifdef __cplusplus
@@ -37,6 +43,10 @@ int fw64_ui_navigation_moved_right(fw64UiNavigation* ui);
 int fw64_ui_navigation_moved_left(fw64UiNavigation* ui);
 int fw64_ui_navigation_accepted(fw64UiNavigation* ui);
 int fw64_ui_navigation_back(fw64UiNavigation* ui);
+
+#define fw64_ui_navigation_lr_enabled(ui) ((ui)->flags & FW64_UI_NAVIGATION_FLAGS_ENABLE_L_R)
+#define fw64_ui_navigation_enable_lr(ui) (ui)->flags |= FW64_UI_NAVIGATION_FLAGS_ENABLE_L_R
+#define fw64_ui_navigation_disable_lr(ui) (ui)->flags &= ~FW64_UI_NAVIGATION_FLAGS_ENABLE_L_R
 
 #ifdef __cplusplus
 }

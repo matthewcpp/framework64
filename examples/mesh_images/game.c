@@ -61,6 +61,10 @@ void game_update(Game* game){
         change_palette(game, -1);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void change_palette(Game* game, int direction) {
     fw64MeshInstance* mesh_instance = fw64_scene_get_mesh_instance(&game->scene, 0);
     fw64Material* material = fw64_material_collection_get_material(mesh_instance->materials, game->selected_material);
@@ -85,7 +89,7 @@ void game_draw(Game* game) {
     fw64RenderPass* renderpass = game->renderpasses[RENDER_PASS_SCENE];
     fw64_renderpass_set_camera(renderpass, game->arcball.camera);
     fw64_renderpass_begin(renderpass);
-    fw64_scene_draw_all(&game->scene, renderpass);
+    fw64_scene_draw_all(&game->scene, renderpass, FW64_LAYER_MASK_ALL_LAYERS);
     fw64_renderpass_end(renderpass);
     fw64_renderer_submit_renderpass(game->engine->renderer, renderpass);
 

@@ -1,0 +1,18 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12",
+            "sourceString": "*>prs: -.1234567890,"
+        }
+    ],
+    "levels":[
+        {
+            "src": "examples/debug_primitives/debug_primitives.gltf"
+        },
+        {
+            "src": "wire_primitives/wire_primitives.gltf"
+        }
+    ]
+}

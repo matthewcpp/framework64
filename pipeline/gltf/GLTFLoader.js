@@ -133,21 +133,27 @@ class GLTFLoader {
                 material.texture = pbr.baseColorTexture.index;
             }
 
-            // Applies a specific shading mode to this material.  In this case mode will not be determined later.
-            if (gltfMaterial.extras && gltfMaterial.extras.shadingMode) {
+            if (Object.hasOwn(gltfMaterial, "extras")) {
                 const extras = gltfMaterial.extras;
 
-                if (extras.shadingMode) {
+                // Applies a specific shading mode to this material.  In this case mode will not be determined later.
+                if (Object.hasOwn(extras, "shadingMode")) {
                     if (Material.ShadingMode.hasOwnProperty(gltfMaterial.extras.shadingMode)) {
                         material.shadingMode = Material.ShadingMode[gltfMaterial.extras.shadingMode];
                     }
                     else {
-                        throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${gltfMaterial.extras.shadingMode}`);
+                        throw new Error(`Unsupported Shading Mode specified in Material: ${gltfMaterial.name}: ${extras.shadingMode}`);
                     }
                 }
 
-                if (extras.baseColorFactor) {
-                    material.setColorFromFloatArray(extras.baseColorFactor);
+                if (Object.hasOwn(extras, "textureFrame")) {
+                    const textureFrame = parseInt(extras.textureFrame);
+
+                    if (isNaN(textureFrame)) {
+                        throw new Error(`Could not parse texture frame in in Material: ${gltfMaterial.name}: ${extras.textureFrame}`);
+                    }
+
+                    material.textureFrame = textureFrame;
                 }
             }
 
@@ -185,11 +191,13 @@ class GLTFLoader {
                     this._readNormals(gltfPrimitive, primitive);
                 }
     
-                if (Object.hasOwn(gltfPrimitive.attributes, "TEXCOORD_0"))
+                if (Object.hasOwn(gltfPrimitive.attributes, "TEXCOORD_0")) {
                     this._readTexCoords(gltfPrimitive, primitive, gltfMesh.name);
+                }
     
-                if (Object.hasOwn(gltfPrimitive.attributes, "JOINTS_0"))
+                if (Object.hasOwn(gltfPrimitive.attributes, "JOINTS_0")) {
                     this._readJointIndices(gltfPrimitive, primitive);
+                }
     
                 this._readIndices(gltfPrimitive, primitive);
     
@@ -200,13 +208,12 @@ class GLTFLoader {
             }
     
             mesh.prunePrimitiveVertices();
-            this._validateMeshPrimitives(mesh);
             mesh.sortPrimitives(this.materials);
             this.meshes.push(mesh);
         }
     }
 
-    _validateMeshPrimitives(mesh) {
+    validateMeshPrimitives(mesh) {
         for (let i = 0; i < mesh.primitives.length; i++) {
             const primitive = mesh.primitives[i];
             const material = this.materials[primitive.material];
@@ -237,6 +244,10 @@ class GLTFLoader {
 
     _determineShadingMode(primitive, material) {
         let materialImageHasAlpha = false;
+
+        if (primitive.elementType === Primitive.ElementType.Lines) {
+            return Material.ShadingMode.Line;
+        }
 
         if (material.hasTexture()) {
             const texture = this.textures[material.texture];
@@ -283,10 +294,13 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
+        const bufferViewByteOffset = Object.hasOwn(bufferView, "byteOffset") ? bufferView.byteOffset : 0;
+        const accessorByteOffset = Object.hasOwn(accessor, "byteOffset") ? accessor.byteOffset : 0;
+
         // by default position vec3's are tightly packed
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : 12;
 
-        let offset = bufferView.byteOffset;
+        let offset = bufferViewByteOffset + accessorByteOffset;
 
         for (let i = 0; i < accessor.count; i++) {
             const position = [
@@ -319,8 +333,11 @@ class GLTFLoader {
             throw new Error("Currently only vertex weights specified as Unsigned byte are supported.");
         }
 
+        const bufferViewByteOffset = Object.hasOwn(bufferView, "byteOffset") ? bufferView.byteOffset : 0;
+        const accessorByteOffset = Object.hasOwn(accessor, "byteOffset") ? accessor.byteOffset : 0;
+
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : 4;
-        let offset = bufferView.byteOffset;
+        let offset = bufferViewByteOffset + accessorByteOffset;
 
         primitive.jointIndices = [];
 
@@ -385,8 +402,12 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
+        const bufferViewByteOffset = Object.hasOwn(bufferView, "byteOffset") ? bufferView.byteOffset : 0;
+        const accessorByteOffset = Object.hasOwn(accessor, "byteOffset") ? accessor.byteOffset : 0;
+
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
-        let offset = bufferView.byteOffset;
+
+        let offset = bufferViewByteOffset + accessorByteOffset;
 
         // TODO: does this need to be extended to handle 4 component vectors?
         let parseVertexColor = null;
@@ -431,9 +452,12 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
+        const bufferViewByteOffset = Object.hasOwn(bufferView, "byteOffset") ? bufferView.byteOffset : 0;
+        const accessorByteOffset = Object.hasOwn(accessor, "byteOffset") ? accessor.byteOffset : 0;
+
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
 
-        let offset = bufferView.byteOffset;
+        let offset = bufferViewByteOffset + accessorByteOffset;
         for (let i = 0; i < accessor.count; i++) {
             const vertex = primitive.vertices[i];
 
@@ -453,9 +477,12 @@ class GLTFLoader {
         const bufferView = this.gltf.bufferViews[accessor.bufferView];
         const buffer = this._getBuffer(bufferView.buffer);
 
+        const bufferViewByteOffset = Object.hasOwn(bufferView, "byteOffset") ? bufferView.byteOffset : 0;
+        const accessorByteOffset = Object.hasOwn(accessor, "byteOffset") ? accessor.byteOffset : 0;
+
         const byteStride = bufferView.hasOwnProperty("byteStride") ? bufferView.byteStride : this._getDefaultStride(accessor.type, accessor.componentType);
 
-        let offset = bufferView.byteOffset;
+        let offset = bufferViewByteOffset + accessorByteOffset;
         for (let i = 0; i < accessor.count; i++) {
             const vertex = primitive.vertices[i];
 
@@ -504,7 +531,10 @@ class GLTFLoader {
 
         const elementSize = primitive.elementType === Primitive.ElementType.Triangles ? 3 : 2;
 
-        GLTFLoader._readElementList(buffer, bufferView.byteOffset, accessor.count, elementSize, accessor.componentType, primitive);
+        const bufferViewByteOffset = Object.hasOwn(bufferView, "byteOffset") ? bufferView.byteOffset : 0;
+        const accessorByteOffset = Object.hasOwn(accessor, "byteOffset") ? accessor.byteOffset : 0;
+
+        GLTFLoader._readElementList(buffer, bufferViewByteOffset + accessorByteOffset, accessor.count, elementSize, accessor.componentType, primitive);
     }
 
 }

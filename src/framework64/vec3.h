@@ -30,6 +30,7 @@ void vec3_negate(Vec3* v);
 void vec3_cross(const Vec3* a, const Vec3* b, Vec3* out);
 float vec3_dot(const Vec3* a, const Vec3* b);
 float vec3_length(const Vec3* v);
+float vec3_length_squared(const Vec3* v);
 
 void vec3_smoothstep(const Vec3* a, const Vec3* b, float t, Vec3* out);
 void vec3_lerp(const Vec3* a, const Vec3* b, float t, Vec3* out);
@@ -46,6 +47,12 @@ void vec3_lerp(const Vec3* a, const Vec3* b, float t, Vec3* out);
 
 #define vec3_set_zero(vec) vec3_set((vec), 0.0f, 0.0f, 0.0f)
 #define vec3_set_one(vec) vec3_set((vec), 1.0f, 1.0f, 1.0f)
+
+typedef struct {
+    int x, y, z;
+} IVec3;
+
+#define ivec3_zero() {0, 0, 0}
 
 #ifdef __cplusplus
 }

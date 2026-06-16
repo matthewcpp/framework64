@@ -1,0 +1,57 @@
+{
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12,
+            "name": "Consolas12",
+            "sourceString": "Grid Air Ground Off Hang Climb Ladder Up Down Idle Exit Enter up tpv mem tri sr char cam /,.-: 0123456789"
+        }
+    ],
+    "levels": [
+        {
+            "src": "examples/collision_test/bomb_omb_battlefield/level/bomb_omb_battlefield.gltf",
+            "collisionGeometry": true,
+            "grid": "16x16"
+        },
+        {
+            "src": "wire_primitives/wire_primitives.gltf"
+        }
+    ],
+    "meshes": [
+        {
+            "src": "examples/collision_test/bomb_omb_battlefield/skybox/skybox.gltf"
+        }
+    ],
+    "skinnedMeshes": [
+        {
+            "notes":[
+                "Blender Animation Sampling: 4"
+            ],
+            "src": "examples/collision_test/character/character.gltf",
+            "animations": [
+                "Idle",
+                "RunForward",
+                "RunJumpUp",
+                "RunJumpDown",
+                "RunJumpLand",
+                "Punch",
+                "Kick",
+                "Dance",
+                "HangIdle",
+                "LedgeClimbUp",
+                "LadderClimb",
+                "LadderExit",
+                "LadderEnterTop"
+            ],
+            "excludeJoints": [
+                ".*_end$"
+            ]
+        }
+    ],
+    "musicBanks": [
+        {
+            "name": "bomb_omb_battlefield_music",
+            "dir": "examples/collision_test/bomb_omb_battlefield/music"
+        }
+    ]
+}

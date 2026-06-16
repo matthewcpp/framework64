@@ -49,6 +49,10 @@ void game_draw(Game* game) {
     ui_draw(&game->ui);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 static void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
     fw64Allocator* allocator = fw64_default_allocator();
     fw64Display* display = fw64_displays_get_primary(engine->displays);
@@ -80,7 +84,7 @@ static void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
 
 void scene_view_draw(SceneView* scene_view) {
     fw64_renderpass_begin(scene_view->renderpass);
-    fw64_scene_draw_all(&scene_view->scene, scene_view->renderpass);
+    fw64_scene_draw_all(&scene_view->scene, scene_view->renderpass, FW64_LAYER_MASK_ALL_LAYERS);
     fw64_renderpass_end(scene_view->renderpass);
 
     fw64_renderer_submit_renderpass(scene_view->engine->renderer, scene_view->renderpass);

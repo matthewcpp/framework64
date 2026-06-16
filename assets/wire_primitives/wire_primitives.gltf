@@ -1,0 +1,340 @@
+{
+  "asset": {
+    "generator": "glTF-Transform v4.2.1",
+    "version": "2.0"
+  },
+  "accessors": [
+    {
+      "name": " capsule_top_line_points",
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 33,
+      "max": [
+        9.999999046325684,
+        10,
+        9.999999046325684
+      ],
+      "min": [
+        -9.999999046325684,
+        0,
+        -9.999999046325684
+      ],
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "name": " capsule_top_line_colors",
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 33,
+      "bufferView": 0,
+      "byteOffset": 12
+    },
+    {
+      "name": " capsule_top_line_indices",
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 128,
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "name": " capsule_stem_line_indices",
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 48,
+      "bufferView": 1,
+      "byteOffset": 256
+    },
+    {
+      "name": " capsule_bottom_line_indices",
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 128,
+      "bufferView": 1,
+      "byteOffset": 352
+    },
+    {
+      "name": " sphere_line_indices",
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 240,
+      "bufferView": 1,
+      "byteOffset": 608
+    },
+    {
+      "name": " box_line_indices",
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 24,
+      "bufferView": 1,
+      "byteOffset": 1088
+    },
+    {
+      "name": " capsule_stem_line_points",
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 16,
+      "max": [
+        10,
+        10,
+        10
+      ],
+      "min": [
+        -10,
+        -10,
+        -10
+      ],
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "name": " capsule_stem_line_colors",
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 16,
+      "bufferView": 2,
+      "byteOffset": 12
+    },
+    {
+      "name": " capsule_bottom_line_points",
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 33,
+      "max": [
+        9.999999046325684,
+        0,
+        9.999999046325684
+      ],
+      "min": [
+        -9.999999046325684,
+        -10,
+        -9.999999046325684
+      ],
+      "bufferView": 3,
+      "byteOffset": 0
+    },
+    {
+      "name": " capsule_bottom_line_colors",
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 33,
+      "bufferView": 3,
+      "byteOffset": 12
+    },
+    {
+      "name": " sphere_line_points",
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 58,
+      "max": [
+        10,
+        10,
+        10
+      ],
+      "min": [
+        -10,
+        -10,
+        -10
+      ],
+      "bufferView": 4,
+      "byteOffset": 0
+    },
+    {
+      "name": " sphere_line_colors",
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 58,
+      "bufferView": 4,
+      "byteOffset": 12
+    },
+    {
+      "name": " box_line_points",
+      "type": "VEC3",
+      "componentType": 5126,
+      "count": 8,
+      "max": [
+        10,
+        10,
+        10
+      ],
+      "min": [
+        -10,
+        -10,
+        -10
+      ],
+      "bufferView": 5,
+      "byteOffset": 0
+    },
+    {
+      "name": " box_line_colors",
+      "type": "VEC4",
+      "componentType": 5126,
+      "count": 8,
+      "bufferView": 5,
+      "byteOffset": 12
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 924,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 924,
+      "byteLength": 1136,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2060,
+      "byteLength": 448,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2508,
+      "byteLength": 924,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3432,
+      "byteLength": 1624,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 5056,
+      "byteLength": 224,
+      "byteStride": 28,
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "name": "wire_primitives",
+      "uri": "wire_primitives.bin",
+      "byteLength": 5280
+    }
+  ],
+  "meshes": [
+    {
+      "name": " capsule_top_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "COLOR_0": 1
+          },
+          "mode": 1,
+          "indices": 2
+        }
+      ]
+    },
+    {
+      "name": " capsule_stem_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 7,
+            "COLOR_0": 8
+          },
+          "mode": 1,
+          "indices": 3
+        }
+      ]
+    },
+    {
+      "name": " capsule_bottom_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 9,
+            "COLOR_0": 10
+          },
+          "mode": 1,
+          "indices": 4
+        }
+      ]
+    },
+    {
+      "name": " sphere_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 11,
+            "COLOR_0": 12
+          },
+          "mode": 1,
+          "indices": 5
+        }
+      ]
+    },
+    {
+      "name": " box_mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 13,
+            "COLOR_0": 14
+          },
+          "mode": 1,
+          "indices": 6
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "wire_primitives",
+      "children": [
+        1
+      ]
+    },
+    {
+      "name": "Scene",
+      "children": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "name": " capsule_top",
+      "mesh": 0
+    },
+    {
+      "name": " capsule_stem",
+      "mesh": 1
+    },
+    {
+      "name": " capsule_bottom",
+      "mesh": 2
+    },
+    {
+      "name": " sphere",
+      "mesh": 3
+    },
+    {
+      "name": " box",
+      "mesh": 4
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}

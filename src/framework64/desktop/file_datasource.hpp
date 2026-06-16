@@ -20,6 +20,7 @@ struct FileDataSource {
 
     static size_t sizeFunc(fw64DataSource* data_source);
     static size_t readFunc(fw64DataSource* data_source, void* buffer, size_t size, size_t count);
+    static int seekFunc(fw64DataSource* data_source, size_t offset);
 };
 
 struct FileDataWriter {

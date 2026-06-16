@@ -135,9 +135,15 @@ static size_t fw64_n64_media_data_reader_size(fw64DataSource* interface) {
     return (size_t)f_size(&data_reader->file);
 }
 
+static int fw64_n64_media_data_reader_seek(fw64DataSource* interface, size_t offset) {
+    fw64N64MediaDataReader* data_reader = (fw64N64MediaDataReader*)interface;
+    return f_lseek(&data_reader->file, (FSIZE_t)offset) == FR_OK;
+}
+
 void fw64_n64_media_data_reader_init(fw64N64MediaDataReader* reader) {
     reader->interface.read = fw64_n64_media_data_reader_read;
     reader->interface.size = fw64_n64_media_data_reader_size;
+    reader->interface.seek = fw64_n64_media_data_reader_seek;
 }
 
 static size_t fw64_n64_media_data_writer_write(fw64DataWriter* interface, const char* buffer, size_t size, size_t count) {

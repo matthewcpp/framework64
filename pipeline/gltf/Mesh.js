@@ -6,18 +6,42 @@ class Mesh {
     primitives = [];
     materialBundle = null;
 
+    /** 
+     * this custom bounding box is currently optionally set when processing static and skinned meshes
+     * TODO: set this when processing meshes in levels too. */
+    customBoundingBox = null;
+
+    /** this is the computed bounding box based solely on the points in the mesh 
+     * lazily computed by calling .pointBoundingBox
+    */
+    _boundingBox = null;
+
     constructor(name) {
         this.name = name;
     }
 
+    /** gets the effective bounding of the mesh */
     get bounding() {
-        const bounding = new Bounding();
-
-        for (const mesh of this.primitives) {
-            bounding.encapsulateBox(mesh.bounding);
+        if (this.customBoundingBox !== null) {
+            return this.customBoundingBox;
         }
 
-        return bounding;
+        return this.pointBoundingBox;
+    }
+
+    /** lazily computes the bounding based on the mesh's points (if necessary) */
+    get pointBoundingBox() {
+        if (this._boundingBox !== null) {
+            return this._boundingBox;
+        }
+
+        this._boundingBox = new Bounding();
+
+        for (const primitive of this.primitives) {
+            this._boundingBox.encapsulateBox(primitive.bounding);
+        }
+
+        return this._boundingBox;
     }
 
     get hasNormals() {
@@ -30,6 +54,15 @@ class Mesh {
 
     get hasMaterialBundle() {
         return this.materialBundle != null;
+    }
+
+    get triangleCount() {
+        let count = 0;
+        for (const primitive of this.primitives) {
+            count += primitive.elements.length;
+        }
+
+        return count;
     }
 
     get isSkinned() {

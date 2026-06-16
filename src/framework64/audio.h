@@ -10,6 +10,12 @@
 
 typedef struct fw64Audio fw64Audio;
 
+typedef uint32_t fw64SoundBankIndex;
+#define FW64_INVALID_SOUND_BANK_INDEX UINT32_MAX
+
+typedef uint32_t fw64MusicBankIndex;
+#define FW64_INVALID_MUSIC_BANK_INDEX UINT32_MAX
+
 #define FW64_NO_AUDIO_BANK_LOADED INT_MAX
 
 typedef enum {

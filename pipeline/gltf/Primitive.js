@@ -24,6 +24,7 @@ class Primitive {
     hasVertexColors = false;
     hasTexCoords = false;
 
+    /** This is populated by the glTF loader as it is processing points. */
     bounding = new Bounding();
 
     constructor(elementType) {

@@ -70,6 +70,17 @@ int fw64_filesystem_tell(int handle) {
     return file_handle->get_pos;
 }
 
+static int fw64_filesystem_seek(int handle, size_t offset) {
+    fw64FileHandle* file_handle = &open_files[handle];
+
+    if (offset < file_handle->size) {
+        file_handle->get_pos = offset;
+        return 1;
+    }
+
+    return 0;
+}
+
 int fw64_filesystem_read(void* buffer, int size, int count, int handle) {
     if (handle < 0 || handle > FW64_FILESYSTEM_MAX_OPEN_FILES || open_files[handle].data_loc == 0)
         return FW64_FILESYSTEM_INVALID_HANDLE;
@@ -154,11 +165,17 @@ static size_t fw64_n64_filesystem_datasource_size(fw64DataSource* interface) {
     return fw64_filesystem_size(data_source->file_handle);
 }
 
+static int fw64_n64_filesystem_datasource_seek(fw64DataSource* interface, size_t offset) {
+    fw64N64FilesystemDataSource* data_source = (fw64N64FilesystemDataSource*) interface;
+
+    return fw64_filesystem_seek(data_source->file_handle, offset);
+}
 
 void fw64_n64_filesystem_datasource_init(fw64N64FilesystemDataSource* data_source, int file_handle) {
     data_source->file_handle = file_handle;
     data_source->interface.read = fw64_n64_filesystem_datasource_read;
     data_source->interface.size = fw64_n64_filesystem_datasource_size;
+    data_source->interface.seek = fw64_n64_filesystem_datasource_seek;
 }
 
 int fw64_n64_filesystem_open_datasource(fw64N64FilesystemDataSource* data_source, int file_handle) {

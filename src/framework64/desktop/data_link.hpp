@@ -43,7 +43,7 @@ struct IncommingMessage {
         return message->payload.size();
     }
 
-    fw64DataSource data_source = {&IncommingMessage::size, &IncommingMessage::read};
+    fw64DataSource data_source = {&IncommingMessage::size, &IncommingMessage::read, nullptr};
     std::vector<uint8_t> payload;
     size_t read_pos;
 };

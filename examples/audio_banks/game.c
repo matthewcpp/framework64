@@ -17,9 +17,13 @@ void game_init(Game* game, fw64Engine* engine) {
     ui_init(&game->ui, engine, &game->audio_state);
 }
 
-void game_update(Game* game){
+void game_update(Game* game) {
     scene_view_update(&game->scene_view);
     controller_update(&game->controller);
+}
+
+void game_fixed_update(Game* game) {
+    (void)game;
 }
 
 void game_draw(Game* game) {
@@ -59,7 +63,7 @@ void scene_view_init(SceneView* scene_view, fw64Engine* engine) {
 
     // scene is static so only need to setup renderpass drawing once
     fw64_renderpass_begin(scene_view->renderpass);
-    fw64_scene_draw_all(&scene_view->scene, scene_view->renderpass);
+    fw64_scene_draw_all(&scene_view->scene, scene_view->renderpass, FW64_LAYER_MASK_ALL_LAYERS);
     fw64_renderpass_end(scene_view->renderpass);
 }
 

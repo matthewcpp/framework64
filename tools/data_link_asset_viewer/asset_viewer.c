@@ -49,6 +49,10 @@ void game_update(Game* game){
     fw64_asset_viewer_update(&game->asset_viewer);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void game_draw(Game* game) {
     fw64_renderpass_set_primitive_mode(game->renderpass, fw64_asset_viewer_determine_primitive_mode(&game->asset_viewer));
     fw64_asset_viewer_draw(&game->asset_viewer);

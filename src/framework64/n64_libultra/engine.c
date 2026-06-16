@@ -37,19 +37,16 @@ fw64Modules modules;
 fw64Renderer renderer;
 fw64Time time;
 fw64SaveFile save_file;
-u64 _previous_update_time = 0;
+u64 _previous_time = 0;
 
 static void fw64_n64_libultra_engine_update_time(fw64Engine* engine) {
-    u64 current_ms = OS_CYCLES_TO_USEC(osGetTime()) / 1000;
+    u64 current_time = osGetTime();
 
-    if (current_ms < _previous_update_time)
-        return;
-
-    float ms_delta = (float)(current_ms - _previous_update_time);
-    engine->time->time_delta = ms_delta / 1000.0f;
+    u64 delta_time = current_time - _previous_time;
+    engine->time->time_delta = ((float)OS_CYCLES_TO_USEC(delta_time)) / 1000000.0f;
     engine->time->total_time += engine->time->time_delta;
 
-    _previous_update_time = current_ms;
+    _previous_time = current_time;
 }
 
 int fw64_n64_libultra_engine_init(fw64Engine* engine, int asset_count) {
@@ -62,6 +59,8 @@ int fw64_n64_libultra_engine_init(fw64Engine* engine, int asset_count) {
     engine->save_file = &save_file;
     engine->time = &time;
 
+    _previous_time = osGetTime();
+
     _fw64_default_allocator_init();
 
     InitHeap(memory_heap, FW64_N64_HEAP_SIZE);
@@ -72,11 +71,13 @@ int fw64_n64_libultra_engine_init(fw64Engine* engine, int asset_count) {
     nuContRmbMgrInit();
     nuEepromMgrInit();
 
+    memset(engine->time, 0, sizeof(fw64Time));
+    engine->time->fixed_time_delta = 1.0f / 30.0f;
+
     fw64_n64_asset_database_init(engine->assets);
     fw64_n64_renderer_init(engine->renderer, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_n64_libultra_displays_init(engine->displays, FW64_N64_SCREEN_WIDTH, FW64_N64_SCREEN_HEIGHT);
     fw64_n64_input_init(engine->input, engine->time);
-    memset(engine->time, 0, sizeof(fw64Time));
     fw64_n64_audio_init(engine->audio);
     fw64_n64_save_file_init(engine->save_file);
 

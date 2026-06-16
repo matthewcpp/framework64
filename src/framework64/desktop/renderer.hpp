@@ -106,8 +106,12 @@ private:
 
 public:
     fw64Material sprite_material;
-
     fw64Camera* current_camera = nullptr;
+
+#ifdef FW64_RENDERER_DEBUG_INFO
+    fw64RendererDebugInfo debug_info;
+#endif
+
 private:
     fw64Display& display;
     framework64::ShaderCache& shader_cache;

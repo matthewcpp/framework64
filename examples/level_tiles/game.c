@@ -229,6 +229,10 @@ void game_update(Game* game){
     follow_camera_update(&game->follow_camera);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void game_draw(Game* game) {
     fw64Frustum frustum;
     fw64_camera_extract_frustum_planes(&game->follow_camera.camera, &frustum);

@@ -117,6 +117,10 @@ void game_update(Game* game){
     update_viewport_info(game);
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void update_viewport_info(Game* game) {
     fw64Viewport* vp = &game->camera.viewport;
     char viewport_info_txt[32];
@@ -138,7 +142,7 @@ void game_draw(Game* game) {
     fw64RenderPass* pass = game->renderpasses[RENDER_PASS_VIEW];
     fw64_renderpass_set_camera(pass, &game->camera);
     fw64_renderpass_begin(pass);
-    fw64_scene_draw_all(&game->scene, pass);
+    fw64_scene_draw_all(&game->scene, pass, FW64_LAYER_MASK_ALL_LAYERS);
     fw64_renderpass_end(pass);
     fw64_renderer_submit_renderpass(game->engine->renderer, pass);
 

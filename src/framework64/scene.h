@@ -3,6 +3,7 @@
 /** \file scene.h */
 
 #include "framework64/collision.h"
+#include "framework64/collision_geometry.h"
 #include "framework64/data_io.h"
 #include "framework64/material_bundle.h"
 #include "framework64/mesh.h"
@@ -17,6 +18,9 @@
 
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
+typedef uint32_t fw64NodeIndex;
+#define FW64_SCENE_INVALID_NODE_INDEX UINT32_MAX
+
 typedef struct {
     uint16_t node_count;
     uint16_t extra_node_count;
@@ -28,7 +32,8 @@ typedef struct {
     uint32_t collider_count;
     uint32_t collision_mesh_count;
     uint32_t custom_bounding_box_count;
-    uint32_t material_bundle_count;
+    uint16_t material_bundle_count;
+    uint16_t collision_geometry_count;
 } fw64SceneInfo;
 
 struct fw64Scene {
@@ -40,6 +45,7 @@ struct fw64Scene {
     fw64StaticVector collision_meshes;
     fw64StaticVector nodes;
 
+    fw64CollisionGeometry* collision_geometry;
     fw64MaterialBundle* material_bundle;
     fw64Allocator* allocator;
     fw64AssetDatabase* assets;
@@ -62,8 +68,8 @@ void fw64_scene_init(fw64Scene* scene, fw64SceneInfo* info, fw64AssetDatabase* a
  */
 void fw64_scene_update_bounding(fw64Scene* scene);
 
-void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass);
-void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, uint32_t layer_mask);
+void fw64_scene_draw_all(fw64Scene* scene, fw64RenderPass* rendererpass, fw64LayerMask layer_mask);
+void fw64_scene_draw_frustrum(fw64Scene* scene, fw64RenderPass* rendererpass, fw64Frustum* frustum, fw64LayerMask layer_mask);
 
 fw64Mesh* fw64_scene_load_mesh_asset(fw64Scene* scene, fw64AssetId assetId);
 int fw64_scene_insert_mesh(fw64Scene* scene, fw64Mesh* mesh);
@@ -76,7 +82,7 @@ uint32_t fw64_scene_get_skinned_mesh_count(fw64Scene* scene);
 
 fw64Node* fw64_scene_create_node(fw64Scene* scene);
 fw64Node* fw64_scene_create_node_with_parent(fw64Scene* scene, fw64Node* parent);
-fw64Node* fw64_scene_get_node(fw64Scene* scene, uint32_t index);
+fw64Node* fw64_scene_get_node(fw64Scene* scene, fw64NodeIndex node_index);
 uint32_t fw64_scene_get_node_count(fw64Scene* scene);
 
 fw64MeshInstance* fw64_scene_create_mesh_instance(fw64Scene* scene, fw64Node* node, fw64Mesh* mesh);

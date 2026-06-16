@@ -91,7 +91,7 @@ const fw64Viewport* fw64_renderpass_get_viewport(fw64RenderPass* renderpass) {
     return &renderpass->viewport;
 }
 
-void fw64_renderpass_set_camera(fw64RenderPass* pass, fw64Camera* camera) {
+void fw64_renderpass_set_camera(fw64RenderPass* pass, const fw64Camera* camera) {
     pass->viewport = camera->viewport;
     pass->projection_matrix = camera->projection;
     pass->view_matrix = camera->view;
@@ -130,6 +130,11 @@ static void fw64_n64_renderpass_toggle_feature(fw64RenderPass* renderpass, fw64N
 
 void fw64_renderpass_set_depth_testing_enabled(fw64RenderPass* renderpass, int enabled) {
     fw64_n64_renderpass_toggle_feature(renderpass, N64_RENDERER_FEATURE_DEPTH_TEST, enabled);
+}
+
+void fw64_renderpass_set_depth_writing_enabled(fw64RenderPass* renderpass, int enabled) {
+    (void)renderpass;
+    (void)enabled;
 }
 
 void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int enabled) {

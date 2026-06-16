@@ -17,6 +17,7 @@ void fw64_ui_navigation_init(fw64UiNavigation* ui, fw64Input* input, int control
     ui->nav_repeat_time = DEFAULT_NAV_REPEAT_TIME;
     ui->controller_index = controller_index;
     ui->nav_time = NOT_CUURENTLY_NAVIGATING;
+    ui->flags = FW64_UI_NAVIGATION_FLAGS_ENABLE_L_R;
     fw64_input_controller_stick(ui->input, ui->controller_index, &ui->current_stick);
 }
 
@@ -36,14 +37,14 @@ static int fw64_ui_navigation_right(fw64UiNavigation* ui) {
     return (ui->current_stick.x > STICK_THRESHOLD ||
         fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_C_RIGHT) || 
         fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_DPAD_RIGHT) ||
-        fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_R));
+        (fw64_ui_navigation_lr_enabled(ui) && fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_R)));
 }
 
 static int fw64_ui_navigation_left(fw64UiNavigation* ui) {
     return (ui->current_stick.x < -STICK_THRESHOLD ||
         fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_C_LEFT) || 
         fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_DPAD_LEFT) ||
-        fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_L));
+        (fw64_ui_navigation_lr_enabled(ui) && fw64_input_controller_button_down(ui->input, ui->controller_index, FW64_N64_CONTROLLER_BUTTON_L)));
 }
 
 static fw64UiNavigationDirection fw64_ui_navigation_check_if_nav_started(fw64UiNavigation* ui) {
@@ -113,7 +114,6 @@ void fw64_ui_navigation_update(fw64UiNavigation* ui, float time_delta) {
             }
         }
     }
-
 }
 
 int fw64_ui_navigation_moved_up(fw64UiNavigation* ui) {

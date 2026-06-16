@@ -32,6 +32,10 @@ void game_update(Game* game){
    }
 }
 
+void game_fixed_update(Game* game) {
+    (void)game;
+}
+
 void game_draw(Game* game) {
     for (int i = 0; i < FW64_MAX_CONTROLLER_COUNT; i++) {
         controller_info_draw(&game->controller_infos[i]);
