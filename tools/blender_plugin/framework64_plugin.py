@@ -244,9 +244,22 @@ class F64_PT_node_panel(bpy.types.Panel):
             box.prop(obj, "f64_node_type")
             box.separator()
             
-            box.label(text="Layers (Multi-Select):")
-            # Drawing an ENUM_FLAG property automatically turns it into a toggle grid
-            box.prop(obj, "f64_layers")
+            # --- NEW TOGGLE UI ---
+            
+            # Create a row for the toggle button
+            row = box.row()
+            row.alignment = 'LEFT'
+            
+            # Swap the icon based on whether it is open or closed
+            icon = 'TRIA_DOWN' if obj.f64_show_layers else 'TRIA_RIGHT'
+            
+            # Draw the boolean property as a textless toggle button
+            row.prop(obj, "f64_show_layers", icon=icon, emboss=False, text="Layers (Multi-Select)")
+            
+            # Only draw the giant grid if the toggle is True
+            if obj.f64_show_layers:
+                layer_box = box.box() # Optional: puts a nice border around the layers
+                layer_box.prop(obj, "f64_layers")
 
 # ------------------------------------------------------------------------
 #   Registration
@@ -279,6 +292,12 @@ def register():
         default='default',
         update=update_node_type
     )
+
+    bpy.types.Object.f64_show_layers = bpy.props.BoolProperty(
+        name="Show Layers",
+        default=False,
+        description="Toggle the visibility of the layers list"
+    )
     
     # By setting options={'ENUM_FLAG'}, Blender treats this as a multi-select set
     bpy.types.Object.f64_layers = bpy.props.EnumProperty(
@@ -299,6 +318,7 @@ def unregister():
     del bpy.types.Object.f64_node_type
     del bpy.types.Object.f64_layers
     del bpy.types.Scene.f64_layer_list
+    del bpy.types.Object.f64_show_layers
     
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
