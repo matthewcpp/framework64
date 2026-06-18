@@ -58,6 +58,10 @@ def update_layers(self, context):
     # We join them with a space for the engine pipeline.
     self["layers"] = " ".join(self.f64_layers)
 
+def update_data(self, context):
+    # Syncs the UI integer back to the raw custom property dictionary
+    self["data"] = self.f64_data
+
 # ------------------------------------------------------------------------
 #   Level Creation & Layer JSON Operators
 # ------------------------------------------------------------------------
@@ -212,10 +216,12 @@ class F64_OT_add_node_properties(bpy.types.Operator):
             # Initialize raw properties
             obj["nodeType"] = "default"
             obj["layers"] = "default"
+            obj["data"] = 0
             
             # Sync UI state
             obj.f64_node_type = 'default'
             obj.f64_layers = {'default'}
+            obj.f64_data = 0
             
             self.report({'INFO'}, f"Added F64 properties to {obj.name}")
             
@@ -260,6 +266,9 @@ class F64_PT_node_panel(bpy.types.Panel):
             if obj.f64_show_layers:
                 layer_box = box.box() # Optional: puts a nice border around the layers
                 layer_box.prop(obj, "f64_layers")
+
+            box.separator()
+            box.prop(obj, "f64_data")
 
 # ------------------------------------------------------------------------
 #   Registration
@@ -307,6 +316,14 @@ def register():
         options={'ENUM_FLAG'},
         update=update_layers
     )
+
+    bpy.types.Object.f64_data = bpy.props.IntProperty(
+        name="Data",
+        description="Framework64 custom integer data",
+        default=0,
+        min=0,
+        update=update_data  # Tie it to the sync function
+    )
     
     bpy.types.VIEW3D_MT_editor_menus.append(draw_menu)
     bpy.types.VIEW3D_MT_object_context_menu.append(draw_context_menu)
@@ -319,6 +336,7 @@ def unregister():
     del bpy.types.Object.f64_layers
     del bpy.types.Scene.f64_layer_list
     del bpy.types.Object.f64_show_layers
+    del bpy.types.Object.f64_data
     
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
