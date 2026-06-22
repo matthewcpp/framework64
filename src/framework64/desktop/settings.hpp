@@ -15,6 +15,9 @@ struct Settings {
     std::string application_name = "framework64";
     std::string media_dir_name = "media";
     fw64SaveFile::SaveFileType save_file_type = fw64SaveFile::SaveFileType::N64Eeprom4k;
+
+    /** Controls whether the input system will emulate controller0 with the keyboard */
+    bool controller0KeyoardEmulation = true;
 };
 
 }

@@ -24,6 +24,10 @@ int main(int argc, char** argv) {
     settings.application_name = FW64_APPLICATION_NAME;
 #endif
 
+#ifdef FW64_DESKTOP_CONTROLLER0_EMULATION
+    settings.controller0KeyoardEmulation = FW64_DESKTOP_CONTROLLER0_EMULATION;
+#endif
+
     CLI::App app("framework64");
     CLI11_PARSE(app, argc, argv);
 
@@ -96,15 +100,4 @@ int main(int argc, char** argv) {
     }
 
     return 0;
-}
-
-fw64SaveFile::SaveFileType getSaveFileType(std::string const & type_name) {
-    if (type_name == "NONE")
-        return fw64SaveFile::SaveFileType::None;
-    else if (type_name == "N64_EEPROM_4K")
-        return fw64SaveFile::SaveFileType::N64Eeprom4k;
-    else if (type_name == "N64_EEPROM_16K")
-        return fw64SaveFile::SaveFileType::N64Eeprom16K;
-
-    return fw64SaveFile::SaveFileType::Unknown;
 }

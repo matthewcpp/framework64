@@ -26,6 +26,10 @@ public:
     [[nodiscard]] bool controllerIsRumbling(int index) const;
     int controllerSetRumble(int index, float value, float duration);
 
+    inline void setController0KeyboardEmulation(bool enabled) {
+        controller0_keyboard_emulation = enabled;
+    }
+
 private:
 
 private:
@@ -37,4 +41,9 @@ private:
     std::array<framework64::Controller, 4> previous_controller_states;
     std::array<float, 4> controller_rumble_durations;
     std::array<SDL_GameController*, 4> sdl_gamecontrollers = {nullptr, nullptr, nullptr, nullptr};
+
+    /** If true, will emulate control of controller 0 from the keyboard when no controller is conencted in that port.
+     * This is used primarily to ease development.
+    */
+    bool controller0_keyboard_emulation = true;
 };

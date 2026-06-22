@@ -2,8 +2,7 @@
 #include "framework64/desktop/input.hpp"
 
 #include "framework64/controller_mapping/n64.h"
-
-#include <iostream>
+#include "framework64/log.h"
 
 void fw64Input::init(framework64::InputInterface& interface_, fw64Time& time_) {
     input_interface = &interface_;
@@ -71,7 +70,7 @@ void fw64Input::update() {
         if(sdl_gamecontrollers[i]) {
             updateControllerState(i);
         }
-        else if (i == 0) {
+        else if (i == 0 && controller0_keyboard_emulation) {
             input_interface->updateControllerFromKeyboard(current_controller_states[i], SDL_GetKeyboardState(nullptr));
         }
 
@@ -82,27 +81,26 @@ void fw64Input::update() {
 }
 
 void fw64Input::onDeviceAdded(int index) {
-    std::cout << "Controller added to port: " << index << std::endl;
-
     if (index < 4) {
         sdl_gamecontrollers[index] = SDL_GameControllerOpen(index);
+        fw64_log_message("Controller added to port: %d", index);
     }
 }
 
 void fw64Input::onDeviceRemoved(int index) {
-    std::cout << "Controller removed from port: " << index << std::endl;
-
     if (index < 4) {
         SDL_GameControllerClose(sdl_gamecontrollers[index]);
         sdl_gamecontrollers[index] = nullptr;
         controller_rumble_durations[index] = 0.0f;
+        fw64_log_message("Controller removed to port: %d", index);
     }
 }
 
 bool fw64Input::controllerIsConnected(int index) const {
     // for now we always will have a keyboard controller in port 0
-    if (index == 0)
+    if (index == 0 && controller0_keyboard_emulation){
         return true;
+    }
 
     return sdl_gamecontrollers[index] != nullptr;
 }
