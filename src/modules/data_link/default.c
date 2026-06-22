@@ -4,10 +4,10 @@ struct fw64DataLink {
     int is_active;
 };
 
-
 static fw64DataLink default_data_link;
 
-fw64DataLink* fw64_data_link_init(void* arg) {
+fw64DataLink* fw64_data_link_init(fw64Engine* engine) {
+    (void)engine;
     return &default_data_link;
 }
 
