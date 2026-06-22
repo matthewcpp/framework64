@@ -10,14 +10,12 @@ struct fw64Light {
 layout(std140) uniform fw64LightingData {
     vec4 fw64_ambient_light_color;
     fw64Light fw64_lights[FW64_MAX_LIGHT_COUNT];
-    int fw64_active_light_count;
+    ivec4 fw64_active_light_count;
 };
 
 layout(std140) uniform fw64MeshTransformData {
     mat4 fw64_mvp_matrix;
     mat4 fw64_normal_matrix;
-    float fw64_camera_near;
-    float fw64_camera_far;
 };
 
 layout(location = 0) in vec4 fw64_vertex_position;
@@ -36,7 +34,7 @@ void main() {
     vec3 normal = normalize(mat3(fw64_normal_matrix) * fw64_vertex_normal);
     vec4 gouraud_color = fw64_ambient_light_color;
 
-    for (int i = 0; i < fw64_active_light_count; i++) {
+    for (int i = 0; i < fw64_active_light_count[0]; i++) {
         vec3 light_dir = normalize(fw64_lights[i].light_direction.xyz);
         float diffuse = max(dot(normal, light_dir), 0.0f);
         gouraud_color += (diffuse * diffuse_color) * fw64_lights[i].light_color;

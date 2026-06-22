@@ -79,19 +79,6 @@ fw64Renderer::ViewportRect fw64Renderer::getViewportRect(fw64Viewport const * vi
     };
 }
 
-void fw64Renderer::setCamera(fw64Camera* camera) {
-    if (camera == current_camera)
-        return;
-
-    mesh_transform_uniform_block.data.camera_near = camera->near;
-    mesh_transform_uniform_block.data.camera_far = camera->far;
-
-    current_camera = camera;
-
-    setViewport(&camera->viewport);
-    setViewMatrices(camera->projection.m, camera->view.m);
-}
-
 void fw64Renderer::setViewport(fw64Viewport const * viewport) {
     auto viewport_rect = getViewportRect(viewport);
     glViewport(viewport_rect.x, viewport_rect.y, viewport_rect.width, viewport_rect.height);
@@ -178,8 +165,8 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
 
     setViewport(&renderpass->viewport);
     setViewMatrices(renderpass->projection_matrix.data(), renderpass->view_matrix.data());
-    mesh_transform_uniform_block.data.camera_near = renderpass->camera_near;
-    mesh_transform_uniform_block.data.camera_far = renderpass->camera_far;
+    fog_data_uniform_block.data.camera_near = renderpass->camera_near;
+    fog_data_uniform_block.data.camera_far = renderpass->camera_far;
 
     if (renderpass->depth_testing_enabled) {
         glEnable(GL_DEPTH_TEST);
@@ -189,15 +176,9 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
 
     glDepthMask(renderpass->depth_writing_enabled);
 
-    if (renderpass->fog_enabled) {
-        setFogEnabled(renderpass->fog_enabled);
-        setFogPositions(renderpass->fog_begin, renderpass->fog_end);
-        setFogColor(renderpass->fog_color[0], renderpass->fog_color[1], renderpass->fog_color[2]);
-        fog_data_uniform_block.update();
-    } else if (fog_enabled) {
-        setFogEnabled(false);
-        fog_data_uniform_block.update();
-    }
+    setFogColor(renderpass->fog_color[0], renderpass->fog_color[1], renderpass->fog_color[2]);
+    setFogEnabled(renderpass->fog_enabled);
+    fog_data_uniform_block.update();
 
     if (fw64_render_queue_has_items(&renderpass->render_queue, FW64_SHADING_MODE_LIT) || 
         fw64_render_queue_has_items(&renderpass->render_queue, FW64_SHADING_MODE_LIT_TEXTURED)) {
@@ -304,7 +285,7 @@ void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
         block_index += 1;
     }
 
-    lighting_data_uniform_block.data.light_count = block_index;
+    lighting_data_uniform_block.data.light_count[0] = block_index;
     lighting_data_uniform_block.update();
 }
 

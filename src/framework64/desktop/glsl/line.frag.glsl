@@ -1,3 +1,5 @@
+precision highp float;
+
 in vec4 line_color;
 out vec4 final_color;
 
