@@ -19,13 +19,15 @@ ShaderProgram* GouraudShader::create(uint32_t primitive_attributes, uint32_t mat
     program->shader = this;
     program->handle = Shader::createFromPaths(vertex_path, fragment_path, preprocessor_statements);
 
-    if (!program->handle)
+    if (!program->handle) {
         return nullptr;
+    }
 
     setupShaderProgram(program.get());
 
-    if (!validateProgram(program.get(), primitive_attributes, material_features))
+    if (!validateProgram(program.get(), primitive_attributes, material_features)) {
         return nullptr;
+    }
 
     return program.release();
 }
@@ -38,11 +40,13 @@ bool GouraudShader::validateProgram(ShaderProgram* program, uint32_t, uint32_t m
             program->diffuse_color_location == -1)
         return false;
 
-    if (has_diffuse_texture && program->diffuse_texture_location == -1)
+    if (has_diffuse_texture && program->diffuse_texture_location == -1) {
         return false;
+    }
 
-    if (has_diffuse_texture && program->texture_info_uniform_block_index == GL_INVALID_INDEX)
+    if (has_diffuse_texture && program->texture_info_uniform_block_index == GL_INVALID_INDEX) {
         return false;
+    }
 
     return true;
 }
