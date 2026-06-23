@@ -16,11 +16,8 @@ typedef enum {
     FW64_TEXTURE_WRAP_MIRROR = G_TX_MIRROR
 } fw64TextureWrapMode;
 #else
-#if defined(__linux__) || defined(FW64_PLATFORM_WEB)
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
+
+#include "framework64/desktop/openGL.hpp"
 
 typedef enum {
     FW64_TEXTURE_WRAP_CLAMP = GL_CLAMP_TO_EDGE,

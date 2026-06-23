@@ -3,11 +3,7 @@
 #include "framework64/asset_database.h"
 #include "framework64/image.h"
 
-#if defined(__linux__) || defined(FW64_PLATFORM_WEB)
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
+#include "framework64/desktop/openGL.hpp"
 
 #include <string>
 #include <vector>

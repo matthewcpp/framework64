@@ -5,16 +5,11 @@
 
 #include "framework64/desktop/font.hpp"
 #include "framework64/desktop/material.hpp"
+#include "framework64/desktop/openGL.hpp"
 #include "framework64/desktop/shader_cache.hpp"
 #include "framework64/desktop/sprite_vertex.hpp"
 #include "framework64/desktop/texture.hpp"
 #include "framework64/desktop/uniform_block.hpp"
-
-#if defined(__linux__) || defined(FW64_PLATFORM_WEB)
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
 
 #include <array>
 #include <string>

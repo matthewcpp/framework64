@@ -22,6 +22,7 @@ set(platform_source_files
     mesh_editor.cpp
     modules.hpp modules.cpp
     n64_input_interface.hpp n64_input_interface.cpp
+    openGL.hpp
     primitive_data.hpp primitive_data.cpp
     render_pass.hpp render_pass.cpp
     renderer.hpp renderer.cpp

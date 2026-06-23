@@ -5,18 +5,13 @@
 #include "framework64/desktop/display.hpp"
 #include "framework64/desktop/framebuffer.hpp"
 #include "framework64/desktop/mesh.hpp"
+#include "framework64/desktop/openGL.hpp"
 #include "framework64/desktop/render_pass.hpp"
 #include "framework64/desktop/shader_cache.hpp"
 #include "framework64/desktop/sprite_batch.hpp"
 #include "framework64/desktop/uniform_block.hpp"
 
 #include <SDL2/SDL.h>
-
-#if defined(__linux__) || defined(FW64_PLATFORM_WEB)
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
 
 #include <array>
 #include <limits>
