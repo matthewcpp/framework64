@@ -13,9 +13,11 @@ void fw64_character_envionment_init(fw64CharacterEnvironment* env) {
     env->horizontal_move_threshold_sq = FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD * FW64_CHARACTER_ENV_HORIZ_MOVE_THRESHOLD;
 }
 
+#ifdef FW64_COLLISION_GEOMETRY_DEBUG_INFO
 void _fw64_character_environment_debug_info_reset(fw64CharacterEnvironmentDebugInfo* debug) {
     memset(debug, 0, sizeof(fw64CharacterEnvironmentDebugInfo));
 }
+#endif
 
 void fw64_character_init(fw64Character* character, fw64CharacterEnvironment* env, fw64Node* node, fw64Scene* scene) {
     character->environment = env;
