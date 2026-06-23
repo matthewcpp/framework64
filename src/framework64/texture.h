@@ -16,7 +16,7 @@ typedef enum {
     FW64_TEXTURE_WRAP_MIRROR = G_TX_MIRROR
 } fw64TextureWrapMode;
 #else
-#ifdef __linux__
+#if defined(__linux__) || defined(FW64_PLATFORM_WEB)
 #include <GL/glew.h>
 #else
 #include <gl/glew.h>

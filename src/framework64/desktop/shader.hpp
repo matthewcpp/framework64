@@ -3,7 +3,7 @@
 #include "framework64/desktop/material.hpp"
 #include "framework64/desktop/texture_info_uniform.hpp"
 
-#ifdef __linux__
+#if defined(__linux__) || defined(FW64_PLATFORM_WEB)
 #include <GL/glew.h>
 #else
 #include <gl/glew.h>
