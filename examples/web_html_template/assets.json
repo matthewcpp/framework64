@@ -1,0 +1,14 @@
+{    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12
+        }
+    ],
+    
+    "musicBanks": [
+        {
+            "name": "music",
+            "dir": "music/bank1"
+        }
+    ]
+}
