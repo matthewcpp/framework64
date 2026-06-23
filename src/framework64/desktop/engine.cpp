@@ -82,6 +82,7 @@ bool Engine::init(Settings const & app_settings) {
     }
 
     input->init(*n64_input_interface, *time);
+    input->setController0KeyboardEmulation(settings.controller0KeyoardEmulation);
     save_file->init(save_file_path, settings.save_file_type);
 
     Filesystem::init(asset_dir_path, *assets);

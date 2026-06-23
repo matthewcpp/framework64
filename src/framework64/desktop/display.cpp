@@ -17,11 +17,21 @@ bool fw64Display::init(const framework64::Settings& settings) {
     _window_width = static_cast<int>(settings.screen_width * settings.display_scale);
     _window_height = static_cast<int>(settings.screen_height * settings.display_scale);
 
+#if defined(FW64_PLATFORM_DESKTOP)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+#elif defined(FW64_PLATFORM_WEB)
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetSwapInterval(1);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+#else
+    #error: Display: Uncofigured GL context for platform
+#endif
 
     window = SDL_CreateWindow(settings.application_name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _window_width, _window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     
@@ -32,9 +42,15 @@ bool fw64Display::init(const framework64::Settings& settings) {
 
     gl_context = SDL_GL_CreateContext(window);
 
+    if (!gl_context){
+        std::cout << "Could not create OpenGL context: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
     GLenum err = glewInit();
 
     if (err != GLEW_OK) {
+        std::cout << "Failed to initialize GLEW" << std::endl;
         return false;
     }
 

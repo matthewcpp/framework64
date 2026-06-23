@@ -5,8 +5,17 @@
 #include <sstream>
 #include <vector>
 
+#if defined(FW64_PLATFORM_WEB)
+    #define GLSL_VERSION_STRING "#version 300 es"
+#elif defined(FW64_PLATFORM_DESKTOP)
+    #define GLSL_VERSION_STRING "#version 410"
+#else
+    #error "unspecified GLSL Version string for platform"
+#endif
+
+
 namespace framework64 {
-std::string const glsl_version_str = "#version 410";
+std::string const glsl_version_str = GLSL_VERSION_STRING;
 
 GLuint Shader::createFromPaths(std::string const & vertex_path, std::string const & frag_path, std::vector<std::string> const & preprocessor_statements) {
     std::ifstream vertex_file(vertex_path);
@@ -82,9 +91,15 @@ GLuint Shader::compile(std::string const& vertex, std::string const& fragment) {
     GLint link_status;
     glGetProgramiv(program, GL_LINK_STATUS, &link_status);
 
-    if (!link_status) {
-        std::cout << "failed to link shader.";
-        return 0;
+    if (link_status == GL_FALSE) {
+        GLint log_length;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
+
+        std::vector<GLchar> error_log(log_length);
+        glGetProgramInfoLog(program, log_length, nullptr, error_log.data());
+        std::cout << "Shader Program Linking Failed:\n" << error_log.data() << std::endl;
+
+        glDeleteProgram(program);
     }
 
     return program;
