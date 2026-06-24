@@ -42,22 +42,7 @@ fw64MaterialBundle* fw64MaterialBundle::loadFromDatasource(fw64DataSource* data_
         // during the pipeline processing enumerated values are written out to file
         // we want to change them to the runtime value of the corresponding texture wrapping
         // gl values
-        const auto getGlWrapParam = [](uint32_t val) {
-            switch(val) {
-                case PIPELINE_TEX_REPEAT:
-                    return FW64_TEXTURE_WRAP_REPEAT;
-                case PIPELINE_TEX_MIRROR:
-                    return FW64_TEXTURE_WRAP_MIRROR;
-                case PIPELINE_TEX_CLAMP:
-                    return FW64_TEXTURE_WRAP_CLAMP;
-                default:
-                    assert(false);
-                    return FW64_TEXTURE_WRAP_REPEAT; 
-            }
-        };
-
-        texture->wrap_s = getGlWrapParam(texture_st.s);
-        texture->wrap_t = getGlWrapParam(texture_st.t);
+        fw64_texture_set_wrap_mode(texture.get(), static_cast<fw64TextureWrapMode>(texture_st.s), static_cast<fw64TextureWrapMode>(texture_st.t));
 
         if (image_index != MATERIAL_BUNDLE_INVALID_INDEX) {
             texture->image = material_bundle->images[image_index].get();
