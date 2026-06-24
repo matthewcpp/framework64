@@ -15,7 +15,7 @@ async function write(environment, scene, gltfData, destPath) {
 async function writeToFile(environment, scene, gltfData, file) {
     // TODO: can we pass in writer/images?
     const writer = WriteInterface.bigEndian();
-    const images = await MeshWriter.createImages(gltfData);
+    const images = await MaterialBundleWriter.createImages(gltfData);
     const materialBundle = scene.materialBundle;
 
     SceneDataWriter.writeSceneInfo(scene, file, writer);

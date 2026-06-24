@@ -1,5 +1,8 @@
 const fs = require("fs");
 const Material = require("../gltf/Material");
+const processImage = require("./ProcessImage");
+
+const path  = require("path");
 
 function write(gltfData, materialBundle, n64Images, file) {
     computeN64TextureMasks(materialBundle, gltfData, n64Images);
@@ -28,7 +31,7 @@ function write(gltfData, materialBundle, n64Images, file) {
         fs.writeSync(file, textureBuffer);
     }
 
-    const materialBuffer = Buffer.alloc(16)
+    const materialBuffer = Buffer.alloc(16);
     for (const materialIndex of materialBundle.materials) {
         const material = gltfData.materials[materialIndex];
         const bundledTextureIndex = material.hasTexture() ? materialBundle.getBundledTextureIndex(material.texture) : Material.NoTexture;
@@ -73,6 +76,22 @@ function writeMaterialBundleInfo(materialBundle, file){
     fs.writeSync(file, buff);
 }
 
+async function createImages(gltfData) {
+    if (gltfData.images.length === 0) {
+        return [];
+    }
+
+    const n64Images = [];
+    const gltfDir = path.dirname(gltfData.gltfPath);
+
+    for (const imageJson of gltfData.images) {
+        n64Images.push(await processImage(imageJson, null, gltfDir, null));
+    }
+
+    return n64Images;
+}
+
 module.exports = {
-    write: write
+    write: write,
+    createImages: createImages
 };

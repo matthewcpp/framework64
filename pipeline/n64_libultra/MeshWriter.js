@@ -2,7 +2,6 @@ const DisplayList = require("./DisplayList");
 const N64Defs = require("./N64Defs");
 const VertexBuffer = require("./VertexBuffer");
 const MaterialBundleWriter = require("./MaterialBundleWriter");
-const processImage = require("./ProcessImage");
 
 const Util = require("../Util");
 const N64Slicer = require("./Slicer");
@@ -12,7 +11,6 @@ const Primitive = require("../gltf/Primitive");
 const Bounding = require("../gltf/Bounding");
 const GLTFVertexIndex = require("../gltf/GLTFVertexIndex")
 
-const path  = require("path");
 const fs = require("fs");
 
 
@@ -41,7 +39,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
 
     if (mesh.materialBundle) {
         materialBundle = mesh.materialBundle;
-        n64Images = await createImages(materialBundle.gltfData);
+        n64Images = await MaterialBundleWriter.createImages(materialBundle.gltfData);
     }
 
     adjustN64VertexNormals(mesh);
@@ -250,25 +248,8 @@ function adjustN64VertexColors(mesh) {
         }
     }
 }
-
-async function createImages(gltfData) {
-    if (gltfData.images.length === 0) {
-        return [];
-    }
-
-    const n64Images = [];
-    const gltfDir = path.dirname(gltfData.gltfPath);
-
-    for (const imageJson of gltfData.images) {
-        n64Images.push(await processImage(imageJson, null, gltfDir, null));
-    }
-
-    return n64Images;
-}
-
 module.exports = {
     writeStaticMesh: writeStaticMesh,
     writeStaticMeshToFile: writeStaticMeshToFile,
-    writeStaticMeshData: writeStaticMeshData,
-    createImages: createImages
+    writeStaticMeshData: writeStaticMeshData
 };
