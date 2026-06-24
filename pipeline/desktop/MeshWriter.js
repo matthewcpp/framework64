@@ -35,7 +35,7 @@ async function _writeMeshToFile(environment, mesh, materialBundle, file) {
 
     if (mesh.materialBundle) {
         const gltfData = mesh.materialBundle.gltfData;
-        const images = await MaterialBundleWriter.createDesktopImages(gltfData);
+        const images = await MaterialBundleWriter.createImages(gltfData);
         await MaterialBundleWriter.write(materialBundle, images, gltfData, file);
     }
 

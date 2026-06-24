@@ -12,8 +12,7 @@ async function _processScene(environment, scene, levelParser, archive, outputDir
     const sceneFile = path.join(outputDirectory, sceneFileName);
 
     await SceneWriter.write(environment, scene, levelParser.gltfData, sceneFile);
-    archive.addScene(sceneFile, scene.name);
-
+    archive.addScene(sceneFile, safeSceneName);
 
     const sceneIncludeFileName =`scene_${safeSceneName}.h`;
     const sceneDefineFile = path.join(includeDirectory, sceneIncludeFileName)

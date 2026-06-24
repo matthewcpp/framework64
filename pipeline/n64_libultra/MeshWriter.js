@@ -41,7 +41,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
 
     if (mesh.materialBundle) {
         materialBundle = mesh.materialBundle;
-        n64Images = await createN64Images(materialBundle.gltfData);
+        n64Images = await createImages(materialBundle.gltfData);
     }
 
     adjustN64VertexNormals(mesh);
@@ -251,7 +251,7 @@ function adjustN64VertexColors(mesh) {
     }
 }
 
-async function createN64Images(gltfData) {
+async function createImages(gltfData) {
     if (gltfData.images.length === 0) {
         return [];
     }
@@ -270,5 +270,5 @@ module.exports = {
     writeStaticMesh: writeStaticMesh,
     writeStaticMeshToFile: writeStaticMeshToFile,
     writeStaticMeshData: writeStaticMeshData,
-    createN64Images: createN64Images
+    createImages: createImages
 };

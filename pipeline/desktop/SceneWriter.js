@@ -14,7 +14,7 @@ async function write(environment, scene, gltfData, destPath) {
 
 async function writeToFile(environment, scene, gltfData, file) {
     const writer = WriteInterface.littleEndian();
-    const images = await MaterialBundleWriter.createDesktopImages(gltfData);
+    const images = await MaterialBundleWriter.createImages(gltfData);
     const materialBundle = scene.materialBundle;
 
     SceneDataWriter.writeSceneInfo(scene, file, writer);

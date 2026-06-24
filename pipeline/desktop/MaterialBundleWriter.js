@@ -78,7 +78,7 @@ async function write(materialBundle, desktopImages, gltfData, file) {
     writeBundleMaterials(gltfData, materialBundle, file);
 }
 
-async function createDesktopImages(gltfData) {
+async function createImages(gltfData) {
     if (gltfData.images.length === 0) {
         return [];
     }
@@ -95,5 +95,5 @@ async function createDesktopImages(gltfData) {
 
 module.exports = {
     write: write,
-    createDesktopImages: createDesktopImages
+    createImages: createImages
 };
