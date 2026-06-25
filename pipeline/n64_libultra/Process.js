@@ -1,4 +1,3 @@
-const AudioConvert = require("./AudioConvert");
 const Environment = require("../Environment");
 const N64LibUltraAssetBundle = require("./AssetBundle");
 
@@ -9,6 +8,8 @@ const processFile = require("./ProcessFile");
 const processFont = require("./ProcessFont");
 const processLevel = require("../ProcessLevel");
 const processLayers = require("../ProcessLayers");
+const processMusicBank = require("./ProcessMusicBank");
+const processSoundBank = require("./ProcessSoundBank");
 const Util = require("../Util");
 
 const fs = require("fs")
@@ -87,8 +88,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
             checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
             console.log(`Processing Sound Bank: ${soundBank.dir}`);
 
-            const sourceDir = path.join(assetDirectory, soundBank.dir);
-            await AudioConvert.convertSoundBank(sourceDir, soundBank.name, outputDirectory, includeDirectory, archive);
+            await processSoundBank(environment, soundBank);
         }
     }
 
@@ -97,8 +97,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
             checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
             console.log(`Processing Music Bank: ${musicBank.dir}`);
 
-            const sourceDir = path.join(assetDirectory, musicBank.dir);
-            await AudioConvert.convertMusicBank(sourceDir, musicBank.name, outputDirectory, includeDirectory, archive);
+            await processMusicBank(environment, musicBank);
         }
     }
 
