@@ -15,7 +15,7 @@ const fs = require("fs");
 
 
 /** Writes a self contained static mesh to file. */
-async function writeStaticMesh(staticMesh, destPath) {
+async function writeStaticMesh(environment, staticMesh, destPath) {
     const file = fs.openSync(destPath, "w");
     await writeStaticMeshToFile(staticMesh, file);
     fs.closeSync(file);

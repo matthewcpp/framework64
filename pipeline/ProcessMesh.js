@@ -1,12 +1,12 @@
-const MaterialBundle = require("../gltf/MaterialBundle");
-const GLTFLoader = require("../gltf/GLTFLoader");
-const MeshWriter = require("./MeshWriter");
+const MaterialBundle = require("./gltf/MaterialBundle");
+const GLTFLoader = require("./gltf/GLTFLoader");
+const MeshWriter = require("./desktop/MeshWriter");
+const MeshCustomBounding = require("./gltf/MeshCustomBounding");
 
 const path = require("path");
-const MeshCustomBounding = require("../gltf/MeshCustomBounding");
 
-async function processMesh(environment, meshJson, bundle, manifestDirectory, outputDirectory) {
-    const srcPath = path.join(manifestDirectory, meshJson.src);
+async function processMesh(environment, meshJson, meshWriter) {
+    const srcPath = path.join(environment.assetDirectory, meshJson.src);
     const gltfLoader = new GLTFLoader();
     await gltfLoader.loadFile(srcPath);
 
@@ -24,10 +24,10 @@ async function processMesh(environment, meshJson, bundle, manifestDirectory, out
     staticMesh.materialBundle.bundleMeshMaterials(0);
 
     const assetFileName = staticMesh.name + ".mesh";
-    const destPath = path.join(outputDirectory, assetFileName);
-    await MeshWriter.writeStaticMesh(environment, staticMesh, destPath);
+    const destPath = path.join(environment.outputDirectory, assetFileName);
+    await meshWriter.writeStaticMesh(environment, staticMesh, destPath);
 
-    bundle.addMesh(assetFileName, meshName);
+    environment.assetBundle.addMesh(assetFileName, meshName);
 }
 
 module.exports = processMesh;

@@ -1,7 +1,7 @@
 const Environment = require("../Environment");
 const N64LibUltraAssetBundle = require("./AssetBundle");
 
-const processMesh = require("./ProcessMesh");
+const processMesh = require("../ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
 const processFile = require("./ProcessFile");
@@ -19,17 +19,18 @@ const path = require("path");
 async function processN64(manifestFile, assetDirectory, outputDirectory, pluginMap) {
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
-    const archive = new N64LibUltraAssetBundle();
+    const archive = new N64LibUltraAssetBundle(outputDirectory);
     const pipelinePath = path.normalize(path.join(__dirname, ".."));
     const environment = new Environment("n64_libultra", Environment.Architecture.Arch32, Environment.Endian.Big, archive, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
 
     if (manifest.meshes) {
+        const MeshWriter = require("./MeshWriter");
+
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`)
-
-            await processMesh(mesh, archive, assetDirectory, outputDirectory);
+            await processMesh(environment, mesh, MeshWriter);
         }
     }
 
@@ -72,7 +73,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            await processLevel(environment, level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory, sceneWriter);
+            await processLevel(environment, level, layerMap, sceneWriter);
         }
     }
 

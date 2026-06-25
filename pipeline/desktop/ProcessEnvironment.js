@@ -4,7 +4,7 @@ const Util = require("../Util");
 
 const processFont = require("./ProcessFont");
 const processImage = require("./ProcessImage");
-const processMesh = require("./ProcessMesh");
+const processMesh = require("../ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
@@ -49,9 +49,11 @@ async function processDesktopEnvironment(manifestFile, assetDirectory, outputDir
     }
 
     if (manifest.meshes) {
+        const MeshWriter = require("./MeshWriter");
+
         for (const mesh of manifest.meshes) {
             console.log(`Processing Mesh: ${mesh.src}`);
-            await processMesh(environment, mesh, bundle, assetDirectory, outputDirectory);
+            await processMesh(environment, mesh, MeshWriter);
         }
     }
 
@@ -68,7 +70,7 @@ async function processDesktopEnvironment(manifestFile, assetDirectory, outputDir
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
 
-            await processLevel(environment, level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory, sceneWriter);
+            await processLevel(environment, level, layerMap, sceneWriter);
         }
     }
 
