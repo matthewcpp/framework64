@@ -1,12 +1,11 @@
-const CollisionGeometryDebug = require("../CollisionGeometryDebug");
-const LevelParser = require("../LevelParser");
-const SceneWriter = require("./SceneWriter");
-const SceneDefines = require("../SceneDefines");
-const Util = require("../Util");
+const CollisionGeometryDebug = require("./CollisionGeometryDebug");
+const LevelParser = require("./LevelParser");
+const SceneDefines = require("./SceneDefines");
+const Util = require("./Util");
 
 const path = require("path");
 
-async function _processScene(environment, scene, levelParser, archive, outputDirectory, includeDirectory) {
+async function _processScene(environment, scene, levelParser, archive, outputDirectory, includeDirectory, SceneWriter) {
     const safeSceneName =  Util.safeDefineName(scene.name);
     const sceneFileName = safeSceneName + ".scene";
     const sceneFile = path.join(outputDirectory, sceneFileName);
@@ -19,7 +18,7 @@ async function _processScene(environment, scene, levelParser, archive, outputDir
     SceneDefines.writeToFile(scene, sceneDefineFile);
 }
 
-async function processLevel(environment, level, layerMap, archive, baseDirectory, outputDirectory, includeDirectory) {
+async function processLevel(environment, level, layerMap, archive, baseDirectory, outputDirectory, includeDirectory, SceneWriter) {
     const srcPath = path.join(baseDirectory, level.src);
     const levelParser = new LevelParser();
     await levelParser.parse(srcPath, layerMap);
@@ -40,16 +39,14 @@ async function processLevel(environment, level, layerMap, archive, baseDirectory
     }
 
     for (const scene of levelParser.scenes) {
-        await _processScene(environment, scene, levelParser, archive, outputDirectory, includeDirectory);
+        await _processScene(environment, scene, levelParser, archive, outputDirectory, includeDirectory, SceneWriter);
 
         if (scene.collisionGeometry !== null) {
-            const WriteInterface = require("../WriteInterface");
-
             const safeSceneName =  Util.safeDefineName(scene.name) + "_collision";
             const collisionDebugSceneFileName = safeSceneName + ".scene";
             const collisionDebugSceneFile = path.join(outputDirectory, collisionDebugSceneFileName);
 
-            await CollisionGeometryDebug.writeCollisionGeometryDebugData(environment, scene.collisionGeometry,  WriteInterface.bigEndian(), SceneWriter, collisionDebugSceneFile);
+            await CollisionGeometryDebug.writeCollisionGeometryDebugData(environment, scene.collisionGeometry, environment.binaryWriter, SceneWriter, collisionDebugSceneFile);
             archive.addFile(collisionDebugSceneFile, safeSceneName);
         }
     }

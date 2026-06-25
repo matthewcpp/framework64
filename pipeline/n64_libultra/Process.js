@@ -7,7 +7,7 @@ const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
 const processFile = require("./ProcessFile");
 const processFont = require("./ProcessFont");
-const processLevel = require("./ProcessLevel");
+const processLevel = require("../ProcessLevel");
 const processLayers = require("../ProcessLayers");
 const Util = require("../Util");
 
@@ -65,12 +65,13 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
 
     if (manifest.levels) {
         const requiredFields = ["src"];
+        const sceneWriter = require("./SceneWriter");
 
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            await processLevel(environment, level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory);
+            await processLevel(environment, level, layerMap, archive, assetDirectory, outputDirectory, includeDirectory, sceneWriter);
         }
     }
 

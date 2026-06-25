@@ -8,7 +8,7 @@ const processMesh = require("./ProcessMesh");
 const processSkinnedMesh = require("./ProcessSkinnedMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
-const processLevel = require("./ProcessLevel")
+const processLevel = require("../ProcessLevel")
 const processLayers = require("../ProcessLayers");
 const processFile = require("./ProcessFile");
 
@@ -63,10 +63,12 @@ async function processDesktopEnvironment(manifestFile, assetDirectory, outputDir
     }
 
     if (manifest.levels) {
+        const sceneWriter = require("./SceneWriter");
+
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
 
-            await processLevel(environment, level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory);
+            await processLevel(environment, level, layerMap, bundle, assetDirectory, outputDirectory, includeDirectory, sceneWriter);
         }
     }
 
