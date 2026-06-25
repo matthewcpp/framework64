@@ -26,6 +26,10 @@ fw64MaterialBundle* fw64MaterialBundle::loadFromDatasource(fw64DataSource* data_
     }
 
     for (uint32_t i = 0; i < material_bundle_info.texture_count; i++) {
+        // this needs to be kept in sync with pipeline/gltf/Texture.js
+        #define PIPELINE_TEX_REPEAT 0
+        #define PIPELINE_TEX_MIRROR 1
+        #define PIPELINE_TEX_CLAMP 2
         struct TextureST {uint32_t s,t;};
         auto& texture = material_bundle->textures.emplace_back(std::make_unique<fw64Texture>());
 
@@ -35,8 +39,10 @@ fw64MaterialBundle* fw64MaterialBundle::loadFromDatasource(fw64DataSource* data_
         fw64_data_source_read(data_source, &image_index, sizeof(uint32_t), 1);
         fw64_data_source_read(data_source, &texture_st, sizeof(TextureST), 1);
 
-        texture->wrap_s = static_cast<fw64TextureWrapMode>(texture_st.s);
-        texture->wrap_t = static_cast<fw64TextureWrapMode>(texture_st.t);
+        // during the pipeline processing enumerated values are written out to file
+        // we want to change them to the runtime value of the corresponding texture wrapping
+        // gl values
+        fw64_texture_set_wrap_mode(texture.get(), static_cast<fw64TextureWrapMode>(texture_st.s), static_cast<fw64TextureWrapMode>(texture_st.t));
 
         if (image_index != MATERIAL_BUNDLE_INVALID_INDEX) {
             texture->image = material_bundle->images[image_index].get();

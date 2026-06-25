@@ -19,8 +19,9 @@ ShaderProgram* SpriteShader::create(uint32_t, uint32_t, std::string const & shad
     program->shader = this;
     program->handle = Shader::createFromPaths(vertex_path, fragment_path, preprocessor_statements);
 
-    if (!program->handle)
+    if (!program->handle) {
         return nullptr;
+    }
 
     setupShaderProgram(program.get());
 
@@ -30,11 +31,13 @@ ShaderProgram* SpriteShader::create(uint32_t, uint32_t, std::string const & shad
     // TODO: this should return a derived program object with this value, and the program should be passed to set uniforms
     program->texture_info_uniform_block_index = glGetUniformBlockIndex(program->handle, "fw64TextureFrameData");
 
-    if (program->mesh_transform_uniform_block_index == GL_INVALID_INDEX || program->diffuse_texture_location == -1)
+    if (program->mesh_transform_uniform_block_index == GL_INVALID_INDEX || program->diffuse_texture_location == -1) {
         return nullptr;
+    }
 
-    if (program->texture_info_uniform_block_index == GL_INVALID_INDEX)
+    if (program->texture_info_uniform_block_index == GL_INVALID_INDEX) {
         return nullptr;
+    }
 
     return program.release();
 }

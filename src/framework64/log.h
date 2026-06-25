@@ -4,10 +4,6 @@
 
 /** \file log.h */
 
-#ifdef NDEBUG
-    #define fw64_log_message(message, ...) 
-#else
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -16,6 +12,4 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -1,13 +1,8 @@
 #pragma once
 
 #include "framework64/desktop/material.hpp"
+#include "framework64/desktop/openGL.hpp"
 #include "framework64/desktop/texture_info_uniform.hpp"
-
-#ifdef __linux__
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
 
 #include <string>
 #include <vector>

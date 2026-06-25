@@ -6,6 +6,7 @@ This framework consists of an asset pipeline and minimal C library providing a q
 - Cross Platform support: 
   - N64 libultra via [Crash's Modern n64 SDK](https://github.com/CrashOveride95/n64sdkmod)
   - Desktop via SDL / OpenGL
+  - WebAssembly via Emscripten
 - Modern CMake based build system
 - Docker based development environment for N64
 - Integrated pipeline for importing and loading models, characters, levels, sound, music

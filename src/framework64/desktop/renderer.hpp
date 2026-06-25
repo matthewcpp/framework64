@@ -5,18 +5,13 @@
 #include "framework64/desktop/display.hpp"
 #include "framework64/desktop/framebuffer.hpp"
 #include "framework64/desktop/mesh.hpp"
+#include "framework64/desktop/openGL.hpp"
 #include "framework64/desktop/render_pass.hpp"
 #include "framework64/desktop/shader_cache.hpp"
 #include "framework64/desktop/sprite_batch.hpp"
 #include "framework64/desktop/uniform_block.hpp"
 
 #include <SDL2/SDL.h>
-
-#ifdef __linux__
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
 
 #include <array>
 #include <limits>
@@ -70,14 +65,14 @@ private:
     struct MeshTransformData {
         std::array<float, 16> mvp_matrix;
         std::array<float, 16> normal_matrix;
-        float camera_near;
-        float camera_far;
     };
 
     struct FogData {
         std::array<float, 4> fog_color = {0.33f, 0.33f, 0.33f, 1.0f};
         float min_distance = std::numeric_limits<float>::max();
         float max_distance = std::numeric_limits<float>::max();
+        float camera_near;
+        float camera_far;
     };
 
 private:
@@ -89,7 +84,7 @@ private:
     struct LightingData {
         std::array<float, 4> ambient_light_color = {0.1f, 0.1f, 0.1f, 1.0f};
         std::array<Light, FW64_RENDERER_MAX_LIGHT_COUNT> lights;
-        int light_count;
+        std::array<int32_t, 4> light_count;
     };
 
     framework64::UniformBlock<LightingData> lighting_data_uniform_block;
@@ -101,7 +96,6 @@ private:
 
     float fog_min_distance = 0.4f;
     float fog_max_distance = 0.8f;
-
     bool fog_enabled = false;
 
 public:

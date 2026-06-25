@@ -17,13 +17,15 @@ ShaderProgram* UnlitShader::create(uint32_t primitive_attributes, uint32_t mater
     }
 
     bool has_diffuse_texture = material_features & fw64Material::Features::DiffuseTexture;
-    if (has_diffuse_texture)
+    if (has_diffuse_texture) {
         preprocessor_statements.emplace_back("#define FW64_DIFFUSE_TEXTURE");
+    }
 
     GLuint handle = Shader::createFromPaths(vertex_path, frag_path, preprocessor_statements);
 
-    if (!handle)
+    if (!handle) {
         return nullptr;
+    }
 
     auto program = std::make_unique<ShaderProgram>();
     program->shader = this;
@@ -31,8 +33,9 @@ ShaderProgram* UnlitShader::create(uint32_t primitive_attributes, uint32_t mater
 
     setupShaderProgram(program.get());
 
-    if (program->mesh_transform_uniform_block_index == GL_INVALID_INDEX)
+    if (program->mesh_transform_uniform_block_index == GL_INVALID_INDEX) {
         return nullptr;
+    }
 
     return program.release();
 }

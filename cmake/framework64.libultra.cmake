@@ -54,7 +54,7 @@ endfunction()
 # performs platform specific configuration of a framework64 game
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
-    set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
+    set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH HTML_TEMPLATE_PATH)
     set(multiValueArgs SOURCES EXTRA_LIBS STATIC_MODULES)
     cmake_parse_arguments(N64_ROM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 

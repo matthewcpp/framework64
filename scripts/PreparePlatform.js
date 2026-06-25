@@ -8,14 +8,22 @@ const path = require("path");
  */
 function preparePlatform(platform, gameBuildDirectory, gameBinDirectory) {
     switch(platform) {
-        case "desktop":
+        case "desktop": {
             const shaderDestDir = path.join(gameBinDirectory, "glsl");
             prepareDesktopShaders(shaderDestDir);
-        break;
+            break;
+        }
 
-        case "n64_libultra":
+        case "web": {
+            const shaderDestDir = path.join(gameBinDirectory, "glsl");
+            prepareDesktopShaders(shaderDestDir);
+            break;
+        }
+
+        case "n64_libultra": {
             purgeCompiledAssetData(gameBuildDirectory);
-        break;
+            break;
+        }
     }
 }
 

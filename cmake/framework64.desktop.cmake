@@ -60,7 +60,7 @@ endfunction()
 # performs platform specific configuration of a framework64 game
 function(create_game)
     set(options ALL_WARNINGS_AS_ERRORS)
-    set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH)
+    set(oneValueArgs TARGET SAVE_FILE_TYPE GAME_HEADER_PATH HTML_TEMPLATE_PATH)
     set(multiValueArgs SOURCES EXTRA_LIBS STATIC_MODULES)
     cmake_parse_arguments(DESKTOP_GAME "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -116,6 +116,7 @@ function(create_game)
 
     target_compile_definitions(${target_name} 
         PUBLIC FW64_APPLICATION_NAME="${target_name}"
-        PUBLIC FW64_SAVE_FILE_TYPE="${DESKTOP_GAME_SAVE_FILE_TYPE}")
+        PUBLIC FW64_SAVE_FILE_TYPE="${DESKTOP_GAME_SAVE_FILE_TYPE}"
+    )
 
 endfunction()

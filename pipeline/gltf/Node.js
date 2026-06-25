@@ -17,6 +17,7 @@ class N64Node {
         Dynamic: 1
     };
 
+    /** Indicates that a node's pointer should be NULL */
     static InvalidNodeIndex = 0xFFFFFFFF;
 
     static NoMesh = 0xFFFFFFFF;

@@ -7,14 +7,8 @@
 
 #include "framework64/desktop/material.hpp"
 #include "framework64/desktop/material_bundle.hpp"
-
+#include "framework64/desktop/openGL.hpp"
 #include "framework64/desktop/primitive_data.hpp"
-
-#ifdef __linux__
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
 
 #include <array>
 #include <memory>

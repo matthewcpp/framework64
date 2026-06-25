@@ -1,12 +1,7 @@
 #pragma once
 
+#include "framework64/desktop/openGL.hpp"
 #include "framework64/desktop/texture.hpp"
-
-#ifdef __linux__
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
 
 #include <array>
 #include <vector>

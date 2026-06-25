@@ -26,7 +26,13 @@ async function processLevel(environment, level, layerMap, archive, baseDirectory
     await levelParser.parse(srcPath, layerMap);
 
     if (Object.hasOwn(level, "collisionGeometry") && level.collisionGeometry === true) {
-        levelParser.createCollisionGeometry();
+        if (!Object.hasOwn(level, "grid")) {
+            throw new Error("Must specify grid size (CountXxCountZ) in order to generate collision geometry.");
+        }
+
+        const dimensions = level.grid.split('x');
+
+        levelParser.createCollisionGeometry(parseInt(dimensions[0]), parseInt(dimensions[1]));
 
         for (const scene of levelParser.scenes) {
             const collisionDebugFile = path.join(path.dirname(outputDirectory), Util.safeDefineName(scene.name) +"_collision_info.txt");

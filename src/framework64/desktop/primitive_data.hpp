@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef __linux__
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
+#include "framework64/desktop/openGL.hpp"
 
 #include <cstdint>
 #include <vector>

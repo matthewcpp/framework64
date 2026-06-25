@@ -32,6 +32,14 @@
                     "FW64_BUILD_TOOLS": "ON"
                 }
             },
+            "web":{
+                "short": "web",
+                "long": "web",
+                "settings": {
+                    "FW64_PLATFORM_WEB": "ON",
+                    "FW64_BUILD_EXAMPLES": "ON"
+                }
+            },
             "n64_libultra": {
                 "short": "n64_libultra",
                 "long": "n64_libultra",

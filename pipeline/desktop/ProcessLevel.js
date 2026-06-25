@@ -26,7 +26,7 @@ async function processLevel(environment, level, layerMap, bundle, baseDirectory,
 
     if (Object.hasOwn(level, "collisionGeometry") && level.collisionGeometry === true) {
         if (!Object.hasOwn(level, "grid")) {
-            throw new Error("Mush specify grid size (CountXxCountZ) in order to generate collision geometry.");
+            throw new Error("Must specify grid size (CountXxCountZ) in order to generate collision geometry.");
         }
 
         const dimensions = level.grid.split('x');

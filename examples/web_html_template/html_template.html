@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDL WebAssembly Sample</title>
+    <style>
+        /* Basic reset for a clean, full-window layout */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #1e1e1e; 
+            color: #ffffff; 
+            overflow: hidden; 
+            font-family: sans-serif; 
+        }
+        
+        /* Flexbox to keep the game canvas dead center */
+        #canvas-container { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            width: 100vw; 
+            height: 100vh; 
+        }
+        
+        canvas { 
+            border: none; 
+            background-color: black; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+        
+        /* The Overlay styling */
+        #launch-overlay {
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            z-index: 10; /* Ensures it renders above the canvas */
+        }
+        
+        #launch-button {
+            padding: 15px 40px; 
+            font-size: 24px; 
+            font-weight: bold;
+            color: white; 
+            background-color: #0078d7; 
+            border: none;
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background 0.2s;
+        }
+        
+        #launch-button:hover { 
+            background-color: #005a9e; 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="launch-overlay">
+        <button id="launch-button">Launch Sample</button>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    </div>
+
+    <script>
+        // 3. Configure the Emscripten Module
+        var Module = {
+            print: function(text) { console.log("C++ STDOUT: " + text); },
+            printErr: function(text) { console.error("C++ STDERR: " + text); },
+            canvas: (function() {
+                var canvas = document.getElementById('canvas');
+                // Basic WebGL context loss handling
+                canvas.addEventListener("webglcontextlost", function(e) { 
+                    alert('WebGL context lost. Please reload the page.'); 
+                    e.preventDefault(); 
+                }, false);
+                return canvas;
+            })()
+        };
+
+        // 4. Handle the Launch Button Click
+        document.getElementById('launch-button').addEventListener('click', function() {
+            // Check if Emscripten is ready
+            if (typeof Module === 'undefined' || !Module.callMain) {
+                console.warn("The WebAssembly module is still downloading. Please wait a moment.");
+                return;
+            }
+
+            // Hide the overlay
+            document.getElementById('launch-overlay').style.display = 'none';
+            
+            // Force focus onto the canvas so SDL instantly catches keyboard input
+            document.getElementById('canvas').focus();
+
+            // Fire C++ main(). Because this happens inside a user-initiated click event,
+            // the browser will unlock the AudioContext!
+            Module.callMain();
+        });
+    </script>
+
+    {{{ SCRIPT }}}
+
+</body>
+</html>

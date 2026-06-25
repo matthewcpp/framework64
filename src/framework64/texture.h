@@ -7,27 +7,13 @@
 
 typedef struct fw64Texture fw64Texture;
 
-#ifdef FW64_PLATFORM_N64_LIBULTRA
-#include <nusys.h>
-
+/** Note the order of values in this enum correspond with the Texture macros defined in N64 libultra gbi.h */
 typedef enum {
-    FW64_TEXTURE_WRAP_CLAMP = G_TX_CLAMP,
-    FW64_TEXTURE_WRAP_REPEAT = G_TX_WRAP,
-    FW64_TEXTURE_WRAP_MIRROR = G_TX_MIRROR
+    /* N64: Wrap */
+    FW64_TEXTURE_WRAP_REPEAT,
+    FW64_TEXTURE_WRAP_MIRROR,
+    FW64_TEXTURE_WRAP_CLAMP
 } fw64TextureWrapMode;
-#else
-#ifdef __linux__
-#include <GL/glew.h>
-#else
-#include <gl/glew.h>
-#endif
-
-typedef enum {
-    FW64_TEXTURE_WRAP_CLAMP = GL_CLAMP_TO_EDGE,
-    FW64_TEXTURE_WRAP_REPEAT = GL_REPEAT,
-    FW64_TEXTURE_WRAP_MIRROR =  GL_MIRRORED_REPEAT
-} fw64TextureWrapMode;
-#endif
 
 #ifdef __cplusplus
 extern "C" {

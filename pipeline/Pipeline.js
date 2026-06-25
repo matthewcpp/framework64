@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const Util = require("./Util");
+const Environment = require("./Environment");
 
 const rimraf = require("rimraf");
 
@@ -37,16 +38,24 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     fse.ensureDirSync(assetIncludeDirectory);
 
     switch (platform) {
-        case "n64_libultra":
-            //purgeCompiledAssetData(gameBuildDirectory)
+        case "n64_libultra": {
             const processN64 = require("./n64_libultra/Process");
             await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
-        break;
+            break;
+        }
 
-        case "desktop":
+        case "desktop":{
             const processDesktop = require("./desktop/Process");
-            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
-        break;
+            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap, Environment.Architecture.Arch64);
+            break;
+        }
+
+        case "web":{
+            // note: right now only support 32 bit wasm is supported.
+            const processDesktop = require("./desktop/Process");
+            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap, Environment.Architecture.Arch32);
+            break;
+        }
 
         default:
             throw new Error(`Unsupported platform: ${platform}`);
