@@ -20,11 +20,11 @@ async function convertMidiToOgg(sourceDir, sourceFile, destDir, destFile) {
     await execFile("docker", conversionArgs);
 }
 
-async function processMusicBank(musicBank, bundle, baseDirectory, outputDirectory, includeDirectory) {
+async function processMusicBank(environment, musicBank) {
     const musicBankName = (!!musicBank.name) ? musicBank.name : path.basename(musicBank.dir);
-    const sourceDir = path.join(baseDirectory, musicBank.dir);
+    const sourceDir = path.join(environment.assetDirectory, musicBank.dir);
     const destDirName = Util.safeDefineName(musicBankName);
-    const destDir = path.join(outputDirectory, destDirName);
+    const destDir = path.join(environment.outputDirectory, destDirName);
 
     fs.mkdirSync(destDir);
 
@@ -60,8 +60,8 @@ async function processMusicBank(musicBank, bundle, baseDirectory, outputDirector
     fs.writeSync(infoFile, infoBuffer);
     fs.closeSync(infoFile)
 
-    bundle.addMusicBank(destDirName, musicBankName);
-    AudioHeader.writeMusicBankHeader(musicBankFiles, musicBankName, includeDirectory);
+    environment.assetBundle.addMusicBank(destDirName, musicBankName);
+    AudioHeader.writeMusicBankHeader(musicBankFiles, musicBankName, environment.includeDirectory);
 }
 
 module.exports = processMusicBank;

@@ -6,11 +6,11 @@ const Util = require("../Util");
 
 const supportedSoundFileExtensions = new Set([".ogg", ".wav"]);
 
-async function processSoundBank(soundBank, bundle, baseDirectory, outputDirectory, includeDirectory) {
+async function processSoundBank(environment, soundBank) {
     const soundBankName = (!!soundBank.name) ? soundBank.name : path.basename(soundBank.dir);
-    const sourceDir = path.join(baseDirectory, soundBank.dir);
+    const sourceDir = path.join(environment.assetDirectory, soundBank.dir);
     const destDirName = Util.safeDefineName(soundBankName);
-    const destDir = path.join(outputDirectory, destDirName);
+    const destDir = path.join(environment.outputDirectory, destDirName);
 
     fs.mkdirSync(destDir);
 
@@ -38,8 +38,8 @@ async function processSoundBank(soundBank, bundle, baseDirectory, outputDirector
     fs.writeSync(infoFile, infoBuffer);
     fs.closeSync(infoFile)
 
-    bundle.addSoundBank(destDirName, soundBankName);
-    AudioHeader.writeSoundBankHeader(soundBankFiles, soundBankName, includeDirectory);
+    environment.assetBundle.addSoundBank(destDirName, soundBankName);
+    AudioHeader.writeSoundBankHeader(soundBankFiles, soundBankName, environment.includeDirectory);
 }
 
 module.exports = processSoundBank;
