@@ -1,15 +1,15 @@
 const Environment = require("../Environment");
 const N64LibUltraAssetBundle = require("./AssetBundle");
 
-const processMesh = require("../ProcessMesh");
-const processSkinnedMesh = require("../ProcessSkinnedMesh");
-const processImage = require("./ProcessImage");
-const processFile = require("../ProcessFile");
-const processFont = require("./ProcessFont");
-const processLevel = require("../ProcessLevel");
+const processMesh = require("../MeshProcessor");
+const processSkinnedMesh = require("../SkinnedMeshProcessor");
+const processImage = require("./ImageProcessor");
+const processFile = require("../FileProcessor");
+const processFont = require("./FontProcessor");
+const processLevel = require("../LevelProcessor");
 const processLayers = require("../ProcessLayers");
-const processMusicBank = require("./ProcessMusicBank");
-const processSoundBank = require("./ProcessSoundBank");
+const processMusicBank = require("./MusicBankProcessor");
+const processSoundBank = require("./SoundBankProcessor");
 const Util = require("../Util");
 
 const fs = require("fs")

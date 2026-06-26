@@ -2,7 +2,7 @@ const Font = require("./Font");
 const FontUtils = require("../FontUtils");
 const FontWriter = require("./FontWriter");
 const Util = require("../Util")
-const processImage = require("./ProcessImage");
+const processImage = require("./ImageProcessor");
 
 const path = require("path");
 

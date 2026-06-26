@@ -1,5 +1,5 @@
 const ImageWriter = require("./ImageWriter");
-const processImage = require("./ProcessImage");
+const processImage = require("./ImageProcessor");
 
 const Material = require("../gltf/Material");
 

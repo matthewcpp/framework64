@@ -2,15 +2,15 @@ const DesktopAssetBundle = require("./AssetBundle");
 const Environment = require("../Environment");
 const Util = require("../Util");
 
-const processFont = require("./ProcessFont");
-const processImage = require("./ProcessImage");
-const processMesh = require("../ProcessMesh");
-const processSkinnedMesh = require("../ProcessSkinnedMesh");
-const processMusicBank = require("./ProcessMusicBank");
-const processSoundBank = require("./ProcessSoundBank");
-const processLevel = require("../ProcessLevel")
-const processLayers = require("../ProcessLayers");
-const processFile = require("../ProcessFile");
+const processFont = require("./FontProcessor");
+const processImage = require("./ImageProcessor");
+const processMesh = require("../MeshProcessor");
+const processSkinnedMesh = require("../SkinnedMeshProcessor");
+const processMusicBank = require("./MusicBankProcessor");
+const processSoundBank = require("./SoundBankProcessor");
+const processLevel = require("../LevelProcessor")
+const processLayers = require("../LayersProcessor");
+const processFile = require("../FileProcessor");
 
 const fs = require("fs")
 const path = require("path");

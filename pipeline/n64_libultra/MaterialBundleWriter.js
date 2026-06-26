@@ -1,6 +1,6 @@
 const fs = require("fs");
 const Material = require("../gltf/Material");
-const processImage = require("./ProcessImage");
+const processImage = require("./ImageProcessor");
 
 const path  = require("path");
 
