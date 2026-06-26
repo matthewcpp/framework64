@@ -4,7 +4,7 @@ const processImage = require("./ProcessImage");
 
 const path  = require("path");
 
-function write(gltfData, materialBundle, n64Images, file) {
+function write(materialBundle, n64Images, gltfData, file) {
     computeN64TextureMasks(materialBundle, gltfData, n64Images);
 
     writeMaterialBundleInfo(materialBundle, file);

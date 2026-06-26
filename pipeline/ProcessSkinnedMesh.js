@@ -1,14 +1,14 @@
-const AnimationParser = require("../animation/Parser");
-const GLTFLoader = require("../gltf/GLTFLoader");
-const MaterialBundle = require("../gltf/MaterialBundle");
+const AnimationParser = require("./animation/Parser");
+const GLTFLoader = require("./gltf/GLTFLoader");
+const MaterialBundle = require("./gltf/MaterialBundle");
 const SkinnedMeshWriter = require("./SkinnedMeshWriter");
-const Util = require("../Util");
+const Util = require("./Util");
 
 const path = require("path");
-const MeshCustomBounding = require("../gltf/MeshCustomBounding");
+const MeshCustomBounding = require("./gltf/MeshCustomBounding");
 
-async function processSkinnedMesh(environment, skinnedMesh, bundle, manifestDirectory, outputDirectory, includeDirectory) {
-    const srcPath = path.join(manifestDirectory, skinnedMesh.src);
+async function processSkinnedMesh(environment, skinnedMesh, meshWriter) {
+    const srcPath = path.join(environment.assetDirectory, skinnedMesh.src);
 
     const gltfLoader = new GLTFLoader();
     await gltfLoader.loadFile(srcPath);
@@ -35,17 +35,17 @@ async function processSkinnedMesh(environment, skinnedMesh, bundle, manifestDire
     mesh.materialBundle.bundleMeshMaterials(0);
 
     const animationOnly = Object.hasOwn(skinnedMesh, "animationOnly") ? skinnedMesh.animationOnly : false;
-    const includeFilePath = path.join(includeDirectory, meshName + "_animation.h");
+    const includeFilePath = path.join(environment.includeDirectory, meshName + "_animation.h");
 
     if (animationOnly) {
-        const destFilePath = path.join(outputDirectory, meshName + ".animation");
-        SkinnedMeshWriter.writeAimationData(animationData, meshName, destFilePath, includeFilePath);
-        bundle.addAnimationData(destFilePath, meshName);
+        const destFilePath = path.join(environment.outputDirectory, meshName + ".animation");
+        SkinnedMeshWriter.writeAnimationData(environment, animationData, meshName, destFilePath, includeFilePath);
+        environment.assetBundle.addAnimationData(destFilePath, meshName);
     }
     else {
-        const destFilePath = path.join(outputDirectory, meshName + ".skinnedmesh");
-        await SkinnedMeshWriter.write(environment, mesh, animationData, destFilePath, includeFilePath);
-        bundle.addSkinnedMesh(destFilePath, meshName);
+        const destFilePath = path.join(environment.outputDirectory, meshName + ".skinnedmesh");
+        await SkinnedMeshWriter.write(environment, mesh, animationData, destFilePath, includeFilePath, meshWriter);
+        environment.assetBundle.addSkinnedMesh(destFilePath, meshName);
     }
 }
 

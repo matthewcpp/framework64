@@ -2,7 +2,7 @@ const Environment = require("../Environment");
 const N64LibUltraAssetBundle = require("./AssetBundle");
 
 const processMesh = require("../ProcessMesh");
-const processSkinnedMesh = require("./ProcessSkinnedMesh");
+const processSkinnedMesh = require("../ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
 const processFile = require("./ProcessFile");
 const processFont = require("./ProcessFont");
@@ -35,9 +35,11 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     }
 
     if (manifest.skinnedMeshes) {
+        const MeshWriter = require("./MeshWriter");
+
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(skinnedMesh, archive, assetDirectory, outputDirectory, includeDirectory);
+            await processSkinnedMesh(environment, skinnedMesh, MeshWriter);
         }
     }
 
@@ -56,10 +58,12 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
 
     if (manifest.fonts) {
         for (const font of manifest.fonts) {
-            if (font.src)
+            if (font.src) {
                 console.log(`Processing Font: ${font.src}`);
-            else
+            }
+            else{
                 console.log(`Processing Image Font: ${font.name}`);
+            }
             
             await processFont(assetDirectory, outputDirectory, font, archive);
         }
@@ -67,13 +71,14 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
 
     if (manifest.levels) {
         const requiredFields = ["src"];
-        const sceneWriter = require("./SceneWriter");
+        const materialBundleWriter = require("./MaterialBundleWriter");
+        const meshWriter = require("./MeshWriter");
 
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
             checkRequiredFields("level", level, requiredFields);
 
-            await processLevel(environment, level, layerMap, sceneWriter);
+            await processLevel(environment, level, layerMap, materialBundleWriter, meshWriter);
         }
     }
 

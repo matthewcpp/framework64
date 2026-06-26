@@ -21,7 +21,7 @@ async function writeStaticMeshToFile(environment, staticMesh, file) {
     await _writeMeshToFile(environment, staticMesh, staticMesh.materialBundle, file);
 }
 
-async function writeMeshData(environment, mesh, materialBundle, file) {
+async function writeMeshData(environment, mesh, materialBundle, images, file) {
     if (mesh.materialBundle != null) {
         throw new Error("Error writing mesh data: unexpected material bundle present on mesh.");
     }

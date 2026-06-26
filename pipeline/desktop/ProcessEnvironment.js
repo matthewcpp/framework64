@@ -5,7 +5,7 @@ const Util = require("../Util");
 const processFont = require("./ProcessFont");
 const processImage = require("./ProcessImage");
 const processMesh = require("../ProcessMesh");
-const processSkinnedMesh = require("./ProcessSkinnedMesh");
+const processSkinnedMesh = require("../ProcessSkinnedMesh");
 const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processLevel = require("../ProcessLevel")
@@ -39,10 +39,12 @@ async function processDesktopEnvironment(manifestFile, assetDirectory, outputDir
 
     if (manifest.fonts) {
         for (const font of manifest.fonts) {
-            if (font.src)
+            if (font.src) {
                 console.log(`Processing Font: ${font.src}`);
-            else
+            }
+            else {
                 console.log(`Processing Image Font: ${font.name}`);
+            }
 
             await processFont(font, bundle, assetDirectory, outputDirectory);
         }
@@ -58,19 +60,22 @@ async function processDesktopEnvironment(manifestFile, assetDirectory, outputDir
     }
 
     if (manifest.skinnedMeshes) {
+        const MeshWriter = require("./MeshWriter");
+
         for (const skinnedMesh of manifest.skinnedMeshes) {
             console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(environment, skinnedMesh, bundle, assetDirectory, outputDirectory, includeDirectory);
+            await processSkinnedMesh(environment, skinnedMesh, MeshWriter);
         }
     }
 
     if (manifest.levels) {
-        const sceneWriter = require("./SceneWriter");
+        const materialBundleWriter = require("./MaterialBundleWriter");
+        const MeshWriter = require("./MeshWriter");
 
         for (const level of manifest.levels) {
             console.log(`Processing Level: ${level.src}`);
 
-            await processLevel(environment, level, layerMap, sceneWriter);
+            await processLevel(environment, level, layerMap, materialBundleWriter, MeshWriter);
         }
     }
 

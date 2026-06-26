@@ -17,24 +17,24 @@ const fs = require("fs");
 /** Writes a self contained static mesh to file. */
 async function writeStaticMesh(environment, staticMesh, destPath) {
     const file = fs.openSync(destPath, "w");
-    await writeStaticMeshToFile(staticMesh, file);
+    await writeStaticMeshToFile(environment, staticMesh, file);
     fs.closeSync(file);
 }
 
-async function writeStaticMeshToFile(staticMesh, file) {
+async function writeStaticMeshToFile(environment, staticMesh, file) {
     if (staticMesh.materialBundle === null) {
         throw new Error("Error writing static mesh: no material bundle present on mesh.");
     }
 
-    await _writeMeshToFile(staticMesh, null, null, file);
+    await _writeMeshToFile(environment, staticMesh, null, null, file);
 }
 
 /** Wrties a static mesh to a currently open file stream */
-async function writeStaticMeshData(mesh, materialBundle, n64Images, file) {
-    await _writeMeshToFile(mesh, materialBundle, n64Images, file)
+async function writeMeshData(environment, mesh, materialBundle, n64Images, file) {
+    await _writeMeshToFile(environment, mesh, materialBundle, n64Images, file)
 }
 
-async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
+async function _writeMeshToFile(environment, mesh, materialBundle, bundleImages, file) {
     let n64Images = bundleImages;
 
     if (mesh.materialBundle) {
@@ -92,7 +92,7 @@ async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
     fs.writeSync(file, meshInfo.buffer);
     
     if (mesh.materialBundle) {
-        MaterialBundleWriter.write(materialBundle.gltfData, materialBundle, n64Images, file);
+        MaterialBundleWriter.write(materialBundle, n64Images, materialBundle.gltfData, file);
     }
 
     for (const buffer of vertexBuffers)
@@ -251,5 +251,5 @@ function adjustN64VertexColors(mesh) {
 module.exports = {
     writeStaticMesh: writeStaticMesh,
     writeStaticMeshToFile: writeStaticMeshToFile,
-    writeStaticMeshData: writeStaticMeshData
+    writeMeshData: writeMeshData
 };

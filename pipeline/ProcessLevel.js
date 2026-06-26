@@ -2,15 +2,16 @@ const CollisionGeometryDebug = require("./CollisionGeometryDebug");
 const LevelParser = require("./LevelParser");
 const SceneDefines = require("./SceneDefines");
 const Util = require("./Util");
+const SceneWriter = require("./SceneWriter");
 
 const path = require("path");
 
-async function _processScene(environment, scene, levelParser, SceneWriter) {
+async function _processScene(environment, scene, levelParser, materialBundleWriter, meshWriter) {
     const safeSceneName =  Util.safeDefineName(scene.name);
     const sceneFileName = safeSceneName + ".scene";
     const sceneFile = path.join(environment.outputDirectory, sceneFileName);
 
-    await SceneWriter.write(environment, scene, levelParser.gltfData, sceneFile);
+    await SceneWriter.write(environment, scene, levelParser.gltfData, sceneFile, materialBundleWriter, meshWriter);
     environment.assetBundle.addScene(sceneFile, safeSceneName);
 
     const sceneIncludeFileName =`scene_${safeSceneName}.h`;
@@ -18,7 +19,7 @@ async function _processScene(environment, scene, levelParser, SceneWriter) {
     SceneDefines.writeToFile(scene, sceneDefineFile);
 }
 
-async function processLevel(environment, level, layerMap, SceneWriter) {
+async function processLevel(environment, level, layerMap, materialBundleWriter, meshWriter) {
     const srcPath = path.join(environment.assetDirectory, level.src);
     const levelParser = new LevelParser();
     await levelParser.parse(srcPath, layerMap);
@@ -39,14 +40,14 @@ async function processLevel(environment, level, layerMap, SceneWriter) {
     }
 
     for (const scene of levelParser.scenes) {
-        await _processScene(environment, scene, levelParser, SceneWriter);
+        await _processScene(environment, scene, levelParser, materialBundleWriter, meshWriter);
 
         if (scene.collisionGeometry !== null) {
             const safeSceneName =  Util.safeDefineName(scene.name) + "_collision";
             const collisionDebugSceneFileName = safeSceneName + ".scene";
             const collisionDebugSceneFile = path.join(environment.outputDirectory, collisionDebugSceneFileName);
 
-            await CollisionGeometryDebug.writeCollisionGeometryDebugData(environment, scene.collisionGeometry, environment.binaryWriter, SceneWriter, collisionDebugSceneFile);
+            await CollisionGeometryDebug.writeCollisionGeometryDebugData(environment, scene.collisionGeometry, environment.binaryWriter, collisionDebugSceneFile, materialBundleWriter, meshWriter);
             environment.assetBundle.addFile(collisionDebugSceneFile, safeSceneName);
         }
     }
