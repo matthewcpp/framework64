@@ -10,7 +10,7 @@ const processMusicBank = require("./ProcessMusicBank");
 const processSoundBank = require("./ProcessSoundBank");
 const processLevel = require("../ProcessLevel")
 const processLayers = require("../ProcessLayers");
-const processFile = require("./ProcessFile");
+const processFile = require("../ProcessFile");
 
 const fs = require("fs")
 const path = require("path");
@@ -96,7 +96,7 @@ async function processDesktopEnvironment(manifestFile, assetDirectory, outputDir
     if (manifest.files) {
         for (const file of manifest.files) {
             console.log(`Processing File: ${file.src}`);
-            await processFile(file, environment, pluginMap);
+            await processFile(environment, file, pluginMap);
         }
     }
 

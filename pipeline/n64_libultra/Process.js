@@ -4,7 +4,7 @@ const N64LibUltraAssetBundle = require("./AssetBundle");
 const processMesh = require("../ProcessMesh");
 const processSkinnedMesh = require("../ProcessSkinnedMesh");
 const processImage = require("./ProcessImage");
-const processFile = require("./ProcessFile");
+const processFile = require("../ProcessFile");
 const processFont = require("./ProcessFont");
 const processLevel = require("../ProcessLevel");
 const processLayers = require("../ProcessLayers");
@@ -85,7 +85,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     if (manifest.files) {
         for (const file of manifest.files) {
             console.log(`Processing File: ${file.src}`);
-            await processFile(file, environment, pluginMap);
+            await processFile(environment, file, pluginMap);
         }
     }
 

@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 // if we have a plugin that can process this file then defer to the plugin, otherwise just copy it over
-async function processFile(fileJson, environment, plugins) {
+async function processFile(environment, fileJson, plugins) {
     const ext = path.extname(fileJson.src);
 
     if (plugins.has(ext)) {
