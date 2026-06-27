@@ -1,76 +1,87 @@
 const Font = require("./Font");
 const FontUtils = require("../FontUtils");
-const FontWriter = require("./FontWriter");
+const DesktopFontWriter = require("./FontWriter");
 const Util = require("../Util")
-const processImage = require("./ImageProcessor");
 
 const path = require("path");
 
-const defaultSourceString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~<> ";
+const ImageProcessor = require("./ImageProcessor");
 
-async function processFontFile(fontInfo, bundle, baseDirectory, outputDirectory) {
-    const fontName = determineFontName(fontInfo);
-    const srcPath = path.join(baseDirectory, fontInfo.src);
-    const sourceString = fontInfo.sourceString ? fontInfo.sourceString : defaultSourceString;
+class DesktopFontProcessor {
+    _environment;
+    _imageProcessor;
 
-    const font = new Font(fontName);
-    await font.loadGlyphs(srcPath, sourceString, fontInfo.size);
-    await font.createGlImage();
+    static defaultSourceString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_-+[];:',./\\\"`~<> ";
 
-    const fontFileName = fontName + ".font";
-    const destPath = path.join(outputDirectory, fontFileName);
-    FontWriter.writeFile(font, destPath);
-    bundle.addFont(fontFileName, font.name);
-}
-
-async function processImageFont(fontInfo, bundle, baseDirectory, outputDirectory) {
-    if (!fontInfo.sourceString) {
-        throw new Error("image fonts must specify an explicit sourceString");
+    constructor(environment, imageProcessor) {
+        this._environment = environment;
+        this._imageProcessor = imageProcessor;
     }
 
-    if (!fontInfo.name) {
-        throw new Error("image fonts must specify an explicit name");
+    async process(fontInfo) {
+        if (fontInfo.sourceFile) {
+            const sourceFilePath = path.join(this._environment.assetDirectory, fontInfo.sourceFile);
+            fontInfo.sourceString = FontUtils.sourceStringFromFile(sourceFilePath);
+        }
+
+        if (fontInfo.src) {
+            await this._processFontFile(fontInfo, this._environment.assetDirectory, this._environment.outputDirectory);
+        } else {
+            await this._processImageFont(fontInfo, this._environment.assetDirectory, this._environment.outputDirectory);
+        }
     }
 
-    const image = await processImage(fontInfo.image, null, baseDirectory, outputDirectory);
+    async _processFontFile(fontInfo) {
+        const fontName = this._determineFontName(fontInfo);
+        const srcPath = path.join(this._environment.assetDirectory, fontInfo.src);
+        const sourceString = fontInfo.sourceString ? fontInfo.sourceString : DesktopFontProcessor.defaultSourceString;
 
-    const frameCount = image.hslices * image.vslices;
-    if (frameCount !== fontInfo.sourceString.length) {
-        throw new Error(`Font image contains ${frameCount} frames but source string is of length: ${fontInfo.sourceString.length}`);
+        const font = new Font(fontName);
+        await font.loadGlyphs(srcPath, sourceString, fontInfo.size);
+        await font.createGlImage();
+
+        const fontFileName = fontName + ".font";
+        const destPath = path.join(this._environment.outputDirectory, fontFileName);
+        new DesktopFontWriter().writeFile(font, destPath);
+        this._environment.assetBundle.addFont(fontFileName, font.name);
     }
 
-    const font = new Font(Util.safeDefineName(fontInfo.name));
-    const tileWidth = image.width / image.hslices;
-    const tileHeight = image.height / image.vslices;
-    font.image = image;
-    font.loadImageFontGlyphs(fontInfo.name, fontInfo.sourceString, tileWidth, tileHeight);
+    async _processImageFont(fontInfo) {
+        if (!fontInfo.sourceString) {
+            throw new Error("image fonts must specify an explicit sourceString");
+        }
 
-    const fontFileName = font.name + ".font";
-    const destPath = path.join(outputDirectory, fontFileName);
-    FontWriter.writeFile(font, destPath);
-    bundle.addFont(fontFileName, font.name);
-}
+        if (!fontInfo.name) {
+            throw new Error("image fonts must specify an explicit name");
+        }
 
-async function processFont(fontInfo, bundle, baseDirectory, outputDirectory) {
-    if (fontInfo.sourceFile) {
-        const sourceFilePath = path.join(baseDirectory, fontInfo.sourceFile);
-        fontInfo.sourceString = FontUtils.sourceStringFromFile(sourceFilePath);
+        const image = await this._imageProcessor.convertWithoutBundling(fontInfo.image, this._environment.assetDirectory);
+
+        const frameCount = image.hslices * image.vslices;
+        if (frameCount !== fontInfo.sourceString.length) {
+            throw new Error(`Font image contains ${frameCount} frames but source string is of length: ${fontInfo.sourceString.length}`);
+        }
+
+        const font = new Font(Util.safeDefineName(fontInfo.name));
+        const tileWidth = image.width / image.hslices;
+        const tileHeight = image.height / image.vslices;
+        font.image = image;
+        font.loadImageFontGlyphs(fontInfo.name, fontInfo.sourceString, tileWidth, tileHeight);
+
+        const fontFileName = font.name + ".font";
+        const destPath = path.join(this._environment.outputDirectory, fontFileName);
+        new DesktopFontWriter().writeFile(font, destPath);
+        this._environment.assetBundle.addFont(fontFileName, font.name);
     }
 
-    if (fontInfo.src) {
-        await processFontFile(fontInfo, bundle, baseDirectory, outputDirectory);
+    _determineFontName(fontInfo) {
+        if (fontInfo.name) {
+            return Util.safeDefineName(fontInfo.name);
+        }
+
+        const basename = path.basename(fontInfo.src, path.extname(fontInfo.src));
+        return Util.safeDefineName(basename + fontInfo.size.toString());
     }
-    else {
-        await processImageFont(fontInfo, bundle, baseDirectory, outputDirectory);
-    }
-}
+};
 
-function determineFontName(fontInfo) {
-    if (fontInfo.name)
-        return Util.safeDefineName(fontInfo.name);
-
-    const basename = path.basename(fontInfo.src, path.extname(fontInfo.src));
-    return Util.safeDefineName(basename + fontInfo.size.toString());
-}
-
-module.exports = processFont;
+module.exports = DesktopFontProcessor;

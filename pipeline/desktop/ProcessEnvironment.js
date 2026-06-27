@@ -2,15 +2,7 @@ const DesktopAssetBundle = require("./AssetBundle");
 const Environment = require("../Environment");
 const Util = require("../Util");
 
-const processFont = require("./FontProcessor");
-const processImage = require("./ImageProcessor");
-const processMesh = require("../MeshProcessor");
-const processSkinnedMesh = require("../SkinnedMeshProcessor");
-const processMusicBank = require("./MusicBankProcessor");
-const processSoundBank = require("./SoundBankProcessor");
-const processLevel = require("../LevelProcessor")
-const processLayers = require("../LayersProcessor");
-const processFile = require("../FileProcessor");
+const DesktopPipelineProcessor = require("./DesktopPipelineProcessor");
 
 const fs = require("fs")
 const path = require("path");
@@ -20,85 +12,14 @@ async function processDesktopEnvironment(manifestFile, assetDirectory, outputDir
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const bundle = new DesktopAssetBundle(outputDirectory);
-    const layerMap = processLayers(path.dirname(manifestFile), includeDirectory);
 
     const pipelinePath = path.normalize(path.join(__dirname, ".."));
     const environment = new Environment(platform, arch, Environment.Endian.Little, 
-        bundle, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
+        bundle, manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
-    if (manifest.images) {
-        for (const image of manifest.images) {
-            if (image.src)
-                console.log(`Processing Image: ${image.src}`);
-            else
-                console.log(`Processing Image Atlas: ${image.name}`);
+    const desktopPipelineProcessor = new DesktopPipelineProcessor(environment, pluginMap);
 
-            await processImage(image, bundle, assetDirectory, outputDirectory);
-        }
-    }
-
-    if (manifest.fonts) {
-        for (const font of manifest.fonts) {
-            if (font.src) {
-                console.log(`Processing Font: ${font.src}`);
-            }
-            else {
-                console.log(`Processing Image Font: ${font.name}`);
-            }
-
-            await processFont(font, bundle, assetDirectory, outputDirectory);
-        }
-    }
-
-    if (manifest.meshes) {
-        const MeshWriter = require("./MeshWriter");
-
-        for (const mesh of manifest.meshes) {
-            console.log(`Processing Mesh: ${mesh.src}`);
-            await processMesh(environment, mesh, MeshWriter);
-        }
-    }
-
-    if (manifest.skinnedMeshes) {
-        const MeshWriter = require("./MeshWriter");
-
-        for (const skinnedMesh of manifest.skinnedMeshes) {
-            console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(environment, skinnedMesh, MeshWriter);
-        }
-    }
-
-    if (manifest.levels) {
-        const materialBundleWriter = require("./MaterialBundleWriter");
-        const MeshWriter = require("./MeshWriter");
-
-        for (const level of manifest.levels) {
-            console.log(`Processing Level: ${level.src}`);
-
-            await processLevel(environment, level, layerMap, materialBundleWriter, MeshWriter);
-        }
-    }
-
-    if (manifest.soundBanks) {
-        for (const soundBank of manifest.soundBanks) {
-            console.log(`Processing Sound Bank: ${soundBank.dir}`);
-            await processSoundBank(environment, soundBank);
-        }
-    }
-
-    if (manifest.musicBanks) {
-        for (const musicBank of manifest.musicBanks) {
-            console.log(`Processing Music Bank: ${musicBank.dir}`);
-            await processMusicBank(environment, musicBank);
-        }
-    }
-
-    if (manifest.files) {
-        for (const file of manifest.files) {
-            console.log(`Processing File: ${file.src}`);
-            await processFile(environment, file, pluginMap);
-        }
-    }
+    await desktopPipelineProcessor.process(manifest);
 
     bundle.writeHeader(path.join(includeDirectory, "assets.h"));
     bundle.writeAssetBundle(path.join(outputDirectory, "asset_bundle.txt"));

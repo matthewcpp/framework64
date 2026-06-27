@@ -5,29 +5,39 @@ const MeshCustomBounding = require("./gltf/MeshCustomBounding");
 
 const path = require("path");
 
-async function processMesh(environment, meshJson, meshWriter) {
-    const srcPath = path.join(environment.assetDirectory, meshJson.src);
-    const gltfLoader = new GLTFLoader();
-    await gltfLoader.loadFile(srcPath);
 
-    if (!gltfLoader.gltf.meshes || gltfLoader.gltf.meshes.length === 0) {
-        throw new Error(`glTF File: ${gltfPath} contains no meshes`);
+class GltfMeshProcessor {
+    _environment;
+    _meshWriter;
+    constructor(environment, meshWriter) {
+        this._environment = environment;
+        this._meshWriter = meshWriter;
     }
 
-    const staticMesh = gltfLoader.meshes[0];
-    MeshCustomBounding.setForStaticMesh(staticMesh, gltfLoader);
+    async process(meshJson) {
+        const srcPath = path.join(this._environment.assetDirectory, meshJson.src);
+        const gltfLoader = new GLTFLoader();
+        await gltfLoader.loadFile(srcPath);
 
-    const meshName = !!meshJson.name ? meshJson.name : path.basename(meshJson.src, path.extname(meshJson.src));
-    staticMesh.name = meshName;
+        if (!gltfLoader.gltf.meshes || gltfLoader.gltf.meshes.length === 0) {
+            throw new Error(`glTF File: ${gltfPath} contains no meshes`);
+        }
 
-    staticMesh.materialBundle = new MaterialBundle(gltfLoader);
-    staticMesh.materialBundle.bundleMeshMaterials(0);
+        const staticMesh = gltfLoader.meshes[0];
+        MeshCustomBounding.setForStaticMesh(staticMesh, gltfLoader);
 
-    const assetFileName = staticMesh.name + ".mesh";
-    const destPath = path.join(environment.outputDirectory, assetFileName);
-    await meshWriter.writeStaticMesh(environment, staticMesh, destPath);
+        const meshName = !!meshJson.name ? meshJson.name : path.basename(meshJson.src, path.extname(meshJson.src));
+        staticMesh.name = meshName;
 
-    environment.assetBundle.addMesh(assetFileName, meshName);
-}
+        staticMesh.materialBundle = new MaterialBundle(gltfLoader);
+        staticMesh.materialBundle.bundleMeshMaterials(0);
 
-module.exports = processMesh;
+        const assetFileName = staticMesh.name + ".mesh";
+        const destPath = path.join(this._environment.outputDirectory, assetFileName);
+        await this._meshWriter.writeStaticMesh(this._environment, staticMesh, destPath);
+
+        this._environment.assetBundle.addMesh(assetFileName, meshName);
+    }
+};
+
+module.exports = GltfMeshProcessor;

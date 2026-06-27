@@ -1,22 +1,34 @@
 const fs = require("fs");
 const path = require("path");
 
-// if we have a plugin that can process this file then defer to the plugin, otherwise just copy it over
-async function processFile(environment, fileJson, plugins) {
-    const ext = path.extname(fileJson.src);
+class BasicFileProcessor {
+    _environment;
+    _plugins;
 
-    if (plugins.has(ext)) {
-        const plugin = plugins.get(ext);
-        await plugin.process(fileJson, environment);
+    constructor(environment, plugins) {
+        this._environment = environment;
+        this._plugins = plugins;
     }
-    else {
-        const sourceFile = path.join(environment.assetDirectory, fileJson.src);
-        const destFile = path.join(environment.outputDirectory, path.basename(fileJson.src));
-        fs.copyFileSync(sourceFile, destFile);
 
-        const assetName = path.basename(fileJson.src, path.extname(fileJson.src));
-        bundle.addFile(destFile, assetName);
+    async process(fileJson) {
+        const ext = path.extname(fileJson.src);
+
+        // if we have a plugin that can process this file then defer to the plugin, otherwise just copy it over
+        if (this._plugins.has(ext)) {
+            const plugin = this._plugins.get(ext);
+            await plugin.process(fileJson, this._environment);
+        }
+        else {
+            const sourceFile = path.join(this._environment.assetDirectory, fileJson.src);
+            const destFile = path.join(this._environment.outputDirectory, path.basename(fileJson.src));
+            fs.copyFileSync(sourceFile, destFile);
+
+            const assetName = path.basename(fileJson.src, path.extname(fileJson.src));
+            this._environment.assetBundle.addFile(destFile, assetName);
+        }
     }
-}
+};
 
-module.exports = processFile;
+
+
+module.exports = BasicFileProcessor;

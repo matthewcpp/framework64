@@ -6,51 +6,63 @@ const SceneWriter = require("./SceneWriter");
 
 const path = require("path");
 
-async function _processScene(environment, scene, levelParser, materialBundleWriter, meshWriter) {
-    const safeSceneName =  Util.safeDefineName(scene.name);
-    const sceneFileName = safeSceneName + ".scene";
-    const sceneFile = path.join(environment.outputDirectory, sceneFileName);
+class GltfLevelProcessor {
+    _environment;
+    _materialBundleWriter;
+    _meshWriter;
 
-    await SceneWriter.write(environment, scene, levelParser.gltfData, sceneFile, materialBundleWriter, meshWriter);
-    environment.assetBundle.addScene(sceneFile, safeSceneName);
+    constructor(environment, materialBundleWriter, meshWriter) {
+        this._environment = environment;
+        this._materialBundleWriter = materialBundleWriter;
+        this._meshWriter = meshWriter;
+    }
 
-    const sceneIncludeFileName =`scene_${safeSceneName}.h`;
-    const sceneDefineFile = path.join(environment.includeDirectory, sceneIncludeFileName)
-    SceneDefines.writeToFile(scene, sceneDefineFile);
-}
+    async process(level, layerMap) {
+        const srcPath = path.join(this._environment.assetDirectory, level.src);
+        const levelParser = new LevelParser();
+        await levelParser.parse(srcPath, layerMap);
 
-async function processLevel(environment, level, layerMap, materialBundleWriter, meshWriter) {
-    const srcPath = path.join(environment.assetDirectory, level.src);
-    const levelParser = new LevelParser();
-    await levelParser.parse(srcPath, layerMap);
+        if (Object.hasOwn(level, "collisionGeometry") && level.collisionGeometry === true) {
+            if (!Object.hasOwn(level, "grid")) {
+                throw new Error("Must specify grid size (CountXxCountZ) in order to generate collision geometry.");
+            }
 
-    if (Object.hasOwn(level, "collisionGeometry") && level.collisionGeometry === true) {
-        if (!Object.hasOwn(level, "grid")) {
-            throw new Error("Must specify grid size (CountXxCountZ) in order to generate collision geometry.");
+            const dimensions = level.grid.split('x');
+
+            levelParser.createCollisionGeometry(parseInt(dimensions[0]), parseInt(dimensions[1]));
+
+            for (const scene of levelParser.scenes) {
+                const collisionDebugFile = path.join(path.dirname(this._environment.outputDirectory), Util.safeDefineName(scene.name) +"_collision_info.txt");
+                CollisionGeometryDebug.writeTextFile(scene.collisionGeometry, collisionDebugFile);
+            }
         }
-
-        const dimensions = level.grid.split('x');
-
-        levelParser.createCollisionGeometry(parseInt(dimensions[0]), parseInt(dimensions[1]));
 
         for (const scene of levelParser.scenes) {
-            const collisionDebugFile = path.join(path.dirname(environment.outputDirectory), Util.safeDefineName(scene.name) +"_collision_info.txt");
-            CollisionGeometryDebug.writeTextFile(scene.collisionGeometry, collisionDebugFile);
+            await this._processScene(scene, levelParser);
+
+            if (scene.collisionGeometry !== null) {
+                const safeSceneName =  Util.safeDefineName(scene.name) + "_collision";
+                const collisionDebugSceneFileName = safeSceneName + ".scene";
+                const collisionDebugSceneFile = path.join(this._environment.outputDirectory, collisionDebugSceneFileName);
+
+                await CollisionGeometryDebug.writeCollisionGeometryDebugData(this._environment, scene.collisionGeometry, this._environment.binaryWriter, collisionDebugSceneFile, this._materialBundleWriter, this._meshWriter);
+                this._environment.assetBundle.addFile(collisionDebugSceneFile, safeSceneName);
+            }
         }
     }
 
-    for (const scene of levelParser.scenes) {
-        await _processScene(environment, scene, levelParser, materialBundleWriter, meshWriter);
+    async _processScene(scene, levelParser) {
+        const safeSceneName =  Util.safeDefineName(scene.name);
+        const sceneFileName = safeSceneName + ".scene";
+        const sceneFile = path.join(this._environment.outputDirectory, sceneFileName);
 
-        if (scene.collisionGeometry !== null) {
-            const safeSceneName =  Util.safeDefineName(scene.name) + "_collision";
-            const collisionDebugSceneFileName = safeSceneName + ".scene";
-            const collisionDebugSceneFile = path.join(environment.outputDirectory, collisionDebugSceneFileName);
+        await SceneWriter.write(this._environment, scene, levelParser.gltfData, sceneFile, this._materialBundleWriter, this._meshWriter);
+        this._environment.assetBundle.addScene(sceneFile, safeSceneName);
 
-            await CollisionGeometryDebug.writeCollisionGeometryDebugData(environment, scene.collisionGeometry, environment.binaryWriter, collisionDebugSceneFile, materialBundleWriter, meshWriter);
-            environment.assetBundle.addFile(collisionDebugSceneFile, safeSceneName);
-        }
+        const sceneIncludeFileName =`scene_${safeSceneName}.h`;
+        const sceneDefineFile = path.join(this._environment.includeDirectory, sceneIncludeFileName)
+        SceneDefines.writeToFile(scene, sceneDefineFile);
     }
-}
+};
 
-module.exports = processLevel;
+module.exports = GltfLevelProcessor;

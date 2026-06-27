@@ -7,7 +7,7 @@ const processImage = require("./ImageProcessor");
 const processFile = require("../FileProcessor");
 const processFont = require("./FontProcessor");
 const processLevel = require("../LevelProcessor");
-const processLayers = require("../ProcessLayers");
+const processLayers = require("../LayerProcessor");
 const processMusicBank = require("./MusicBankProcessor");
 const processSoundBank = require("./SoundBankProcessor");
 const Util = require("../Util");
@@ -21,7 +21,8 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new N64LibUltraAssetBundle(outputDirectory);
     const pipelinePath = path.normalize(path.join(__dirname, ".."));
-    const environment = new Environment("n64_libultra", Environment.Architecture.Arch32, Environment.Endian.Big, archive, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
+    const environment = new Environment("n64_libultra", Environment.Architecture.Arch32, Environment.Endian.Big, archive, 
+        manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
     const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
 

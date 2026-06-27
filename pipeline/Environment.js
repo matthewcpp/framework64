@@ -23,14 +23,15 @@ class Environment {
     _includeDirectory;
     _outputDirectory;
     _pipelineDirectory;
-    
+    _manifestFile;
 
-    constructor(platform, architecture, endian, assetBundle, assetDirectory, outputDirectory, includeDirectory, pipelineDirectory) {
+    constructor(platform, architecture, endian, assetBundle, manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelineDirectory) {
         this._platform = platform;
         this._architecture = architecture;
         this._endian = endian;
 
         this._assetBundle = assetBundle;
+        this._manifestFile = manifestFile;
         this._assetDirectory = assetDirectory;
         this._outputDirectory = outputDirectory;
         this._includeDirectory = includeDirectory;
@@ -82,6 +83,11 @@ class Environment {
     /** The directory containing common pipeline files. */
     get pipelineDirectory() {
         return this._pipelineDirectory;
+    }
+
+    /** The path to the manifest file being processed */
+    get manifestFile() {
+        return this._manifestFile;
     }
 }
 
