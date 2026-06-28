@@ -45,15 +45,15 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
         }
 
         case "desktop":{
-            const processDesktop = require("./desktop/Process");
-            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap, Environment.Architecture.Arch64);
+            const processDesktop = require("./desktop/Process").processDesktop;
+            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
         }
 
         case "web":{
             // note: right now only support 32 bit wasm is supported.
-            const processDesktop = require("./desktop/Process");
-            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap, Environment.Architecture.Arch32);
+            const processWeb = require("./web/Process");
+            await processWeb(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
         }
 
