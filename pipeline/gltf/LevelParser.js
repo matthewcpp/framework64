@@ -1,10 +1,10 @@
 const CollisionGeometry = require("./CollisionGeometry");
-const Bounding = require("./gltf/Bounding");
-const GLTFLoader = require("./gltf/GLTFLoader");
-const GLTFUtil = require("./gltf/GLTFUtil");
-const MaterialBundle = require("./gltf/MaterialBundle");
-const N64Node = require("./gltf/Node");
-const Scene = require("./gltf/Scene");
+const Bounding = require("./Bounding");
+const GLTFLoader = require("./GLTFLoader");
+const GLTFUtil = require("./GLTFUtil");
+const MaterialBundle = require("./MaterialBundle");
+const N64Node = require("./Node");
+const Scene = require("./Scene");
 
 class LevelParser {
     gltfData = null;

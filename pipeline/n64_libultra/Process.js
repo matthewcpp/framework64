@@ -1,10 +1,10 @@
 const Environment = require("../Environment");
 const N64LibUltraAssetBundle = require("./AssetBundle");
 
-const BasicFileProcessor = require("../FileProcessor");
-const GltfLevelProcessor = require("../LevelProcessor");
-const GltfMeshProcessor = require("../MeshProcessor");
-const GltfSkinnedMeshProcessor = require("../SkinnedMeshProcessor");
+const BasicFileProcessor = require("../common/FileProcessor");
+const GltfLevelProcessor = require("../common/LevelProcessor");
+const GltfMeshProcessor = require("../common/MeshProcessor");
+const GltfSkinnedMeshProcessor = require("../common/SkinnedMeshProcessor");
 const N64LibultraFontProcessor = require("./FontProcessor");
 const N64LibUltraImageProcessor = require("./ImageProcessor");
 const N64LibUltraMaterialBundleWriter = require("./MaterialBundleWriter");

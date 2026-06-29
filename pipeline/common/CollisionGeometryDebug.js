@@ -1,13 +1,13 @@
-const GLTFLoader = require("./gltf/GLTFLoader");
+const GLTFLoader = require("../gltf/GLTFLoader");
 
 const fs = require("fs");
-const Material = require("./gltf/Material");
-const Primitive = require("./gltf/Primitive");
-const Scene = require("./gltf/Scene");
-const LevelParser = require("./LevelParser");
-const MaterialBundle = require("./gltf/MaterialBundle");
-const Mesh = require("./gltf/Mesh");
-const Node = require("./gltf/Node");
+const Material = require("../gltf/Material");
+const Primitive = require("../gltf/Primitive");
+const Scene = require("../gltf/Scene");
+const LevelParser = require("../gltf/LevelParser");
+const MaterialBundle = require("../gltf/MaterialBundle");
+const Mesh = require("../gltf/Mesh");
+const Node = require("../gltf/Node");
 const SceneWriter = require("./SceneWriter")
 
 /** This should be kept in sync with CollisionGeometryDebugLayerMask in fw64_collision_geometry_debug.h */

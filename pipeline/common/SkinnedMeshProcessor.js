@@ -1,11 +1,11 @@
-const AnimationParser = require("./animation/Parser");
-const GLTFLoader = require("./gltf/GLTFLoader");
-const MaterialBundle = require("./gltf/MaterialBundle");
+const AnimationParser = require("../animation/Parser");
+const GLTFLoader = require("../gltf/GLTFLoader");
+const MaterialBundle = require("../gltf/MaterialBundle");
 const SkinnedMeshWriter = require("./SkinnedMeshWriter");
-const Util = require("./Util");
+const Util = require("../Util");
 
 const path = require("path");
-const MeshCustomBounding = require("./gltf/MeshCustomBounding");
+const MeshCustomBounding = require("../gltf/MeshCustomBounding");
 
 class GltfSkinnedMeshProcessor {
     _environment;

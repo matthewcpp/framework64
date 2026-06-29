@@ -1,8 +1,8 @@
-const Bounding = require("./gltf/Bounding");
-const N64Node = require("./gltf/Node");
+const Bounding = require("../gltf/Bounding");
+const N64Node = require("../gltf/Node");
 
 const fs = require("fs");
-const Environment = require("./Environment");
+const Environment = require("../Environment");
 
 /// The order these values are written should correspond with the SceneInfo struct in framework64/scene.h
 function writeSceneInfo(scene, file, writer) {

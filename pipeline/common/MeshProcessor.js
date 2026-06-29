@@ -1,7 +1,7 @@
-const MaterialBundle = require("./gltf/MaterialBundle");
-const GLTFLoader = require("./gltf/GLTFLoader");
-const MeshWriter = require("./desktop/MeshWriter");
-const MeshCustomBounding = require("./gltf/MeshCustomBounding");
+const MaterialBundle = require("../gltf/MaterialBundle");
+const GLTFLoader = require("../gltf/GLTFLoader");
+const MeshWriter = require("../desktop/MeshWriter");
+const MeshCustomBounding = require("../gltf/MeshCustomBounding");
 
 const path = require("path");
 

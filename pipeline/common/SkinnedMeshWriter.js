@@ -1,9 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const MeshWriter = require("./desktop/MeshWriter");
-const AnimationWriter = require("./animation/Writer");
-const WriteInterface = require("./WriteInterface");
+const AnimationWriter = require("../animation/Writer");
+const WriteInterface = require("../WriteInterface");
 
 async function write(environment, mesh, animationData, meshFilePath, includeFilePath, meshWriter) {
     const file = fs.openSync(meshFilePath, "w");

@@ -1,6 +1,6 @@
 const fs = require("fs");
-const CollisionGeometry = require("./CollisionGeometry");
-const Bounding = require("./gltf/Bounding");
+const CollisionGeometry = require("../gltf/CollisionGeometry");
+const Bounding = require("../gltf/Bounding");
 
 class CollisionGeometryWriter {
     /** This needs to be kept in sync with fw64CollisionGeometryInfo in collision_geometry.h */

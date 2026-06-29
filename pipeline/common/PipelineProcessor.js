@@ -1,4 +1,4 @@
-const BasicFileProcessor = require("../FileProcessor");
+const BasicFileProcessor = require("./FileProcessor");
 const LayersProcessor = require("./LayersProcessor");
 
 const path = require("path");

@@ -1,4 +1,4 @@
-const BasicFileProcessor = require("../FileProcessor");
+const BasicFileProcessor = require("../common/FileProcessor");
 const DesktopAssetBundle = require("./AssetBundle");
 const DesktopFontProcessor = require("./FontProcessor");
 const DesktopImageProcessor = require("./ImageProcessor");
@@ -7,9 +7,9 @@ const DesktopMaterialBundleWriter = require("./MaterialBundleWriter");
 const DesktopMeshWriter = require("./MeshWriter");
 const DesktopMusicBankProcessor = require("./MusicBankProcessor");
 const Environment = require("../Environment");
-const GltfLevelProcessor = require("../LevelProcessor");
-const GltfMeshProcessor = require("../MeshProcessor");
-const GltfSkinnedMeshProcessor = require("../SkinnedMeshProcessor");
+const GltfLevelProcessor = require("../common/LevelProcessor");
+const GltfMeshProcessor = require("../common/MeshProcessor");
+const GltfSkinnedMeshProcessor = require("../common/SkinnedMeshProcessor");
 const PipelineProcessor = require("../common/PipelineProcessor");
 const Util = require("../Util");
 

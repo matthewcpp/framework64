@@ -1,7 +1,7 @@
 const CollisionGeometryDebug = require("./CollisionGeometryDebug");
-const LevelParser = require("./LevelParser");
+const LevelParser = require("../gltf/LevelParser");
 const SceneDefines = require("./SceneDefines");
-const Util = require("./Util");
+const Util = require("../Util");
 const SceneWriter = require("./SceneWriter");
 
 const path = require("path");
