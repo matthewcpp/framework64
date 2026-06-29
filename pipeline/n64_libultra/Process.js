@@ -1,17 +1,19 @@
 const Environment = require("../Environment");
 const N64LibUltraAssetBundle = require("./AssetBundle");
 
-const processMesh = require("../MeshProcessor");
-const processSkinnedMesh = require("../SkinnedMeshProcessor");
-const processImage = require("./ImageProcessor");
-const processFile = require("../FileProcessor");
-const processFont = require("./FontProcessor");
-const processLevel = require("../LevelProcessor");
-const processLayers = require("../LayerProcessor");
-const processMusicBank = require("./MusicBankProcessor");
-const processSoundBank = require("./SoundBankProcessor");
-const Util = require("../Util");
+const BasicFileProcessor = require("../FileProcessor");
+const GltfLevelProcessor = require("../LevelProcessor");
+const GltfMeshProcessor = require("../MeshProcessor");
+const GltfSkinnedMeshProcessor = require("../SkinnedMeshProcessor");
+const N64LibultraFontProcessor = require("./FontProcessor");
+const N64LibUltraImageProcessor = require("./ImageProcessor");
+const N64LibUltraMaterialBundleWriter = require("./MaterialBundleWriter");
+const N64LibUltraMeshWriter = require("./MeshWriter");
+const N64LibUltraMusicBankProcessor = require("./MusicBankProcessor");
+const N64LibUltraSoundBankProcessor = require("./SoundBankProcessor");
+const PipelineProcessor = require("../common/PipelineProcessor");
 
+const Util = require("../Util");
 const fs = require("fs")
 const path = require("path");
 
@@ -24,100 +26,33 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     const environment = new Environment("n64_libultra", Environment.Architecture.Arch32, Environment.Endian.Big, archive, 
         manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
-    const layerMap = processLayers(path.dirname(manifestFile), Util.assetIncludeDirectory(outputDirectory));
-
-    if (manifest.meshes) {
-        const MeshWriter = require("./MeshWriter");
-
-        for (const mesh of manifest.meshes) {
-            console.log(`Processing Mesh: ${mesh.src}`)
-            await processMesh(environment, mesh, MeshWriter);
-        }
-    }
-
-    if (manifest.skinnedMeshes) {
-        const MeshWriter = require("./MeshWriter");
-
-        for (const skinnedMesh of manifest.skinnedMeshes) {
-            console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-            await processSkinnedMesh(environment, skinnedMesh, MeshWriter);
-        }
-    }
-
-    if (manifest.images) {
-        for (const image of manifest.images) {
-            if (image.src) {
-                console.log(`Processing Image: ${image.src}`);
-            }
-            else if (image.frames || image.frameDir){
-                console.log(`Processing Image Atlas: ${image.name}`);
-            }
-
-            await processImage(image, archive, assetDirectory, outputDirectory);
-        }
-    }
-
-    if (manifest.fonts) {
-        for (const font of manifest.fonts) {
-            if (font.src) {
-                console.log(`Processing Font: ${font.src}`);
-            }
-            else{
-                console.log(`Processing Image Font: ${font.name}`);
-            }
-            
-            await processFont(assetDirectory, outputDirectory, font, archive);
-        }
-    }
-
-    if (manifest.levels) {
-        const requiredFields = ["src"];
-        const materialBundleWriter = require("./MaterialBundleWriter");
-        const meshWriter = require("./MeshWriter");
-
-        for (const level of manifest.levels) {
-            console.log(`Processing Level: ${level.src}`);
-            checkRequiredFields("level", level, requiredFields);
-
-            await processLevel(environment, level, layerMap, materialBundleWriter, meshWriter);
-        }
-    }
-
-    if (manifest.files) {
-        for (const file of manifest.files) {
-            console.log(`Processing File: ${file.src}`);
-            await processFile(environment, file, pluginMap);
-        }
-    }
-
-    if (manifest.soundBanks) {
-        for (const soundBank of manifest.soundBanks) {
-            checkRequiredFields("soundBank", soundBank, ["name", "dir"]);
-            console.log(`Processing Sound Bank: ${soundBank.dir}`);
-
-            await processSoundBank(environment, soundBank);
-        }
-    }
-
-    if (manifest.musicBanks) {
-        for (const musicBank of manifest.musicBanks) {
-            checkRequiredFields("musicBank", musicBank, ["name", "dir"]);
-            console.log(`Processing Music Bank: ${musicBank.dir}`);
-
-            await processMusicBank(environment, musicBank);
-        }
-    }
+    const pipelineProcessor = new N64LibUltraPipelineProcessor(environment, pluginMap);
+    await pipelineProcessor.process(manifest);
 
     archive.writeHeader(path.join(includeDirectory, "assets.h"));
     archive.writeArchive(path.join(outputDirectory, "assets.dat"));
     archive.writeManifest(path.join(outputDirectory, "manifest.txt"))
 }
 
-function checkRequiredFields(type, obj, fields) {
-    for (const field of fields) {
-        if (!obj.hasOwnProperty(field))
-            throw new Error(`${type} object must have the following properties: `+ fields.join(' '));
+class N64LibUltraPipelineProcessor extends PipelineProcessor {
+    constructor(environment, plugins) {
+        super(environment);
+
+        this._fileProcessor = new BasicFileProcessor(environment, plugins);
+        this._musicBankProcessor = new N64LibUltraMusicBankProcessor(environment);
+        this._soundBankProcessor = new N64LibUltraSoundBankProcessor(environment);
+
+        this._imageProcessor = new N64LibUltraImageProcessor(environment);
+        this._fontProcessor = new N64LibultraFontProcessor(environment);
+
+        const materialBundleWriter = new N64LibUltraMaterialBundleWriter(this._imageProcessor);
+        const meshWriter = new N64LibUltraMeshWriter(materialBundleWriter);
+
+        this._levelProcessor = new GltfLevelProcessor(environment, materialBundleWriter, meshWriter);
+        this._meshProcessor = new GltfMeshProcessor(environment, meshWriter);
+        this._skinnedMeshProcessor = new GltfSkinnedMeshProcessor(environment, meshWriter);
     }
-}
+};
+
 
 module.exports = processN64;

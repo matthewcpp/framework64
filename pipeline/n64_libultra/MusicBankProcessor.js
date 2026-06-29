@@ -8,77 +8,85 @@ const path = require("path");
 const util = require("util");
 const execFile = util.promisify(require('child_process').execFile);
 
-function checkOutputPaths(paths) {
-    for (const path of paths) {
-        if (!fs.existsSync(path))
-            throw new Error(`Docker container did not signal conversion failure but ${path} does not exist.`);
-    }
-}
+class N64LibUltraMusicBankProcessor {
+    _environment;
 
-async function processMusicBank(environment, musicBank) {
-    const sourceDir = path.join(environment.assetDirectory, musicBank.dir);
-    const name = musicBank.name;
-    
-    if (!fs.existsSync(sourceDir)) {
-        throw new Error(`Source directory: ${sourceDir} does not exist`);
+    constructor(environment) {
+        this._environment = environment;
     }
 
-    const tempDir = tmp.dirSync({unsafeCleanup: true});
+    async process(musicBank) {
+        const sourceDir = path.join(this._environment.assetDirectory, musicBank.dir);
+        const name = musicBank.name;
+        
+        if (!fs.existsSync(sourceDir)) {
+            throw new Error(`Source directory: ${sourceDir} does not exist`);
+        }
 
-    const conversionArgs = [
-        "run", "--rm",
-        "-v", `${sourceDir}:/src`,
-        "-v", `${tempDir.name}:/dest`,
-        "matthewcpp/framework64-audio",
-        "create_sequence_bank", name
-    ];
+        const tempDir = tmp.dirSync({unsafeCleanup: true});
 
-    try {
-        console.log(`Creating sequence bank: ${name} from ${sourceDir}`);
-        await execFile("docker", conversionArgs);
-        console.log(`Successfully created: ${name}`);
+        const conversionArgs = [
+            "run", "--rm",
+            "-v", `${sourceDir}:/src`,
+            "-v", `${tempDir.name}:/dest`,
+            "matthewcpp/framework64-audio",
+            "create_sequence_bank", name
+        ];
 
-        const ctrlFilePath = path.join(tempDir.name, name + ".ctl");
-        const tblFilePath = path.join(tempDir.name, name + ".tbl");
-        const sbkFilePath = path.join(tempDir.name, name + ".sbk");
-        const jsonFilePath = path.join(tempDir.name, name + ".json");
-        checkOutputPaths([ctrlFilePath, tblFilePath, sbkFilePath, jsonFilePath]);
+        try {
+            console.log(`Creating sequence bank: ${name} from ${sourceDir}`);
+            await execFile("docker", conversionArgs);
+            console.log(`Successfully created: ${name}`);
 
-        const output = JSON.parse(fs.readFileSync(jsonFilePath, {encoding: "utf8"}));
+            const ctrlFilePath = path.join(tempDir.name, name + ".ctl");
+            const tblFilePath = path.join(tempDir.name, name + ".tbl");
+            const sbkFilePath = path.join(tempDir.name, name + ".sbk");
+            const jsonFilePath = path.join(tempDir.name, name + ".json");
+            N64LibUltraMusicBankProcessor._checkOutputPaths([ctrlFilePath, tblFilePath, sbkFilePath, jsonFilePath]);
 
-        const instrumentBankPath = path.join(environment.outputDirectory, `${name}.instrumentbank`);
-        SoundBank.writeFile(instrumentBankPath, ctrlFilePath, tblFilePath, 0);
-        let index = -1;
-        environment.assetBundle.withoutDefiningAssets(() => {
-            index = environment.assetBundle.addFile(instrumentBankPath, name);
-        });
+            const output = JSON.parse(fs.readFileSync(jsonFilePath, {encoding: "utf8"}));
 
-        const sbkFileStats = fs.statSync(sbkFilePath);
+            const instrumentBankPath = path.join(this._environment.outputDirectory, `${name}.instrumentbank`);
+            SoundBank.writeFile(instrumentBankPath, ctrlFilePath, tblFilePath, 0);
+            let index = -1;
+            this._environment.assetBundle.withoutDefiningAssets(() => {
+                index = this._environment.assetBundle.addFile(instrumentBankPath, name);
+            });
 
-        const musicBankHeader = Buffer.alloc(12);
-        musicBankHeader.writeUInt32BE(output.length, 0);
-        musicBankHeader.writeUInt32BE(index, 4);
-        musicBankHeader.writeUInt32BE(sbkFileStats.size, 8);
+            const sbkFileStats = fs.statSync(sbkFilePath);
 
-        const musicBankPath = path.join(environment.outputDirectory, `${name}.musicbank`);
-        const musicBankFile = fs.openSync(musicBankPath, "w");
-        fs.writeSync(musicBankFile, musicBankHeader);
-        fs.writeSync(musicBankFile, fs.readFileSync(sbkFilePath));
-        fs.closeSync(musicBankFile);
+            const musicBankHeader = Buffer.alloc(12);
+            musicBankHeader.writeUInt32BE(output.length, 0);
+            musicBankHeader.writeUInt32BE(index, 4);
+            musicBankHeader.writeUInt32BE(sbkFileStats.size, 8);
 
-        const files = fs.readdirSync(sourceDir);
-        AudioHeader.writeMusicBankHeader(files, name, environment.includeDirectory);
+            const musicBankPath = path.join(this._environment.outputDirectory, `${name}.musicbank`);
+            const musicBankFile = fs.openSync(musicBankPath, "w");
+            fs.writeSync(musicBankFile, musicBankHeader);
+            fs.writeSync(musicBankFile, fs.readFileSync(sbkFilePath));
+            fs.closeSync(musicBankFile);
 
-        await environment.assetBundle.addMusicBank(musicBankPath, name);
+            const files = fs.readdirSync(sourceDir);
+            AudioHeader.writeMusicBankHeader(files, name, this._environment.includeDirectory);
+
+            await this._environment.assetBundle.addMusicBank(musicBankPath, name);
+        }
+        catch (e) {
+            console.log(e);
+            console.log("docker", conversionArgs.join(' '));
+            throw (e);
+        }
+        finally {
+            tempDir.removeCallback();
+        }
     }
-    catch (e) {
-        console.log(e);
-        console.log("docker", conversionArgs.join(' '));
-        throw (e);
-    }
-    finally {
-        tempDir.removeCallback();
-    }
-}
 
-module.exports = processMusicBank;
+    static _checkOutputPaths(paths) {
+        for (const path of paths) {
+            if (!fs.existsSync(path))
+                throw new Error(`Docker container did not signal conversion failure but ${path} does not exist.`);
+        }
+    }
+};
+
+module.exports = N64LibUltraMusicBankProcessor;
