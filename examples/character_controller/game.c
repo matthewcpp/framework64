@@ -16,6 +16,8 @@ void game_init(Game* game, fw64Engine* engine) {
     
     bomb_omb_battlefield_init(&game->battlefield, engine, allocator);
     fw64Font* font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
+
+#ifdef ENABLE_CHARACTER_DEBUG
     fw64DebugPrimitivesConfig config = {
         FW64_ASSET_scene_wire_primitives,
         FW64_scene_wire_primitives_node__capsule_stem,
@@ -28,17 +30,19 @@ void game_init(Game* game, fw64Engine* engine) {
         1,
         1
     };
-
+    
     fw64_character_debug_init(&game->character_debug, engine, COLLISION_GEOMETRY_DEBUG_SIZE, &config, allocator);
     fw64_character_debug_track(&game->character_debug, &game->battlefield.player.character, FW64_ASSET_file_Bomb_Omb_Battlefield_collision, &game->battlefield.player.camera);
-    
-    
+#endif
+
     ui_init(&game->ui, engine, font, &game->battlefield.player, &game->character_debug.collision_geometry, &game->bump_allocator);
 }
 
 void game_update(Game* game){
     bomb_omb_battlefield_update(&game->battlefield);
+#ifdef ENABLE_CHARACTER_DEBUG
     fw64_character_debug_update(&game->character_debug);
+#endif
     ui_update(&game->ui);
 }
 
@@ -49,5 +53,7 @@ void game_fixed_update(Game* game) {
 void game_draw(Game* game) {
     bomb_omb_battlefield_draw(&game->battlefield);
     ui_draw(&game->ui);
+#ifdef ENABLE_CHARACTER_DEBUG
     fw64_character_debug_draw(&game->character_debug);
+#endif
 }

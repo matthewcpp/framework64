@@ -13,5 +13,9 @@ create_game(
     EXTRA_LIBS fw64_components
     ALL_WARNINGS_AS_ERRORS)
 
-    #target_compile_definitions(character_controller PRIVATE -DFW64_N64LIBULTRA_WAIT_FOR_START)
-    target_compile_definitions(character_controller PRIVATE -DCOLLISION_TEST_NO_MUSIC)
+if (NOT FW64_PLATFORM_N64_LIBULTRA OR FW64_PLATFORM_N64_LIBDRAGON)
+    target_compile_definitions(character_controller PRIVATE -DENABLE_CHARACTER_DEBUG)
+endif()
+
+#target_compile_definitions(character_controller PRIVATE -DFW64_N64LIBULTRA_WAIT_FOR_START)
+target_compile_definitions(character_controller PRIVATE -DCOLLISION_TEST_NO_MUSIC)
