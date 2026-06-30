@@ -5,8 +5,32 @@
 #include <cassert>
 #include <utility>
 
-fw64Texture::fw64Texture(fw64Image* img) {
+fw64Texture::fw64Texture() {
+    setWrapMode(FW64_TEXTURE_WRAP_CLAMP, FW64_TEXTURE_WRAP_CLAMP);
+}
+
+fw64Texture::fw64Texture(fw64Image* img) 
+    :fw64Texture() {
     image = img;
+}
+
+void fw64Texture::setWrapMode(fw64TextureWrapMode s, fw64TextureWrapMode t) {
+    const auto getGlEnumVal = [](fw64TextureWrapMode wrap_mode) -> GLenum {
+        switch(wrap_mode) {
+            case FW64_TEXTURE_WRAP_CLAMP:
+                return GL_CLAMP_TO_EDGE;
+            case FW64_TEXTURE_WRAP_REPEAT:
+                return GL_REPEAT;
+            case FW64_TEXTURE_WRAP_MIRROR:
+                return GL_MIRRORED_REPEAT;
+        }
+        // invalid value set here
+        assert(false);
+        return GL_CLAMP_TO_EDGE;
+    };
+
+    wrap_s = getGlEnumVal(s);
+    wrap_t = getGlEnumVal(t);
 }
 
 GLuint fw64Texture::getGlImageHandle() const {
@@ -67,22 +91,7 @@ int fw64_texture_vslices(fw64Texture* texture) {
 }
 
 void fw64_texture_set_wrap_mode(fw64Texture* texture, fw64TextureWrapMode wrap_s, fw64TextureWrapMode wrap_t) {
-    const auto getGlEnumVal = [](fw64TextureWrapMode wrap_mode) {
-        switch(wrap_mode) {
-            case FW64_TEXTURE_WRAP_CLAMP:
-                return GL_CLAMP_TO_EDGE;
-            case FW64_TEXTURE_WRAP_REPEAT:
-                return GL_REPEAT;
-            case FW64_TEXTURE_WRAP_MIRROR:
-                return GL_MIRRORED_REPEAT;
-        }
-        // invalid value set here
-        assert(false);
-        return GL_CLAMP_TO_EDGE;
-    };
-
-    texture->wrap_s = getGlEnumVal(wrap_s);
-    texture->wrap_t = getGlEnumVal(wrap_t);
+    texture->setWrapMode(wrap_s, wrap_t);
 }
 
 void fw64_texture_set_palette_index(fw64Texture* texture, uint32_t index) {
