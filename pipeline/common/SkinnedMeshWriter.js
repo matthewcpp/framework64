@@ -1,24 +1,20 @@
 const fs = require("fs");
 const path = require("path");
 
-const MeshWriter = require("./MeshWriter");
 const AnimationWriter = require("../animation/Writer");
 const WriteInterface = require("../WriteInterface");
 
-async function write(mesh, animationData, meshFilePath, includeFilePath) {
-    const writer = WriteInterface.bigEndian();
-
+async function write(environment, mesh, animationData, meshFilePath, includeFilePath, meshWriter) {
     const file = fs.openSync(meshFilePath, "w");
-    await MeshWriter.writeStaticMeshToFile(mesh, file);
-    AnimationWriter.writeToFile(animationData, writer, file);
+    await meshWriter.writeStaticMeshToFile(environment, mesh, file);
+    AnimationWriter.writeToFile(animationData, environment.binaryWriter, file);
     fs.closeSync(file);
 
     AnimationWriter.writeHeaderFile(animationData, mesh.name, includeFilePath);
 }
 
-function writeAnimationData(animationData, meshName, dataFilePath, includeFilePath) {
-    const writer = WriteInterface.bigEndian();
-    AnimationWriter.write(animationData, dataFilePath, writer);
+function writeAnimationData(environment, animationData, meshName, dataFilePath, includeFilePath) {
+    AnimationWriter.write(animationData, dataFilePath, environment.binaryWriter);
     AnimationWriter.writeHeaderFile(animationData, meshName, includeFilePath);
 }
 

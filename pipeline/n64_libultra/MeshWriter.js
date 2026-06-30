@@ -1,8 +1,6 @@
 const DisplayList = require("./DisplayList");
 const N64Defs = require("./N64Defs");
 const VertexBuffer = require("./VertexBuffer");
-const MaterialBundleWriter = require("./MaterialBundleWriter");
-const processImage = require("./ProcessImage");
 
 const Util = require("../Util");
 const N64Slicer = require("./Slicer");
@@ -12,107 +10,195 @@ const Primitive = require("../gltf/Primitive");
 const Bounding = require("../gltf/Bounding");
 const GLTFVertexIndex = require("../gltf/GLTFVertexIndex")
 
-const path  = require("path");
 const fs = require("fs");
 
+class N64LibUltraMeshWriter {
+    _materialBundleWriter;
 
-/** Writes a self contained static mesh to file. */
-async function writeStaticMesh(staticMesh, destPath) {
-    const file = fs.openSync(destPath, "w");
-    await writeStaticMeshToFile(staticMesh, file);
-    fs.closeSync(file);
-}
-
-async function writeStaticMeshToFile(staticMesh, file) {
-    if (staticMesh.materialBundle === null) {
-        throw new Error("Error writing static mesh: no material bundle present on mesh.");
+    constructor(materialBundleWriter) {
+        this._materialBundleWriter = materialBundleWriter;
     }
 
-    await _writeMeshToFile(staticMesh, null, null, file);
-}
-
-/** Wrties a static mesh to a currently open file stream */
-async function writeStaticMeshData(mesh, materialBundle, n64Images, file) {
-    await _writeMeshToFile(mesh, materialBundle, n64Images, file)
-}
-
-async function _writeMeshToFile(mesh, materialBundle, bundleImages, file) {
-    let n64Images = bundleImages;
-
-    if (mesh.materialBundle) {
-        materialBundle = mesh.materialBundle;
-        n64Images = await createN64Images(materialBundle.gltfData);
+    /** Writes a self contained static mesh to file. */
+    async writeStaticMesh(environment, staticMesh, destPath) {
+        const file = fs.openSync(destPath, "w");
+        await this.writeStaticMeshToFile(environment, staticMesh, file);
+        fs.closeSync(file);
     }
 
-    adjustN64VertexNormals(mesh);
-    adjustN64TexCoordinates(mesh, materialBundle.gltfData, n64Images);
-    adjustN64VertexColors(mesh);
+    async writeStaticMeshToFile(environment, staticMesh, file) {
+        if (staticMesh.materialBundle === null) {
+            throw new Error("Error writing static mesh: no material bundle present on mesh.");
+        }
 
-    const meshInfo = new MeshInfo();
-    meshInfo.materialBundle = mesh.materialBundle;
-    meshInfo.primitiveCount = mesh.primitives.length;
-    meshInfo.triangleCount = mesh.triangleCount;
-    meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
-    meshInfo.bounding = mesh.bounding;
-
-    const primitiveInfos = [];
-    const vertexBuffers = [];
-    const displayListBuffers = [];
-    const vertexPointerBuffers = []
-    const vertexPointerCountBuffer = Buffer.alloc(mesh.primitives.length * 4); // holds number of vertex pointer indices per primitive
-    const materialCollectionBuffer = Buffer.alloc(mesh.primitives.length * 4); // holds material indidices
-
-    for (let i = 0; i <  mesh.primitives.length; i++) {
-        const primitive = mesh.primitives[i];
-
-        const primitiveInfo = new PrimitiveInfo();
-        primitiveInfo.verticesBufferIndex = meshInfo.vertexCount; // the index for this primitive is set to the total size of the mesh's vertices buffer added thus far
-        primitiveInfo.displayListBufferIndex = meshInfo.displayListCount; // the index for this primitive is set to the total size of the mesh's display list buffer this far
-        primitiveInfo.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : Primitive.NoJoint; // used for skinning, refer to Mesh.splitPrimitivesForSkinning
-        primitiveInfos.push(primitiveInfo);
-        materialCollectionBuffer.writeUInt32BE(materialBundle.getBundledMaterialIndex(primitive.material), i * 4);
-
-        // slice the vertices into chunks that can fit into N64 vertex cache
-        const slices = N64Slicer.slice(primitive);
-
-        // generate the display list for rendering the primitive geometry
-        const vertexBuffer = VertexBuffer.createVertexBuffer(slices, primitive.hasNormals);
-        const {displayList, vertexPointers, vertexCommandIndices} = primitive.elementType === Primitive.ElementType.Triangles ?
-            DisplayList.createTriangleDisplayListBuffer(slices) : DisplayList.createLineDisplayListBuffer(slices);
-
-        // update the mesh info totals
-        meshInfo.vertexCount += vertexBuffer.length / N64Defs.SizeOfVtx;
-        meshInfo.displayListCount += displayList.length / N64Defs.SizeOfGfx;
-        meshInfo.vertexPointerDataSize += vertexPointers.length;
-        vertexPointerCountBuffer.writeUInt32BE(vertexPointers.length / 4, i * 4); // vertexPointers is a binary buffer of uint 32's so we divide to get the actual count of items in the buffer
-
-        vertexBuffers.push(vertexBuffer);
-        displayListBuffers.push(displayList);
-        vertexPointerBuffers.push(vertexPointers);
+        await this._writeMeshToFile(environment, staticMesh, null, null, file);
     }
 
-    fs.writeSync(file, meshInfo.buffer);
-    
-    if (mesh.materialBundle) {
-        MaterialBundleWriter.write(materialBundle.gltfData, materialBundle, n64Images, file);
+    /** Wrties a static mesh to a currently open file stream */
+    async writeMeshData(environment, mesh, materialBundle, n64Images, file) {
+        await this._writeMeshToFile(environment, mesh, materialBundle, n64Images, file)
     }
 
-    for (const buffer of vertexBuffers)
-        fs.writeSync(file, buffer);
+    async _writeMeshToFile(environment, mesh, materialBundle, bundleImages, file) {
+        let n64Images = bundleImages;
 
-    for (const buffer of displayListBuffers)
-        fs.writeSync(file, buffer);
+        if (mesh.materialBundle) {
+            materialBundle = mesh.materialBundle;
+            n64Images = await this._materialBundleWriter.createImages(materialBundle.gltfData);
+        }
 
-    for (const primitiveInfo of primitiveInfos) {
-        fs.writeSync(file, primitiveInfo.buffer)
+        this._adjustN64VertexNormals(mesh);
+        this._adjustN64TexCoordinates(mesh, materialBundle.gltfData, n64Images);
+        this._adjustN64VertexColors(mesh);
+
+        const meshInfo = new MeshInfo();
+        meshInfo.materialBundle = mesh.materialBundle;
+        meshInfo.primitiveCount = mesh.primitives.length;
+        meshInfo.triangleCount = mesh.triangleCount;
+        meshInfo.vertexPointerDataSize = mesh.primitives.length * 4;
+        meshInfo.bounding = mesh.bounding;
+
+        const primitiveInfos = [];
+        const vertexBuffers = [];
+        const displayListBuffers = [];
+        const vertexPointerBuffers = []
+        const vertexPointerCountBuffer = Buffer.alloc(mesh.primitives.length * 4); // holds number of vertex pointer indices per primitive
+        const materialCollectionBuffer = Buffer.alloc(mesh.primitives.length * 4); // holds material indidices
+
+        for (let i = 0; i <  mesh.primitives.length; i++) {
+            const primitive = mesh.primitives[i];
+
+            const primitiveInfo = new PrimitiveInfo();
+            primitiveInfo.verticesBufferIndex = meshInfo.vertexCount; // the index for this primitive is set to the total size of the mesh's vertices buffer added thus far
+            primitiveInfo.displayListBufferIndex = meshInfo.displayListCount; // the index for this primitive is set to the total size of the mesh's display list buffer this far
+            primitiveInfo.jointIndex = primitive.jointIndices ? primitive.jointIndices[0] : Primitive.NoJoint; // used for skinning, refer to Mesh.splitPrimitivesForSkinning
+            primitiveInfos.push(primitiveInfo);
+            materialCollectionBuffer.writeUInt32BE(materialBundle.getBundledMaterialIndex(primitive.material), i * 4);
+
+            // slice the vertices into chunks that can fit into N64 vertex cache
+            const slices = N64Slicer.slice(primitive);
+
+            // generate the display list for rendering the primitive geometry
+            const vertexBuffer = VertexBuffer.createVertexBuffer(slices, primitive.hasNormals);
+            const {displayList, vertexPointers, vertexCommandIndices} = primitive.elementType === Primitive.ElementType.Triangles ?
+                DisplayList.createTriangleDisplayListBuffer(slices) : DisplayList.createLineDisplayListBuffer(slices);
+
+            // update the mesh info totals
+            meshInfo.vertexCount += vertexBuffer.length / N64Defs.SizeOfVtx;
+            meshInfo.displayListCount += displayList.length / N64Defs.SizeOfGfx;
+            meshInfo.vertexPointerDataSize += vertexPointers.length;
+            vertexPointerCountBuffer.writeUInt32BE(vertexPointers.length / 4, i * 4); // vertexPointers is a binary buffer of uint 32's so we divide to get the actual count of items in the buffer
+
+            vertexBuffers.push(vertexBuffer);
+            displayListBuffers.push(displayList);
+            vertexPointerBuffers.push(vertexPointers);
+        }
+
+        fs.writeSync(file, meshInfo.buffer);
+        
+        if (mesh.materialBundle) {
+            this._materialBundleWriter.write(materialBundle, n64Images, materialBundle.gltfData, file);
+        }
+
+        for (const buffer of vertexBuffers)
+            fs.writeSync(file, buffer);
+
+        for (const buffer of displayListBuffers)
+            fs.writeSync(file, buffer);
+
+        for (const primitiveInfo of primitiveInfos) {
+            fs.writeSync(file, primitiveInfo.buffer)
+        }
+
+        fs.writeSync(file, vertexPointerCountBuffer);
+        for (const buffer of vertexPointerBuffers)
+            fs.writeSync(file, buffer);
+
+        fs.writeSync(file, materialCollectionBuffer);
     }
 
-    fs.writeSync(file, vertexPointerCountBuffer);
-    for (const buffer of vertexPointerBuffers)
-        fs.writeSync(file, buffer);
+    /** adjusts vertex normals from GLTF (float) to work with N64 vertex format.
+     *  the normals are treated as 8-bit signed values (-128 to 127)
+    */
+    _adjustN64VertexNormals(mesh) {
+        for (const primitive of mesh.primitives) {
+            if (!primitive.hasNormals)
+                continue;
 
-    fs.writeSync(file, materialCollectionBuffer);
-}
+            for (const vertex of primitive.vertices) {
+                vertex[6] = Math.min(Math.round(vertex[6] * 128), 127);
+                vertex[7] = Math.min(Math.round(vertex[7] * 128), 127);
+                vertex[8] = Math.min(Math.round(vertex[8] * 128), 127);
+                vertex[9] = 255
+            }
+        }
+    }
+
+    /** adjusts tex coords from GLTF (float) to work with N64 tex coord system */
+    _adjustN64TexCoordinates(mesh, gltfData, n64Images) {
+        /** ensure that the tex coord value will fit in a signed 16 bit integer */
+        const validateTexCoord = (val) => {
+            return val >= -32768 && val <= 32767;
+        }
+
+        for (const primitive of mesh.primitives) {
+            if (!primitive.hasTexCoords)
+                continue;
+
+            const material = gltfData.materials[primitive.material];
+            if (material.texture === Material.NoTexture)
+                continue;
+            
+            const texture = gltfData.textures[material.texture];
+            const image = n64Images[texture.image];
+
+            const sliceWidth = image.width / image.hslices;
+            const sliceHeight = image.height / image.vslices;
+
+            if (!Util.isPowerOf2(sliceWidth) || !Util.isPowerOf2(sliceHeight)) {
+                throw new Error(`image: ${image.name} has non power of 2 dimensions: ${image.width}x${image.height}`);
+            }
+
+            for (const vertex of primitive.vertices) {
+                let s = vertex[4];
+                let t = vertex[5];
+
+                const origS = s;
+                const origT = t;
+
+                // Although uncommon for meshes, we want use slice width/height here
+                s *= sliceWidth * 2;
+                t *= sliceHeight * 2;
+
+                // Note that the texture coordinates (s,t) are encoded in S10.5 format.
+                vertex[4] = Math.round(s * (1 << 5));
+                vertex[5] = Math.round(t * (1 << 5));
+
+                const textCoordsAreValid = validateTexCoord(vertex[4]) && validateTexCoord(vertex[5]);
+
+                if (!textCoordsAreValid) {
+                    throw new Error(`Mesh ${mesh.name}: vertex: [${vertex[0]}, ${vertex[1]}, ${vertex[2]}] [${origS}, ${origT}] contains tex coord value outside of S10.5 format range.  Check model source data.`);
+                }
+            }
+        }
+    }
+
+    /** adjusts vertex colors from GLTF (float) 0.0-1.0 to uint8 0-255 */
+    _adjustN64VertexColors(mesh) {
+        for (const primitive of mesh.primitives) {
+            if (!primitive.hasVertexColors) {
+                continue;
+            }
+
+            for (const vertex of primitive.vertices) {
+                vertex[GLTFVertexIndex.ColorR] = Math.round(vertex[GLTFVertexIndex.ColorR] * 255);
+                vertex[GLTFVertexIndex.ColorG] = Math.round(vertex[GLTFVertexIndex.ColorG] * 255);
+                vertex[GLTFVertexIndex.ColorB] = Math.round(vertex[GLTFVertexIndex.ColorB] * 255);
+                vertex[GLTFVertexIndex.ColorA] = Math.round(vertex[GLTFVertexIndex.ColorA] * 255);
+            }
+        }
+    }
+};
 
 /**
  * This class represents the header of the Mesh data.
@@ -169,106 +255,4 @@ class PrimitiveInfo {
     }
 }
 
-/** adjusts vertex normals from GLTF (float) to work with N64 vertex format.
- *  the normals are treated as 8-bit signed values (-128 to 127)
-*/
-function adjustN64VertexNormals(mesh) {
-    for (const primitive of mesh.primitives) {
-        if (!primitive.hasNormals)
-            continue;
-
-        for (const vertex of primitive.vertices) {
-            vertex[6] = Math.min(Math.round(vertex[6] * 128), 127);
-            vertex[7] = Math.min(Math.round(vertex[7] * 128), 127);
-            vertex[8] = Math.min(Math.round(vertex[8] * 128), 127);
-            vertex[9] = 255
-        }
-    }
-}
-
-/** adjusts tex coords from GLTF (float) to work with N64 tex coord system */
-function adjustN64TexCoordinates(mesh, gltfData, n64Images) {
-    /** ensure that the tex coord value will fit in a signed 16 bit integer */
-    const validateTexCoord = (val) => {
-        return val >= -32768 && val <= 32767;
-    }
-
-    for (const primitive of mesh.primitives) {
-        if (!primitive.hasTexCoords)
-            continue;
-
-        const material = gltfData.materials[primitive.material];
-        if (material.texture === Material.NoTexture)
-            continue;
-        
-        const texture = gltfData.textures[material.texture];
-        const image = n64Images[texture.image];
-
-        const sliceWidth = image.width / image.hslices;
-        const sliceHeight = image.height / image.vslices;
-
-        if (!Util.isPowerOf2(sliceWidth) || !Util.isPowerOf2(sliceHeight)) {
-            throw new Error(`image: ${image.name} has non power of 2 dimensions: ${image.width}x${image.height}`);
-        }
-
-        for (const vertex of primitive.vertices) {
-            let s = vertex[4];
-            let t = vertex[5];
-
-            const origS = s;
-            const origT = t;
-
-            // Although uncommon for meshes, we want use slice width/height here
-            s *= sliceWidth * 2;
-            t *= sliceHeight * 2;
-
-            // Note that the texture coordinates (s,t) are encoded in S10.5 format.
-            vertex[4] = Math.round(s * (1 << 5));
-            vertex[5] = Math.round(t * (1 << 5));
-
-            const textCoordsAreValid = validateTexCoord(vertex[4]) && validateTexCoord(vertex[5]);
-
-            if (!textCoordsAreValid) {
-                throw new Error(`Mesh ${mesh.name}: vertex: [${vertex[0]}, ${vertex[1]}, ${vertex[2]}] [${origS}, ${origT}] contains tex coord value outside of S10.5 format range.  Check model source data.`);
-            }
-        }
-    }
-}
-
-/** adjusts vertex colors from GLTF (float) 0.0-1.0 to uint8 0-255 */
-function adjustN64VertexColors(mesh) {
-    for (const primitive of mesh.primitives) {
-        if (!primitive.hasVertexColors) {
-            continue;
-        }
-
-        for (const vertex of primitive.vertices) {
-            vertex[GLTFVertexIndex.ColorR] = Math.round(vertex[GLTFVertexIndex.ColorR] * 255);
-            vertex[GLTFVertexIndex.ColorG] = Math.round(vertex[GLTFVertexIndex.ColorG] * 255);
-            vertex[GLTFVertexIndex.ColorB] = Math.round(vertex[GLTFVertexIndex.ColorB] * 255);
-            vertex[GLTFVertexIndex.ColorA] = Math.round(vertex[GLTFVertexIndex.ColorA] * 255);
-        }
-    }
-}
-
-async function createN64Images(gltfData) {
-    if (gltfData.images.length === 0) {
-        return [];
-    }
-
-    const n64Images = [];
-    const gltfDir = path.dirname(gltfData.gltfPath);
-
-    for (const imageJson of gltfData.images) {
-        n64Images.push(await processImage(imageJson, null, gltfDir, null));
-    }
-
-    return n64Images;
-}
-
-module.exports = {
-    writeStaticMesh: writeStaticMesh,
-    writeStaticMeshToFile: writeStaticMeshToFile,
-    writeStaticMeshData: writeStaticMeshData,
-    createN64Images: createN64Images
-};
+module.exports = N64LibUltraMeshWriter;

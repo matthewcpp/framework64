@@ -1,25 +1,23 @@
-const CollisionGeometryWriter = require("../CollisionGeometryWriter");
-const MaterialBundleWriter = require("./MaterialBundleWriter");
-const MeshWriter = require("./MeshWriter")
-const SceneDataWriter = require("../SceneDataWriter");
+const CollisionGeometryWriter = require("./CollisionGeometryWriter");
+const SceneDataWriter = require("./SceneDataWriter");
 const WriteInterface = require("../WriteInterface");
 
 const fs = require("fs");
 
-async function write(environment, scene, gltfData, destPath) {
+async function write(environment, scene, gltfData, destPath, materialBundleWriter, meshWriter) {
     const file = fs.openSync(destPath, "w");
-    await writeToFile(environment, scene, gltfData, file);
+    await writeToFile(environment, scene, gltfData, file, materialBundleWriter, meshWriter);
     fs.closeSync(file);
 }
 
-async function writeToFile(environment, scene, gltfData, file) {
-    const writer = WriteInterface.littleEndian();
-    const images = await MaterialBundleWriter.createDesktopImages(gltfData);
+async function writeToFile(environment, scene, gltfData, file, materialBundleWriter, meshWriter) {
+    const writer = environment.binaryWriter;
+    const images = await materialBundleWriter.createImages(gltfData);
     const materialBundle = scene.materialBundle;
 
     SceneDataWriter.writeSceneInfo(scene, file, writer);
     if (scene.materialBundle) {
-        await MaterialBundleWriter.write(scene.materialBundle, images, gltfData, file);
+        await materialBundleWriter.write(scene.materialBundle, images, gltfData, file);
     }
 
     if (scene.collisionGeometry) {
@@ -29,7 +27,7 @@ async function writeToFile(environment, scene, gltfData, file) {
 
     for (const gltfMeshIndex of scene.meshBundle) {
         const mesh = gltfData.meshes[gltfMeshIndex];
-        await MeshWriter.writeMeshData(environment, mesh, materialBundle, file);
+        await meshWriter.writeMeshData(environment, mesh, materialBundle, images, file);
     }
 
     // The order in which these are written out needs to align with scene.c reading

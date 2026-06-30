@@ -1,33 +1,36 @@
 const fs = require("fs");
 
-async function writeFile(image, dest_path) {
-    const imageFile = fs.openSync(dest_path, "w");
-    await writeToOpenStream(image, imageFile);
-    fs.closeSync(imageFile);
-}
-
-async function writeToOpenStream(image, fileStream) {
-    const primaryImageFileBuffer = await image.getPrimaryFileBuffer();
-
-    const imageHeader = new ImageHeader(image, primaryImageFileBuffer.length);
-    fs.writeSync(fileStream, imageHeader.buffer);
-    fs.writeSync(fileStream, primaryImageFileBuffer);
-
-    if (image.additionalPalettes.length == 0)
-        return;
-
-    const fileSizesBuffer = Buffer.alloc(image.additionalPalettes.length * 4);
-    let index = 0;
-    for (const additionalPalette of image.additionalPalettes) {
-        index = fileSizesBuffer.writeUint32LE(additionalPalette.length, index);
+class DesktopImageWriter {
+    async writeFile(image, destPath) {
+        const imageFile = fs.openSync(destPath, "w");
+        await this.writeToOpenStream(image, imageFile);
+        fs.closeSync(imageFile);
     }
 
-    fs.writeSync(fileStream, fileSizesBuffer);
+    async writeToOpenStream(image, fileStream) {
+        const primaryImageFileBuffer = await image.getPrimaryFileBuffer();
 
-    for (const additionalPalette of image.additionalPalettes) {
-        fs.writeSync(fileStream, additionalPalette);
+        const imageHeader = new ImageHeader(image, primaryImageFileBuffer.length);
+        fs.writeSync(fileStream, imageHeader.buffer);
+        fs.writeSync(fileStream, primaryImageFileBuffer);
+
+        if (image.additionalPalettes.length == 0) {
+            return;
+        }
+
+        const fileSizesBuffer = Buffer.alloc(image.additionalPalettes.length * 4);
+        let index = 0;
+        for (const additionalPalette of image.additionalPalettes) {
+            index = fileSizesBuffer.writeUint32LE(additionalPalette.length, index);
+        }
+
+        fs.writeSync(fileStream, fileSizesBuffer);
+
+        for (const additionalPalette of image.additionalPalettes) {
+            fs.writeSync(fileStream, additionalPalette);
+        }
     }
-}
+};
 
 // this class should correspond to ImageHeader in desktop/image.cpp
 class ImageHeader {
@@ -49,7 +52,4 @@ class ImageHeader {
     }
 };
 
-module.exports = {
-    writeFile: writeFile,
-    writeToOpenStream: writeToOpenStream
-};
+module.exports = DesktopImageWriter;

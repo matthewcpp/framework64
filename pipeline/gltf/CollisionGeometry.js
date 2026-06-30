@@ -1,6 +1,6 @@
-const Bounding = require("./gltf/Bounding");
-const N64Node = require("./gltf/Node")
-const GLTFUtil = require("./gltf/GLTFUtil");
+const Bounding = require("./Bounding");
+const N64Node = require("./Node")
+const GLTFUtil = require("./GLTFUtil");
 const glMatrix = require("gl-matrix");
 const Intersect = require("./Intersect");
 

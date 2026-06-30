@@ -1,16 +1,18 @@
-const ImageWriter = require("./ImageWriter");
+const DesktopImageWriter = require("./ImageWriter");
 
 const fs = require("fs");
 
-async function writeFile(font, dest_path) {
-    const fontHeader = new FontHeader(font);
+class DesktopFontWriter {
+    async writeFile(font, dest_path) {
+        const fontHeader = new FontHeader(font);
 
-    const fontFile = fs.openSync(dest_path, "w");
-    fs.writeSync(fontFile, fontHeader.buffer);
-    fs.writeSync(fontFile, font.desktopGlyphBuffer);
-    await ImageWriter.writeToOpenStream(font.image, fontFile);
-    fs.closeSync(fontFile);
-}
+        const fontFile = fs.openSync(dest_path, "w");
+        fs.writeSync(fontFile, fontHeader.buffer);
+        fs.writeSync(fontFile, font.desktopGlyphBuffer);
+        await new DesktopImageWriter().writeToOpenStream(font.image, fontFile);
+        fs.closeSync(fontFile);
+    }
+};
 
 // this class should correspond to FontHeader in desktop/font.cpp
 class FontHeader {
@@ -31,6 +33,4 @@ class FontHeader {
     }
 }
 
-module.exports = {
-    writeFile: writeFile
-};
+module.exports = DesktopFontWriter;

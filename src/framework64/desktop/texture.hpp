@@ -7,8 +7,10 @@
 #include <string>
 
 struct fw64Texture {
-    fw64Texture() = default;
+    fw64Texture();
     fw64Texture(fw64Image* img);
+
+    void setWrapMode(fw64TextureWrapMode s, fw64TextureWrapMode t);
 
     fw64Image* image = nullptr;
     GLenum wrap_s = FW64_TEXTURE_WRAP_CLAMP;

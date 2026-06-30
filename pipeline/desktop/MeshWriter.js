@@ -4,46 +4,50 @@ const WriteInterface = require("../WriteInterface");
 
 const fs = require("fs");
 
-/** Writes a self contained static mesh to file.
- *  Precondition: this gltf data should contain at least 1 mesh.
- */
-async function writeStaticMesh(environment, staticMesh, destPath) {
-    const file = fs.openSync(destPath, "w");
-    await writeStaticMeshToFile(environment, staticMesh, file)
-    fs.closeSync(file);
-}
+class DesktopMeshWriter {
+    _materialBundleWriter;
 
-async function writeStaticMeshToFile(environment, staticMesh, file) {
-    if (staticMesh.materialBundle === null) {
-        throw new Error("Error writing static mesh: no material bundle present on mesh.");
+    constructor(materialBundleWriter) {
+        this._materialBundleWriter = materialBundleWriter;
     }
 
-    await _writeMeshToFile(environment, staticMesh, staticMesh.materialBundle, file);
-}
-
-async function writeMeshData(environment, mesh, materialBundle, file) {
-    if (mesh.materialBundle != null) {
-        throw new Error("Error writing mesh data: unexpected material bundle present on mesh.");
-    }
-    await _writeMeshToFile(environment, mesh, materialBundle, file);
-}
-
-async function _writeMeshToFile(environment, mesh, materialBundle, file) {
-    const writer = WriteInterface.littleEndian();
-
-    GLMeshWriter.writeMeshInfo(mesh, writer, file)
-
-    if (mesh.materialBundle) {
-        const gltfData = mesh.materialBundle.gltfData;
-        const images = await MaterialBundleWriter.createDesktopImages(gltfData);
-        await MaterialBundleWriter.write(materialBundle, images, gltfData, file);
+    /** Writes a self contained static mesh to file.
+     *  Precondition: this gltf data should contain at least 1 mesh.
+     */
+    async writeStaticMesh(environment, staticMesh, destPath) {
+        const file = fs.openSync(destPath, "w");
+        await this.writeStaticMeshToFile(environment, staticMesh, file)
+        fs.closeSync(file);
     }
 
-    GLMeshWriter.writeMeshData(environment, mesh, materialBundle, writer, file);
-}
+    async writeStaticMeshToFile(environment, staticMesh, file) {
+        if (staticMesh.materialBundle === null) {
+            throw new Error("Error writing static mesh: no material bundle present on mesh.");
+        }
 
-module.exports = {
-    writeStaticMesh: writeStaticMesh,
-    writeStaticMeshToFile: writeStaticMeshToFile,
-    writeMeshData: writeMeshData
+        await this._writeMeshToFile(environment, staticMesh, staticMesh.materialBundle, file);
+    }
+
+    async writeMeshData(environment, mesh, materialBundle, images, file) {
+        if (mesh.materialBundle != null) {
+            throw new Error("Error writing mesh data: unexpected material bundle present on mesh.");
+        }
+        await this._writeMeshToFile(environment, mesh, materialBundle, file);
+    }
+
+    async _writeMeshToFile(environment, mesh, materialBundle, file) {
+        const writer = WriteInterface.littleEndian();
+
+        GLMeshWriter.writeMeshInfo(mesh, writer, file)
+
+        if (mesh.materialBundle) {
+            const gltfData = mesh.materialBundle.gltfData;
+            const images = await this._materialBundleWriter.createImages(gltfData);
+            await this._materialBundleWriter.write(materialBundle, images, gltfData, file);
+        }
+
+        GLMeshWriter.writeMeshData(environment, mesh, materialBundle, writer, file);
+    }
 };
+
+module.exports = DesktopMeshWriter;

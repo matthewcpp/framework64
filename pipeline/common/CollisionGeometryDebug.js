@@ -1,13 +1,14 @@
-const GLTFLoader = require("./gltf/GLTFLoader");
+const GLTFLoader = require("../gltf/GLTFLoader");
 
 const fs = require("fs");
-const Material = require("./gltf/Material");
-const Primitive = require("./gltf/Primitive");
-const Scene = require("./gltf/Scene");
-const LevelParser = require("./LevelParser");
-const MaterialBundle = require("./gltf/MaterialBundle");
-const Mesh = require("./gltf/Mesh");
-const Node = require("./gltf/Node");
+const Material = require("../gltf/Material");
+const Primitive = require("../gltf/Primitive");
+const Scene = require("../gltf/Scene");
+const LevelParser = require("../gltf/LevelParser");
+const MaterialBundle = require("../gltf/MaterialBundle");
+const Mesh = require("../gltf/Mesh");
+const Node = require("../gltf/Node");
+const SceneWriter = require("./SceneWriter")
 
 /** This should be kept in sync with CollisionGeometryDebugLayerMask in fw64_collision_geometry_debug.h */
 const LayerMask = {
@@ -187,7 +188,7 @@ function createTriangleNode(scene, parentNode, gltfLoader, name, triangles, colo
 
 }
 
-async function writeCollisionGeometryDebugData(environment, collisionGeometry, writeInterface, SceneWriter, filePath){
+async function writeCollisionGeometryDebugData(environment, collisionGeometry, writeInterface, filePath, materialBundleWriter, meshWriter){
     const file = fs.openSync(filePath, "w");
 
     // allocate cell offset buffer and re-reserve space in file
@@ -227,7 +228,7 @@ async function writeCollisionGeometryDebugData(environment, collisionGeometry, w
 
         const stats = fs.statSync(filePath);
         offsetBufferIndex = writeInterface.writeUInt32(cellOffsetBuffer, stats.size, offsetBufferIndex);
-        await SceneWriter.writeToFile(environment, scene, gltfLoader, file)
+        await SceneWriter.writeToFile(environment, scene, gltfLoader, file, materialBundleWriter, meshWriter)
     }
 
     // write the actual cell data offsets into the file
