@@ -5,7 +5,9 @@ const BasicFileProcessor = require("../common/FileProcessor");
 const GltfLevelProcessor = require("../common/LevelProcessor");
 const GltfMeshProcessor = require("../common/MeshProcessor");
 const GltfSkinnedMeshProcessor = require("../common/SkinnedMeshProcessor");
-const N64LibultraFontProcessor = require("./FontProcessor");
+const FontProcessor = require("../common/FontProcessor");
+const N64LibUltraFont = require("./Font");
+const N64LibUltraFontWriter = require("./FontWriter");
 const N64LibUltraImageProcessor = require("./ImageProcessor");
 const N64LibUltraMaterialBundleWriter = require("./MaterialBundleWriter");
 const N64LibUltraMeshWriter = require("./MeshWriter");
@@ -43,7 +45,7 @@ class N64LibUltraPipelineProcessor extends PipelineProcessor {
         this._soundBankProcessor = new N64LibUltraSoundBankProcessor(environment);
 
         this._imageProcessor = new N64LibUltraImageProcessor(environment);
-        this._fontProcessor = new N64LibultraFontProcessor(environment);
+        this._fontProcessor = new N64LibUltraFontProcessor(environment, this._imageProcessor);
 
         const materialBundleWriter = new N64LibUltraMaterialBundleWriter(this._imageProcessor);
         const meshWriter = new N64LibUltraMeshWriter(materialBundleWriter);
@@ -54,5 +56,14 @@ class N64LibUltraPipelineProcessor extends PipelineProcessor {
     }
 };
 
+class N64LibUltraFontProcessor extends FontProcessor {
+    constructor(environment, imageProcessor) {
+        super(environment, imageProcessor, new N64LibUltraFontWriter());
+    }
+
+    _createFont(name) {
+        return new N64LibUltraFont(name);
+    }
+};
 
 module.exports = processN64;

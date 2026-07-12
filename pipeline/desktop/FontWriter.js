@@ -4,12 +4,18 @@ const fs = require("fs");
 
 class DesktopFontWriter {
     async writeFile(font, dest_path) {
+        // image fonts do not need to write glyps to a canvas, they are already stitched together in a grid
+        if (!font.isImageFont) {
+            await font.createGlImage();
+        }
+
         const fontHeader = new FontHeader(font);
 
         const fontFile = fs.openSync(dest_path, "w");
         fs.writeSync(fontFile, fontHeader.buffer);
         fs.writeSync(fontFile, font.desktopGlyphBuffer);
-        await new DesktopImageWriter().writeToOpenStream(font.image, fontFile);
+        const imageWriter = new DesktopImageWriter();
+        await imageWriter.writeToOpenStream(font.image, fontFile);
         fs.closeSync(fontFile);
     }
 };

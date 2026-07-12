@@ -18,6 +18,11 @@ class FontBase {
 
     glyphs = null;
 
+    /** Set to true if the font was loaded from a set of images */
+    isImageFont = false;
+    /** the accompanying image containing font glyphs */
+    image = null;
+
     /** Generic glyph info class which holds codepoint metrics*/
     static GlyphInfo = class {
         codepoint;
@@ -73,6 +78,7 @@ class FontBase {
 
         this.tileWidth = Util.nextPowerOf2(this.tileWidth);
         this.tileHeight = Util.nextPowerOf2(this.tileHeight);
+        this.isImageFont = false;
     }
 
     _parseGlyphData(opentypeGlyph) {
@@ -113,6 +119,8 @@ class FontBase {
                 height: tileHeight
             });
         }
+
+        this.isImageFont = true;
     }
 }
 
