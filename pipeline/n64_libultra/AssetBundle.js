@@ -12,18 +12,14 @@ class N64LibUltraAssetBundle extends AssetBundle {
     }
 
     _addAsset(assetType, assetPath, assetName = null) {
-        if (assetName === null) {
-            assetName = path.basename(assetPath, path.extname(assetPath));
-        }
-
         // Note: we expect absolute paths here, this is a temporary fix because some of the
-        // common processing functions do not provide absolute assets paths.  This should be
+        // common processing functions do not provide absolute assets paths. This should be
         // removed when that is fixed up.
         if (!path.isAbsolute(assetPath)) {
             assetPath = path.join(this._outputDirectory, assetPath);
         }
 
-        return this._addAssetBase(assetType, this.entries.length, assetPath, assetName)
+        return super._addAsset(assetType, assetPath, assetName)
     }
 
     writeArchive(archivePath) {
