@@ -1,9 +1,10 @@
 const Bounding = require("./Bounding");
 
 class Primitive {
+    // TODO: are the values for these defines the best idea?
     static ElementType = {
-        Lines: 1,
-        Triangles: 4
+        Lines: 1, /*GL_LINES*/
+        Triangles: 4 /*GL_TRIANGLES*/
     };
 
     static NoMaterial = 0xFFFF;
