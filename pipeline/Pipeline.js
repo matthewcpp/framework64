@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const runInDocker = require("./RunInDocker");
 const Util = require("./Util");
 const Environment = require("./Environment");
 
@@ -21,6 +22,12 @@ const { glMatrix } = require("gl-matrix");
 async function prepareAssets(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest) {
     glMatrix.setMatrixArrayType(Array);
 
+    platform = platform.toLowerCase();
+
+    if (await runInDocker(manifestFile, assetDirectory, platform, outputDirectory, pluginManifest)) {
+        return;
+    }
+
     if (!fse.existsSync(manifestFile)) {
         throw new Error(`Manifest file does not exist: ${manifestFile}`);
     }
@@ -28,8 +35,6 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     if (fse.existsSync(outputDirectory)) {
         rimraf.sync(outputDirectory);
     }
-
-    platform = platform.toLowerCase();
 
     const pluginMap = loadPlugins(pluginManifest);
 
@@ -43,6 +48,11 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
             await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
             break;
         }
+
+        case "n64_libdragon":
+            const processN64Libdragon = require("./n64_libdragon/Process");
+            await processN64Libdragon(manifestFile, assetDirectory, outputDirectory, pluginMap);
+            break;
 
         case "desktop":{
             const processDesktop = require("./desktop/Process").processDesktop;
