@@ -1,6 +1,7 @@
 const Util = require("./Util");
 
 const fs = require("fs");
+const path = require("path");
 
 class AssetBundleEntry {
     type;
@@ -87,12 +88,25 @@ class AssetBundle {
         this.defineAssets = true;
     }
 
-    _addAsset(assetType, assetPath, assetName = null) {
-        throw new Error("Dervied asset bundle should override the addAsset method");
+    get nextId() {
+        return this.entries.length;
     }
 
-    /** Protected method for adding an asset into the bundle. All dervied classes should call this from their own AddAsset function*/
-    _addAssetBase(assetType, assetId, assetPath, assetName) {
+    /** Default method for getting an asset Id.  This simply returns the number of items we currently have in our asset array
+     * Other implementations are free to make this more elaborate.
+     */
+    _getAssetId(assetType, assetPath, assetName) {
+        return this.entries.length;
+    }
+
+    /** Default method for adding an asset into the bundle. 
+     * Derived class should override this method if they need extra functionality */
+    _addAsset(assetType, assetPath, assetName = null) {
+        if (assetName === null) {
+            assetName = path.basename(assetPath, path.extname(assetPath));
+        }
+
+        const assetId = this._getAssetId(assetType, assetPath, assetName);
         this.entries.push(new AssetBundleEntry(assetType, assetId, assetPath, Util.safeDefineName(assetName), this.defineAssets));
         
         return assetId;

@@ -1,10 +1,13 @@
 const fs = require("fs");
+const Image = require("./Image");
+const N64LibUltraImageWriter = require("./ImageWriter");
 
 class N64LibUltraFontWriter {
     static SizeOfFontHeader = 12;
     static SizeOfFontGlyph = 8;
 
-    writeBinary(font, imageBuffer, path) {
+    async writeFile(font, path) {
+        const imageBuffer = await this._getOrCreateImageBuffer(font);
         const headerBuffer = Buffer.alloc(N64LibUltraFontWriter.SizeOfFontHeader);
         let bufferOffset = 0;
 
@@ -29,6 +32,20 @@ class N64LibUltraFontWriter {
         fs.writeSync(file, glyphBuffer);
         fs.writeSync(file, imageBuffer);
         fs.closeSync(file);
+    }
+
+    async _getOrCreateImageBuffer(font) {
+        if (font.isImageFont) {
+            // this image processor returns image details. In the case of libultra, this also contains an asset buffer of the image
+            return font.image.assetBuffer;
+        } else {
+            // create the image of all the glyphs and write it to a buffer
+            const image = await font.createFontImage(Image.Format.IA8);
+            const hslices = image.width / font.tileWidth;
+            const vslices = image.height / font.tileHeight;
+            const imageWriter = new N64LibUltraImageWriter();
+            return imageWriter.writeBuffer(image, hslices, vslices);
+        }
     }
 };
 

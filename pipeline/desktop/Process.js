@@ -1,6 +1,8 @@
 const BasicFileProcessor = require("../common/FileProcessor");
 const DesktopAssetBundle = require("./AssetBundle");
-const DesktopFontProcessor = require("./FontProcessor");
+const FontProcessor = require("../common/FontProcessor");
+const DesktopFont = require("./Font");
+const DesktopFontWriter = require("./FontWriter");
 const DesktopImageProcessor = require("./ImageProcessor");
 const DesktopSoundBankProcessor = require("./SoundBankProcessor");
 const DesktopMaterialBundleWriter = require("./MaterialBundleWriter");
@@ -55,6 +57,16 @@ class DesktopPipelineProcessor extends PipelineProcessor {
         this._levelProcessor = new GltfLevelProcessor(environment, materialBundleWriter, meshWriter);
         this._meshProcessor = new GltfMeshProcessor(environment, meshWriter);
         this._skinnedMeshProcessor = new GltfSkinnedMeshProcessor(environment, meshWriter);
+    }
+};
+
+class DesktopFontProcessor extends FontProcessor {
+    constructor(environment, imageProcessor) {
+        super(environment, imageProcessor, new DesktopFontWriter());
+    }
+
+    _createFont(name) {
+        return new DesktopFont(name);
     }
 };
 
