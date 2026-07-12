@@ -12,6 +12,10 @@ function configureEnvironment(platform, destDirectory) {
         case "n64_libultra":
             configureN64Libultra(configDir, destDirectory);
             break;
+
+        case "n64_libdragon":
+            configureN64Libdragon(configDir, destDirectory);
+            break;
     
         default:
             console.error(`Unsupported platform specified: ${platform}`);
@@ -26,8 +30,16 @@ function configureDesktop(configDir, destDirectory) {
 
 function configureN64Libultra(configDir, destDirectory) {
     console.log("Configuring for: N64 libultra");
+    copyDevcontainerJson("n64_libultra", configDir, destDirectory);
+}
 
-    const devcontainerSrcFile = path.join(configDir, "n64_libultra", "n64_libultra.devcontainer.json");
+function configureN64Libdragon(configDir, destDirectory) {
+    console.log("Configuring for: N64 libdragon");
+    copyDevcontainerJson("n64_libdragon", configDir, destDirectory);
+}
+
+function copyDevcontainerJson(platform, configDir, destDirectory) {
+    const devcontainerSrcFile = path.join(configDir, platform, `${platform}.devcontainer.json`);
     const devcontainerDestFile = path.join(destDirectory, ".devcontainer.json");
     console.log(`Copy: ${devcontainerSrcFile} --> ${devcontainerDestFile}`);
     fs.copyFileSync(devcontainerSrcFile, devcontainerDestFile);

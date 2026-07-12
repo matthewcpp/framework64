@@ -70,6 +70,8 @@ target_include_directories(framework64 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if (FW64_PLATFORM_DESKTOP OR FW64_PLATFORM_WEB)
     add_subdirectory(desktop)
+elseif(FW64_PLATFORM_N64_LIBDRAGON)
+    add_subdirectory(n64_libdragon)
 elseif(FW64_PLATFORM_N64_LIBULTRA)
     add_subdirectory(n64_libultra)
 endif()

@@ -7,7 +7,7 @@ ARG NODE_MAJOR_VERSION=20
 ARG CMAKE_VERSION=3.29.4
 ARG CMAKE_ARCHIVE=cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz
 
-ENV FW64_N64_LIBULTRA_DOCKER_CONTAINER=1
+ENV FW64_DOCKER_CONTAINER="n64_libultra"
 ENV PATH=/opt/cmake-3.29.4-linux-x86_64/bin:${PATH}
 
 RUN apt-get update && apt-get remove -y cmake && cd /opt && \

@@ -45,8 +45,8 @@ GLuint fw64Texture::getGlImageHandle() const {
 // C Interface
 
 fw64Texture* fw64_texture_create_from_image(fw64Image* image, fw64Allocator* allocator) {
-    // TODO: fix this...
     assert(allocator != nullptr);
+    assert(image != nullptr);
     (void)allocator;
     return new fw64Texture(image);
 }
