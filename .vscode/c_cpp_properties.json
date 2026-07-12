@@ -18,6 +18,10 @@
             "compileCommands": "${workspaceFolder}/build_n64_libultra/compile_commands.json"
         },
         {
+            "name": "n64_libdragon",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
             "name": "Desktop",
             "configurationProvider": "ms-vscode.cmake-tools"
         }

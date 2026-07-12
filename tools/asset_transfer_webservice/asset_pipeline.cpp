@@ -34,7 +34,7 @@ bool AssetPipeline::init(const std::string& framework64_dir, const std::string& 
 
     std::cout << "Asset Pipeline: Using NodeJS: " << node_path << std::endl;
 
-    auto pipeline_script_file = std::filesystem::path(framework64_dir) / "scripts" / "RunPipeline.js";
+    auto pipeline_script_file = std::filesystem::path(framework64_dir) / "pipeline" / "RunPipeline.js";
     
     if (!std::filesystem::is_regular_file(pipeline_script_file)) {
         std::cout << "Asset Pipeline: Unable to locate framework64 pipeline script: " << pipeline_script_file << std::endl;

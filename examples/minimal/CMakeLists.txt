@@ -4,4 +4,7 @@ set(src_files
 create_game(
     TARGET minimal
     SOURCES ${src_files}
-    ALL_WARNINGS_AS_ERRORS)
+    EXTRA_LIBS fw64_components
+    ALL_WARNINGS_AS_ERRORS
+    WAIT_FOR_START
+)

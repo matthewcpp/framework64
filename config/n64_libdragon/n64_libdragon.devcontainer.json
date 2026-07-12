@@ -1,0 +1,17 @@
+{
+    "image": "matthewcpp/framework64_n64_libdragon",
+    "runArgs": [
+        "--net=host"
+    ],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "extensions.verifySignature": false
+            },
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools"
+            ]
+        }
+    }
+}

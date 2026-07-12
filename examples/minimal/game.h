@@ -1,10 +1,21 @@
 #pragma once
 
 #include "framework64/engine.h"
+#include "framework64/scene.h"
+
+#include "fw64_arcball_camera.h"
+#include "framework64/util/bump_allocator.h"
+
+#define KNIGHT_MAX 2
 
 typedef struct {
     fw64Engine* engine;
+    fw64BumpAllocator bump_allocator;
     fw64RenderPass* renderpass;
+    fw64SpriteBatch* spritebatch;
+    fw64Texture* test_texture1;
+    fw64Texture* test_texture2;
+    fw64Texture* test_texture3;
 } Game;
 
 #ifdef __cplusplus

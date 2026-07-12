@@ -4,14 +4,19 @@
 
 #include <string.h>
 
+#define FW64_STATIC_VECTOR_DEFAULT_ALIGNMENT 8
+
 void fw64_static_vector_init(fw64StaticVector* vector, size_t item_size, size_t item_capacity, fw64Allocator* allocator) {
+    fw64_static_vector_init_aligned(vector, item_size, item_capacity, allocator, FW64_STATIC_VECTOR_DEFAULT_ALIGNMENT);
+}
+
+void fw64_static_vector_init_aligned(fw64StaticVector* vector, size_t item_size, size_t item_capacity, fw64Allocator* allocator, size_t alignment) {
     vector->item_size = (uint32_t)item_size;
     vector->item_capacity = (uint32_t)item_capacity;
     vector->item_count = 0;
 
     if (item_capacity) {
-        // vector->data = fw64_allocator_malloc(allocator, item_size * item_capacity);
-        vector->data = fw64_allocator_memalign(allocator, 8, item_size * item_capacity);
+        vector->data = fw64_allocator_memalign(allocator, alignment, item_size * item_capacity);
     } else {
         vector->data = NULL;
     }

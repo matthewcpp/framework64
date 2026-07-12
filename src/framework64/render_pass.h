@@ -13,6 +13,10 @@
 
 typedef struct fw64RenderPass fw64RenderPass;
 
+#ifdef FW64_PLATFORM_N64_LIBDRAGON
+#include <GL/gl_enums.h>
+#endif
+
 typedef enum {
     FW64_CLEAR_FLAG_NONE = 0,
     FW64_CLEAR_FLAG_COLOR = 1,

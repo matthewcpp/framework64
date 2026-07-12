@@ -15,19 +15,15 @@ typedef struct fw64Mesh fw64Mesh;
 typedef struct fw64Scene fw64Scene;
 
 typedef uint64_t fw64AssetId;
-
 #define FW64_INVALID_ASSET_ID UINT64_MAX
 
 typedef struct fw64AssetDatabase fw64AssetDatabase;
 
 #define FW64_ASSETS_MAX_OPEN_DATASOURCES 4
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// TODO: this should not be void* change this after data source loading is all setup
 
 /** 
  * Loads an image from the asset bundle given a handle.  

@@ -18,6 +18,7 @@ extern "C" {
 #endif
 
 void fw64_static_vector_init(fw64StaticVector* vector, size_t item_size, size_t item_capacity, fw64Allocator* allocator);
+void fw64_static_vector_init_aligned(fw64StaticVector* vector, size_t item_size, size_t item_capacity, fw64Allocator* allocator, size_t alignment);
 void fw64_static_vector_uninit(fw64StaticVector* vector, fw64Allocator* allocator);
 void fw64_static_vector_resize(fw64StaticVector* vector, size_t count);
 
@@ -30,6 +31,7 @@ int fw64_static_vector_is_empty(fw64StaticVector* vector);
 void fw64_static_vector_clear(fw64StaticVector* vector);
 
 #define fw64_static_vector_size(vector) ((vector)->item_count)
+#define fw64_static_vector_data(vector) ((vector)->data)
 void* fw64_static_vector_get_item(fw64StaticVector* vector, uint32_t index);
 
 #ifdef __cplusplus
