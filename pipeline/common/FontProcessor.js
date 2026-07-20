@@ -44,7 +44,7 @@ class FontProcessor {
         const fontFileName = fontName + ".font";
         const destPath = path.join(this._environment.outputDirectory, fontFileName);
         await this._fontWriter.writeFile(font, destPath);
-        this._environment.assetBundle.addFont(fontFileName, font.name);
+        this._environment.assetBundle.addFont(destPath, font.name);
     }
 
     async _processImageFont(fontInfo) {

@@ -16,6 +16,7 @@ typedef struct {
     fw64Texture* test_texture1;
     fw64Texture* test_texture2;
     fw64Texture* test_texture3;
+    fw64Font* font;
 } Game;
 
 #ifdef __cplusplus

@@ -4,6 +4,7 @@ set(libdragon_source_files
     libdragon_display.h libdragon_display.c
     libdragon_dfs_datasource.h libdragon_dfs_datasource.c
     libdragon_engine.h libdragon_engine.c
+    libdragon_font.h libdragon_font.c
     libdragon_image.h libdragon_image.c
     libdragon_input.h libdragon_input.c
     libdragon_material.h libdragon_material.c
