@@ -39,7 +39,7 @@ function configureN64Libdragon(configDir, destDirectory) {
 }
 
 function copyDevcontainerJson(platform, configDir, destDirectory) {
-    const devcontainerSrcFile = path.join(configDir, platform, `${platform}.devcontainer.json`);
+    const devcontainerSrcFile = path.join(configDir, platform, `${platform}.devcontainer.jsonc`);
     const devcontainerDestFile = path.join(destDirectory, ".devcontainer.json");
     console.log(`Copy: ${devcontainerSrcFile} --> ${devcontainerDestFile}`);
     fs.copyFileSync(devcontainerSrcFile, devcontainerDestFile);
