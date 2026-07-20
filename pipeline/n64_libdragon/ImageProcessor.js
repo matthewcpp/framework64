@@ -16,6 +16,18 @@ class N64LibDragonImageProcessor {
     }
 
     async process(imageJson) {
+        return this._process(imageJson, true, this._environment.assetDirectory);
+    }
+
+    /** Used by other processers to convert images without adding them into the asset bundle
+     * For example, fonts and material bundles.  Note the asset directory is passed in here and
+     * we are not necessarily using the environment's asset directory.
+    */
+    async convertWithoutBundling(imageJson, assetDirectory) {
+        return this._process(imageJson, false, assetDirectory);
+    }
+
+    async _process(imageJson, bundleAssets, assetDirectory) {
         const defaultArgs = {
             hslices: 1,
             vslices: 1
@@ -23,16 +35,16 @@ class N64LibDragonImageProcessor {
         imageJson = Object.assign(defaultArgs, imageJson);
 
         if (imageJson.hslices == 1 && imageJson.vslices == 1) {
-            return this._processImage(imageJson);
+            return this._processImage(imageJson, bundleAssets, assetDirectory);
         } else {
-            return this._processSprite(imageJson);
+            return this._processSprite(imageJson, bundleAssets, assetDirectory);
         }
     }
 
-    async _processImage(imageJson) {
+    async _processImage(imageJson, bundleAssets, assetDirectory) {
         const name = Util.safeDefineName(Object.hasOwn(imageJson, "name") ? imageJson.name : path.basename(imageJson.src, path.extname(imageJson.src)));
         const format = Object.hasOwn(imageJson, "format") ? imageJson.format.toUpperCase() : "RGBA16";
-        const sourcePath = path.join(this._environment.assetDirectory, imageJson.src);
+        const sourcePath = path.join(assetDirectory, imageJson.src);
 
         const imageWriter = new N64LibDragonImageWriter();
         const convertedSpriteFile = await imageWriter.writeLibdragonSprite(sourcePath, format);
@@ -41,13 +53,18 @@ class N64LibDragonImageProcessor {
         const spriteAssetFile = path.join(this._environment.outputDirectory, path.basename(convertedSpriteFile));
         imageWriter.writeImageToPath(convertedSpriteFile, spriteAssetFile);
 
-        return this._environment.assetBundle.addImage(spriteAssetFile, name);
+        // TODO: need to make a struct here that has the id and path returned...
+        if (bundleAssets) {
+            return this._environment.assetBundle.addImage(spriteAssetFile, name);
+        } else {
+            return spriteAssetFile;
+        }
     }
 
-    async _processSprite(imageJson) {
+    async _processSprite(imageJson, bundleAssets, assetDirectory) {
         const name = Util.safeDefineName(Object.hasOwn(imageJson, "name") ? imageJson.name : path.basename(imageJson.src, path.extname(imageJson.src)));
         const format = Object.hasOwn(imageJson, "format") ? imageJson.format.toUpperCase() : "RGBA16";
-        const sourcePath = path.join(this._environment.assetDirectory, imageJson.src);
+        const sourcePath = path.join(assetDirectory, imageJson.src);
         
         // since we use libdragon's OpenGL-like api for sprite rendering we need to break the sprites up into individual textures
         const image = new LibDragonImage();
@@ -64,7 +81,13 @@ class N64LibDragonImageProcessor {
         const spriteAssetFile = path.join(this._environment.outputDirectory, path.basename(sourcePath, path.extname(sourcePath)) + ".sprite");
         imageWriter.writeImageSlicesToPath(libdragonSprites, imageJson.hslices, imageJson.vslices, spriteAssetFile);
 
-        return this._environment.assetBundle.addImage(spriteAssetFile, name);
+        // TODO: need to make a struct here that has the id and path returned...
+        if (bundleAssets) {
+            return this._environment.assetBundle.addImage(spriteAssetFile, name);
+        } else {
+            return spriteAssetFile;
+        }
+        
     }
 }
 

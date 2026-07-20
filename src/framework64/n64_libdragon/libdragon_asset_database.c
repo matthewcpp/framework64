@@ -1,5 +1,6 @@
 #include "libdragon_asset_database.h"
 
+#include "libdragon_font.h"
 #include "libdragon_image.h"
 #include "libdragon_mesh.h"
 
@@ -48,6 +49,20 @@ fw64Image* fw64_assets_load_image(fw64AssetDatabase* asset_database, fw64AssetId
     fw64_assets_close_datasource(asset_database, datasource);
 
     return image;
+}
+
+fw64Font* fw64_assets_load_font(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {
+    fw64DataSource* datasource = fw64_assets_open_datasource(asset_database, asset_id);
+
+    if (!datasource) {
+        return NULL;
+    }
+
+    fw64Font* font = fw64_font_load_from_datasource(datasource, allocator);
+
+    fw64_assets_close_datasource(asset_database, datasource);
+
+    return font;
 }
 
 fw64Mesh* fw64_assets_load_mesh(fw64AssetDatabase* asset_database, fw64AssetId asset_id, fw64Allocator* allocator) {

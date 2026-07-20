@@ -11,5 +11,11 @@
             "hslices": 2,
             "vslices": 2
         }
+    ],
+    "fonts": [
+        {
+            "src": "Consolas.ttf",
+            "size": 12
+        }
     ]
 }

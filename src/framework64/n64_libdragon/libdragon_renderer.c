@@ -19,6 +19,7 @@ static void fw64_renderer_draw_sprite_batches(fw64RenderPass* renderpass) {
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexHalfFixedPrecisionN64(FW64_LIBDRAGON_FRACTIONAL_BITS);

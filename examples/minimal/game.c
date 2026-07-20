@@ -29,6 +29,8 @@ void game_init(Game* game, fw64Engine* engine) {
     game->test_texture3 = fw64_texture_create_from_image(image3, allocator);
 
     fw64_renderpass_set_clear_color(game->renderpass, 8, 200, 10);
+
+    game->font = fw64_assets_load_font(engine->assets, FW64_ASSET_font_Consolas12, allocator);
 }
 
 void game_update(Game* game){
@@ -52,6 +54,8 @@ void game_draw(Game* game) {
 
     fw64_spritebatch_set_color(game->spritebatch, 255, 255, 255, 255);
     fw64_spritebatch_draw_sprite(game->spritebatch, game->test_texture3, 125, 75);
+
+    fw64_spritebatch_draw_string(game->spritebatch, game->font, "hello world", 25, 150);
 
     // fw64_spritebatch_set_color(game->spritebatch, 100, 0, 75, 255);
     // fw64_spritebatch_draw_sprite(game->spritebatch, game->test_texture1, 10, 85);

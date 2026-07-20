@@ -1,7 +1,10 @@
 const Environment = require("../Environment");
 
 const BasicFileProcessor = require("../common/FileProcessor");
+const FontProcessor = require("../common/FontProcessor");
 const N64LibDragonImageProcessor = require("./ImageProcessor");
+const N64LibDragonFont = require("./Font");
+const N64LibDragonFontWriter = require("./FontWriter");
 const N64LibDragonMusicBankProcessor = require("./MusicBankProcessor");
 const N64LibDragonSoundBankProcessor = require("./SoundBankProcessor");
 
@@ -24,7 +27,7 @@ async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory
     const environment = new Environment("n64_libdragon", Environment.Architecture.Arch32, Environment.Endian.Big, dfsAssets, 
         manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
-    const pipelineProcessor = new N64LibdragonPipelineProcessor(environment, pluginMap);
+    const pipelineProcessor = new N64LibDragonPipelineProcessor(environment, pluginMap);
     await pipelineProcessor.process(manifest);
 
     // create the DFS asset bundle and write out the header and manifest
@@ -38,7 +41,7 @@ async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory
     await dfsAssets.makeBundle(dfsDirectory, path.join(outputDirectory, "assets.dfs"));
 }
 
-class N64LibdragonPipelineProcessor extends PipelineProcessor {
+class N64LibDragonPipelineProcessor extends PipelineProcessor {
     constructor(environment, plugins) {
         super(environment);
 
@@ -47,7 +50,18 @@ class N64LibdragonPipelineProcessor extends PipelineProcessor {
         this._soundBankProcessor = new N64LibDragonSoundBankProcessor(environment);
 
         this._imageProcessor = new N64LibDragonImageProcessor(environment);
+        this._fontProcessor = new N64LibDragonFontProcessor(environment, this._imageProcessor);
     }
 }
+
+class N64LibDragonFontProcessor extends FontProcessor {
+    constructor(environment, imageProcessor) {
+        super(environment, imageProcessor, new N64LibDragonFontWriter());
+    }
+
+    _createFont(name) {
+        return new N64LibDragonFont(name);
+    }
+};
 
 module.exports = processN64Libdragon;

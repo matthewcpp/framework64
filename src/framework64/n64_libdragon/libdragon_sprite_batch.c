@@ -1,5 +1,6 @@
 #include "libdragon_sprite_batch.h"
 
+#include "libdragon_font.h"
 #include "libdragon_texture.h"
 #include "libdragon_vertex.h"
 
@@ -248,4 +249,8 @@ void fw64_spritebatch_draw_sprite(fw64SpriteBatch* sprite_batch, fw64Texture* te
 
 void fw64_spritebatch_set_color(fw64SpriteBatch* sprite_batch, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     fw64_color_rgba8_set(&sprite_batch->color, r, g, b, a);
+}
+
+void fw64_spritebatch_draw_string(fw64SpriteBatch* sprite_batch, fw64Font* font, const char* text, int x, int y) {
+    fw64_spritebatch_draw_sprite_slice(sprite_batch, &font->glyph_texture, 0, x, y);
 }
