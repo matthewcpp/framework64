@@ -1,0 +1,26 @@
+{
+    "image": "matthewcpp/framework64_n64_libdragon",
+    /* By mounting the pipeline directory outside of the main workspace, we can use the node modules compiled for the container, not the native host */
+    "mounts": [
+        "source=${localWorkspaceFolder}/pipeline,target=/opt/framework64/pipeline,type=bind",
+        "source=${localWorkspaceFolder}/scripts,target=/opt/framework64/scripts,type=bind"
+    ],
+    "containerEnv":{
+        /* Indicates that the continer is being run by this devcontainer.json. The pipeline will take the binds above into account when searching for certain paths */
+        "FW64_DEV_CONTAINER": "1"
+    },
+    "runArgs": [
+        "--net=host"
+    ],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "extensions.verifySignature": false
+            },
+            "extensions": [
+                "ms-vscode.cmake-tools",
+                "ms-vscode.cpptools"
+            ]
+        }
+    }
+}

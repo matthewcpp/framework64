@@ -58,10 +58,21 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
+            "args":["debug_primitives", "desktop"]
+            //"args":["billboard", "web"]
+        },
+        {
+            "name": "Asset Pipeline - devcontainer",
+            "type": "node",
+            "program": "/opt/framework64/scripts/PrepareExampleAssets.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/opt/framework64",
             // "args":["shading_modes", "n64_libultra"]
             "args":["minimal", "n64_libdragon"]
-            //"args":["debug_primitives", "desktop"]
-            //"args":["billboard", "web"]
         },
         {
             "name": "GDB Debug Rom",
