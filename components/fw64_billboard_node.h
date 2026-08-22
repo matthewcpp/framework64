@@ -20,7 +20,9 @@ extern "C" {
 #endif
 
 void fw64_billboard_nodes_init(fw64BillboardNodes* system, fw64Allocator* allocator);
+void fw64_billboard_nodes_uninit(fw64BillboardNodes* system);
 fw64BillboardNode* fw64_billboard_nodes_create(fw64BillboardNodes* system, fw64Node* node, fw64Camera* camera, fw64BillboardNodeHandle* out_handle);
+int fw64_billboard_nodes_remove(fw64BillboardNodes* system, fw64BillboardNodeHandle handle);
 void fw64_billboard_nodes_update(fw64BillboardNodes* system);
 
 #ifdef __cplusplus
