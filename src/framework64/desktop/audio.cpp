@@ -4,6 +4,9 @@
 
 #include <SDL2/SDL_mixer.h>
 
+#include <cassert>
+#include <fstream>
+
 bool fw64Audio::loadSoundBankAsset(fw64AssetDatabase* asset_database, fw64AssetId asset_id) {
     auto asset_path = asset_database->getAssetPath(asset_id);
     if (asset_path.empty() || asset_path == sound_bank_path) {
@@ -13,45 +16,42 @@ bool fw64Audio::loadSoundBankAsset(fw64AssetDatabase* asset_database, fw64AssetI
     unloadSoundBank();
 
     auto bank_info_path = asset_path / "info.soundbank";
-    framework64::FileDataSource datasource;
-    if (!datasource.open(bank_info_path)) {
+    std::ifstream info_file(bank_info_path);
+    if (!info_file) {
         return false;
     }
 
     sound_bank_path = std::move(asset_path);
-
-    uint32_t sound_count;
-    fw64_data_source_read(&datasource.interface, &sound_count, sizeof(uint32_t), 1);
-    
-
-    current_sounds.resize(sound_count, nullptr);
-    for (size_t i = 0; i < current_sounds.size(); i++) {
-        auto sound_path = sound_bank_path / (std::to_string(i) + ".ogg");
+    std::string line;
+    while (std::getline(info_file, line)) {
+        auto sound_path = sound_bank_path / line;
 
         auto* sound_effect = Mix_LoadWAV(sound_path.string().c_str());
+        assert(sound_effect);
 
         if (!sound_effect) {
             unloadSoundBank();
             return false;
         }
 
-        current_sounds[i] = sound_effect;
+        current_sounds.emplace_back(sound_effect);
     }
+
     return true;
 }
 
 void fw64Audio::unloadSoundBank() {
     for (const auto sound_effect : current_sounds) {
-        if (sound_effect)
-            Mix_FreeChunk(sound_effect);
+        Mix_FreeChunk(sound_effect);
     }
 
-    current_sounds.resize(0);
+    current_sounds.clear();
 }
 
 int fw64Audio::playSound(uint32_t sound_num) {
-    if (sound_num >= current_sounds.size())
+    if (sound_num >= current_sounds.size()){
         return -1;
+    }
 
     return Mix_PlayChannel(-1, current_sounds[sound_num], 0);
 }

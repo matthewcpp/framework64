@@ -33,16 +33,16 @@ class DesktopSoundBankProcessor {
             }
 
             const srcFile = path.join(sourceDir, fileName);
-            const destFile = path.join(destDir, soundBankFiles.length.toString() + ext);
+            const destFile = path.join(destDir, fileName);
             fs.copyFileSync(srcFile, destFile);
             soundBankFiles.push(srcFile);
         }
 
-        const infoBuffer = Buffer.alloc(4);
-        infoBuffer.writeUint32LE(soundBankFiles.length, 0);
         const infoFilePath = path.join(destDir, "info.soundbank");
         const infoFile = fs.openSync(infoFilePath, "w");
-        fs.writeSync(infoFile, infoBuffer);
+        for (const soundBankFile of soundBankFiles) {
+            fs.writeSync(infoFile, path.basename(soundBankFile) + '\n');
+        }
         fs.closeSync(infoFile)
 
         this._environment.assetBundle.addSoundBank(destDirName, soundBankName);
