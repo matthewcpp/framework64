@@ -29,10 +29,17 @@ class DesktopMusicBankProcessor {
             const file = files[i];
             const ext = path.extname(file);
 
-            const destFile = `${musicBankFiles.length}.ogg`;  path.join(destDir, );
+            const destFile = `${musicBankFiles.length}.ogg`;
 
             if (DesktopMusicBankProcessor.midiFileExtensions.has(ext)) {
-                await this._convertMidiToOgg(sourceDir, file, destDir, destFile);
+                // check if there is a valid alternative audio file we can use in lieu of converting the midi
+                const sourceFile = path.join(sourceDir, file);
+                const alternativeAudioPath = path.join(path.dirname(sourceFile), `${path.basename(sourceFile, path.extname(sourceFile))}.ogg`);
+                if (fs.existsSync(alternativeAudioPath)) {
+                    console.log(`${file}: using alternative file: ${path.basename(alternativeAudioPath)}`);
+                } else {
+                    await this._convertMidiToOgg(sourceDir, file, destDir, destFile);
+                }
             }
             else if (ext === ".ogg") {
                 const sourceFilePath = path.join(sourceDir, file);
