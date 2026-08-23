@@ -3,6 +3,10 @@
 #include "framework64/node.h"
 
 void fw64_mesh_instance_update(fw64MeshInstance* mesh_instance) {
+    if (!mesh_instance->mesh) {
+        return;
+    }
+
     Box mesh_bounding = fw64_mesh_get_bounding_box(mesh_instance->mesh);
     matrix_transform_box(mesh_instance->node->transform.world_matrix, &mesh_bounding, &mesh_instance->render_bounds);
 
@@ -21,6 +25,10 @@ void fw64_mesh_instance_init(fw64MeshInstance* mesh_instance, fw64Node* node, fw
 void fw64_mesh_instance_set_mesh(fw64MeshInstance* mesh_instance, fw64Mesh* mesh) {
     // TODO: need to deal /w skinned mesh?
     mesh_instance->mesh = mesh;
-    mesh_instance->materials = fw64_mesh_get_material_collection(mesh);
-    fw64_mesh_instance_update(mesh_instance);
+    if (mesh) {
+        mesh_instance->materials = fw64_mesh_get_material_collection(mesh);
+        fw64_mesh_instance_update(mesh_instance);
+    } else {
+        mesh_instance->materials = NULL;
+    }
 }
