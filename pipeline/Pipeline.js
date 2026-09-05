@@ -3,6 +3,7 @@
 const runInDocker = require("./RunInDocker");
 const Util = require("./Util");
 const Environment = require("./Environment");
+const Plugins = require("./Plugins");
 
 const rimraf = require("rimraf");
 
@@ -36,7 +37,7 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
         rimraf.sync(outputDirectory);
     }
 
-    const pluginMap = loadPlugins(pluginManifest);
+    const plugins = loadPlugins(pluginManifest);
 
     // ensure that required asset folders are setup for downstream processors
     const assetIncludeDirectory = Util.assetIncludeDirectory(outputDirectory);
@@ -45,25 +46,25 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
     switch (platform) {
         case "n64_libultra": {
             const processN64 = require("./n64_libultra/Process");
-            await processN64(manifestFile, assetDirectory, outputDirectory, pluginMap);
+            await processN64(manifestFile, assetDirectory, outputDirectory, plugins);
             break;
         }
 
         case "n64_libdragon":
             const processN64Libdragon = require("./n64_libdragon/Process");
-            await processN64Libdragon(manifestFile, assetDirectory, outputDirectory, pluginMap);
+            await processN64Libdragon(manifestFile, assetDirectory, outputDirectory, plugins);
             break;
 
         case "desktop":{
             const processDesktop = require("./desktop/Process").processDesktop;
-            await processDesktop(manifestFile, assetDirectory, outputDirectory, pluginMap);
+            await processDesktop(manifestFile, assetDirectory, outputDirectory, plugins);
             break;
         }
 
         case "web":{
             // note: right now only support 32 bit wasm is supported.
             const processWeb = require("./web/Process");
-            await processWeb(manifestFile, assetDirectory, outputDirectory, pluginMap);
+            await processWeb(manifestFile, assetDirectory, outputDirectory, plugins);
             break;
         }
 
@@ -73,10 +74,10 @@ async function prepareAssets(manifestFile, assetDirectory, platform, outputDirec
 }
 
 function loadPlugins(pluginManifestPath) {
-    const pluginMap = new Map();
+    const plugins = new Plugins();
 
     if (!pluginManifestPath) {
-        return pluginMap;
+        return plugins;
     }
 
     pluginManifestPath = path.resolve(pluginManifestPath);
@@ -85,49 +86,9 @@ function loadPlugins(pluginManifestPath) {
         throw new Error(`Plugin manifest does not exist: ${pluginManifestPath}`);
     }
 
-    const pluginManifest = JSON.parse(fse.readFileSync(pluginManifestPath, {encoding: "utf8"}));
-    const manifestDir = path.dirname(pluginManifestPath);
+    plugins.load(pluginManifestPath);
 
-    if (!Object.hasOwn(pluginManifest, "plugins")) {
-        return pluginMap;
-    }
-
-    for (let i = 0; i < pluginManifest.plugins.length; i++) {
-        const plugInfo = pluginManifest.plugins[i];
-
-        if (!Object.hasOwn(plugInfo, "src")) {
-            throw new Error(`Plugin ${i} does not specify a 'src' attribute`);
-        }
-
-        if (!Object.hasOwn(plugInfo, "extensions") || plugInfo.extensions.length === 0) {
-            throw new Error(`Plugin does not declare any file extensions to process: ${plugInfo.src}`);
-        }
-
-        const pluginPath = path.join(manifestDir, plugInfo.src);
-        if (!fse.existsSync(pluginPath)) {
-            throw new Error(`Plugin does not exist: ${pluginPath}`);
-        }
-
-        const pluginClass = require(pluginPath);
-
-        if (typeof(pluginClass) !== "function") {
-            throw new Error(`Plugin script should export a single class: ${plugInfo.src}`);
-        }
-
-        const pluginInstance = new pluginClass();
-
-        for (const extension of plugInfo.extensions) {
-            if (pluginMap.has(extension)) {
-                throw new Error(`Multiple plugins registered for extension: ${extension}`)
-            }
-
-            pluginMap.set(extension, pluginInstance);
-        }
-
-        console.log(`Loaded plugin: ${plugInfo.src}`);
-    }
-
-    return pluginMap;
+    return plugins;
 }
 
 module.exports = {

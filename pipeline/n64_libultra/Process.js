@@ -20,7 +20,7 @@ const fs = require("fs")
 const path = require("path");
 
 
-async function processN64(manifestFile, assetDirectory, outputDirectory, pluginMap) {
+async function processN64(manifestFile, assetDirectory, outputDirectory, plugins) {
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
     const archive = new N64LibUltraAssetBundle(outputDirectory);
@@ -28,7 +28,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
     const environment = new Environment("n64_libultra", Environment.Architecture.Arch32, Environment.Endian.Big, archive, 
         manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
-    const pipelineProcessor = new N64LibUltraPipelineProcessor(environment, pluginMap);
+    const pipelineProcessor = new N64LibUltraPipelineProcessor(environment, plugins);
     await pipelineProcessor.process(manifest);
 
     archive.writeHeader(path.join(includeDirectory, "assets.h"));
@@ -38,7 +38,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, pluginM
 
 class N64LibUltraPipelineProcessor extends PipelineProcessor {
     constructor(environment, plugins) {
-        super(environment);
+        super(environment, plugins);
 
         this._fileProcessor = new BasicFileProcessor(environment, plugins);
         this._musicBankProcessor = new N64LibUltraMusicBankProcessor(environment);
