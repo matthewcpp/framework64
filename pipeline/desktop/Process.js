@@ -32,6 +32,7 @@ async function runPipelineProcessor(manifestFile, assetDirectory, outputDirector
     const environment = new Environment(platform, arch, Environment.Endian.Little, 
         bundle, manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
+    await plugins.initialize(environment);
     const desktopPipelineProcessor = new DesktopPipelineProcessor(environment, plugins);
     await desktopPipelineProcessor.process(manifest);
 

@@ -5,11 +5,24 @@ class Plugins {
     filePlugins;
     assetPlugins;
 
+    _environment;
+
     _manifestDir;
 
-    constructor() {
+    constructor(environment) {
+        this._environment = environment;
+
         this.filePlugins = new Map();
         this.assetPlugins = [];
+    }
+
+    /// TODO: unify with plugin loading
+    async initialize(environment){
+        for (const plugin of this.assetPlugins) {
+            if (typeof plugin.initialize === "function") {
+                await plugin.initialize(environment);
+            }
+        }
     }
 
     async postProcessFont(fontJson) {

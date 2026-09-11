@@ -28,6 +28,7 @@ async function processN64(manifestFile, assetDirectory, outputDirectory, plugins
     const environment = new Environment("n64_libultra", Environment.Architecture.Arch32, Environment.Endian.Big, archive, 
         manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
+    await plugins.initialize(environment);
     const pipelineProcessor = new N64LibUltraPipelineProcessor(environment, plugins);
     await pipelineProcessor.process(manifest);
 
