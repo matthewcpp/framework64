@@ -45,13 +45,6 @@ private:
     void drawSpriteBatch(fw64SpriteBatch* spritebatch);
     void drawMeshesFromQueue(fw64RenderPass* renderpass, fw64ShadingMode index);
     void drawRenderPass(fw64RenderPass* renderpass);
-    
-
-public:
-    void setFogEnabled(bool enabled);
-    [[nodiscard]] inline bool fogEnabled() const { return fog_enabled; }
-    void setFogPositions(float fog_min, float fog_max);
-    void setFogColor(float r, float g, float b);
 
 private:     
     void updateMeshTransformBlock(float* matrix);
@@ -73,6 +66,7 @@ private:
         float max_distance = std::numeric_limits<float>::max();
         float camera_near;
         float camera_far;
+        float enabled = 0.0f;
     };
 
 private:
@@ -93,10 +87,6 @@ private:
 
     std::array<float, 16> view_matrix, projection_matrix, view_projection_matrix;
     framework64::ShaderProgram* active_shader = nullptr;
-
-    float fog_min_distance = 0.4f;
-    float fog_max_distance = 0.8f;
-    bool fog_enabled = false;
 
 public:
     fw64Material sprite_material;
