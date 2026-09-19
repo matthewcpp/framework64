@@ -10,6 +10,7 @@ class DesktopMusicBankProcessor {
     _environment;
 
     static midiFileExtensions = new Set([".mid", ".midi"]);
+    static midiAlternateExtension = ".desktop_ogg";
 
     constructor(environment) {
         this._environment = environment;
@@ -34,21 +35,29 @@ class DesktopMusicBankProcessor {
             if (DesktopMusicBankProcessor.midiFileExtensions.has(ext)) {
                 // check if there is a valid alternative audio file we can use in lieu of converting the midi
                 const sourceFile = path.join(sourceDir, file);
-                const alternativeAudioPath = path.join(path.dirname(sourceFile), `${path.basename(sourceFile, path.extname(sourceFile))}.ogg`);
+                const alternativeAudioFileName = path.basename(sourceFile, path.extname(sourceFile)) + DesktopMusicBankProcessor.midiAlternateExtension;
+                const alternativeAudioPath = path.join(path.dirname(sourceFile), alternativeAudioFileName);
+
+                // if a desktop alternative is present, no need to convert, simply copy it over
                 if (fs.existsSync(alternativeAudioPath)) {
-                    console.log(`${file}: using alternative file: ${path.basename(alternativeAudioPath)}`);
+                    console.log(`Musicbank ${musicBankName}: ${file}: using desktop alternative file: ${path.basename(alternativeAudioPath)}`);
+                    const destFilePath = path.join(destDir, destFile);
+                    fs.copyFileSync(alternativeAudioPath, destFilePath);
                 } else {
                     await this._convertMidiToOgg(sourceDir, file, destDir, destFile);
                 }
             }
+            // if the music file is already in ogg format then no conversion is needed, just a copy to the destination
             else if (ext === ".ogg") {
                 const sourceFilePath = path.join(sourceDir, file);
                 const destFilePath = path.join(destDir, destFile);
-
                 fs.copyFileSync(sourceFilePath, destFilePath);
             }
             else {
-                console.log(`Musicbank ${musicBankName} Warning: skipping file with unsupported extension: ${file}.`);
+                if (ext !== DesktopMusicBankProcessor.midiAlternateExtension) {
+                    console.log(`Musicbank ${musicBankName} Warning: skipping file with unsupported extension: ${file}.`);
+                }
+
                 continue;
             }
             
