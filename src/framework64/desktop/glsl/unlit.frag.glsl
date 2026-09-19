@@ -18,13 +18,12 @@ layout(std140) uniform fw64FogData {
 };
 
 /** Computes the amount of fog color to mix into the final pixel color. 
-    The value is based on the normalized distance of the fragment between the near and far plane.
-    This attempts to approximate the fog algorithm for n64_libultra. 
+    The value is based on the non-linear depth distance between the near and far plane
+    This attempts to approximate the fog algorithm for n64_libultra.
 */
 float fw64_get_fog_factor() {
-    float linearDepth = 1.0 / gl_FragCoord.w; // note: this is in actual units
-    float normalizedDepth = (linearDepth - fw64_fog_cam_near) / (fw64_fog_cam_far - fw64_fog_cam_near);
-    return clamp((normalizedDepth - fw64_fog_min) / (fw64_fog_max - fw64_fog_min), 0.0, 1.0) * fw64_fog_enabled;
+    float fog_value = gl_FragCoord.z - fw64_fog_min;
+    return clamp(fog_value / (fw64_fog_max - fw64_fog_min), 0.0, 1.0) * fw64_fog_enabled;
 }
 
 #ifdef FW64_DIFFUSE_TEXTURE

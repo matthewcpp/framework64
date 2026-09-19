@@ -149,15 +149,17 @@ static void ui_update_spritebatch(Ui* ui) {
     fw64_spritebatch_draw_string(ui->spritebatch, ui->font, text, pos_x, pos_y);
     pos_y += line_height;
 
-    sprintf(text, "Begin: %0.1f", ui->fog_settings->begin);
+    sprintf(text, "Begin: %0.3f", ui->fog_settings->begin);
     fw64_spritebatch_draw_string(ui->spritebatch, ui->font, text, pos_x, pos_y);
     pos_y += line_height;
 
-    sprintf(text, "End: %0.1f", ui->fog_settings->end);
+    sprintf(text, "End: %0.3f", ui->fog_settings->end);
     fw64_spritebatch_draw_string(ui->spritebatch, ui->font, text, pos_x, pos_y);
 
     fw64_spritebatch_end(ui->spritebatch);
 }
+
+#define FOG_DELTA_AMOUNT 0.025f
 
 static void ui_update_active_setting(Ui* ui, float direction) {
     switch(ui->active_setting) {
@@ -166,11 +168,11 @@ static void ui_update_active_setting(Ui* ui, float direction) {
             break;
 
         case FOG_SETTING_FOG_BEGIN: 
-            ui->fog_settings->begin = fw64_clamp(ui->fog_settings->begin + 0.1f * direction, 0, ui->fog_settings->end - 0.1f);
+            ui->fog_settings->begin = fw64_clamp(ui->fog_settings->begin + FOG_DELTA_AMOUNT * direction, 0, ui->fog_settings->end - FOG_DELTA_AMOUNT);
             break;
 
         case FOG_SETTING_FOG_END: 
-            ui->fog_settings->end = fw64_clamp(ui->fog_settings->end + 0.1f * direction, ui->fog_settings->begin + 0.1f, 1.0f);
+            ui->fog_settings->end = fw64_clamp(ui->fog_settings->end + FOG_DELTA_AMOUNT * direction, ui->fog_settings->begin + FOG_DELTA_AMOUNT, 1.0f);
             break;
     }
 
@@ -219,7 +221,7 @@ void ui_draw(Ui* ui) {
 static void fog_settings_init(FogSettings* settings, fw64Renderer* renderer, fw64RenderPass* renderpass) {
     settings->enabled = 1;
     fw64_color_rgba8_set(&settings->color, 51, 187, 255, 255);
-    settings->begin = 0.5;
+    settings->begin = 0.8;
     settings->end = 1.0;
     settings->renderer = renderer;
     settings->renderpass = renderpass;

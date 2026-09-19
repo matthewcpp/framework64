@@ -57,10 +57,14 @@ void fw64_renderpass_draw_static_mesh(fw64RenderPass* renderpass, fw64MeshInstan
 void fw64_renderpass_draw_skinned_mesh(fw64RenderPass* renderpass, fw64SkinnedMeshInstance* skinned_mesh_instance);
 
 void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled);
+
 /**
  * Sets the min and max positions of fog.
- * The values for min / max should be values in the range [0.0, 1.0]
- * A values of 0.0 is on the near plane, while 1.0 is on the far plane.
+ * The values for min / max should be in the range [0.0, 1.0]
+ * A value of 0.0 is on the near plane, while 1.0 is on the far plane.
+ * This function mimics n64 libultra implementation. These values scale non-linearly against 
+ * the Z-buffer. Depth precision is heavily compressed near the camera, meaning 
+ * small value changes near 0.0 will have a much larger visual impact than changes near 1.0.
  */ 
 void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min, float fog_max);
 void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_t g, uint8_t b);

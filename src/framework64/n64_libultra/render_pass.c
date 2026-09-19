@@ -149,12 +149,13 @@ void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled) {
  * The N64 Fog Algorithm is not totally clear.
  * This implementation attempts to provide a reasonable approximation of how I think it should work.
  * Note that a crash has been observed if fog_min == fog_max
+ * The desktop version of this fuction provides assertions on the input parameters
  */
 void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min, float fog_max) {
-    renderpass->fog_min = (s32)fw64_clamp(900.0f + (fog_min * 100.0f), 0.0f, 1000.0f);
-    renderpass->fog_max = (s32)fw64_clamp(900.0f + (fog_max * 100.0f), 0.0f, 1000.0f);
+    renderpass->fog_min = (s32)(fog_min * 1000.0f);
+    renderpass->fog_max = (s32)(fog_max * 1000.0f);
 
-    if (renderpass->fog_min == renderpass->fog_max) {
+    if (renderpass->fog_max - renderpass->fog_min < 8 ) {
         renderpass->fog_min = renderpass->fog_max - 8;
     }
 }
