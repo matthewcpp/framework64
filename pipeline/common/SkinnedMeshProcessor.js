@@ -56,6 +56,8 @@ class GltfSkinnedMeshProcessor {
             await SkinnedMeshWriter.write(this._environment, mesh, animationData, destFilePath, includeFilePath, this._meshWriter);
             this._environment.assetBundle.addSkinnedMesh(destFilePath, meshName);
         }
+
+        return gltfLoader;
     }
 };
 

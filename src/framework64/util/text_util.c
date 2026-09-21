@@ -10,3 +10,9 @@ IVec2 fw64_text_util_center_string(fw64Font* font, const char* str, const IVec2*
 
     return centered_pos;
 }
+
+int fw64_text_util_horizontal_center_string(fw64Font* font, const char* str, int width) {
+    IVec2 text_measurement = fw64_font_measure_text(font, str);
+
+    return (width / 2) - (text_measurement.x / 2);
+}

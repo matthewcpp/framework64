@@ -8,27 +8,22 @@ layout(std140) uniform fw64MeshTransformData {
     mat4 fw64_normal_matrix;
 };
 
-// TODO: these values should represent 0...1 between near and far plane
-// TODO: https://community.khronos.org/t/plane-intersection-on-the-fragment-shader/77283
-#define FW64_FOG_MIN_DIST 0
-#define FW64_FOG_MAX_DIST 1
-#define FW64_CAMERA_NEAR 2
-#define FW64_CAMERA_FAR 3
-
 layout(std140) uniform fw64FogData {
     vec4 fw64_fog_color;
-    vec4 fw64_fog_distances;
+    float fw64_fog_min;
+    float fw64_fog_max;
+    float fw64_fog_cam_near;
+    float fw64_fog_cam_far;
+    float fw64_fog_enabled;
 };
 
-float fw64_get_fog_factor(float d) {
-    float fog_min_distance = fw64_fog_distances[FW64_FOG_MIN_DIST];
-    float fog_max_distance = fw64_fog_distances[FW64_FOG_MAX_DIST];
-    float camera_near = fw64_fog_distances[FW64_CAMERA_NEAR];
-    float camera_far = fw64_fog_distances[FW64_CAMERA_FAR];
-
-    float cam_t = (d - camera_near) / (camera_far - camera_near);
-
-    return smoothstep(fog_min_distance, fog_max_distance, cam_t);
+/** Computes the amount of fog color to mix into the final pixel color. 
+    The value is based on the non-linear depth distance between the near and far plane
+    This attempts to approximate the fog algorithm for n64_libultra.
+*/
+float fw64_get_fog_factor() {
+    float fog_value = gl_FragCoord.z - fw64_fog_min;
+    return clamp(fog_value / (fw64_fog_max - fw64_fog_min), 0.0, 1.0) * fw64_fog_enabled;
 }
 
 #ifdef FW64_DIFFUSE_TEXTURE
@@ -55,8 +50,7 @@ void main() {
     final_color = unlit_color;
 #endif
 
-    float fragment_distance_to_camera =  gl_FragCoord.z / gl_FragCoord.w;
-    final_color = mix(final_color, fw64_fog_color, fw64_get_fog_factor(fragment_distance_to_camera));
+    final_color = mix(final_color, fw64_fog_color, fw64_get_fog_factor());
 
     if (final_color.a == 0.0)
         discard;

@@ -66,7 +66,8 @@ class N64LibUltraMusicBankProcessor {
             fs.writeSync(musicBankFile, fs.readFileSync(sbkFilePath));
             fs.closeSync(musicBankFile);
 
-            const files = fs.readdirSync(sourceDir);
+            // currently libultra music bank processor only will handle files with .mid extension
+            const files = fs.readdirSync(sourceDir).filter(file => file.endsWith(".mid"));
             AudioHeader.writeMusicBankHeader(files, name, this._environment.includeDirectory);
 
             await this._environment.assetBundle.addMusicBank(musicBankPath, name);

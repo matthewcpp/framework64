@@ -1,10 +1,16 @@
 {
     "version": 1,
-    "plugins": [
+    "filePlugins": [
         {
             "src": "ProcessMondrian.js",
             "description": "creates a binary represention of a json file describing a mondrian like image",
             "extensions": [".json"]
+        }
+    ],
+    "assetPlugins": [
+        {
+            "src": "AssetPlugin.js",
+            "description": "Shows how to hook into asset post processing"
         }
     ]
 }

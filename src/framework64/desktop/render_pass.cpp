@@ -121,13 +121,13 @@ void fw64_renderpass_set_anti_aliasing_enabled(fw64RenderPass* renderpass, int e
 }
 
 void fw64_renderpass_set_fog_enabled(fw64RenderPass* renderpass, int enabled) {
-    renderpass->fog_enabled = static_cast<bool>(enabled);
+    renderpass->fog_enabled = enabled == 0 ? 0.0f : 1.0f;
 }
 
 void fw64_renderpass_set_fog_positions(fw64RenderPass* renderpass, float fog_min, float fog_max) {
     assert( fog_min >= 0.0f && fog_min <= 1.0f &&
         fog_max >= 0.0f && fog_max <= 1.0f &&
-        fog_max >= fog_min);
+        fog_max > fog_min);
 
     renderpass->fog_begin = fog_min;
     renderpass->fog_end = fog_max;
@@ -137,6 +137,7 @@ void fw64_renderpass_set_fog_color(fw64RenderPass* renderpass, uint8_t r, uint8_
     renderpass->fog_color[0] = r / 255.0f;
     renderpass->fog_color[1] = g / 255.0f;
     renderpass->fog_color[2] = b / 255.0f;
+    // note Fog Alpha is always 1.0 (set in initialization)
 }
 
 void fw64_renderpass_set_light_enabled(fw64RenderPass* renderpass, int index, int enabled) {

@@ -165,8 +165,6 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
 
     setViewport(&renderpass->viewport);
     setViewMatrices(renderpass->projection_matrix.data(), renderpass->view_matrix.data());
-    fog_data_uniform_block.data.camera_near = renderpass->camera_near;
-    fog_data_uniform_block.data.camera_far = renderpass->camera_far;
 
     if (renderpass->depth_testing_enabled) {
         glEnable(GL_DEPTH_TEST);
@@ -176,8 +174,12 @@ void fw64Renderer::drawRenderPass(fw64RenderPass* renderpass) {
 
     glDepthMask(renderpass->depth_writing_enabled);
 
-    setFogColor(renderpass->fog_color[0], renderpass->fog_color[1], renderpass->fog_color[2]);
-    setFogEnabled(renderpass->fog_enabled);
+    fog_data_uniform_block.data.enabled = renderpass->fog_enabled;
+    fog_data_uniform_block.data.camera_near = renderpass->camera_near;
+    fog_data_uniform_block.data.camera_far = renderpass->camera_far;
+    fog_data_uniform_block.data.fog_color = renderpass->fog_color;
+    fog_data_uniform_block.data.min_distance = renderpass->fog_begin;
+    fog_data_uniform_block.data.max_distance = renderpass->fog_end;
     fog_data_uniform_block.update();
 
     if (fw64_render_queue_has_items(&renderpass->render_queue, FW64_SHADING_MODE_LIT) || 
@@ -252,14 +254,17 @@ void fw64Renderer::setActiveShader(framework64::ShaderProgram* shader) {
 
         glUseProgram(active_shader->handle);
 
-        if (active_shader->lighting_data_uniform_block_index != GL_INVALID_INDEX)
+        if (active_shader->lighting_data_uniform_block_index != GL_INVALID_INDEX) {
             glUniformBlockBinding(active_shader->handle, active_shader->lighting_data_uniform_block_index, lighting_data_uniform_block.binding_index);
+        }
 
-        if (active_shader->mesh_transform_uniform_block_index != GL_INVALID_INDEX)
+        if (active_shader->mesh_transform_uniform_block_index != GL_INVALID_INDEX) {
             glUniformBlockBinding(active_shader->handle, active_shader->mesh_transform_uniform_block_index, mesh_transform_uniform_block.binding_index);
+        }
 
-        if (active_shader->fog_uniform_block_index != GL_INVALID_INDEX)
+        if (active_shader->fog_uniform_block_index != GL_INVALID_INDEX) {
             glUniformBlockBinding(active_shader->handle, active_shader->fog_uniform_block_index, fog_data_uniform_block.binding_index);
+        }
     }
 }
 
@@ -287,29 +292,6 @@ void fw64Renderer::updateLightingBlock(const LightingInfo& lighting_info) {
 
     lighting_data_uniform_block.data.light_count[0] = block_index;
     lighting_data_uniform_block.update();
-}
-
-void fw64Renderer::setFogEnabled(bool enabled) {
-    fog_enabled = enabled;
-
-    if (enabled) {
-        setFogPositions(fog_min_distance, fog_max_distance);
-    } else {
-        setFogPositions(std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-    }
-}
-
-void fw64Renderer::setFogPositions(float fog_min, float fog_max) {
-    fog_min_distance = fog_min;
-    fog_max_distance = fog_max;
-    fog_data_uniform_block.data.min_distance = fog_min;
-    fog_data_uniform_block.data.max_distance = fog_max;
-}
-
-void fw64Renderer::setFogColor(float r, float g, float b) {
-    fog_data_uniform_block.data.fog_color[0] = r;
-    fog_data_uniform_block.data.fog_color[1] = g;
-    fog_data_uniform_block.data.fog_color[2] = b;
 }
 
 void fw64Renderer::submitRenderpass(fw64RenderPass* renderpass) {

@@ -4,6 +4,10 @@ void fw64_billboard_nodes_init(fw64BillboardNodes* system, fw64Allocator* alloca
     fw64_sparse_set_init(&system->components, sizeof(fw64BillboardNode), allocator);
 }
 
+void fw64_billboard_nodes_uninit(fw64BillboardNodes* system) {
+    fw64_sparse_set_uninit(&system->components);
+}
+
 fw64BillboardNode* fw64_billboard_nodes_create(fw64BillboardNodes* system, fw64Node* node, fw64Camera* camera, fw64BillboardNodeHandle* out_handle) {
     fw64BillboardNodeHandle handle;
     fw64BillboardNode* billboard_node = (fw64BillboardNode*)fw64_sparse_set_alloc(&system->components, &handle);
@@ -16,6 +20,10 @@ fw64BillboardNode* fw64_billboard_nodes_create(fw64BillboardNodes* system, fw64N
     }
 
     return billboard_node;
+}
+
+int fw64_billboard_nodes_remove(fw64BillboardNodes* system, fw64BillboardNodeHandle handle) {
+    return fw64_sparse_set_delete(&system->components, handle);
 }
 
 void fw64_billboard_nodes_update(fw64BillboardNodes* system) {

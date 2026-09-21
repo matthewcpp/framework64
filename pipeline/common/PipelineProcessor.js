@@ -16,9 +16,11 @@ class PipelineProcessor {
     _musicBankProcessor;
     _skinnedMeshProcessor;
     _soundBankProcessor;
+    _plugins;
 
-    constructor(_environment) {
+    constructor(_environment, plugins) {
         this._environment = _environment;
+        this._plugins = plugins;
     }
 
     async process(manifest) {
@@ -49,6 +51,7 @@ class PipelineProcessor {
                 }
                 
                 await this._fontProcessor.process(font);
+                await this._plugins.postProcessFont(font);
             }
         }
 
@@ -56,7 +59,8 @@ class PipelineProcessor {
             for (const mesh of manifest.meshes) {
                 this._checkRequiredFields("mesh", mesh, ["src"]);
                 console.log(`Processing Mesh: ${mesh.src}`)
-                await this._meshProcessor.process(mesh);
+                const meshData = await this._meshProcessor.process(mesh);
+                await this._plugins.postProcessMesh(mesh, meshData);
             }
         }
 
@@ -64,7 +68,9 @@ class PipelineProcessor {
             for (const skinnedMesh of manifest.skinnedMeshes) {
                 this._checkRequiredFields("skinnedMesh", skinnedMesh, ["src"]);
                 console.log(`Processing Skinned Mesh: ${skinnedMesh.src}`);
-                await this._skinnedMeshProcessor.process(skinnedMesh);
+                const meshData = await this._skinnedMeshProcessor.process(skinnedMesh);
+                await this._plugins.postProcessSkinnedMesh(skinnedMesh, meshData);
+                
             }
         }
 

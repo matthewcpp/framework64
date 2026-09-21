@@ -37,6 +37,8 @@ class GltfMeshProcessor {
         await this._meshWriter.writeStaticMesh(this._environment, staticMesh, destPath);
 
         this._environment.assetBundle.addMesh(assetFileName, meshName);
+
+        return gltfLoader;
     }
 };
 

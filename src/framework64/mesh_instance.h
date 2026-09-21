@@ -12,7 +12,7 @@
 
 typedef enum {
     FW64_MESH_INSTANCE_FLAG_NONE,
-    FW64_MESH_INSTANCE_FLAG_SKINNED
+    FW64_MESH_INSTANCE_FLAG_SKINNED = 1
 } fw64MeshInstanceFlags;
 
 typedef struct fw64Node fw64Node;
@@ -38,6 +38,8 @@ void fw64_mesh_instance_set_mesh(fw64MeshInstance* mesh_instance, fw64Mesh* mesh
 
 #define fw64_mesh_instance_get_material_collection(mesh_instance) ((mesh_instance)->materials)
 #define fw64_mesh_instance_set_material_collection(mesh_instance, material_collection) (mesh_instance)->materials = (material_collection)
+
+#define fw64_mesh_instance_is_skinned(mesh_instance) ((mesh_instance)->flags & FW64_MESH_INSTANCE_FLAG_SKINNED)
 
 #ifdef __cplusplus
 }

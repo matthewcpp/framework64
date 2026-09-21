@@ -14,8 +14,8 @@ class BasicFileProcessor {
         const ext = path.extname(fileJson.src);
 
         // if we have a plugin that can process this file then defer to the plugin, otherwise just copy it over
-        if (this._plugins.has(ext)) {
-            const plugin = this._plugins.get(ext);
+        if (this._plugins.filePlugins.has(ext)) {
+            const plugin = this._plugins.filePlugins.get(ext);
             await plugin.process(fileJson, this._environment);
         }
         else {

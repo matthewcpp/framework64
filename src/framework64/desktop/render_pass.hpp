@@ -62,10 +62,10 @@ public:
     fw64RenderQueue render_queue;
     LightingInfo lighting_info;
 
-    std::array<float, 3> fog_color = {0.6f, 0.6f, 0.6f};
+    std::array<float, 4> fog_color = {0.6f, 0.6f, 0.6f, 1.0f};
     float fog_begin = 0.5;
     float fog_end = 1.0f;
-    bool fog_enabled = 0;
+    float fog_enabled = 0.0f;
     bool depth_testing_enabled = true;
     bool depth_writing_enabled = true;
     bool anti_aliasing_enabled = true;
