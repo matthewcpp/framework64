@@ -1,5 +1,6 @@
 const AnimationParser = require("../animation/Parser");
 const GLTFLoader = require("../gltf/GLTFLoader");
+const loadGltf = require("../gltf/LoadGltf")
 const MaterialBundle = require("../gltf/MaterialBundle");
 const SkinnedMeshWriter = require("./SkinnedMeshWriter");
 const Util = require("../Util");
@@ -19,8 +20,7 @@ class GltfSkinnedMeshProcessor {
     async process(skinnedMesh) {
         const srcPath = path.join(this._environment.assetDirectory, skinnedMesh.src);
 
-        const gltfLoader = new GLTFLoader();
-        await gltfLoader.loadFile(srcPath);
+        const gltfLoader = await loadGltf(skinnedMesh, this._environment);
 
         if (gltfLoader.meshes.length === 0) {
             throw new Error(`glTF File: ${srcPath} contains no meshes`);

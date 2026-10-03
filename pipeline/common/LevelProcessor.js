@@ -20,7 +20,7 @@ class GltfLevelProcessor {
     async process(level, layerMap) {
         const srcPath = path.join(this._environment.assetDirectory, level.src);
         const levelParser = new LevelParser();
-        await levelParser.parse(srcPath, layerMap);
+        await levelParser.parse(level, layerMap, this._environment);
 
         if (Object.hasOwn(level, "collisionGeometry") && level.collisionGeometry === true) {
             if (!Object.hasOwn(level, "grid")) {

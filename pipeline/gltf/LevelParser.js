@@ -2,6 +2,7 @@ const CollisionGeometry = require("./CollisionGeometry");
 const Bounding = require("./Bounding");
 const GLTFLoader = require("./GLTFLoader");
 const GLTFUtil = require("./GLTFUtil");
+const loadGltf = require("./LoadGltf")
 const MaterialBundle = require("./MaterialBundle");
 const N64Node = require("./Node");
 const Scene = require("./Scene");
@@ -18,11 +19,11 @@ class LevelParser {
 
     _meshes = [];
 
-    async parse(gltfPath, layerMap) {
+    async parse(levelJson, layerMap, environment) {
         this._reset();
 
         this.layerMap = layerMap;
-        await this.gltfData.loadFile(gltfPath);
+        this.gltfData = await loadGltf(levelJson, environment);
 
         const gltf = this.gltfData.gltf;
 
@@ -301,7 +302,7 @@ class LevelParser {
     }
 
     _reset() {
-        this.gltfData = new GLTFLoader();
+        this.gltfData = null
         this.scenes = [];
         this.layerMap = null;
     }

@@ -1,6 +1,6 @@
 const MaterialBundle = require("../gltf/MaterialBundle");
 const GLTFLoader = require("../gltf/GLTFLoader");
-const MeshWriter = require("../desktop/MeshWriter");
+const loadGltf = require("../gltf/LoadGltf")
 const MeshCustomBounding = require("../gltf/MeshCustomBounding");
 
 const path = require("path");
@@ -16,8 +16,7 @@ class GltfMeshProcessor {
 
     async process(meshJson) {
         const srcPath = path.join(this._environment.assetDirectory, meshJson.src);
-        const gltfLoader = new GLTFLoader();
-        await gltfLoader.loadFile(srcPath);
+        const gltfLoader = await loadGltf(meshJson, this._environment);
 
         if (!gltfLoader.gltf.meshes || gltfLoader.gltf.meshes.length === 0) {
             throw new Error(`glTF File: ${gltfPath} contains no meshes`);
