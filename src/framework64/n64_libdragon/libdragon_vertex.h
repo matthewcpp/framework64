@@ -2,14 +2,19 @@
 
 #include <stdint.h>
 
+/** Tex coords from 0..1 in S10.5 fixed point format */
+typedef struct {
+    /** S10.5 fixed point format */
+    int16_t s, t;
+} fw64LibdragonTexCoord;
+
 #if 1
 /** Vertex format used for drawing sprites */
 typedef struct {
     /** S10.5 fixed point format */
     int16_t pos[3];
     int16_t flag;
-    /** S10.5 fixed point format */
-    int16_t tex_coord[2];
+    fw64LibdragonTexCoord tex_coord[2];
     uint8_t color[4];
 } Fw64LibdragonSpriteVertex;
 #else

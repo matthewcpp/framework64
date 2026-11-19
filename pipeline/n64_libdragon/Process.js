@@ -17,7 +17,7 @@ const fse = require("fs-extra");
 const path = require("path");
 const PipelineProcessor = require("../common/PipelineProcessor");
 
-async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory, pluginMap) {
+async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory, plugins) {
     console.log(`n64_libdragon build assets: ${outputDirectory}`);
     const manifest = JSON.parse(fs.readFileSync(manifestFile, "utf8"));
     const includeDirectory = Util.assetIncludeDirectory(outputDirectory);
@@ -27,7 +27,8 @@ async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory
     const environment = new Environment("n64_libdragon", Environment.Architecture.Arch32, Environment.Endian.Big, dfsAssets, 
         manifestFile, assetDirectory, outputDirectory, includeDirectory, pipelinePath);
 
-    const pipelineProcessor = new N64LibDragonPipelineProcessor(environment, pluginMap);
+    await plugins.initialize(environment);
+    const pipelineProcessor = new N64LibDragonPipelineProcessor(environment, plugins);
     await pipelineProcessor.process(manifest);
 
     // create the DFS asset bundle and write out the header and manifest
@@ -43,7 +44,7 @@ async function processN64Libdragon(manifestFile, assetDirectory, outputDirectory
 
 class N64LibDragonPipelineProcessor extends PipelineProcessor {
     constructor(environment, plugins) {
-        super(environment);
+        super(environment, plugins);
 
         this._fileProcessor = new BasicFileProcessor(environment, plugins);
         this._musicBankProcessor = new N64LibDragonMusicBankProcessor(environment);

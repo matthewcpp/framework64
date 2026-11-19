@@ -6,16 +6,20 @@ fw64Font* fw64_font_load_from_datasource(fw64DataSource* data_source, fw64Alloca
 
     fw64_data_source_read(data_source, &font->info, sizeof(fw64LibDragonFontInfo), 1);
     
-    // TODO: this should probably be updated when textures are fleshed out
-    font->glyph_texture.image = fw64_allocator_malloc(allocator, sizeof(fw64Image));
-    if (!fw64_libdragon_image_init_from_datasource(font->glyph_texture.image, data_source, allocator)) {
+    
+    fw64Image* image = fw64_allocator_malloc(allocator, sizeof(fw64Image));
+    if (!fw64_libdragon_image_init_from_datasource(image, data_source, allocator)) {
         fw64_allocator_free(allocator, font);
         return NULL;
     }
+    // TODO: this should probably be updated when textures are fleshed out
+    font->glyph_texture.image = image;
 
-    font->glyphs = fw64_allocator_malloc(allocator, sizeof(fw64LibDragonFontGlyph) * font->info.glyph_count);
-    fw64_data_source_read(data_source, font->glyphs, sizeof(fw64LibDragonFontGlyph), font->info.glyph_count);
-
+    font->glyphs = fw64_allocator_malloc(allocator, sizeof(fw64FontGlyph) * font->info.glyph_count);
+    fw64_data_source_read(data_source, font->glyphs, sizeof(fw64FontGlyph), font->info.glyph_count);
+    
+    font->textcoord_lookup = fw64_allocator_malloc(allocator, sizeof(fw64LibdragonTexCoord) * font->info.glyphs_per_slice * 4);
+    fw64_data_source_read(data_source, font->textcoord_lookup, sizeof(fw64LibdragonTexCoord), font->info.glyphs_per_slice * 4);
     return font;
 }
 
@@ -25,6 +29,7 @@ void fw64_font_delete(fw64AssetDatabase* assets, fw64Font* font, fw64Allocator* 
     fw64_libdragon_image_uninit(font->glyph_texture.image, allocator);
     fw64_allocator_free(allocator, font->glyph_texture.image);
     fw64_allocator_free(allocator, font->glyphs);
+    fw64_allocator_free(allocator, font->textcoord_lookup);
     fw64_allocator_free(allocator, font);
 }
 
@@ -36,11 +41,11 @@ int fw64_font_line_height(fw64Font* font) {
     return font->info.line_height;
 }
 
-static uint16_t find_font_glyph_rec(fw64LibDragonFontGlyph* glyphs, int min_index, int max_index, uint32_t codepoint) {
+static uint16_t find_font_glyph_rec(fw64FontGlyph* glyphs, int min_index, int max_index, uint32_t codepoint) {
     uint32_t center_index = min_index + (max_index - min_index) / 2;
     if (min_index > max_index) return UINT16_MAX;
 
-    fw64LibDragonFontGlyph* center_glyph = glyphs + center_index;
+    fw64FontGlyph* center_glyph = glyphs + center_index;
 
     if (center_glyph->codepoint == codepoint) {
         return center_index;

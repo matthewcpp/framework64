@@ -2,7 +2,6 @@
 
 #include "libdragon_font.h"
 #include "libdragon_texture.h"
-#include "libdragon_vertex.h"
 
 #include <string.h>
 
@@ -78,10 +77,9 @@ void fw64_spritebatch_end(fw64SpriteBatch* spritebatch) {
     (void)spritebatch;
 }
 
-void fw64_spritebatch_draw_sprite_slice(fw64SpriteBatch* spritebatch, fw64Texture* texture, int frame, int x, int y) {
-    fw64SpriteBatchTexureId id = {{texture, (uint32_t)frame}};
+static void _fw64_libdragon_spritebatch_draw_sprite_slice(fw64SpriteBatch* spritebatch, fw64Texture* texture, int frame, const fw64LibdragonTexCoord* tex_coords, int x, int y, int width, int height) {
+fw64SpriteBatchTexureId id = {{texture, (uint32_t)frame}};
     fw64SpriteBatchLayer* layer = spritebatch->layers + spritebatch->active_layer;
-    fw64LibdragonSpriteSlice* slice = texture->image->sprites + frame;
 
     uint32_t texture_index = INVALID_BATCH_INDEX;
     if (fw64_dynamic_vector_size(&layer->batches) > 0) {
@@ -112,34 +110,31 @@ void fw64_spritebatch_draw_sprite_slice(fw64SpriteBatch* spritebatch, fw64Textur
         chunk = batch_texture->last;
     }
 
-    int width = slice->sprite->width;
-    int height = slice->sprite->height;
-
     Fw64LibdragonSpriteVertex v0 = {
         {(x + width) << FW64_LIBDRAGON_FRACTIONAL_BITS, (y + height) << FW64_LIBDRAGON_FRACTIONAL_BITS, 0},
         0,
-        {1 << FW64_LIBDRAGON_FRACTIONAL_BITS, 1 << FW64_LIBDRAGON_FRACTIONAL_BITS},
+        {tex_coords[0]}, //{1 << FW64_LIBDRAGON_FRACTIONAL_BITS, 1 << FW64_LIBDRAGON_FRACTIONAL_BITS},
         {spritebatch->color.r, spritebatch->color.g, spritebatch->color.b, spritebatch->color.a}
     };
 
     Fw64LibdragonSpriteVertex v1 = {
         {x << FW64_LIBDRAGON_FRACTIONAL_BITS, (y + height) << FW64_LIBDRAGON_FRACTIONAL_BITS, 0},
         0,
-        {0, 1 << FW64_LIBDRAGON_FRACTIONAL_BITS},
+        {tex_coords[1]}, //{0, 1 << FW64_LIBDRAGON_FRACTIONAL_BITS},
         {spritebatch->color.r, spritebatch->color.g, spritebatch->color.b, spritebatch->color.a}
     };
 
     Fw64LibdragonSpriteVertex v2 = {
         {x << FW64_LIBDRAGON_FRACTIONAL_BITS, y << FW64_LIBDRAGON_FRACTIONAL_BITS, 0},
         0,
-        {0, 0},
+        {tex_coords[2]}, //{0, 0},
         {spritebatch->color.r, spritebatch->color.g, spritebatch->color.b, spritebatch->color.a}
     };
 
     Fw64LibdragonSpriteVertex v3 = {
         {(x + width) << FW64_LIBDRAGON_FRACTIONAL_BITS, y << FW64_LIBDRAGON_FRACTIONAL_BITS, 0},
         0,
-        {1 << FW64_LIBDRAGON_FRACTIONAL_BITS, 0},
+        {tex_coords[3]}, //{1 << FW64_LIBDRAGON_FRACTIONAL_BITS, 0},
         {spritebatch->color.r, spritebatch->color.g, spritebatch->color.b, spritebatch->color.a}
     };
 
@@ -150,6 +145,19 @@ void fw64_spritebatch_draw_sprite_slice(fw64SpriteBatch* spritebatch, fw64Textur
     fw64_static_vector_push_back(&chunk->vertices, &v0);
     fw64_static_vector_push_back(&chunk->vertices, &v2);
     fw64_static_vector_push_back(&chunk->vertices, &v3);
+}
+
+static const fw64LibdragonTexCoord sprite_tex_coords[4] = {
+    {1 << FW64_LIBDRAGON_FRACTIONAL_BITS, 1 << FW64_LIBDRAGON_FRACTIONAL_BITS},
+    {0, 1 << FW64_LIBDRAGON_FRACTIONAL_BITS},
+    {0, 0},
+    {1 << FW64_LIBDRAGON_FRACTIONAL_BITS, 0}
+};
+
+
+void fw64_spritebatch_draw_sprite_slice(fw64SpriteBatch* spritebatch, fw64Texture* texture, int frame, int x, int y) {
+    fw64LibdragonSpriteSlice* slice = texture->image->sprites + frame;
+    _fw64_libdragon_spritebatch_draw_sprite_slice(spritebatch, texture, frame, sprite_tex_coords, x, y, slice->sprite->width, slice->sprite->height);
 }
 
 // https://rosettacode.org/wiki/Sorting_algorithms/Insertion_sort#C
@@ -244,7 +252,6 @@ void fw64_spritebatch_draw_sprite(fw64SpriteBatch* sprite_batch, fw64Texture* te
         x = x_start;
         y += vstride;
     }
-    
 }
 
 void fw64_spritebatch_set_color(fw64SpriteBatch* sprite_batch, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -252,5 +259,31 @@ void fw64_spritebatch_set_color(fw64SpriteBatch* sprite_batch, uint8_t r, uint8_
 }
 
 void fw64_spritebatch_draw_string(fw64SpriteBatch* sprite_batch, fw64Font* font, const char* text, int x, int y) {
-    fw64_spritebatch_draw_sprite_slice(sprite_batch, &font->glyph_texture, 0, x, y);
+    fw64_spritebatch_draw_string_count(sprite_batch, font, text, UINT32_MAX, x, y);
+}
+
+void fw64_spritebatch_draw_string_count(fw64SpriteBatch* sprite_batch, fw64Font* font, const char* text, uint32_t count, int x, int y) {
+    if (!text || text[0] == 0) return;
+    
+    char ch = text[0];
+    uint16_t glyph_index = fw64_libdragon_font_get_glyph_index(font, ch);
+    fw64FontGlyph* glyph = font->glyphs + glyph_index;
+    fw64Texture* texture = &font->glyph_texture;
+
+    int caret = x + glyph->left;
+
+    for (uint32_t i = 0; i < count && ch != 0; i++) {
+        glyph_index = fw64_libdragon_font_get_glyph_index(font, ch);
+        glyph = font->glyphs + glyph_index;
+
+        int draw_pos_x = caret + glyph->left;
+        int draw_pos_y = y + glyph->top;
+
+        const fw64LibdragonTexCoord* tex_coords = font->textcoord_lookup + glyph->index * 4;
+        _fw64_libdragon_spritebatch_draw_sprite_slice(sprite_batch, texture, glyph->frame, tex_coords, draw_pos_x, draw_pos_y, 16, 16);
+
+        caret += glyph->advance;
+        text++;
+        ch = text[0];
+    }
 }
